@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Classic NES Series: Castlevania",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "classic-nes-series-castlevania",
+    file = "classic-nes-series-castlevania.zip",
+    hashes = {
+      { hash = "1f90a64fb3b26abee5ff9284fe628758", label = "Classic NES Series - Castlevania (USA).gba" },
+      { hash = "d6496e67cdbe8a13e509c374014ede7c", label = "Classic NES Series - Castlevania (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X7228, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X722A, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="0 lives in game" },
+        { address=0X722A, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 life in game" },
+        { address=0X722A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X722A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+      health = {
+        { address=0X7245, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] player health decreased" },
+        { address=0X7245, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] player health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X7264, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] sub weapon upgrade" },
+        { address=0X735B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8Bit] Current equiped subweapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X79FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] [8bit] Current score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X73A9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] boss hp" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X721E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8Bit] Demo Timer" },
+        { address=0X7242, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16Bit] stage timer" },
+        { address=0X7244, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8Bit] Health timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,155 @@
+return {
+  game = {
+    title = "Sonic Adventure 2: Battle",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "sonic-adventure-2-battle",
+    file = "sonic-adventure-2-battle.zip",
+    hashes = {
+      { hash = "67b57d1203865fa1defb6cc7a4b9ab71", label = "Sonic Adventure 2 - Battle (USA) (En,Ja,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1CC169, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="MISC : Demo to Play" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CC1AA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ENGINE : Stage Clear Flag" },
+        { address=0X1F52FC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kart Race - Beginner Course - Clear Flag" },
+        { address=0X1F5309, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kart Race - Standard Course - Clear Flag" },
+        { address=0X1F5316, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kart Race - Expert Course - Clear Flag" },
+        { address=0X1F5564, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Race - Beginner Race - Clear Flag" },
+        { address=0X1F5565, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Race - Jewel Races - Clear Flag" },
+        { address=0X1F5566, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Race - Challenge Race - Clear Flag" },
+        { address=0X1F5567, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Race - Hero Race - Clear Flag" },
+        { address=0X1F5568, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Race - Dark Race - Clear Flag" },
+        { address=0X1F5571, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Karate - Beginner Level - Clear Flag" },
+        { address=0X1F5572, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Karate - Standard Level - Clear Flag" },
+        { address=0X1F5573, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Karate - Expert Level - Clear Flag" },
+        { address=0X1F5574, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chao Karate - Super Level - Clear Flag" },
+        { address=0X1F57D3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hero Story Cleared Flag" },
+        { address=0X1F57D4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Dark Story Cleared Flag" },
+        { address=0X1F57D5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Last Story Cleared Flag" },
+        { address=0X1F57D6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Boss Attack Cleared Flag (Hero)" },
+        { address=0X1F57D7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Boss Attack Cleared Flag (Dark)" },
+        { address=0X1F57D8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Boss Attack Cleared Flag (All)" },
+        { address=0X14BB687, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Menu Theme Background" },
+      },
+      zone = {
+        { address=0X1F5569, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chao World - Unlock Flag (Sonic)" },
+        { address=0X1F556A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chao World - Unlock Flag (Shadow)" },
+        { address=0X1F556D, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chao World - Unlock Flag (Knuckles)" },
+        { address=0X1F556E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chao World - Unlock Flag (Rouge)" },
+        { address=0X1F556F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chao World - Unlock Flag (Tails)" },
+        { address=0X1F5570, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chao World - Unlock Flag (Dr. Eggman)" },
+      },
+      stage = {
+        { address=0X3AD820, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage [16-bit BE]" },
+        { address=0X133F2A3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE : Aquatic Mine - Water Level" },
+        { address=0X14BAAFF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mission/Character Select Flag (Stage Select)" },
+        { address=0X14BAB0D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Currently Selected Mission (Stage Select)" },
+        { address=0X14BAB10, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Currently Selected Stage (Stage Select)" },
+        { address=0X1510D4B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action Stage Song Selection Menu Flag (Sound Test)" },
+        { address=0X1510D58, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Selected Song in Sound Test (Action Stage)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1CC175, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="HUD : Lives HUD Visibility Flag increased" },
+        { address=0X1CC175, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="HUD : Lives HUD Visibility Flag decreased" },
+        { address=0X1CC1CC, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="PLAYER : Lives [16-bit BE] increased" },
+        { address=0X1CC1CC, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="PLAYER : Lives [16-bit BE] decreased" },
+        { address=0X1F369C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="RANK : Death Chamber - Mission 1" },
+        { address=0X1F369D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="RANK : Death Chamber - Mission 2" },
+        { address=0X1F369E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="RANK : Death Chamber - Mission 3" },
+        { address=0X1F369F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="RANK : Death Chamber - Mission 4" },
+        { address=0X1F36A0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="RANK : Death Chamber - Mission 5" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1E50CE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="UPGRADES : Treasure Scope Unlock Flag" },
+      },
+      weapon = {
+        { address=0X1F2CA8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="RANK : Weapons Bed - Mission 1" },
+        { address=0X1F2CA9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="RANK : Weapons Bed - Mission 2" },
+        { address=0X1F2CAA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="RANK : Weapons Bed - Mission 3" },
+        { address=0X1F2CAB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="RANK : Weapons Bed - Mission 4" },
+        { address=0X1F2CAC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="RANK : Weapons Bed - Mission 5" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1CC1F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="PLAYER : Score [32-bit BE]" },
+        { address=0X1F2D80, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="City Escape - Mission 1 - Best Score [32-bit BE]" },
+      },
+      collectibles = {
+        { address=0X1CC176, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="HUD : Rings HUD Visibility Flag increased" },
+        { address=0X1CC1D0, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="PLAYER : Rings [16-bit BE] increased" },
+        { address=0X1CC204, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="PLAYER : Total Rings [32-bit BE] increased" },
+        { address=0X1E50B7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="UPGRADES : Flame Ring (Sonic) Unlock Flag increased" },
+        { address=0X1E50C6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="UPGRADES : Flame Ring (Shadow) Unlock Flag increased" },
+        { address=0X1F2D7C, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="City Escape - Mission 1 - Best Rings [16-bit BE] increased" },
+        { address=0X1F5AEA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Wild Canyon - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F5CDA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Green Forest - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F5D4A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Cannon's Core - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F5EEA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Final Chase - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F5F5A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Street - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F5F8A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Aquatic Mine - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F5FCA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="City Escape - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F60EA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Radical Highway (Mission 5) - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F631A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sky Rail - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F65CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Metal Harbor - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F665A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Egg Quarters - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F677A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Crazy Gadget - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F686A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Final Rush - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6AAA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Iron Gate - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6B0A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lost Colony (Mission 5) - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6B0A, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Lost Colony (Mission 5) - Gold Beetle - Existence Flag [Bit7] empty" },
+        { address=0X1F6BBA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Crazy Gadget (Mission 5) - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6C0A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sand Ocean - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6C4A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hidden Base - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6C8A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dry Lagoon - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6CCA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="White Jungle - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6D0A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Meteor Herd - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F6E5A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Security Hall - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F703A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Street (Mission 5) - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F728A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Pyramid Cave - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F734A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Radical Highway - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F736A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Prison Lane (Mission 5) - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F747A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Prison Lane - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F751A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Pyramid Cave (Mission 5) - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F759A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Eternal Engine - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F75EA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="City Escape (Mission 5) - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F7A8A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Death Chamber - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F7AEA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Cosmic Wall - Gold Beetle - Existence Flag [Bit7] increased" },
+        { address=0X1F7C5A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mad Space - Gold Beetle - Existence Flag [Bit7] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X14BB5CB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Selected Boss Attack (Boss Attack Menu)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1F5F9A, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="DESTRUCTIBLE : Eternal Engine : Door #2 [Bit7]" },
+        { address=0X1F72FA, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="DESTRUCTIBLE : Eternal Engine : Door #1 [Bit7]" },
+        { address=0X1F730A, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="DESTRUCTIBLE : Eternal Engine : Door #4 [Bit7]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X150F67E, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Title Screen Timer [16-bit BE]" },
+      },
+    },
+  },
+}

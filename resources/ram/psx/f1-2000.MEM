@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "F1 2000",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "f1-2000",
+    file = "f1-2000.zip",
+    hashes = {
+      { hash = "6c9b090fc615a965cbbdcdb620b0000b", label = "F1 2000 (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X1465A4, type="u8", condition="eq", value=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="HIght Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1465A0, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X1465A0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Main Menu Selection" },
+      },
+    },
+  },
+}

@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Hudson Selection Vol. 2: Star Soldier",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "hudson-selection-vol-2-star-soldier",
+    file = "hudson-selection-vol-2-star-soldier.zip",
+    hashes = {
+      { hash = "1b3575c4d085897e6b8c9e3362ca666c", label = "Hudson Selection Vol. 2 - Star Soldier (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18C857, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X18C857, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X18C857, type="u8", condition="eq", value=0X0B, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue screen" },
+        { address=0X18C857, type="u8", condition="eq", value=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="High Scores (Attract Mode)" },
+        { address=0X18C857, type="u8", condition="eq", value=0X1B, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X18F753, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shield Level" },
+        { address=0X18F759, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power Level" },
+        { address=0X1EBDBA, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Final Stage complete. Goes back to 0 after starting a game mode" },
+      },
+      stage = {
+        { address=0X18C85B, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X18C85F, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2 Minutes Mode" },
+        { address=0X18C85F, type="u8", condition="eq", value=0X11, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="5 Minutes Mode" },
+        { address=0X18C85F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X18C86F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X18C87B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Omake Menu: Stage Select Option Selected" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X18C867, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Player (Starting Lives)" },
+        { address=0X18F744, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [16-bit BE] increased" },
+        { address=0X18F744, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [16-bit BE] decreased" },
+        { address=0X18F78E, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ship explodes. Active at Death to crash" },
+        { address=0X1EC052, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stage Progress [16-bit BE] increased" },
+        { address=0X1EC052, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage Progress [16-bit BE] decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X18F78E, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Laser power-up" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X18C857, type="u8", condition="eq", value=0X11, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores (from main menu)" },
+        { address=0X18C857, type="u8", condition="eq", value=0X12, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores (name entry)" },
+        { address=0X18C85B, type="u8", condition="eq", value=0X03, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+        { address=0X18C86B, type="u8", condition="eq", value=0X00, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores: Normal Game" },
+        { address=0X18C86B, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores: 2 Minutes Mode" },
+        { address=0X18C86B, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores: 5 Minutes Mode" },
+        { address=0X1EBDFC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32-bit BE]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X18C87B, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss on Parade" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X18F74C, type="u16be", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility Timer [16-bit BE]" },
+      },
+    },
+  },
+}

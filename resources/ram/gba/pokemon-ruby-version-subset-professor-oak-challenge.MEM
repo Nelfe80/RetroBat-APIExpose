@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Pokémon Ruby Version [Subset - Professor Oak Challenge]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "pokemon-ruby-version-subset-professor-oak-challenge",
+    file = "pokemon-ruby-version-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "5eea818df4dc59b2991d57b77844b884", label = "Pokemon - Ruby Version [Subset - Professor Oak Challenge].gba" },
+      { hash = "c62c3386c3c49dcde7a678dce2b2d0e8", label = "Pokemon - Ruby Version (Rev 1) [Subset - Professor Oak Challenge].gba" },
+    }
+  },
+
+  events = {
+  },
+}

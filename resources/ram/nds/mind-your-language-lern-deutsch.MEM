@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Mind Your Language: Lern Deutsch!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "mind-your-language-lern-deutsch",
+    file = "mind-your-language-lern-deutsch.zip",
+    hashes = {
+      { hash = "770013dd842ca90c92448e1aba7e7f24", label = "Mind Your Language - Lern Deutsch! (Europe) (En,Fr,De,Es,It) [b].nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XEA318, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="ein (Level 2)" },
+        { address=0XEA31A, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="ein (Level 3)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Zool: Ninja of the Nth Dimension",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "zool-ninja-of-the-nth-dimension",
+    file = "zool-ninja-of-the-nth-dimension.zip",
+    hashes = {
+      { hash = "1425bc943f215cba23f1ec8c4bc22bbc", label = "Zool - Ninja of the 'Nth' Dimension (Europe).gb" },
+      { hash = "52700ea227c3a31f170ccbc6a052a7a8", label = "Zool - Ninja of the 'Nth' Dimension (USA).gb" },
+    }
+  },
+
+  events = {
+  },
+}

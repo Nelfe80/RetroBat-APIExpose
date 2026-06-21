@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Solatorobo: Red the Hunter",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure, Platform, Role-Playing"
+  },
+
+  rom = {
+    name = "solatorobo-red-the-hunter",
+    file = "solatorobo-red-the-hunter.zip",
+    hashes = {
+      { hash = "1ca7cd467a7da09d860e3921c595c0d5", label = "Solatorobo - Red the Hunter (USA) (En,Fr,De,Es,It) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X231641, type="u8", condition="bit_true", bit=7, mask=0X80, action="COMBO_HIT", no_log=false, no_survey=false, desc="40. Combos" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2310FA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X23163D, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="7. Level Up" },
+        { address=0X3FFFFC, type="u8", condition="eq", value=0X0C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X3FFFFC, type="u8", condition="eq", value=0X0D, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+      },
+      zone = {
+        { address=0X2316D4, type="u8", condition="eq", value=0X14, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Airedale: Wonders Of The World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X23163D, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="4. Life Gauge" },
+        { address=0X2316BC, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Papion" },
+        { address=0X2316D4, type="u8", condition="eq", value=0X3F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Duel Ship: Flaming Death Match" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2316D4, type="u8", condition="eq", value=0X0A, action="TREASURE", no_log=false, no_survey=false, desc="Spinon: Friend's Lost Treasure" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2316C8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Quest Points (not instant updated)" },
+        { address=0X2316F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tune Points" },
+        { address=0X2316F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Fishing Points" },
+      },
+      collectibles = {
+        { address=0X2310EC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Rings Earned increased" },
+        { address=0X231100, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+        { address=0X23167E, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="31. Gold Golden Roar (unlocked)" },
+        { address=0X23167E, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="31. Gold Golden Roar (bought)" },
+        { address=0X23167E, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="31. Gold Golden Roar (need to compose x% songs)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2316D4, type="u8", condition="eq", value=0X32, action="BOSS_HIT", no_log=false, no_survey=false, desc="Golden Roar: Boss Battle Part 1" },
+        { address=0X2316D4, type="u8", condition="eq", value=0X33, action="BOSS_HIT", no_log=false, no_survey=false, desc="Golden Roar: Boss Battle Part 2" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X23163D, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="1. Movement and Jumping" },
+        { address=0X231674, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="6. Air In Airedale (unlocked)" },
+        { address=0X231675, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="6. Air In Airedale (bought)" },
+        { address=0X231675, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="6. Air In Airedale (need to compose x% songs)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2310F6, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Total Broken Objects" },
+        { address=0X23169B, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="33. Destroy All (unlocked)" },
+        { address=0X23169B, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="33. Destroy All (bought)" },
+        { address=0X2316BE, type="u8", condition="eq", value=0X07, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Chapter 7: The Door... Opens" },
+        { address=0X2316D4, type="u8", condition="eq", value=0X1A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Vizsla: Broken Bug Flute" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2316BE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Chapter (not instant updated)" },
+      },
+    },
+  },
+}

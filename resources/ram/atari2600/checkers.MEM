@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Checkers",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Board Game, Strategy"
+  },
+
+  rom = {
+    name = "checkers",
+    file = "checkers.zip",
+    hashes = {
+      { hash = "3f5a43602f960ede330cd2f43a25139e", label = "Checkers (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

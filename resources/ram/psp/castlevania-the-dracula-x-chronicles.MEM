@@ -1,0 +1,138 @@
+return {
+  game = {
+    title = "Castlevania: The Dracula X Chronicles",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "castlevania-the-dracula-x-chronicles",
+    file = "castlevania-the-dracula-x-chronicles.zip",
+    hashes = {
+      { hash = "59b37df8ade6d7020391eb96a5acd549", label = "Castlevania - The Dracula X Chronicles (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11CF415, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Card" },
+        { address=0X11CF418, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="N Demon Card" },
+        { address=0X11FC440, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      events = {
+        { address=0X11E23AA, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Id of item/combo was used" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X11FC440, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="During 'Level Up' animation and others;" },
+        { address=0X1234838, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b0 - Heart Underground Cavern top" },
+        { address=0X123483B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b0 - HP Underground Caverns Holy Symbol" },
+      },
+      stage = {
+        { address=0XCF7281, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rondo Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCF728D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Rondo Lives increased" },
+        { address=0XCF728D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rondo Lives decreased" },
+      },
+      health = {
+        { address=0XBF8B28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Current decreased" },
+        { address=0XBF8B28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Current increased" },
+        { address=0XBF8B29, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0XBF8B29, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0XBF9A28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Chronicles E decreased" },
+        { address=0XBF9A28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Chronicles E increased" },
+        { address=0XBF9A29, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP Chronicles E decreased" },
+        { address=0XBF9A29, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP Chronicles E increased" },
+        { address=0XCF7298, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rondo HP E decreased" },
+        { address=0XCF7298, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rondo HP E increased" },
+        { address=0X11CF63C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X11CF63C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X11E45BE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maria HP decreased" },
+        { address=0X11E45BE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maria HP increased" },
+        { address=0X11E517E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Scylla HP decreased" },
+        { address=0X11E517E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Scylla HP increased" },
+        { address=0X11E68FE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shaft orb HP decreased" },
+        { address=0X11E68FE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shaft orb HP increased" },
+        { address=0X1234830, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b0 - HP Castle Center decreased" },
+        { address=0X1234830, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b0 - HP Castle Center increased" },
+        { address=0X1234831, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b0 - HP Castle Center decreased" },
+        { address=0X1234831, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b0 - HP Castle Center increased" },
+        { address=0X1234837, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b0 - HP Entrance 1st room decreased" },
+        { address=0X1234837, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b0 - HP Entrance 1st room increased" },
+        { address=0X1234841, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b1 - HP Catacombs decreased" },
+        { address=0X1234841, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b1 - HP Catacombs increased" },
+        { address=0X1234844, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b4- HP Royal Chappel decreased" },
+        { address=0X1234844, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b4- HP Royal Chappel increased" },
+        { address=0X123484D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b5 - HP Castle Keep decreased" },
+        { address=0X123484D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b5 - HP Castle Keep increased" },
+        { address=0X1234857, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b3 - HP Reverse Center decreased" },
+        { address=0X1234857, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b3 - HP Reverse Center increased" },
+        { address=0X1234860, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b0 - HP Reverse Olrox decreased" },
+        { address=0X1234860, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b0 - HP Reverse Olrox increased" },
+        { address=0X1234864, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b0 - HP Reverse Entrance decreased" },
+        { address=0X1234864, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b0 - HP Reverse Entrance increased" },
+        { address=0X1234868, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b4 - HP Reverse Caves decreased" },
+        { address=0X1234868, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b4 - HP Reverse Caves increased" },
+        { address=0X1234870, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b1 - HP Reverse Catacombs decreased" },
+        { address=0X1234870, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b1 - HP Reverse Catacombs increased" },
+        { address=0X1234871, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b0 - HP Reverse Catacombs decreased" },
+        { address=0X1234871, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b0 - HP Reverse Catacombs increased" },
+        { address=0X1234874, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b4 - HP Anti-Chapel decreased" },
+        { address=0X1234874, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b4 - HP Anti-Chapel increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XBF8B2C, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Sub Weapon" },
+        { address=0XBF9A2C, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Sub Weapon Chronicles E" },
+        { address=0XCF7283, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Rondo Sub Weapon" },
+        { address=0XCF7293, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Rondo Weapon E" },
+        { address=0X11CF698, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Sub Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X11CF41C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring of Vlad increased" },
+        { address=0X11CF516, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring of Ares increased" },
+        { address=0X11CF517, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Golden Ring increased" },
+        { address=0X11CF518, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Silver Ring increased" },
+        { address=0X11CF519, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring of Varda increased" },
+        { address=0X12347A4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b0 - HP Librarian increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XBF9A44, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Can be used for boss rush" },
+        { address=0XBF9A7C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+        { address=0XC8AF00, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Maybe can be useful for boss rush" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X11CF42A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Rod" },
+        { address=0X11CF437, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Alucard Shield" },
+        { address=0X1234867, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="b0 - Alucard Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1234780, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch regular castle" },
+        { address=0X1234788, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Reverse" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11CEF1C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Death timeflag" },
+        { address=0X11CEF30, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lesser Demon timeflag" },
+        { address=0X1234852, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="b2 - HP Clock Tower" },
+        { address=0X123488C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="b1 - HP Reverse Clock" },
+      },
+    },
+  },
+}

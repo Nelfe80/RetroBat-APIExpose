@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Yumimi Mix Remix",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "yumimi-mix-remix",
+    file = "yumimi-mix-remix.zip",
+    hashes = {
+      { hash = "4fdfd379ec1c91a9d0829a3724477fa9", label = "Yumimi Mix Remix (Japan) (En) (v1.0) (Supper)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X160590, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X147006, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in Yumimi Puzzle" },
+      },
+    },
+  },
+}

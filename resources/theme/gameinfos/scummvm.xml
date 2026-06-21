@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${white}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Left Mouse Button</text>
+			<color>${gray}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Right Mouse Button</text>
+			<color>${black}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>Esc</text>
+			<color>${black}</color>
+		</text>
+		<text name="button4" extra="true">
+			<text>.</text>
+			<color>${black}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Enter</text>
+			<color>${black}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Numpad 5</text>
+			<color>${black}</color>
+		</text>
+		<text name="button7" extra="true">
+			<text>Backspace</text>
+			<color>${black}</color>
+		</text>
+		<text name="button8" extra="true">
+			<text>Cursor Fine Control</text>
+			<color>${black}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>F1</text>
+			<color>${black}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>ScummVM GUI</text>
+			<color>${black}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

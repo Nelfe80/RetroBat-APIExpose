@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "GT Advance 3: Pro Concept Racing",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "gt-advance-3-pro-concept-racing",
+    file = "gt-advance-3-pro-concept-racing.zip",
+    hashes = {
+      { hash = "df7b1d5fb2f71445497feabf7babb8ef", label = "GT Advance 3 - Pro Concept Racing (Europe).gba" },
+      { hash = "c283484d8f35b059bbff9e4d852c5420", label = "GT Advance 3 - Pro Concept Racing (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0267, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 for Demo" },
+        { address=0X58BE, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="bit4+bit5 = Pause" },
+      },
+      events = {
+        { address=0X0458, type="u8", condition="eq", value=0X04, action="COMBO_HIT", no_log=false, no_survey=false, desc="Drift-Combo;" },
+        { address=0X58B4, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Max Combo" },
+        { address=0X5B4A, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Max Combo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X17A6, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nissan STAGEA NM35 car available" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1780, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[2-bit each] Medals. 00 = None, 01 = Bronze, 02 = Silver, 03 = Gold increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0458, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack;" },
+        { address=0X27F8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra Mode Quick Race or Time Attack" },
+        { address=0X5898, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-bit Timer" },
+        { address=0X5B78, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-bit Timer" },
+      },
+    },
+  },
+}

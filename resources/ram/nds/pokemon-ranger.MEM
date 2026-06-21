@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Pokémon Ranger",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-ranger",
+    file = "pokemon-ranger.zip",
+    hashes = {
+      { hash = "a3d61a457ce077c4c5c16806349aae1b", label = "Pokemon Ranger (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF2E8E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background ID?" },
+        { address=0XF2F76, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Music Fadeout - Goal" },
+        { address=0XF6EE4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Music Fadeout - Goal" },
+        { address=0X13A657, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="New" },
+        { address=0X13A657, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Read" },
+        { address=0X13A657, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ranger Glossary - Styler Level" },
+        { address=0X13A65F, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="New" },
+        { address=0X13A65F, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Read" },
+        { address=0X13A660, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="New" },
+        { address=0X13A660, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Read" },
+        { address=0X13A661, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="New" },
+        { address=0X13A661, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Read" },
+        { address=0X13A662, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="New" },
+        { address=0X13A662, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Read" },
+        { address=0X13A663, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="New" },
+        { address=0X13A663, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Read" },
+        { address=0X13A8E0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Styler Level - XP (32bit)" },
+        { address=0X13A8E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Styler Level - Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X13A655, type="u8", condition="eq", value=0X1, action="HEALTH_STATE", no_log=true, no_survey=false, desc="New" },
+        { address=0X13A655, type="u8", condition="eq", value=0X2, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Read" },
+        { address=0X13A655, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Ranger Glossary - Styler Energy" },
+        { address=0X13A656, type="u8", condition="eq", value=0X1, action="HIT", no_log=false, no_survey=false, desc="New" },
+        { address=0X13A656, type="u8", condition="eq", value=0X2, action="HIT", no_log=false, no_survey=false, desc="Read" },
+        { address=0X13A66E, type="u8", condition="eq", value=0X1, action="HEALTH_STATE", no_log=true, no_survey=false, desc="New" },
+        { address=0X13A66E, type="u8", condition="eq", value=0X2, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Read" },
+        { address=0X13A66E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Ranger Glossary - Partner Energy" },
+        { address=0X13A8F0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Styler Energy - Current (16bit) decreased" },
+        { address=0X13A8F0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Styler Energy - Current (16bit) increased" },
+        { address=0X13A8F8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Styler Energy - Max (16bit) decreased" },
+        { address=0X13A8F8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Styler Energy - Max (16bit) increased" },
+        { address=0X24B0C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Charge energy decreased" },
+        { address=0X24B0C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Charge energy increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X273E54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Capture Challenge - Score (32bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2805D8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Map ID (moves Objects; changes Music)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1ECE38, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mission Cleared - Graphic Timer" },
+      },
+    },
+  },
+}

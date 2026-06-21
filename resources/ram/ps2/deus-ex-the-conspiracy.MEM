@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Deus Ex: The Conspiracy",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing, Shooter"
+  },
+
+  rom = {
+    name = "deus-ex-the-conspiracy",
+    file = "deus-ex-the-conspiracy.zip",
+    hashes = {
+      { hash = "3e82931b8e00aec6b6d45d928e65a334", label = "Deus Ex - The Conspiracy (USA)" },
+      { hash = "93528ed147363ea890f0a67d06c75ae1", label = "Deus Ex - The Conspiracy (SLUS-20111) [3AD6CF7E]" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X5101D8, type="u32le", condition="eq", value=0X41E00000, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="carrying object" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "The Emperor's New Groove",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-emperors-new-groove",
+    file = "the-emperors-new-groove.zip",
+    hashes = {
+      { hash = "7e0bc856feb59566d167350fc1a1775a", label = "Emperor's New Groove, The (Europe) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC20C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="ff when in game. 00 when in pause screen." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC123, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sub level (ex. 01 when on level 1-1, 02 when on level 1-2, 01 when on level 2-1)." },
+        { address=0XC124, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main level (ex. 01 when on level 1-1, 01 when on level 1-2, 02 when on level 2-1)." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC02B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player lives increased" },
+        { address=0XC02B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player lives decreased" },
+      },
+      health = {
+        { address=0XC025, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XC025, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XC032, type="u8", condition="eq", value=0X06, action="JUMPING", no_log=false, no_survey=false, desc="jumping or otherwise in mid-air" },
+        { address=0XC032, type="u8", condition="eq", value=0X15, action="JUMPING", no_log=false, no_survey=false, desc="end of longer jumping animation" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Metal Gear Solid: Digital Graphic Novel",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "metal-gear-solid-digital-graphic-novel",
+    file = "metal-gear-solid-digital-graphic-novel.zip",
+    hashes = {
+      { hash = "45cb873fd9cfc4946949865457bdd9af", label = "Metal Gear Solid - Digital Graphic Novel (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0XD571A4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32 Bit] 3D Cube Current Object ID" },
+      },
+    },
+  },
+}

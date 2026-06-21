@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Super Othello",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "super-othello",
+    file = "super-othello.zip",
+    hashes = {
+      { hash = "9e059aea68928d80ff77ea225045395b", label = "Super Othello v1.0 (19xx)(-).do" },
+    }
+  },
+
+  events = {
+  },
+}

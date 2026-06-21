@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>button on top of left stick</text>
+			<color>${red}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>button on top of right stick</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>left button</text>
+			<color>${green}</color>
+		</text>
+		<text name="button7" extra="true">
+			<text>right button</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button3" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button5" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button7" extra="true">
+			<text>Button 4</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

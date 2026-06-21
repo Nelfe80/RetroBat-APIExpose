@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Aspic: Mahebiou no Noroi",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "aspic-mahebiou-no-noroi",
+    file = "aspic-mahebiou-no-noroi.zip",
+    hashes = {
+      { hash = "7d6153486d7103c639659a2256e88e5c", label = "Aspic - Majaou no Noroi (Japan).fds" },
+      { hash = "4efacc69281f3037467c9d3fdff13e07", label = "Aspic - Majaou no Noroi (Japan) (En) (v1.0) (BlackPaladin).fds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X060F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Samson's current HP decreased" },
+        { address=0X060F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Samson's current HP increased" },
+        { address=0X0613, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Samson's LIM (Max HP) decreased" },
+        { address=0X0613, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Samson's LIM (Max HP) increased" },
+        { address=0X0615, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Warrior 1's current HP decreased" },
+        { address=0X0615, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Warrior 1's current HP increased" },
+        { address=0X061B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Warrior 2's current HP decreased" },
+        { address=0X061B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Warrior 2's current HP increased" },
+        { address=0X0655, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X0655, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X0659, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy max HP decreased" },
+        { address=0X0659, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X060D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Key increased" },
+        { address=0X0628, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Amount of gold in possession increased" },
+        { address=0X065D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 2 Gold (maya Tower) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X003D, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Current direction in doors" },
+      },
+    },
+  },
+}

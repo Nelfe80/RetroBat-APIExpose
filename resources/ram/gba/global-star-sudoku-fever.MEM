@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Global Star: Sudoku Fever",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "global-star-sudoku-fever",
+    file = "global-star-sudoku-fever.zip",
+    hashes = {
+      { hash = "926bebf30f7fecd6b9fa30cfd353dfee", label = "Global Star - Sudoku Fever (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0430, type="u8", condition="eq", value=0X0A, action="PAUSE_ON", no_log=false, no_survey=false, desc="In Pause Menu" },
+      },
+    },
+  },
+}

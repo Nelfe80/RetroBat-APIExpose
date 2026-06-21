@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Mickey's Safari in Letterland",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Education, Platform"
+  },
+
+  rom = {
+    name = "mickeys-safari-in-letterland",
+    file = "mickeys-safari-in-letterland.zip",
+    hashes = {
+      { hash = "0afb69ecca89adbb0e648d0df7eba4f7", label = "Mickey's Safari in Letterland (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0203, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo mode (00 = playing, 01 = demo)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0218, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level id" },
+        { address=0X021B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear condition;" },
+      },
+      stage = {
+        { address=0X0219, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0066, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="mickey condition (sliding, hurt, falling, etc)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X029B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="letter block amount (00-03)" },
+      },
+    },
+  },
+}

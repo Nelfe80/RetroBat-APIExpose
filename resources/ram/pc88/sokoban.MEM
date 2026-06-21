@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Sōkoban",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sokoban",
+    file = "sokoban.zip",
+    hashes = {
+      { hash = "e9ff3dfb280a795bf2ca8ade11be5683", label = "Soukoban {V1 mode}.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8561, type="u8", condition="eq", value=0X6D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X8661, type="u8", condition="eq", value=0X6D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8523, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Starting level" },
+        { address=0X8561, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X8623, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Starting level (alt)" },
+        { address=0X8661, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (alt)" },
+      },
+    },
+  },
+}

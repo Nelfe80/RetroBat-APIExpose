@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Crisis Core: Final Fantasy VII [Subset - Cursed - Lv.6]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "crisis-core-final-fantasy-vii-subset-cursed-lv-6",
+    file = "crisis-core-final-fantasy-vii-subset-cursed-lv-6.zip",
+    hashes = {
+      { hash = "c56148e9b53c546c0d4b6b30a4e6d8ed", label = "Crisis Core - Final Fantasy VII [Subset - Cursed Lv. 6].iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA43E6E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zack's Level" },
+      },
+    },
+  },
+}

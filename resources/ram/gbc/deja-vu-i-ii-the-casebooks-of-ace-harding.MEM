@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Deja Vu I & II: The Casebooks of Ace Harding",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "deja-vu-i-ii-the-casebooks-of-ace-harding",
+    file = "deja-vu-i-ii-the-casebooks-of-ace-harding.zip",
+    hashes = {
+      { hash = "07876bd62abbe5fd8878a0363e23a42f", label = "Deja Vu I & II (Japan).gbc" },
+      { hash = "497e32beeface0c5dac4bfe84a5964b6", label = "Deja Vu I & II - The Casebooks of Ace Harding (Europe) (Fr,De).gbc" },
+      { hash = "d63504ea68f55d3c290cd01d71d4d1cc", label = "Deja Vu I & II - The Casebooks of Ace Harding (USA).gbc" },
+      { hash = "e51c03fc9ed1a31a9e2be404f9e01068", label = "Deja Vu I & II - The Casebooks of Ace Harding (Europe) (En,Fr).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Ultraverse Prime",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ultraverse-prime",
+    file = "ultraverse-prime.zip",
+    hashes = {
+      { hash = "eaa7bb525aba09528613e664d6578ea9", label = "Ultraverse Prime (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X90843, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X900A0, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X90075, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X90075, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X91278, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+  },
+}

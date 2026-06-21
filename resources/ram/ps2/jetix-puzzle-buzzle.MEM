@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Jetix Puzzle Buzzle",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "jetix-puzzle-buzzle",
+    file = "jetix-puzzle-buzzle.zip",
+    hashes = {
+      { hash = "ff2b4eef9d3bf9bb7cf1bf8e3e714fd2", label = "Jetix Puzzle Buzzle (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X17ADF4, type="u16le", condition="eq", value=0X1C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Screen" },
+        { address=0X7ED8DC, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[32bit] Continues - Thanks Game for Not Showing this Shit!" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X17AC44, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Current Round" },
+        { address=0X17AC48, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Max Rounds" },
+        { address=0X1B71FC, type="u16le", condition="eq", value=0X002710, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Infinite (10000)" },
+        { address=0X1B71FC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Custom Mode Settings - Rounds" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17B798, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Score" },
+        { address=0X1A8230, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Solo Mode - Max Level Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X17B7AC, type="u32le", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="False" },
+        { address=0X17B7AC, type="u32le", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="True" },
+        { address=0X17B7AC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bit] Boolean - Timer IsActive" },
+        { address=0X1B71EC, type="u16le", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="On" },
+        { address=0X1B71EC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bit] Custom Mode Settings - Bomb Time Boolean" },
+      },
+    },
+  },
+}

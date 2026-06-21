@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "SD F-1 Grand Prix",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "sd-f-1-grand-prix",
+    file = "sd-f-1-grand-prix.zip",
+    hashes = {
+      { hash = "5f6793846c883ce0e405a43493660748", label = "SD F-1 Grand Prix (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X209CA, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="world gp" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X20A71, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="p1 health decreased" },
+        { address=0X20A71, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="p1 health increased" },
+        { address=0X21648, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="p1 health decreased" },
+        { address=0X21648, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="p1 health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X20A7A, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="homing, 02=3bomb,03=oilcan, 04=bomb, 05=star, 06=time stop, 07=spring, 08=weight" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00B0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="d-pad input" },
+        { address=0X0E04, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="1" },
+        { address=0X0E04, type="u8", condition="eq", value=0X13, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="20" },
+        { address=0X0E04, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="track no. time attack" },
+        { address=0X209CA, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time attack" },
+        { address=0X209DD, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer millisecs" },
+        { address=0X209DE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer tens" },
+        { address=0X209DF, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer mins" },
+        { address=0X20A77, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="p1 lap counter" },
+        { address=0X20A85, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="p1 lap counter" },
+        { address=0X20B1D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20B2B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20BC7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20BD5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20C6D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20C7B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20D13, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20D21, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20DB9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20DC7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20E5F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20E6D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20F05, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+        { address=0X20F13, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="cpu lap counter" },
+      },
+    },
+  },
+}

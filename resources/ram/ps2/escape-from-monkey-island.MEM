@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Escape from Monkey Island",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "escape-from-monkey-island",
+    file = "escape-from-monkey-island.zip",
+    hashes = {
+      { hash = "137d96f7e585db4b9ba7ebb6afbe200e", label = "Escape from Monkey Island (USA)" },
+      { hash = "92988156f8725d3603d6232eabe036de", label = "Escape from Monkey Island (Europe)" },
+      { hash = "3abd73f4f927b42a782db8b15c132969", label = "Escape from Monkey Island (France)" },
+      { hash = "7af7bd531e52c1bfde2b422198284612", label = "Flucht von Monkey Island (Germany)" },
+      { hash = "321791f2faeb22fb2f0c39c10a80bccd", label = "Fuga de Monkey Island, La (Spain)" },
+      { hash = "57920208b5501150498cc0f171485d5e", label = "Fuga da Monkey Island (Italy)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X242B48, type="u32le", condition="eq", value=0X7C, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause theme" },
+        { address=0X244820, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="GLOBAL : demo mode ID (128-bit)" },
+      },
+    },
+  },
+}

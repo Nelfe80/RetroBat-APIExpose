@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Suikogaiden Vol. 2: Duel at Crystal Valley",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "suikogaiden-vol-2-duel-at-crystal-valley",
+    file = "suikogaiden-vol-2-duel-at-crystal-valley.zip",
+    hashes = {
+      { hash = "6749928628ecb5aca24d52a9c47012b7", label = "Gensou Suiko Gaiden Vol. 2 - Crystal Valley no Kettou (Japan)" },
+      { hash = "e41d75d61cbe528c2eeab63b64238a42", label = "Gensou Suiko Gaiden Vol. 2 - Crystal Valley no Kettou (Japan) (En)" },
+    }
+  },
+
+  events = {
+  },
+}

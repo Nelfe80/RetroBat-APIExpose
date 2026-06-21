@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Pachio-kun Special",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Gambling"
+  },
+
+  rom = {
+    name = "pachio-kun-special",
+    file = "pachio-kun-special.zip",
+    hashes = {
+      { hash = "5ea62c13fdd3e01e5da6492f299ec6d5", label = "Pachio-kun Special (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00A3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Game] Number of machines cleared in current parlor" },
+        { address=0X00A8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Player] Number of machines cleared in current parlor" },
+        { address=0X0A2C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Game] Number of machines cleared in leftmost Underground parlor" },
+        { address=0X0A6F, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A70, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A71, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A72, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A73, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A74, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A75, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A76, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A77, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A78, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A79, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A7A, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A7B, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A7C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A7D, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0A91, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Game] Total number of machines cleared" },
+        { address=0X0B36, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Graphic] Round number displayed on Starcrash/Invader attacker" },
+        { address=0X0C78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Pachinko] Fever mode round number" },
+        { address=0X0C8E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Pachinko] Current fever round" },
+        { address=0X0CDF, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0CDF, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+      stage = {
+        { address=0X001E, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sitting at machine (or interacting with one in the overworld" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0C83, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Pachinko] Balls remaining in machine [20-bit BCD] increased" },
+        { address=0X0C83, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Pachinko] Balls remaining in machine [20-bit BCD] decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0A89, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Player] Number of machine points for current parlor increased" },
+        { address=0X0A8B, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Player] Amount of gold on hand increased" },
+        { address=0X0A9D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Game] Number of Diamond Rings in inventory increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0A8E, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door open" },
+        { address=0X0A8F, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door open" },
+      },
+    },
+  },
+}

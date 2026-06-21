@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Baroque",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "baroque",
+    file = "baroque.zip",
+    hashes = {
+      { hash = "8e26e496a2875a75e746472fa8c95a8e", label = "Baroque (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XBDD9CC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[8bit] Angelic Rifle Ammo" },
+      },
+    },
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Horrible Histories: Ruthless Romans",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "horrible-histories-ruthless-romans",
+    file = "horrible-histories-ruthless-romans.zip",
+    hashes = {
+      { hash = "a1afa09f285a73d01c0cd4cb8481db80", label = "Horrible Histories - Ruthless Romans (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X40443C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Player health decreased" },
+        { address=0X40443C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Player health increased" },
+        { address=0X404440, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Enemy health decreased" },
+        { address=0X404440, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Enemy health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X355BF0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Score" },
+        { address=0X355D90, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Minigame score" },
+      },
+      collectibles = {
+        { address=0X318C88, type="u32be", condition="eq", value=0X1D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Rings" },
+        { address=0X318CE4, type="u32be", condition="eq", value=0X1D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Rings" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X31A288, type="u32be", condition="eq", value=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Merchent door open" },
+        { address=0X31A298, type="u32be", condition="eq", value=0X03, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Merchent door open" },
+        { address=0X31A2B4, type="u32be", condition="eq", value=0X03, action="DOOR_OPENED", no_log=false, no_survey=false, desc="colo door unlocked" },
+      },
+    },
+  },
+}

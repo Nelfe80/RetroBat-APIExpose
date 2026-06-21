@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Dragon: The Bruce Lee Story",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-the-bruce-lee-story",
+    file = "dragon-the-bruce-lee-story.zip",
+    hashes = {
+      { hash = "94ebb9a19bbb7b5749bf07ab3ce8fbb9", label = "Dragon - The Bruce Lee Story (USA).md" },
+      { hash = "a279a2fa2317f9081ba02226cce6b1ed", label = "Dragon - The Bruce Lee Story (Europe).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X9C00, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="count stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8298, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Life - Max 40 increased" },
+        { address=0X8298, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Life - Max 40 decreased" },
+        { address=0X8474, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Opponent Life? increased" },
+        { address=0X8474, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Opponent Life? decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Ski or Die",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "ski-or-die",
+    file = "ski-or-die.zip",
+    hashes = {
+      { hash = "baf62f8e6eaae46212a14501877f3cad", label = "Ski or Die (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0059, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Snowball Fight Round [0 based]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X005C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit Acro Aerials points [Halfpipe_downhill timer]" },
+        { address=0X0770, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit total competition mode score [resets each game]" },
+        { address=0X0773, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit opponent score in Innertube Thrash" },
+      },
+    },
+  },
+}

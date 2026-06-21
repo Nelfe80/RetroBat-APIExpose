@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "20Q",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "20q",
+    file = "20q.zip",
+    hashes = {
+      { hash = "44f66514dd16fed5eb8a8520d559b573", label = "20Q (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

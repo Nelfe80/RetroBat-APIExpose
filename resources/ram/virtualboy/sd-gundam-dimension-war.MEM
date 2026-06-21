@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "SD Gundam: Dimension War",
+    system = "virtualboy",
+    system_name = "Virtual Boy",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "sd-gundam-dimension-war",
+    file = "sd-gundam-dimension-war.zip",
+    hashes = {
+      { hash = "1cf8c69d8a740d6ef3aab54deced31c4", label = "SD Gundam - Dimension War (Japan).vb" },
+      { hash = "45825104799b74d36740d486f3f0cdf2", label = "SD Gundam - Dimension War (Japan) (En) (v1.0) (Benjamin Stevens, Greg Stevens).vb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0328, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 bits] Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X04A8, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 1 life increased" },
+        { address=0X04A8, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 1 life decreased" },
+        { address=0X04BC, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 2 life increased" },
+        { address=0X04BC, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 2 life decreased" },
+        { address=0X04D0, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 3 life increased" },
+        { address=0X04D0, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 3 life decreased" },
+        { address=0X04E4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 4 life increased" },
+        { address=0X04E4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 4 life decreased" },
+        { address=0X04F8, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 5 life increased" },
+        { address=0X04F8, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 5 life decreased" },
+        { address=0X050C, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 6 life increased" },
+        { address=0X050C, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Enemy 6 life decreased" },
+        { address=0X3A7C, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Life bar in the left side increased" },
+        { address=0X3A7C, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bits] Life bar in the left side decreased" },
+        { address=0X3C24, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 bits] Life bar in the right side increased" },
+        { address=0X3C24, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 bits] Life bar in the right side decreased" },
+      },
+    },
+  },
+}

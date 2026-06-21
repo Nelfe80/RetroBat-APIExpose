@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 10: Masaki Mai",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-10-masaki-mai",
+    file = "private-idol-disc-vol-10-masaki-mai.zip",
+    hashes = {
+      { hash = "cc7e8fcf19ef362ecd3a66e8eb26a0c6", label = "Private Idol Disc Vol. 10 - Mai Masaki (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X12C935, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X108DDE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Menu object thing for RP" },
+      },
+    },
+  },
+}

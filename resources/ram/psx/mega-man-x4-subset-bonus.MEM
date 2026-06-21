@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Mega Man X4 [Subset - Bonus]",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "mega-man-x4-subset-bonus",
+    file = "mega-man-x4-subset-bonus.zip",
+    hashes = {
+      { hash = "17e635e4f67d2d37409fb2190d506bb7", label = "Mega Man X4 [Subset - Bonus]" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X1721CC, type="u16le", condition="eq", value=0X000D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="X Intro Animation" },
+        { address=0X1721CC, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (16bits)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X14195E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Using weapon:" },
+      },
+    },
+  },
+}

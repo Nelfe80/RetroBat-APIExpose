@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Super Mario Galaxy",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "super-mario-galaxy",
+    file = "super-mario-galaxy.zip",
+    hashes = {
+      { hash = "4e0d0d2f2c5d3c13d758b027bbcc059f", label = "Super Mario Galaxy (USA) (En,Fr,Es)" },
+      { hash = "0128a1e25b16d967b8dd3e404076efbc", label = "Super Mario Galaxy (Europe, Australia) (En,Fr,De,Es,It)" },
+      { hash = "5c5ef042c38df9ae4f3cc43e8bc52c33", label = "Super Mario Galaxy (Japan)" },
+      { hash = "b9319e8d546e79041fc04ea99b9a71e8", label = "Super Mario Galaxy (USA) (En,Fr,Es) (PtBR)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Plump Pop | Jumping Pop (Nics)",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Ball & Paddle"
+  },
+
+  rom = {
+    name = "plump-pop-jumping-pop",
+    file = "plump-pop-jumping-pop.zip",
+    hashes = {
+      { hash = "26f721a4d153f9e5187f67ee58666e97", label = "jpopnics.7z <Jumping Pop (Nics, Korean bootleg of Plump Pop)>" },
+      { hash = "e65f524536907f0f4f02de3fbde061a0", label = "plumppop.7z <Plump Pop (Japan)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3305, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

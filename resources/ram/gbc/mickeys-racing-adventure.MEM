@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Mickey's Racing Adventure",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "mickeys-racing-adventure",
+    file = "mickeys-racing-adventure.zip",
+    hashes = {
+      { hash = "221d3b96df7d86291b553a7cb4702dec", label = "Mickey's Racing Adventure (USA, Europe) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0XCE1B, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto1; Bit1 = Pluto2" },
+        { address=0XCE1B, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto3; Bit3 = Pluto4" },
+        { address=0XCE1B, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Railroad Puzzle" },
+        { address=0XCE1D, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto1; Bit1 = Pluto2" },
+        { address=0XCE1D, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto3; Bit3 = Pluto4" },
+        { address=0XCE1D, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Railroad Puzzle" },
+        { address=0XCE1F, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto1; Bit1 = Pluto2" },
+        { address=0XCE1F, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto3; Bit3 = Pluto4" },
+        { address=0XCE1F, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Railroad Puzzle" },
+        { address=0XCE21, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto1; Bit1 = Pluto2" },
+        { address=0XCE21, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto3; Bit3 = Pluto4" },
+        { address=0XCE21, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Railroad Puzzle" },
+        { address=0XCE23, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto1; Bit1 = Pluto2" },
+        { address=0XCE23, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pluto3; Bit3 = Pluto4" },
+        { address=0XCE23, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Railroad Puzzle" },
+        { address=0XCE25, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Railroad Puzzle" },
+        { address=0XCFFE, type="u8", condition="eq", value=0X70, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Characters World" },
+      },
+    },
+  },
+}

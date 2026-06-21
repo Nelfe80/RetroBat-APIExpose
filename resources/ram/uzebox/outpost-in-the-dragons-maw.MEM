@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Outpost in the Dragon's Maw",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "outpost-in-the-dragons-maw",
+    file = "outpost-in-the-dragons-maw.zip",
+    hashes = {
+      { hash = "ed366e0950fac5db8cda44fc15a22393", label = "Outpost in the Dragon's Maw (World) (v1.1) (Jubatian).uze" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X0294, type="u8", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X0294, type="u8", condition="eq", value=0X0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Raw material (inactive - Gold never upgrades)" },
+      },
+    },
+  },
+}

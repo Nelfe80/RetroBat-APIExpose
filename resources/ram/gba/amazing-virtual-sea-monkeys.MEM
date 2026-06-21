@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Amazing Virtual Sea Monkeys",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Simulation"
+  },
+
+  rom = {
+    name = "amazing-virtual-sea-monkeys",
+    file = "amazing-virtual-sea-monkeys.zip",
+    hashes = {
+      { hash = "8989a8830651ca9705c676676aaf4894", label = "Amazing Virtual Sea-Monkeys, The (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "SNK vs. Capcom: The Match of the Millennium",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "snk-vs-capcom-the-match-of-the-millennium",
+    file = "snk-vs-capcom-the-match-of-the-millennium.zip",
+    hashes = {
+      { hash = "d7a3dc19391c754709a330d17710a1dc", label = "SNK vs. Capcom - The Match of the Millennium (World) (En,Ja) (SvC Unlock Char).ngc" },
+      { hash = "dfea3ad9af4a631de6f97d86589b971e", label = "SNK vs. Capcom - The Match of the Millennium (World) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X085D, type="u8", condition="eq", value=0XA5, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Game Over" },
+      },
+      events = {
+        { address=0X0B17, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Combo Hits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X085D, type="u8", condition="eq", value=0XA1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round End" },
+        { address=0X08AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Wins" },
+        { address=0X08CA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds Wins" },
+        { address=0X08EB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Match - Round" },
+        { address=0X0FCA, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Novice" },
+        { address=0X0FCA, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X0FCA, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X0FCA, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X0FCA, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Brutal" },
+        { address=0X0FCA, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gamer" },
+        { address=0X0FCA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Level" },
+        { address=0X0FCC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Winning Point (Rounds)" },
+      },
+      zone = {
+        { address=0X085D, type="u8", condition="eq", value=0X81, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+      stage = {
+        { address=0X0FD9, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X0FD9, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final" },
+        { address=0X0FD9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Settings - Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X08AF, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X08AF, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 - HP (Display)" },
+        { address=0X08CF, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X08CF, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 - HP (Display)" },
+        { address=0X0961, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X0961, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 - HP (Value)" },
+        { address=0X0AE1, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X0AE1, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 - HP (Value)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X036A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Olympics - Targets 9 Score" },
+        { address=0X1044, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Olympic - Vs. Points [16-bits]" },
+      },
+      collectibles = {
+        { address=0X3FF0, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X085D, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Game Not Started (used to block sram unlocks)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X02AF, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Unlockables - Secret Member Parts (Counter)" },
+        { address=0X08BE, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="P1 - Style" },
+        { address=0X08EE, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Match - Round Timer" },
+        { address=0X0FCB, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Settings - Time" },
+      },
+    },
+  },
+}

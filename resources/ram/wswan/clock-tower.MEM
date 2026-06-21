@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Clock Tower",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "clock-tower",
+    file = "clock-tower.zip",
+    hashes = {
+      { hash = "8f0ba3401662a40e8da5ebcfe7b85e81", label = "Clock Tower for WonderSwan (Japan) (Rev 1).ws" },
+      { hash = "bdaacc5193951ca7fff2845b1664d451", label = "Clock Tower for WonderSwan (Japan) (En) (v1.1) (Team C.U.T.S.).ws" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0328, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Flag" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X11AD8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Gold Key Found increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X115E0, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[16 Bit] Living Room Broken TV Flag" },
+      },
+    },
+  },
+}

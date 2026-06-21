@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Madou Monogatari I: 3-Tsu no Madoukyuu",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "madou-monogatari-i-3-tsu-no-madoukyuu",
+    file = "madou-monogatari-i-3-tsu-no-madoukyuu.zip",
+    hashes = {
+      { hash = "abca338c5f08d06526d09b70588add2c", label = "Madou Monogatari I - 3-Tsu no Madoukyuu (Japan).gg" },
+      { hash = "81c3447b356a808a8e8e7b7c6a815c32", label = "Sorcery Saga I - 3 Magic Spheres (Japan) (En) (v1.0) (filler,SSTranslations).gg" },
+      { hash = "5478500b145c0fc5cf7f477744998aad", label = "Sorcery Saga I - 3 Magic Spheres (Japan) (En) (v1.0) (filler,SSTranslations) (T.S.) (EvilJagaGenius).gg" },
+      { hash = "b6be40c384542cfb27894ebf69417ffb", label = "Sorcery Saga I - 3 Magic Spheres (Japan) (En) (v1.0) (filler,SSTranslations) (T.S.) (EvilJagaGenius) (HW Fix) (Supper).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0110, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0111, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X0111, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0X0201, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life increased" },
+        { address=0X0201, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X011C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

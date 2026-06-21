@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Pocket Monsters Stadium",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "pocket-monsters-stadium",
+    file = "pocket-monsters-stadium.zip",
+    hashes = {
+      { hash = "c46e087d966a35095df96799b0b4ffae", label = "Pokemon Stadium (Japan).z64" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X1098EC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tournament Progress - Great Ball Tournament blocked [8bit]" },
+        { address=0X1098EE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tournament Progress - Poké Ball Tournament blocked [8bit]" },
+        { address=0X1098F0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tournament Progress - Master Ball Tournament blocked [8bit]" },
+        { address=0X1098F2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tournament Progress - Ultra Ball Tournament blocked [8bit]" },
+      },
+    },
+  },
+}

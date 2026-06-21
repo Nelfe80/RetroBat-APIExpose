@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Mickey's Ultimate Challenge",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "mickeys-ultimate-challenge",
+    file = "mickeys-ultimate-challenge.zip",
+    hashes = {
+      { hash = "f7d266bc81c150796ae373bddd0a9a84", label = "Mickey's Ultimate Challenge (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0F4, type="u16le", condition="eq", value=0X0800, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC698, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Drawbridge: Current Round Number" },
+        { address=0XC69E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blacksmith: Round Number" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC44F, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gallery Game (Gold Bar)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC92E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gallery: Time Remaining" },
+      },
+    },
+  },
+}

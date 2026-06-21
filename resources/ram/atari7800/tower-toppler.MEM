@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Tower Toppler",
+    system = "atari7800",
+    system_name = "Atari 7800",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "tower-toppler",
+    file = "tower-toppler.zip",
+    hashes = {
+      { hash = "8d64763db3100aadc552db5e6868506a", label = "Tower Toppler (USA).a78" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X20E0, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00B1, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Playing level" },
+        { address=0X00B1, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level" },
+        { address=0X00B1, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level skip" },
+        { address=0X00B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X01FE, type="u8", condition="eq", value=0XEC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reset to level 1" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00B1, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X00BA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X00BA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X00BB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - Player 2 increased" },
+        { address=0X00BB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - Player 2 decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X22E8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 1 - X0000000" },
+        { address=0X22E9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 1 - 0X000000" },
+        { address=0X22EA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 1 - 00X00000" },
+        { address=0X22EB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 1 - 000X0000" },
+        { address=0X22EC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 1 - 0000X000" },
+        { address=0X22ED, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 1 - 00000X00" },
+        { address=0X22EE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 1 - 000000X0" },
+        { address=0X22EF, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 1 - 0000000X" },
+        { address=0X22F0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 2 - X0000000" },
+        { address=0X22F1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 2 - 0X000000" },
+        { address=0X22F2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 2 - 00X00000" },
+        { address=0X22F3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 2 - 000X0000" },
+        { address=0X22F4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 2 - 0000X000" },
+        { address=0X22F5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 2 - 00000X00" },
+        { address=0X22F6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 2 - 000000X0" },
+        { address=0X22F7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Player 2 - 0000000X" },
+        { address=0X22F8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[4 bytes BCD] High score 1" },
+        { address=0X22FC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 1 - Letter 1" },
+        { address=0X22FD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 1 - Letter 2" },
+        { address=0X22FE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 1 - Letter 3" },
+        { address=0X2300, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[4 bytes BCD] High score 2" },
+        { address=0X2304, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 2 - Letter 1" },
+        { address=0X2305, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 2 - Letter 2" },
+        { address=0X2306, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 2 - Letter 3" },
+        { address=0X2308, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[4 bytes BCD] High score 3" },
+        { address=0X230C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 3 - Letter 1" },
+        { address=0X230D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 3 - Letter 2" },
+        { address=0X230E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 3 - Letter 3" },
+        { address=0X2310, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[4 bytes BCD] High score 4" },
+        { address=0X2314, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 4 - Letter 1" },
+        { address=0X2315, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 4 - Letter 2" },
+        { address=0X2316, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score 4 - Letter 3" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00B1, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="State" },
+      },
+    },
+  },
+}

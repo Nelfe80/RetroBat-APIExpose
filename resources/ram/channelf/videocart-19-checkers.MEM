@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Videocart-19: Checkers",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Board"
+  },
+
+  rom = {
+    name = "videocart-19-checkers",
+    file = "videocart-19-checkers.zip",
+    hashes = {
+      { hash = "35d61d40ef7ec337cba092aabac74dbd", label = "Checkers (USA).bin" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X000F, type="u8", condition="eq", value=0X3A, action="JUMPING", no_log=true, no_survey=false, desc="Check for CPU multijumps" },
+        { address=0X000F, type="u8", condition="eq", value=0X4D, action="JUMPING", no_log=true, no_survey=false, desc="CPU multijumps if possible" },
+        { address=0X000F, type="u8", condition="eq", value=0X6F, action="JUMPING", no_log=true, no_survey=false, desc="Check for player multijumps" },
+        { address=0X0018, type="u8", condition="eq", value=0X14, action="JUMPING", no_log=true, no_survey=false, desc="Player Jump" },
+        { address=0X0018, type="u8", condition="eq", value=0XF6, action="JUMPING", no_log=true, no_survey=false, desc="Jump Required!" },
+        { address=0X001D, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[bit 0] Manditory jump required" },
+      },
+    },
+  },
+}

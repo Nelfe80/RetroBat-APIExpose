@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1  WINGS     30000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2  TROJAN    20000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 SECTION Z  18000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4  1942      16000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5  COMMAND   12000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 EXED EXES  10000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 ♥.Z....... 5000</text>
+		</text>
+	</view>
+</theme>

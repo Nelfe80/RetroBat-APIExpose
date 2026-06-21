@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "Wonder Boy in Monster World",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Platform, Role-Playing"
+  },
+
+  rom = {
+    name = "wonder-boy-in-monster-world",
+    file = "wonder-boy-in-monster-world.zip",
+    hashes = {
+      { hash = "5837764c172c8c43c8c7b21f2144cf27", label = "Wonder Boy in Monster World (Europe).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00C7, type="u8", condition="bit_true", bit=5, mask=0X20, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause/menu on screen" },
+        { address=0X1600, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8-bit Boolean] Game Status (0x00 = title screen / demo mode / password entry, 0xfd = in-game)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X06D0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-bit Boolean] Player Death Animation Active (0 = no, 1 = yes)" },
+      },
+      health = {
+        { address=0X058D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health (0x00 - 0x20) decreased" },
+        { address=0X058D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health (0x00 - 0x20) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0598, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gradius" },
+        { address=0X0598, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Knight sword" },
+        { address=0X0598, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Trident" },
+        { address=0X0598, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Excalibur" },
+        { address=0X0598, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Legend sword" },
+        { address=0X0600, type="u8", condition="eq", value=0X15, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon shop" },
+        { address=0X0600, type="u8", condition="eq", value=0X3F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Begonia - Dragon weaponsmith's room" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X067D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold x1 increased" },
+        { address=0X067E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold x256 increased" },
+        { address=0X1201, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hidden Coins Remaining - Maugham Desert Sunken Cave (0x00 - 0x0a) increased" },
+        { address=0X1203, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hidden Coins Remaining - Field Next to Shion's House (0x00 - 0x0a) increased" },
+        { address=0X1205, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hidden Coins Remaining - Alsedo Ocean (0x00 - 0x0a) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0600, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Purapril sewers - leftmost area (captive princess and guard miniboss fight)" },
+        { address=0X0600, type="u8", condition="eq", value=0X29, action="BOSS_HIT", no_log=false, no_survey=false, desc="Alsedo cave exit room after boss" },
+        { address=0X0600, type="u8", condition="eq", value=0X2C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Childam - Ice Bomber boss room" },
+        { address=0X0600, type="u8", condition="eq", value=0X2D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pyramid - Tyrant Dragon boss room" },
+        { address=0X0600, type="u8", condition="eq", value=0X2E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dark castle - Almighty Demon King boss room" },
+        { address=0X0600, type="u8", condition="eq", value=0X2F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Spaceship - Biomeka boss room" },
+        { address=0X0600, type="u8", condition="eq", value=0X30, action="BOSS_HIT", no_log=false, no_survey=false, desc="Jungle temple - Gragg & Glagg boss room" },
+        { address=0X0600, type="u8", condition="eq", value=0X31, action="BOSS_HIT", no_log=false, no_survey=false, desc="Alsedo cave - Mushroom Spirit boss room" },
+        { address=0X0600, type="u8", condition="eq", value=0X3A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Spaceship - corridor to repeat boss battle rooms" },
+        { address=0X06AE, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8-bit Boolean] Boss Defeated - BioMeka (0 = no, 1 = yes)" },
+        { address=0X06C3, type="u8", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Once (Childam)" },
+        { address=0X06C3, type="u8", condition="eq", value=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Twice (Childam and rematch on spaceship)" },
+        { address=0X06C4, type="u8", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Once (Pyramid)" },
+        { address=0X06C4, type="u8", condition="eq", value=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Twice (Pyramid and rematch on spaceship)" },
+        { address=0X06C5, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8-bit Boolean] Boss Defeated - The Almighty Demon King (0 = no, 1 = yes)" },
+        { address=0X06C7, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8-bit Boolean] Boss Defeated - Gragg & Glagg (0 = no, 1 = yes)" },
+        { address=0X06C8, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8-bit Boolean] Boss Defeated - The Mushroom Spirit (0 = no, 1 = yes)" },
+        { address=0X0D10, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Boolean] Chest Opened (Axe of Ancients) - Childam Boss (0 = no, 1 = yes)" },
+        { address=0X0D11, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Boolean] Chest Opened (Sacred Flame and Thunder Magic) - Pyramid Boss (0 = no, 1 = yes)" },
+        { address=0X0D12, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Boolean] Chest Opened (Legendary Armor) - Dark Castle Boss (0 = no, 1 = yes)" },
+        { address=0X0D13, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Boolean] Chest Opened (Trident) - Jungle Temple Boss (0 = no, 1 = yes)" },
+        { address=0X0D14, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Boolean] Chest Opened (Firestorm Magic) - Alsedo Cave Boss (0 = no, 1 = yes)" },
+        { address=0X0D15, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Boolean] Chest Opened (Heart) - Spaceship Boss Rematches (0 = no, 1 = yes)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X00FF, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Shield Magic Bought in Lilypad (0 = no, 1 = yes)" },
+        { address=0X0589, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Magic" },
+        { address=0X058E, type="u8", condition="eq", value=0X05, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X05A4, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X05A4, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wood" },
+        { address=0X05A4, type="u8", condition="eq", value=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Steel" },
+        { address=0X05A4, type="u8", condition="eq", value=0X03, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Knight" },
+        { address=0X05A4, type="u8", condition="eq", value=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Flame" },
+        { address=0X05A4, type="u8", condition="eq", value=0X05, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Legend" },
+        { address=0X05A5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Wood Shield in Inventory (0 = no, 1 = yes)" },
+        { address=0X05A6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Steel Shield in Inventory (0 = no, 1 = yes)" },
+        { address=0X05A7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Knight Shield in Inventory (0 = no, 1 = yes)" },
+        { address=0X05A8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Flame Shield in Inventory (0 = no, 1 = yes)" },
+        { address=0X05A9, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Legend Shield in Inventory (0 = no, 1 = yes)" },
+        { address=0X0D07, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Chest Opened (Shield Magic) - Maugham Desert Well (0 = no, 1 = yes)" },
+        { address=0X0D0A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Chest Opened (Legendary Shield) - Dark Castle (0 = no, 1 = yes)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00EF, type="u8", condition="eq", value=0X03, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Childam entrance seal broken" },
+        { address=0X0B06, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8-bit Boolean] Jungle Temple Door Open (0x00 = yes, 0x01 OR 0xff = no)" },
+        { address=0X0B2A, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8-bit Boolean] Alsedo Cave Door 1 - Seal Broken (0x00 = yes, 0x01 OR 0x18 = no)" },
+        { address=0X0B2B, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8-bit Boolean] Alsedo Cave Door 2 - Seal Broken (0x00 = yes, 0x01 OR 0x18 = no)" },
+        { address=0X0B2C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8-bit Boolean] Alsedo Cave Door 3 - Seal Broken (0x00 = yes, 0x01 OR 0x18 = no)" },
+      },
+    },
+  },
+}

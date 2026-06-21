@@ -1,0 +1,116 @@
+return {
+  game = {
+    title = "Devil May Cry 3:  Dante's Awakening",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "devil-may-cry-3-dantes-awakening",
+    file = "devil-may-cry-3-dantes-awakening.zip",
+    hashes = {
+      { hash = "615a2edb733271b696d9298304cf0308", label = "Devil May Cry 3 - Dante's Awakening (USA) (En,Ja,Ko)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X731716, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Weapon Level - Ebony & Ivory (8-bit)" },
+        { address=0X731717, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Weapon Level - Shotgun (8-bit)" },
+        { address=0X731718, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Weapon Level - Artemis (8-bit)" },
+        { address=0X731719, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Weapon Level - Spiral (8-bit)" },
+        { address=0X73171A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Weapon Level - Kalina Ann (8-bit)" },
+        { address=0X1786E74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Style Level (8-bit)" },
+        { address=0X1CB0529, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Bonus Art" },
+      },
+      stage = {
+        { address=0X73174C, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stinger Level 1" },
+        { address=0X73174D, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stinger Level 2" },
+        { address=0X731750, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Revolver Level 2" },
+        { address=0X731753, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Agni & Rudra - Jet-Stream: Level 2" },
+        { address=0X731753, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Agni & Rudra - Jet-Stream: Level 3" },
+        { address=0X731756, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nevan - Bat Rift: Level 2" },
+        { address=0X731756, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nevan - Reverb Shock Level 1" },
+        { address=0X731756, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nevan - Reverb Shock Level 2" },
+        { address=0X73175B, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Beowulf - Straight: Level 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1CB0520, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dante Must Die Mode" },
+      },
+      health = {
+        { address=0X7316FC, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Current Mission Damage Taken (32-bit)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X7316A6, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316A6, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316A7, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316A7, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316A8, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316A8, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316AA, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316AA, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316AB, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316AB, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316AC, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316AC, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316AD, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316AD, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316AE, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316AE, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316AF, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316AF, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7316B1, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X7316B1, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1786F4A, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 1" },
+        { address=0X1786F4A, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 2" },
+        { address=0X1786F4B, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 1" },
+        { address=0X1786F4B, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 2" },
+        { address=0X1786F4C, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rebellion" },
+        { address=0X1786F4C, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cerberus" },
+        { address=0X1786F4C, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Agni & Rudra" },
+        { address=0X1786F4C, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nevan" },
+        { address=0X1786F4C, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Beowulf" },
+        { address=0X1786F4D, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rebellion" },
+        { address=0X1786F4D, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cerberus" },
+        { address=0X1786F4D, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Agni & Rudra" },
+        { address=0X1786F4D, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nevan" },
+        { address=0X1786F4D, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Beowulf" },
+        { address=0X1786F4E, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ebony & Ivory" },
+        { address=0X1786F4E, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X1786F4E, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Artemis" },
+        { address=0X1786F4E, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spiral" },
+        { address=0X1786F4E, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Kalina Ann" },
+        { address=0X1786F4F, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ebony & Ivory" },
+        { address=0X1786F4F, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X1786F4F, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Artemis" },
+        { address=0X1786F4F, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spiral" },
+        { address=0X1786F4F, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Kalina Ann" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X731844, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="During Start Cutscene" },
+        { address=0X731844, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Phase 1" },
+        { address=0X731844, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Phase 2" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7318E2, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Jukebox" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X731888, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Credits Timer (32-bit)" },
+        { address=0X1786F94, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo Timer (Float)" },
+        { address=0X1CB0514, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Death Counter (32-bit)" },
+      },
+    },
+  },
+}

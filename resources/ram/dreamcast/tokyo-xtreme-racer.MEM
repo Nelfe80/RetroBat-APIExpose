@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Tokyo Xtreme Racer",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "tokyo-xtreme-racer",
+    file = "tokyo-xtreme-racer.zip",
+    hashes = {
+      { hash = "7d88f8782d4471a4430bc5ce5e924c62", label = "Tokyo Xtreme Racer (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1518DC, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="QR Demo Car" },
+        { address=0X156BB0, type="u16le", condition="eq", value=0X190, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XBCC8A0, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Not Active" },
+        { address=0XBCC8A0, type="u8", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="Clossing Black Square" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1528D7, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tarmac Suzuki (Top Level Leader)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1518DE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bits] Highscore Quick Race SP Battle" },
+      },
+      collectibles = {
+        { address=0X1528DE, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Lonely Jackal (Rings Leader)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15005A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="SP Battle Rounds Counter" },
+        { address=0X1518DA, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Battle" },
+        { address=0X1518DA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quick Mode Event:" },
+        { address=0X1528DA, type="u8", condition="bit_true", bit=3, mask=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time's Cloud (Speed Box Leader)" },
+      },
+    },
+  },
+}

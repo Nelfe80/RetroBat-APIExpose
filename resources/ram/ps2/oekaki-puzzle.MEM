@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Oekaki Puzzle",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "oekaki-puzzle",
+    file = "oekaki-puzzle.zip",
+    hashes = {
+      { hash = "199ab792cc5b4ee3fd4227a0f53d5c56", label = "SuperLite 2000 Vol. 7 - Oekaki Puzzle (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

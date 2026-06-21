@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "TrackMania: Build to Race",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle, Racing"
+  },
+
+  rom = {
+    name = "trackmania-build-to-race",
+    file = "trackmania-build-to-race.zip",
+    hashes = {
+      { hash = "a3132d549b21aab7abea70c52d351e2e", label = "TrackMania - Build to Race (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB1F68C, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Credits" },
+        { address=0XB21194, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 2 | Credits" },
+        { address=0XB23608, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 3 | Credits" },
+        { address=0XB2360C, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 3 | Credits" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XB210DB, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour" },
+        { address=0XB210DE, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Builder" },
+        { address=0XB22BE3, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour" },
+        { address=0XB2505B, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour" },
+        { address=0XB2505E, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Builder" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB1F898, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 1 | Gold Medals Race increased" },
+        { address=0XB1F8A8, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 1 | Gold Medals Puzzle increased" },
+        { address=0XB1F8B8, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 1 | Gold Medals Platform increased" },
+        { address=0XB1FCB8, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Medal" },
+        { address=0XB213A0, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 2 | Gold Medals increased" },
+        { address=0XB213B0, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 2 | Gold Medals Puzzle increased" },
+        { address=0XB213C0, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 2 | Gold Medals Platform increased" },
+        { address=0XB23818, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 3 | Gold Medals increased" },
+        { address=0XB23828, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 3 | Gold Medals Puzzle increased" },
+        { address=0XB23838, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Profile 3 | Gold Medals Platform increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB210E3, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="All Blocks" },
+        { address=0XB25063, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="All Blocks" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB1F5F0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Race Records | Play Time" },
+        { address=0XB1F8F0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Profile 1 | Stadium A1 Time" },
+        { address=0XB1F8F4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Profile 1 | Stadium A2 Time" },
+        { address=0XB1F8F8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Profile 1 | Stadium A3 Time" },
+        { address=0XB1F8FC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Profile 1 | Stadium A4 Time" },
+        { address=0XB1F900, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Profile 1 | Stadium A5 Time" },
+        { address=0XB1F904, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Profile 1 | Desert A1 Time" },
+      },
+    },
+  },
+}

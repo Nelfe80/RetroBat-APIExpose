@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Aaahh!!! Real Monsters",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "aaahh-real-monsters",
+    file = "aaahh-real-monsters.zip",
+    hashes = {
+      { hash = "9f54481697efc9e6b96fcd054883ae70", label = "Aaahh!!! Real Monsters (USA).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE848, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XE848, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Objective" },
+      },
+      stage = {
+        { address=0XE77A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus stage all fossils" },
+        { address=0XE850, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus stage number of bounces" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE774, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XE774, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XB78C, type="u8", condition="eq", value=0X0B, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full HP" },
+        { address=0XB78C, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE776, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Trash/Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE83A, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Locked" },
+      },
+    },
+  },
+}

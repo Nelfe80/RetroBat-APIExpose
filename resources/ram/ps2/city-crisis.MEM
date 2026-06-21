@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "City Crisis",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Flight Simulator"
+  },
+
+  rom = {
+    name = "city-crisis",
+    file = "city-crisis.zip",
+    hashes = {
+      { hash = "f753bcad51bcc767aee1f37a640cffc8", label = "City Crisis (USA)" },
+      { hash = "51576c779c8849e459a7f37ffb82f1e7", label = "City Crisis (Europe) (En,Fr,De,It)" },
+      { hash = "4a2f849819d716fdf9d27a81fb217d11", label = "City Crisis (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3BA878, type="u16le", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration Mode" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3BA954, type="u16le", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Fish" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3BA900, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[NTSCU]" },
+      },
+    },
+  },
+}

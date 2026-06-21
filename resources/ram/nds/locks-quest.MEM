@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Lock's Quest",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "locks-quest",
+    file = "locks-quest.zip",
+    hashes = {
+      { hash = "1606e5f4bf5e1e39a1080802830e0968", label = "Lock's Quest (Europe) (En,Sv,No,Da,Fi).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X1BE987, type="u8", condition="eq", value=0X0, action="COMBO_HIT", no_log=false, no_survey=false, desc="Basic combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC1522, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld, day failed, siege mode, options" },
+        { address=0XC22A5, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Siege mode day 1-5 cleared" },
+        { address=0XC22A5, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Siege mode day 6-10 cleared" },
+        { address=0XC22A5, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Siege mode day 11-15 cleared" },
+        { address=0XC22A5, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Siege mode day 16-20 cleared (freeze)" },
+        { address=0XC22A7, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1BE97C, type="u16le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0XC22E1, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="Helper Damage" },
+        { address=0X1BE79C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Siege mode HP decreased" },
+        { address=0X1BE79C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Siege mode HP increased" },
+        { address=0X1BE97C, type="u16le", condition="eq", value=0XFA, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1BE97C, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Lock's HP" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1BE98F, type="u8", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Drop" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC2248, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Number of tile with stuff built on it. Adjusts in build mode, blinks to 0 between modes. Behaves" },
+      },
+    },
+  },
+}

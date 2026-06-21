@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Peppa Pig: Fun and Games",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "peppa-pig-fun-and-games",
+    file = "peppa-pig-fun-and-games.zip",
+    hashes = {
+      { hash = "5d88763330201dff59f07f7f4f07ff53", label = "Peppa Pig - Fun and Games (Europe).nds" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X21B7D8, type="u32le", condition="eq", value=0X44, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door appears" },
+        { address=0X21B7D8, type="u32le", condition="eq", value=0X45, action="DOOR_OPENED", no_log=false, no_survey=false, desc="You quit the game" },
+      },
+    },
+  },
+}

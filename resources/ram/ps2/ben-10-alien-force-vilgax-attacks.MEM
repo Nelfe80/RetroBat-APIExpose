@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Ben 10: Alien Force - Vilgax Attacks",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ben-10-alien-force-vilgax-attacks",
+    file = "ben-10-alien-force-vilgax-attacks.zip",
+    hashes = {
+      { hash = "a51883e9832bdabd93afe38592a9a8da", label = "Ben 10 - Alien Force - Vilgax Attacks (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X554CCC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0X554D20, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII] Level ID" },
+      },
+    },
+  },
+}

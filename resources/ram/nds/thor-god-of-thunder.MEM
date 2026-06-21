@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Thor: God of Thunder",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "thor-god-of-thunder",
+    file = "thor-god-of-thunder.zip",
+    hashes = {
+      { hash = "a83c60e3d080ca5689d175b7e63db4c3", label = "Thor - God of Thunder (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF6C28, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause/Selection Screen Active" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XE3200, type="u32le", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chapter VII, Act I" },
+        { address=0XF6C40, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Survival I" },
+        { address=0XF6C40, type="u16le", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Survival II" },
+        { address=0XF6C40, type="u16le", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Surivial III" },
+        { address=0XF6C40, type="u16le", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Survival IV" },
+        { address=0XF6C40, type="u16le", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Survival V" },
+        { address=0XF6C40, type="u16le", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Survival VI" },
+        { address=0XF6C40, type="u16le", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Suvival VII" },
+        { address=0XF6C40, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Survival Stage [32-Bit] [Stale when not in Survival Mode]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X161E79, type="u16le", condition="eq", value=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="Full Life" },
+        { address=0X161E7A, type="u8", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="Full Life" },
+        { address=0X161E7A, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="K.O" },
+        { address=0X161E7A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="--PLAYER HP-- (Gross life) increased" },
+        { address=0X161E7A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--PLAYER HP-- (Gross life) decreased" },
+      },
+      health = {
+        { address=0X1617D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Bar gauge decreased" },
+        { address=0X1617D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Bar gauge increased" },
+        { address=0X161E79, type="u16le", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Descrecent [0x161e7a]" },
+        { address=0X161E79, type="u16le", condition="eq", value=0X70, action="HEALTH_STATE", no_log=false, no_survey=false, desc="K.O" },
+        { address=0X161E79, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="--PLAYER HP-- (Countdown)" },
+        { address=0X1A0995, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1A0995, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1A0B56, type="u8", condition="eq", value=0X25, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X1A0B56, type="u8", condition="eq", value=0X2B, action="JUMPING", no_log=false, no_survey=false, desc="Jump+pitch" },
+        { address=0X1A0B5C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="--FLAG JUMP--" },
+        { address=0X1A0B78, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+  },
+}

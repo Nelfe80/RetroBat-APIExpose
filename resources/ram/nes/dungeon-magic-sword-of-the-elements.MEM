@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Dungeon Magic: Sword of the Elements",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "dungeon-magic-sword-of-the-elements",
+    file = "dungeon-magic-sword-of-the-elements.zip",
+    hashes = {
+      { hash = "5764fa1e710b6a9818cd13e66b1eb69e", label = "Dungeon Magic - Sword of the Elements (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0003, type="u8", condition="eq", value=0X1B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Scene" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0011, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Consistently in a town, castle, in a dungeon" },
+      },
+      stage = {
+        { address=0X004A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X00DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Value decreased" },
+        { address=0X00DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Value increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X6085, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slots" },
+        { address=0X6086, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 2" },
+        { address=0X6087, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 3" },
+        { address=0X6088, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 4" },
+        { address=0X6089, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 5" },
+        { address=0X608A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 6" },
+        { address=0X608B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 7" },
+        { address=0X608C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 8" },
+        { address=0X608D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 9" },
+        { address=0X608E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons & Armor Slot 10" },
+        { address=0X60B8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Paper Doll" },
+        { address=0X60D0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon & Armor Slot 1" },
+        { address=0X60D1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon & Armor Slot 2 ?" },
+        { address=0X6115, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon & Armor Menu" },
+        { address=0X6117, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon & Armor Menu" },
+        { address=0X611E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon & Armor Menu" },
+        { address=0X611F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon & Armor Menu" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0040, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Count increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X60B9, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Paper Doll" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X000D, type="u8", condition="eq", value=0X28, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Talk with king" },
+        { address=0X000D, type="u8", condition="eq", value=0XC0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Standing before King" },
+        { address=0X000D, type="u8", condition="eq", value=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Attacking Snake" },
+        { address=0X000D, type="u8", condition="eq", value=0X5C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Neutral Snake" },
+        { address=0X000D, type="u8", condition="eq", value=0X3C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Neutral Fly" },
+        { address=0X000D, type="u8", condition="eq", value=0XFF, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Spell Effect From Player" },
+        { address=0X0493, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Open?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Ultimate Muscle: Legends vs. New Generation",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "ultimate-muscle-legends-vs-new-generation",
+    file = "ultimate-muscle-legends-vs-new-generation.zip",
+    hashes = {
+      { hash = "c12d1e0fdd2f8954c581722de1f96ec0", label = "Ultimate Muscle - Legends vs. New Generation (USA)" },
+      { hash = "1c06dd48c2b90c9aed91ae275438369f", label = "Ultimate Muscle - Legends vs. New Generation (USA) (Undub) (v1.0) (Paquimex)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4B2BF8, type="u32be", condition="eq", value=0X14, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X32C4F2, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 Special" },
+        { address=0X32C9A4, type="u32be", condition="eq", value=0X2DF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X32C9A4, type="u32be", condition="eq", value=0X5A0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X32C9A4, type="u32be", condition="eq", value=0X960, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+      },
+      stage = {
+        { address=0X249D88, type="u32be", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tower Ring" },
+        { address=0X249D88, type="u32be", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Coliseum Ring" },
+        { address=0X249D88, type="u32be", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Alps Ring" },
+        { address=0X249D88, type="u32be", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Five Ring Stage" },
+        { address=0X249D88, type="u32be", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arena Mountain Ring Stage" },
+        { address=0X249D88, type="u32be", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lake Ring" },
+        { address=0X249D88, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE] Ring Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X32C99C, type="u32be", condition="eq", value=0X960, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full HP" },
+        { address=0X32C99C, type="u32be", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[32-bit BE] P1 HP" },
+        { address=0X32D278, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] P2 HP decreased" },
+        { address=0X32D278, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE] P2 HP increased" },
+        { address=0X32DB54, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] P3 HP decreased" },
+        { address=0X32DB54, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE] P3 HP increased" },
+        { address=0X32E430, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] P4 HP decreased" },
+        { address=0X32E430, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE] P4 HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X441C7C, type="u32be", condition="eq", value=0X17, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Man" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X31F340, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Versus - Ring Stage Decision increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2A4B54, type="u32be", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Unlimited" },
+        { address=0X2A4B54, type="u32be", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="3 Minutes" },
+        { address=0X2A4B54, type="u32be", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="5 Minutes" },
+        { address=0X2A4B54, type="u32be", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="10 Minutes" },
+        { address=0X2A4B54, type="u32be", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="15 Minutes" },
+        { address=0X2A4B54, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Tournament - Match Time Decision" },
+        { address=0X31F33C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Versus - Match Time Decision" },
+      },
+    },
+  },
+}

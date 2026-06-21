@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Shadow of the Beast",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "shadow-of-the-beast",
+    file = "shadow-of-the-beast.zip",
+    hashes = {
+      { hash = "c66e0612ba0b5c6846d21508b6f1cb69", label = "Shadow of the Beast (1990)(Gremlin Graphics Software)(Side A).dsk" },
+      { hash = "24f7193625e4345246189d0f6d9d892c", label = "Shadow of the Beast (1990)(Gremlin Graphics Software)(Side B).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X087D, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Well" },
+        { address=0X087D, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Plains" },
+        { address=0X087D, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="West Tree Cave" },
+        { address=0X087D, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="East Tree Cave" },
+        { address=0X087D, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Castle" },
+        { address=0X087D, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jetpack Tunnel" },
+        { address=0X087D, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Graveyard" },
+        { address=0X087D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Map/Level]" },
+        { address=0X087E, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared when Key has been used to open Well" },
+        { address=0X087F, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared when Key has been used to open the door at the end of the sewer (different from other ve" },
+      },
+      stage = {
+        { address=0X08D2, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="During Opening Cutscene" },
+        { address=0X08D2, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="East Tree Cave, Castle" },
+        { address=0X08D2, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Graveyard" },
+        { address=0X08D2, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jetpack Tunnel" },
+        { address=0X08D2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Stage Type?]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0872, type="u8", condition="eq", value=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cutscene" },
+        { address=0X0872, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X087D, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Skeleton Boss" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X087B, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Otherwise" },
+        { address=0X087D, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Red Dragon Boss" },
+        { address=0X087D, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hydra Boss" },
+        { address=0X087D, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Lobsterjaw Boss" },
+        { address=0X087D, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+        { address=0X08D2, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="All Bosses, The Well" },
+      },
+    },
+  },
+}

@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Athena",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "athena",
+    file = "athena.zip",
+    hashes = {
+      { hash = "0454aa97682235df3ed1a3456bc86e62", label = "athena.7z <Athena>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X47F4, type="u8", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X47F4, type="u8", condition="eq", value=0X4, action="DEMO_MODE", no_log=false, no_survey=false, desc="playing" },
+        { address=0X47F4, type="u8", condition="eq", value=0X7, action="DEMO_MODE", no_log=false, no_survey=false, desc="being controlled by cutscene?" },
+        { address=0X5D2F, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5D35, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      zone = {
+        { address=0X5D44, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Key to World of Labyrinth" },
+      },
+      stage = {
+        { address=0X5D34, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Part of the stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2D2F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+        { address=0X5D2F, type="u8", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="0 lives in game" },
+        { address=0X5D2F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 lives increased" },
+        { address=0X5D2F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 lives decreased" },
+      },
+      health = {
+        { address=0X2D17, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: energy" },
+        { address=0X2D37, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: energy" },
+        { address=0X5D17, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X5D17, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X5D37, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health decreased" },
+        { address=0X5D37, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X5D3A, type="u8", condition="eq", value=0X23, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Club" },
+        { address=0X5D3A, type="u8", condition="eq", value=0X27, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hammer" },
+        { address=0X5D3A, type="u8", condition="eq", value=0X2B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flail" },
+        { address=0X5D3A, type="u8", condition="eq", value=0X13, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blue sword" },
+        { address=0X5D3A, type="u8", condition="eq", value=0X17, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Yellow Sword" },
+        { address=0X5D3A, type="u8", condition="eq", value=0X33, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Crossbow" },
+        { address=0X5D3A, type="u8", condition="eq", value=0X43, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Wand" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2D29, type="u24be", condition="change", action="SCORE_STATE", color="orange", min=10, max=100, no_log=false, no_survey=false, desc="Score delta 10-100: Score delta 10-100" },
+        { address=0X2D29, type="u24be", condition="change", action="SCORE_STATE", color="cyan", min=110, max=300, no_log=false, no_survey=false, desc="Score delta 110-300: Score delta 110-300" },
+        { address=0X2D29, type="u24be", condition="change", action="SCORE_STATE", color="green", min=310, max=1000, no_log=false, no_survey=false, desc="Score delta 310-1000: Score delta 310-1000" },
+        { address=0X2D29, type="u24be", condition="change", action="SCORE_STATE", color="blue", min=1100, max=10000, no_log=false, no_survey=false, desc="Score delta 1100-10000: Score delta 1100-10000" },
+        { address=0X47F5, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(24Bit) BCD High score to submit" },
+        { address=0X5D29, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) BCD Score (minus 0 part)" },
+        { address=0X5D8D, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(24Bit) BCD Score P2" },
+      },
+      collectibles = {
+        { address=0XD7F1, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+        { address=0X5D3D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Shield increased" },
+        { address=0X5D3E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Red Ring 0x8b (Increases STR by 5) increased" },
+      },
+    },
+  },
+}

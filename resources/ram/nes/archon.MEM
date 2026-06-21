@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Archon",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Board Game, Shooter, Strategy"
+  },
+
+  rom = {
+    name = "archon",
+    file = "archon.zip",
+    hashes = {
+      { hash = "0f3b320959931b549eab42566aeadb63", label = "Archon (USA).nes" },
+      { hash = "ae20571cd276964fdaca9cb2804b5fa2", label = "Archon (USA) (Ru) (v1.0) (ConsolGames).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X05EA, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo indicator (ff if demo, 00 otherwise)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1E27, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Light HP decreased" },
+        { address=0X1E27, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Light HP increased" },
+        { address=0X1E28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dark HP decreased" },
+        { address=0X1E28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dark HP increased" },
+      },
+    },
+  },
+}

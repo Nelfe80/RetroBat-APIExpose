@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Teen Titans",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "teen-titans",
+    file = "teen-titans.zip",
+    hashes = {
+      { hash = "148c4190c830886bece41eb380ea3533", label = "Teen Titans (USA) (En,Fr).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA113, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Levels Unlocked (8-bit)" },
+        { address=0XA118, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select ID (8-bit)" },
+        { address=0XB4BA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select - Level Highlighted (16-bit)" },
+        { address=0XB56B, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Incomplete" },
+        { address=0XB56B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - Knock Outs (8-bit)" },
+        { address=0XB583, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - Enemies Defeated (8-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XB498, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Robin (16-bit) decreased" },
+        { address=0XB498, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Robin (16-bit) increased" },
+        { address=0XB49A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Raven (16-bit) decreased" },
+        { address=0XB49A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Raven (16-bit) increased" },
+        { address=0XB49C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Beast Boy (16-bit) decreased" },
+        { address=0XB49C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Beast Boy (16-bit) increased" },
+        { address=0XB49E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Cyborg (16-bit) decreased" },
+        { address=0XB49E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Cyborg (16-bit) increased" },
+        { address=0XB4A0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Starfire (16-bit) decreased" },
+        { address=0XB4A0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Starfire (16-bit) increased" },
+      },
+    },
+  },
+}

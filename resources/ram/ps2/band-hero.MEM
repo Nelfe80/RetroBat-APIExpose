@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Band Hero",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "band-hero",
+    file = "band-hero.zip",
+    hashes = {
+      { hash = "33e0cf4a3642c91bd03fd81ed55b3831", label = "Band Hero (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4B1540, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Check" },
+        { address=0X95E1A8, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[32 Bit] Demo Active Check" },
+        { address=0X95E1B8, type="u32le", condition="eq", value=0X00010000, action="DEMO_MODE", no_log=false, no_survey=false, desc="Green" },
+        { address=0X95E1B8, type="u32le", condition="eq", value=0X00001000, action="DEMO_MODE", no_log=false, no_survey=false, desc="Red" },
+        { address=0X95E1B8, type="u32le", condition="eq", value=0X00000100, action="DEMO_MODE", no_log=false, no_survey=false, desc="Yellow" },
+        { address=0X95E1B8, type="u32le", condition="eq", value=0X00000010, action="DEMO_MODE", no_log=false, no_survey=false, desc="Blue" },
+        { address=0X95E1B8, type="u32le", condition="eq", value=0X00000001, action="DEMO_MODE", no_log=false, no_survey=false, desc="Orange" },
+        { address=0X1D5F058, type="u32le", condition="eq", value=0X01D601C0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+      events = {
+        { address=0X95E478, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] Total Notes Hit in First Combo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9601C8, type="u32le", condition="eq", value=0X7C98E3C4, action="LIVES_STATE", no_log=false, no_survey=false, desc="Papa Roach - Lifeline" },
+        { address=0X9601C8, type="u32le", condition="eq", value=0XABD82191, action="LIVES_STATE", no_log=false, no_survey=false, desc="Evanescence - Bring Me to Life" },
+      },
+      health = {
+        { address=0X9601C8, type="u32le", condition="eq", value=0X8AFCD7A7, action="HIT", no_log=false, no_survey=false, desc="Culture Club - Do You Really Want to Hurt Me" },
+        { address=0X1D10728, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Career Stars - Do You Really Want to Hurt Me | Expert Guitar" },
+        { address=0X1D130A8, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Career Stars - Do You Really Want to Hurt Me | Medium Guitar" },
+        { address=0X1D131C8, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Career Stars - Do You Really Want to Hurt Me | Easy Guitar" },
+        { address=0X1D132A8, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Career Stars - Do You Really Want to Hurt Me | Hard Guitar" },
+        { address=0X1D140A8, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Career Stars - Do You Really Want to Hurt Me | Beginner Guitar" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X895E28, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit Float] Black Horse and the Cherry Tree | Bass Score (Beginner)" },
+        { address=0X95E448, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit Float] Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9601C8, type="u32le", condition="eq", value=0XB494CE29, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mighty Mighty Bosstones - The Impression That I Get" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X85DAC0, type="u32le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[32 Bit] Cheat Active | Invincible" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9601C8, type="u32le", condition="eq", value=0XC15CCE84, action="DOOR_OPENED", no_log=false, no_survey=false, desc="3 Doors Down - When I'm Gone" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X95E178, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Times Actived Star Power" },
+      },
+    },
+  },
+}

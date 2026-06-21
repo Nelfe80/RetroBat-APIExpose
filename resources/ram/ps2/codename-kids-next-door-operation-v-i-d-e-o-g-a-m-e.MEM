@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Codename: Kids Next Door - Operation: V.I.D.E.O.G.A.M.E.",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "codename-kids-next-door-operation-v-i-d-e-o-g-a-m-e",
+    file = "codename-kids-next-door-operation-v-i-d-e-o-g-a-m-e.zip",
+    hashes = {
+      { hash = "d07f585bac612c1e69a6fec2b2985666", label = "Codename - Kids Next Door - Operation - V.I.D.E.O.G.A.M.E. (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X828E58, type="u32le", condition="eq", value=0X00737469, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X8516A8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused (01)?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X828E58, type="u32le", condition="eq", value=0X42003165, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cavity Cave" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X00326563, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Moon Trip" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X00336472, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Brush Off" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X00356567, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ship Shape" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X00004232, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tarpoon" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X00316472, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spankariffic" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X33736865, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hamsterama" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X35004132, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Snot Bomber" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X35736865, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boogification" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X41347368, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spank Happy" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X42347368, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overflow" },
+        { address=0X828E58, type="u32le", condition="eq", value=0X6C6C416E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lunarumble" },
+        { address=0X828E58, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID 2 (32-bit) (ASCII)" },
+        { address=0X83842C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Spankariffic (32-bit)" },
+        { address=0X83844C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Brush Off (32-bit)" },
+        { address=0X83846C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Cavity Cave (32-bit)" },
+        { address=0X83848C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Donutty (32-bit)" },
+        { address=0X8384AC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Lunarumble (32-bit)" },
+        { address=0X8384BC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Ship Shape (32-bit)" },
+        { address=0X8384CC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Snot Bomber (32-bit)" },
+        { address=0X8384EC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Tarpoon (32-bit)" },
+        { address=0X83850C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Moon Trip (32-bit)" },
+        { address=0X83852C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Tutorial (32-bit)" },
+        { address=0X83853C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Hamsterama (32-bit)" },
+        { address=0X83855C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Spank Happy (32-bit)" },
+        { address=0X83857C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Overflow (32-bit)" },
+        { address=0X83859C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Boogification (32-bit)" },
+        { address=0XFB29EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tutorial level Secret - Number of Toilet Rolls Kicked into Tire (8-bit)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X83838C, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheat Activation Flag - Invincibility (8-bit)" },
+        { address=0X8383EC, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheat Unlock Flag - Invincibility (8-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X828EC4, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Timer (Float)" },
+      },
+    },
+  },
+}

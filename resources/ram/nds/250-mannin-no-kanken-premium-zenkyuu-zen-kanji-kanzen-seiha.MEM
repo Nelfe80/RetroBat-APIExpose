@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "250 Mannin no Kanken Premium: Zenkyuu Zen-Kanji Kanzen Seiha",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "250-mannin-no-kanken-premium-zenkyuu-zen-kanji-kanzen-seiha",
+    file = "250-mannin-no-kanken-premium-zenkyuu-zen-kanji-kanzen-seiha.zip",
+    hashes = {
+      { hash = "af85fd2776f9ffe5f3d9ca9159c72ff3", label = "Zaidan Houjin Nihon Kanji Nouryoku Kentei Kyoukai Koushiki Soft - 250 Mannin no Kanken - Shin Tokoton Kanji Nou - 47,000 + Jouyou Kanji Jiten, Yoji Jukugo Jiten (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

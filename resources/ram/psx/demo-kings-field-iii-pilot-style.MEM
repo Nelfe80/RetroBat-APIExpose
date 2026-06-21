@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "~Demo~ King's Field III: Pilot Style",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "demo-kings-field-iii-pilot-style",
+    file = "demo-kings-field-iii-pilot-style.zip",
+    hashes = {
+      { hash = "cb6a4d34a3801f12ff8c0ea82ff1476a", label = "King's Field III - Pilot Style (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1A22E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X17447C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Guardian HP decreased" },
+        { address=0X17447C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Guardian HP increased" },
+        { address=0X1A22F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X1A22F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X1A22F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X1A22F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1A23A3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Slot" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB0F13, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Silver Ring increased" },
+        { address=0XB0F39, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Ring increased" },
+        { address=0X1A232C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XB0EF3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Leather Shield" },
+        { address=0XB0EF4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield" },
+        { address=0XB0EF5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Earth Shield" },
+        { address=0X1A23CA, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Slot" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB0F3D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Moonlight sword" },
+      },
+    },
+  },
+}

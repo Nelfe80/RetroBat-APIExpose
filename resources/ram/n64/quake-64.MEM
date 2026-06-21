@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Quake 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter, 1ere Personne"
+  },
+
+  rom = {
+    name = "quake-64",
+    file = "quake-64.zip",
+    hashes = {
+      { hash = "097605021951024c3ecb2d502c0c2a9f", label = "Quake (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8D110, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="how many secrets in a level" },
+        { address=0X8D114, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="how many kills in a level" },
+        { address=0X8E8D5, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="in air" },
+        { address=0X8E8D5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0x02=on ground" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X163932, type="u16be", condition="eq", value=0X42C8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="100 health points" },
+        { address=0X163932, type="u16be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="(16bit) health" },
+        { address=0X1639EA, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Powerup (0x00 = none, 0x20 = biosuit, 0x40 = quad damage)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1639E8, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="shotgun (always on)" },
+        { address=0X1639E8, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="double barrel shotgun" },
+        { address=0X1639E8, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="nailgun" },
+        { address=0X1639E8, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="super nailgun" },
+        { address=0X1639E8, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="grenade launcher" },
+        { address=0X1639E8, type="u8", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="rocket launcher" },
+        { address=0X1639E8, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="thunderbolt" },
+        { address=0X163A26, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Axe" },
+        { address=0X163A26, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X163A26, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Double-Barrelled Shotgun" },
+        { address=0X163A26, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nailgun" },
+        { address=0X163A26, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Super Nailgun" },
+        { address=0X163A26, type="u8", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade Launcher" },
+        { address=0X163A26, type="u8", condition="eq", value=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rocket Launcher" },
+        { address=0X163A26, type="u8", condition="eq", value=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Thunderbolt" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X163946, type="u16be", condition="eq", value=0X42C8, action="SCORE_STATE", no_log=false, no_survey=false, desc="100 armor points" },
+      },
+      collectibles = {
+        { address=0X163A28, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Nail ammo 1" },
+        { address=0X163A2C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Nail ammo 2" },
+        { address=0X163A2E, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shell ammo" },
+        { address=0X163A30, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Cells ammo" },
+        { address=0X163A32, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Rocket ammo" },
+      },
+    },
+  },
+}

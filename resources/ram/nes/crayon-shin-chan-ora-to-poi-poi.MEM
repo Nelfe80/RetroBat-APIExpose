@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Crayon Shin-chan: Ora to Poi Poi",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "crayon-shin-chan-ora-to-poi-poi",
+    file = "crayon-shin-chan-ora-to-poi-poi.zip",
+    hashes = {
+      { hash = "309ee82fe7a2b90ff0d984a99cbb5a17", label = "Crayon Shin-chan - Ora to Poi Poi (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0480, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="a3 when cursor on Continue" },
+        { address=0X04B1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Game mode. 00=Drama Mode; 01= vs AI; 02 vs 2P; 03=Demo" },
+        { address=0X04B4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X020D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Left player goal line 6th row" },
+        { address=0X0248, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Right player goal line 1st row" },
+        { address=0X0249, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Right player goal line 2nd row" },
+        { address=0X024A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Right player goal line 3rd row" },
+        { address=0X024B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Right player goal line 4th row" },
+        { address=0X024C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Right player goal line 5th row" },
+        { address=0X024D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Right player goal line 6th row" },
+        { address=0X02DC, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="120" },
+        { address=0X02DC, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="100" },
+        { address=0X02DC, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="80" },
+        { address=0X02DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level (opponent blocks) custom mode" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0320, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Left player remaining blocks" },
+        { address=0X0330, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Right player remaining blocks" },
+        { address=0X0342, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Left player 1st collected block" },
+        { address=0X0343, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Left player 2nd collected block" },
+        { address=0X0344, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Left player 3rd collected block" },
+        { address=0X0345, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Left player 4th collected block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0368, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="combo counter" },
+      },
+    },
+  },
+}

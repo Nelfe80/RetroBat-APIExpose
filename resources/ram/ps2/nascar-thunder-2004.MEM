@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "NASCAR Thunder 2004",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "nascar-thunder-2004",
+    file = "nascar-thunder-2004.zip",
+    hashes = {
+      { hash = "597f58ee3e679d928986641aa1d289d8", label = "NASCAR Thunder 2004 (USA)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X42C614, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] player last lap time" },
+        { address=0X8165FC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Hella EA Sports Bio Time" },
+      },
+    },
+  },
+}

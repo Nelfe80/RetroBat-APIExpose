@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Chaos Break: Episode from ''Chaos Heat''",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Horror, Shooter"
+  },
+
+  rom = {
+    name = "chaos-break-episode-from-chaos-heat",
+    file = "chaos-break-episode-from-chaos-heat.zip",
+    hashes = {
+      { hash = "9fa5b5be39d1b2355311cd2055893091", label = "Chaos Break (Europe) (En,Fr,De,It)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XE524E, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life - Max increased" },
+        { address=0XE524E, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life - Max decreased" },
+        { address=0XE5250, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0XE5250, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0XEA973, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cutscene - Dead Scientist in Starting Area" },
+      },
+      health = {
+        { address=0XE5274, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy decreased" },
+        { address=0XE5274, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy increased" },
+        { address=0XE5278, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Clip Energy (EU) decreased" },
+        { address=0XE5278, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Clip Energy (EU) increased" },
+        { address=0XE7408, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Clip Energy (JP) decreased" },
+        { address=0XE7408, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Clip Energy (JP) increased" },
+      },
+    },
+  },
+}

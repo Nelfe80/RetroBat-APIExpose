@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hatena Satena",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "hatena-satena",
+    file = "hatena-satena.zip",
+    hashes = {
+      { hash = "d30a036c3bd3cb62f6029be745910075", label = "Hatena Satena (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

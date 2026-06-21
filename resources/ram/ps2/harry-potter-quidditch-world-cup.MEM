@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Harry Potter: Quidditch World Cup",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "harry-potter-quidditch-world-cup",
+    file = "harry-potter-quidditch-world-cup.zip",
+    hashes = {
+      { hash = "41df9bac037f3dd88d0610e0e31d9d9f", label = "Harry Potter - Quidditch World Cup (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X1DF3D80, type="u8", condition="bit_true", bit=4, mask=0X10, action="COMBO_HIT", no_log=false, no_survey=false, desc="Challenge Six: Combos - House Record (House Logo)" },
+        { address=0X1DF3D82, type="u8", condition="bit_true", bit=4, mask=0X10, action="COMBO_HIT", no_log=false, no_survey=false, desc="Challenge Six: Combos - School Record (House Logo)" },
+        { address=0X1DF3D86, type="u8", condition="bit_true", bit=3, mask=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="Challenge Six: Combos - Team Record (Seeker)" },
+        { address=0X1DF3D8C, type="u8", condition="bit_true", bit=4, mask=0X10, action="COMBO_HIT", no_log=false, no_survey=false, desc="Perform a 4-part Combo (Team Special Move)" },
+        { address=0X1DF3D8E, type="u8", condition="bit_true", bit=3, mask=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="Perform a 3-part Combo (Team Special Move)" },
+        { address=0X1DF3D90, type="u8", condition="bit_true", bit=3, mask=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="Perform a 4-part Combo (Team Special Move)" },
+        { address=0X1DF3D92, type="u8", condition="bit_true", bit=2, mask=0X04, action="COMBO_HIT", no_log=false, no_survey=false, desc="Perform a Combo (Team Special Move)" },
+        { address=0X1DF3D94, type="u8", condition="bit_true", bit=3, mask=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="Perform a 5-part Combo (Team Special Move)" },
+        { address=0X1DF3D96, type="u8", condition="bit_true", bit=2, mask=0X04, action="COMBO_HIT", no_log=false, no_survey=false, desc="Score from a Combo (Team Special Move)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1DF3D80, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 5 goals in a match (Team Special Move)" },
+        { address=0X1DF3D82, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 5 goals in a match (Team Special Move)" },
+        { address=0X1DF3D83, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 12 goals in the Hogwarts Quidditch Cup (Team Special Move)" },
+        { address=0X1DF3D85, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 6 goals in a match (Team Special Move)" },
+        { address=0X1DF3D86, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 6 goals in a match (Team Special Move)" },
+        { address=0X1DF3D87, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 12 goals in the Hogwarts Quidditch Cup (Team Special Move)" },
+        { address=0X1DF3D8A, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat Germany at player's ground (Team Photo)" },
+        { address=0X1DF3D8A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 15 goals in a match (Team Special Move)" },
+        { address=0X1DF3D8C, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat France at player's ground (Team Photo)" },
+        { address=0X1DF3D8C, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score a goal through each of the 3 goal hoops (Team Special Move)" },
+        { address=0X1DF3D8C, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 15 goals in a match (Team Special Move)" },
+        { address=0X1DF3D8E, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat USA at player's ground (Team Photo)" },
+        { address=0X1DF3D8E, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 25 goals in the Quidditch World Cup (Team Special Move)" },
+        { address=0X1DF3D90, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat Japan at player's ground (Team Photo)" },
+        { address=0X1DF3D90, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 3 goals through each of the three goal hoops (Team Special Move)" },
+        { address=0X1DF3D90, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Win a match without conceding a goal (Team Special Move)" },
+        { address=0X1DF3D92, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat England at player's ground (Team Photo)" },
+        { address=0X1DF3D92, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 20 goals in the Quidditch World Cup (Team Special Move)" },
+        { address=0X1DF3D94, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat Spain at player's ground (Team Photo)" },
+        { address=0X1DF3D94, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 12 goals in a match (Team Special Move)" },
+        { address=0X1DF3D94, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Play and win a match scoring only through the right goal hoop (Team Special Move)" },
+        { address=0X1DF3D96, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat Australia at player's ground (Team Photo)" },
+        { address=0X1DF3D96, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 3 goals through each of the three goal hoops (Team Special Move)" },
+        { address=0X1DF3D98, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat the Nordic team at player's ground (Team Photo)" },
+        { address=0X1DF3D98, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 15 goals in a match (Team Special Move)" },
+        { address=0X1DF3D98, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 25 goals in the Quidditch World Cup (Team Special Move)" },
+        { address=0X1DF3D9A, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat Bulgaria at player's ground (Team Photo)" },
+        { address=0X1DF3D9A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score 3 Combo goals in a match (Team Special Move)" },
+        { address=0X1DF3D9A, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Win a match without scoring any goals (Team Special Move)" },
+      },
+      zone = {
+        { address=0X1DF3D8A, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with Germany (World Cup)" },
+        { address=0X1DF3D8C, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with France (World Cup)" },
+        { address=0X1DF3D8E, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with USA (World Cup)" },
+        { address=0X1DF3D90, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with Japan (World Cup)" },
+        { address=0X1DF3D92, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with England (World Cup)" },
+        { address=0X1DF3D94, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with Spain (World Cup)" },
+        { address=0X1DF3D96, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with Australia (World Cup)" },
+        { address=0X1DF3D98, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with the Nordic team (World Cup)" },
+        { address=0X1DF3D9A, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win the World Cup with Bulgaria (World Cup)" },
+        { address=0X1DF3D9C, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win World Cup for first time at Comet 260 Level (Comet 260)" },
+        { address=0X1DF3D9C, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win World Cup for first time at Nimbus 2000 Level (Nimbus 2000)" },
+        { address=0X1DF3D9C, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win World Cup for first time at Nimbus 2001 Level (Nimbus 2001)" },
+        { address=0X1DF3D9C, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win World Cup for first time at Firebolt Level (Firebolt)" },
+        { address=0X1DF3D9C, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win World Cup on all four skill levels (Ludo Bagman)" },
+        { address=0X1DF3D9C, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Win World Cup for the first time (Queerditch Marsh)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1DF3D82, type="u8", condition="bit_true", bit=5, mask=0X20, action="SCORE_STATE", no_log=false, no_survey=false, desc="Match Two: Win by 100 Points (Team Photo)" },
+        { address=0X1DF3D86, type="u8", condition="bit_true", bit=4, mask=0X10, action="SCORE_STATE", no_log=false, no_survey=false, desc="Match One: Win by 100 Points (House Logo)" },
+        { address=0X1DF3D86, type="u8", condition="bit_true", bit=5, mask=0X20, action="SCORE_STATE", no_log=false, no_survey=false, desc="Match Three: Win by 100 Points (Team Photo)" },
+        { address=0X1DF3D88, type="u8", condition="bit_true", bit=0, mask=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Match One: Win by 150 Points (Hogwarts - Summer)" },
+        { address=0X1DF3D88, type="u8", condition="bit_true", bit=1, mask=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Match Two: Win by 150 Points (Hogwarts - Winter)" },
+        { address=0X1DF3D88, type="u8", condition="bit_true", bit=2, mask=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="Match Three: Win by 150 Points (Hogwarts - Madam Hooch)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1DF3D8A, type="u8", condition="bit_true", bit=3, mask=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Strike a Chaser 3 times with a Bludger (Team Special Move)" },
+        { address=0X1DF3D96, type="u8", condition="bit_true", bit=3, mask=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Strike a Chaser 5 times with a Bludger (Team Special Move)" },
+        { address=0X1DF3D98, type="u8", condition="bit_true", bit=3, mask=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Strike a Chaser 3 times with a Bludger (Team Special Move)" },
+      },
+    },
+  },
+}

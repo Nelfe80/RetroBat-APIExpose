@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Alien Syndrome",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "alien-syndrome",
+    file = "alien-syndrome.zip",
+    hashes = {
+      { hash = "0103136b3bf5ad61e4f5187168797bcb", label = "aliensyn.7z <Alien Syndrome (set 4, System 16B, unprotected)>" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0101, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+        { address=0X0237, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages rescued" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X002F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives dipswitch increased" },
+        { address=0X002F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives dipswitch decreased" },
+        { address=0X0235, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0235, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0C7E, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Boss HP, starts at 0, and increases as the boss takes damage" },
+        { address=0X0D3E, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Boss HP, starts at 0, and increases as the boss takes damage" },
+        { address=0X0DFE, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Boss HP, starts at 0, and increases as the boss takes damage" },
+        { address=0X0E5E, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Boss HP, starts at 0, and increases as the boss takes damage" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X023E, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser" },
+        { address=0X023E, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade Launcher" },
+        { address=0X023E, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flamethrower" },
+        { address=0X023E, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fireball" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0060, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Top Score XXXX0000" },
+        { address=0X0062, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Top Score 0000XXXX" },
+        { address=0X0068, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Score XXXX0000" },
+        { address=0X006A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Score 0000XXXX" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0CCE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Bit0] Boss fight" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0010, type="u8", condition="eq", value=0X1011, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X0010, type="u8", condition="eq", value=0X1111, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X0010, type="u8", condition="eq", value=0X0111, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X0010, type="u8", condition="eq", value=0X0011, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hardest" },
+        { address=0X0014, type="u8", condition="eq", value=0X50, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="120 seconds" },
+        { address=0X0014, type="u8", condition="eq", value=0X60, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="130 seconds" },
+        { address=0X0014, type="u8", condition="eq", value=0X70, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="140 seconds" },
+        { address=0X0014, type="u8", condition="eq", value=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="150 seconds" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0014, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time dipswitch" },
+      },
+    },
+  },
+}

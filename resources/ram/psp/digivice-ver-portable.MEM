@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Digivice Ver. Portable",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "digivice-ver-portable",
+    file = "digivice-ver-portable.zip",
+    hashes = {
+      { hash = "436ceb68658b81c42b1294dac1188357", label = "Digivice Ver Portable (Japan) (PSN).iso" },
+      { hash = "6ed5c568614941f02c240fa756319e81", label = "Digivice Ver Portable (Japan) (PSN) (Es) (v1.0) (Bunkai).iso" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1159724, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Step Counter - Boss Battle / Area Clear" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cowboy Casino",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cowboy-casino",
+    file = "cowboy-casino.zip",
+    hashes = {
+      { hash = "e5397ad1abf40c39b8c5fad81d4c199b", label = "Cowboy Casino (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

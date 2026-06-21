@@ -1,0 +1,107 @@
+return {
+  game = {
+    title = "Silent Scope",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "silent-scope",
+    file = "silent-scope.zip",
+    hashes = {
+      { hash = "ca000124b65dc2df51f6db472a676a02", label = "Silent Scope (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15F362, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game: Game Paused (bit, 0x01 = pause)" },
+        { address=0X1B026D, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Main Menu screens 0x01=Arcade Mode, 0x02=Shooting Range Oudoor Stage Select, 0x03=Main Menu, 0x0" },
+        { address=0X1B027C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Game: Demo Scene ID (0x00-0x07, 0xff=Game Active)" },
+        { address=0X1F3374, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game: Number of continues remaniing (Story Mode)" },
+        { address=0X26FEF0, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Config: Continue (0x00-0x05, default 0x02, 0x05=EXTRA)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X186A78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game: Display transparent background for text at bottom of screen (bit, 0x01=on)" },
+        { address=0X1B0976, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player: Rounds left in rifle (0x00-0x05)" },
+        { address=0X26FF10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Config: Difficulty Level (0x00-0x07, default 0x03)" },
+        { address=0X272124, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game: Options Menu selection (0x00-0x05) 0x00=GAME_CONFIG, 0x01=SYSTEM_CONFIG, 0x02=SOUND_CONFIG" },
+      },
+      stage = {
+        { address=0X1B0938, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game: Challenge100/Time Attack Letter Grade At Stage Result Screen (0x00-0x07, F-SS)" },
+        { address=0X2215D8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game: Outdoor Shooting Range Stage Selection (0x00-0x08)" },
+        { address=0X271A98, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 1 grade (0x00-0x07, F-SS)" },
+        { address=0X271AE0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 10 grade (0x00-0x07, F-SS)" },
+        { address=0X271B30, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 20 grade (0x00-0x07, F-SS)" },
+        { address=0X271B80, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 30 grade (0x00-0x07, F-SS)" },
+        { address=0X271BD0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 40 grade (0x00-0x07, F-SS)" },
+        { address=0X271C20, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 50 grade (0x00-0x07, F-SS)" },
+        { address=0X271C70, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 60 grade (0x00-0x07, F-SS)" },
+        { address=0X271CC0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 70 grade (0x00-0x07, F-SS)" },
+        { address=0X271D10, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 80 grade (0x00-0x07, F-SS)" },
+        { address=0X271D60, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 90 grade (0x00-0x07, F-SS)" },
+        { address=0X271DB0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge100: Stage 100 grade (0x00-0x07, F-SS)" },
+        { address=0X27267C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game: Challenge100 Stage No. (0x00-0x63, 0xfe=Other Game Modes)" },
+        { address=0XD627B5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game: Parachute stage spotted by enemies (bit) 0x00=NOT SPOTTED, 0x01=SPOTTED" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1B094C, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player: Life remaining (top 4 1st byte and bottom 4 2nd byte, value*2) increased" },
+        { address=0X1B094C, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player: Life remaining (top 4 1st byte and bottom 4 2nd byte, value*2) decreased" },
+        { address=0X1B0A24, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Game: Scope Status (0x00=Nothing, 0x01=Hit, 0x02=Bonus Life) increased" },
+        { address=0X1B0A24, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game: Scope Status (0x00=Nothing, 0x01=Hit, 0x02=Bonus Life) decreased" },
+        { address=0X26FF18, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Game Config: Player Life (0x00-0x03, default 0x02) increased" },
+        { address=0X26FF18, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game Config: Player Life (0x00-0x03, default 0x02) decreased" },
+      },
+      health = {
+        { address=0X1B09D8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Game: Tom's current HP decreased" },
+        { address=0X1B09D8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Game: Tom's current HP increased" },
+        { address=0X1B09DE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Game: Tom's Max HP decreased" },
+        { address=0X1B09DE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Game: Tom's Max HP increased" },
+        { address=0X1ED3CD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Game: Monica's face mask HP in Story Mode (0x00-0x02) decreased" },
+        { address=0X1ED3CD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Game: Monica's face mask HP in Story Mode (0x00-0x02) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B0928, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player: Score" },
+        { address=0X271A9A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Challenge100: Stage 1 Total Score" },
+        { address=0X271A9C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Challenge100: Stage 1 Base Score" },
+        { address=0X271DB4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game: Challenge100 Total Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1B09C2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Game: Boss ID (0x09=Scorpion/Bros, 0x0a=Cobra, 0x0b=Hornet, 0x0c=Tom and Jerry, 0x0f=Monica, 0xf" },
+        { address=0X1B09C3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Game: Boss Active (0x02=ACTIVE, ff=OFF)" },
+        { address=0X1B09C4, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Game: Boss current health (value x2)" },
+        { address=0X1B09CA, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Game: Boss Max Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1B026C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Game: Game Status (0x06=Arcade Mode active, 0x08=Outdoor Shooting Range)" },
+        { address=0X1B026F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Game: Training/Challenge100/Outdoor Shooting Range Menu (0x07=Currently In Menu)" },
+        { address=0X1E44B0, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Game: Parachute Searchlight No. 5 (0x00=destroyed, 0x01=alive)" },
+        { address=0X1E47FC, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Game: Parachute Searchlight No. 6 (0x00=destroyed, 0x01=alive)" },
+        { address=0X1E4B48, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Game: Parachute Searchlight No. 3 (0x00=destroyed, 0x01=alive)" },
+        { address=0X1E4E94, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Game: Parachute Searchlight No. 4 (0x00=destroyed, 0x01=alive)" },
+        { address=0X1E51E0, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Game: Parachute Searchlight No. 1 (0x00=destroyed, 0x01=alive)" },
+        { address=0X1E552C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Game: Parachute Searchlight No. 2 (0x00=destroyed, 0x01=alive)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1B0974, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player: Timer between chambered rounds (0x00-0x19?)" },
+        { address=0X1ED719, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game: Monica's face mask HP in Time Attack (0x00-0x02)" },
+        { address=0X26FEF4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Config: Time Limit (0x00-0x03, 0x00 default)" },
+        { address=0X271A9E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenge100: Stage 1 Time Bonus" },
+      },
+    },
+  },
+}

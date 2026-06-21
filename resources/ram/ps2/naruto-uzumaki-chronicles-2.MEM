@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Naruto: Uzumaki Chronicles 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "naruto-uzumaki-chronicles-2",
+    file = "naruto-uzumaki-chronicles-2.zip",
+    hashes = {
+      { hash = "f13a0e5abc10d61e51a5faa5d9bd7037", label = "Naruto - Uzumaki Chronicles 2 (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X3CFBA0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Naruto - HP [16bit] decreased" },
+        { address=0X3CFBA0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Naruto - HP [16bit] increased" },
+        { address=0X3CFCF4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kankuro - HP [16bit] decreased" },
+        { address=0X3CFCF4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kankuro - HP [16bit] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3D0021, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item - Gold Bar increased" },
+      },
+    },
+  },
+}

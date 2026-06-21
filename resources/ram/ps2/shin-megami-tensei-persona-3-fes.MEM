@@ -1,0 +1,122 @@
+return {
+  game = {
+    title = "Shin Megami Tensei: Persona 3 FES",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-persona-3-fes",
+    file = "shin-megami-tensei-persona-3-fes.zip",
+    hashes = {
+      { hash = "0a0ebe21327a53c99764160892cf56a9", label = "Shin Megami Tensei - Persona 3 FES (USA) (Undub - Original BGM) (v1.01) (Fei)" },
+      { hash = "67247a7fae57e8fd881abf1a145ccbdb", label = "Shin Megami Tensei - Persona 3 FES (USA) (Direct Commands) (v1.1) (TGE)" },
+      { hash = "72e55002257a6e6c540b7625bb91e7b9", label = "Shin Megami Tensei - Persona 3 FES (USA)" },
+      { hash = "e26d1fec86be5754175b72bec0b5d187", label = "Shin Megami Tensei - Persona 3 FES (USA) (Direct Commands) (v1.1) (TGE) (Undub - Original BGM) (v1.01) (Fei)" },
+      { hash = "1b8907ceadd31e5a1ec9b70bb569ba2a", label = "Shin Megami Tensei - Persona 3 FES (USA) (Es) (v1.1b) (TraduSquare)" },
+      { hash = "235ba0069852347546924d46f6f88be6", label = "Shin Megami Tensei - Persona 3 FES (USA) (Direct Commands) (v1.1) (TGE) (Undub - Remix BGM) (v1.01) (Fei)" },
+      { hash = "dc8ade764b7b940c188c802655d91bfa", label = "Shin Megami Tensei - Persona 3 FES (USA) (Undub - Remix BGM) (v1.01) (Fei)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8340F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yukari - Level" },
+        { address=0X834454, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aigis - Level" },
+        { address=0X8347B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mitsuru - Level" },
+        { address=0X834B1C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Junpei - Level" },
+        { address=0X834E80, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fuuka - Level" },
+        { address=0X8351E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Akihiko - Level" },
+        { address=0X835548, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ken - Level" },
+        { address=0X835C10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Koromaru - Level" },
+        { address=0X83622A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MC - Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X83628C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Social Link" },
+        { address=0X10C2DA4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Balm of Life Qty increased" },
+        { address=0X10C2DA4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Balm of Life Qty decreased" },
+        { address=0X10C2E80, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1UP Qty increased" },
+        { address=0X10C2E80, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1UP Qty decreased" },
+        { address=0X10C2F1C, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diet Food Qty" },
+        { address=0X10C2F1E, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Super Diet Food Qty" },
+      },
+      health = {
+        { address=0X83401C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yukari - Current HP decreased" },
+        { address=0X83401C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yukari - Current HP increased" },
+        { address=0X834380, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Aigis - Current HP decreased" },
+        { address=0X834380, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Aigis - Current HP increased" },
+        { address=0X8346E4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mitsuru - Current HP decreased" },
+        { address=0X8346E4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mitsuru - Current HP increased" },
+        { address=0X834A48, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Junpei - Current HP decreased" },
+        { address=0X834A48, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Junpei - Current HP increased" },
+        { address=0X835110, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Akihiko - Current HP decreased" },
+        { address=0X835110, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Akihiko - Current HP increased" },
+        { address=0X835474, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ken - Current HP decreased" },
+        { address=0X835474, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ken - Current HP increased" },
+        { address=0X8357D8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shinjiro Current HP decreased" },
+        { address=0X8357D8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shinjiro Current HP increased" },
+        { address=0X835B3C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Koromaru - Current HP decreased" },
+        { address=0X835B3C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Koromaru - Current HP increased" },
+        { address=0X83622C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="MC / Aigis (The Answer) - Current HP decreased" },
+        { address=0X83622C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="MC / Aigis (The Answer) - Current HP increased" },
+        { address=0X10C2F22, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Supplement Qty decreased" },
+        { address=0X10C2F22, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Supplement Qty increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X10C2E54, type="u16le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald Qty" },
+      },
+      weapon = {
+        { address=0X83406C, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Yukari - Weapon Equip" },
+        { address=0X8343D0, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Aigis - Weapon Equip" },
+        { address=0X834734, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mitsuru - Weapon Equip" },
+        { address=0X834A98, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Junpei Weapon Equip" },
+        { address=0X835160, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Akihiko - Weapon Equip" },
+        { address=0X8354C4, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ken - Weapon Equip" },
+        { address=0X835B8C, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Koromaru - Weapon Equip" },
+        { address=0X83678C, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="MC / Aigis (The Answer) - Weapon Equipped" },
+        { address=0X83A700, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Fusion" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10C2E10, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin of Page Qty increased" },
+        { address=0X10C2E12, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin of Knight Qty increased" },
+        { address=0X10C2E14, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin of Queen Qty increased" },
+        { address=0X10C2E16, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin of King Qty increased" },
+        { address=0X10C2EB0, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Wealth Coin Qty increased" },
+        { address=0X10C2EB2, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasure Coin Qty increased" },
+        { address=0X10C2EB4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Supreme Coin Qty increased" },
+        { address=0X10C2EB6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Opulent Coin Qty increased" },
+        { address=0X10C2EB8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Luxury Coin Qty increased" },
+        { address=0X10C2EBA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Glorious Coin Qty increased" },
+        { address=0X10C2ED4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Medal Qty increased" },
+        { address=0X10C2EF0, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Handguard Qty increased" },
+        { address=0X10C2EF2, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Ring Qty increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X83A3D6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Bitflags] Tartarus Boss Alive" },
+        { address=0X83A3D9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Bitflags] Tartarus Boss Alive" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X10C2F10, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Heart Qty" },
+        { address=0X10C2F2A, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Copper Doorknob Qty" },
+        { address=0X10C2F36, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Wheel Qty" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X83679E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time of day" },
+      },
+    },
+  },
+}

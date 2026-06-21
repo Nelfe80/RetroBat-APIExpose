@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "God Panic: Shijou Saikyou no Gundan",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "god-panic-shijou-saikyou-no-gundan",
+    file = "god-panic-shijou-saikyou-no-gundan.zip",
+    hashes = {
+      { hash = "ed23bb5432cbef9d39a754062c5c7c56", label = "God Panic - Shijou Saikyou no Gundan (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0041, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="demo/title" },
+        { address=0X0041, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0X0044, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="demo/title" },
+        { address=0X0044, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0X0049, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="demo/title" },
+        { address=0X0049, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X004C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="player max health level" },
+        { address=0X004E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="shot power level" },
+      },
+      stage = {
+        { address=0X005C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stages, current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X004A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="player lives increased" },
+        { address=0X004A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player lives decreased" },
+        { address=0X004B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="stages, current stage but changes ealry after boss death" },
+        { address=0X1FFF, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X1FFF, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 (default)" },
+        { address=0X1FFF, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="3" },
+        { address=0X1FFF, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="options lives increased" },
+        { address=0X1FFF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="options lives decreased" },
+      },
+      health = {
+        { address=0X004F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health decreased" },
+        { address=0X004F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health increased" },
+        { address=0X0C09, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="old man sheild health decreased" },
+        { address=0X0C09, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="old man sheild health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0050, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player special weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0045, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="score 32bit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0063, type="u8", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="moving" },
+        { address=0X0063, type="u8", condition="eq", value=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="moving" },
+        { address=0X0063, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="stopped" },
+        { address=0X0065, type="u8", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="moving" },
+        { address=0X0065, type="u8", condition="eq", value=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="moving" },
+        { address=0X0065, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="stopped" },
+        { address=0X0772, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="goes down on boss being hit" },
+      },
+    },
+  },
+}

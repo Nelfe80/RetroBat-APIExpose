@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "King of Fighters R-2: Pocket Fighting Series",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "king-of-fighters-r-2-pocket-fighting-series",
+    file = "king-of-fighters-r-2-pocket-fighting-series.zip",
+    hashes = {
+      { hash = "b361ed78f6126f94179dc69fe4c58781", label = "King of Fighters R-2 - Pocket Fighting Series (World) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0CEA, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0" },
+        { address=0X0CEA, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0X0CEA, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2" },
+        { address=0X0CEA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds (8-bit)" },
+        { address=0X0D08, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0" },
+        { address=0X0D08, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0X0D08, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2" },
+        { address=0X0D08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds (8-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X02E6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X12C3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time (8-bit)" },
+      },
+    },
+  },
+}

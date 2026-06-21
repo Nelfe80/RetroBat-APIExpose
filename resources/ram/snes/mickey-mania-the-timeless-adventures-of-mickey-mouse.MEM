@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Mickey Mania: The Timeless Adventures of Mickey Mouse",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "mickey-mania-the-timeless-adventures-of-mickey-mouse",
+    file = "mickey-mania-the-timeless-adventures-of-mickey-mouse.zip",
+    hashes = {
+      { hash = "25079ae8cf72ed2138e6ca781a2210e9", label = "Mickey Mania (Europe).sfc" },
+      { hash = "4441d7c6dc0b43b769b620ac4dc950e8", label = "[MSU-1] Mickey Mania (USA) (Saturn OST) (PepilloPEV) (v1,2018-04-01)" },
+      { hash = "e3f9cc6d8321fa661a30cabe5dce141a", label = "Mickey Mania - The Timeless Adventures of Mickey Mouse (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0604, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X060E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X060E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X060F, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Part of 16-bit lives counter, also becomes FF on Game Over increased" },
+        { address=0X060F, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Part of 16-bit lives counter, also becomes FF on Game Over decreased" },
+        { address=0X0610, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LevelSelectUsed (0080 Bit7), Difficulty (Bit 0 and 1), Lives (Bit 2 and 3), Bit4 IsInGame increa" },
+        { address=0X0610, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LevelSelectUsed (0080 Bit7), Difficulty (Bit 0 and 1), Lives (Bit 2 and 3), Bit4 IsInGame decrea" },
+        { address=0X0722, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="PeteHits ff=Dead" },
+        { address=0X5B30, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Table 1UP ff07not f707collected increased" },
+        { address=0X5B30, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Table 1UP ff07not f707collected decreased" },
+        { address=0X5FCC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="SecretGhostHouse1UP fe36=N f636=Y increased" },
+        { address=0X5FCC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="SecretGhostHouse1UP fe36=N f636=Y decreased" },
+        { address=0X6304, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1UP Warf (00fe not collected) (00f6 Collected) increased" },
+        { address=0X6304, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1UP Warf (00fe not collected) (00f6 Collected) decreased" },
+        { address=0X6326, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="GhostHouse1UP fe19=N f619=Y increased" },
+        { address=0X6326, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="GhostHouse1UP fe19=N f619=Y decreased" },
+        { address=0X66CE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ghost1UP L fe4c=not f64c=collected increased" },
+        { address=0X66CE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ghost1UP L fe4c=not f64c=collected decreased" },
+        { address=0X66D2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="GhostHouse1UP R fe6e=N f66e=Y increased" },
+        { address=0X66D2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="GhostHouse1UP R fe6e=N f66e=Y decreased" },
+        { address=0X6E2E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Beanstalk1UP (ff07 not collected) (f707 collected) increased" },
+        { address=0X6E2E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Beanstalk1UP (ff07 not collected) (f707 collected) decreased" },
+      },
+      health = {
+        { address=0X08A2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="MadDoctorHP decreased" },
+        { address=0X08A2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="MadDoctorHP increased" },
+        { address=0X0B32, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="TL Cog HP decreased" },
+        { address=0X0B32, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="TL Cog HP increased" },
+        { address=0X0BB2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="TL Cog HP decreased" },
+        { address=0X0BB2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="TL Cog HP increased" },
+        { address=0X0E32, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="BL Cog HP decreased" },
+        { address=0X0E32, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="BL Cog HP increased" },
+        { address=0X0EB2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="BL Cog HP decreased" },
+        { address=0X0EB2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="BL Cog HP increased" },
+      },
+    },
+  },
+}

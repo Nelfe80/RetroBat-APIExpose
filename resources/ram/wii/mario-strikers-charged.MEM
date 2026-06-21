@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Mario Strikers Charged",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "mario-strikers-charged",
+    file = "mario-strikers-charged.zip",
+    hashes = {
+      { hash = "c25723a48c76937838502df8401470f9", label = "Mario Strikers Charged (USA) (En,Fr,Es) (Rev 1)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC60740, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rookie" },
+        { address=0XC60740, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Professional" },
+        { address=0XC60740, type="u32be", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Superstar" },
+        { address=0XC60740, type="u32be", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legend" },
+        { address=0XC60740, type="u32be", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Megastriker" },
+        { address=0XC60740, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Domination Options: Skill Level" },
+        { address=0XC60744, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals" },
+        { address=0XC6074C, type="u32be", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="3 Goals" },
+        { address=0XC6074C, type="u32be", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="4 Goals" },
+        { address=0XC6074C, type="u32be", condition="eq", value=0X0A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="10 Goals" },
+        { address=0XC6789E, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16-bit BE] Home Team: Shots On Goal" },
+        { address=0XC76DDC, type="u32be", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Qualifying" },
+        { address=0XC76DDC, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elimination" },
+        { address=0XC76DDC, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Finals" },
+        { address=0XC76DDC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Fire Cup: Current Round Type of Current Cup" },
+        { address=0XC76DE0, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16-bit BE] Fire Cup: Progress through Current Round Type" },
+        { address=0XC78194, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16-bit BE] Fire Cup: Player's Goals For in Cup" },
+        { address=0XC78196, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16-bit BE] Fire Cup: Player's Goals Against in Cup" },
+        { address=0XC782C8, type="u32be", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Qualifying" },
+        { address=0XC782C8, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elimination" },
+        { address=0XC782C8, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Finals" },
+        { address=0XC782C8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Crystal Cup: Current Round Type of Current Cup" },
+        { address=0XC782CC, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16-bit BE] Crystal Cup: Progress through Current Round Type" },
+        { address=0XC7AE10, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16-bit BE] Crystal Cup: Player's Goals For in Cup" },
+        { address=0XC7AE12, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16-bit BE] Crystal Cup: Player's Goals Against in Cup" },
+        { address=0XC7AFB4, type="u32be", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Qualifying" },
+        { address=0XC7AFB4, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elimination" },
+        { address=0XC7AFB4, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Finals" },
+        { address=0XC7AFB4, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Striker Cup: Current Round Type of Current Cup" },
+        { address=0XC7AFB8, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16-bit BE] Striker Cup: Progress through Current Round Type" },
+        { address=0XC7B4D0, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16-bit BE] Striker Cup: Player's Goals For in Cup" },
+        { address=0XC7B4D2, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16-bit BE] Striker Cup: Player's Goals Against in Cup" },
+        { address=0XCFA270, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal Scored" },
+        { address=0XCFA288, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit BE] Number of Goals in Current Megastrike" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC7F46C, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Overall Record: Sudden Death in Current Road to Striker" },
+      },
+      health = {
+        { address=0XC6075C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Domination Options: Power-Up Cheats decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC6075C, type="u32be", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="None" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Explosives" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Freezing" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shells" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Giant" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Accelerator" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Peelin' Out" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Seek and Destroy" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bombs Away" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X09, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Super Captains" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Infinite" },
+        { address=0XC6075C, type="u32be", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No Power-Ups" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC7817E, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Fire Cup: Player's Points in Cup" },
+        { address=0XC7ADFA, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Crystal Cup: Player's Points in Cup" },
+        { address=0XC7B4BA, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Striker Cup: Player's Points in Cup" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC6075C, type="u32be", condition="eq", value=0X09, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Super Captains" },
+      },
+    },
+  },
+}

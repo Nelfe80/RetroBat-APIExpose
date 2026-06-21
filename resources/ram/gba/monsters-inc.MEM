@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Monsters, Inc.",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "monsters-inc",
+    file = "monsters-inc.zip",
+    hashes = {
+      { hash = "d3bc617082a50dcfa360c10f6ec5f845", label = "Monsters, Inc. (Europe) (En,Es,Nl).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X29EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID inside area" },
+        { address=0X2DC4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bonus snow level is completed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X28A4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life counter increased" },
+        { address=0X28A4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life counter decreased" },
+        { address=0X29BC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Candies" },
+        { address=0X4B3B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Area 1 boss life increased" },
+        { address=0X4B3B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Area 1 boss life decreased" },
+        { address=0X4BB3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Area 2 to 5 boss life increased" },
+        { address=0X4BB3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Area 2 to 5 boss life decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6F4C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss ID" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2F70, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door pieces in possession" },
+        { address=0X7CC4, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Guarded door in the room" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X027C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sully Healthbar" },
+      },
+    },
+  },
+}

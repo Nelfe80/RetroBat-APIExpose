@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bomberman Max: Ain Version [Subset - Max Charabom Levels]",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "bomberman-max-ain-version-subset-max-charabom-levels",
+    file = "bomberman-max-ain-version-subset-max-charabom-levels.zip",
+    hashes = {
+      { hash = "715e2085de32c99e487426ee7af8fa01", label = "Bomberman Max - Ain Version [Subset - Max Charabom Levels].gbc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fireman Sam: Action Stations",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "fireman-sam-action-stations",
+    file = "fireman-sam-action-stations.zip",
+    hashes = {
+      { hash = "4a41e4fd2dcfeb03f8a760d0ea5aae97", label = "Fireman Sam - Action Stations (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

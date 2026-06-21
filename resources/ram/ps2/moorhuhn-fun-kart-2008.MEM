@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Moorhuhn Fun Kart 2008",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "moorhuhn-fun-kart-2008",
+    file = "moorhuhn-fun-kart-2008.zip",
+    hashes = {
+      { hash = "7405576f8e50c6b20473402041df74b9", label = "Moorhuhn Fun Kart 2008 (Europe) (En,Fr,De,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3D03D0, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X37A71C, type="u16le", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times" },
+        { address=0X37A71C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GP Post-race menu state" },
+        { address=0X37A820, type="u16le", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X37A820, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Selected mode" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Star Wars: Battlefront II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "star-wars-battlefront-ii",
+    file = "star-wars-battlefront-ii.zip",
+    hashes = {
+      { hash = "ffb7e6298d9386cc197af821e67e58f9", label = "Star Wars - Battlefront II (USA) (v2.01)" },
+      { hash = "3d995cb1e54e97b48d64ca5ae87809d7", label = "Star Wars - Battlefront II (SLUS-21240) [02F4B541]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X600B44, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="GAME : Pause boolean" },
+        { address=0X6A4880, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="GAME : Pause boolean" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6A90F8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="PLAYER : Deaths" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5FA880, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HUNT OPTION : Score Limit" },
+        { address=0X6A90F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="PLAYER : Points" },
+        { address=0X6A90FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="PLAYER : Hero points" },
+      },
+      collectibles = {
+        { address=0X600B1D, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="CHEAT : Infinite Ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X66AF58, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="OBJECTIVES : This array contains visual indicators on the battlefield related to current objecti" },
+      },
+    },
+  },
+}

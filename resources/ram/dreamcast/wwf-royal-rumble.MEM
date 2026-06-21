@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "WWF Royal Rumble",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-royal-rumble",
+    file = "wwf-royal-rumble.zip",
+    hashes = {
+      { hash = "471b7c1125bf108f9811da0dbb289996", label = "WWF Royal Rumble (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1848E8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="RR Continue" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XB1DD9C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Weapon use in backstage brawl. Unfortunately also tracks cars that come past in the parking lot" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB1E2FC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Wrestlers Eliminated (during current life) increased" },
+        { address=0XB1E2FC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wrestlers Eliminated (during current life) decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2C688C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Elimination countdown (lying on ring apron - Rikishi) increased" },
+        { address=0X4B3B8C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Elimination countdown (lying on ring apron. Only for Mankind?) increased" },
+        { address=0XB1E5A0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of wrestlers in ring counter (RR). Can't be lower than 02 increased" },
+        { address=0XB33474, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Potential player active note? 01 in ring, 00 eliminted increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB1E5AC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage counter - Arcade mode (increments as soon as the pin's been made)" },
+      },
+    },
+  },
+}

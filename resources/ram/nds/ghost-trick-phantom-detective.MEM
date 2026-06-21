@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Ghost Trick: Phantom Detective",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "ghost-trick-phantom-detective",
+    file = "ghost-trick-phantom-detective.zip",
+    hashes = {
+      { hash = "f58b3448add412176e45e7394cbea223", label = "Ghost Trick - Phantom Detective (USA) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC9EA3, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Beginning of Credits" },
+      },
+    },
+  },
+}

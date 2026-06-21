@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Anonymous Notes: Chapter 1 - From the Abyss",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "anonymous-notes-chapter-1-from-the-abyss",
+    file = "anonymous-notes-chapter-1-from-the-abyss.zip",
+    hashes = {
+      { hash = "d1ea047fd7be153a008d559bffd2b59d", label = "Anonymous Notes 1 - From the Abyss (Europe)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X454694, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abyss and Stage Bitflags" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4546F8, type="u8", condition="eq", value=0X32, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Analyzer" },
+      },
+      health = {
+        { address=0X4546A2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X4546A2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X4546A6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Max Health decreased" },
+        { address=0X4546A6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Max Health increased" },
+        { address=0X455362, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 1 HP decreased" },
+        { address=0X455362, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 1 HP increased" },
+        { address=0X455366, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 1 Max HP decreased" },
+        { address=0X455366, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 1 Max HP increased" },
+        { address=0X455692, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 2 HP decreased" },
+        { address=0X455692, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 2 HP increased" },
+        { address=0X455696, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 2 Max HP decreased" },
+        { address=0X455696, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 2 Max HP increased" },
+        { address=0X4559C2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 3 HP decreased" },
+        { address=0X4559C2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 3 HP increased" },
+        { address=0X4559C6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 3 Max HP decreased" },
+        { address=0X4559C6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 3 Max HP increased" },
+        { address=0X455CF2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 4 HP decreased" },
+        { address=0X455CF2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 4 HP increased" },
+        { address=0X455CF6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 4 Max HP decreased" },
+        { address=0X455CF6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 4 Max HP increased" },
+        { address=0X456022, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 5 HP decreased" },
+        { address=0X456022, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 5 HP increased" },
+        { address=0X456026, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 5 Max HP decreased" },
+        { address=0X456026, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 5 Max HP increased" },
+        { address=0X456352, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 6 HP decreased" },
+        { address=0X456352, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 6 HP increased" },
+        { address=0X456356, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 6 Max HP decreased" },
+        { address=0X456356, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 6 Max HP increased" },
+        { address=0X456682, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 7 HP decreased" },
+        { address=0X456682, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 7 HP increased" },
+        { address=0X456686, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 7 Max HP decreased" },
+        { address=0X456686, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 7 Max HP increased" },
+        { address=0X4569B2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 8 HP decreased" },
+        { address=0X4569B2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 8 HP increased" },
+        { address=0X4569B6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 8 Max HP decreased" },
+        { address=0X4569B6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 8 Max HP increased" },
+        { address=0X457012, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 9 HP decreased" },
+        { address=0X457012, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 9 HP increased" },
+        { address=0X457016, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 9 Max HP decreased" },
+        { address=0X457016, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 9 Max HP increased" },
+        { address=0X457342, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 10 HP decreased" },
+        { address=0X457342, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 10 HP increased" },
+        { address=0X457346, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 10 Max HP decreased" },
+        { address=0X457346, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 10 Max HP increased" },
+        { address=0X457672, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 11 HP decreased" },
+        { address=0X457672, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 11 HP increased" },
+        { address=0X457676, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster 11 Max HP decreased" },
+        { address=0X457676, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster 11 Max HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4546BD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4546CC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Ring increased" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X79, action="MONEY_STATE", no_log=false, no_survey=false, desc="Angel Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X7A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Sun Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X7B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Pinky Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X7C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Guardian Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X7D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Sonic Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X7E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Powered Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X7F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Spirit Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Antidote Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X81, action="MONEY_STATE", no_log=false, no_survey=false, desc="Exorcist Ring" },
+        { address=0X4546D4, type="u8", condition="eq", value=0X82, action="MONEY_STATE", no_log=false, no_survey=false, desc="Moonshine Ring" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2B9BE4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Number of Times Cleared" },
+      },
+    },
+  },
+}

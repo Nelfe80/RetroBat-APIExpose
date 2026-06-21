@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 TAD 20000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 TAD 19800</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 TAD 19200</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 TAD 12800</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 TAD 8751</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 TAD 8087</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 TAD 8086</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 TAD 8080</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 TAD 6809</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 TAD 6502</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 TAD 6500</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 TAD 6400</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 TAD 6300</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 TAD 6200</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 TAD 6100</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 TAD 6000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 TAD 5900</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 TAD 5800</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 TAD 5700</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 TAD 5600</text>
+		</text>
+	</view>
+</theme>

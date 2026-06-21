@@ -1,0 +1,109 @@
+return {
+  game = {
+    title = "Hajime no Ippo: The Fighting",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "hajime-no-ippo-the-fighting",
+    file = "hajime-no-ippo-the-fighting.zip",
+    hashes = {
+      { hash = "e33de4139d69d016394a26119cdeba32", label = "Hajime no Ippo - The Fighting! (Japan) (En) (v1.0) (Markliujy).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00E3, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Select Mode" },
+        { address=0X3CA4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0101= Pause" },
+        { address=0X16788, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="32-Bits Progress (40505= Demo)" },
+        { address=0X17690, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X17690, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Command List" },
+        { address=0X17690, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="Retry" },
+        { address=0X17690, type="u8", condition="eq", value=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Exist" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3C46, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Standard" },
+        { address=0X3C46, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1Rounds" },
+        { address=0X3C46, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4 Rounds" },
+        { address=0X3C46, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="6 Rounds" },
+        { address=0X3C46, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="8 Rounds" },
+        { address=0X3C46, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="10 Rounds" },
+        { address=0X3C46, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="12 Rounds" },
+        { address=0X3C46, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tournament Mode * Round *" },
+        { address=0X3C47, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X3C47, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X3C47, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X3C47, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tournament Mode * CPU Level *" },
+        { address=0X3C56, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X3C56, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4 Rounds" },
+        { address=0X3C56, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="6 Rounds" },
+        { address=0X3C56, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="8 Rounds" },
+        { address=0X3C56, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="10 Rounds" },
+        { address=0X3C56, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="12 Rounds" },
+        { address=0X3C56, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sparring Settings * Round *" },
+        { address=0X3C57, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X3C57, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X3C57, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X3C57, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sparring Settings * CPU Level *" },
+        { address=0X3C9F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+        { address=0X17ACB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assistance Between Rounds * SP Increase UP *" },
+        { address=0X17ACC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assistance Between Rounds * Down Limit UP *" },
+      },
+      stage = {
+        { address=0X3C44, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Standard" },
+        { address=0X3C44, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Random" },
+        { address=0X3C44, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gym" },
+        { address=0X3C44, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stadium" },
+        { address=0X3C44, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tournament Mode * Stage *" },
+        { address=0X3C54, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="GYM" },
+        { address=0X3C54, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stadium" },
+        { address=0X3C54, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sparring Settings * Stage *" },
+        { address=0X16832, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage On Tournament (Progress)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X17ACA, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Assistance Between Rounds * Recover Damage *" },
+        { address=0X17B06, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Health decreased" },
+        { address=0X17B06, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Health increased" },
+        { address=0X17BE4, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Okita, Date, Shigeta, Sendo and Volg - 1" },
+        { address=0X17BE5, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Okita, Date, Shigeta, Sendo and Volg - 2" },
+        { address=0X17BE6, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Okita, Date, Shigeta, Sendo and Volg - 3" },
+        { address=0X17BE8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Okita, Date, Shigeta, Sendo and Volg - 4 * Bang *" },
+        { address=0X17BF4, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Ippo - 1" },
+        { address=0X17BF5, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Ippo - 2" },
+        { address=0X17BF6, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Ippo - 3" },
+        { address=0X17BF8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Ippo - 4 * Bang *" },
+        { address=0X17BFC, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Mashiba and Hayam - 1" },
+        { address=0X17BFD, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Mashiba and Hayam - 2" },
+        { address=0X17BFE, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Mashiba and Hayam - 3" },
+        { address=0X17C00, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Mashiba and Hayami - 4 * Bang *" },
+        { address=0X17C04, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Saeki and Myata - 1" },
+        { address=0X17C05, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Saeki and Myata - 2" },
+        { address=0X17C06, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Saeki and Myata - 3" },
+        { address=0X17C08, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy damage with Saeki and Myata - 4 * Bang *" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3C18, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bits Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3C53, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="On" },
+        { address=0X3C53, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sparring Settings * Time Limite *" },
+        { address=0X3C91, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Cpu Down Counter" },
+        { address=0X3C92, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Down Counter" },
+        { address=0X3C93, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Partially Point Counter (No Use)" },
+        { address=0X3C9C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Timer" },
+      },
+    },
+  },
+}

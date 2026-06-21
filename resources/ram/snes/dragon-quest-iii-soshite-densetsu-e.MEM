@@ -1,0 +1,137 @@
+return {
+  game = {
+    title = "Dragon Quest III: Soshite Densetsu e...",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-quest-iii-soshite-densetsu-e",
+    file = "dragon-quest-iii-soshite-densetsu-e.zip",
+    hashes = {
+      { hash = "1dff04776bde5aae152835c0db436f37", label = "Dragon Quest III - Soshite Densetsu he... (Japan) (En) (DaMarsMan) (1.1).sfc" },
+      { hash = "7c7c7db73b0608a184cc5e1d73d7695b", label = "Dragon Quest III - Soshite Densetsu e... (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X362C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Kill Villagers (Demon Personality) 1f = 2 left alive, 3f = 1 left alive, 7f = all dead" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3925, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hero level" },
+        { address=0X40C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Follower1 Display Level In Combat?" },
+        { address=0X40C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Follower2 Display Level (In Combat)" },
+        { address=0XBDDF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Speech ID (different per zone)" },
+        { address=0XBDE0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Speech ID Zone?" },
+        { address=0XDB1B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hero Pos 1 Level" },
+      },
+      zone = {
+        { address=0X10487, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map Treasure Box opened (0=nope, 1=yup)" },
+      },
+      stage = {
+        { address=0X1D0A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Increments as a character is gaining levels" },
+        { address=0X2DBA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot1 Level Display 1/2" },
+        { address=0X2DBC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot1 Level Display 2/2" },
+        { address=0X2DC4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot2 Level Display 1/2" },
+        { address=0X2DC6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot2 Level Display 2/2" },
+        { address=0X2DCE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot3 Level Display 1/2" },
+        { address=0X2DD0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot3 Level Display 2/2" },
+        { address=0X2DD8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot4 Level Display 1/2" },
+        { address=0X2DDA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot4 Level Display 2/2" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2030, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Arena Monster 1 HP (x * 1) decreased" },
+        { address=0X2030, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Arena Monster 1 HP (x * 1) increased" },
+        { address=0X2031, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Arena Monster 1 HP (x * 256) decreased" },
+        { address=0X2031, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Arena Monster 1 HP (x * 256) increased" },
+        { address=0X2064, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster1 HP decreased" },
+        { address=0X2064, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster1 HP increased" },
+        { address=0X207A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster1 HP Current // Arena Monster 3 HP (x * 1) decreased" },
+        { address=0X207A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster1 HP Current // Arena Monster 3 HP (x * 1) increased" },
+        { address=0X207B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster1 HP Current // Arena Monster 3 HP (x * 256) decreased" },
+        { address=0X207B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster1 HP Current // Arena Monster 3 HP (x * 256) increased" },
+        { address=0X2089, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster2 HP decreased" },
+        { address=0X2089, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster2 HP increased" },
+        { address=0X209F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster2 HP Current // Arena Monster 4 HP (x * 1) decreased" },
+        { address=0X209F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster2 HP Current // Arena Monster 4 HP (x * 1) increased" },
+        { address=0X20A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster2 HP Current // Arena Monster 4 HP (x * 256) decreased" },
+        { address=0X20A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster2 HP Current // Arena Monster 4 HP (x * 256) increased" },
+        { address=0X20AE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster3 HP decreased" },
+        { address=0X20AE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster3 HP increased" },
+        { address=0X20C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster4 HP decreased" },
+        { address=0X20C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster4 HP increased" },
+        { address=0X20E9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster5 HP decreased" },
+        { address=0X20E9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster5 HP increased" },
+        { address=0X210E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster6 HP decreased" },
+        { address=0X210E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster6 HP increased" },
+        { address=0X2133, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster6 HP decreased" },
+        { address=0X2133, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster6 HP increased" },
+        { address=0X2158, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster7 HP decreased" },
+        { address=0X2158, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster7 HP increased" },
+        { address=0X217D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster8 HP decreased" },
+        { address=0X217D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster8 HP increased" },
+        { address=0X2CFA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character Slot 1 Health Display 1/2 decreased" },
+        { address=0X2CFA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character Slot 1 Health Display 1/2 increased" },
+        { address=0X2CFC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character Slot 1 Health Display 2/2 decreased" },
+        { address=0X2CFC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character Slot 1 Health Display 2/2 increased" },
+        { address=0X3929, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero HP Max (x * 1) decreased" },
+        { address=0X3929, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero HP Max (x * 1) increased" },
+        { address=0X392A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero HP Max (x * 256) decreased" },
+        { address=0X392A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero HP Max (x * 256) increased" },
+        { address=0X392B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero HP Current (x * 1) decreased" },
+        { address=0X392B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero HP Current (x * 1) increased" },
+        { address=0X392C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero HP Current (x * 256) decreased" },
+        { address=0X392C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero HP Current (x * 256) increased" },
+        { address=0X3965, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Follower1 HP Max (x * 1) decreased" },
+        { address=0X3965, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Follower1 HP Max (x * 1) increased" },
+        { address=0X3966, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Follower1 HP Max (x * 256) decreased" },
+        { address=0X3966, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Follower1 HP Max (x * 256) increased" },
+        { address=0X3967, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Follower1 HP Current (x * 1) decreased" },
+        { address=0X3967, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Follower1 HP Current (x * 1) increased" },
+        { address=0X3968, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Follower1 HP Current (x * 256) decreased" },
+        { address=0X3968, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Follower1 HP Current (x * 256) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X10081, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Red Ord Treasure Box unopened=00, opened=02" },
+        { address=0X101F7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Magic Key Treasure Box" },
+        { address=0X10303, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pachisi 1 Treasure Box 1 0=Unopened 1=Opened" },
+        { address=0X10305, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pachisi 1 Treasure Box 2" },
+        { address=0X10527, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pachisi 3 Treasure Box 1" },
+        { address=0X10529, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pachisi 3 Treasure Box 2" },
+        { address=0X1061F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pachisi 2 Treasure Box 1" },
+        { address=0X10621, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pachisi 2 Treasure Box 2" },
+        { address=0X10739, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Blue Orb Treasure Box Opened?" },
+        { address=0X10E49, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pachisi 4 Treasure" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X362B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="During Demon in Village dream increased" },
+        { address=0X3696, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (X * 1) increased" },
+        { address=0X3697, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (X * 256) increased" },
+        { address=0X3698, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (X * 65536) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2055, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Monster Health? (x * 1) // Arena Monster 2" },
+        { address=0X2056, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Monster Health? (x * 256)" },
+        { address=0X30B8, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="First Letter in bottom box (used for M = 18, Monsters Defeated and for first letter of Boss name" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1031B, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed Wall with Magic Ball? (0=nope, 1=yup)" },
+      },
+    },
+  },
+}

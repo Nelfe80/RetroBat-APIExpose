@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Fortix",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fortix",
+    file = "fortix.zip",
+    hashes = {
+      { hash = "cb858ed1864774ca5f1af0f35e747c3a", label = "Fortix (Europe) (minis) (PSN).iso" },
+      { hash = "154cc1966c5579d5c29477df853d9f2b", label = "Fortix (Europe) (v3) (minis) (PSN).iso" },
+      { hash = "742c8bdfbeedf89aa1dc0986cfa3651f", label = "Fortix (USA) (minis) (PSN).iso" },
+      { hash = "64b88cfd70fa1ca544b5f784b8b4b426", label = "Fortix (USA) (v3) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XA2D5BE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1FFF520, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Dynamic" },
+      },
+    },
+  },
+}

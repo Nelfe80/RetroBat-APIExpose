@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Rabbids Go Home",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "rabbids-go-home",
+    file = "rabbids-go-home.zip",
+    hashes = {
+      { hash = "f4ea22aceb8441e55896e9f0239d6758", label = "Rabbids Go Home (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCDE6DC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - All Pile on The Rabbid (32-bit BE)" },
+        { address=0XCDE6F0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Keep on Piling! (32-bit BE)" },
+        { address=0XCDE704, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Holy Pile of Junk! (32-bit BE)" },
+        { address=0XCDE718, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - King of the Pile! (32-bit BE)" },
+        { address=0XCDE740, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Shop Till You Drop (32-bit BE)" },
+        { address=0XCE0858, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ft of Stuff Collected in Level (32-bit BE)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCE156C, type="u32be", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="During Death Screen" },
+        { address=0XCE156C, type="u32be", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Otherwise" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCDE6CC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - All Pile on The Rabbid (32-bit BE)" },
+        { address=0XCDE6E0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Keep on Piling! (32-bit BE)" },
+        { address=0XCDE6F4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Holy Pile of Junk! (32-bit BE)" },
+        { address=0XCDE708, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - King of the Pile! (32-bit BE)" },
+        { address=0XCDE730, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Shop Till You Drop (32-bit BE)" },
+        { address=0XCDE744, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - In the Nick of Time (32-bit BE)" },
+        { address=0XCDE758, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Infectious Blues (32-bit BE)" },
+        { address=0XCDE76C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Wack-A-Wabbid (32-bit BE)" },
+        { address=0XCDE780, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Just Plane Dumb (32-bit BE)" },
+        { address=0XCDE794, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Rabbid Fire Reaction (32-bit BE)" },
+        { address=0XCDE7A8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - High Stakes Steak (32-bit BE)" },
+        { address=0XCDE7BC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Bubble Bed Bonanza (32-bit BE)" },
+        { address=0XCDE7D0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Super Racket in the Market (32-bit BE)" },
+        { address=0XCDE7E4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Atomic Rabbid Blast (32-bit BE)" },
+        { address=0XCDE7F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Rules are for Tools (32-bit BE)" },
+        { address=0XCDE80C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Totally Tubing (32-bit BE)" },
+        { address=0XCDE820, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Apocalypse Cow (32-bit BE)" },
+        { address=0XCDE834, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Furryous Fun (32-bit BE)" },
+        { address=0XCDE848, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Backwater Rabbids (32-bit BE)" },
+        { address=0XCDE85C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Bubble Bed Blues (32-bit BE)" },
+        { address=0XCDE884, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - County Free-For-All (32-bit BE)" },
+        { address=0XCDE898, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Hoppy Xmas (32-bit BE)" },
+        { address=0XCDE8AC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Cow-tch Me if You Can (32-bit BE)" },
+        { address=0XCDE8C0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Rabbids Go Boom (32-bit BE)" },
+        { address=0XCDE8D4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Fetchez la Vache (32-bit BE)" },
+        { address=0XCDE8E8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Hard-Hat Helpings (32-bit BE)" },
+        { address=0XCDE8FC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Daredevil Rabbid (32-bit BE)" },
+        { address=0XCDE910, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Hold Up in the Hangar (32-bit BE)" },
+        { address=0XCDE924, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - 14-Carrot Rabbid (32-bit BE)" },
+        { address=0XCDE938, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Till Rabbids Do Us Cart (32-bit BE)" },
+        { address=0XCDE94C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Carry-On Catastrophe (32-bit BE)" },
+        { address=0XCDE960, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Scrap Happy Rabbids (32-bit BE)" },
+        { address=0XCDE974, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score - Moo-Ning Miami (32-bit BE)" },
+        { address=0XCE1544, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Challenge Best Score - Shake, Rattle And Roll Your Rabbid (32-bit BE)" },
+      },
+      collectibles = {
+        { address=0XCDE870, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Level Score - Time is Money, Honey (32-bit BE) increased" },
+        { address=0XCDE874, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="XL Item Collected - Time is Money, Honey (32-bit BE) increased" },
+        { address=0XCDFB0C, type="u32be", condition="eq", value=0X1428, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time is Money, Honey" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCDEDC4, type="u32be", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint ID (32-bit BE)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCDFB0C, type="u32be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Current Map ID (32-bit BE)" },
+      },
+    },
+  },
+}

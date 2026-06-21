@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Neopets: Petpet Adventures - The Wand of Wishing",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "neopets-petpet-adventures-the-wand-of-wishing",
+    file = "neopets-petpet-adventures-the-wand-of-wishing.zip",
+    hashes = {
+      { hash = "9a137c4695d18bd5896e37392a62e952", label = "Neopets - Petpet Adventures - The Wand of Wishing (USA).iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XF58368, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Save State - Health decreased" },
+        { address=0XF58368, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Save State - Health increased" },
+        { address=0X11FDDEE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16-Bit - Health? decreased" },
+        { address=0X11FDDEE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16-Bit - Health? increased" },
+        { address=0X11FDE36, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16-Bit - Health Stat? decreased" },
+        { address=0X11FDE36, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16-Bit - Health Stat? increased" },
+        { address=0X11FDEF0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="8-Bit - Options - Damage Display" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XAE9A28, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - NeoPoints - Hud?" },
+        { address=0X11F4A14, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - NeoPoints - Hud?" },
+      },
+    },
+  },
+}

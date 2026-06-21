@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Cliffhanger",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Beat 'em Up, Platform"
+  },
+
+  rom = {
+    name = "cliffhanger",
+    file = "cliffhanger.zip",
+    hashes = {
+      { hash = "b33d6f65f4a566d715ce480bffd004ad", label = "Cliffhanger (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFADB, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFAD7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XFAD7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+  },
+}

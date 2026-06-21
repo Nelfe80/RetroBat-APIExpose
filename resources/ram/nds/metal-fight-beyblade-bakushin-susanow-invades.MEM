@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Metal Fight Beyblade: Bakushin Susanow invades!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "metal-fight-beyblade-bakushin-susanow-invades",
+    file = "metal-fight-beyblade-bakushin-susanow-invades.zip",
+    hashes = {
+      { hash = "8786880ab61f3ba9341db298791bc1ce", label = "Metal Fight Beyblade - Baku Shin Susanoo Shuurai! (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

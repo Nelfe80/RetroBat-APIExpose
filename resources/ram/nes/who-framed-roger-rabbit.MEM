@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Who Framed Roger Rabbit",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "who-framed-roger-rabbit",
+    file = "who-framed-roger-rabbit.zip",
+    hashes = {
+      { hash = "7e79c4712be2047006738d4bf61fa264", label = "Who Framed Roger Rabbit (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="eq", value=0X90, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Various Title Screen" },
+        { address=0X001A, type="u8", condition="eq", value=0X30, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Game Over Screen" },
+        { address=0X0388, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen/Password Screen/Beat Doom" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X03E7, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="puff of smoke" },
+        { address=0X03E7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Any item placed on ground = 09" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X001A, type="u8", condition="eq", value=0X78, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lost A Life" },
+        { address=0X0057, type="u8", condition="eq", value=0XDC, action="LOSE_LIFE", no_log=false, no_survey=false, desc="not on screen, pause" },
+      },
+    },
+  },
+}

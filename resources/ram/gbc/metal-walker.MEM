@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Metal Walker",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "metal-walker",
+    file = "metal-walker.zip",
+    hashes = {
+      { hash = "82d17beb1aefd1b93621d6fa61dfa1cb", label = "Metal Walker (USA) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC80E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Exp needed to level up" },
+        { address=0XC810, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XC85F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="RCP-09 Groundhog Recipe Data" },
+        { address=0XCBC2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="HP in Overworld" },
+      },
+      zone = {
+        { address=0XC5FC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Overworld, world location. Upper 4 Y, Lower 4 X." },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCA18, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] HP in Battle decreased" },
+        { address=0XCA18, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] HP in Battle increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC1E3, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Scrap Ammount" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC0A7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="In Battle" },
+      },
+    },
+  },
+}

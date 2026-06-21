@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>analog_stick</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Hop</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>??not used</text>
+		</text>
+		<text name="button6" extra="true">
+			<text>??not used</text>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Hop</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>??not used</text>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>??not used</text>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 RR  96300</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 WEC 89900</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 JNZ 74100</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 HOP 62100</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 GJR 57200</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 E A 46350</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 NLA 43600</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 MLH 38500</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 SAM 20700</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 SGM 19400</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

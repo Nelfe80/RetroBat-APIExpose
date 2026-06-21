@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-03: Video Blackjack",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Gambling"
+  },
+
+  rom = {
+    name = "videocart-03-video-blackjack",
+    file = "videocart-03-video-blackjack.zip",
+    hashes = {
+      { hash = "b074c867f235fb69ced96c6916673b45", label = "Video Blackjack (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

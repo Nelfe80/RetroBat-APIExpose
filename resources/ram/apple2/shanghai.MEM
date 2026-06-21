@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Shanghai",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shanghai",
+    file = "shanghai.zip",
+    hashes = {
+      { hash = "8e0d5c3ed17bf61d50ae0a1b42d94a4a", label = "Shanghai.woz" },
+      { hash = "b9ab7fe2746fc56ae406ce65c375ffd1", label = "Shanghai (4am crack).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

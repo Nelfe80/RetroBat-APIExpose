@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Timmy Time",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "timmy-time",
+    file = "timmy-time.zip",
+    hashes = {
+      { hash = "4819a28ca8c5c18df5eab68a821845ab", label = "Timmy Time (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

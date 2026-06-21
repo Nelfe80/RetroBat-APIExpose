@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Fill the Cup",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fill-the-cup",
+    file = "fill-the-cup.zip",
+    hashes = {
+      { hash = "eb154494abb4500c5c5f223c091cf7ae", label = "Fill the Cup (World).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X010B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Level fill-up goal" },
+        { address=0X048A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Current level starts at 01" },
+        { address=0X048B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Loading into level loads down from 8c" },
+        { address=0X0501, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- 01 when level completed level 1-3" },
+      },
+    },
+  },
+}

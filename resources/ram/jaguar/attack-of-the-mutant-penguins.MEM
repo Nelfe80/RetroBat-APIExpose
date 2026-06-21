@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Attack of the Mutant Penguins",
+    system = "jaguar",
+    system_name = "Atari Jaguar",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "attack-of-the-mutant-penguins",
+    file = "attack-of-the-mutant-penguins.zip",
+    hashes = {
+      { hash = "3ab524a6a18f79b5e7fd0bb189fe8170", label = "Attack of the Mutant Penguins (World).j64" },
+    }
+  },
+
+  events = {
+  },
+}

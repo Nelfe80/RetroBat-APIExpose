@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Gyakuten Saiban 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "gyakuten-saiban-2",
+    file = "gyakuten-saiban-2.zip",
+    hashes = {
+      { hash = "41ae841d5771e442f7fb5393906cb898", label = "Gyakuten Saiban 2 (Japan).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X10C3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="First Background Image ID" },
+        { address=0X15BD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Background Image ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3848, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="New Health decreased" },
+        { address=0X3848, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="New Health increased" },
+        { address=0X384A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Old Health (max 50) decreased" },
+        { address=0X384A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Old Health (max 50) increased" },
+      },
+    },
+  },
+}

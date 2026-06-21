@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Choujin Sentai Jetman",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "choujin-sentai-jetman",
+    file = "choujin-sentai-jetman.zip",
+    hashes = {
+      { hash = "0e5ae85fbec99239f4cb7c3a03918dbf", label = "Choujin Sentai - Jetman (Japan) (En) (Magimoogle) (1.0).nes" },
+      { hash = "d9f661e8b3c9123cd7ae0583f911b34e", label = "Choujin Sentai - Jetman (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0037, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0040, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0087, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sentai Health decreased" },
+        { address=0X0087, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sentai Health increased" },
+        { address=0X00A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Great Icarus Health decreased" },
+        { address=0X00A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Great Icarus Health increased" },
+        { address=0X00A9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Great Icarus Displayed Health decreased" },
+        { address=0X00A9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Great Icarus Displayed Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0617, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X00A2, type="u8", condition="eq", value=0X7F, action="SPEED_START", no_log=false, no_survey=false, desc="P-meter fully charged" },
+        { address=0X00A2, type="u8", condition="decrease", action="SPEED_STOP", no_log=false, no_survey=false, desc="P-meter draining down" },
+        { address=0X00A2, type="u8", condition="change", action="SPEED_TIMER", no_log=true, no_survey=false, desc="Great Icarus power meter" },
+      },
+    },
+  },
+}

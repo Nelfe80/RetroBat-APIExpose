@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Star Trek: Deep Space Nine - Crossroads of Time",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "star-trek-deep-space-nine-crossroads-of-time",
+    file = "star-trek-deep-space-nine-crossroads-of-time.zip",
+    hashes = {
+      { hash = "485635b7bf2b4f337bcf2b654690763d", label = "Star Trek - Deep Space Nine - Crossroads of Time (Europe).sfc" },
+      { hash = "7eee6e99e418e59c97ce9329a8464532", label = "Star Trek - Deep Space Nine - Crossroads of Time (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X052A, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="02 - Cutscene/Game Over" },
+        { address=0X0C8E, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen ID - 2506" },
+        { address=0X200A, type="u16le", condition="eq", value=0X37, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen?" },
+        { address=0X200B, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Bit 7 - Game Over/Password Screen" },
+        { address=0X2C38, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Cutscene/Game Over Screen ID?" },
+        { address=0X2C4F, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo = FF?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2CBF, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pylon 3" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gamma Quadrant" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bajor - Temple" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bajor - Catacombs 1" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bajor - Catacombs 2" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bajor - Generator" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bashir's Investigation" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wolf 359" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cardassian Warship" },
+        { address=0X2CBF, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="We'll Be Watching" },
+        { address=0X2CBF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Missions (Level)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2BAA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life (HP) increased" },
+        { address=0X2BAA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life (HP) decreased" },
+        { address=0X2C29, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit 0 - Unlimited Life Activated increased" },
+        { address=0X2C29, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 0 - Unlimited Life Activated decreased" },
+      },
+      health = {
+        { address=0X0DEE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Ship Health (Asteroid Field) decreased" },
+        { address=0X0DEE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Ship Health (Asteroid Field) increased" },
+        { address=0X2BCA, type="u8", condition="eq", value=0X03, action="HIT", no_log=false, no_survey=false, desc="Damaged PADD" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X200A, type="u16le", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bajor - Weapons Generator" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2BAC, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0C90, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Over Screen Time Limit" },
+      },
+    },
+  },
+}

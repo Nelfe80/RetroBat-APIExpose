@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "MTV Celebrity Deathmatch",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mtv-celebrity-deathmatch",
+    file = "mtv-celebrity-deathmatch.zip",
+    hashes = {
+      { hash = "92824ced83dca7405718e702b8d46125", label = "MTV Celebrity Deathmatch (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4493B0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3C3570, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Episode 1 Clear" },
+        { address=0X3C3574, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Episode 2 Clear" },
+        { address=0X3C3578, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Episode 3 Clear" },
+        { address=0X3C357C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Episode 4 Clear" },
+        { address=0X3C3580, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Episode 5 Clear" },
+        { address=0X3C3584, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Episode 6 Clear" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X432C4A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP decreased" },
+        { address=0X432C4A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP increased" },
+        { address=0X432D9E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent HP decreased" },
+        { address=0X432D9E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X44B6C7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stages: Tomb Ring increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X462D18, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Limit" },
+      },
+    },
+  },
+}

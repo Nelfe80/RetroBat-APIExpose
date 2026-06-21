@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Moorhuhn 2: Die Jagd geht weiter",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "moorhuhn-2-die-jagd-geht-weiter",
+    file = "moorhuhn-2-die-jagd-geht-weiter.zip",
+    hashes = {
+      { hash = "b5fe88bbde541c28625e32b83239e6f0", label = "Moorhuhn 2 - Die Jagd geht weiter (Germany).gbc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XC13A, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+  },
+}

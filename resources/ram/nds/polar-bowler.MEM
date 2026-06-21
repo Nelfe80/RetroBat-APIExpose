@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Polar Bowler",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "polar-bowler",
+    file = "polar-bowler.zip",
+    hashes = {
+      { hash = "3aaab1bb85e33f98ff847112e3a62b30", label = "Polar Bowler (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X841E2, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In Title Screen" },
+        { address=0X8FA61, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Lane Track 3" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB91F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Profile 1 Lifetime Total Score" },
+        { address=0XB9228, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Profile 2 Lifetime Total Score" },
+        { address=0XB925C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Profile 3 Lifetime Total Score" },
+        { address=0XB9290, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Profile 4 Lifetime Total Score" },
+        { address=0XB92C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Profile 5 Lifetime Total Score" },
+        { address=0XB92F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Profile 6 Lifetime Total Score" },
+        { address=0XB932C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Profile 7 Lifetime Total Score" },
+        { address=0XB9360, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Profile 8 Lifetime Total Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X841E2, type="u8", condition="eq", value=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="In Lane" },
+      },
+    },
+  },
+}

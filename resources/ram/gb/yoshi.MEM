@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Yoshi",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "yoshi",
+    file = "yoshi.zip",
+    hashes = {
+      { hash = "a8804c8514619cc918960c2008ed65d1", label = "Yoshi (USA).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC6AB, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over indicator?" },
+        { address=0XC704, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Might set to 01 when game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC6B3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XC6B7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="How far from the initial level have you gone in" },
+        { address=0XC6CF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In-game level ones place" },
+        { address=0XC6D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In-game level tens place" },
+        { address=0XC703, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Might set to 01 when clear" },
+        { address=0XFE00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sprite ram of object eating in Game B is around here for Thoreaus suggestion in game page commen" },
+        { address=0XFF93, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level of Yoshi, and other things" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC200, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0x00 during title screen, level select and game over; 0x01 in-game increased" },
+        { address=0XC6E2, type="u16le", condition="eq", value=0X18, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin" },
+        { address=0XC6E2, type="u16le", condition="eq", value=0X19, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin" },
+        { address=0XC6E2, type="u16le", condition="eq", value=0X1A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC6E2, type="u16le", condition="eq", value=0X1B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P-Switch" },
+      },
+    },
+  },
+}

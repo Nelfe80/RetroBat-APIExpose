@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Samurai Shodown V Special",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "samurai-shodown-v-special",
+    file = "samurai-shodown-v-special.zip",
+    hashes = {
+      { hash = "d585df49cbc106b84e3c6cb4d0ef22b7", label = "samsh5sp.7z <Samurai Shodown V Special / Samurai Spirits Zero Special (NGM-2720)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X80C4, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X80C4, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X80C4, type="u8", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X80C4, type="u8", condition="eq", value=0X14, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X80E7, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Used" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      events = {
+        { address=0X8561, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 Combo Meter" },
+        { address=0X8771, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P2 Combo Meter" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8465, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won" },
+        { address=0X85FE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Critical Threat Level" },
+        { address=0X8675, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Rounds Won" },
+        { address=0X880E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Critical Threat Level" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-1" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-2" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-3" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-4" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-5" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-6" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-7" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-8" },
+        { address=0XFD8A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level" },
+        { address=0XFD91, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU Match Rounds" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X8444, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP decreased" },
+        { address=0X8444, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP increased" },
+        { address=0X8654, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP decreased" },
+        { address=0X8654, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X80C4, type="u8", condition="eq", value=0X03, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores" },
+      },
+    },
+  },
+}

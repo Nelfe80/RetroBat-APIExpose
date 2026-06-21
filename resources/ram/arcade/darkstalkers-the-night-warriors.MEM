@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Darkstalkers: The Night Warriors",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "darkstalkers-the-night-warriors",
+    file = "darkstalkers-the-night-warriors.zip",
+    hashes = {
+      { hash = "6917407020977114942fec31ab56184d", label = "dstlk.7z <Darkstalkers - the night warriors (940705 Euro)>" },
+      { hash = "891118a73716e769ba535e2f59247fbe", label = "vampj.7z <Vampire - the night warriors (940705 Japan)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0352, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Game;" },
+        { address=0X0352, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen;" },
+        { address=0XF420, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+      events = {
+        { address=0X88FC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 Hit Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1946, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MAX ROUNDS" },
+        { address=0X8236, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Rounds (Settings)" },
+        { address=0X8731, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won (Match only) [1]" },
+        { address=0X8B31, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won (Match only) [2]" },
+        { address=0X940C, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1" },
+        { address=0X940C, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X854A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1P Health (Display) [90 = Full; 00 = Dead]" },
+        { address=0X894A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Health (Display) [90 = Full; 00 = Dead]" },
+      },
+      health = {
+        { address=0X194A, type="u8", condition="eq", value=0X04, action="HIT", no_log=false, no_survey=false, desc="5 Medium; 05 = 6; 06 = 7; 07 = 8;" },
+        { address=0X194A, type="u8", condition="eq", value=0X08, action="HIT", no_log=false, no_survey=false, desc="9 Maximum ]" },
+        { address=0X8262, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Level (Settings)" },
+        { address=0X83CA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health (Value) decreased" },
+        { address=0X83CA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health (Value) increased" },
+        { address=0X87CA, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full Health" },
+        { address=0X87CA, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="No Health" },
+        { address=0X87CA, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player 2 Health" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X81D1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Credits increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9408, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Counter (Hex-based value)" },
+        { address=0XB558, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="P1 Continue Counter" },
+      },
+    },
+  },
+}

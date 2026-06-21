@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "GO Series: Undead Storm",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "go-series-undead-storm",
+    file = "go-series-undead-storm.zip",
+    hashes = {
+      { hash = "14e3f1fcbbb1ccfb96cdfa8a4a168548", label = "GO Series - Undead Storm (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Lunar Legend",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "lunar-legend",
+    file = "lunar-legend.zip",
+    hashes = {
+      { hash = "ae5ee35f0aadf386cb6918a2d83f5a3b", label = "Lunar Legend (USA).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X3F0D3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 1st char status - 1=poisoned 8=dead 2=paralyzed" },
+        { address=0X3F19B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 2nd char status - 1=poisoned 8=dead 2=paralyzed" },
+        { address=0X3F263, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 3rd char status - 1=poisoned 8=dead 2=paralyzed" },
+        { address=0X3F32B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 4th char status - 8=dead 2=paralyzed" },
+        { address=0X3F3F3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 5th char status - 8=dead 2=paralyzed" },
+        { address=0X3F4BB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 1st enemy status - 5=confused 8=dead" },
+        { address=0X3F583, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 2nd enemy status - 5=confused 8=dead" },
+        { address=0X3F64B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 3rd enemy status - 5=confused 8=dead" },
+      },
+      health = {
+        { address=0X0660, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="related to the damage the player or the enemy has done" },
+        { address=0X4AC2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Alex - current HP decreased" },
+        { address=0X4AC2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Alex - current HP increased" },
+        { address=0X4AD2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Alex - max HP decreased" },
+        { address=0X4AD2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Alex - max HP increased" },
+        { address=0X3F094, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 1st char current HP - in combat decreased" },
+        { address=0X3F094, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 1st char current HP - in combat increased" },
+        { address=0X3F15C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 2nd char current HP - in combat decreased" },
+        { address=0X3F15C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 2nd char current HP - in combat increased" },
+        { address=0X3F224, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 3rd char current HP - in combat decreased" },
+        { address=0X3F224, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 3rd char current HP - in combat increased" },
+        { address=0X3F2EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 4th char current HP - in combat decreased" },
+        { address=0X3F2EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 4th char current HP - in combat increased" },
+        { address=0X3F3B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 5th char current HP - in combat decreased" },
+        { address=0X3F3B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 5th char current HP - in combat increased" },
+        { address=0X3F47C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st enemy HP - Current decreased" },
+        { address=0X3F47C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st enemy HP - Current increased" },
+        { address=0X3F47E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st enemy HP - Max decreased" },
+        { address=0X3F47E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st enemy HP - Max increased" },
+        { address=0X3F4C2, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="damage 1st received?" },
+        { address=0X3F544, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 2nd enemy HP - Current decreased" },
+        { address=0X3F544, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 2nd enemy HP - Current increased" },
+        { address=0X3F60C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 3rd enemy HP - Current decreased" },
+        { address=0X3F60C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 3rd enemy HP - Current increased" },
+        { address=0X3F6D4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 4th enemy HP - Current decreased" },
+        { address=0X3F6D4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 4th enemy HP - Current increased" },
+        { address=0X3F79C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 5th enemy HP - Current decreased" },
+        { address=0X3F79C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 5th enemy HP - Current increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4AE4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Alex - Weapon Slot" },
+        { address=0X4B64, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Nash - Weapon Slot" },
+        { address=0X4BA4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Mia - Weapon Slot" },
+        { address=0X4C24, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Kyle - Weapon Slot" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1C7E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit5=1st door opened at Damons Spire" },
+      },
+    },
+  },
+}

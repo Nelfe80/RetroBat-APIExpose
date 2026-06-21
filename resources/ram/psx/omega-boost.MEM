@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Omega Boost",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "omega-boost",
+    file = "omega-boost.zip",
+    hashes = {
+      { hash = "b44ee31c7a12d5171f6bc3002d0252d6", label = "Omega Boost (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA7950, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XA7BF0, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Staggering March (0-10 AP)" },
+        { address=0XA7BF0, type="u8", condition="eq", value=0X0E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Omega Zeus (94+ AP)" },
+        { address=0XA7BF4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA7950, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone Play" },
+        { address=0XA7EE0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boost Level: 0-d (8-bit)" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X15, action="LEVEL_ZONE_V5", no_log=false, no_survey=false, desc="Zone V5" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X16, action="LEVEL_TRAINING", no_log=false, no_survey=false, desc="Training" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X18, action="LEVEL_ZONE_1_INTRO", no_log=false, no_survey=false, desc="Zone 1 intro" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X19, action="LEVEL_ZONE_6_INTRO", no_log=false, no_survey=false, desc="Zone 6 intro" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X1C, action="LEVEL_INTRO_MOVIE", no_log=false, no_survey=false, desc="Intro movie" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X1D, action="LEVEL_ENDING", no_log=false, no_survey=false, desc="Ending" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X1E, action="LEVEL_CREDITS", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X1F, action="LEVEL_ZONE_3_INTRO", no_log=false, no_survey=false, desc="Zone 3 intro" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X20, action="LEVEL_ZONE_5_INTRO", no_log=false, no_survey=false, desc="Zone 5 intro" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X21, action="LEVEL_ZONE_7_INTRO", no_log=false, no_survey=false, desc="Zone 7 intro" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X22, action="LEVEL_ZONE_9_INTRO", no_log=false, no_survey=false, desc="Zone 9 intro" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X27, action="LEVEL_TITLE_MAIN_MENU", no_log=false, no_survey=false, desc="Title/Main Menu" },
+        { address=0X10A1B4, type="u8", condition="eq", value=0X28, action="LEVEL_LOGOS", no_log=false, no_survey=false, desc="Logos" },
+        { address=0X10F1EE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Over/Level Clear Flag (Bit0)" },
+        { address=0X12D1EC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Clear Flag (Training) (Bit0)" },
+      },
+      zone = {
+        { address=0X10A1B4, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Zone (8-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA7EBC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (16-bit) decreased" },
+        { address=0XA7EBC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (16-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9C048, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score (32-bit)" },
+        { address=0XA7C04, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Final Score (32-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA794C, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed (16-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA7E90, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Zone Time (32-bit)" },
+      },
+    },
+  },
+}

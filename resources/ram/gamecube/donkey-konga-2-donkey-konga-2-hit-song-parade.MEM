@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "Donkey Konga 2 (Japan) | Donkey Konga 2 - Hit Song Parade",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "donkey-konga-2-donkey-konga-2-hit-song-parade",
+    file = "donkey-konga-2-donkey-konga-2-hit-song-parade.zip",
+    hashes = {
+      { hash = "a0b2ec44b49d9bc3537517c59cd9f724", label = "Donkey Konga 2 - Hit Song Parade (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1B369B, type="u8", condition="eq", value=0X16, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1B36AF, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Freestyle Zone" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XEE901C, type="u32be", condition="eq", value=0X1772, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Winning" },
+        { address=0XEE901C, type="u32be", condition="eq", value=0X2710, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0XEE901C, type="u32be", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[32bit BE] Solo Mode - Health Bar - In Game" },
+        { address=0XF1EDFC, type="u32be", condition="eq", value=0X1772, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Winning" },
+        { address=0XF1EDFC, type="u32be", condition="eq", value=0X2710, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0XF1EDFC, type="u32be", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[32bit BE] Duet Mode - Health Bar - In Game" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1B36AB, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sakuranbo - Ai Otsuka" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Secret Base ~ Kimi ga Kureta Mono ~" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Wild Challenger - Jindou (Bobobo-bo Bo-bobo Opening Theme)" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Over Drive" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Go Girl ` Koi no Victory - Morning Musume" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="WA ni Natte Odorou" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Yeah! Me-cha Holiday - Aya Matsuura" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X0F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Danzen! Futari wa Pretty Cure - Mayumi Gojo (Futari wa Pretty Cure Opening Theme)" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Viva Rock - Orange Range (Naruto Ending Theme)" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Realize - Nami Tamaki (Mobile Suit Gundam SEED Opening Theme)" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X13, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mazinger Z - Ichiro Mizuku (Mazinger Z Opening Theme)" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X16, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="The Legend of Zelda Theme" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Donkey Kong A-Go-Go!! (Donkey Konga 2 Theme)" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X19, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ambitious Japan!" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X1A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Tane no Uta - Strawberry Flower (Pikmin 2 Commercial Theme)" },
+        { address=0X1B36AB, type="u8", condition="eq", value=0X1B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Yankee Doodle" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sakuranbo - Ai Otsuka" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ambitious Japan!" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Go Girl ` Koi no Victory - Morning Musume" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="WA ni Natte Odorou" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Secret Base ~ Kimi ga Kureta Mono ~" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Yeah! Me-cha Holiday - Aya Matsuura" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Over Drive" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X0E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Random Song" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X0F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Exit" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Donkey Kong A-Go-Go!! (Donkey Konga 2 Theme)" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="The Legend of Zelda Theme" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X13, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Yankee Doodle" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X15, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mazinger Z - Ichiro Mizuku (Mazinger Z Opening Theme)" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Realize - Nami Tamaki (Mobile Suit Gundam SEED Opening Theme)" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X19, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Viva Rock - Orange Range (Naruto Ending Theme)" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X1A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Wild Challenger - Jindou (Bobobo-bo Bo-bobo Opening Theme)" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X1B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Danzen! Futari wa Pretty Cure - Mayumi Gojo (Futari wa Pretty Cure Opening Theme)" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X1F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Tane no Uta - Strawberry Flower (Pikmin 2 Commercial Theme)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B369B, type="u8", condition="eq", value=0X0E, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Selecting High Score Option" },
+        { address=0X1B369B, type="u8", condition="eq", value=0X20, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Reading the Info Pages" },
+      },
+      collectibles = {
+        { address=0XED0764, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit BE] Current Coins increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1B36AB, type="u8", condition="eq", value=0X1A, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into Tane no Uta - Strawberry Flower (Pikmin 2 Commercial Theme)" },
+        { address=0X1B36CF, type="u8", condition="eq", value=0X1F, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into Tane no Uta - Strawberry Flower (Pikmin 2 Commercial Theme)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "The Adventures of Gilligans Island",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "the-adventures-of-gilligans-island",
+    file = "the-adventures-of-gilligans-island.zip",
+    hashes = {
+      { hash = "f1b2b46f62705a96409e0754f5a309b9", label = "Adventures of Gilligan's Island, The (USA).nes" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X13A8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 000,0X0" },
+        { address=0X13A9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 000,X00" },
+        { address=0X13AA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 00X,000" },
+        { address=0X13AB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 0X0,000" },
+        { address=0X13AC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - X00,000" },
+      },
+    },
+  },
+}

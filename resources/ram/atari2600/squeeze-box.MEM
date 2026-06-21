@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Squeeze Box",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "squeeze-box",
+    file = "squeeze-box.zip",
+    hashes = {
+      { hash = "ba257438f8a78862a9e014d831143690", label = "Squeeze Box (USA).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0065, type="u8", condition="eq", value=0X20, action="GAME_OVER", no_log=false, no_survey=false, desc="On Screen, facing Left" },
+        { address=0X0065, type="u8", condition="eq", value=0XA0, action="GAME_OVER", no_log=false, no_survey=false, desc="On Screen, facing Right" },
+        { address=0X0065, type="u8", condition="eq", value=0X30, action="GAME_OVER", no_log=false, no_survey=false, desc="Disappear" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0078, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Starts at 0x20, decreases each round," },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0069, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Remaining (Stars) increased" },
+        { address=0X0069, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Remaining (Stars) decreased" },
+      },
+    },
+  },
+}

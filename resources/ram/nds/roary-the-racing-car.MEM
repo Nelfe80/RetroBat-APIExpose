@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Roary the Racing Car",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "roary-the-racing-car",
+    file = "roary-the-racing-car.zip",
+    hashes = {
+      { hash = "5e7390f5f0d520db7f1221479078c91a", label = "Roary the Racing Car (United Kingdom).nds" },
+    }
+  },
+
+  events = {
+  },
+}

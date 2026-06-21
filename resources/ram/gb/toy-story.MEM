@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Toy Story",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "toy-story",
+    file = "toy-story.zip",
+    hashes = {
+      { hash = "344ed70fe1a7a8cc904eda886543252c", label = "Toy Story (USA) (Rev 1) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0A7, type="u8", condition="eq", value=0X0C, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XC939, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0XDF65, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC0A7, type="u8", condition="eq", value=0X0A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed" },
+      },
+    },
+  },
+}

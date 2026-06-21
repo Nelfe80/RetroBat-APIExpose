@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "FIFA Street",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "fifa-street",
+    file = "fifa-street.zip",
+    hashes = {
+      { hash = "8b70109cc0959bc3f0d24b1e3e3afbe6", label = "FIFA Street (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X543D20, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Home - Goalie" },
+        { address=0X543D30, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Away - Goalie" },
+        { address=0X543D50, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals to Win" },
+        { address=0X544688, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Player Goals" },
+        { address=0X5446E8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Opponent Goals" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X543D48, type="u32le", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X54468C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player Points" },
+        { address=0X5446EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Opponent Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X543D48, type="u32le", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time" },
+        { address=0X543D48, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="End Game" },
+        { address=0X543D4C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32-bit Float] Match Time (Seconds)" },
+        { address=0X544744, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit Float] Current Match Time" },
+      },
+    },
+  },
+}

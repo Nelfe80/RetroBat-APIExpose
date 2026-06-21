@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cosmo Gang: The Video [Subset - Multiplayer]",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "cosmo-gang-the-video-subset-multiplayer",
+    file = "cosmo-gang-the-video-subset-multiplayer.zip",
+    hashes = {
+      { hash = "4d7f7707f032030b11f9701893800036", label = "Cosmo Gang - The Video [Subset - Multi].sfc" },
+    }
+  },
+
+  events = {
+  },
+}

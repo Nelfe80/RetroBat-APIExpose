@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Incredible Machine",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-incredible-machine",
+    file = "the-incredible-machine.zip",
+    hashes = {
+      { hash = "1a1438fb896409e1edff3d8c327debec", label = "Incredible Machine, The (USA)" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0XB88A9, type="u8", condition="eq", value=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Placing Objects" },
+      },
+    },
+  },
+}

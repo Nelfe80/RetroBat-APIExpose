@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 5: Fujisaki Nanako",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-5-fujisaki-nanako",
+    file = "private-idol-disc-vol-5-fujisaki-nanako.zip",
+    hashes = {
+      { hash = "ada226686c1f22a78badddc15de03b2c", label = "Private Idol Disc Vol. 5 - Nanako Fujisaki (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X133404, type="u8", condition="eq", value=0X1, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12D74D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz level" },
+        { address=0X12DBB9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz - correct answers needed to clear level" },
+      },
+    },
+  },
+}

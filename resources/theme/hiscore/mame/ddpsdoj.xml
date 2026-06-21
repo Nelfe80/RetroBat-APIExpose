@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 MON 1169136364</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ISO 1021616255</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 ATO 900000000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 SAS 800000000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 TAK 700000000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 AKO 600000000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 MAT 500000000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 KIT 400000000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 INO 300000000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 MAS 200000000</text>
+		</text>
+	</view>
+</theme>

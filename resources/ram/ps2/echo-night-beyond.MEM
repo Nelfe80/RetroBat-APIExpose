@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Echo Night Beyond",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "echo-night-beyond",
+    file = "echo-night-beyond.zip",
+    hashes = {
+      { hash = "bf17ca0722cae016ae2f37490e6c1443", label = "Echo Night - Beyond (USA)" },
+      { hash = "4bab193192d5955bab19deba5e21e6d3", label = "Echo Night - Beyond (USA) (Es) (v1.0.1) (Tío Víctor)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2ADB90, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First Level" },
+        { address=0X2ADB90, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Second Level" },
+        { address=0X2ADC04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Float] Brightness Level" },
+        { address=0X2BBBA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Float) Map - Zoom Level" },
+        { address=0X9CCD00, type="u16le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="card dropped" },
+        { address=0X9CCD00, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="obtained" },
+        { address=0X9CCD00, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) Level 1 Card Key" },
+        { address=0X9CCD04, type="u16le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="card dropped" },
+        { address=0X9CCD04, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="obtained" },
+        { address=0X9CCD04, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) Level 2 Card Key" },
+        { address=0X9CCD08, type="u16le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="card dropped" },
+        { address=0X9CCD08, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="obtained" },
+        { address=0X9CCD08, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) Level 3 Card Key" },
+        { address=0XAD6DE4, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First Level" },
+        { address=0XAD6DE4, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Second Level" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2ADBA8, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Promise Ring" },
+        { address=0X9CCD80, type="u32le", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="obtained" },
+        { address=0X9CCDA4, type="u32le", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="raised the seat" },
+        { address=0X9CCDA4, type="u32le", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="obtained" },
+        { address=0X9CCDA8, type="u32le", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="obtained" },
+        { address=0X9CCDAC, type="u32le", condition="eq", value=0X1, action="COIN_LOSE", no_log=false, no_survey=false, desc="dropped" },
+        { address=0X9CCDAC, type="u32le", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="obtained" },
+        { address=0X9CCF18, type="u32le", condition="eq", value=0X14, action="MONEY_STATE", no_log=false, no_survey=false, desc="released" },
+        { address=0X9CCF48, type="u32le", condition="eq", value=0X14, action="MONEY_STATE", no_log=false, no_survey=false, desc="released" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9CCEB8, type="u32le", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cutscene were he block your path" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9CCE88, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32 bit) Kenneth Livingston" },
+        { address=0X9CD2F8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32 bit) Syrigne at Studio" },
+      },
+    },
+  },
+}

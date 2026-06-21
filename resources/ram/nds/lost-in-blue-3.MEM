@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lost in Blue 3",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "lost-in-blue-3",
+    file = "lost-in-blue-3.zip",
+    hashes = {
+      { hash = "5eba2a035234bd9ee04186a3b9927e2a", label = "Lost in Blue 3 (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

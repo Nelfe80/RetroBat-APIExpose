@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Princess Maker [Subset - 33 Endings]",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "princess-maker-subset-33-endings",
+    file = "princess-maker-subset-33-endings.zip",
+    hashes = {
+      { hash = "adc6b3444f2af75bada0397d76237df5", label = "Princess Maker (1992) (Micro Cabin) (En) [Subset - 33 Endings] (Disk 1).dsk" },
+      { hash = "7e30abb1fa38053b548fac6d78c3ad2b", label = "Princess Maker (1992) (Micro Cabin) (En) [Subset - 33 Endings] (Disk 2).dsk" },
+      { hash = "ce49690dbad086705520eac8fbc8495c", label = "Princess Maker (1992) (Micro Cabin) (En) [Subset - 33 Endings] (Disk 4).dsk" },
+      { hash = "d3231e6da1da302c462bb4a862c6d49b", label = "Princess Maker (1992) (Micro Cabin) (En) [Subset - 33 Endings] (Disk 5).dsk" },
+      { hash = "a001efd0ef6d14cb03051bd8a644f1b0", label = "Princess Maker (1992) (Micro Cabin) (En) [Subset - 33 Endings] (Disk 6).dsk" },
+      { hash = "484bdf9af80983fddf0601321875f0ca", label = "Princess Maker (1992) (Micro Cabin) (En) [Subset - 33 Endings] (Disk 7).dsk" },
+      { hash = "3895420eb9b26a95645c4106ce18d170", label = "Princess Maker (1992) (Micro Cabin) (En) [Subset - 33 Endings] (User Disk).dsk" },
+      { hash = "864b3cb01ab7109e7d727a89d2d972b5", label = "Princess Maker (1992) (Micro Cabin) (En) [Subset - 33 Endings] (Disk 3).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

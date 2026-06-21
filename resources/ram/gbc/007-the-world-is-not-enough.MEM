@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "007: The World Is Not Enough",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Shooter, Stealth"
+  },
+
+  rom = {
+    name = "007-the-world-is-not-enough",
+    file = "007-the-world-is-not-enough.zip",
+    hashes = {
+      { hash = "1f1fb3cf8783f880bc796d667be60231", label = "007 - The World Is Not Enough (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC447, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage value - 00 - 07 (1-8)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCB12, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0XCB12, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+      },
+    },
+  },
+}

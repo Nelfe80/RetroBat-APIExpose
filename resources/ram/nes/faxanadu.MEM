@@ -1,0 +1,115 @@
+return {
+  game = {
+    title = "Faxanadu",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform, Role-Playing"
+  },
+
+  rom = {
+    name = "faxanadu",
+    file = "faxanadu.zip",
+    hashes = {
+      { hash = "28eb470f84bcd54320fa890003d26402", label = "Faxanadu (USA) (Rev 1).nes" },
+      { hash = "b01a5dbe05aef906d65cdd2c0286cb5d", label = "Faxanadu (USA) (Pt) (v1999) (BRGames).nes" },
+      { hash = "b3bb9296b5e1e0c83e90b6da9e8a41aa", label = "Faxanadu (USA).nes" },
+      { hash = "b9c0075700f4949ed981a4ce35723f47", label = "Faxanadu (USA) (Facelift) (v1.0) (Ice Ranger).nes" },
+      { hash = "c7e191e16ca84482a1d613de877bb533", label = "Faxanadu (USA) (Fr) (v0.4) (Torus).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X02A4, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0003, type="u8", condition="eq", value=0X90, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Enemy On Screen" },
+        { address=0X0003, type="u8", condition="eq", value=0X91, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="NPC On Screen" },
+        { address=0X0003, type="u8", condition="eq", value=0XAF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Text (blinking at cursor)" },
+        { address=0X0024, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Eolis" },
+        { address=0X0024, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X0024, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tower of Mist, Some Others?" },
+        { address=0X0024, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Apolune, Forepaw" },
+        { address=0X0024, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Inside Any Shop/Church/House" },
+        { address=0X0024, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fraternal Castle" },
+        { address=0X0024, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone For Maps (Stable)" },
+        { address=0X008A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offset of level's scrolling A" },
+        { address=0X008B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offset of level's scrolling B" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X03C0, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+      health = {
+        { address=0X0344, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 8 HP decreased" },
+        { address=0X0344, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 8 HP increased" },
+        { address=0X0345, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 7 HP decreased" },
+        { address=0X0345, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 7 HP increased" },
+        { address=0X0346, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 HP decreased" },
+        { address=0X0346, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 HP increased" },
+        { address=0X0347, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 HP decreased" },
+        { address=0X0347, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 HP increased" },
+        { address=0X0348, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 HP decreased" },
+        { address=0X0348, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 HP increased" },
+        { address=0X0349, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X0349, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0X034A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X034A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X034B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0X034B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0X0431, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0431, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X03BE, type="u8", condition="eq", value=0XFF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="none" },
+        { address=0X03BE, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Leather" },
+        { address=0X03BE, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Scale Mail" },
+        { address=0X03BE, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Full Plate" },
+        { address=0X03BE, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Battle Suit" },
+      },
+      weapon = {
+        { address=0X0061, type="u8", condition="eq", value=0X22, action="WEAPON_STATE", no_log=false, no_survey=false, desc="No Weapon" },
+        { address=0X0061, type="u8", condition="eq", value=0X73, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dagger" },
+        { address=0X039D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory (Weapon-01)" },
+        { address=0X039E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory (Weapon-02)" },
+        { address=0X039F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory (Weapon-03)" },
+        { address=0X03A0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory (Weapon-04)" },
+        { address=0X03BD, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dagger" },
+        { address=0X03BD, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Long Sword" },
+        { address=0X03BD, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Giant Sword" },
+        { address=0X03BD, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dragon Slayer" },
+        { address=0X03C8, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="None/In Building" },
+        { address=0X03C8, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dagger" },
+        { address=0X03C8, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Long Sword" },
+        { address=0X03C8, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Giant Sword" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X02D3, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin" },
+        { address=0X0392, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(24-bit) Gold increased" },
+        { address=0X0DFE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money? increased" },
+        { address=0X1392, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0X15FE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money? increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X03A5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory (Shield-01)" },
+        { address=0X03A6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory (Shield-02)" },
+        { address=0X03A7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory (Shield-03)" },
+        { address=0X03A8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory (Shield-04)" },
+        { address=0X03BF, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Small Shield" },
+        { address=0X03BF, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Large Shield" },
+        { address=0X03BF, type="u8", condition="eq", value=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Magic Shield" },
+        { address=0X03BF, type="u8", condition="eq", value=0X03, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Battle Helmet" },
+      },
+    },
+  },
+}

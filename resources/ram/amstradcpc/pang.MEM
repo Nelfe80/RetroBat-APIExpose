@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Pang",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "pang",
+    file = "pang.zip",
+    hashes = {
+      { hash = "df95e5552728076f4097e0dfccca5cac", label = "Pang (1990)(Schneider Magazin)[cr].dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X1B3E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Overall stage number" },
+      },
+    },
+  },
+}

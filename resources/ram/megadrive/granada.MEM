@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "Granada",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "granada",
+    file = "granada.zip",
+    hashes = {
+      { hash = "9e215cea722159b321a2eac544573f0d", label = "Granada (Japan, USA) (En).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF08, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="in Demo" },
+        { address=0XBF0A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Level" },
+        { address=0XFDAC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause State" },
+        { address=0XFE02, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8014, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8 - Temple Left Part" },
+        { address=0X8015, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8 - Temple Top Part" },
+        { address=0X8016, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8 - Temple Bottom Part" },
+        { address=0X8017, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8 - Temple Right Part" },
+        { address=0X801E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8 - Temple Center Part" },
+        { address=0X809E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 7" },
+        { address=0X80FE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 8" },
+        { address=0X81FE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 13" },
+        { address=0X831E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 - Nail Canister 3" },
+        { address=0X833E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 - Nail Canister 4" },
+        { address=0X835E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 - Nail Canister 5" },
+        { address=0X837E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 - Nail Canister 2" },
+        { address=0X839E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 - Nail Canister 1" },
+        { address=0X891E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 3" },
+        { address=0X893E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 9" },
+        { address=0X8A1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 10" },
+        { address=0X8A3E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 11" },
+        { address=0X8A5E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 12" },
+        { address=0X8ABE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 2" },
+        { address=0X8AFE, type="u8", condition="eq", value=0XDEAD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0x00" },
+        { address=0X8AFE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - Big Compressor 2 Health" },
+        { address=0X8B1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Mine 4" },
+        { address=0XB452, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rough Ground" },
+        { address=0XBF3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X8012, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit - 1st reflector collected in stage 1" },
+        { address=0X8052, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit - 2nd reflector collected in Stage 1" },
+        { address=0X8822, type="u8", condition="eq", value=0XDEAD, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x00" },
+        { address=0X8822, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit Compressor 3 Stage 1" },
+        { address=0X88E2, type="u8", condition="eq", value=0XDEAD, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x00" },
+        { address=0X88E2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit Compressor 1 Stage 1" },
+        { address=0X8A7E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 - Reactor Bottom Right 3" },
+        { address=0X8A9E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 - Reactor Bottom Right 1" },
+        { address=0X8AE2, type="u8", condition="eq", value=0XDEAD, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x00" },
+        { address=0X8AE2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit Compressor 2 Stage 1" },
+        { address=0X8E3E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 - Reactor Bottom Left 1" },
+        { address=0X8E5E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 - Reactor Bottom Left 2" },
+        { address=0X8E7E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 - Reactor Bottom Left 3" },
+        { address=0XB45C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit - Driving on ice [Stage 5]" },
+        { address=0XB470, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit - Missile upgrades collected in stage 2" },
+        { address=0XBEC6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit - Blaster upgrade in Stage 2" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XB454, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XB454, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB41A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score (4 upper digits)" },
+        { address=0XB41C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score (4 lower digits)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X83DE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 4 Health" },
+        { address=0X845E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 7 - Boss Health" },
+        { address=0X879E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 6 Health" },
+        { address=0X87BE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Health" },
+        { address=0X8ADE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Health" },
+        { address=0X8F5E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 8 Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XFE0A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Max Shield" },
+      },
+      player = {
+        { address=0X813E, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Level 8 - Jumper 2" },
+        { address=0X855E, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Level 8 - Jumper 1" },
+        { address=0X857E, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Level 8 - Jumper 3" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBF0C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Demo Timer" },
+      },
+    },
+  },
+}

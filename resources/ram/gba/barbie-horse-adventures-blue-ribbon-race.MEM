@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Barbie: Horse Adventures - Blue Ribbon Race",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "barbie-horse-adventures-blue-ribbon-race",
+    file = "barbie-horse-adventures-blue-ribbon-race.zip",
+    hashes = {
+      { hash = "b0c8edeae511c647f9617b32ddc37594", label = "Barbie Horse Adventures - Blue Ribbon Race (USA).gba" },
+      { hash = "f7960bb4694205288a59556ab82c34e5", label = "Barbie Horse Adventures (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X25E4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Races Cleared" },
+      },
+      stage = {
+        { address=0X5244, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 01: Flowers on Pots" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2679, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8Bit] Coins Collected increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X25C3, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Objects Collected" },
+        { address=0X5240, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objects Collected" },
+      },
+    },
+  },
+}

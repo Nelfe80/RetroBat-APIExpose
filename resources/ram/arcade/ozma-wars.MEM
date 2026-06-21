@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ozma Wars",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ozma-wars",
+    file = "ozma-wars.zip",
+    hashes = {
+      { hash = "805d5b396d7e502022f831433ad0ebee", label = "ozmawars.7z <Ozma Wars (set 1)>" },
+    }
+  },
+
+  events = {
+  },
+}

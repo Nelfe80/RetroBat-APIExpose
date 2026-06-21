@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Quiz & Dragons: Capcom Quiz Game",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "quiz-dragons-capcom-quiz-game",
+    file = "quiz-dragons-capcom-quiz-game.zip",
+    hashes = {
+      { hash = "d601470f41a1487f4dc2376bd0616da6", label = "qad.7z <Quiz & Dragons (capcom quiz game 920701 USA)>" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XE4A6, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last 3 questions in Gordian stage" },
+        { address=0XE4A6, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last question in Gordian stage" },
+      },
+    },
+  },
+}

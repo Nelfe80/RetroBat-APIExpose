@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Fieldrunners",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fieldrunners",
+    file = "fieldrunners.zip",
+    hashes = {
+      { hash = "3bda85e67a8a99f4af76a5213ea7a2cb", label = "Fieldrunners (Europe, Australia)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X50B908, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+      collectibles = {
+        { address=0X52D1EC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

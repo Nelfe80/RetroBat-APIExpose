@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Perfect Performer: The Yellow Monkey",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "perfect-performer-the-yellow-monkey",
+    file = "perfect-performer-the-yellow-monkey.zip",
+    hashes = {
+      { hash = "d830a46c0dd32ccc645ed2572bd6044e", label = "Perfect Performer - The Yellow Monkey (Japan)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1B863E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- P1 - Health decreased" },
+        { address=0X1B863E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- P1 - Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B861C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1P - Score" },
+        { address=0X1B861E, type="u16le", condition="eq", value=0X0001, action="SCORE_STATE", no_log=false, no_survey=false, desc="65536" },
+        { address=0X1B861E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1P - Score Overflow" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X79930, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Continue Time between each second" },
+        { address=0X79932, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Continue Counter" },
+        { address=0X1B8638, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="- 1P - Combo Counter" },
+      },
+    },
+  },
+}

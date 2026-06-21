@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Znake",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "znake",
+    file = "znake.zip",
+    hashes = {
+      { hash = "477db24da6b0ec8063410db7f5910803", label = "Znake (World) (freiguy1).wasm" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X3B50, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Score" },
+      },
+    },
+  },
+}

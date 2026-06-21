@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Jungle no Ouja Tar-chan: Sekai Manyuu Dai Kakutou no Maki",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "jungle-no-ouja-tar-chan-sekai-manyuu-dai-kakutou-no-maki",
+    file = "jungle-no-ouja-tar-chan-sekai-manyuu-dai-kakutou-no-maki.zip",
+    hashes = {
+      { hash = "bd9dbcd497764d2bd56992c698351d63", label = "Jungle no Ouja Tar-chan - Sekaimanyuu Daikakutou no Maki (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0750, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Protect the Jungle | Tank" },
+        { address=0X0750, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rural China | Ouki" },
+        { address=0X0750, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Las Vegas | Apollonia Mask" },
+        { address=0X0750, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vampire Castle | Dan Marceau" },
+        { address=0X0750, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cerberus Island | Iron Mask" },
+        { address=0X0750, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[No Stage] | Enraged Iron Mask" },
+        { address=0X0750, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage [8 bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0751, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="has died, respawned" },
+        { address=0X075C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Remaining [8 bit] increased" },
+        { address=0X075C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Remaining [8 bit] decreased" },
+      },
+      health = {
+        { address=0X0754, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health [8 bit] decreased" },
+        { address=0X0754, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health [8 bit] increased" },
+        { address=0X0757, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health [8 bit] decreased" },
+        { address=0X0757, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health [8 bit] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0753, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="otter" },
+        { address=0X0753, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="armadillo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0758, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24 bit]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0751, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss stage" },
+        { address=0X0756, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Round [8 bit]" },
+      },
+    },
+  },
+}

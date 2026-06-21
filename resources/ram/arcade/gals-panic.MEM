@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Gals Panic",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Mature"
+  },
+
+  rom = {
+    name = "gals-panic",
+    file = "gals-panic.zip",
+    hashes = {
+      { hash = "2b0a17187c12ddc79d80976180b43a9f", label = "galsnew.zip <Gals Panic (Export, EXPRO-02 PCB)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3D065, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Max 9" },
+        { address=0X41A4C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits on screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3E7D5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X3E7D5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3E7E6, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time Remaining seconds (Hex)" },
+        { address=0X3E7E7, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time Remaining Minutes" },
+      },
+    },
+  },
+}

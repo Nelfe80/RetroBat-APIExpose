@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Classic NES Series: Metroid",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Adventure, Platform, Shooter"
+  },
+
+  rom = {
+    name = "classic-nes-series-metroid",
+    file = "classic-nes-series-metroid.zip",
+    hashes = {
+      { hash = "5d9da9584ee479f0f096963ba713710e", label = "Classic NES Series - Metroid (USA, Europe).gba" },
+      { hash = "7aa3d0f0c73456c7500f1628767eceb7", label = "Classic NES Series - Metroid (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X721E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="This address covers the state that the game is in: whether the game is paused or not usually" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X38878, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Address covers the special equipment. Each is marked on the Bit level. Each goes from 0 to 1 whe" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X721F, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="The playing type of the game. Covers whether game is being played from the start, whether a pass" },
+        { address=0X38881, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="This address shows the amount of deaths/games played for the session. Password adds number to th" },
+      },
+      health = {
+        { address=0X7298, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Address focusing on the current status of Mother Brain. Only health meter that appears tied to h" },
+        { address=0X7298, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Address focusing on the current status of Mother Brain. Only health meter that appears tied to h" },
+        { address=0X7306, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Address covers health. On 8-bit layer, left digit stores 1's place of energy number, right digit" },
+        { address=0X7306, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Address covers health. On 8-bit layer, left digit stores 1's place of energy number, right digit" },
+        { address=0X7307, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Address covers health. On 8-bit layer, left digit stores the current number of filled energy tan" },
+        { address=0X7307, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Address covers health. On 8-bit layer, left digit stores the current number of filled energy tan" },
+        { address=0X38877, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Covers the number of Energy Tanks that have been collected. However, only goes up to 6 for the f" },
+        { address=0X38877, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Covers the number of Energy Tanks that have been collected. However, only goes up to 6 for the f" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X389B3, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="When designation of 1 is at this address, Armorless/zero suit is enabled" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X760B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mini- boss health appears to be covered at this address (resets when leaving/entering room) incr" },
+        { address=0X761D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Address involves the duration of an item (missile/energy) being present before disappearing. Als" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X720C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Will have a byte designation of 94 when an item is being picked up or a mini-boss is being devel" },
+        { address=0X760D, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Address appears to involve the duration of an effect (ice?) on mini-boss. Goes to 0 when dead, b" },
+        { address=0X3887B, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Address that is used to show the status of the mini-boss Kraid. When defeated, shows designation" },
+        { address=0X3887C, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Address that is used to show the status of the mini-boss Ridley. When defeated, shows designatio" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X389B2, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="When designation of 1 is at this address, invincible code (NARPASSWORD) is enabled" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7256, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="This address covers the direction that Samus is going when going through doors." },
+        { address=0X726D, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Address seems tied to door transitions. Will either be 0, 1, 2, or 3 depending, though unstable" },
+        { address=0X38887, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Beginning of item/red door array; 2 bytes are updated to each adjacent addresses with each picku" },
+        { address=0X388EA, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="End of array of item pickup/red doors before Tourian (true 100%)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X722D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Seems to offer milliseconds to the timer, though is ruined when a player pauses the game as it c" },
+        { address=0X38886, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Item collection/red door opening counter" },
+      },
+    },
+  },
+}

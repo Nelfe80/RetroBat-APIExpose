@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Fallout: Brotherhood of Steel",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "fallout-brotherhood-of-steel",
+    file = "fallout-brotherhood-of-steel.zip",
+    hashes = {
+      { hash = "584642f386a04d9f3d803c6cdc694b68", label = "Fallout - Brotherhood of Steel (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X36CDE8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="PLAYER 1 : Slayer Skill level" },
+        { address=0X36D1E8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="PLAYER 1 : Artful Dodger Skill level" },
+        { address=0X36D3E8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="PLAYER 1 : Bargaining Power Skill level" },
+        { address=0X36D5E8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="PLAYER 1 : Fortune Finder Skill level" },
+        { address=0XA5A2C8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="PLAYER1 : Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X36CFE8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="PLAYER 1 : Die Hard Skill level" },
+      },
+      health = {
+        { address=0XA59B18, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PLAYER : Health Max [float] decreased" },
+        { address=0XA59B18, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PLAYER : Health Max [float] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XA59D08, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="INVENTORY : Number of items in Weapons Tab" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X59DFB4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objectives related array" },
+      },
+    },
+  },
+}

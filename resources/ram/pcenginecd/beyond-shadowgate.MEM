@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Beyond Shadowgate",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "beyond-shadowgate",
+    file = "beyond-shadowgate.zip",
+    hashes = {
+      { hash = "a9bb49d6cbb338e2195d8735097ccf87", label = "Beyond Shadowgate (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0300, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+    },
+  },
+}

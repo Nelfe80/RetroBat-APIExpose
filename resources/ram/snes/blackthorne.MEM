@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Blackthorne",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform, Shooter"
+  },
+
+  rom = {
+    name = "blackthorne",
+    file = "blackthorne.zip",
+    hashes = {
+      { hash = "0832ab17819be1ac7056fb551b9ec5a7", label = "Blackthorne (USA) (Ru) (Shedevr).sfc" },
+      { hash = "c9be62563253854cbaff00041e8e06c0", label = "Blackthorne (USA) (Es) (DaRKWiZaRDX) (2.0).sfc" },
+      { hash = "e292260abd6dad2348975accecfb2395", label = "Blackthorne (USA) (Pt) (v1.0) (Mr. Magoo).sfc" },
+      { hash = "ee33097d436b4901a71f7e4c9a5cb409", label = "Blackthorne (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X108F, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue or Give up" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0D71, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Myabe Some Screen ID?( 10 = Last Screen of level?)" },
+        { address=0X1315, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Some levels elevador = fc" },
+        { address=0X1335, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Other level ID?" },
+        { address=0X18F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0FD1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Grag'ohr(Blue one) Life increased" },
+        { address=0X0FD1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Grag'ohr(Blue one) Life decreased" },
+        { address=0X0FF1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life (Plant 1 Life?)? increased" },
+        { address=0X0FF1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life (Plant 1 Life?)? decreased" },
+        { address=0X0FF3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life (Plant 2 Life?)? increased" },
+        { address=0X0FF3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life (Plant 2 Life?)? decreased" },
+        { address=0X0FF5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life (Plant 3 Life?)? increased" },
+        { address=0X0FF5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life (Plant 3 Life?)? decreased" },
+        { address=0X0FF7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life (Plant 4 Life?)? increased" },
+        { address=0X0FF7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life (Plant 4 Life?)? decreased" },
+      },
+      health = {
+        { address=0X0FC5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0FC5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X1876, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Item Slot 1(04 = Health Potion, 05 = Bomb,06 = Levitator, 07 = Key, 08 = Remote Wasp, 0a = Blue" },
+        { address=0X1876, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Item Slot 1(04 = Health Potion, 05 = Bomb,06 = Levitator, 07 = Key, 08 = Remote Wasp, 0a = Blue" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0305, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) - 80 during demo increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0345, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "LEGO Batman 2: DC Super Heroes",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "lego-batman-2-dc-super-heroes",
+    file = "lego-batman-2-dc-super-heroes.zip",
+    hashes = {
+      { hash = "1cd38206abdec71eac66fd5e5dc9d00f", label = "LEGO Batman 2 - DC Super Heroes (Europe) (En,Fr,De,Es,It,Nl,Da) (Rev 1).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19FAB3, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="In-game" },
+        { address=0X19FAB3, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="In-pause screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X189B33, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gotham Theatre Unlocked" },
+        { address=0X189B33, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gotham Theatre Freeplay Unlocked" },
+        { address=0X189B33, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Joker Getaway Unlocked" },
+        { address=0X189B33, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Joker Getaway Freeplay Unlocked" },
+        { address=0X189B34, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arkham Estate Unlocked" },
+        { address=0X189B34, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arkham Estate Freeplay Unlocked" },
+        { address=0X189B34, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arkham Asylum Unlocked" },
+        { address=0X189B35, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arkham Asylum Freeplay Unlocked" },
+        { address=0X189B35, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ace Chemicals Unlocked" },
+        { address=0X189B35, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ace Chemicals Freeplay Unlocked" },
+        { address=0X189B36, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Juggernaut chase Unlocked" },
+        { address=0X189B36, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Juggernaut chase Freeplay Unlocked" },
+        { address=0X189B36, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Batcave Unlocked" },
+        { address=0X189B36, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Batcave Freeplay unlocked" },
+        { address=0X189B37, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assault the VTOL Unlocked" },
+        { address=0X189B37, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assault the VTOL Freeplay Unlocked" },
+        { address=0X189B38, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Attack on LexCorp Unlocked" },
+        { address=0X189B38, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Attack on LexCorp Freeplay Unlocked" },
+        { address=0X189B38, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Robot Sky Battle Unlocked" },
+        { address=0X189B38, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Robot Sky Battle Freeplay Unlocked" },
+        { address=0X189B39, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gotham Metro Unlocked" },
+        { address=0X189B39, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gotham Metro Freeplay Unlocked" },
+        { address=0X189B39, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Brawl at City Hall Unlocked" },
+        { address=0X189B3A, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Brawl at City Hall Freeplay Unlocked" },
+        { address=0X189B3A, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wayne Industries Unlocked" },
+        { address=0X189B3A, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wayne Industries Freeplay Unlocked" },
+        { address=0X189B3B, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Final Battle Unlocked" },
+        { address=0X189B3B, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Final Battle Freeplay Unlocked" },
+      },
+      zone = {
+        { address=0X189AF5, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World's Greatest Detector" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X189B1E, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadshot Unlocked" },
+        { address=0X189B1E, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadshot Bought" },
+        { address=0X189B1E, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathstroke Unlocked" },
+        { address=0X189B1E, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathstroke Bought" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X189B1A, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Batman (Classic Suit) Unlocked" },
+        { address=0X189B1A, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Batman (Classic Suit) Bought" },
+        { address=0X189B1A, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Batman (Electric Suit) Unlocked" },
+        { address=0X189B1A, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Batman (Electric Suit) Bought" },
+        { address=0X189B1A, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Batman (Power Suit) Unlocked" },
+        { address=0X189B1A, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Batman (Power Suit) Bought" },
+        { address=0X189B1A, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Batman (Sensor Suit) Unlocked" },
+        { address=0X189B1A, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Batman (Sensor Suit) Bought" },
+        { address=0X189B29, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robin (Classic Suit) Unlocked" },
+        { address=0X189B29, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robin (Classic Suit) Bought" },
+        { address=0X189B29, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robin (Hazard Suit) Unlocked" },
+        { address=0X189B29, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robin (Hazard Suit) Bought" },
+        { address=0X189B29, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robin (Ice Suit) Unlocked" },
+        { address=0X189B29, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robin (Ice Suit) Bought" },
+        { address=0X189B2A, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robin (Magnet Suit) Unlocked" },
+        { address=0X189B2A, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robin (Magnet Suit) Bought" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X189B17, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+        { address=0X19FAE5, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X188BD3, type="u8", condition="bit_true", bit=1, mask=0X02, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Minikit behind super strength handles" },
+      },
+    },
+  },
+}

@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Batman: Return of the Joker",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "batman-return-of-the-joker",
+    file = "batman-return-of-the-joker.zip",
+    hashes = {
+      { hash = "97bc907deba1e7d7c9bc72fca0310822", label = "Batman - Return of the Joker (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC716, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1 if paused, 0 otherwise" },
+        { address=0XC767, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC753, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 Clear" },
+        { address=0XC753, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 2 Clear" },
+        { address=0XC753, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 3 Clear" },
+      },
+      stage = {
+        { address=0XC29E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage enemy health 2" },
+        { address=0XC2BE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage enemy health 3" },
+        { address=0XC2DE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage enemy health 4" },
+        { address=0XC2FE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage enemy health 5" },
+        { address=0XC31E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage enemy health 6" },
+        { address=0XC33E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage enemy health 7" },
+        { address=0XC35E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage enemy health 8" },
+        { address=0XC62C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0C when in a stage" },
+        { address=0XC712, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0XC740, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="FF while playing any stage" },
+        { address=0XFFB0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage and Sub-Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC754, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Sewer life up increased" },
+        { address=0XC754, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sewer life up decreased" },
+      },
+      health = {
+        { address=0XFF8A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XFF8A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XFF8E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0XFF8E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC27E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Boss health (during boss fights) increased" },
+        { address=0XC759, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC73E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current boss" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XFF80, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+      },
+    },
+  },
+}

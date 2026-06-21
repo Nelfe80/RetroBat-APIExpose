@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Pinocchio",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "pinocchio",
+    file = "pinocchio.zip",
+    hashes = {
+      { hash = "99fa6ab3d399e4cff74bb6ff79727efe", label = "Pinocchio (Europe).md" },
+      { hash = "9a016622b1ef6ea4a6c8d26625bea1cf", label = "Pinocchio (USA) (Ru) (SergeyK).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8C1A, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X8C20, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Books collected, gives continue" },
+        { address=0X8C24, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Books needed for a continue:" },
+        { address=0XEA86, type="u16be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo 16 bit (0xffff - demo)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB000, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="White page - Sink for longer on level 6" },
+        { address=0XB001, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yellow page - Longer balloons on level 4" },
+        { address=0XE7AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 - Alive insects bits" },
+        { address=0XE82A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fireshow: Items left to pass level" },
+      },
+      stage = {
+        { address=0XE7AC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 - Active insects bits" },
+        { address=0XE880, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Marionette Show: Stage 00, 04, 08, 0c, 10 - win" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8C1C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Low Dec increased" },
+        { address=0X8C1C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Low Dec decreased" },
+        { address=0X8C1D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives High Dec increased" },
+        { address=0X8C1D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives High Dec decreased" },
+        { address=0X8C1E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Hats collected, gives life increased" },
+        { address=0X8C1E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hats collected, gives life decreased" },
+        { address=0X8C22, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Hats needed for a life: increased" },
+        { address=0X8C22, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hats needed for a life: decreased" },
+      },
+      health = {
+        { address=0X8C26, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (0x64 - max) decreased" },
+        { address=0X8C26, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (0x64 - max) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XB003, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Blue page - Higher jumps" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle Series Vol. 5: Slither Link",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-series-vol-5-slither-link",
+    file = "puzzle-series-vol-5-slither-link.zip",
+    hashes = {
+      { hash = "7298cfc6544a82b22e45621da38a47b1", label = "Puzzle Series Vol. 5 - Slither Link (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

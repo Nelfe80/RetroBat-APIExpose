@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Immercenary",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "immercenary",
+    file = "immercenary.zip",
+    hashes = {
+      { hash = "9c8328c8a696b41f9c93b94eff1d2fc8", label = "Immercenary - Combat in a Digital World (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7ADB2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Defense Level" },
+        { address=0X7ADB6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Offense Level" },
+        { address=0X7ADBA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Agility Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X7ADF2, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16bit] Damage Given" },
+        { address=0X7ADF6, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16bit] Damage Taken" },
+        { address=0X161FA2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Target Health decreased" },
+        { address=0X161FA2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Target Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X109DD0, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Stunya Ammo" },
+        { address=0X109DD2, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] HEX Ammo" },
+        { address=0X109DD4, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Switchya Ammo" },
+        { address=0X109DD5, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] DFA Ammo" },
+        { address=0X109DD6, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Ice Ammo" },
+        { address=0X109DD7, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Pushya Ammo" },
+        { address=0X109DD8, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] PEMS Ammo" },
+        { address=0X109DD9, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Chaff Ammo" },
+        { address=0X109DDA, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Ashflay Ammo" },
+        { address=0X109DDB, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Annaballs Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X73E38, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] 0x46=Higher Crash (Boss Dead)" },
+      },
+    },
+  },
+}

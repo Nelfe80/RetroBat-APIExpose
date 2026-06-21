@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Skullmonkeys",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "skullmonkeys",
+    file = "skullmonkeys.zip",
+    hashes = {
+      { hash = "c6aaedf62e0b8ed58af5493ea6d5c7b3", label = "Skullmonkeys (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9B24E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Swirly Q pause display" },
+        { address=0X9DDEC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X9DDEE, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demomode" },
+        { address=0X9DE28, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="index of last button pressed on pause menu 0-7 for cheats" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9B235, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X9B239, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Secrets (Cumulated after Level finish)" },
+      },
+      zone = {
+        { address=0X9B234, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9B245, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X9B245, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9B236, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Cumulated at score screen) 16-bit" },
+        { address=0X134618, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Final Score on you win screen 16-bit hex EEEE on world complete" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9B251, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss hits left" },
+      },
+    },
+  },
+}

@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Stuntman",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform, Racing, Sports"
+  },
+
+  rom = {
+    name = "stuntman",
+    file = "stuntman.zip",
+    hashes = {
+      { hash = "89e5cd6e74e0606376c7ae12b7656223", label = "Stuntman (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="RAScript link (has Rich Presence and demonstration achievements for level complete/perfect compl" },
+        { address=0X2917CC, type="u16le", condition="eq", value=0X2, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Career (Continue Career)" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X315118, type="u16le", condition="eq", value=0XF, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Arena - World Record Attempt" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X315118, type="u16le", condition="eq", value=0X1, action="JUMPING", no_log=false, no_survey=false, desc="Arena - Cannon Jump" },
+      },
+    },
+  },
+}

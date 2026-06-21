@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "Shadowgate 64: Trials of the Four Towers",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Adventure, Puzzle-Game"
+  },
+
+  rom = {
+    name = "shadowgate-64-trials-of-the-four-towers",
+    file = "shadowgate-64-trials-of-the-four-towers.zip",
+    hashes = {
+      { hash = "11169a32d449ec3a8903ca8a9d69a6aa", label = "Shadowgate 64 - Trials of the Four Towers (Europe) (Fr,De,Nl).z64" },
+      { hash = "1960a3879fadf2c5eff5beb47e0e1441", label = "Shadowgate 64 - Trials of the Four Towers (Japan).z64" },
+      { hash = "407a1a18bd7dbe0485329296c3f84eb8", label = "Shadowgate 64 - Trials of the Four Towers (USA) (En,Es).z64" },
+      { hash = "a06e757cf1930b29fa4c0b5c9f31335f", label = "Shadowgate 64 - Trials of the Four Towers (Europe) (Es,It).z64" },
+      { hash = "e8955c3b743fddfe403e52e769e9853f", label = "Shadowgate 64 - Trials of the Four Towers (Europe).z64" },
+    }
+  },
+
+  events = {
+  },
+}

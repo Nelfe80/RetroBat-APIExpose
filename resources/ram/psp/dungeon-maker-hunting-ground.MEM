@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Dungeon Maker: Hunting Ground",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dungeon-maker-hunting-ground",
+    file = "dungeon-maker-hunting-ground.zip",
+    hashes = {
+      { hash = "25d3573fb5629e806a6326c533eac07c", label = "Dungeon Maker - Hunting Ground (USA).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XBFF490, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Quest Clear" },
+        { address=0XBFF495, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Quest Clear" },
+        { address=0XBFF496, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Quest Clear" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC594C1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [B4] Max Health +1 decreased" },
+        { address=0XC594C1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [B4] Max Health +1 increased" },
+        { address=0XC594C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [B0] Max Health +16 decreased" },
+        { address=0XC594C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [B0] Max Health +16 increased" },
+        { address=0XC594C3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [B0] Max Health +4096 decreased" },
+        { address=0XC594C3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [B0] Max Health +4096 increased" },
+        { address=0XC594C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [B0] Health +1 decreased" },
+        { address=0XC594C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [B0] Health +1 increased" },
+        { address=0XC594C5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [B0] Health +256 decreased" },
+        { address=0XC594C5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [B0] Health +256 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC71A8C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Flags" },
+        { address=0XC71A8D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Flags" },
+        { address=0XC71A8E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Flags" },
+        { address=0XC71A8F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Flags" },
+        { address=0XC71A90, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Flags" },
+        { address=0XC71A91, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Flags" },
+        { address=0XC71A92, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Flags" },
+        { address=0XC71A93, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Flags" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBFF491, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Quest Clear increased" },
+        { address=0XBFF492, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Quest Clear increased" },
+        { address=0XBFF493, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Quest Clear increased" },
+        { address=0XBFF494, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Quest Clear increased" },
+        { address=0XC594B4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC72D90, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Health 2" },
+        { address=0XC734D0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Health 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC59074, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] Shield Equipped" },
+      },
+    },
+  },
+}

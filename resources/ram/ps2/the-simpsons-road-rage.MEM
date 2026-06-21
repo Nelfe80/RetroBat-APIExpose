@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Simpsons: Road Rage",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-simpsons-road-rage",
+    file = "the-simpsons-road-rage.zip",
+    hashes = {
+      { hash = "3712b6a56c4183070876524c5cc75142", label = "Simpsons, The - Road Rage (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3209B0, type="u32le", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nuclear Power Plant" },
+      },
+    },
+  },
+}

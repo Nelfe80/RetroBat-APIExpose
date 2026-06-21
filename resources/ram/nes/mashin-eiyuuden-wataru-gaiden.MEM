@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Mashin Eiyuuden Wataru Gaiden",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "mashin-eiyuuden-wataru-gaiden",
+    file = "mashin-eiyuuden-wataru-gaiden.zip",
+    hashes = {
+      { hash = "2fd8765df61731e7dc20c693d20d259d", label = "Mashin Eiyuuden Wataru Gaiden (Japan) (En) (Hubz) (1.0).nes" },
+      { hash = "93f21e3b0a89987f7a9b8ce5b83c3d25", label = "Mashin Eiyuuden Wataru Gaiden (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6800, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X69A6, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="Dragon Life Set" },
+        { address=0X69C1, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Dragon Life" },
+      },
+      health = {
+        { address=0X680C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X680C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X680E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X680E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X7C42, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Check decreased" },
+        { address=0X7C42, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Check increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6806, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="'16-bit' Money increased" },
+        { address=0X6808, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money * 65536 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X69A3, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated Dongoro" },
+        { address=0X69A3, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated Dragon" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X69A0, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Passed Checkpoint" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X040E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="If not-zero, random-battle is possible. If 0x00, random battles and the step-counter are paused." },
+      },
+    },
+  },
+}

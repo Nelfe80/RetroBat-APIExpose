@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>dial</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire Missile</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Warp Drive</text>
+			<color>${lime}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Shields</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire Missile</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Warp Drive</text>
+			<color>${lime}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Shields</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 RAQ 20430</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 JON 16120</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 ARM 13990</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 AJM 11780</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 TJC 9860</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 ELP 8570</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 DRJ 6550</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 JIM 4330</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 DAN 3010</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 BIL 2540</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

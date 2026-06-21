@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Golf",
+    system = "virtualboy",
+    system_name = "Virtual Boy",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "golf",
+    file = "golf.zip",
+    hashes = {
+      { hash = "977c4da800dacfac1a1402781670f872", label = "Golf (USA).vb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD098, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="auto pause setting" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBF84, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="rounds finished" },
+        { address=0XBFC4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="rounds finished(slot 2)" },
+        { address=0XC004, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="rounds finished (slot 3)" },
+        { address=0XC044, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="rounds finished (slot 4)" },
+        { address=0XC084, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="rounds finished (slot 5)" },
+        { address=0XC0C4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="rounds finished (slot 6)" },
+        { address=0XC104, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="rounds finished (slot 7)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBF9C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="birdies" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD0E2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="score in tournament mode, relative to par" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC2CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="times hole 1 has been cleared" },
+      },
+    },
+  },
+}

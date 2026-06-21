@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Pony Friends",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "pony-friends",
+    file = "pony-friends.zip",
+    hashes = {
+      { hash = "36143c4b7b36a0220b5dcdf9415f63bd", label = "Pony Friends (USA) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X39E088, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hair & Ribbons - Combo 1 [32bit]" },
+        { address=0X39E090, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hair & Ribbons - Combo 2 [32bit]" },
+        { address=0X39E098, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hair & Ribbons - Combo 3 [32bit]" },
+        { address=0X39E0A0, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hair & Ribbons - Combo 4 [32bit]" },
+        { address=0X39E0A8, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hair & Ribbons - Combo 5 [32bit]" },
+        { address=0X39E0B0, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hair & Ribbons - Combo 6 [32bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X39E420, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Goals - Wildlife Explorer [32bit] increased" },
+        { address=0X39E420, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Goals - Wildlife Explorer [32bit] decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X39DEA0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Money [32bit] increased" },
+        { address=0X39DF68, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bridles - Gold Bridle [32bit] increased" },
+        { address=0X39DF78, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bridles - Gold-Trimmed Bridle [32bit] increased" },
+        { address=0X39DFE8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Horseshoes - Gold Horseshoes [32bit] increased" },
+        { address=0X39E2A4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Play Length [32bit] increased" },
+        { address=0X39E2F0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Pony Collector [32bit] increased" },
+        { address=0X39E33C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Ponies Donated [32bit] increased" },
+        { address=0X39E388, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Ponies Retired [32bit] increased" },
+        { address=0X39E3D4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Breed Collector [32bit] increased" },
+        { address=0X39E46C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Objectives Completed [32bit] increased" },
+        { address=0X39E4B8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Washing Sessions [32bit] increased" },
+        { address=0X39E504, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Grooming Sessions [32bit] increased" },
+        { address=0X39E550, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Hoof Care Session [32bit] increased" },
+        { address=0X39E59C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Super Shopper [32bit] increased" },
+        { address=0X39E5E8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Shell Collector [32bit] increased" },
+        { address=0X39E634, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Coin Collector [32bit] increased" },
+        { address=0X39E680, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Accessory Collector [32bit] increased" },
+        { address=0X39E6CC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Stylist [32bit] increased" },
+        { address=0X39E718, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Pony Health [32bit] increased" },
+        { address=0X39E764, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Pony Nurse [32bit] increased" },
+        { address=0X39E7B0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Pony Designer [32bit] increased" },
+        { address=0X39E7FC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Pony Racer [32bit] increased" },
+        { address=0X39E848, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Pony Rider [32bit] increased" },
+        { address=0X39E894, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goals - Pony Explorer [32bit] increased" },
+        { address=0X39E950, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Collected Coins increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X39DF38, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Saddles - Jumping Saddle [32bit]" },
+      },
+    },
+  },
+}

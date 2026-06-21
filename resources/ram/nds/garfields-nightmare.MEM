@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Garfield's Nightmare",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "garfields-nightmare",
+    file = "garfields-nightmare.zip",
+    hashes = {
+      { hash = "59df8218e892d683a6d609b9dbdbf0c1", label = "Garfield's Nightmare (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi).nds" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X12542A, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Untouched" },
+        { address=0X12542A, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="In Door" },
+        { address=0X12542A, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Complete/Gone" },
+        { address=0X12542B, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Untouched" },
+        { address=0X12542B, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="In Door" },
+        { address=0X12542B, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Complete/Gone" },
+        { address=0X12542C, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Untouched" },
+        { address=0X12542C, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="In Door" },
+        { address=0X12542C, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Complete/Gone" },
+      },
+    },
+  },
+}

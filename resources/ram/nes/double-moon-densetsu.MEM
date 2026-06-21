@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Double Moon Densetsu",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "double-moon-densetsu",
+    file = "double-moon-densetsu.zip",
+    hashes = {
+      { hash = "38472922f5520c1a62cef0b291a0b9a9", label = "Double Moon Densetsu (Japan).nes" },
+      { hash = "6295ab7a2c7fae510ee4c0768144c22c", label = "Double Moon Densetsu (Japan) (En) (v1.02) (Stardust Crusaders).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X005F, type="u16le", condition="eq", value=0XCCAC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="There's no one around" },
+        { address=0X64C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goes up once per battle round - probably used as a randomizer seed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6017, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X607F, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X60E7, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X614F, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0X6001, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Joule HP decreased" },
+        { address=0X6001, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Joule HP increased" },
+        { address=0X6004, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Joule Max HP decreased" },
+        { address=0X6004, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Joule Max HP increased" },
+        { address=0X6069, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2nd Char HP decreased" },
+        { address=0X6069, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2nd Char HP increased" },
+        { address=0X606C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2nd Char Max HP decreased" },
+        { address=0X606C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2nd Char Max HP increased" },
+        { address=0X60D1, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3rd Char HP decreased" },
+        { address=0X60D1, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3rd Char HP increased" },
+        { address=0X60D4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3rd Char Max HP decreased" },
+        { address=0X60D4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3rd Char Max HP increased" },
+        { address=0X6139, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4th Char HP decreased" },
+        { address=0X6139, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4th Char HP increased" },
+        { address=0X613C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4th Char Max HP decreased" },
+        { address=0X613C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4th Char Max HP increased" },
+        { address=0X6207, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0X6207, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0X6228, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X6228, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X6249, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X6249, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X6023, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Joule Index of equipped right hand weapon" },
+        { address=0X608B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="2nd Char Index of equipped right hand weapon" },
+        { address=0X60F3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="3rd Char Index of equipped right hand weapon" },
+        { address=0X615B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="4th Char Index of equipped right hand weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X05D6, type="u8", condition="eq", value=0XB6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gablet talks about the ring (Entia)" },
+        { address=0X05D8, type="u8", condition="eq", value=0XB6, action="COIN_GAIN", no_log=false, no_survey=false, desc="defeat Basilisk (Elsam Cave)" },
+        { address=0X05D8, type="u8", condition="eq", value=0XB5, action="COIN_GAIN", no_log=false, no_survey=false, desc="defeat Gel+Solomon (Rhodos)" },
+        { address=0X05D8, type="u8", condition="eq", value=0XB4, action="COIN_GAIN", no_log=false, no_survey=false, desc="Mueller joins the party (Berth)" },
+        { address=0X05D8, type="u8", condition="eq", value=0XB3, action="COIN_GAIN", no_log=false, no_survey=false, desc="defeat Parasite (Cortos)" },
+        { address=0X05D8, type="u8", condition="eq", value=0XB2, action="COIN_GAIN", no_log=false, no_survey=false, desc="meet Mueller (Berth)" },
+        { address=0X05D8, type="u8", condition="eq", value=0XB1, action="COIN_GAIN", no_log=false, no_survey=false, desc="find out Romina has been kidnapped (Rhodos)" },
+        { address=0X05D8, type="u8", condition="eq", value=0XB0, action="COIN_GAIN", no_log=false, no_survey=false, desc="join 'Chasers' (Langley)" },
+        { address=0X6435, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Aim Ring (Demag Mine B1)" },
+        { address=0X643D, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Casino coins increased" },
+        { address=0X6482, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24-bit] Gold increased" },
+        { address=0X64CE, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold from battle increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X05D4, type="u8", condition="eq", value=0XB2, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="intermission when leaving east island cave after defeating boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6435, type="u8", condition="eq", value=0XB6, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="PowerRing (Demag Mine B2)" },
+        { address=0X6435, type="u8", condition="eq", value=0XB5, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Lotus Wand (Demag Mine B1)" },
+        { address=0X6435, type="u8", condition="eq", value=0XB4, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Potion (Demag Mine B1)" },
+        { address=0X6435, type="u8", condition="eq", value=0XB3, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Potion (Demag Mine B1)" },
+        { address=0X6435, type="u8", condition="eq", value=0XB1, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="MagicSource (Demag Mine B1)" },
+        { address=0X6435, type="u8", condition="eq", value=0XB0, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Talisman (Rhodos mountain passage)" },
+      },
+    },
+  },
+}

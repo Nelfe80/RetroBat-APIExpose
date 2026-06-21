@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Sitting Ducks",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "sitting-ducks",
+    file = "sitting-ducks.zip",
+    hashes = {
+      { hash = "478debc8b8ac10f23a67196180da8050", label = "Sitting Ducks (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0194, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission 1" },
+        { address=0X0194, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission 2" },
+        { address=0X0194, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission 3" },
+        { address=0X0194, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission 8" },
+      },
+    },
+  },
+}

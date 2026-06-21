@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "Shin Combat Choro Q",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shin-combat-choro-q",
+    file = "shin-combat-choro-q.zip",
+    hashes = {
+      { hash = "3f7acb154e2ce3487878b49eea5e4678", label = "Seek and Destroy (USA)" },
+      { hash = "ecd197e0b90eecf262d0d0db63de7cc8", label = "Seek and Destroy (USA) (Widescreen) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X23FE5C, type="u32le", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X26CF24, type="u32le", condition="eq", value=0X133B0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X23FB3F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="event ready" },
+        { address=0X23FB3F, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="event used" },
+        { address=0X23FB3F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Boolean] Overworld Code Event Controller" },
+        { address=0X23FD98, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="loading" },
+        { address=0X23FD98, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="initial level cutscene" },
+        { address=0X23FD98, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level ending cutscene/transition cutscene" },
+        { address=0X23FD98, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level State" },
+        { address=0X23FE0C, type="u32le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="goaled" },
+        { address=0X23FE78, type="u32le", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Bomber" },
+        { address=0X23FEA8, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="player victory" },
+        { address=0X23FEA8, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU victory" },
+        { address=0X23FEA8, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="draw" },
+        { address=0X23FEA8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battlemode - In-Level Victory Tracker" },
+      },
+      zone = {
+        { address=0X1EBF08, type="u16le", condition="eq", value=0X0B, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="world map" },
+      },
+      stage = {
+        { address=0X23FD98, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level is active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X23FB34, type="u16le", condition="eq", value=0X0042, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Colonel Hoffman death scene" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1ED532, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Shell" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="SuperShell" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Torpedo" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Crump" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=true, no_survey=false, desc="AP Shell" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Drill Shot" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Scatter" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Long Shot" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Retro Bomb" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Sharp Bomb" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X0B, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Burst Bomb" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Beam" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X0D, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Hi-Laser" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X0E, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Flame Shot" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Satellite" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X10, action="WEAPON_STATE", no_log=true, no_survey=false, desc="BOTSU" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X11, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Graviton" },
+        { address=0X1ED532, type="u8", condition="eq", value=0X12, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Positoron" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Grand Bomb" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Air Shell" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Drum Bomb" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Protector" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Side Saw" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Machinegun" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Flame Gun" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Blaze Gun" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Goliath" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Blaster" },
+        { address=0X1ED534, type="u8", condition="eq", value=0X0B, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Grand Flag" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Chaff" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Smoke" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Srch Light" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Flare Bomb" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Machinegun" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Gatling" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Chain Saw" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Missile" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Bound Bomb" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Launcher" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X0B, action="WEAPON_STATE", no_log=true, no_survey=false, desc="16-missile" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=true, no_survey=false, desc="AirGatling" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X0D, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Roll Drum" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X0E, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Stun Gun" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Speaker" },
+        { address=0X1ED536, type="u8", condition="eq", value=0X10, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Old Speaker" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X23FBD0, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="1000 Gold" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1EBF08, type="u16le", condition="eq", value=0X27, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="mission: Destroy the Iron Fort" },
+        { address=0X1EBF08, type="u16le", condition="eq", value=0X41, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blockhouse Arena" },
+        { address=0X23FE74, type="u32le", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blockhouse Arena" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1EE1F4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Loop Counter" },
+      },
+    },
+  },
+}

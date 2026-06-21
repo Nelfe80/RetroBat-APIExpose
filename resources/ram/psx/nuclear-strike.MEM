@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Nuclear Strike",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "nuclear-strike",
+    file = "nuclear-strike.zip",
+    hashes = {
+      { hash = "4ee305edc9498f858f4be899e86ce866", label = "Nuclear Strike (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X81A89, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Delta Strike" },
+        { address=0X81A89, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Island Strike" },
+        { address=0X81A89, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Peace Strike - Pt 1" },
+        { address=0X81A89, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Peace Strike - Pt 2" },
+        { address=0X81A89, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="DMZ Strike" },
+        { address=0X81A89, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fortress Strike" },
+        { address=0X81A89, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lightning Strike" },
+        { address=0X81A89, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XD0928, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Smoke Pits - Level 1" },
+        { address=0XD092C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rescue Strike Agent - Level 1" },
+        { address=0XD099C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Elites Unloaded - Level 1, Mission 5" },
+        { address=0XD0A94, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chopper 1 Loaded - Level 1, Mission 5" },
+        { address=0XD0AB8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Generals Taken Alive - Level 1, Mission 6" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X81A88, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X81A88, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X81A8A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons Package" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD4708, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Enemy Ammo Depot Targets Remaining - DMZ Strike" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8E662, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E666, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E66A, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E66E, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E672, type="u24le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E676, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E67A, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E67E, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E682, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X8E686, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies Destroyed Count" },
+        { address=0X98A48, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemy Fuel Depot Destroyed? - DMZ Strike" },
+      },
+    },
+  },
+}

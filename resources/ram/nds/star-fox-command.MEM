@@ -1,0 +1,133 @@
+return {
+  game = {
+    title = "Star Fox Command",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "star-fox-command",
+    file = "star-fox-command.zip",
+    hashes = {
+      { hash = "b409163d18d54e676868b200c6ce6701", label = "Star Fox Command (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1D97FD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D97FF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9800, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9801, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9802, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9804, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9805, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9806, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9807, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D980B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D980C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D980D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9812, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9813, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9814, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9819, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D981A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D981B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D981C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9820, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9821, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9827, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9828, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9829, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D982A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D982E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D982F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9830, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9831, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9835, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9836, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X1D9837, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete" },
+      },
+      zone = {
+        { address=0XB83C8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World Location" },
+        { address=0X1D9738, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Single Player" },
+      },
+      stage = {
+        { address=0XB83CC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Scenario Stage Location" },
+        { address=0XBDEF6, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Activated" },
+        { address=0XBDEF6, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Unactivated" },
+        { address=0XBDEF6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Scenario Activated" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2D2634, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total Enemy Death Count" },
+        { address=0X2D2636, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Skirmish Enemy Death Count" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1D973E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score of Current Mission" },
+        { address=0X1D9740, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points" },
+        { address=0X1D974C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: The Adventure Begins!" },
+        { address=0X1D974E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Decision Time" },
+        { address=0X1D9750, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Reunion with Slippy" },
+        { address=0X1D9752, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: General Peppy" },
+        { address=0X1D9754, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Father and DAughter" },
+        { address=0X1D9756, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Lucy and Krystal" },
+        { address=0X1D975A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Missile Threat" },
+        { address=0X1D975C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: The Meteorite Trap" },
+        { address=0X1D975E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Falco's Decision" },
+        { address=0X1D9760, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: The Anglor Emperor" },
+        { address=0X1D9768, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Fog of War" },
+        { address=0X1D976A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Oikonny Strikes Back!" },
+        { address=0X1D976C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Former Rivals" },
+        { address=0X1D9776, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Krystal" },
+        { address=0X1D9778, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Hold Firm, Katina!" },
+        { address=0X1D977A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Falco to the Fore!" },
+        { address=0X1D9784, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Amanda" },
+        { address=0X1D9786, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Slippy's Resolve" },
+        { address=0X1D9788, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Octoman's Ruse" },
+        { address=0X1D978A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Beneath the Waves" },
+        { address=0X1D9792, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: The Red-Hot Planet" },
+        { address=0X1D9794, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: The Ultimate Weapon" },
+        { address=0X1D97A0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Andross's Legacy" },
+        { address=0X1D97A2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Wolf's Plot" },
+        { address=0X1D97A4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: The Worm" },
+        { address=0X1D97A6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Dash" },
+        { address=0X1D97AE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Star Wolf Returns!" },
+        { address=0X1D97B0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Dash Makes a Choice" },
+        { address=0X1D97B2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Good-bye, Fox" },
+        { address=0X1D97B4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Fox and Krystal" },
+        { address=0X1D97BC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: Pigma's Revenge" },
+        { address=0X1D97BE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: The Curse of Pigma" },
+        { address=0X1D97C0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score: We Meet Again" },
+      },
+      collectibles = {
+        { address=0X27E01C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Training Level 1 Ring Count increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1D3CF0, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Shield" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2D2628, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X2D2728, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X2D27A8, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X2D2B28, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X2D2BA8, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X2D2D28, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1D97FE, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage Complete" },
+      },
+    },
+  },
+}

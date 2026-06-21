@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Bomberman: Panic Bomber",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "bomberman-panic-bomber",
+    file = "bomberman-panic-bomber.zip",
+    hashes = {
+      { hash = "ae4f680157ee1278871eb68a4773115b", label = "panicbom.7z <Panic Bomber>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0066, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo and Level-1" },
+        { address=0X007C, type="u8", condition="eq", value=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Bugler/Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0066, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-2" },
+        { address=0X0066, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-3" },
+        { address=0X0066, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-4" },
+        { address=0X0066, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-5" },
+        { address=0X0066, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-6" },
+        { address=0X0066, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-7" },
+        { address=0X0066, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-8" },
+        { address=0X0066, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Difficulty Level" },
+        { address=0X3940, type="u8", condition="eq", value=0X0F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Final Level" },
+        { address=0X3940, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (Player 1)" },
+      },
+      stage = {
+        { address=0X007C, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Baromu" },
+        { address=0X007C, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kurin" },
+        { address=0X007C, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Buroru" },
+        { address=0X007C, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Pasu" },
+        { address=0X007C, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Funya" },
+        { address=0X007C, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bakebake" },
+        { address=0X007C, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Peggi" },
+        { address=0X007C, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kurobon" },
+        { address=0X007C, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="End" },
+        { address=0X007C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+  },
+}

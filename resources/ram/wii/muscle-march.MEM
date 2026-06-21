@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Muscle March",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "muscle-march",
+    file = "muscle-march.zip",
+    hashes = {
+      { hash = "bca5f2f3adcf1c10b0d50c48525172c5", label = "Muscle March (USA) (WiiWare)" },
+      { hash = "9d07e91bb51a9ec0e456b36bfe5bfa13", label = "Muscle March (Europe) (WiiWare)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X10060B88, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] [NA/US] Continue Timer" },
+      },
+    },
+  },
+}

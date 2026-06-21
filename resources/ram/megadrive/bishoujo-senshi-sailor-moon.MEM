@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Bishoujo Senshi Sailor Moon",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "bishoujo-senshi-sailor-moon",
+    file = "bishoujo-senshi-sailor-moon.zip",
+    hashes = {
+      { hash = "54a7dbc8748695a90d95d2728f946b9e", label = "Bishoujo Senshi Sailor Moon (Japan) (En) (Supper).md" },
+      { hash = "b5365025a46a2781c63e254345268bf1", label = "Bishoujo Senshi Sailor Moon (Japan).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE339, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="8-bit Continues Up to 7" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XFE92, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage screen (add 0x01 or 0x02 per screen)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFE8B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="8-bit Lives increased" },
+        { address=0XFE8B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="8-bit Lives decreased" },
+      },
+      health = {
+        { address=0XE050, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8-nit] Current health decreased" },
+        { address=0XE050, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8-nit] Current health increased" },
+      },
+    },
+  },
+}

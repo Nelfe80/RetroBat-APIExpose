@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Guitar Hero: On Tour [Subset - Expert Full Combos]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "guitar-hero-on-tour-subset-expert-full-combos",
+    file = "guitar-hero-on-tour-subset-expert-full-combos.zip",
+    hashes = {
+      { hash = "3cd6ff8eff2f526aba0deb5e80f5d42e", label = "Guitar Hero - On Tour (USA) [Subset - Expert Full Combo]" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Driver Dan's Story Train",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "driver-dans-story-train",
+    file = "driver-dans-story-train.zip",
+    hashes = {
+      { hash = "5eec9803761eb69be35f260cadda276e", label = "Driver Dan's Story Train (Europe).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8CDB0, type="u8", condition="eq", value=0X15, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X98858, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Bit0 = Pause" },
+        { address=0X98C00, type="u16le", condition="eq", value=0X8760, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X98930, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Extra Lives increased" },
+        { address=0X98930, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Extra Lives decreased" },
+      },
+      health = {
+        { address=0X90A01, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X90A01, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X988A4, type="u8", condition="eq", value=0X07, action="MONEY_STATE", no_log=false, no_survey=false, desc="Brick Ring Tower" },
+        { address=0X9894C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Red Coins increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X960E5, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Wario Door unlocked" },
+      },
+    },
+  },
+}

@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Operation Thunderbolt",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "operation-thunderbolt",
+    file = "operation-thunderbolt.zip",
+    hashes = {
+      { hash = "be4f6b60a2ce518ba46c9f33e4fa0ff5", label = "Operation Thunderbolt (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3704, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="P1 Credits" },
+        { address=0X3721, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="2P Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X078E, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="FFFF = Mission One Cleared (16-Bit)" },
+        { address=0X0790, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="FFFF = Mission Three Cleared (16-Bit)" },
+        { address=0X0792, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="FFFF = Mission Two Cleared (16-Bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X36EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP decreased" },
+        { address=0X36EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP increased" },
+        { address=0X3707, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P HP decreased" },
+        { address=0X3707, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X36F6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score: 000XX0" },
+        { address=0X36F7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score: 0XX000" },
+        { address=0X36F8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score: X00000" },
+        { address=0X3713, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2P Score: 000XX0" },
+        { address=0X3714, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2P Score: 0XX000" },
+        { address=0X3715, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score: X00000" },
+      },
+    },
+  },
+}

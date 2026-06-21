@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "My Street",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "my-street",
+    file = "my-street.zip",
+    hashes = {
+      { hash = "c4014b67f2049fa497bb7faee997d72a", label = "My Street (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X281F18, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(Marbles) Points to Win." },
+      },
+      collectibles = {
+        { address=0X287072, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money. increased" },
+      },
+    },
+  },
+}

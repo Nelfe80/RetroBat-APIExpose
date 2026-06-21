@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mind Teazzer",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "mind-teazzer",
+    file = "mind-teazzer.zip",
+    hashes = {
+      { hash = "2d13fca9767858fb7b93da2c74f525f9", label = "Mind Teazzer (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

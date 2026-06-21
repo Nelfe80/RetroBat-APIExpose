@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Knockout Kings 2000",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Sports, Boxe"
+  },
+
+  rom = {
+    name = "knockout-kings-2000",
+    file = "knockout-kings-2000.zip",
+    hashes = {
+      { hash = "008b473841ce4d9ac050d55f99b4b5d4", label = "Knockout Kings 2000 (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XECD00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slugfest Options - Rounds - 01 - 10" },
+      },
+    },
+  },
+}

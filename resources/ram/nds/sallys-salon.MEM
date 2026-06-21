@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Sally's Salon",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Construction and Management Simulation"
+  },
+
+  rom = {
+    name = "sallys-salon",
+    file = "sallys-salon.zip",
+    hashes = {
+      { hash = "85b9c74ff95b00d4fc3f3e305103613b", label = "Sally's Salon (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X185FD8, type="u8", condition="eq", value=0X29, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X186204, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen/shop screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X185FD8, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="playing a level?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Where the Wild Things Are",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "where-the-wild-things-are",
+    file = "where-the-wild-things-are.zip",
+    hashes = {
+      { hash = "aad9a5a2fa90f5e399146a1f423fa6f9", label = "Where the Wild Things Are (USA) (En,Fr,Es)" },
+      { hash = "f75f342838560db722a63b65ce85e841", label = "Where the Wild Things Are - The Videogame (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X682554, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[USA] | [32 Bit BE] Pause Active" },
+        { address=0X682558, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[USA] | [32 Bit BE] Pause Check" },
+        { address=0X682794, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[PAL] | [32 Bit BE] Pause Active" },
+        { address=0X682798, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[PAL] | [32 Bit BE] Pause Check" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X66E578, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA | [Float BE] Zone Transition" },
+        { address=0X66E7B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] | [Float BE] Zone Transition" },
+        { address=0X68256C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [32 Bit BE | 40 Bytes] Level ID ASCII" },
+        { address=0X6827AC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] | [32 Bit BE | 40 Bytes] Level ID ASCII" },
+      },
+      stage = {
+        { address=0X66E57C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[USA] | [Float BE] Zone Transition Active" },
+        { address=0X66E7BC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[PAL] | [Float BE] Zone Transition Active" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X67FD90, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[USA] | [Float BE] Max Health decreased" },
+        { address=0X67FD90, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[USA] | [Float BE] Max Health increased" },
+        { address=0X67FD94, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[USA] | [Float BE] Total Health decreased" },
+        { address=0X67FD94, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[USA] | [Float BE] Total Health increased" },
+        { address=0X67FFD0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[PAL] | [Float BE] Max Health decreased" },
+        { address=0X67FFD0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[PAL] | [Float BE] Max Health increased" },
+        { address=0X67FFD4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[PAL] | [Float BE] Total Health decreased" },
+        { address=0X67FFD4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[PAL] | [Float BE] Total Health increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X66E690, type="u32be", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[USA] | [32 Bit BE | 20 Bytes] Checkpoint ASCII" },
+        { address=0X66E8D0, type="u32be", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[PAL] | [32 Bit BE | 20 Bytes] Checkpoint ASCII" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X66E470, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[USA] | [Float BE] Time Spent in Level" },
+        { address=0X66E6B0, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[PAL] | [Float BE] Time Spent in Level" },
+        { address=0X67FD84, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[USA] | [Float BE] Timer Since Damage Taken" },
+        { address=0X67FFC4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[PAL] | [Float BE] Timer Since Damage Taken" },
+      },
+    },
+  },
+}

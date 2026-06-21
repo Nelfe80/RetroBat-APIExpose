@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "More More",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Mini-Games"
+  },
+
+  rom = {
+    name = "more-more",
+    file = "more-more.zip",
+    hashes = {
+      { hash = "5453dae252cb54545c0ed2219acf2bcb", label = "moremore.7z <More More>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2294, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[8bit] Credits" },
+      },
+    },
+  },
+}

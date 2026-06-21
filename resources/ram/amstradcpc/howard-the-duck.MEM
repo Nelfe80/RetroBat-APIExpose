@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Howard the Duck",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "howard-the-duck",
+    file = "howard-the-duck.zip",
+    hashes = {
+      { hash = "bd5acee43743975d47d658f73aa1ca00", label = "Howard the Duck (1987)(Activision).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X1ECE, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="main menu" },
+        { address=0X1ECE, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="island" },
+        { address=0X1ECE, type="u8", condition="eq", value=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="lava caves" },
+        { address=0X1ECE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8-bit) stage/map" },
+        { address=0X1FE2, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="island" },
+        { address=0X1FE2, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="lava caves" },
+        { address=0X1FE2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8-bit) stage/map" },
+        { address=0X43DB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8-bit) health when getting attacked on beach stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1D1E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) lives increased" },
+        { address=0X1D1E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) lives decreased" },
+        { address=0X474C, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0X474C, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="(8-bit) guy at bridge health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB583, type="u8", condition="eq", value=0X42, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="on" },
+        { address=0XB584, type="u8", condition="eq", value=0X48, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="on" },
+      },
+    },
+  },
+}

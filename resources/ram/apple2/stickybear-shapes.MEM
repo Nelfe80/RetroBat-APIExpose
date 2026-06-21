@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Stickybear Shapes",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "stickybear-shapes",
+    file = "stickybear-shapes.zip",
+    hashes = {
+      { hash = "53fc8eedaa36e3546ca874ea5d26d408", label = "Stickybear Shapes (1983)(Optimum Resource).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00A1, type="u8", condition="eq", value=0XB7, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Inputs" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X004D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Animation Check for one minigame in level 3" },
+        { address=0X0098, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Level for 1." },
+        { address=0X0099, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Level for 3." },
+        { address=0X009D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Level for 2." },
+      },
+    },
+  },
+}

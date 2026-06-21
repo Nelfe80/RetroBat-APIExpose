@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Classic Bubble Bobble | Taito Memorial: Bubble Bobble",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "classic-bubble-bobble-taito-memorial-bubble-bobble",
+    file = "classic-bubble-bobble-taito-memorial-bubble-bobble.zip",
+    hashes = {
+      { hash = "4bc8467ed91a94ba23648706b551cef5", label = "Classic Bubble Bobble (USA) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "b59fa772b15a07f44110d5b7aa24b424", label = "Taito Memorial - Bubble Bobble (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC04F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+      },
+    },
+  },
+}

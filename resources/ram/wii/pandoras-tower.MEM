@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Pandora's Tower",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "pandoras-tower",
+    file = "pandoras-tower.zip",
+    hashes = {
+      { hash = "e7f24f7cdbfe4184305b21b6a8c0e704", label = "Pandora's Tower (USA) (En,Fr,Es)" },
+      { hash = "64bd2be185d4fa8adec37a3834c67693", label = "Pandora's Tower (Europe) (En,Fr,De,Es,It)" },
+      { hash = "e0ebe39bdae7c591a8f1800c01f1ab3c", label = "Pandora no Tou - Kimi no Moto e Kaeru made (Japan)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X14BCF7C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bit BE] Player Health decreased" },
+        { address=0X14BCF7C, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bit BE] Player Health increased" },
+      },
+    },
+  },
+}

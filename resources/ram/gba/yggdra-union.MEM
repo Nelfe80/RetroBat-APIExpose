@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Yggdra Union",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "yggdra-union",
+    file = "yggdra-union.zip",
+    hashes = {
+      { hash = "85853646ee8ed8269a442a13bffc6e0d", label = "Yggdra Union - We'll Never Fight Alone (Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FD2F, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Tail" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1FD2F, type="u8", condition="eq", value=0X07, action="LIVES_STATE", no_log=false, no_survey=false, desc="Misanga of Life" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1FD2F, type="u8", condition="eq", value=0X3F, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Map" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1FD2F, type="u8", condition="eq", value=0X1D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Shiny Coin" },
+        { address=0X1FD2F, type="u8", condition="eq", value=0X0E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Engagement Ring" },
+      },
+    },
+  },
+}

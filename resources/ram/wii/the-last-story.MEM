@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "The Last Story",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "the-last-story",
+    file = "the-last-story.zip",
+    hashes = {
+      { hash = "c6ad0865f0abffc0e64cd26cd6ef3569", label = "Last Story, The (Europe) (En,Fr,De,Es,It)" },
+      { hash = "fc7995d35ae54413420bf2e795d61049", label = "Last Story, The (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X87F038, type="u32be", condition="eq", value=0X28, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The Last World" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X12FB078, type="u32be", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X12FB078, type="u32be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Enemy HP gauge" },
+        { address=0X12FB098, type="u32be", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Active" },
+        { address=0X12FB0B8, type="u32be", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X88085C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Float BE] Weapon size modifier" },
+      },
+    },
+  },
+}

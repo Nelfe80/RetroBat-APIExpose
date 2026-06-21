@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Buffy the Vampire Slayer: Chaos Bleeds",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "buffy-the-vampire-slayer-chaos-bleeds",
+    file = "buffy-the-vampire-slayer-chaos-bleeds.zip",
+    hashes = {
+      { hash = "7c59ec5f291a2ded69036e8cb52a9bcc", label = "Buffy the Vampire Slayer - Chaos Bleeds (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X32413C, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of Continues Used in Current Level (32-bit)" },
+        { address=0X325F88, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X325F88, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X326D98, type="u8", condition="bit_true", bit=5, mask=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles" },
+        { address=0X326DAA, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Stats - Magic Box - Continues Used (16-bit)" },
+        { address=0X327069, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Blood Factory: Zombie Demon (Multiplayer)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X32412C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Secrets Discovered in Current Level (Bitflags)" },
+        { address=0X324138, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monsters Killed in Current Level (32-bit)" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magic Box" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cemetary" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magic Box Revisited" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Downtown Sunnydale" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sunnydale Hospital" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="High School" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Old Quarry" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Initiative" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sunnydale Mall" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sunnydale Zoo" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The First's Lair" },
+        { address=0X326D94, type="u16le", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Epilogue" },
+        { address=0X326D94, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Latest Unlocked Level (32-bit)" },
+        { address=0X327070, type="u16le", condition="eq", value=0X00, action="LEVEL_MAGIC_BOX", no_log=false, no_survey=false, desc="Magic Box" },
+        { address=0X327070, type="u16le", condition="eq", value=0X01, action="LEVEL_CEMETARY", no_log=false, no_survey=false, desc="Cemetary" },
+        { address=0X327070, type="u16le", condition="eq", value=0X02, action="LEVEL_BLOOD_FACTORY", no_log=false, no_survey=false, desc="Blood Factory" },
+        { address=0X327070, type="u16le", condition="eq", value=0X03, action="LEVEL_MAGIC_BOX_REVISITED", no_log=false, no_survey=false, desc="Magic Box Revisited" },
+        { address=0X327070, type="u16le", condition="eq", value=0X04, action="LEVEL_DOWNTOWN_SUNNYDALE", no_log=false, no_survey=false, desc="Downtown Sunnydale" },
+        { address=0X327070, type="u16le", condition="eq", value=0X05, action="LEVEL_SUNNYDALE_HOSPITAL", no_log=false, no_survey=false, desc="Sunnydale Hospital" },
+        { address=0X327070, type="u16le", condition="eq", value=0X06, action="LEVEL_HIGH_SCHOOL", no_log=false, no_survey=false, desc="High School" },
+        { address=0X327070, type="u16le", condition="eq", value=0X07, action="LEVEL_OLD_QUARRY", no_log=false, no_survey=false, desc="Old Quarry" },
+        { address=0X327070, type="u16le", condition="eq", value=0X08, action="LEVEL_THE_INITIATIVE", no_log=false, no_survey=false, desc="The Initiative" },
+        { address=0X327070, type="u16le", condition="eq", value=0X09, action="LEVEL_SUNNYDALE_MALL", no_log=false, no_survey=false, desc="Sunnydale Mall" },
+        { address=0X327070, type="u16le", condition="eq", value=0X0A, action="LEVEL_SUNNYDALE_ZOO", no_log=false, no_survey=false, desc="Sunnydale Zoo" },
+        { address=0X327070, type="u16le", condition="eq", value=0X0B, action="LEVEL_THE_FIRST_S_LAIR", no_log=false, no_survey=false, desc="The First's Lair" },
+        { address=0X327070, type="u16le", condition="eq", value=0X0C, action="LEVEL_EPILOGUE", no_log=false, no_survey=false, desc="Epilogue" },
+        { address=0X327070, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select ID (32-bit)" },
+      },
+      stage = {
+        { address=0X326D94, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blood Factory" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X32706A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Initiative: Zombie Soldier (Multiplayer)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X324130, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Current Level Timer (32-bit) [Seconds]" },
+      },
+    },
+  },
+}

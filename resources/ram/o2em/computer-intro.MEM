@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Computer Intro",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "computer-intro",
+    file = "computer-intro.zip",
+    hashes = {
+      { hash = "1e7035584d19aaa53eb3795d92fa6215", label = "Computer Intro (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Crayon Shin-chan: Arashi wo yobu Enji",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "crayon-shin-chan-arashi-wo-yobu-enji",
+    file = "crayon-shin-chan-arashi-wo-yobu-enji.zip",
+    hashes = {
+      { hash = "678218d7e6e1f4721501362d0859a362", label = "Crayon Shin-chan - Arashi o Yobu Enji (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00AD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Seconds" },
+        { address=0X00AE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Minutes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00B2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (1 = 0 left) increased" },
+        { address=0X00B2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (1 = 0 left) decreased" },
+      },
+      health = {
+        { address=0X0461, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0461, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+  },
+}

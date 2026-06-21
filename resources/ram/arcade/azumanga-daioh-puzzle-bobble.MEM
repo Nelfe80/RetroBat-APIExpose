@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Azumanga Daioh: Puzzle Bobble",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "azumanga-daioh-puzzle-bobble",
+    file = "azumanga-daioh-puzzle-bobble.zip",
+    hashes = {
+      { hash = "6274e432cf34c2164e9ffe997ffa14c8", label = "azumanga.zip <Azumanga Daioh Puzzle Bobble (GDL-0018)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11728E, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Yes (Default)" },
+        { address=0X1173FC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode" },
+        { address=0X117768, type="u8", condition="eq", value=0X05, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue screen" },
+        { address=0X117768, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X117768, type="u8", condition="eq", value=0X08, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Yearbook, 1P Puzzle Mode complete, Credits, 2P Co-op start" },
+        { address=0X117768, type="u8", condition="eq", value=0X09, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X119100, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Service Menu - Continues Enabled Setting Selected" },
+        { address=0X119600, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Enabled" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X11728C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0X11728C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 (Default)" },
+        { address=0X11728C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0X11728C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2P Versus - Round Count Setting" },
+        { address=0X1173C4, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Summer Challenge Stage / Kid's Course complete" },
+        { address=0X1173C4, type="u8", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="School Course/After School Course complete" },
+        { address=0X1173C4, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X1173C4, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X1173C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+        { address=0X1190FE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Service Menu - 2P Versus - Round Count Setting Selected" },
+        { address=0X1195FE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2P Versus - Round Count Setting" },
+      },
+      stage = {
+        { address=0X1173C4, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spring Round 1-3 / Kid's Course Round 1-5" },
+        { address=0X1173C4, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Summer Round 1-3" },
+        { address=0X1173C4, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Autumn Round 1-3" },
+        { address=0X1173C4, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Winter Challenge Stage" },
+        { address=0X1173C4, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Winter Round 1-3" },
+        { address=0X1173C4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Season/Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X113828, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score" },
+        { address=0X114CEC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score in 2P Co-op Mode" },
+        { address=0X114CF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score in 2P Battle Mode" },
+        { address=0X1176A8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Round Timer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEE590, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Continue Timer" },
+        { address=0X11385C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Shot Timer" },
+        { address=0X117414, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Menu Timer" },
+      },
+    },
+  },
+}

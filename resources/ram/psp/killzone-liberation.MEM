@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Killzone: Liberation",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "killzone-liberation",
+    file = "killzone-liberation.zip",
+    hashes = {
+      { hash = "c6d61976bec67766a5fc2f1dd96aa3cf", label = "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso" },
+      { hash = "dc741e38e34338e1b838f78fa842643e", label = "Killzone - Liberation (USA) (v1.20) (Chapter 5 DLC).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10D7CE4, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="English" },
+        { address=0X10D7CE4, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Francais" },
+        { address=0X10D7CE4, type="u8", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Espanol" },
+        { address=0X10D7CE4, type="u8", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Deutsch" },
+        { address=0X10D7CE4, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Italiano" },
+        { address=0X10D7CE4, type="u8", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Nederlands" },
+        { address=0X10D7CE4, type="u8", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Russian" },
+        { address=0X10D7CE4, type="u8", condition="eq", value=0X0E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Polski" },
+      },
+    },
+  },
+}

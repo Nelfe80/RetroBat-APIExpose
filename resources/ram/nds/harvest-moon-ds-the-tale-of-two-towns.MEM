@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Harvest Moon DS: The Tale of Two Towns",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "harvest-moon-ds-the-tale-of-two-towns",
+    file = "harvest-moon-ds-the-tale-of-two-towns.zip",
+    hashes = {
+      { hash = "9d15d6b2143f739c81b8db0116a7783c", label = "Harvest Moon - The Tale of Two Towns (Europe) (En,Fr,De).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X3DDA8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Money in the Shipping Bin (to be delivered the next day to your pockets) increased" },
+        { address=0X506F8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

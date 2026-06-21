@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Peggle: Dual Shot",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle, Strategy"
+  },
+
+  rom = {
+    name = "peggle-dual-shot",
+    file = "peggle-dual-shot.zip",
+    hashes = {
+      { hash = "ad62c1722d395d04316ea64a124d6a5a", label = "Peggle Dual Shot (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X138410, type="u16le", condition="eq", value=0X02, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Finish Level" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDFE34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level [Adventure]" },
+        { address=0X100AD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Adventure Mode - Current Level" },
+        { address=0X100AF0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Adventure Mode - Current Level [Nights]" },
+        { address=0X100B38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- 100% level flags" },
+        { address=0X101B8C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level?" },
+      },
+      zone = {
+        { address=0X100AD1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Adventure Mode - Current 'World'" },
+        { address=0X100AF1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Adventure Mode - Current 'World' [Nights]" },
+      },
+      stage = {
+        { address=0XDFE3A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="saved selected level stage select" },
+        { address=0X100B36, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Q9 - Score 500,000 points in a single stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X100AD4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Adventure Mode - Total Score" },
+        { address=0X100AE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Adventure Mode - Shot Points" },
+        { address=0X100AE8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Adventure Mode - Fever Points" },
+        { address=0X135E54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - MIRROR" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X100B36, type="u8", condition="bit_true", bit=5, mask=0X20, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Q8 - Shoot the Ball 1000 times" },
+      },
+    },
+  },
+}

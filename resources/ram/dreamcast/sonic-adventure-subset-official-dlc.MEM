@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Sonic Adventure [Subset - Official DLC]",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "sonic-adventure-subset-official-dlc",
+    file = "sonic-adventure-subset-official-dlc.zip",
+    hashes = {
+      { hash = "17daffe5c6e225a4ea502e8f345fe742", label = "Sonic Adventure (Japan) [Subset - Official DLC]" },
+      { hash = "8663f447c7b05a812e4405674e8f345e", label = "Sonic Adventure (Europe) [Subset - Official DLC]" },
+      { hash = "ae7ca5e32c6ef30ab17f533e65afd381", label = "Sonic Adventure (USA) (Rev A) [Subset - Official DLC]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7493B4, type="u16le", condition="eq", value=0X05, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Loading After a Level" },
+        { address=0X7493B4, type="u16le", condition="eq", value=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X7493B4, type="u16le", condition="eq", value=0X13, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X7493B4, type="u16le", condition="eq", value=0X16, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Card" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X19E970, type="u24le", condition="eq", value=0X07, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Lost World" },
+      },
+      stage = {
+        { address=0X19E971, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal Twinkle Circuit" },
+        { address=0X19E971, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Twinkle Circuit Samba DLC" },
+        { address=0X19E971, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Act/Room" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X19E8B0, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Emerald Coast" },
+        { address=0X19E970, type="u24le", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Emerald Coast" },
+        { address=0X7490A4, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Window" },
+        { address=0X7490A4, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Store" },
+        { address=0X7490A4, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Pool" },
+        { address=0X7490A4, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Casino Awning" },
+        { address=0X7490A4, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Train" },
+      },
+    },
+  },
+}

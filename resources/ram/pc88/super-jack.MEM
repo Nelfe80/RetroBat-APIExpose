@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Super Jack",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "super-jack",
+    file = "super-jack.zip",
+    hashes = {
+      { hash = "05f2a5bdc7ab885b5da760276154a6ce", label = "Super Jack [Set 2] (En) (JPN Translations) (0.9.1).d88" },
+      { hash = "806ac9c875076375f63de1cb0aad2d34", label = "Super Jack.d88" },
+      { hash = "d2aff22e02df81eea501e13d75a3da28", label = "Super Jack [Set 2].d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XFFFF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Game Level" },
+      },
+    },
+  },
+}

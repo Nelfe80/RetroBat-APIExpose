@@ -1,0 +1,1 @@
+.uae;.scummvm;.residualvm;.pc;.dos;.daphne;.squashfs;.wsquashfs;.nca;.nsp;.xci;.m3u;.iso;.img;.cue;.ccd;.mdf;.cso;.pbp;.cbn;.ima;.nrg;.chd;.xcp;.plus;.wine

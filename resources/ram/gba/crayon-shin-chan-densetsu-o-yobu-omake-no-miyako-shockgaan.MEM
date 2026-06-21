@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Crayon Shin-chan: Densetsu o Yobu Omake no Miyako Shockgaan!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "crayon-shin-chan-densetsu-o-yobu-omake-no-miyako-shockgaan",
+    file = "crayon-shin-chan-densetsu-o-yobu-omake-no-miyako-shockgaan.zip",
+    hashes = {
+      { hash = "7199c3bc2cc2d685ad7ecd9447e6d75f", label = "Crayon Shin-chan - Densetsu o Yobu Omake no Miyako Shockgaan! (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Hero of Sparta",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hero-of-sparta",
+    file = "hero-of-sparta.zip",
+    hashes = {
+      { hash = "78b5ac3ea83f524e90bcc69e263394c6", label = "Hero of Sparta (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X169344, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1-1" },
+        { address=0X169344, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1-2" },
+        { address=0X169344, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1-3" },
+        { address=0X169344, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1-1 revisit" },
+        { address=0X169344, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2-1" },
+        { address=0X169344, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2-2" },
+        { address=0X169344, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3-1" },
+        { address=0X169344, type="u8", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4-1" },
+        { address=0X169344, type="u8", condition="eq", value=0X13, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5-1" },
+        { address=0X169344, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="'level' ID (section of level)" },
+        { address=0X16935C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="oracle island clear : ffffffff -> 00001001" },
+        { address=0X169360, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ffffffff -> 2005 when level 2 clear" },
+        { address=0X169364, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ffffffff -> 1005 when level 2 clear" },
+        { address=0X169368, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="casque de persee obtenu (32b) ou lv3 clear" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA0D9A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (eng, 16b) decreased" },
+        { address=0XA0D9A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (eng, 16b) increased" },
+        { address=0XA0DEA8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (esp, 16b) decreased" },
+        { address=0XA0DEA8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (esp, 16b) increased" },
+        { address=0XA0E008, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (fr, 16b) decreased" },
+        { address=0XA0E008, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (fr, 16b) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X169358, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="back to 1-1 after collecting shield (32b)" },
+        { address=0X66C48E, type="u8", condition="eq", value=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="hephaistos sword+shield" },
+        { address=0X66C48E, type="u8", condition="eq", value=0X09, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="damocles sword" },
+      },
+    },
+  },
+}

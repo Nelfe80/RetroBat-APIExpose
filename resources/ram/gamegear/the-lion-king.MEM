@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "The Lion King",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-lion-king",
+    file = "the-lion-king.zip",
+    hashes = {
+      { hash = "62328f27bcda54d1882a265bf8378688", label = "Lion King, The (USA).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X060B, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0X0631, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continues" },
+        { address=0X06C0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="02=demo running" },
+        { address=0X06F7, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="game running" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0101, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1st element in level(02 when gone)" },
+        { address=0X0640, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (00=1)" },
+      },
+      stage = {
+        { address=0X061A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 = level select activated" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0107, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="pridelands : 1up increased" },
+        { address=0X0107, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="pridelands : 1up decreased" },
+        { address=0X063D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X063D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X063E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X063E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0349, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss hp" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X06D4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="jump button pressed" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0103, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="pridelands checkpoint 2 (up before boss)" },
+        { address=0X0115, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="pridelands checkpoint 1" },
+      },
+    },
+  },
+}

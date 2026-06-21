@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Evolution",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "evolution",
+    file = "evolution.zip",
+    hashes = {
+      { hash = "e0d1ff37974fa017a6c78c174925643a", label = "Evolution (USA) (Unl).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0037, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode On" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0038, type="u8", condition="eq", value=0X1D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Amoeba" },
+        { address=0X0038, type="u8", condition="eq", value=0X5D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Frog" },
+        { address=0X0038, type="u8", condition="eq", value=0X73, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="rat" },
+        { address=0X0038, type="u8", condition="eq", value=0X8B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="beaver" },
+        { address=0X0038, type="u8", condition="eq", value=0XC1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="gorilla" },
+        { address=0X0038, type="u8", condition="eq", value=0XE4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="human" },
+        { address=0X0038, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Rage of the Dragons",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "rage-of-the-dragons",
+    file = "rage-of-the-dragons.zip",
+    hashes = {
+      { hash = "6a8f93c8604f7ce5feb3598abfda4a03", label = "rotd.7z <Rage of the Dragons (NGM-264)>" },
+      { hash = "8c081dd74a81d7551cb487605c7a0a6e", label = "rotdbr.7z <Rage of the Dragons (NGM-264, Brazil)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X097A, type="u24le", condition="eq", value=0X2600, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage introduction" },
+        { address=0X097A, type="u24le", condition="eq", value=0X3500, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over (in-game)" },
+        { address=0X097A, type="u24le", condition="eq", value=0X3800, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen (no credits inserted)" },
+        { address=0X097A, type="u24le", condition="eq", value=0X3801, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen (credit inserted)" },
+        { address=0X097A, type="u24le", condition="eq", value=0X3803, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration" },
+        { address=0X097A, type="u24le", condition="eq", value=0X3900, action="GAME_OVER", no_log=false, no_survey=false, desc="Ending" },
+        { address=0X097A, type="u24le", condition="eq", value=0X3A00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over (end of run)" },
+        { address=0X097A, type="u24le", condition="eq", value=0X3B00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits roll" },
+        { address=0X097A, type="u24le", condition="eq", value=0X2F00, action="DEMO_MODE", no_log=false, no_survey=false, desc="DEMO test" },
+        { address=0X69F4, type="u8", condition="eq", value=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Test" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      events = {
+        { address=0X2350, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Hit Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFD8B, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 (default AES)" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 (default MVS)" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8" },
+      },
+      stage = {
+        { address=0X6A6C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode: Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X22DB, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0X2356, type="u16le", condition="eq", value=0XA0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Pupa, Alice" },
+        { address=0X2356, type="u16le", condition="eq", value=0XAA, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Annie" },
+        { address=0X2356, type="u16le", condition="eq", value=0XB4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Billy, Lynn, Cassandra, Pepe, Elias, Sonia, Jimmy" },
+        { address=0X2356, type="u16le", condition="eq", value=0XBE, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Radel, Oni, Jones, Kang" },
+        { address=0X2356, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 - Current Character Health" },
+        { address=0X2453, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0X24CE, type="u16le", condition="eq", value=0XA0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Pupa, Alice" },
+        { address=0X24CE, type="u16le", condition="eq", value=0XAA, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Annie" },
+        { address=0X24CE, type="u16le", condition="eq", value=0XB4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Billy, Lynn, Cassandra, Pepe, Elias, Sonia, Jimmy" },
+        { address=0X24CE, type="u16le", condition="eq", value=0XBE, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Radel, Oni, Jones, Kang" },
+        { address=0X24CE, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 - Current Character Health" },
+        { address=0X2646, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Sub-character Health decreased" },
+        { address=0X2646, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Sub-character Health increased" },
+        { address=0X27C2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Sub-character Health decreased" },
+        { address=0X27C2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Sub-character Health increased" },
+        { address=0X3DC6, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Damaged" },
+        { address=0X3F3E, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Damaged" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6B36, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] P1 - Score (0XX0000)" },
+        { address=0X6B37, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] P1 - Score (X000000)" },
+        { address=0X6B38, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] P1 - Score (00000XX)" },
+        { address=0X6B39, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] P1 - Score (000XX00)" },
+      },
+      collectibles = {
+        { address=0X6B3C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 Stats - Ground Impacts Landed During a Match increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3DC6, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken" },
+        { address=0X3F3E, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken" },
+        { address=0X6B4A, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P1 Stats - Total Hits Blocked by P2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6B10, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game: Round Timer" },
+        { address=0XF08D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Settings: Play Time" },
+      },
+    },
+  },
+}

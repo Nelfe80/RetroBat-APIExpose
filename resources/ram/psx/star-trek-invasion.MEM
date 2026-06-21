@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Star Trek: Invasion",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "star-trek-invasion",
+    file = "star-trek-invasion.zip",
+    hashes = {
+      { hash = "520af0bb3523468acd4719f10fb5cdbd", label = "Star Trek - Invasion (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X58E0C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[bitflag] pause screen bit0 = 1" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XABF4C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X5BEC8, type="u32le", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=false, no_survey=false, desc="100%" },
+        { address=0X5BEC8, type="u32le", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="0%" },
+        { address=0X5BEC8, type="u32le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="32 bit energy reserve" },
+        { address=0X5BECD, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=false, no_survey=false, desc="100%" },
+        { address=0X5BECD, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="0%" },
+        { address=0X5BECD, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Warp speed energy" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X11AD98, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="number of stun weapon charges - 01 max" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5BCE8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] - overall score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X5FDB8, type="u16le", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="0%" },
+      },
+    },
+  },
+}

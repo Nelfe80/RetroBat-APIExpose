@@ -1,0 +1,135 @@
+return {
+  game = {
+    title = "Bulk Slash",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "bulk-slash",
+    file = "bulk-slash.zip",
+    hashes = {
+      { hash = "173eb41e4c5416c59d823c8d30fb7e99", label = "Bulk Slash (Japan)" },
+      { hash = "fc0c515563030d8183b2337297198ca7", label = "Bulk Slash (Japan) (En) (v1.001)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X123524, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo flag." },
+        { address=0X123AC2, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Movie." },
+        { address=0X123AC2, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stage 1." },
+        { address=0X123AC2, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stage 2." },
+        { address=0X123AC2, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stage 3." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X121FC2, type="u16le", condition="eq", value=0X0001, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear (timer @ 0x123520). Persists through ending and main menu, only cleared at Stage Select?" },
+        { address=0X123420, type="u16le", condition="eq", value=0X2000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X123420, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3." },
+        { address=0X123422, type="u16le", condition="eq", value=0X2000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X123422, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3." },
+        { address=0X123424, type="u16le", condition="eq", value=0X2000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X123424, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3." },
+        { address=0X123426, type="u16le", condition="eq", value=0X2000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X123426, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3." },
+        { address=0X123428, type="u16le", condition="eq", value=0X2000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X123428, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3." },
+        { address=0X12342A, type="u16le", condition="eq", value=0X2000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X12342A, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3." },
+        { address=0X12342C, type="u16le", condition="eq", value=0X2000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X12342C, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3." },
+        { address=0X123434, type="u16le", condition="eq", value=0X2000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X123434, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3." },
+        { address=0X123528, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag: Stage 2 Clear this run" },
+        { address=0X123529, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag: Stage 1 Clear this run" },
+        { address=0X12352A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag: Stage 4 Clear this run" },
+        { address=0X12352B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag: Stage 3 Clear this run" },
+        { address=0X12352C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag: Stage 6 Clear this run" },
+        { address=0X12352D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag: Stage 5 Clear this run" },
+        { address=0X12352F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag: Stage 7 Clear this run" },
+        { address=0X123592, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission Complete. (Except Stage 7)" },
+      },
+      stage = {
+        { address=0X122512, type="u16le", condition="eq", value=0X0000, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1." },
+        { address=0X122512, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage." },
+        { address=0X123592, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal gameplay." },
+        { address=0X123592, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Found MISS/Mission Results." },
+        { address=0X123592, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Event." },
+        { address=0X159362, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4-Chain hits (stage 2)" },
+        { address=0X15A6A2, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4-Chain hits (stage 1)" },
+        { address=0X15B680, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Items picked up (stage 2)" },
+        { address=0X15B74A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Type (stage 2)" },
+        { address=0X15B750, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Ammo (stage 2)" },
+        { address=0X15C112, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4-Chain hits (stage 5)" },
+        { address=0X15C9C0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Items picked up (stage 1)" },
+        { address=0X15CA8A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Type (stage 1)" },
+        { address=0X15CA90, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Ammo (stage 1)" },
+        { address=0X15CE32, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4-Chain hits (stage 3)" },
+        { address=0X15CF62, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4-Chain hits (stage 4)" },
+        { address=0X15E430, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Items picked up (stage 5)" },
+        { address=0X15E4FA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Type (stage 5)" },
+        { address=0X15E500, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Ammo (stage 5)" },
+        { address=0X15E752, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4-Chain hits (stage 6)" },
+        { address=0X15F0E2, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4-Chain hits (stage 7)" },
+        { address=0X15F150, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Items picked up (stage 3)" },
+        { address=0X15F21A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Type (stage 3)" },
+        { address=0X15F220, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Ammo (stage 3)" },
+        { address=0X15F280, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Items picked up (stage 4)" },
+        { address=0X15F34A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Type (stage 4)" },
+        { address=0X15F350, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Ammo (stage 4)" },
+        { address=0X160A70, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Items picked up (stage 6)" },
+        { address=0X160B3A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Type (stage 6)" },
+        { address=0X160B40, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Ammo (stage 6)" },
+        { address=0X161400, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Items picked up (stage 7)" },
+        { address=0X1614CA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Type (stage 7)" },
+        { address=0X1614D0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special Weapon Ammo (stage 7)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X121FC2, type="u16le", condition="eq", value=0XFFFE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fail: Died." },
+        { address=0X121FC2, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fail: Convoy died." },
+      },
+      health = {
+        { address=0X1235D0, type="u16le", condition="eq", value=0X1000, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Maximum." },
+        { address=0X1235D0, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health." },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X15CA7A, type="u16le", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Normal." },
+        { address=0X15CA7A, type="u16le", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Flying." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X123544, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 1/2." },
+        { address=0X123546, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 2/2." },
+        { address=0X1235E0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Previous Score 1/2." },
+        { address=0X1235E2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Previous Score 2/2." },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X122080, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss active flag?" },
+        { address=0X12344A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss type? Possibly area to load?" },
+        { address=0X123592, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss incoming." },
+        { address=0X123614, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss active flag 2?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X121FC2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Success/Fail Mission." },
+        { address=0X123520, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Mission Clear/Fail transition timer." },
+        { address=0X15935A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Ground Time (stage 2)" },
+        { address=0X15A69A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Ground Time (stage 1)" },
+        { address=0X15A69E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Air Time (Stage 1)" },
+        { address=0X15CE2A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Ground Time (stage 3)" },
+      },
+    },
+  },
+}

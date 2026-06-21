@@ -1,0 +1,117 @@
+return {
+  game = {
+    title = "Genesis: Beyond the Revelation",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "genesis-beyond-the-revelation",
+    file = "genesis-beyond-the-revelation.zip",
+    hashes = {
+      { hash = "3cb80a87a6f236821f1c4fee0a6d83e8", label = "Genesis [Set 1] (En) (Mike Curious) (0.1).d88" },
+      { hash = "f968098a13aa41884916e99f081f4a6d", label = "Genesis [Set 1].d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1093A, type="u32be", condition="eq", value=0X00000000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Menu/New Game Start" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10960, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game-Item Count-Ground Scanner [8-Bit BCD]" },
+      },
+      zone = {
+        { address=0X1094A, type="u8", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X49EE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life increased" },
+        { address=0X49EE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life decreased" },
+        { address=0X49F0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life increased" },
+        { address=0X49F0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life decreased" },
+        { address=0X49F1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life increased" },
+        { address=0X49F1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life decreased" },
+        { address=0X49F3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life increased" },
+        { address=0X49F3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life decreased" },
+        { address=0X1092F, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X10965, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game-Item Count-Deadly Poison [8-Bit BCD]" },
+      },
+      health = {
+        { address=0X1092F, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health(y)" },
+        { address=0X10936, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Game-HP [16-Bit BE/BCD] decreased" },
+        { address=0X10936, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Game-HP [16-Bit BE/BCD] increased" },
+        { address=0X10968, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Game-Item Count-Energy Circuit [8-Bit BCD] decreased" },
+        { address=0X10968, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Game-Item Count-Energy Circuit [8-Bit BCD] increased" },
+        { address=0X1096B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Game-Item Count-Energy Unit [8-Bit BCD] decreased" },
+        { address=0X1096B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Game-Item Count-Energy Unit [8-Bit BCD] increased" },
+        { address=0X10994, type="u8", condition="eq", value=0XB1, action="HEALTH_STATE", no_log=false, no_survey=false, desc="9999 HP (Palm Tree Fruit)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1093E, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cloth" },
+        { address=0X1093E, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Protector" },
+        { address=0X1093E, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Combat Suit" },
+        { address=0X1093E, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powered Armor" },
+        { address=0X1093E, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Battle Tank" },
+        { address=0X1093E, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Destroid Armor" },
+        { address=0X1093E, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bio-Psycholizer" },
+        { address=0X1094B, type="u8", condition="eq", value=0XB0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cloth" },
+        { address=0X1094B, type="u8", condition="eq", value=0XB1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Protector" },
+        { address=0X1094B, type="u8", condition="eq", value=0XB2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Combat Suit" },
+        { address=0X1094B, type="u8", condition="eq", value=0XB3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powered Armor" },
+        { address=0X1094B, type="u8", condition="eq", value=0XB4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Battle Tank" },
+        { address=0X1094B, type="u8", condition="eq", value=0XB5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Destroid Armor" },
+        { address=0X1094B, type="u8", condition="eq", value=0XB6, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bio-Psycholizer" },
+        { address=0X10973, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Game-Item Count-Emerald [8-Bit BCD]" },
+      },
+      weapon = {
+        { address=0X1093F, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Knife" },
+        { address=0X1093F, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X1093F, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Blade" },
+        { address=0X1093F, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Power Crusher" },
+        { address=0X1093F, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Surge Discharger" },
+        { address=0X1093F, type="u8", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Heat Hawk" },
+        { address=0X1093F, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Plasma Sword" },
+        { address=0X1093F, type="u8", condition="eq", value=0X7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dimension Distorter" },
+        { address=0X1094C, type="u8", condition="eq", value=0XB6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dimension Distorter (Weapon 1)" },
+        { address=0X1094C, type="u8", condition="eq", value=0XB7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dimension Distorter (Weapon 2)" },
+        { address=0X1094D, type="u8", condition="eq", value=0XB0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Knife" },
+        { address=0X1094D, type="u8", condition="eq", value=0XB1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol" },
+        { address=0X1094D, type="u8", condition="eq", value=0XB2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X1094D, type="u8", condition="eq", value=0XB3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rifle" },
+        { address=0X1094D, type="u8", condition="eq", value=0XB4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Blade" },
+        { address=0X1094D, type="u8", condition="eq", value=0XB5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ray Gun" },
+        { address=0X1094D, type="u8", condition="eq", value=0XB6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Power Crusher" },
+        { address=0X1094D, type="u8", condition="eq", value=0XB7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile Launcher" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10938, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Game-Gold [16-Bit BE/BCD] increased" },
+        { address=0X10994, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="1000g (Pyramid Gold)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X10969, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Game-Item Count-Shield Metal [8-Bit BCD]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X10994, type="u8", condition="eq", value=0XB0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Secret Door (Jerusalem)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1093A, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Game-Timer [32-Bit BE/BCD]" },
+      },
+    },
+  },
+}

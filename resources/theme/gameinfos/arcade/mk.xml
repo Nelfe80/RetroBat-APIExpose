@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Low Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="button4" extra="true">
+			<text>High Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Block</text>
+			<color>${white}</color>
+		</text>
+		<text name="button7" extra="true">
+			<text>High Kick</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button8" extra="true">
+			<text>Low Kick</text>
+			<color>${white}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Low Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button4" extra="true">
+			<text>High Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button5" extra="true">
+			<text>Block</text>
+			<color>${white}</color>
+		</text>
+		<text name="p2button7" extra="true">
+			<text>High Kick</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button8" extra="true">
+			<text>Low Kick</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 CRL 3356790</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 STF 3251200</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 DUY 3155600</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 BYL 3040930</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 BBB 2992200</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FEL 800000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 SAN 700000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HAI 600000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 SFT 500000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 BBD 400000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 WIT 300000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 HOU 200000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 TTT 100000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 RYU 90000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 TWG 80000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

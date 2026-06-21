@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Up",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "up",
+    file = "up.zip",
+    hashes = {
+      { hash = "c2512cddb55291548564b95805fefeb0", label = "Disney-Pixar Up (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+  },
+}

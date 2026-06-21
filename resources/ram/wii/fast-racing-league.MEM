@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "FAST Racing League",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "fast-racing-league",
+    file = "fast-racing-league.zip",
+    hashes = {
+      { hash = "a0318b3c21745f60b27398bbbfd65a01", label = "FAST - Racing League (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2801CC, type="u32be", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Menu" },
+        { address=0X2801CC, type="u32be", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-game (or in demo..)" },
+        { address=0X530E40, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10642844, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Part 1" },
+        { address=0X10642844, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Qualification round" },
+        { address=0X106494A8, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494A8, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494AC, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494AC, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494B0, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494B0, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494B4, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494B4, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494B8, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494B8, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494BC, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494BC, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494C0, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494C0, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494C4, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494C4, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494C8, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494C8, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494CC, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494CC, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494D0, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494D0, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494D4, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494D4, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494D8, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494D8, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494DC, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494DC, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494E0, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494E0, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494E4, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494E4, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494E8, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494E8, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494EC, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494EC, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494F0, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494F0, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494F4, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494F4, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X106494F8, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X106494F8, type="u32be", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Star Clear" },
+        { address=0X10649510, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X10649514, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X1064951C, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+    },
+  },
+}

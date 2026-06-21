@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "The Adventures of Mighty Max",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "the-adventures-of-mighty-max",
+    file = "the-adventures-of-mighty-max.zip",
+    hashes = {
+      { hash = "dca672428cf983fa0a79ab9ec3b04285", label = "Adventures of Mighty Max, The (Europe).sfc" },
+      { hash = "ef03535ce894aedabe6c098f6b858d87", label = "Mighty Max (USA).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X028C, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X028C, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0294, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0294, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+  },
+}

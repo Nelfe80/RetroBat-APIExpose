@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Mortal Kombat: Deadly Alliance",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-deadly-alliance",
+    file = "mortal-kombat-deadly-alliance.zip",
+    hashes = {
+      { hash = "1f09e7894dec2f4cad4384a0a01f7cac", label = "Mortal Kombat - Deadly Alliance (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X40A218, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - Rounds to Win [32 bits] [1]" },
+        { address=0X40A388, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Round Wins [32 bits]" },
+        { address=0X40A38C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Round Wins [32 bits]" },
+        { address=0X588EC8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - Rounds to Win [32 bits] [3, Main]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X40A390, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - HP [Floats] decreased" },
+        { address=0X40A390, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - HP [Floats] increased" },
+        { address=0X40A394, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - HP [Floats] decreased" },
+        { address=0X40A394, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - HP [Floats] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X550EA4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Profile - Gold Koins [32 bits] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X14E8B4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Code - No Fatality Time [32 bits]" },
+        { address=0X40A39C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Match - Timer [32 bits]" },
+        { address=0X40A3CC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Arcade - Timer [32 bits]" },
+        { address=0X40AE34, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Arcade - Mini-Game Time Remaining [32 bits]" },
+      },
+    },
+  },
+}

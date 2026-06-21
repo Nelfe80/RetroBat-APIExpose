@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Sphinx and the Cursed Mummy",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "sphinx-and-the-cursed-mummy",
+    file = "sphinx-and-the-cursed-mummy.zip",
+    hashes = {
+      { hash = "b679b990e63f66ded66dbbd98429ba46", label = "Sphinx and the Cursed Mummy (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X4778B4, type="u32le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="On the Ground" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X552854, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Book of the Dead" },
+      },
+      health = {
+        { address=0X4778AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X4778AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0X4778B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0X4778B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X5534F4, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Room Key" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4E5E84, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score in Blowipe Gallery" },
+      },
+      collectibles = {
+        { address=0X5525A4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Scarabs increased" },
+        { address=0X5525D4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Ankh Pieces increased" },
+        { address=0X552624, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Key increased" },
+        { address=0X5529D4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hunter Gold Class increased" },
+        { address=0X5535E4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ishka's Ring REMOVED increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X552DE4, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield of Osiris" },
+      },
+      player = {
+        { address=0X4778B4, type="u32le", condition="eq", value=0X2, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X552674, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cave Door Key" },
+        { address=0X553554, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Ledge Door Key" },
+      },
+    },
+  },
+}

@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Final Fantasy Crystal Chronicles: Echoes of Time",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "final-fantasy-crystal-chronicles-echoes-of-time",
+    file = "final-fantasy-crystal-chronicles-echoes-of-time.zip",
+    hashes = {
+      { hash = "3729802f981a90a4c3f3031b9ce0c57c", label = "Final Fantasy Crystal Chronicles - Echoes of Time (Europe) (En,Fr,De,Es).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X11F810, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit[ Main Avatar Level" },
+      },
+      stage = {
+        { address=0X1230DB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Character 1 - Current Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X11F848, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Character 2 Maximum Health decreased" },
+        { address=0X11F848, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Character 2 Maximum Health increased" },
+        { address=0X12300C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Member 1 - Current HP decreased" },
+        { address=0X12300C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Member 1 - Current HP increased" },
+        { address=0X123080, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X123080, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X116871, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+      },
+      weapon = {
+        { address=0X124AA7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon array" },
+        { address=0X1357A0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="=== Magic Weapon Scrolls (2/7) ===" },
+        { address=0X1357A2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="=== Magic Weapon Scrolls (4/7) ===" },
+        { address=0X1357A4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="=== Magic Weapon Scrolls (6/7) ===" },
+        { address=0X1357A5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="=== Magic Weapon Scrolls (7/7) ===" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X307D00, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32bit] Boss HP" },
+      },
+    },
+  },
+}

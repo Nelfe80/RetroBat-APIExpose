@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Linkle Liver Story",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "linkle-liver-story",
+    file = "linkle-liver-story.zip",
+    hashes = {
+      { hash = "2f64a277f265ab19a1d0ba51f326337c", label = "Linkle Liver Story (Japan)" },
+      { hash = "477d34dd63ac4c8379b97e9c454328da", label = "Linkle Liver Story (Japan) (En) (v1.0) (Stardust Crusaders)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XFFE60, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Water Seed Level" },
+        { address=0XFFE61, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Earth Seed Level" },
+        { address=0XFFE62, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wind Seed Level" },
+        { address=0XFFE63, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire Seed Level" },
+      },
+      zone = {
+        { address=0XFFF81, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Heading out to world" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XFFE67, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Rocky Plaza;" },
+        { address=0XFFE67, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Crown Village;" },
+        { address=0XFFE67, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Sky Island(missable);" },
+        { address=0XFFE67, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Flume Fortress;" },
+        { address=0XFFE67, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mistral Peak;" },
+        { address=0XFFE67, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Coral Island" },
+        { address=0XFFF02, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP, Max starts at 0x30 decreased" },
+        { address=0XFFF02, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP, Max starts at 0x30 increased" },
+        { address=0X197058, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X197058, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XFFE08, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hammer Obtained" },
+        { address=0XFFE09, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Glove Obtained" },
+        { address=0XFFE0A, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ax Obtained" },
+        { address=0XFFE0B, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Boomerang Obtained" },
+        { address=0XFFE0C, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword Obtained" },
+        { address=0XFFE0D, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spear Obtained" },
+        { address=0XFFE0F, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cane Obtained" },
+        { address=0XFFE2B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Starting-Weapon's Elemental Type" },
+        { address=0XFFE5C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot2 Weapon Type" },
+        { address=0XFFE5D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot1 Weapon Type" },
+        { address=0XFFE5E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot4 Weapon Type" },
+        { address=0XFFE5F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot3 Weapon Type" },
+        { address=0XFFF06, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Selected Weapon Slot" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XFFF04, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFFFC0, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Machine Head Midboss 2 defeated;" },
+        { address=0XFFFC0, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Machine Head Midboss 3 defeated;" },
+        { address=0XFFFC0, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Machine Head Wall-Boss defeated;" },
+        { address=0XFFFC0, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Volcano Boss defeated;" },
+        { address=0XFFFC0, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Fake Cassie defeated" },
+        { address=0XFFFC2, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit7 = Final Boss Defeated" },
+        { address=0XFFFC9, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit0 = Final Boss Defeated" },
+        { address=0X19EABC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Might be unique 'boss lock' for Keeller, whose fight is different, also Presstor" },
+        { address=0X1A3C02, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Screen is changed to boss-mode in Crown Village; Also seems to be 01 for most rooms that can fun" },
+        { address=0X1CC5AE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Caterpillar most-stable boss-mode address, starts at zero then becomes something different when" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFFF00, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Max HP, increases every time a flower is restored" },
+        { address=0XFFF70, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Bosses Defeated;" },
+      },
+    },
+  },
+}

@@ -1,0 +1,126 @@
+return {
+  game = {
+    title = "The Amazing Spider-Man vs. the Kingpin",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-amazing-spider-man-vs-the-kingpin",
+    file = "the-amazing-spider-man-vs-the-kingpin.zip",
+    hashes = {
+      { hash = "03cc7766d9738f00820f52b7563a8dd5", label = "Amazing Spider-Man vs. The Kingpin, The (USA) (Rev 1)" },
+      { hash = "dde3d8f861c8e1a65c737ab454d13be4", label = "Amazing Spider-Man vs. The Kingpin, The (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8EF75, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8BDD6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bleeker Street Cleared Comic Book Notification" },
+        { address=0X8BFD2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Another Level ID" },
+        { address=0X8C544, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Doc Ock's Hideout" },
+        { address=0X8C545, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Daily Bugle Building" },
+        { address=0X8C546, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Electro's Power Station" },
+        { address=0X8C547, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: The Lizard's Lair" },
+        { address=0X8C548, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Hobgoblin's Neighborhood" },
+        { address=0X8C549, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Sandman's Park" },
+        { address=0X8C54B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Venom's Cathedral" },
+        { address=0X8C54D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: The Kingpin's Base" },
+        { address=0X8C550, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Vulture's Subway" },
+        { address=0X8C551, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Mysterio's Maze" },
+        { address=0X8C552, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Pier 45" },
+        { address=0X8C553, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Union Terminal Freight Station" },
+        { address=0X8C554, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Bleeker St Cleared" },
+        { address=0X8C555, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: West Street" },
+        { address=0X8C558, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Port Authority" },
+        { address=0X8C55C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: 11th Avenue" },
+        { address=0X8C55D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Julliard School of Music" },
+        { address=0X8C55E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Bus Terminal" },
+        { address=0X8C560, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Riverside Drive" },
+        { address=0X8C562, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Henry Street" },
+        { address=0X8C563, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: KMRV Channel 42" },
+        { address=0X8C564, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Starret Lehigh Building" },
+        { address=0X8C56C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Harlem Meer" },
+        { address=0X8C56F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Central Park North" },
+        { address=0X8C573, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Central Park" },
+        { address=0X8C575, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Central Park Zoo" },
+        { address=0X8C576, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Battery Park Power Station" },
+        { address=0X8C578, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: New York Public Library" },
+        { address=0X8C579, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: South of Power Station" },
+        { address=0X8C57A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Empire State Building" },
+        { address=0X8C57B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: 3rd Avenue" },
+        { address=0X8C57D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Chrysler Building" },
+        { address=0X8C580, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: East Harlem" },
+        { address=0X8C581, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Harlem" },
+        { address=0X8C583, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Park Ave North" },
+        { address=0X8C585, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Park Ave" },
+        { address=0X8C587, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: 1st Ave" },
+        { address=0X8C588, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Chinatown" },
+        { address=0X8C589, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Greenwich Village" },
+        { address=0X8C58A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Civic Center" },
+        { address=0X8C58C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: 125th Street" },
+        { address=0X8C58D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: East Village" },
+        { address=0X8C59E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Saint Patrick's Cathedral" },
+        { address=0X8C5A1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Saint Bartholomew's Church" },
+        { address=0X8C5A2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Morton Street" },
+        { address=0X8C5A3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Clarkson Street" },
+        { address=0X8C5A4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Houston Street" },
+        { address=0X8C5A5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Bedford Street" },
+        { address=0X8C5BC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Jay Street" },
+        { address=0X8C5BE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Court Street" },
+        { address=0X8C5BF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed: Dekalb Ave" },
+        { address=0X8CA1C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Exit Status" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8C881, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mary Jane Died, Final Boss (01)" },
+        { address=0X8C920, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X8C920, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8C80E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score (Ten Thousands and Hundred Thousands) (BCD)" },
+        { address=0X8C80F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score (Millions and Ten Millions) (BCD)" },
+        { address=0X8C810, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score (Ones and Tens) (BCD)" },
+        { address=0X8C811, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score (Hundreds and Thousands) (BCD)" },
+        { address=0X8C812, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Ten Thousands and Hundred Thousands) (BCD)" },
+        { address=0X8C813, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Millions and Ten Millions) (BCD)" },
+        { address=0X8C814, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Ones and Tens) (BCD)" },
+        { address=0X8C815, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Hundreds and Thousands) (BCD)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X59E0E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss/Doc Ock Health?" },
+        { address=0X8BFD5, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Bar On-Screen (01)" },
+        { address=0X8C360, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Present - Union Terminal Freight Station" },
+        { address=0X8C3AC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Present - South of Power Station" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X8C92E, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8C8C0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Enemy/Object On-Screen?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8EF6A, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level Timer" },
+        { address=0X8EFEC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Demo Timer" },
+      },
+    },
+  },
+}

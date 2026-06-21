@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Ishidō: The Way of Stones",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "ishido-the-way-of-stones",
+    file = "ishido-the-way-of-stones.zip",
+    hashes = {
+      { hash = "addc6c0ae7b535839815b8e7f7fd0f11", label = "Ishido - The Way of Stones (USA, Europe).lnx" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0036, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Open" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2066, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] P1 Score" },
+        { address=0X2069, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] P2 Score" },
+        { address=0X417B, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 - Modern" },
+        { address=0X417E, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 4-Ways - Modern" },
+        { address=0X4181, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 Tiles Remaining - Modern" },
+        { address=0X4184, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 - Modern" },
+        { address=0X4187, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 4-Ways - Modern" },
+        { address=0X418A, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 Tiles Remaining - Modern" },
+        { address=0X418D, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 - Modern" },
+        { address=0X4190, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 4-Ways - Modern" },
+        { address=0X4193, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 Tiles Remaining - Modern" },
+        { address=0X4196, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 4 - Modern" },
+        { address=0X4199, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 4 4-Ways - Modern" },
+        { address=0X419C, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 4 Tiles Remaining - Modern" },
+        { address=0X41A8, type="u24le", condition="eq", value=0XFE, action="SCORE_STATE", no_log=false, no_survey=false, desc="Record exists, game unfinished - no score" },
+        { address=0X41A8, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 - Ancient" },
+        { address=0X41AB, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 4-Ways - Ancient" },
+        { address=0X41AE, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 Tiles Remaining - Ancient" },
+        { address=0X41B1, type="u24le", condition="eq", value=0XFE, action="SCORE_STATE", no_log=false, no_survey=false, desc="Record exists, game unfinished - no score" },
+        { address=0X41B1, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 - Ancient" },
+        { address=0X41B4, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 4-Ways - Ancient" },
+        { address=0X41B7, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 Tiles Remaining - Ancient" },
+        { address=0X41BA, type="u24le", condition="eq", value=0XFE, action="SCORE_STATE", no_log=false, no_survey=false, desc="Record exists, game unfinished - no score" },
+        { address=0X41BA, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 - Ancient" },
+        { address=0X41BD, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 4-Ways - Ancient" },
+        { address=0X41C0, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 Tiles Remaining - Ancient" },
+        { address=0X41C3, type="u24le", condition="eq", value=0XFE, action="SCORE_STATE", no_log=false, no_survey=false, desc="Record exists, game unfinished - no score" },
+        { address=0X41C3, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 4 - Ancient" },
+        { address=0X41C6, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 4 4-Ways - Ancient" },
+        { address=0X41C9, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 4 Tiles Remaining - Ancient" },
+        { address=0X41D5, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 - Tournament" },
+        { address=0X41D8, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 4-Ways - Tournament" },
+        { address=0X41DB, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 Tiles Remaining - Tournament" },
+        { address=0X41DE, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 - Tournament" },
+        { address=0X41E1, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 4-Ways - Tournament" },
+        { address=0X41E4, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 2 Tiles Remaining - Tournament" },
+        { address=0X41E7, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 - Tournament" },
+        { address=0X41EA, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 4-Ways - Tournament" },
+        { address=0X41ED, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 3 Tiles Remaining - Tournament" },
+        { address=0X41F0, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 1 - Tournament" },
+        { address=0X41F3, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 4 4-Ways - Tournament" },
+        { address=0X41F6, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score 4 Tiles Remaining - Tournament" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAF7A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer Amount - Tens Place" },
+        { address=0XAF85, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer Amount - Ones Place" },
+      },
+    },
+  },
+}

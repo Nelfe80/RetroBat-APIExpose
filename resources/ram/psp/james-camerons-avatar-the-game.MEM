@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "James Cameron's Avatar: The Game",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "james-camerons-avatar-the-game",
+    file = "james-camerons-avatar-the-game.zip",
+    hashes = {
+      { hash = "74471220ceeeb33721ee3d2a7d4f41ea", label = "James Cameron's Avatar - The Game (USA) (En,Fr,Es)" },
+      { hash = "8b05170086e069c03fa0cac0b574bb63", label = "James Cameron's Avatar - The Game (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XEFBE54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Blue Points thingy" },
+        { address=0XF1C514, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Blue Points thingy Also" },
+      },
+    },
+  },
+}

@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Skitchin'",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Racing, Sports"
+  },
+
+  rom = {
+    name = "skitchin",
+    file = "skitchin.zip",
+    hashes = {
+      { hash = "619106321a4317fb38a3baced692d30f", label = "Skitchin' (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X131C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0XF460, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0696=Setup; dd96/dd9c=EA Logo; d36c=Warning; d382=Main Screen; d3da=Demo; d458=Menu Screen; d46e" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X000C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Skates" },
+        { address=0X000D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Wheels" },
+        { address=0X000E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Elbow Pads" },
+        { address=0X000F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Knee Pads" },
+        { address=0X0010, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Gloves" },
+        { address=0X0011, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Wrist Guards" },
+        { address=0X0050, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number Warp Zone" },
+        { address=0X0794, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Player (Normal/on Ground)" },
+        { address=0X0816, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 1 (Normal/on Ground)" },
+        { address=0X0898, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 2 (Normal/on Ground)" },
+        { address=0X091A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 3 (Normal/on Ground)" },
+        { address=0X099C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 4 (Normal/on Ground)" },
+        { address=0X0A1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 5 (Normal/on Ground)" },
+        { address=0X0AA0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 6 (Normal/on Ground)" },
+        { address=0X0B22, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 7 (Normal/on Ground)" },
+        { address=0X0BA4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 8 (Normal/on Ground)" },
+        { address=0X0C26, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 9 (Normal/on Ground)" },
+        { address=0X0CA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 10 (Normal/on Ground)" },
+        { address=0X0D2A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 11 (Normal/on Ground)" },
+        { address=0X0DAC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 12 (Normal/on Ground)" },
+        { address=0X0E2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 13 (Normal/on Ground)" },
+        { address=0X0EB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Status Skitcher 14 (Normal/on Ground)" },
+        { address=0XEF36, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XF048, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop : Equipment Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X077A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Player decreased" },
+        { address=0X077A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Player increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0788, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="1a=Hit; 2e/30/33/34/43=Hit with Weapon" },
+        { address=0X0820, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Skitcher 1" },
+        { address=0X08A2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Skitcher 2" },
+        { address=0X0924, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Skitcher 3" },
+        { address=0X09A6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Skitcher 4" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0790, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jumping" },
+        { address=0X07A9, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Action : 00=Standing; 01Jumping; 02=Crouching; 04=Grabbing Car" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0036, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Race" },
+        { address=0X004C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Skitch Cop Car" },
+        { address=0X12C2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Visibility Judges" },
+      },
+    },
+  },
+}

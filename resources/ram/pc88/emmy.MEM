@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Emmy",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "emmy",
+    file = "emmy.zip",
+    hashes = {
+      { hash = "c3fd72c922d4f9fd581d41b19b65772c", label = "Emmy.d88" },
+    }
+  },
+
+  events = {
+  },
+}

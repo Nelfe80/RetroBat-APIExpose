@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Shin Kidou Senki Gundam W: Endless Duel",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "shin-kidou-senki-gundam-w-endless-duel",
+    file = "shin-kidou-senki-gundam-w-endless-duel.zip",
+    hashes = {
+      { hash = "3b74c6e1887b1cbf4b5b9ee10e7c2b3c", label = "Shin Kidou Senki Gundam W - Endless Duel (Japan) (En) (Aeon Genesis) (1.0).sfc" },
+      { hash = "53b2c91892b09c47ac4408beccac5c66", label = "Shin Kidou Senki Gundam W - Endless Duel (Japan) (Sv) (v0.2).sfc" },
+      { hash = "ac39bcc1c19813048903098d0c1e4935", label = "Shin Kidou Senki Gundam W - Endless Duel (Japan) (En) (MSU-1) (PepilloPEV) (v3.0).sfc" },
+      { hash = "e2c3cc007c2c1c358bfe50ead5c8b9ac", label = "Shin Kidou Senki Gundam W - Endless Duel (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0550, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level on option only" },
+        { address=0X0560, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[2 Byte] P1 - Level strength (FGT) (Hex=Dec)" },
+        { address=0X0564, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[2 Byte] P2 - Level strength (FGT) (Hex=Dec)" },
+        { address=0X0610, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round (Mission)" },
+        { address=0X1B90, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds won" },
+        { address=0X1B94, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds won" },
+        { address=0XFF00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL (Difficulty): 0=Easy, 2=Normal, 4=Hard" },
+      },
+      stage = {
+        { address=0X051A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE" },
+        { address=0X060E, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Airport Stage / 0c = Base Space Stage" },
+        { address=0X060E, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Aircraft Carrier Stage / 0e = Base Ice Stage" },
+        { address=0X060E, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Colony Stage / 12 = Base Space Stage" },
+        { address=0X060E, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Desert Stage /" },
+        { address=0X060E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="-------- Stage --------" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1B08, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 - Mech: 00=Wing, 02=Death Scythe, 04=Shenlong, 06=Heavy Arms, 08=Sandrock, 0A=Wing Zero, 0C=T" },
+        { address=0X1B0C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 - Mech: 00=Wing, 02=Death Scythe, 04=Shenlong, 06=Heavy Arms, 08=Sandrock, 0A=Wing Zero, 0C=T" },
+        { address=0X1B70, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life P1 in hex (when it reaches 0x00 -P1 loses the round) increased" },
+        { address=0X1B70, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life P1 in hex (when it reaches 0x00 -P1 loses the round) decreased" },
+        { address=0X1B74, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life P2 in hex (when it reaches 0x00 -P2 loses the round) increased" },
+        { address=0X1B74, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life P2 in hex (when it reaches 0x00 -P2 loses the round) decreased" },
+      },
+      health = {
+        { address=0X1B71, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health (Starts at 0x70) decreased" },
+        { address=0X1B71, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health (Starts at 0x70) increased" },
+        { address=0X1B72, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health Bar decreased" },
+        { address=0X1B72, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health Bar increased" },
+        { address=0X1B75, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health (Starts at 0x70) decreased" },
+        { address=0X1B75, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health (Starts at 0x70) increased" },
+        { address=0X1B76, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health Bar decreased" },
+        { address=0X1B76, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health Bar increased" },
+        { address=0X1B80, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - energy meter (16-bit) decreased" },
+        { address=0X1B80, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - energy meter (16-bit) increased" },
+        { address=0X1B81, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[2 Byte] P1 - Energy (Up to 0x012C or 300) decreased" },
+        { address=0X1B81, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[2 Byte] P1 - Energy (Up to 0x012C or 300) increased" },
+        { address=0X1B82, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - energy meter bar (16-bit) decreased" },
+        { address=0X1B82, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - energy meter bar (16-bit) increased" },
+        { address=0X1B85, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[2 Byte] P2 - Energy (Up to 0x012C or 300) decreased" },
+        { address=0X1B85, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[2 Byte] P2 - Energy (Up to 0x012C or 300) increased" },
+        { address=0X1B88, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - energy meter (16-bit) decreased" },
+        { address=0X1B88, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - energy meter (16-bit) increased" },
+        { address=0X1B8A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - energy meter (16-bit) decreased" },
+        { address=0X1B8A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - energy meter (16-bit) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X060E, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mountain Stage / 10 = Boss Stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X060C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (Hex=Dec)" },
+        { address=0X1BA8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 - Hit Counter (Hex=Dec)" },
+        { address=0X1BAC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 - Hit Counter (Hex=Dec)" },
+        { address=0XFF02, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME: 0=Limit, 2=No Limit" },
+      },
+    },
+  },
+}

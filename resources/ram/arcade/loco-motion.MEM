@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Loco-Motion",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "loco-motion",
+    file = "loco-motion.zip",
+    hashes = {
+      { hash = "fb5485bf674f4b24a2fe84a184ceba9c", label = "locomotn.7z <Loco-Motion>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0008, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Game" },
+        { address=0X0012, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [8-bit Hex]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0100, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0100, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01C0, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] Score" },
+      },
+    },
+  },
+}

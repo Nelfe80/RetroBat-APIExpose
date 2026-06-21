@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "World Tour Racing",
+    system = "jaguarcd",
+    system_name = "Atari Jaguar CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "world-tour-racing",
+    file = "world-tour-racing.zip",
+    hashes = {
+      { hash = "127d2f80ea98b6090977bf80f3133d7c", label = "World Tour Racing (USA) (Songbird)" },
+    }
+  },
+
+  events = {
+  },
+}

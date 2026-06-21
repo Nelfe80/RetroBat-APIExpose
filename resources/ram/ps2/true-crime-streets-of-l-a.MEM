@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "True Crime: Streets of L.A.",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Racing"
+  },
+
+  rom = {
+    name = "true-crime-streets-of-l-a",
+    file = "true-crime-streets-of-l-a.zip",
+    hashes = {
+      { hash = "76a8a42fc6f9e62f85ff7d5e6a23599f", label = "True Crime - Streets of LA (USA)" },
+      { hash = "1205dcfbfdb442aa411ae7df474a83d0", label = "True Crime - Streets of LA (SLUS-20550) [EB7854F1]" },
+      { hash = "d0a6ed1135840ad16a48f4ba5cd25574", label = "True Crime - Streets of LA (USA) (60fps) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X75D400, type="u32le", condition="eq", value=0X37, action="DEMO_MODE", no_log=false, no_survey=false, desc="Mission 5 - Inner Demons" },
+      },
+      events = {
+        { address=0X75D4E4, type="u8", condition="eq", value=0X3, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Tiger Sweep" },
+        { address=0X75D4E4, type="u8", condition="eq", value=0X5, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Tiger Claw" },
+        { address=0X75D4E4, type="u8", condition="eq", value=0X6, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Leaping Tiger" },
+        { address=0X75D4E4, type="u8", condition="eq", value=0X7, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Dragon Kick" },
+        { address=0X75D4E5, type="u8", condition="eq", value=0X0, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Dragon Fist" },
+        { address=0X75D4E5, type="u8", condition="eq", value=0X1, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Flying Dragon" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X496CB4, type="u32le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="main menu (video in the background)" },
+        { address=0X75D4E4, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Attacks" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X75D400, type="u32le", condition="eq", value=0X38, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 6 - Die Die My Concubine" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X49F480, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Balance on screen" },
+        { address=0X49F488, type="u32le", condition="eq", value=0XFFFFFFFF, action="SCORE_STATE", no_log=false, no_survey=false, desc="negative score" },
+        { address=0X75D414, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32bit total reward points" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X75D400, type="u32le", condition="eq", value=0X2D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mission 5 - On the Chopping Block" },
+        { address=0X75D51C, type="u8", condition="eq", value=0X5, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Back Switchblade" },
+        { address=0X75D51C, type="u8", condition="eq", value=0X6, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="FWD Switchblade" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X75D400, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Current mission" },
+      },
+    },
+  },
+}

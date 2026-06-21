@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Test Drive 5",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "test-drive-5",
+    file = "test-drive-5.zip",
+    hashes = {
+      { hash = "f9ac6014cc0a7b996dfbe7f69e66e225", label = "Test Drive 5 (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

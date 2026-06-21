@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Harvest Moon: Boy & Girl",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "harvest-moon-boy-girl",
+    file = "harvest-moon-boy-girl.zip",
+    hashes = {
+      { hash = "a9b1576d504656e1b3dfd18d690129b8", label = "Harvest Moon - Boy & Girl (USA).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X9B26AC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money earned in the month increased" },
+        { address=0X9B2F0C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

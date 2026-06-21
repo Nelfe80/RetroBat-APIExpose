@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Ojamajo Doremi Dokkan: Maho-dou Eigo Festival",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "ojamajo-doremi-dokkan-maho-dou-eigo-festival",
+    file = "ojamajo-doremi-dokkan-maho-dou-eigo-festival.zip",
+    hashes = {
+      { hash = "2b5bc756fc69d6db69c864039f373fad", label = "Kids Station - Oja Majo DoReMi Dokkan! Maho-dou Eigo Festival (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X3E66E, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1: 'きらきらビーズ'" },
+        { address=0X3E66E, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2: 'どれみへプレゼント'" },
+        { address=0X3E66E, type="u16le", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3: 'にらめっこ!'" },
+        { address=0X3E66E, type="u16le", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4: 'すきなあそび'" },
+        { address=0X3E66E, type="u16le", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5: 'ライオン かえる?'" },
+        { address=0X3E66E, type="u16le", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6: 'かたつむりにのって'" },
+        { address=0X3E66E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Story Mode - Stage ID (Permanent Load)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3E472, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[6-bytes] Story Mode - Stage 1: 'きらきらビーズ' - Completed Areas Counter" },
+        { address=0X3E478, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[6-bytes] Story Mode - Stage 2: 'どれみへプレゼント' - Completed Areas Counter" },
+        { address=0X3E47E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[6-bytes] Story Mode - Stage 3: 'にらめっこ!' - Completed Areas Counter" },
+        { address=0X3E484, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[6-bytes] Story Mode - Stage 4: 'すきなあそび' - Completed Areas Counter" },
+        { address=0X3E48A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[6-bytes] Story Mode - Stage 5: 'ライオン かえる?' - Completed Areas Counter" },
+        { address=0X3E490, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[6-bytes] Story Mode - Stage 6: 'かたつむりにのって' - Completed Areas Counter" },
+        { address=0X3E4BC, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Parental Control - Game Time" },
+        { address=0X3E882, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Title Screen - Demo Counters" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 11: Hirose Mayumi",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-11-hirose-mayumi",
+    file = "private-idol-disc-vol-11-hirose-mayumi.zip",
+    hashes = {
+      { hash = "d007fc9f26118242d584c98251f23562", label = "Private Idol Disc Vol. 11 - Mayumi Hirose (Japan) (2M)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X12C93D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X108DDE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Menu object thing for RP" },
+      },
+    },
+  },
+}

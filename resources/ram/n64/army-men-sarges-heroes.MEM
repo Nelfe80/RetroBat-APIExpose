@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Army Men: Sarge's Heroes",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "army-men-sarges-heroes",
+    file = "army-men-sarges-heroes.zip",
+    hashes = {
+      { hash = "53e2872612760133ab7b2cc2e22b847c", label = "Army Men - Sarge's Heroes (Europe) (En,Fr,De).z64" },
+      { hash = "b8085c2edb1c6d23e52ed8c06d92b4f8", label = "Army Men - Sarge's Heroes (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X101504, type="u8", condition="eq", value=0X0D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA7CA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Original dev thought to be level ID but not" },
+        { address=0X101504, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boot Camp" },
+        { address=0X101504, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0X75EC3F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amount of enemies killed on a level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X75ECD0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X75ECD0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X15969C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="01 = All Weapons Cheat Active (4MB)" },
+        { address=0X35EC94, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon (4 MB)" },
+        { address=0X35ECCC, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sniper Rifle" },
+        { address=0X731C94, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon (8 MB)" },
+        { address=0X739494, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon (8 MB) (Low Resolution? Option doesn't seem to exist)" },
+        { address=0X75EC94, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon (8MB)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X15FCBC, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="When 01, Max-Ammo cheat is active. (4MB)" },
+        { address=0X731CCC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Collected Weapons Bit String?? (8 MB) increased" },
+        { address=0X75EC04, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="(attack) sniper ammo = 8-bit" },
+        { address=0X75ED18, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Rifle Ammo?" },
+        { address=0X762A60, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Flamethrower Ammo?" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X14E174, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of Objectives completed in a mission" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X141CAA, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time on Level, 02 = 2:10, 03 = 3:15" },
+      },
+    },
+  },
+}

@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Majin Tensei II: Spiral Nemesis",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "majin-tensei-ii-spiral-nemesis",
+    file = "majin-tensei-ii-spiral-nemesis.zip",
+    hashes = {
+      { hash = "492dc64e90aa5eae1bd8349e50464113", label = "Majin Tensei II - Spiral Nemesis (Japan) (En) (v1.0) (DDSTranslation).sfc" },
+      { hash = "8e21174afb7fdcc060b71bfb7f1feb1e", label = "Majin Tensei II - Spiral Nemesis (Japan).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X2000, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 1 HP (Hero) decreased" },
+        { address=0X2000, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 1 HP (Hero) increased" },
+        { address=0X2037, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 1 Max HP (Hero) decreased" },
+        { address=0X2037, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 1 Max HP (Hero) increased" },
+        { address=0X2040, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 3 HP (Kaoru) decreased" },
+        { address=0X2040, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 3 HP (Kaoru) increased" },
+        { address=0X2077, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 3 Max HP (Kaoru) decreased" },
+        { address=0X2077, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 3 Max HP (Kaoru) increased" },
+        { address=0X2080, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 3 HP (Second Hero) decreased" },
+        { address=0X2080, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 3 HP (Second Hero) increased" },
+        { address=0X20B7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 3 HP (Second Hero) decreased" },
+        { address=0X20B7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 3 HP (Second Hero) increased" },
+        { address=0X3000, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy A HP decreased" },
+        { address=0X3000, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy A HP increased" },
+        { address=0X3037, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy A Max HP decreased" },
+        { address=0X3037, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy A Max HP increased" },
+        { address=0X3040, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy B HP decreased" },
+        { address=0X3040, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy B HP increased" },
+        { address=0X3077, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy B Max HP decreased" },
+        { address=0X3077, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy B Max HP increased" },
+        { address=0X3080, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy C HP decreased" },
+        { address=0X3080, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy C HP increased" },
+        { address=0X30B7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy C Max HP decreased" },
+        { address=0X30B7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy C Max HP increased" },
+        { address=0X30C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy D HP decreased" },
+        { address=0X30C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy D HP increased" },
+        { address=0X30F7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy D Max HP decreased" },
+        { address=0X30F7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy D Max HP increased" },
+        { address=0X3100, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy X HP decreased" },
+        { address=0X3100, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy X HP increased" },
+        { address=0X3137, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy X Max HP decreased" },
+        { address=0X3137, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy X Max HP increased" },
+        { address=0X3140, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Y HP decreased" },
+        { address=0X3140, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Y HP increased" },
+        { address=0X3177, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Y Max HP decreased" },
+        { address=0X3177, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Y Max HP increased" },
+        { address=0X3180, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Z HP decreased" },
+        { address=0X3180, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Z HP increased" },
+        { address=0X31B7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Z Max HP decreased" },
+        { address=0X31B7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Z Max HP increased" },
+      },
+    },
+  },
+}

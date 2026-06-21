@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Garfield: Caught in the Act",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "garfield-caught-in-the-act",
+    file = "garfield-caught-in-the-act.zip",
+    hashes = {
+      { hash = "8766ad6ab161ffc7796a543325a82fb6", label = "Garfield - Caught in the Act (USA, Europe).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1201, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X1201, type="u8", condition="eq", value=0X06, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X12F5, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Transition (including title/pause)" },
+        { address=0X12F5, type="u8", condition="eq", value=0X12, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X12F5, type="u8", condition="eq", value=0X13, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue screen" },
+        { address=0X12F5, type="u8", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over screen" },
+        { address=0X1906, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+        { address=0X19AD, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8bit] Continues" },
+        { address=0X1B13, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[16bit] Pookie Continue Point Activated" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12F5, type="u8", condition="eq", value=0X15, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level/Game Completed screen" },
+      },
+      zone = {
+        { address=0X12F5, type="u8", condition="eq", value=0X0F, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Static World Load" },
+      },
+      stage = {
+        { address=0X1017, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Garfield Token (stage 3-2; stage 5-2)" },
+        { address=0X101C, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Garfield token (stage 6-1)" },
+        { address=0X1025, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Garfield Token (stage 1-2)" },
+        { address=0X1033, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Garfield token (stage 7-2)" },
+        { address=0X103D, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Garfield Token (stage 2-3)" },
+        { address=0X1460, type="u24le", condition="eq", value=0XA1B4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="start" },
+        { address=0X1460, type="u24le", condition="eq", value=0XA244, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="final tic" },
+        { address=0X1460, type="u24le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16bit] Bonus Round Timer (during bonus stage only)" },
+        { address=0X1C2F, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Falling" },
+        { address=0X1C2F, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="On ground" },
+        { address=0X1C2F, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Primed on seesaw" },
+        { address=0X1C2F, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Launched" },
+        { address=0X1C2F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Boulder Status (Stage 1-3)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1454, type="u8", condition="eq", value=0X14, action="LOSE_LIFE", no_log=false, no_survey=false, desc="full (Odie Dino)" },
+        { address=0X1454, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="transition to lower level (Odie Dino)" },
+        { address=0X19AB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X19AB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X1B24, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lower Floor" },
+        { address=0X1B24, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Upper floor" },
+        { address=0X1B36, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Odie" },
+        { address=0X1C2F, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Off-screen (including hitting Odie Dino)" },
+      },
+      health = {
+        { address=0X19AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X19AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X19AF, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Infinite Ammo Cheat (0x00 = Off / 0x02 = On)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1454, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="full (Orange Beard)" },
+        { address=0X1454, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X146C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Health" },
+        { address=0X149C, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="start" },
+        { address=0X149C, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X01A0, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="A (1 = Jump, 2 = Attack)" },
+        { address=0X01A0, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="B (1 = Attack, 2 = Jump)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1C34, type="u8", condition="eq", value=0X0D, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Max" },
+      },
+    },
+  },
+}

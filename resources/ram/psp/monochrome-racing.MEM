@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Monochrome Racing",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "monochrome-racing",
+    file = "monochrome-racing.zip",
+    hashes = {
+      { hash = "b7829d98fa35956e58248a2f216cdb36", label = "Monochrome Racing (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Cosmo Police Galivan",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cosmo-police-galivan",
+    file = "cosmo-police-galivan.zip",
+    hashes = {
+      { hash = "406dc6101e234af8f5603f38aa9323d4", label = "galivan2.7z <Cosmo Police Galivan (12/16/1985)>" },
+      { hash = "8185ee7ebb0914bc1e8dc5a84e9fc046", label = "galivan.7z <Cosmo Police Galivan (12/26/1985)>" },
+      { hash = "c95db9131ba4c6db62acc58c01369e11", label = "galivan3.7z <Cosmo Police Galivan (12/11/1985)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X124D, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

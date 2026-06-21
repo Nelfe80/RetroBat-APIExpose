@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Zool: Ninja of the Nth Dimension",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "zool-ninja-of-the-nth-dimension",
+    file = "zool-ninja-of-the-nth-dimension.zip",
+    hashes = {
+      { hash = "42fb44c9a2c82b8c4aef8191c1b5676f", label = "Zool - Ninja of the 'Nth' Dimension (Europe).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1ED8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Options [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1ED7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Options [8bit] increased" },
+        { address=0X1ED7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Options [8bit] decreased" },
+      },
+    },
+  },
+}

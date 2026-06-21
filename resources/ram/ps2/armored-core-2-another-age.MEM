@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Armored Core 2: Another Age",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "armored-core-2-another-age",
+    file = "armored-core-2-another-age.zip",
+    hashes = {
+      { hash = "5145ad0cdf4056cc856fbebd260e2670", label = "Armored Core 2 - Another Age (Europe)" },
+      { hash = "7a9e5acc60130e47aba1d972279cbd52", label = "Armored Core 2 - Another Age (Japan)" },
+      { hash = "a8385d5234bf5969bbaf536996b9dc8c", label = "Armored Core 2 - Another Age (China)" },
+      { hash = "f4f00f4164e1a523da94a88cf92d6cfb", label = "Armored Core 2 - Another Age (USA)" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X31A8F8, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mission - (Neo-Isaac) Destroy Prototype MTs - Complete [Bit1]" },
+        { address=0X31A90C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mission - (Old Zam) Destroy Security System - Complete [Bit1]" },
+      },
+    },
+  },
+}

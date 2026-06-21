@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "The Great Battle V",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat'em Up"
+  },
+
+  rom = {
+    name = "the-great-battle-v",
+    file = "the-great-battle-v.zip",
+    hashes = {
+      { hash = "2f1fe5f94124990c1b292d269916f503", label = "Great Battle V, The (Japan) (En) (Aeon Genesis) (1.2).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00A5, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Partial pause by chat - Dead" },
+        { address=0X19DE, type="u16le", condition="eq", value=0X16, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1B04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1P Level" },
+      },
+      stage = {
+        { address=0X00B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage - Location ID (Rooms)" },
+        { address=0X00B9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stages(notes for myself)" },
+        { address=0X1918, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Wagons on the train stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X043D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ff= invencibily by back flips / Deaths" },
+        { address=0X0800, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="see it to life on texas increased" },
+        { address=0X0800, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="see it to life on texas decreased" },
+        { address=0X1500, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Check death (GFX)" },
+        { address=0X19DE, type="u16le", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Music / 1st stage" },
+        { address=0X1B01, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1P Lives increased" },
+        { address=0X1B01, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1P Lives decreased" },
+      },
+      health = {
+        { address=0X044E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P HP decreased" },
+        { address=0X044E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P HP increased" },
+        { address=0X094E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X094E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X114E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 3 decreased" },
+        { address=0X114E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 3 increased" },
+        { address=0X1B05, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X1B05, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1B00, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="1P Coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X00B8, type="u8", condition="eq", value=0X25, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Snake) [Gundam - Gundam Path]" },
+        { address=0X00B8, type="u8", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Aerial man) [RX - Gundam Path" },
+        { address=0X00B8, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mountain Boss (Fire demon) [RX - Gundam Path]" },
+        { address=0X00B8, type="u8", condition="eq", value=0X62, action="BOSS_HIT", no_log=false, no_survey=false, desc="Barrel Cave Boss (Giant Robot Shoot) [RX - Gundam Path]" },
+        { address=0X00B8, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hotel boss (Sabotregon and Crazygon) [Ultraman - Gundam path]" },
+        { address=0X00B8, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Monster Sonic) [Ultramamn - Gundam Path]" },
+        { address=0X00B9, type="u8", condition="eq", value=0X3F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Monutain Boss(Golden Dragon) [RX - RX Pach]" },
+        { address=0X00B9, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Monster Sonic) [RX - RX Path]" },
+        { address=0X00B9, type="u8", condition="eq", value=0X47, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hotel Boss (Master) [RX - RX Path]" },
+        { address=0X00B9, type="u8", condition="eq", value=0X25, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Snake) [Ultraman - RX Path]" },
+        { address=0X00B9, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mountain Boss (Fire demon) [Ultraman - RX Path]" },
+        { address=0X00B9, type="u8", condition="eq", value=0X62, action="BOSS_HIT", no_log=false, no_survey=false, desc="Barrel Cave Boss (Giant Robot Shoot) [Ultraman - RX Path]" },
+        { address=0X00B9, type="u8", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Aerial man) [Gundam - RX Path]" },
+        { address=0X00B9, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hotel boss (Sabotregon and Crazygon) [Gundam - RX Path]" },
+        { address=0X00BA, type="u8", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Aerial man) [Ultraman - Ultraman Path]" },
+        { address=0X00BA, type="u8", condition="eq", value=0X3F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Monutain Boss(Golden Dragon) [Ultraman - Ultraman Path]" },
+        { address=0X00BA, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Monster Sonic) [Gundam - Ultraman Path]" },
+        { address=0X00BA, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mountain Boss (Fire demon) [Gundam - Ultraman Path]" },
+        { address=0X00BA, type="u8", condition="eq", value=0X62, action="BOSS_HIT", no_log=false, no_survey=false, desc="Barrel Cave Boss (Giant Robot Shoot) [Gundam - Ultraman Path]" },
+        { address=0X00BA, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hotel boss (Sabotregon and Crazygon) RX - Ultraman Path]" },
+        { address=0X00BA, type="u8", condition="eq", value=0X25, action="BOSS_HIT", no_log=false, no_survey=false, desc="Texas Boss (Snake) [RX - Ultraman Path]" },
+        { address=0X084E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Hotel Boss HP" },
+        { address=0XF014, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Crystal boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2014, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Hotel" },
+        { address=0X2369, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Texas checkpoint" },
+        { address=0X3764, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint cave - boss" },
+        { address=0X3768, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Texas 2" },
+        { address=0XD04E, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ffff= Destroy basement" },
+        { address=0XD064, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ffff= Destroy Bar" },
+        { address=0XD066, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ffff= Destroy Bar 2" },
+        { address=0XD068, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ffff= Destroy Bar 3" },
+        { address=0XD0F8, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ffff= Destroy Cassino" },
+        { address=0XD348, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ffff= Destroy chapel" },
+        { address=0XD34A, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ffff= Destroy chapel" },
+        { address=0X1E860, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Barrel Cave" },
+      },
+    },
+  },
+}

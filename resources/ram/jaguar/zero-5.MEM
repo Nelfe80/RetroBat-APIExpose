@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Zero 5",
+    system = "jaguar",
+    system_name = "Atari Jaguar",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "zero-5",
+    file = "zero-5.zip",
+    hashes = {
+      { hash = "08b31fae8cbd44ac65d44baf1a0545a2", label = "Zero 5 (World) (Aftermarket) (Unl).j64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB3610, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit BE] Pause Check" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1FAAB2, type="u16be", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Operation: Death Match" },
+      },
+      health = {
+        { address=0XB361C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit BE] Health | BamBam decreased" },
+        { address=0XB361C, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit BE] Health | BamBam increased" },
+        { address=0XB36A0, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit BE | 64 Bytes] Health | Hit-PAK decreased" },
+        { address=0XB36A0, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit BE | 64 Bytes] Health | Hit-PAK increased" },
+        { address=0XB3730, type="u32be", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32 Bit BE] Damage Check | Hit-PAK" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XB3630, type="u32be", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[32 Bit BE] Powerup Selection | BamBam" },
+      },
+      weapon = {
+        { address=0XB362C, type="u32be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32 Bit BE] Full Power | Weapon" },
+        { address=0X1FAABC, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16 Bit BE] Cheat Active | Weapon Restoration" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB3614, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit BE] Score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XB3634, type="u32be", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[32 Bit BE] Full Power | Shield" },
+        { address=0X1FAABA, type="u16be", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[16 Bit BE] Cheat Active | Invincibility" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1FAAB2, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit BE] Mission ID" },
+      },
+    },
+  },
+}

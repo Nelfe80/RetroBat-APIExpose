@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Soul Eater: Battle Resonance",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "soul-eater-battle-resonance",
+    file = "soul-eater-battle-resonance.zip",
+    hashes = {
+      { hash = "d772bc1de547bf032c8a1e68efcec234", label = "Soul Eater - Battle Resonance (Japan).iso" },
+      { hash = "dd6bf8705a8c790dfa524aa463603846", label = "Soul Eater - Battle Resonance (Japan) (En) (v1.0) (Anime Games Translation Team).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X998CFA, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Test for Credits Screen - Arcade" },
+        { address=0XB86954, type="u8", condition="eq", value=0X08, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Beaten / Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB8A069, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="DWMA Underground Unlocked" },
+        { address=0XB8A082, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Evil Underground 3" },
+        { address=0XB8A0A9, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="DWMA Underground Unlocked" },
+        { address=0XB8A0C1, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Evil Underground 1" },
+        { address=0XB8A0C1, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Evil Underground 2" },
+        { address=0XB8A0C2, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Evil Underground 3" },
+        { address=0XB8A0E9, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="DWMA Underground Unlocked" },
+        { address=0XB8A101, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Evil Underground 1" },
+        { address=0XB8A101, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Evil Underground 2" },
+        { address=0XB8A102, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Evil Underground 3" },
+      },
+      stage = {
+        { address=0X99B050, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode Stages" },
+        { address=0XB86954, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Excalibur" },
+        { address=0XB86954, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages - Arcade Mode?" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="DWMA" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cinder Castle" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hook Cemetery" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Patchwork Lab" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Needle Village" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Church" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Eternal Cave" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tower Bridge" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ghost Ship Nidhogg" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="DWMA Underground" },
+        { address=0XB8A040, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID - File 1 32 bits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA3043D, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lord Death" },
+        { address=0XB868B4, type="u8", condition="eq", value=0X0B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lord Death" },
+        { address=0XB8A040, type="u16le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death City" },
+        { address=0XB8A068, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death City Unlocked" },
+        { address=0XB8A0A8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death City Unlocked" },
+        { address=0XB8A0BE, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Play with Lord Death" },
+        { address=0XB8A0E8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death City Unlocked" },
+        { address=0XB8A0FE, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Play with Lord Death" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XB8A0BC, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Battle with Weapons" },
+        { address=0XB8A0FC, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Battle with Weapons" },
+      },
+    },
+  },
+}

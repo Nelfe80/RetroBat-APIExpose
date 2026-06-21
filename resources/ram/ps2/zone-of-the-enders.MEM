@@ -1,0 +1,146 @@
+return {
+  game = {
+    title = "Zone of the Enders",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "zone-of-the-enders",
+    file = "zone-of-the-enders.zip",
+    hashes = {
+      { hash = "3e29550b61a7728ce298059cb73a3567", label = "Zone of the Enders (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X48EF11, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X48EF4A, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Total Continues Used (16-Bit)" },
+        { address=0X49C604, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (01)" },
+        { address=0X51CE54, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Game Over Menu Continue/EXIT" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X48EF01, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+        { address=0X48F8AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Versus Player 1 Level" },
+        { address=0X48F8AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Versus Player 2 Level" },
+      },
+      stage = {
+        { address=0X4AA240, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID (ASCII Text)" },
+        { address=0X4AA246, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X48EF04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (Static Clone) (Float) decreased" },
+        { address=0X48EF04, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (Static Clone) (Float) increased" },
+        { address=0X48EF6C, type="u8", condition="eq", value=0X0A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Cheat Fully Input" },
+        { address=0X48EF6C, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Refill Health/Ammo Cheat Inputs" },
+        { address=0X4FB740, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="FACTORY.1 Damage" },
+        { address=0X4FBE20, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="FACTORY.1 Total Damage Value" },
+        { address=0X4FCE60, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="TOWN.1 Total Damage Value" },
+        { address=0X4FD680, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="TOWN.2 Total Damage Value" },
+        { address=0X4FD6A0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Damage" },
+        { address=0X4FD6B0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Damage" },
+        { address=0X4FD6C0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Damage" },
+        { address=0X4FD6D0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Damage" },
+        { address=0X4FD6E0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Damage" },
+        { address=0X4FD6F0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Damage" },
+        { address=0X4FD708, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Damage" },
+        { address=0X4FD718, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Damage" },
+        { address=0X4FDEA0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="CITY.1 Total Damage Value" },
+        { address=0X4FF700, type="u8", condition="eq", value=0X0120, action="HIT", no_log=false, no_survey=false, desc="Bad Ending Requirement" },
+        { address=0X500F78, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="MOUNTAIN.1 Damage" },
+        { address=0X5AEA8E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] ? Health Value decreased" },
+        { address=0X5AEA8E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] ? Health Value increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X48EF10, type="u16le", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Find a Long-Distance Weapon" },
+        { address=0X48EF24, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Obtained Weapons" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Javelin" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Geyser" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bounder" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Phalanx" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Halberd" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Comet" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gauntlet" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sniper" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Decoy" },
+        { address=0X48EF2A, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mummy" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X48EF02, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Experience Points (16-Bit)" },
+      },
+      collectibles = {
+        { address=0X48EF25, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Obtained Weapons/Modules Bit String increased" },
+        { address=0X48EF2E, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Javelin Ammo (16-Bit)" },
+        { address=0X48EF30, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Geyser Ammo (16-Bit)" },
+        { address=0X48EF32, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Bounder Ammo (16-Bit)" },
+        { address=0X48EF34, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Phalanx Ammo (16-Bit)" },
+        { address=0X48EF36, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Halberd Ammo (16-Bit)" },
+        { address=0X48EF38, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Comet Ammo (16-Bit)" },
+        { address=0X48EF3A, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Gauntlet Ammo (16-Bit)" },
+        { address=0X48EF3C, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Sniper Ammo (16-Bit)" },
+        { address=0X48EF3E, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Decoy Ammo (16-Bit)" },
+        { address=0X48EF40, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Mummy Ammo (16-Bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X49C9D8, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32 Bit] Boss Health (all boss or just Tempest ?) (Float)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X48EED4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective Arrow Active (01)" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Raptor" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Escape FACTORY.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Obtain the Flight Module and Escape FACTORY.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Obtain the Flight Module and Escape FACTORY.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Tempest and Save TOWN.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Leave TOWN.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Obtain the Colony Info from FACTORY.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Obtain the Colony Info from FACTORY.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Leave FACTORY.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X09, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Move to CITY.1 and Destroy the EPS Relay" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X0B, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Porters in TOWN.2 and Obtain the Item" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X0C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Snipe the EPS Relay Block in CITY.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X0D, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Power Supply Facility of EPS.1 and EPS.2" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X0E, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Power Supply Facility of EPS.1 and EPS.2" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X0F, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Emergency Generator of EPS.2" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Find an Uncontrolled Raptor" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X11, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Use the Raptor to Destroy the Emergency Generator of EPS.2" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X12, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Use the Raptor to Destroy the Emergency Generator of EPS.2" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X13, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Use the Raptor to Destroy the Emergency Generator of EPS.2" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X14, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Meet up with the Atlantis at MOUNTAIN.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X15, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Escape the Large Orbital Frame" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X16, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Find a Way to Repair ADA in FACTORY.2" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X17, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Find a Way to Repair ADA in FACTORY.2" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X18, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Find a Module to Avoid the Laser Attacks" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X19, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Find a Module to Avoid the Laser Attacks" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X1A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Tyrant in PARK.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X1B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Meet Up With the Atlantis at MOUNTAIN.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X1C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fly Throught the Gully Along the MOUNTAIN.1 slope" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X1D, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Nebula at MOUNTAIN.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X1E, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Defeat Neith in WAREHOUSE.1" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X1F, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dispose of the Bombs!" },
+        { address=0X48EF10, type="u16le", condition="eq", value=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Defeat Neith in HUB.1 and Rendezvous With the Atlantis!" },
+        { address=0X48EF46, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Total Enemies Destroyed (16-Bit)" },
+        { address=0X4F96BD, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Porters Destroyed and Item Collected (01)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5BBB18, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Number of Times Fired on EPS Shield (Dynamic?)" },
+      },
+    },
+  },
+}

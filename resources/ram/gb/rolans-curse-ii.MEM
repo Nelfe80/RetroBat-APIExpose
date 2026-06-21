@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Rolan's Curse II",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "rolans-curse-ii",
+    file = "rolans-curse-ii.zip",
+    hashes = {
+      { hash = "27f2c99b13cbdb5a5be4afce87b9039b", label = "Rolan's Curse II (USA).gb" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC3FD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP = Hero decreased" },
+        { address=0XC3FD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP = Hero increased" },
+        { address=0XC3FE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP - Pit decreased" },
+        { address=0XC3FE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP - Pit increased" },
+        { address=0XC3FF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP - Lane decreased" },
+        { address=0XC3FF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP - Lane increased" },
+        { address=0XC400, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP - Kyle decreased" },
+        { address=0XC400, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP - Kyle increased" },
+        { address=0XFFA7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP - Current Character decreased" },
+        { address=0XFFA7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP - Current Character increased" },
+        { address=0XFFA8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Hp - Current Character decreased" },
+        { address=0XFFA8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Hp - Current Character increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC0C3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Chests in Area After 5th Boss Fight:" },
+        { address=0XC194, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="also used for Boss Fight IDs" },
+        { address=0XC196, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Room Id (same for every boss)" },
+        { address=0XC1BB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss health" },
+        { address=0XC1BC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss health overflow" },
+        { address=0XC405, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Beaten Unlocks:" },
+      },
+    },
+  },
+}

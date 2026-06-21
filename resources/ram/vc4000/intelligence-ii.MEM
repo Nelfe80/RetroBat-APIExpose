@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Intelligence II",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "intelligence-ii",
+    file = "intelligence-ii.zip",
+    hashes = {
+      { hash = "9f513213f1ee6c6867dcf959a6dc03c9", label = "Four in a Row (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

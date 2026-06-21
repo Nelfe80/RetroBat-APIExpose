@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "The Amazing Spider-Man 2",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "the-amazing-spider-man-2",
+    file = "the-amazing-spider-man-2.zip",
+    hashes = {
+      { hash = "506ccd75db221acbf26f1681f3c97efd", label = "Spider-Man 2 (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD097, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Playing" },
+        { address=0XD097, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused/Room Transition" },
+        { address=0XD0B4, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD116, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD116, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD0E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XD0E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XD114, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mysterio dead" },
+        { address=0XD11A, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0XD0DF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spider-Man Health decreased" },
+        { address=0XD0DF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spider-Man Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD0A6, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Lizard Boss Room" },
+        { address=0XD0A6, type="u8", condition="eq", value=0X24, action="BOSS_HIT", no_log=false, no_survey=false, desc="Graviton Boss Room" },
+        { address=0XD0A6, type="u8", condition="eq", value=0X1B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mysterio Room" },
+        { address=0XD0E3, type="u8", condition="eq", value=0X96, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full Health" },
+        { address=0XD0E3, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XD151, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump and Freeze to fly" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD9A5, type="u8", condition="eq", value=0XFE, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hobgoblin still alive" },
+        { address=0XD9A5, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hobgoblin down" },
+        { address=0XD9A5, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Key Obtained" },
+        { address=0XD9AA, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="obtained" },
+      },
+    },
+  },
+}

@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Street Supremacy",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "street-supremacy",
+    file = "street-supremacy.zip",
+    hashes = {
+      { hash = "2a983b975f6b1ebf0a772cba140c860c", label = "Street Supremacy (Europe)" },
+      { hash = "f0db4f0719d46ab66635958ab3ddd365", label = "Street Supremacy (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA23880, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0XA23ED0, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0XA4A188, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[EU] No. 147: Red Demon - Win flag" },
+        { address=0XA4A18C, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[EU] No. 147: Red Demon - Lose flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA47B78, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] No. 60: Nuclear Warhead - Win flag" },
+        { address=0XA47B7C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] No. 60: Nuclear Warhead - Lose flag" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA413D0, type="u32le", condition="eq", value=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Driver" },
+        { address=0XA413D0, type="u32le", condition="eq", value=0X3E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Driver" },
+        { address=0XA47398, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[EU] No. 42: Natural-Born Soldier - Win flag" },
+        { address=0XA4739C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[EU] No. 42: Natural-Born Soldier - Lose flag" },
+        { address=0XA485F8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[EU] No. 84: Bombardier - Win flag" },
+        { address=0XA485FC, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[EU] No. 84: Bombardier - Lose flag" },
+        { address=0XA4B308, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[EU] No. 187: Death Driver - Win flag" },
+        { address=0XA4B30C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[EU] No. 187: Death Driver - Lose flag" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XA413D0, type="u32le", condition="eq", value=0X22, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Hard Weapon" },
+        { address=0XA413D0, type="u32le", condition="eq", value=0X40, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Hard Weapon" },
+        { address=0XA4AC08, type="u32le", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="[EU] No. 171: Hard Weapon - Win flag" },
+        { address=0XA4AC0C, type="u32le", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="[EU] No. 171: Hard Weapon - Lose flag" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA4A118, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[EU] No. 146: Perfect Score - Win flag" },
+        { address=0XA4A11C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[EU] No. 146: Perfect Score - Lose flag" },
+      },
+      collectibles = {
+        { address=0XA42208, type="u16le", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Road R." },
+        { address=0XA42208, type="u16le", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Road L." },
+        { address=0XA45A28, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[US] Money increased" },
+        { address=0XA46078, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[EU] Money increased" },
+        { address=0XA4B458, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[EU] No. 190: Gold License - Win flag increased" },
+        { address=0XA4B45C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[EU] No. 190: Gold License - Lose flag increased" },
+        { address=0XA4B45C, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="[EU] No. 190: Gold License - Lose flag empty" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA413D0, type="u32le", condition="eq", value=0X36, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Marvelous Invincible" },
+        { address=0XA477F8, type="u32le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[EU] No. 52: Mr. Invincible - Win flag" },
+        { address=0XA477FC, type="u32le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[EU] No. 52: Mr. Invincible - Lose flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA413D0, type="u32le", condition="eq", value=0X16, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Toyota Sprinter Trueno GT-APEX 3-door" },
+        { address=0XA41C70, type="u16le", condition="eq", value=0XC9, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Empty slot" },
+        { address=0XA422C0, type="u16le", condition="eq", value=0XC9, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Empty slot" },
+        { address=0XA422C4, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Live Monitor 2 Opponent ID [EU]" },
+        { address=0XA422C8, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Live Monitor 3 Opponent ID [EU]" },
+        { address=0XA46510, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[EU] No. 9: Broken Arrow - Team" },
+        { address=0XA46528, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[EU] No. 9: Broken Arrow - Win flag" },
+        { address=0XA4652C, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[EU] No. 9: Broken Arrow - Lose flag" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA41C70, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Live Monitor 1 Opponent ID [US]" },
+        { address=0XA42208, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Track ID [EU]" },
+        { address=0XA422C0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Live Monitor 1 Opponent ID [EU]" },
+      },
+    },
+  },
+}

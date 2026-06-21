@@ -1,0 +1,115 @@
+return {
+  game = {
+    title = "Naruto: Path of the Ninja 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "naruto-path-of-the-ninja-2",
+    file = "naruto-path-of-the-ninja-2.zip",
+    hashes = {
+      { hash = "ac74a75313264e2abc022061460c584e", label = "Naruto - Path of the Ninja 2 (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD6034, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Room ID (00 on Title Screen)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X28BAA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 1 level" },
+        { address=0X28BB88, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sakura's Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD4391, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Prepared to Die Tag" },
+        { address=0XD43BE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sudden Death Resistance : Rin" },
+        { address=0XD43BF, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sudden Death Resistance : Hyo" },
+      },
+      health = {
+        { address=0XD3EB8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Naruto - Current HP decreased" },
+        { address=0XD3EB8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Naruto - Current HP increased" },
+        { address=0XD3ED4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sasuke - Current HP decreased" },
+        { address=0XD3ED4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sasuke - Current HP increased" },
+        { address=0XD3EF0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sakura - Current HP decreased" },
+        { address=0XD3EF0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sakura - Current HP increased" },
+        { address=0XD3F0C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shikamaru - Current HP decreased" },
+        { address=0XD3F0C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shikamaru - Current HP increased" },
+        { address=0XD3F28, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Choji - Current HP decreased" },
+        { address=0XD3F28, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Choji - Current HP increased" },
+        { address=0XD3F44, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ino - Current HP decreased" },
+        { address=0XD3F44, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ino - Current HP increased" },
+        { address=0XD3F7C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shino - Current HP decreased" },
+        { address=0XD3F7C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shino - Current HP increased" },
+        { address=0XD3F98, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hinata - Current HP decreased" },
+        { address=0XD3F98, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hinata - Current HP increased" },
+        { address=0XD3FB4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Neji - Current HP decreased" },
+        { address=0XD3FB4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Neji - Current HP increased" },
+        { address=0XD3FD0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lee - Current HP decreased" },
+        { address=0XD3FD0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lee - Current HP increased" },
+        { address=0XD3FEC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tenten - Current HP decreased" },
+        { address=0XD3FEC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tenten - Current HP increased" },
+        { address=0XD4008, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gaara - Current HP decreased" },
+        { address=0XD4008, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gaara - Current HP increased" },
+        { address=0XD4024, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Temari - Current HP decreased" },
+        { address=0XD4024, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Temari - Current HP increased" },
+        { address=0XD4040, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kankuro - Current HP decreased" },
+        { address=0XD4040, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kankuro - Current HP increased" },
+        { address=0XD40E8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Nine-Tailed Naruto - Current HP decreased" },
+        { address=0XD40E8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Nine-Tailed Naruto - Current HP increased" },
+        { address=0XD43F2, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Chakra Damage Tag" },
+        { address=0X2BE540, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kiba HP decreased" },
+        { address=0X2BE540, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kiba HP increased" },
+        { address=0X2C71A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shino HP decreased" },
+        { address=0X2C71A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shino HP increased" },
+        { address=0X2C7420, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Haku hp decreased" },
+        { address=0X2C7420, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Haku hp increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XD4477, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Bits" },
+        { address=0XD4478, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Bits" },
+        { address=0XD4479, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Bits" },
+        { address=0XD447A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Bits" },
+        { address=0XD447B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Bits" },
+        { address=0XD447C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chests [Bitflags]" },
+        { address=0XD447D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chests [Bitflags]" },
+        { address=0XD447F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chests [Bitflags]" },
+        { address=0XD4480, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chests [Bitflags]" },
+        { address=0XD4481, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chests [Bitflags]" },
+        { address=0XD4482, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chests [Bitflags]" },
+      },
+      weapon = {
+        { address=0XD43E6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Breaker Tag" },
+        { address=0XD442E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ST : Hidden Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD42E3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Ticket increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2BDB60, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP (2bdb60)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD4458, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Valley of Great Evil Door BitFlag" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2C42D4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Rokkaku health (1st time) - 2" },
+      },
+    },
+  },
+}

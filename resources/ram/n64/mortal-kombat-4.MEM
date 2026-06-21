@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Mortal Kombat 4",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-4",
+    file = "mortal-kombat-4.zip",
+    hashes = {
+      { hash = "c70b91430866300ce38b49098019ef9d", label = "Mortal Kombat 4 (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X493BC, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues set in options" },
+        { address=0XF84B8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues set in options" },
+        { address=0XF8504, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues remaining" },
+        { address=0XFE770, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused:" },
+      },
+      events = {
+        { address=0X1051A8, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Used to determine address for P1 moves, combos e.t.c." },
+        { address=0X1051AC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Used to determine address for P2 moves, combos e.t.c." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X48CC8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Fatalities in cheat menu:" },
+        { address=0X493B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds to Win" },
+        { address=0XF1F48, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background:" },
+        { address=0XFE554, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 won round tokens" },
+        { address=0XFE558, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background:" },
+        { address=0X1050F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 won round tokens" },
+        { address=0X10D7DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XFE0D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 health: decreased" },
+        { address=0XFE0D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 health: increased" },
+        { address=0XFE0D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - P1 - Value decreased" },
+        { address=0XFE0D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - P1 - Value increased" },
+        { address=0XFE735, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - P1 - Bar/Display decreased" },
+        { address=0XFE735, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - P1 - Bar/Display increased" },
+        { address=0X105011, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - P2 - Bar/Display decreased" },
+        { address=0X105011, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - P2 - Bar/Display increased" },
+        { address=0X126F54, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 health: decreased" },
+        { address=0X126F54, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 health: increased" },
+        { address=0X126F55, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - P2 - Value decreased" },
+        { address=0X126F55, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - P2 - Value increased" },
+      },
+    },
+  },
+}

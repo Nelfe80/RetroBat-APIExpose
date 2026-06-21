@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-01: Tic-Tac-Toe, Shooting Gallery, Doodle, Quadra-Doodle",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Casual Game"
+  },
+
+  rom = {
+    name = "videocart-01-tic-tac-toe-shooting-gallery-doodle-quadra-doodle",
+    file = "videocart-01-tic-tac-toe-shooting-gallery-doodle-quadra-doodle.zip",
+    hashes = {
+      { hash = "7e5c26a6d1f9a90c68669a9800ba522d", label = "Tic-Tac-Toe, Shooting Gallery, Doodle, Quadra-Doodle (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

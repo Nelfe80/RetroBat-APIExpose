@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Earnest Evans",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "earnest-evans",
+    file = "earnest-evans.zip",
+    hashes = {
+      { hash = "d9fb5e8f32e161bc62d52c9bea7a9ca1", label = "Earnest Evans (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB62A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x01=Demo Mode" },
+        { address=0XBF06, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Started at 0x01 at the title screen, advanced to 0x03 when the main game started" },
+        { address=0XBF10, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0XFBA4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="FF = Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8F6A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Key taken" },
+        { address=0XA4B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Key taken" },
+        { address=0XBF04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lead-Zero Level-ID" },
+        { address=0X15832, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="May be sound-track, but seems to change as the next level loads" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1588, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Usually 0, becomes F5 on death then 03 on countdown, then 04 on Game Over" },
+        { address=0XA4AA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x01 = Death" },
+        { address=0XA4AE, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Large Health Bars remaining (lives); increased" },
+        { address=0XA4AE, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Large Health Bars remaining (lives); decreased" },
+        { address=0XA4BC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01 on death, but doesn't change on Game Over" },
+      },
+      health = {
+        { address=0XA4B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP, full bar is 0x40 or 64 decreased" },
+        { address=0XA4B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP, full bar is 0x40 or 64 increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB230, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Current Score x65536" },
+        { address=0XB232, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Current Score x1 (hex)" },
+        { address=0XBF00, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-bit BE High Score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XB628, type="u16be", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="16-bit Invincibility Timer, doesn't seem to go over 0x0100 unless a level is complete" },
+      },
+    },
+  },
+}

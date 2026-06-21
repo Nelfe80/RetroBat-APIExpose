@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Lotto Fun",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "lotto-fun",
+    file = "lotto-fun.zip",
+    hashes = {
+      { hash = "7eef33eb51dc35a4445ec6342130440d", label = "arcade\lottofun.zip" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDA09, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of Credits" },
+        { address=0XDA3D, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo (chute doesn't open automatically)" },
+        { address=0XDA3D, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Regular" },
+      },
+    },
+  },
+}

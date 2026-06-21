@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Curse: The Eye of Isis",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "curse-the-eye-of-isis",
+    file = "curse-the-eye-of-isis.zip",
+    hashes = {
+      { hash = "868fc9849e1c819c445fc41f2e4e9fb9", label = "Curse - The Eye of Isis (Europe) (En,Fr,De,Es,It,Pt)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1EA3BE4, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32-bit Bool] Subtitles" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9DE7C0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Darien's Hp decreased" },
+        { address=0X9DE7C0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Darien's Hp increased" },
+      },
+    },
+  },
+}

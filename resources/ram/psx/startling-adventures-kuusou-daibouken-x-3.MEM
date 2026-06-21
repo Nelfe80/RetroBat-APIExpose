@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Startling Adventures: Kuusou Daibouken X 3",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "startling-adventures-kuusou-daibouken-x-3",
+    file = "startling-adventures-kuusou-daibouken-x-3.zip",
+    hashes = {
+      { hash = "e16d9435263130bd713ba7d69d23fc6c", label = "Startling Adventures - Kuusou 3x Daibouken (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB0FE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pre-rendered background screen assigned number ID for any given 'Room ID'" },
+        { address=0XB0FE6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total unique pre-rendered background screens assigned to a 'Room ID'" },
+        { address=0XB0FE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tracks the previous visited pre-rendered background screen in any given 'Room ID'" },
+      },
+      stage = {
+        { address=0XB0FE0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X8F5E0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="G-Birkin Factory Health?? decreased" },
+        { address=0X8F5E0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="G-Birkin Factory Health?? increased" },
+        { address=0XACAEE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XACAEE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB0FD0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Opening Animation ID?" },
+      },
+    },
+  },
+}

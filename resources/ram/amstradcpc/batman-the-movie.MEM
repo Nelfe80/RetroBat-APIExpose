@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Batman: The Movie",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Platform, Racing, Shooter"
+  },
+
+  rom = {
+    name = "batman-the-movie",
+    file = "batman-the-movie.zip",
+    hashes = {
+      { hash = "e2543529154f2f68cd927ad43dca9eac", label = "Batman The Movie (1989)(Ocean Software).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEE01, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XEE44, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - Axis Chemicals" },
+        { address=0XEE44, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 - The Batmobile" },
+        { address=0XEE44, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - The Batcave" },
+        { address=0XEE44, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 - The Batwing" },
+        { address=0XEE44, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 - The Cathedral Tower" },
+        { address=0XEE44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEE01, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Lost" },
+      },
+    },
+  },
+}

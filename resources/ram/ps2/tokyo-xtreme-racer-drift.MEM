@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tokyo Xtreme Racer Drift",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "tokyo-xtreme-racer-drift",
+    file = "tokyo-xtreme-racer-drift.zip",
+    hashes = {
+      { hash = "5da1870e04498a0f67f4bb606bf0f6b7", label = "Tokyo Xtreme Racer - Drift (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "NASCAR 2000",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "nascar-2000",
+    file = "nascar-2000.zip",
+    hashes = {
+      { hash = "bd45a822e254bcaddf85a1f9951a7c51", label = "NASCAR 2000 (USA)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XBEF58, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Magnet World Final",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "magnet-world-final",
+    file = "magnet-world-final.zip",
+    hashes = {
+      { hash = "023f5b0818e6dad5c987c41ea1c81dc8", label = "Magnet World Final.d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9A02, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Level Complete Check" },
+      },
+      stage = {
+        { address=0X8623, type="u16le", condition="eq", value=0X8638, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X8623, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage Edit Selected" },
+        { address=0X9A03, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage ID" },
+        { address=0X9DAF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Magnets Left in Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEC54, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Lower4] Lives increased" },
+        { address=0XEC54, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Lower4] Lives decreased" },
+      },
+    },
+  },
+}

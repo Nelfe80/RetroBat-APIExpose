@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "F355 Challenge: Passione Rossa",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Racing, Sports"
+  },
+
+  rom = {
+    name = "f355-challenge-passione-rossa",
+    file = "f355-challenge-passione-rossa.zip",
+    hashes = {
+      { hash = "caa830b4915be2ca30502f5ce7442013", label = "F355 Challenge - Passione Rossa (Europe) (En,Fr,De,Es,It)" },
+      { hash = "cfe592d38f7263f547a30009f9d4ac02", label = "F355 Challenge - Passione Rossa (USA)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X2A7E64, type="u32le", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X2A7E64, type="u32le", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X2A7E64, type="u32le", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X2A7E64, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Difficulty (Arcade Only)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Drivers' Ed Portable",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "drivers-ed-portable",
+    file = "drivers-ed-portable.zip",
+    hashes = {
+      { hash = "4beb8ff6562051cfd17e1d6ca1b98adc", label = "Drivers' Ed Portable (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

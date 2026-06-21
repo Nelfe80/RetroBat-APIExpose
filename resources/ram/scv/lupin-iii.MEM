@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Lupin III",
+    system = "scv",
+    system_name = "Super Cassette Vision",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "lupin-iii",
+    file = "lupin-iii.zip",
+    hashes = {
+      { hash = "e1547118cf5a9e88825408f12550b890", label = "Lupin Sansei (Japan) (En).bin" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFF80, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="PRO mode (0: AMA)" },
+        { address=0XFF80, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game (0: demo)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFF83, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Upper 4: player 2 lives increased" },
+        { address=0XFF83, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Upper 4: player 2 lives decreased" },
+      },
+    },
+  },
+}

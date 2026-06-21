@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Ford Street Racing",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ford-street-racing",
+    file = "ford-street-racing.zip",
+    hashes = {
+      { hash = "8e99253a16f27cf2c5c832afa5fcdbb4", label = "Ford Bold Moves Street Racing (USA)" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0X40AE34, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] 1969 Mustang Boss 302" },
+        { address=0X40AE35, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] 1970 Mustang Boss 429" },
+      },
+    },
+  },
+}

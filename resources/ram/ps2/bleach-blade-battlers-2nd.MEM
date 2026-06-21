@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Bleach: Blade Battlers 2nd",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "bleach-blade-battlers-2nd",
+    file = "bleach-blade-battlers-2nd.zip",
+    hashes = {
+      { hash = "29e408e80d18e2326a099acac72f1b7d", label = "Bleach - Blade Battlers 2nd (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X388270, type="u8", condition="bit_true", bit=7, mask=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="メインタイトル - Main Title" },
+        { address=0X814300, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game - State [32 bits] [1] - Title Screen Address" },
+        { address=0X814304, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Opening Game" },
+        { address=0X814304, type="u16le", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X814304, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Menu" },
+        { address=0X814304, type="u16le", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Story Mode" },
+        { address=0X814304, type="u16le", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Character Select" },
+        { address=0X814304, type="u16le", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X814304, type="u16le", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Option" },
+        { address=0X814304, type="u16le", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Tutorial" },
+        { address=0X814304, type="u16le", condition="eq", value=0X09, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Battlers Mode" },
+        { address=0X814304, type="u16le", condition="eq", value=0X0A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Shop Urahara" },
+        { address=0X814304, type="u16le", condition="eq", value=0X0F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Battle / Transition in Story Mode" },
+        { address=0X814304, type="u16le", condition="eq", value=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X814304, type="u16le", condition="eq", value=0X7C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Battle - Story Mode (will go crazy if you confirm the money)" },
+        { address=0X814308, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Story Mode" },
+        { address=0X814308, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Battlers Mode" },
+        { address=0X814308, type="u16le", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Free Battle" },
+        { address=0X814308, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Training Mode" },
+        { address=0X814308, type="u16le", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Tutorial" },
+        { address=0X814308, type="u16le", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Shop" },
+        { address=0X814308, type="u16le", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Option" },
+        { address=0X814344, type="u16le", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Dialogue" },
+        { address=0X814344, type="u16le", condition="eq", value=0X13, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Fighting" },
+      },
+      events = {
+        { address=0X38826E, type="u8", condition="bit_true", bit=1, mask=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Mission 20" },
+        { address=0X38826E, type="u8", condition="bit_true", bit=2, mask=0X04, action="COMBO_HIT", no_log=false, no_survey=false, desc="Mission 21 - Last" },
+        { address=0X81510E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo P1 - not editable addreses" },
+        { address=0X816A90, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo P1 - Real Address - Rukia" },
+        { address=0X816AB0, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo P1 - Real Address - Ichigo" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X388270, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="尸魂界炎上 - Soul World Flames" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X38826F, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="副隊長 + 1の日常 - Vice Captain + 1 Daily Life" },
+        { address=0X814F7D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Free Battle Lives - Player A increased" },
+        { address=0X814F7D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Free Battle Lives - Player A decreased" },
+        { address=0X814F7E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Free Battle Lives - Player B increased" },
+        { address=0X814F7E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Free Battle Lives - Player B decreased" },
+        { address=0X814F7F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Free Battle Lives - Player C increased" },
+        { address=0X814F7F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Free Battle Lives - Player C decreased" },
+        { address=0X814F80, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Free Battle Lives - Player D increased" },
+        { address=0X814F80, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Free Battle Lives - Player D decreased" },
+      },
+      health = {
+        { address=0X816928, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health - 2 decreased" },
+        { address=0X816928, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health - 2 increased" },
+        { address=0X816948, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health - 1 decreased" },
+        { address=0X816948, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health - 1 increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X388124, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Money in Shop 32 bits increased" },
+        { address=0X814310, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Count in Result Screen 32 bits increased" },
+        { address=0X814318, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Kon Coins" },
+        { address=0X814318, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="End Kon Coins" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X814FD8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock 16 bits" },
+        { address=0X815188, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock 32 bits" },
+        { address=0X816B6C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter - Mission" },
+      },
+    },
+  },
+}

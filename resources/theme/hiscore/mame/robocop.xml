@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 5ZB 79100</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 MURPHY   50000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 LEWIS    48000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ED-209   47000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 SCI-VAX. 46000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 SWORDMST 43000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 GANGAN.H 35000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 STADIUM  32000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 HERO     31000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 O.C.P.   30000</text>
+		</text>
+	</view>
+</theme>

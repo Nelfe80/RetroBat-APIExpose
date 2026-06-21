@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Pokémon White Version [Subset - Professor Oak Challenge]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-white-version-subset-professor-oak-challenge",
+    file = "pokemon-white-version-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "2b9077dad20233d9067e1b7598cc9c8a", label = "Pokemon - White Version [Subset - Professor Oak Challenge].nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X23D20D, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magnezone" },
+        { address=0X24F9DD, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear" },
+      },
+      stage = {
+        { address=0X26E3B4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Battle - Opponent - active Pokémon 1 - Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X23BF66, type="u8", condition="eq", value=0XB6, action="LIVES_STATE", no_log=false, no_survey=false, desc="School Life" },
+        { address=0X23D213, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Herdier" },
+      },
+      health = {
+        { address=0X26D6D4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Player - active Pokémon 1 - HP left (16bit) decreased" },
+        { address=0X26D6D4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Player - active Pokémon 1 - HP left (16bit) increased" },
+        { address=0X26E3AC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Opponent - active Pokémon 1 - HP left (16bit) decreased" },
+        { address=0X26E3AC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Opponent - active Pokémon 1 - HP left (16bit) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X23C09E, type="u8", condition="eq", value=0XB6, action="TREASURE", no_log=false, no_survey=false, desc="treasure hunter (route 13)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X23F5CE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="result of the last test (points) (16 bit)" },
+        { address=0X259912, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="battle institute points (16 bit) (dynamic)" },
+      },
+      collectibles = {
+        { address=0X23BFEB, type="u8", condition="eq", value=0XB6, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic gold" },
+        { address=0X23BFEC, type="u8", condition="eq", value=0XB1, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic gold" },
+        { address=0X23BFEC, type="u8", condition="eq", value=0XB4, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic statue" },
+        { address=0X23BFEC, type="u8", condition="eq", value=0XB6, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic copper (2f)" },
+        { address=0X23BFEC, type="u8", condition="eq", value=0XB7, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic copper (2f)" },
+        { address=0X23BFED, type="u8", condition="eq", value=0XB3, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic gold (2f)" },
+        { address=0X23BFED, type="u8", condition="eq", value=0XB4, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic gold (2f)" },
+        { address=0X23BFED, type="u8", condition="eq", value=0XB5, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic gold (2f)" },
+        { address=0X23BFF2, type="u8", condition="eq", value=0XB4, action="MONEY_STATE", no_log=false, no_survey=false, desc="relic gold (3f)" },
+        { address=0X23CDCC, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money (24 bits) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X23D207, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shieldon" },
+      },
+      player = {
+        { address=0X23D1EB, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=true, no_survey=false, desc="Jumpluff" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2A6A8C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Battle - Pokéball used (16bit)" },
+      },
+    },
+  },
+}

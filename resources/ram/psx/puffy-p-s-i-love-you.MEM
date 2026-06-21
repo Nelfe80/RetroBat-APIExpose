@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Puffy: P.S. I Love You",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puffy-p-s-i-love-you",
+    file = "puffy-p-s-i-love-you.zip",
+    hashes = {
+      { hash = "92326e503b07aa5d601357423361d3c7", label = "Puffy - P.S. I Love You (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XBA480, type="u16le", condition="eq", value=0X0000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lvl 1 - Can throwing" },
+        { address=0XBA480, type="u16le", condition="eq", value=0X0001, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lvl 2 - Can shooting by Size" },
+        { address=0XBA480, type="u16le", condition="eq", value=0X0002, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lvl 3 - Cans shot out of cannons" },
+        { address=0XBA480, type="u16le", condition="eq", value=0X0003, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lvl 4 - Shooting cans that are bouncing around" },
+        { address=0XBA480, type="u16le", condition="eq", value=0X0004, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lvl 5 - Shoot a giant can 100 times" },
+        { address=0XBA480, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-Bit - Gun Game - Current Level" },
+      },
+    },
+  },
+}

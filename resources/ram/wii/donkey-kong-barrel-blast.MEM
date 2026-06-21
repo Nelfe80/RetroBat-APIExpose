@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Donkey Kong Barrel Blast",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "donkey-kong-barrel-blast",
+    file = "donkey-kong-barrel-blast.zip",
+    hashes = {
+      { hash = "fe7f984bade5f8ab33a9f9e1c2955767", label = "Donkey Kong - Barrel Blast (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X524EA9, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3511D4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] GP 1st Place: Score added this round" },
+        { address=0X3511D8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] GP 1st Place: Score" },
+        { address=0X5391F4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Amount scored in Mission 1?" },
+        { address=0X58CDC0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Amount scored in Mission 4?" },
+        { address=0X591EC0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Amount scored in Mission 6?" },
+      },
+      collectibles = {
+        { address=0X48C6F4, type="u32be", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X351FA1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Main menu mode selection" },
+      },
+    },
+  },
+}

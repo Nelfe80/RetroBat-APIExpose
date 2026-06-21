@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Jerry Glanville's Pigskin Footbrawl",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "jerry-glanvilles-pigskin-footbrawl",
+    file = "jerry-glanvilles-pigskin-footbrawl.zip",
+    hashes = {
+      { hash = "de6153f3bb6a8888cbcb05fb56824c9c", label = "Jerry Glanville's Pigskin Footbrawl (USA).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB6B0, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="skill level menu" },
+        { address=0XB874, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="skill level" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X9AA0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="blue current weapon" },
+        { address=0XA538, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="red current weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB79C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="blue score value" },
+        { address=0XB79E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="red score value" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB7A6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="point celebration timer" },
+        { address=0XB980, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="match clock" },
+        { address=0XFD0C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Period Time option" },
+      },
+    },
+  },
+}

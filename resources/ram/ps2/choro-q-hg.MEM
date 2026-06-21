@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Choro Q HG",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "choro-q-hg",
+    file = "choro-q-hg.zip",
+    hashes = {
+      { hash = "fd3ace419460a1c03d1fee0d0fb7ffba", label = "Gadget Racers (USA)" },
+      { hash = "5e319f0ac3058fc3fd724af92ffa30f3", label = "Penny Racers (Europe) (En,Fr,De)" },
+      { hash = "e15b0b761c01218806b1f4d3186dcca4", label = "Choro Q HG (Japan)" },
+      { hash = "7419b7aa827e9953eaa6ecfa359e6ab2", label = "Choro Q HG (Japan) (Jenny Hi-Grade Box)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1D26E0, type="u8", condition="eq", value=0X101, action="LIVES_STATE", no_log=false, no_survey=false, desc="Game of Life Piece" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X343B52, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] | [16 Bit] 1st Place Score | Grand Prix" },
+        { address=0X343B56, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] | [16 Bit] 2nd Place Score | Grand Prix" },
+        { address=0X343B5A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] | [16 Bit] 3rd Place Score | Grand Prix" },
+        { address=0X343B5E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] | [16 Bit] 4th Place Score | Grand Prix" },
+        { address=0X343B62, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] | [16 Bit] 5th Place Score | Grand Prix" },
+        { address=0X343B66, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] | [16 Bit] 6th Place Score | Grand Prix" },
+        { address=0X343B6A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] | [16 Bit] 7th Place Score | Grand Prix" },
+        { address=0X343B6E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] | [16 Bit] 8th Place Score | Grand Prix" },
+      },
+      collectibles = {
+        { address=0X3427C8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[USA] | [32 Bit] Best Placement | HG Circuit/Long Course - Coin Holder Cup increased" },
+      },
+    },
+  },
+}

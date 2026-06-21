@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Australian Rugby League",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "australian-rugby-league",
+    file = "australian-rugby-league.zip",
+    hashes = {
+      { hash = "29d948108a1c768c20af6796ab9ffc47", label = "Australian Rugby League (Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X958F, type="u8", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC6D8, type="u8", condition="eq", value=0X1D, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Drop Goal" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X959C, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Key Points" },
+      },
+      collectibles = {
+        { address=0X94DE, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Coast" },
+        { address=0X9570, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Coast Chargers" },
+        { address=0X9571, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Coast Chargers" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X959C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+        { address=0XC6D8, type="u8", condition="eq", value=0X4F, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Half Time" },
+        { address=0XC6D8, type="u8", condition="eq", value=0X53, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Full Time" },
+        { address=0XC6D8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Gunvari Collection + Time Crisis",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "gunvari-collection-time-crisis",
+    file = "gunvari-collection-time-crisis.zip",
+    hashes = {
+      { hash = "6a5fa8903eb98f8ea3d8894425706af4", label = "Gunvari Collection + Time Crisis (Japan) (With GunCon2)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X3F4B54, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Time Crisis: Lives increased" },
+        { address=0X3F4B54, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Time Crisis: Lives decreased" },
+        { address=0XE477BA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Time Crisis: Life Counter in Cheat Menu increased" },
+        { address=0XE477BA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Time Crisis: Life Counter in Cheat Menu decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE477BB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Time Crisis: Coin Counter on Cheat Menu increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3F515A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Crisis: Stage?" },
+        { address=0XE477BF, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Crisis: Ammo Control on Cheat Menu" },
+      },
+    },
+  },
+}

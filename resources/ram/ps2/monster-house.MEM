@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Monster House",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Horror"
+  },
+
+  rom = {
+    name = "monster-house",
+    file = "monster-house.zip",
+    hashes = {
+      { hash = "695be7d166d37de66d2c9f34678f6ab7", label = "Monster House (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+  },
+}

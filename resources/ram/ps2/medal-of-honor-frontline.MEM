@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Medal of Honor: Frontline",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "medal-of-honor-frontline",
+    file = "medal-of-honor-frontline.zip",
+    hashes = {
+      { hash = "d873dcf6d4178fd8db98c6550f0b531b", label = "Medal of Honor - Frontline (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X23FA04, type="u32le", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+        { address=0X23FC50, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Enable 'Our Trip to Holland' Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X23F8D0, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="False, 0x01=True" },
+        { address=0X23F8D0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In-Level Flag" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X23FA50, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier's Medal" },
+        { address=0X2417D8, type="u32le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X2417D8, type="u32le", condition="eq", value=0X64, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X2417D8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Life increased" },
+        { address=0X2417D8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Life decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2417DC, type="u32le", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Colt .45" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Walther P38" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Silenced Pistol" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X0E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M1 Garand" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Springfield '03" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gewehr 43" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X14, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Thompson" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X15, action="WEAPON_STATE", no_log=false, no_survey=false, desc="MP-40" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X18, action="WEAPON_STATE", no_log=false, no_survey=false, desc="STG-44" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X19, action="WEAPON_STATE", no_log=false, no_survey=false, desc="B.A.R." },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X1D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X1E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bazooka" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Panzerschreck" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X21, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mark II Grenade" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X22, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Stielgranate" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0X25, action="WEAPON_STATE", no_log=false, no_survey=false, desc="I.D. Papers" },
+        { address=0X2417DC, type="u32le", condition="eq", value=0XFFFFFFFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing / Bare Hands" },
+        { address=0X33AE50, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Float] Weapon Zoom Scale" },
+        { address=0X33AE54, type="u32le", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="False" },
+        { address=0X33AE54, type="u32le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="True" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X254AEC, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Remaining Ammo for equipped Weapon" },
+        { address=0X254AF0, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current Ammo in equipped Weapon" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X23FA4C, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Bullet Shield available" },
+        { address=0X23FA4C, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Bullet Shield enabled" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X23FA46, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mission Objectives completed" },
+        { address=0X253D68, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Current Amount of Mission Objectives" },
+        { address=0X253D74, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pending, 0x01=Done" },
+        { address=0X253D80, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pending, 0x01=Done" },
+        { address=0X253D8C, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pending, 0x01=Done" },
+        { address=0X253D98, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pending, 0x01=Done" },
+        { address=0X253DA4, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pending, 0x01=Done" },
+        { address=0X253DB0, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pending, 0x01=Done" },
+        { address=0X253DBC, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pending, 0x01=Done" },
+        { address=0X253DC8, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pending, 0x01=Done" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1DBBD90, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter for Scene in The Golden Lion" },
+        { address=0X1DBBE18, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter for Scene in The Golden Lion" },
+        { address=0X1DBBEAC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter for Scene in The Golden Lion" },
+        { address=0X1DBBF4C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter for Scene in The Golden Lion" },
+      },
+    },
+  },
+}

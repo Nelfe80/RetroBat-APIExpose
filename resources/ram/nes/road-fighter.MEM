@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Road Fighter",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "road-fighter",
+    file = "road-fighter.zip",
+    hashes = {
+      { hash = "98e6ceaaf5eaf6fec679be36b208318d", label = "Road Fighter (Europe).nes" },
+      { hash = "efceb99991929decd1bb19fbe1ef4a38", label = "Road Fighter (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause = 10" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X003A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal / Checkpoint = 09" },
+        { address=0X0050, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X0050, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="00 = Level 1" },
+      },
+      stage = {
+        { address=0X0060, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage: ff=1,fe=2,fd=3,fc=4,fb=5" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00E6, type="u8", condition="eq", value=0X2, action="SCORE_STATE", no_log=false, no_survey=false, desc="Konami man gives points" },
+      },
+    },
+  },
+}

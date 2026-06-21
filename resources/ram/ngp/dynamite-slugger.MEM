@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dynamite Slugger",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dynamite-slugger",
+    file = "dynamite-slugger.zip",
+    hashes = {
+      { hash = "c84f675a617df14b1a1bf06f02be773d", label = "Dynamite Slugger (Japan, Europe) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+  },
+}

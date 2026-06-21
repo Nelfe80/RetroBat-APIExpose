@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "The Ren & Stimpy Show: Time Warp",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-ren-stimpy-show-time-warp",
+    file = "the-ren-stimpy-show-time-warp.zip",
+    hashes = {
+      { hash = "ed49865ebe805577613453317572f5bf", label = "Ren & Stimpy Show, The - Time Warp (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0A9C, type="u8", condition="eq", value=0XAA, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0AC9, type="u8", condition="eq", value=0X0A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0A9C, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player is currently in a Time Machine Level" },
+      },
+      stage = {
+        { address=0X0A9C, type="u8", condition="eq", value=0XA8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Player has loaded into a Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0563, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+        { address=0X0565, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0563, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No Power Up" },
+        { address=0X0563, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powered up by one Powered Toast" },
+        { address=0X0563, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powered up by two Powered Toasts" },
+        { address=0X0565, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No Power Up" },
+        { address=0X0565, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powered up by one Powered Toast" },
+        { address=0X0565, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powered up by two Powered Toasts" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0A9C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="State change" },
+        { address=0X0AC9, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Game & Watch: Manhole",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "game-watch-manhole",
+    file = "game-watch-manhole.zip",
+    hashes = {
+      { hash = "a98bd543991cf386dde97adf215f64cb", label = "Game & Watch - Manhole (USA, Europe)" },
+      { hash = "1b531477db8691487f562c321d6bad66", label = "Game & Watch - Manhole (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

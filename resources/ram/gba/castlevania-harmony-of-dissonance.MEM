@@ -1,0 +1,123 @@
+return {
+  game = {
+    title = "Castlevania: Harmony of Dissonance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "castlevania-harmony-of-dissonance",
+    file = "castlevania-harmony-of-dissonance.zip",
+    hashes = {
+      { hash = "e619f9dcd7ef3d4c6851834018b139bd", label = "Castlevania - Harmony of Dissonance (Europe).gba" },
+      { hash = "ea589465486d15e91ba94165c8024b55", label = "Castlevania - Harmony of Dissonance (USA).gba" },
+      { hash = "ed1b3af80ec67c3a69611eed9c3ebf61", label = "Castlevania - Harmony of Dissonance (USA) (Recolor Patch) (v1.0) (JonataGuitar and sorrow).gba" },
+      { hash = "f07e766c568916dc64a97dd1e13c6a1d", label = "Castlevania - Harmony of Dissonance (Europe) (Pt) (v1.1) (Various).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X21A8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+        { address=0X2086A, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="1st Drop of Feather Demon" },
+        { address=0X2087A, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="2nd Drop of Feather Demon" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2077C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Juste's Level" },
+        { address=0X2086F, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1st Drop of Clear Bone" },
+        { address=0X2087F, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="2nd Drop of Clear Bone" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8315, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death defeated" },
+        { address=0X2085E, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death 1st form" },
+        { address=0X2085E, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death 2nd form" },
+        { address=0X20864, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st Drop of Bone Soldier" },
+        { address=0X20874, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd Drop of Bone Soldier" },
+      },
+      health = {
+        { address=0X8338, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X8338, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X83E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health (8-Bit) decreased" },
+        { address=0X83E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health (8-Bit) increased" },
+        { address=0X2054E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP (16-Bit) decreased" },
+        { address=0X2054E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP (16-Bit) increased" },
+        { address=0X20786, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP (16 Bit) decreased" },
+        { address=0X20786, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP (16 Bit) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X20821, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Goods: Emerald Cloak" },
+        { address=0X0001, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="bit per item" },
+        { address=0X20187A0, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="28||Item inventory" },
+      },
+      weapon = {
+        { address=0X2077E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Subweapon: 00=Nothing, 01=Dagger, 02=Axe, 03=Cross, 04=Holy Water, 05=Bible, 06=Holy Fis" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2079C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (32-Bit) increased" },
+        { address=0X20807, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Head: Gold Headband increased" },
+        { address=0X2082D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Gold Necklace increased" },
+        { address=0X20835, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Lucky Ring increased" },
+        { address=0X20836, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Holy Ring increased" },
+        { address=0X20837, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Rare Ring increased" },
+        { address=0X20838, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Chaos Ring increased" },
+        { address=0X20839, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Nova Ring increased" },
+        { address=0X2083A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Logoth's Ring increased" },
+        { address=0X2083C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Aurora Ring increased" },
+        { address=0X2083D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Goods: Earth Ring increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8314, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Giant Bat defeated" },
+        { address=0X8314, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Living Armor defeated" },
+        { address=0X8314, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Skull Knight defeated" },
+        { address=0X8314, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Golem defeated" },
+        { address=0X8314, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Minotaur defeated" },
+        { address=0X8314, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Devil defeated" },
+        { address=0X8314, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Giant Merman defeated" },
+        { address=0X8314, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Max Slimer defeated" },
+        { address=0X8315, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Peeping Big defeated" },
+        { address=0X8315, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Shadow defeated" },
+        { address=0X8315, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Legion (Saint) defeated" },
+        { address=0X8315, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Pazuzu defeated" },
+        { address=0X8315, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Minotaur Lv2 defeated" },
+        { address=0X8315, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Legion (Corpse) defeated" },
+        { address=0X8315, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Talos defeated" },
+        { address=0X8316, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Cyclops defeated" },
+        { address=0X8316, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dracula Wraith (first form) defeated" },
+        { address=0X8316, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dracula Wraith (second form) defeated" },
+        { address=0X8320, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X8320, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X8320, type="u8", condition="eq", value=0X30, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X8358, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses flags" },
+        { address=0X83A8, type="u8", condition="eq", value=0X19, action="BOSS_HIT", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X83A8, type="u8", condition="eq", value=0X1A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X83A8, type="u8", condition="eq", value=0X1B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X83DC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush In-Game = 01" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2084E, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Key Config Jump (B or A)" },
+        { address=0X2084F, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Key Config Jump (L or R)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8339, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="HP" },
+        { address=0X833A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="HP" },
+        { address=0X833B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="HP" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Rune Factory: Tides of Destiny",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "rune-factory-tides-of-destiny",
+    file = "rune-factory-tides-of-destiny.zip",
+    hashes = {
+      { hash = "5bd942215546a2ef0924383a16c6586c", label = "Rune Factory - Tides of Destiny (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

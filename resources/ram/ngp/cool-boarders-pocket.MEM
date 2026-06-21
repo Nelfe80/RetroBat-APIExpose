@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Cool Boarders Pocket",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cool-boarders-pocket",
+    file = "cool-boarders-pocket.zip",
+    hashes = {
+      { hash = "dc8fa0cedef94fe22a219f2eeca43dc0", label = "Cool Boarders Pocket (Japan, Europe) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X21B7, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="1 if demo is playing, 0 otherwise" },
+        { address=0X25D8, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Countdown until demo starts" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X20BA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1 when you complete any stage or begin any stage, 0 otherwise" },
+      },
+      stage = {
+        { address=0X001F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 if you are playing a stage, 0 otherwise" },
+        { address=0X23D7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Course stage number (starts at 0)" },
+        { address=0X2BD4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0 if you are in a stage, FF otherwise" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X206A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X206A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2273, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course A Time Goals:" },
+        { address=0X2274, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course A Time Goals:" },
+        { address=0X2275, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course A Time Goals:" },
+        { address=0X2276, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course A Time Goals:" },
+        { address=0X2277, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course B Time Goals:" },
+        { address=0X2278, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course B Time Goals:" },
+        { address=0X2279, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course B Time Goals:" },
+        { address=0X227A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course B Time Goals:" },
+        { address=0X227B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course C Time Goals:" },
+        { address=0X227C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course C Time Goals:" },
+        { address=0X227D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course C Time Goals:" },
+        { address=0X227E, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course C Time Goals:" },
+        { address=0X227F, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course D Time Goals:" },
+        { address=0X2280, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course D Time Goals:" },
+        { address=0X2281, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course D Time Goals:" },
+        { address=0X2282, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course D Time Goals:" },
+        { address=0X22CF, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level A-20 Time Record" },
+        { address=0X23CB, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra stage time record" },
+      },
+    },
+  },
+}

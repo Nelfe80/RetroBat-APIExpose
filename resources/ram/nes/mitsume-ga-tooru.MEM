@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Mitsume ga Tooru",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "mitsume-ga-tooru",
+    file = "mitsume-ga-tooru.zip",
+    hashes = {
+      { hash = "796a7546ac394c86b1f287894b89eaf6", label = "Mitsume ga Tooru (Japan) (En) (v1.01) (Toma).nes" },
+      { hash = "e46b3344a28667be0c8028edff9631ce", label = "Mitsume ga Tooru (Japan).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X007B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X007B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0669, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ghost/final stage (on death) boss HP" },
+      },
+      health = {
+        { address=0X007A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X007A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0080, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon selected" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X06E9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin value 14-1000$ increased" },
+        { address=0X06F9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins number of jumps? increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0668, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+  },
+}

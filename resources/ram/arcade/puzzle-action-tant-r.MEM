@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Puzzle & Action: Tant-R",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Mini-Games"
+  },
+
+  rom = {
+    name = "puzzle-action-tant-r",
+    file = "puzzle-action-tant-r.zip",
+    hashes = {
+      { hash = "edd8b9d66238320d7bcf497af45fb7c2", label = "tantr.zip" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB6E2, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of players asked to continue" },
+        { address=0XB6EA, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+        { address=0XFC19, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Available credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB628, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X99AE, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="1P Continue timer: seconds" },
+        { address=0X9DAE, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="2P Continue timer: seconds" },
+        { address=0XB62A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Minion Counter" },
+      },
+    },
+  },
+}

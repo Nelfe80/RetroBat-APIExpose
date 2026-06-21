@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "A Boy and His Blob",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "a-boy-and-his-blob",
+    file = "a-boy-and-his-blob.zip",
+    hashes = {
+      { hash = "e08dd4f61988a5d5a9fb0a44830d188e", label = "Boy and His Blob, A (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

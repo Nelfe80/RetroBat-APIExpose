@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "Metal Slug 3D",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "metal-slug-3d",
+    file = "metal-slug-3d.zip",
+    hashes = {
+      { hash = "7509fcae0589c129a23db897c75569af", label = "Metal Slug (Japan)" },
+      { hash = "4c57a1f05307445b14df1efe935d46be", label = "Metal Slug (Japan) (60FPS)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB26A54, type="u16le", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X66854B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Characters [Marco] - Life Up [Bit0] increased" },
+        { address=0X66854B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Characters [Marco] - Life Up [Bit0] decreased" },
+        { address=0X668573, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Characters [Tarma] - Life Up [Bit0] increased" },
+        { address=0X668573, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Characters [Tarma] - Life Up [Bit0] decreased" },
+        { address=0X66859B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Characters [Eri] - Life Up [Bit0] increased" },
+        { address=0X66859B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Characters [Eri] - Life Up [Bit0] decreased" },
+        { address=0X6685C3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Characters [Fio] - Life Up [Bit0] increased" },
+        { address=0X6685C3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Characters [Fio] - Life Up [Bit0] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X663DF4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission - Checkpoint 1 Score [32 bits]" },
+        { address=0X663DF8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission - Checkpoint 2 Score [32 bits]" },
+        { address=0X663ECC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission - Score [32 bits] [1]" },
+        { address=0X663EF4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission - Score [32 bits] [2, Main]" },
+        { address=0X668134, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 1 [Normal - Marco] - Score [32 bits] [1, Clone]" },
+        { address=0X6686C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Record [Normal] - Mission 1 Score [32 bits] [2]" },
+        { address=0X6686E8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Record [Normal] - Mission 11 Score [32 bits] [2]" },
+        { address=0X6686EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Record [Hard] - Mission 1 Score [32 bits] [2]" },
+        { address=0X66871C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Record [Normal] - Total Score [32 bits] [2]" },
+        { address=0X668898, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game - Total Score [32 bits]" },
+      },
+      collectibles = {
+        { address=0X663E9E, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Player [Sub] - Grenade Ammo [16 bits]" },
+        { address=0X663EA0, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Player [Sub] - Fire Bomb Ammo [16 bits]" },
+        { address=0X663EA2, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Player [Sub] - Stone Ammo [16 bits]" },
+        { address=0X663EA4, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Player [Sub] - Smoke Bomb Ammo [16 bits]" },
+        { address=0X663EA6, type="u16le", condition="eq", value=0XFFFE, action="AMMO_STATE", no_log=false, no_survey=false, desc="Not unlocked" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6CCF50, type="u16le", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1851F4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Code - Float Value for Jump Height 1 [Float]" },
+        { address=0X185200, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Code - Float Value for Jump Height 2 [Float]" },
+        { address=0X18520C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Code - Float Value for Jump Height 3 [Float]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X663EF8, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Mission - Checkpoint [8 bits]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6687E0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Record [Normal] - Mission 1 Clear Time (Hours) [8 bits] [2]" },
+        { address=0X6687E1, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Record [Normal] - Mission 1 Clear Time (Minutes) [8 bits] [2]" },
+        { address=0X6687E2, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Record [Normal] - Mission 1 Clear Time (Seconds) [8 bits] [2]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Call of Duty: Roads to Victory",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "call-of-duty-roads-to-victory",
+    file = "call-of-duty-roads-to-victory.zip",
+    hashes = {
+      { hash = "d7876edbcd6a928e4b89a668e55f0645", label = "Call of Duty - Roads to Victory (Europe) (En,Fr,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

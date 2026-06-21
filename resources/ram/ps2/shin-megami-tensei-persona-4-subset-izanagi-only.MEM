@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Shin Megami Tensei: Persona 4 [Subset - Izanagi Only]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-persona-4-subset-izanagi-only",
+    file = "shin-megami-tensei-persona-4-subset-izanagi-only.zip",
+    hashes = {
+      { hash = "9b19e5ac0813ba782338a43fb9bc2226", label = "Shin Megami Tensei - Persona 4 (USA) (Undub) [Subset - Izanagi Only]" },
+      { hash = "a21b63f04ef5e476332780a1bd9c4cec", label = "Shin Megami Tensei - Persona 4 (USA) [Subset - Izanagi Only]" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X797F90, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MC - Persona 1 - Level [16bit]" },
+      },
+    },
+  },
+}

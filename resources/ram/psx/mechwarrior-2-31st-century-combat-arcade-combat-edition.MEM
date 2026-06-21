@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "MechWarrior 2: 31st Century Combat - Arcade Combat Edition",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mechwarrior-2-31st-century-combat-arcade-combat-edition",
+    file = "mechwarrior-2-31st-century-combat-arcade-combat-edition.zip",
+    hashes = {
+      { hash = "a7e225f18a2841e2688fe51b77d119cc", label = "MechWarrior 2 - 31st Century Combat - Arcade Combat Edition (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X74D89, type="u16le", condition="eq", value=0X4435, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles" },
+        { address=0X76CE0, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X76D7C, type="u8", condition="eq", value=0X11, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X57F06, type="u8", condition="eq", value=0X6F7B, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White (Energy Shield)" },
+        { address=0X57F0E, type="u16le", condition="eq", value=0X6F7B, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White (Energy Shield)" },
+        { address=0X57F10, type="u16le", condition="eq", value=0X6F7B, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White (Energy Shield)" },
+        { address=0X57F12, type="u16le", condition="eq", value=0X6F7B, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White (Energy Shield)" },
+        { address=0X57F14, type="u16le", condition="eq", value=0X6F7B, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White (Energy Shield)" },
+        { address=0XD14A8, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Energy type" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X76CE4, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Extra weapon variants" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X76CE4, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+      player = {
+        { address=0X76CE4, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="Unlimited Jumpjets" },
+        { address=0X76CE5, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Jumpjets for all mechs" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X57F06, type="u8", condition="eq", value=0X8000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Black (Depleted or Destroyed)" },
+        { address=0X57F0E, type="u16le", condition="eq", value=0X8000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Black (Depleted or Destroyed)" },
+        { address=0X57F10, type="u16le", condition="eq", value=0X8000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Black (Depleted or Destroyed)" },
+        { address=0X57F12, type="u16le", condition="eq", value=0X8000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Black (Depleted or Destroyed)" },
+        { address=0X57F14, type="u16le", condition="eq", value=0X8000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Black (Depleted or Destroyed)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD1630, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Power Up 5 Time" },
+        { address=0XD1634, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Power Up 3 Time" },
+        { address=0XD1638, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Power Up 1 Time" },
+        { address=0XD163C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Power Up 2 Time" },
+        { address=0XD1640, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Power Up 4 Time" },
+      },
+    },
+  },
+}

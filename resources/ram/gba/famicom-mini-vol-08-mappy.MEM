@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Famicom Mini Vol. 08: Mappy",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "famicom-mini-vol-08-mappy",
+    file = "famicom-mini-vol-08-mappy.zip",
+    hashes = {
+      { hash = "71dffd1adcef71adf9d4ca089b08b6b2", label = "Famicom Mini 08 - Mappy (Japan) (En).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7242, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen | Attract Mode | Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X727A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1st Level" },
+        { address=0X727A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Type" },
+      },
+    },
+  },
+}

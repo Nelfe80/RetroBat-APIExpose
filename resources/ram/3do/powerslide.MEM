@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Powerslide",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "powerslide",
+    file = "powerslide.zip",
+    hashes = {
+      { hash = "6acf401db7a75f2b1c190cb951c13ac7", label = "Powerslide (USA) (Unl)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Ninja vs Knights",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ninja-vs-knights",
+    file = "ninja-vs-knights.zip",
+    hashes = {
+      { hash = "5921f8b9bb63024bd3145172806d2498", label = "Ninja vs Knights (World) (v1.0.1) (Mr.Rafael).wasm" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X47B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE : Best Distance (32-bit)" },
+      },
+      collectibles = {
+        { address=0X47B4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SCORE : Best Money (32-bit) increased" },
+      },
+    },
+  },
+}

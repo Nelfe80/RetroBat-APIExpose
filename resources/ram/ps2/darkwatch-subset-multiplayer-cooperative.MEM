@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Darkwatch [Subset - Multiplayer Cooperative]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Horror, Shooter"
+  },
+
+  rom = {
+    name = "darkwatch-subset-multiplayer-cooperative",
+    file = "darkwatch-subset-multiplayer-cooperative.zip",
+    hashes = {
+      { hash = "36c35e39f3e8214bdc75a6972e2aee50", label = "Darkwatch (USA) [Subset-MultiCoop] (v1.0) (ASolidSnack)" },
+      { hash = "dfa65a5a45a97d732459f13bedd6c3ab", label = "Darkwatch (EU,AUS) [Subset-MultiCoop] (v1.0) (ASolidSnack)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X729330, type="u8", condition="eq", value=0X3, action="PAUSE_ON", no_log=false, no_survey=false, desc="> Any InGameMenu is active. (eg. PauseMenu and submenus, menus for saving to the memory card, Lo" },
+        { address=0X73B430, type="u8", condition="eq", value=0X3, action="PAUSE_ON", no_log=false, no_survey=false, desc="> Any InGameMenu is active. (eg. PauseMenu and submenus, menus for saving to the memory card, Lo" },
+        { address=0X965CB0, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[PAL][bit0 BitFlag:Display_IsSubtitlesEnabled |32-bit]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X965CC0, type="u32le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="> Surround" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8FF528, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[NTSCU][8-bit:DeathmatchSetting_KillsToWin(non-functional) |32-bit]" },
+        { address=0X911508, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> No Kill Limit" },
+        { address=0X911508, type="u8", condition="eq", value=0X5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> 5 Kills" },
+        { address=0X911508, type="u8", condition="eq", value=0XA, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> 10 Kills" },
+        { address=0X911508, type="u8", condition="eq", value=0XF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> 15 Kills" },
+        { address=0X911508, type="u8", condition="eq", value=0X19, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> 25 Kills" },
+        { address=0X911508, type="u8", condition="eq", value=0X32, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> 50 Kills" },
+        { address=0X911514, type="u32le", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Deathmatch" },
+        { address=0X953C60, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[NTSCU][32-bit:PlayerDeaths_ChapterTotal-Player1]" },
+        { address=0X953C94, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[NTSCU][32-bit:PlayerDeaths_ChapterSection-Player1]" },
+        { address=0X965C40, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[PAL][32-bit:PlayerDeaths_ChapterTotal-Player1]" },
+        { address=0X965C74, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[PAL][32-bit:PlayerDeaths_ChapterSection-Player1]" },
+        { address=0X9B69F8, type="u32le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadeye" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X69B4F0, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="current weapon equipped" },
+        { address=0X965DAD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(unverified) [PAL][8-bit:FavoriteWeapon_WeaponID-Player2]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X36BB74, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[NTSCU][AssemblyInstruction:SubtitleRendering |32-bit] increased" },
+        { address=0X36C024, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[PAL][AssemblyInstruction:SubtitleRendering |32-bit] increased" },
+        { address=0X15C4A5C, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="current weapon reserve ammo" },
+        { address=0X15C4A60, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="current weapon magazine ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA6F0B4, type="u32le", condition="eq", value=0X3, action="BOSS_HIT", no_log=false, no_survey=false, desc="casside" },
+        { address=0XA6F0B4, type="u32le", condition="eq", value=0X4, action="BOSS_HIT", no_log=false, no_survey=false, desc="tala" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X960F7C, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield ability flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X95B042, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[NTSCU][13-byte ASCII:CheckpointID]" },
+        { address=0X96D022, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[PAL][13-byte ASCII:CheckpointID]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X911504, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[PAL][8-bit:MatchDuration(non-functional) |32-bit]" },
+      },
+    },
+  },
+}

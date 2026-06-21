@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "Open Season",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "open-season",
+    file = "open-season.zip",
+    hashes = {
+      { hash = "5048d3110f72b4ba40f0b98936413a0b", label = "Open Season (Europe) (En,Fr,De,Es,It,Sv,No,Da,Fi).gba" },
+      { hash = "64b19adca4ba8ebfca983c39c7f21c8c", label = "Open Season (USA) (En,Fr,Es).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7791, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level skip cheat flag" },
+        { address=0X77D8, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rabbit Land" },
+        { address=0X77D8, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skunk Land" },
+        { address=0X77D8, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Squirrel Land" },
+        { address=0X77D8, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beaver Land" },
+        { address=0X77D8, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Duck Land" },
+        { address=0X77D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X77D9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game, Level area" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7750, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X77E5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player, Lives increased" },
+        { address=0X77E5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player, Lives decreased" },
+      },
+      health = {
+        { address=0X6122, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Beaver Land enemy HP decreased" },
+        { address=0X6122, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Beaver Land enemy HP increased" },
+        { address=0X6626, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Beaver Land enemy HP decreased" },
+        { address=0X6626, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Beaver Land enemy HP increased" },
+        { address=0X68E6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Beaver Land enemy HP decreased" },
+        { address=0X68E6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Beaver Land enemy HP increased" },
+        { address=0X69B2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Beaver Land enemy HP decreased" },
+        { address=0X69B2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Beaver Land enemy HP increased" },
+        { address=0X6B1A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Skunk Land enemy HP decreased" },
+        { address=0X6B1A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Skunk Land enemy HP increased" },
+        { address=0X6B9A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Beaver Land enemy HP decreased" },
+        { address=0X6B9A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Beaver Land enemy HP increased" },
+        { address=0X6BE6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Skunk Land enemy HP decreased" },
+        { address=0X6BE6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Skunk Land enemy HP increased" },
+        { address=0X6C80, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Skunk Land enemy HP decreased" },
+        { address=0X6C80, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Skunk Land enemy HP increased" },
+        { address=0X6E0C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Skunk Land charging enemy HP decreased" },
+        { address=0X6E0C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Skunk Land charging enemy HP increased" },
+        { address=0X6EC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Skunk Land charging enemy HP decreased" },
+        { address=0X6EC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Skunk Land charging enemy HP increased" },
+        { address=0X77E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player, Health decreased" },
+        { address=0X77E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player, Health increased" },
+        { address=0X77E7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player, maximum HP decreased" },
+        { address=0X77E7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player, maximum HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2801, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Invincibility power-up active" },
+      },
+      weapon = {
+        { address=0X77E3, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rabbit" },
+        { address=0X77E3, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Skunk" },
+        { address=0X77E3, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Squirrel" },
+        { address=0X77E3, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Beaver" },
+        { address=0X77E3, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Duck" },
+        { address=0X77E3, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bubble Gum" },
+        { address=0X77E3, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dinkleman" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X48F9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Skunk Land boss HP" },
+        { address=0X4949, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Beaver Land boss HP" },
+        { address=0X4DDA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Shaw Boss Stage 3 HP" },
+        { address=0X4E1A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Shaw Boss Stage 2 HP" },
+        { address=0X4F42, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Shaw Boss Stage 1 HP" },
+        { address=0X516C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Duck Land boss HP" },
+        { address=0X53C1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Squirrel Land boss HP" },
+        { address=0X55B7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Rabbit Land boss HP" },
+        { address=0X7751, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Elliot boss helper" },
+        { address=0X77D8, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Shaw's Cabin (Final boss)" },
+        { address=0X77F0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP bar integer" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4970, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility timer" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7750, type="u8", condition="eq", value=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Scene switch" },
+        { address=0X7750, type="u8", condition="eq", value=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Grabbable object nearby" },
+        { address=0X7751, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Elliot checkpoint / store / Skunk" },
+      },
+    },
+  },
+}

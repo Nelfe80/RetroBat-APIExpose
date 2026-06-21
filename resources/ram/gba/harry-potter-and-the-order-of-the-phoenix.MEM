@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Harry Potter and the Order of the Phoenix",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "harry-potter-and-the-order-of-the-phoenix",
+    file = "harry-potter-and-the-order-of-the-phoenix.zip",
+    hashes = {
+      { hash = "3a92a2d56665a8aa1640fc276095659a", label = "Harry Potter and the Order of the Phoenix (USA, Europe) (En,Fr,De,Es,It,Nl,Da).gba" },
+    }
+  },
+
+  events = {
+  },
+}

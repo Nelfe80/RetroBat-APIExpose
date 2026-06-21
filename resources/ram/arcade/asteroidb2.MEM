@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "asteroidb2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "asteroidb2",
+    file = "asteroidb2.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X56, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X51, type="u16be", condition="change", action="SCORE_STATE", color="red", min=10, max=1000, no_log=false, no_survey=false, desc="Score delta 10-1000: Score delta 10-1000" },
+      },
+      collectibles = {
+        { address=0X6F, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

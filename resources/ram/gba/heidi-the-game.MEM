@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Heidi: The Game",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "heidi-the-game",
+    file = "heidi-the-game.zip",
+    hashes = {
+      { hash = "2dd50cff5266e703e72964fa0755e0c7", label = "Heidi - The Game (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7654, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off" },
+        { address=0X7654, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="On" },
+        { address=0X76F8, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X76F8, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit" },
+        { address=0X9F9C, type="u16le", condition="eq", value=0X09, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XA471, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="On" },
+        { address=0XA48C, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Slot 1" },
+        { address=0XA48C, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Slot 2" },
+        { address=0XA48C, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Slot 3" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X7651, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7788, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Counter In-Game" },
+        { address=0X7790, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Counter In-Game Alt" },
+        { address=0X9FCC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Counter in the Scoring Screen" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X764C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Start Counter" },
+      },
+    },
+  },
+}

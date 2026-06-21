@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "The Incredibles",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-incredibles",
+    file = "the-incredibles.zip",
+    hashes = {
+      { hash = "031898768e12d76f906e78aff351cccf", label = "Incredibles, The - Os Super-Herois (Portugal)" },
+      { hash = "118df08935c780a6a9fb73e1f0ddfe51", label = "Disney-Pixar The Incredibles (Europe)" },
+      { hash = "16412af8b92d9383efae84736e82903e", label = "Disney-Pixar Gli Incredibili (Italy)" },
+      { hash = "37553ec271e43d02219883bed8d084ae", label = "Disney-Pixar Die Unglaublichen (Germany)" },
+      { hash = "44ce1c853d530f385712fe0d2010c369", label = "Disney-Pixar The Incredibles (Europe) (Fr,Nl)" },
+      { hash = "703f3a4d8f070707f313b916b326debb", label = "Disney-Pixar The Incredibles (USA)" },
+      { hash = "bb91496016f8a0a828f09dffe8fe5dfe", label = "Disney-Pixar The Incredibles (Scandinavia) (Sv,No,Da,Fi)" },
+      { hash = "eedef4d71d35f66facd91d94ff801c9d", label = "Disney-Pixar Los Increibles (Spain)" },
+      { hash = "fa69811588ebf7861e0bfb18fa78185e", label = "Mr. Incredible (Japan)" },
+      { hash = "f909b43fd4196e8a1a73429809a7eaff", label = "Disney-Pixar The Incredibles (Korea)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X63156C, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Main Menu/Loading/Level Complete/Game Paused (including cutscenes)" },
+        { address=0X631E5C, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Main Menu/Loading/Level Complete/Game Paused (including cutscenes)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6CF114, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[1] name" },
+        { address=0X6CF194, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[1] value" },
+        { address=0X6CF198, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[2] name" },
+        { address=0X6CF218, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[2] value" },
+        { address=0X6CF21C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[3] name" },
+        { address=0X6CF29C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[3] value" },
+        { address=0X6CF2A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[4] name" },
+        { address=0X6CF320, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[4] value" },
+        { address=0X6CF324, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[5] name" },
+        { address=0X6CF3A4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[5] value" },
+        { address=0X6CF3A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[6] name" },
+        { address=0X6CF428, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[6] value" },
+        { address=0X6CF42C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[7] name" },
+        { address=0X6CF4AC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[7] value" },
+        { address=0X6CF4B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[8] name" },
+        { address=0X6CF530, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[8] value" },
+        { address=0X6CF534, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[9] name" },
+        { address=0X6CF5B4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[9] value" },
+        { address=0X6CF5B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[10] name" },
+        { address=0X6CF638, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[10] value" },
+        { address=0X6CF63C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[11] name" },
+        { address=0X6CF6BC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[11] value" },
+        { address=0X6CF6C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[12] name" },
+        { address=0X6CF740, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[12] value" },
+        { address=0X6CF744, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[13] name" },
+        { address=0X6CF7C4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[13] value" },
+        { address=0X6CF7C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[14] name" },
+        { address=0X6CF848, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[14] value" },
+        { address=0X6CF84C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[15] name" },
+        { address=0X6CF8CC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[15] value" },
+        { address=0X6CF950, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[16] value" },
+        { address=0X6CF954, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[US] [128-bytes ASCII] level_stats[16] name" },
+      },
+      zone = {
+        { address=0X631C40, type="u32le", condition="eq", value=0X12, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Save the World" },
+        { address=0X632530, type="u32le", condition="eq", value=0X12, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Save the World" },
+        { address=0X6327B0, type="u32le", condition="eq", value=0X12, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Save the World" },
+      },
+      stage = {
+        { address=0X6CF110, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[US] [32-bit float] level_stats[0] value (See 0x631C30); The level_stats array fills up as playe" },
+      },
+    },
+  },
+}

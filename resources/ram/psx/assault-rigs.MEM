@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Assault Rigs",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "assault-rigs",
+    file = "assault-rigs.zip",
+    hashes = {
+      { hash = "ede340588f99e07c9116000d029d4304", label = "Assault Rigs (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1C9848, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1C9848, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X1C984C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1C984C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X1C9850, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1C9850, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X1C9854, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1C9854, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+  },
+}

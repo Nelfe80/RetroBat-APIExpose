@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Tech Romancer",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "tech-romancer",
+    file = "tech-romancer.zip",
+    hashes = {
+      { hash = "2103e231be2ea211a5330b9b4865a97c", label = "Tech Romancer (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2E3352, type="u8", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2E36D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Rounds Won" },
+        { address=0X2E36D3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 Rounds Won" },
+      },
+      stage = {
+        { address=0X2E3352, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Win" },
+        { address=0X2E3352, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hero Challenge Stage" },
+        { address=0X2E3354, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Episode X (vs Rafaga)" },
+        { address=0X2E3354, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Level Path A/B (vs Goldibus)" },
+        { address=0X2E3354, type="u8", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Level Path I (vs Goldibus)" },
+        { address=0X2E3354, type="u8", condition="eq", value=0X0E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Level Path C/D/E/F/G/H (vs Gamda)" },
+        { address=0X2E3354, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="vs Goldibus" },
+        { address=0X2E3354, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Good Ending (vs Goldibus)" },
+        { address=0X2E3354, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bad Ending (vs G. Kaiser)" },
+        { address=0X2E3354, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Path B (vs Goldibus)" },
+        { address=0X2E3354, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Story Mode Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2E2295, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="1" },
+        { address=0X2E2295, type="u8", condition="eq", value=0X07, action="HIT", no_log=false, no_survey=false, desc="8" },
+        { address=0X2E36B8, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0X2E36B8, type="u8", condition="eq", value=0X90, action="HIT", no_log=false, no_survey=false, desc="Max val" },
+        { address=0X2E36B9, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 2 Damage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2E35D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 1 Score (32-bits)" },
+        { address=0X2E35DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 2 Score (32-bits)" },
+        { address=0X2E35E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 3 Score (32-bits)" },
+        { address=0X2E35E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 4 Score (32-bits)" },
+        { address=0X2E35E8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 5 Score (32-bits)" },
+        { address=0X2E35EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 6 Score (32-bits)" },
+        { address=0X2E35F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 7 Score (32-bits)" },
+        { address=0X2E35F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 8 Score (32-bits)" },
+        { address=0X2E35F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 9 Score (32-bits)" },
+        { address=0X2E35FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 10 Score (32-bits)" },
+        { address=0X2E3600, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 11 Score (32-bits)" },
+        { address=0X2E3604, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Stage 12 Score (32-bits)" },
+        { address=0X2E3608, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Free Mode Total Score (32-bits)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2E3352, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2E332C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (16-bit)" },
+        { address=0X2E3370, type="u8", condition="eq", value=0X28, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Max" },
+        { address=0X2E3370, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="G. Kaiser Last Story Misison Timer" },
+      },
+    },
+  },
+}

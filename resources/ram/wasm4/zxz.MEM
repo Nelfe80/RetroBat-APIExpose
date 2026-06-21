@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "ZxZ",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "zxz",
+    file = "zxz.zip",
+    hashes = {
+      { hash = "88f0a50bf711bdc9fae8f1ee91395cb1", label = "ZxZ (World) (Rev 1) (Scislaw Dercz).wasm" },
+      { hash = "9967ddb877ad4d0332e129a1db67beee", label = "ZxZ (World) (Scislaw Dercz).wasm" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X34F4, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Dark World bitflag [bit 0]" },
+        { address=0X7510, type="u16le", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="space has entity on it. can be anything from enemy to player. Does not include walls" },
+        { address=0X7510, type="u16le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="explosion?" },
+        { address=0X7510, type="u16le", condition="eq", value=0XCE, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="self destruct button" },
+        { address=0X7510, type="u16le", condition="eq", value=0XFF, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="???" },
+        { address=0X7510, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World State Map (7f by 1f)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X350B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Music Switch (77,0d) bitflag [bit1]" },
+        { address=0X358B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch (08,01) On bitflag [bit 1]" },
+        { address=0X360B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch (13,00) On bitflag [bit 1]" },
+        { address=0X3617, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (7c,0e) bitflag [bit 0]" },
+        { address=0X361F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (00, 0e) bitflag [bit 0]" },
+        { address=0X3627, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (04,0e) bitflag [bit 0]" },
+        { address=0X36BF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (7b,0b) bitflag [bit 0]" },
+        { address=0X3713, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch (00,16) On bitflag [bit 1]" },
+        { address=0X371F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (0e,11)" },
+        { address=0X3727, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (6a,16)" },
+        { address=0X375B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch (65,18) On bitflag [bit 1]" },
+        { address=0X378F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (1d,13) bitflag [bit 2]" },
+        { address=0X3797, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (1c,12) bitflag [bit 2]" },
+        { address=0X379F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (17,0e) bitflag [bit 2]" },
+        { address=0X37BB, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch (32,19) On bitflag [bit 1]" },
+        { address=0X37C7, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (36,16)" },
+        { address=0X3877, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (3e,16) bitflag [bit 3]" },
+        { address=0X3897, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (20,1f)" },
+        { address=0X38CF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (2a,0d)" },
+        { address=0X38D7, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (27,0a)" },
+        { address=0X38EB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch (10,18) On bitflag [bit 1]" },
+        { address=0X398B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch (22,04) On bitflag [bit 1]" },
+        { address=0X399F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (27,06)" },
+        { address=0X39A7, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (26,03)" },
+        { address=0X39AF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (19,1f)" },
+        { address=0X39B7, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Unbreakable Block (17,08)" },
+        { address=0X39FF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block (2d,04)" },
+        { address=0X3A53, type="u24le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch (24,10) On bitflag [bit 1]" },
+      },
+    },
+  },
+}

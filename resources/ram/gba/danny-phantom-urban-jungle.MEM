@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Danny Phantom: Urban Jungle",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "danny-phantom-urban-jungle",
+    file = "danny-phantom-urban-jungle.zip",
+    hashes = {
+      { hash = "022cc7ccc60272a2b773071ad448bba9", label = "Danny Phantom - Urban Jungle (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X37B8, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Chain combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="levels" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1CAC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1CAC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X39E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X39E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X3A14, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ghost energy decreased" },
+        { address=0X3A14, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ghost energy increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1C84, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bit) score" },
+      },
+    },
+  },
+}

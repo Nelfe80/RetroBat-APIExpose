@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Echo Night: The First Voyage",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "echo-night-the-first-voyage",
+    file = "echo-night-the-first-voyage.zip",
+    hashes = {
+      { hash = "a4bae227ca291d6c03fcfcfe35209241", label = "Echo Night - The First Voyage (Japan) (En) (v1.0) (Mugi).iso" },
+    }
+  },
+
+  events = {
+  },
+}

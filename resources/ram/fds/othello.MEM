@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Othello",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "othello",
+    file = "othello.zip",
+    hashes = {
+      { hash = "907f107fce9fe854c55827e9d0d72df5", label = "Othello (Japan) (DV 2).fds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6003, type="u8", condition="eq", value=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0122, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Computer Strength Level (0x01 to 0x04)" },
+      },
+    },
+  },
+}

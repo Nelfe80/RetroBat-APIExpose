@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Ninja Fuzzgrawth",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ninja-fuzzgrawth",
+    file = "ninja-fuzzgrawth.zip",
+    hashes = {
+      { hash = "e938c3bd3f51bbde769cd266fddd775d", label = "Ninja Fuzzgrawth (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X063B, type="u16le", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X063B, type="u16le", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Normal Block" },
+        { address=0X063B, type="u16le", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Spike [Right]" },
+        { address=0X063B, type="u16le", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Spike [Left]" },
+        { address=0X063B, type="u16le", condition="eq", value=0X04, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Breakable Block" },
+        { address=0X063B, type="u16le", condition="eq", value=0X05, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Window" },
+        { address=0X063B, type="u16le", condition="eq", value=0X06, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Window" },
+        { address=0X063B, type="u16le", condition="eq", value=0X07, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Enemy firing Missile [Facing Right]" },
+        { address=0X063B, type="u16le", condition="eq", value=0X08, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Dissapearing Block" },
+        { address=0X063B, type="u16le", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Dissapearing Block" },
+        { address=0X063B, type="u16le", condition="eq", value=0X0A, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X063B, type="u16le", condition="eq", value=0X0B, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Electricity Beam" },
+        { address=0X063B, type="u16le", condition="eq", value=0X0C, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Electricity Block" },
+        { address=0X0711, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="False (Title Screen)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X063B, type="u16le", condition="eq", value=0X0D, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Coin [Collec to clear stage]" },
+        { address=0X071A, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="False" },
+        { address=0X071A, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="True" },
+      },
+      stage = {
+        { address=0X070D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit -> Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X070E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="8-bit-> Lives left increased" },
+        { address=0X070E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="8-bit-> Lives left decreased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X01D9, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Jump input pressed (Once released bit will not turn to 1 before player has landed and begun a ne" },
+        { address=0X01D9, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=true, no_survey=false, desc="Upwards momentum during a jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X063B, type="u16le", condition="eq", value=0X32, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Window" },
+        { address=0X063B, type="u16le", condition="eq", value=0X33, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Window" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0713, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="8-bit -> Counter - Windows broken" },
+      },
+    },
+  },
+}

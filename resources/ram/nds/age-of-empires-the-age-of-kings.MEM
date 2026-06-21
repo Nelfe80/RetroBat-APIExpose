@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Age of Empires: The Age of Kings",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "age-of-empires-the-age-of-kings",
+    file = "age-of-empires-the-age-of-kings.zip",
+    hashes = {
+      { hash = "80de6a816ab6f9a6f941015c15d8a3ce", label = "Age of Empires - The Age of Kings (Europe) (En,Es,It).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X3870FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Empire Points Earned" },
+        { address=0X387100, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Empire Points Available" },
+      },
+    },
+  },
+}

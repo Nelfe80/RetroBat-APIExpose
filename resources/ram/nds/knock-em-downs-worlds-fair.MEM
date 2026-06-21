@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Knock 'Em Downs: World's Fair",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "knock-em-downs-worlds-fair",
+    file = "knock-em-downs-worlds-fair.zip",
+    hashes = {
+      { hash = "39ca5c3f47248c318d28320301f93921", label = "Knock 'Em Downs - World's Fair (Europe) (En,Es).nds" },
+    }
+  },
+
+  events = {
+  },
+}

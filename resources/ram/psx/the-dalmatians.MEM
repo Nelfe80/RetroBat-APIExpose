@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Dalmatians",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-dalmatians",
+    file = "the-dalmatians.zip",
+    hashes = {
+      { hash = "cc522cc6c437a4ec707b87f0958ded07", label = "Dalmatians, The (Europe) (En,Fr,De,Nl)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4CD7C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] Menu isPaused" },
+      },
+    },
+  },
+}

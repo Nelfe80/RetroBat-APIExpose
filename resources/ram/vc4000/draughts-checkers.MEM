@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Draughts | Checkers",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "draughts-checkers",
+    file = "draughts-checkers.zip",
+    hashes = {
+      { hash = "e3fc6069cfc0307e33fd1f506de1721f", label = "Draughts (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

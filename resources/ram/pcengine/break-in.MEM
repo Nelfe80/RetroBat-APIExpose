@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Break In",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Sports, Billard"
+  },
+
+  rom = {
+    name = "break-in",
+    file = "break-in.zip",
+    hashes = {
+      { hash = "ccf0795c95150fc3246926312fecf842", label = "Break In (Japan).pce" },
+    }
+  },
+
+  events = {
+  },
+}

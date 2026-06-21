@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "The Dukes of Hazzard: Racing for Home",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "the-dukes-of-hazzard-racing-for-home",
+    file = "the-dukes-of-hazzard-racing-for-home.zip",
+    hashes = {
+      { hash = "193f103b57f5861b55524644badb4ecd", label = "Dukes of Hazzard, The - Racing for Home (USA).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XDCB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level selector in the 'Play mission' screen" },
+        { address=0XDD0F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level - Goes up by 2" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCF5C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player's Health decreased" },
+        { address=0XCF5C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player's Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9C20, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer tens of minutes digit" },
+        { address=0X9C21, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer minutes digit" },
+        { address=0X9C23, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer tens of seconds digit" },
+        { address=0X9C24, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer seconds digit" },
+      },
+    },
+  },
+}

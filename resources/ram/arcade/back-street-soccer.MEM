@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "bssoccer",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Soccer"
+  },
+
+  rom = {
+    name = "back-street-soccer",
+    file = "back-street-soccer.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X200E14, type="u8be", condition="change", action="SCORE_STATE", min=1, max=100, no_log=false, no_survey=false, desc="Score delta 1-100: Goal" },
+      },
+      collectibles = {
+        { address=0X200070, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

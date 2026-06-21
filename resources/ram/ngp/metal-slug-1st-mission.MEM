@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Metal Slug: 1st Mission",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "metal-slug-1st-mission",
+    file = "metal-slug-1st-mission.zip",
+    hashes = {
+      { hash = "4d3efef436c67d4f4e031951b97d64c8", label = "Metal Slug - 1st Mission (World) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2A20, type="u8", condition="eq", value=0X0, action="DEMO_MODE", no_log=false, no_survey=false, desc="playing" },
+        { address=0X2A20, type="u8", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo play" },
+        { address=0X2A83, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X01F8, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="boss health (see also 0x000216) (and enemy 1 life) increased" },
+        { address=0X01F8, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="boss health (see also 0x000216) (and enemy 1 life) decreased" },
+        { address=0X0216, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="boss 'lives' increased" },
+        { address=0X0216, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="boss 'lives' decreased" },
+        { address=0X0288, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Metal Flyer HP / ( also mini boss life???) increased" },
+        { address=0X0288, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Metal Flyer HP / ( also mini boss life???) decreased" },
+        { address=0X0318, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="metal Slug Health(and enemy 2 life) increased" },
+        { address=0X0318, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="metal Slug Health(and enemy 2 life) decreased" },
+      },
+      health = {
+        { address=0X00D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (editable) decreased" },
+        { address=0X00D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (editable) increased" },
+        { address=0X00D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (no edit / locked) decreased" },
+        { address=0X00D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (no edit / locked) increased" },
+        { address=0X00DA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max health bar size decreased" },
+        { address=0X00DA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max health bar size increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2A48, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Machine Gun ammo" },
+        { address=0X2A4E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Solder 'B' Ammo" },
+        { address=0X2A52, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Tank 'C' ammo" },
+        { address=0X2A54, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Jet 'M' ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X25B4, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 0 (Boss)" },
+        { address=0X25B4, type="u8", condition="eq", value=0X28, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 0 Boss (From Parachute)" },
+      },
+    },
+  },
+}

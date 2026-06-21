@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Hungry Giraffe",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hungry-giraffe",
+    file = "hungry-giraffe.zip",
+    hashes = {
+      { hash = "f0e8dfb7ecdef17ee576089bd4658708", label = "Hungry Giraffe (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA9C088, type="u32le", condition="eq", value=0X00000000, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="In Game/Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA9C1C8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Circumnavigation - Complete 10 Stages Single Session" },
+        { address=0XB3E9E8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32-Bit - Feed Me - Starting Level" },
+      },
+      stage = {
+        { address=0XA9C1EC, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XA9C1EC, type="u16le", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 10" },
+        { address=0XA9C1EC, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="32-Bit - Feed Me - Highest Stage Reached" },
+        { address=0XB3E29C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="32-Bit - Feed Me - Current Stage" },
+        { address=0XB3E2A0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="32-Bit - Feed Me - Current Stage Single Session" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA9C1E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Feed Me -Best Score" },
+        { address=0XB3E9E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Feed Me - Current Score" },
+      },
+    },
+  },
+}

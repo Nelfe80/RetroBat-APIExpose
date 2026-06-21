@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Up",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "up",
+    file = "up.zip",
+    hashes = {
+      { hash = "97819643dc6629ce6a9381efaea9e153", label = "Up (Europe) (Fr,De,Nl).nds" },
+      { hash = "a328548ec4df94e051aaeded36193ebd", label = "Up (USA) (En,Fr).nds" },
+      { hash = "fcb6484b28423f90d6e2df240276601d", label = "Up (Europe) (Sv,No,Da).nds" },
+    }
+  },
+
+  events = {
+  },
+}

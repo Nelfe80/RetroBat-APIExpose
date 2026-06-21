@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Pass the Pigs: Let the Good Swines Roll!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "pass-the-pigs-let-the-good-swines-roll",
+    file = "pass-the-pigs-let-the-good-swines-roll.zip",
+    hashes = {
+      { hash = "039acd57a1bb5cf6654c108d85d1c471", label = "Pass the Pigs - Let the Good Swines Roll! (Europe).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4A874, type="u16le", condition="eq", value=0X21C4, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Screen" },
+        { address=0X4A88C, type="u16le", condition="eq", value=0X0B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On Title Screen" },
+      },
+      events = {
+        { address=0X4A8CC, type="u32le", condition="eq", value=0X0A, action="COMBO_HIT", no_log=false, no_survey=false, desc="Mixed Combo (10)" },
+        { address=0X4A8CC, type="u32le", condition="eq", value=0X0B, action="COMBO_HIT", no_log=false, no_survey=false, desc="Mixed Combo (15)" },
+        { address=0X4A8CC, type="u32le", condition="eq", value=0X0C, action="COMBO_HIT", no_log=false, no_survey=false, desc="Mixed Combo (20)" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X4A874, type="u16le", condition="eq", value=0X9AC0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour Info Screen" },
+        { address=0X4A874, type="u16le", condition="eq", value=0XABE8, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="In front of Building (World Tour)" },
+        { address=0X4A874, type="u16le", condition="eq", value=0XAFF8, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Talking to Character (World Tour)" },
+        { address=0X4A890, type="u16le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour" },
+        { address=0X4A930, type="u16le", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="United States" },
+        { address=0X4A930, type="u16le", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Europe" },
+        { address=0X4A930, type="u16le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Europe/Russia/Egypt" },
+        { address=0X4A930, type="u16le", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Africa" },
+        { address=0X4A930, type="u16le", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Asia" },
+        { address=0X4A930, type="u16le", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Australia" },
+        { address=0X4A930, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Map Screen in World Tour" },
+        { address=0X4A938, type="u32le", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="San Francisco" },
+        { address=0X4A938, type="u32le", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Las Vegas" },
+        { address=0X4A938, type="u32le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chicago" },
+        { address=0X4A938, type="u32le", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Miami" },
+        { address=0X4A938, type="u32le", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="New York" },
+        { address=0X4A938, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Level in World Tour" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4A874, type="u16le", condition="eq", value=0X6F4C, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Screen" },
+        { address=0X4A874, type="u16le", condition="eq", value=0X91A0, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Screen (After Game)" },
+        { address=0X4A874, type="u16le", condition="eq", value=0X96C0, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Screen (From Menu)" },
+        { address=0X4A88C, type="u16le", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Menu" },
+        { address=0X4A89A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score from Current Turn" },
+        { address=0X4A89C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score from Roll" },
+        { address=0X4A904, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Banked Score (World Tour)" },
+        { address=0X4A91C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Opponent Score" },
+        { address=0X4A98E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #1 Name 1" },
+        { address=0X4A990, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #1 Name 2" },
+        { address=0X4A992, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #1 Name 3" },
+        { address=0X4A9E8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #1" },
+        { address=0X4A9EA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #2" },
+        { address=0X4A9EC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #3" },
+        { address=0X4A9EE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #4" },
+        { address=0X4A9F0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #5" },
+        { address=0X4A9F2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #6" },
+        { address=0X4A9F4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #7" },
+        { address=0X4A9F6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score #8" },
+      },
+    },
+  },
+}

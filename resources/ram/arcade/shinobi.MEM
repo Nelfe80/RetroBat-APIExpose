@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Shinobi",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "shinobi",
+    file = "shinobi.zip",
+    hashes = {
+      { hash = "37fc2767ab1c4826c736f1fced9a4ae7", label = "shinobi.7z <Shinobi (set 6, System 16A, unprotected)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X175A, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[Game] Credits used by active player in current game" },
+        { address=0X1780, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Game: Sub-Level (Alternates 00 and 05 on demo)" },
+        { address=0X3001, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Entered" },
+        { address=0X3027, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode (0x00=Game Active, 0x01=Attract Mode on)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1768, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Perfect (When 0x1768=ff)" },
+        { address=0X1768, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game: No. of ninjas spawned in bonus stage (BCD)" },
+        { address=0X1769, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Perfect" },
+        { address=0X1769, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game: No of ninjas hit in bonus stage (BCD)" },
+        { address=0X3027, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Between Rounds (0x01=Yes, 0x00=Game Active)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X005C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game: Player Death Status (Upper 4, 0x10=Dead)" },
+        { address=0X1751, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1751, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X3018, type="u24le", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="2" },
+        { address=0X3018, type="u24le", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="3" },
+        { address=0X3018, type="u24le", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="5" },
+        { address=0X3018, type="u24le", condition="eq", value=0XF0, action="LIVES_STATE", no_log=false, no_survey=false, desc="240" },
+        { address=0X3018, type="u24le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Setting (Takes effect on reset) increased" },
+        { address=0X3018, type="u24le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Setting (Takes effect on reset) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1740, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game: Current Player's Score (BCD)" },
+        { address=0X175C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game: Player 2 Score (BCD)" },
+        { address=0X17A0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game: Player 1 Score (BCD)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0890, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Game: Boss Health (Value*8)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X174C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time played? - Resets to 00 at continue screen" },
+        { address=0X302B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Continue Screen Timer" },
+      },
+    },
+  },
+}

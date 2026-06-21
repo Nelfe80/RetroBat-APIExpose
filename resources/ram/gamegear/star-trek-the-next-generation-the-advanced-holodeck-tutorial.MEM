@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Star Trek: The Next Generation - The Advanced Holodeck Tutorial",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Simulation"
+  },
+
+  rom = {
+    name = "star-trek-the-next-generation-the-advanced-holodeck-tutorial",
+    file = "star-trek-the-next-generation-the-advanced-holodeck-tutorial.zip",
+    hashes = {
+      { hash = "b8d1dafa4077b7afcb8989c23246bbcb", label = "Star Trek - The Next Generation - The Advanced Holodeck Tutorial (USA).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0D0B, type="u16le", condition="eq", value=0X00, action="CORPORATE_SCREEN", no_log=false, no_survey=false, desc="SEGA!" },
+        { address=0X0D0B, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Star Trek Title Screen" },
+        { address=0X0D0B, type="u16le", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X111D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Support Status increased" },
+        { address=0X111D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Support Status decreased" },
+      },
+      health = {
+        { address=0X0D0B, type="u16le", condition="eq", value=0X16, action="HIT", no_log=false, no_survey=false, desc="Damage Control" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0D0B, type="u16le", condition="eq", value=0X12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Arming/Disarming Weapons" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0D0B, type="u16le", condition="eq", value=0X11, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Raising/Lowering Shields" },
+        { address=0X1129, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Status" },
+        { address=0X130A, type="u8", condition="eq", value=0X7F, action="SPEED_START", no_log=false, no_survey=false, desc="P-meter fully charged" },
+        { address=0X130A, type="u8", condition="decrease", action="SPEED_STOP", no_log=false, no_survey=false, desc="P-meter draining down" },
+        { address=0X130A, type="u8", condition="change", action="SPEED_TIMER", no_log=true, no_survey=false, desc="Transport Minigame: Power Meter" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0ED1, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Romulan Blockade - Min Lt. Commander" },
+        { address=0X0ED1, type="u8", condition="eq", value=0X13, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Asteroid (Romulan Outpost) - Min Commander" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X12F9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Credits Timer" },
+      },
+    },
+  },
+}

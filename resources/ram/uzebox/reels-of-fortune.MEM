@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Reels of Fortune",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "reels-of-fortune",
+    file = "reels-of-fortune.zip",
+    hashes = {
+      { hash = "d7aa7d8e9e33c7221dabee40cfecaded", label = "Reels of Fortune (World) (KILO).uze" },
+    }
+  },
+
+  events = {
+  },
+}

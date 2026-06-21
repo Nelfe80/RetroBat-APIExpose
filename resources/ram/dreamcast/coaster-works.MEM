@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Coaster Works",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Construction and Management Simulation, Strategy"
+  },
+
+  rom = {
+    name = "coaster-works",
+    file = "coaster-works.zip",
+    hashes = {
+      { hash = "911fba77cced5ebad1a99794eb04fa49", label = "Coaster Works (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X120348, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X11FA9E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minimum Speed Score in KPH" },
+        { address=0X11FAA0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="G-Force Score" },
+        { address=0X11FAA2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Thrill Score" },
+        { address=0X11FAA4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Safety Score" },
+        { address=0X11FAAE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minimum Speed Score in KPH" },
+        { address=0X11FAB0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="G-Force Score" },
+        { address=0X11FAB2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Thrill Score" },
+        { address=0X11FAB4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Safety Score" },
+        { address=0X11FC8E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="File 1 Total Score" },
+        { address=0X11FC90, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="File 2 Total Score" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X11F8CC, type="u16le", condition="eq", value=0X0, action="JUMPING", no_log=true, no_survey=false, desc="On" },
+      },
+    },
+  },
+}

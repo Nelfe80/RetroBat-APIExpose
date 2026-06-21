@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Ushio to Tora",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ushio-to-tora",
+    file = "ushio-to-tora.zip",
+    hashes = {
+      { hash = "56eb2efae78362a61a06067199029155", label = "Ushio to Tora (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X082F, type="u8", condition="eq", value=0X1A, action="GAME_OVER", no_log=false, no_survey=false, desc="92" },
+        { address=0X082F, type="u8", condition="eq", value=0X1B, action="GAME_OVER", no_log=false, no_survey=false, desc="A5" },
+        { address=0X082F, type="u8", condition="eq", value=0X1C, action="GAME_OVER", no_log=false, no_survey=false, desc="B0" },
+        { address=0X082F, type="u8", condition="eq", value=0X4A, action="GAME_OVER", no_log=false, no_survey=false, desc="C6" },
+        { address=0X082F, type="u8", condition="eq", value=0X4B, action="GAME_OVER", no_log=false, no_survey=false, desc="D5" },
+        { address=0X082F, type="u8", condition="eq", value=0X7A, action="GAME_OVER", no_log=false, no_survey=false, desc="93" },
+        { address=0X082F, type="u8", condition="eq", value=0X10A, action="GAME_OVER", no_log=false, no_survey=false, desc="9A" },
+        { address=0X082F, type="u8", condition="eq", value=0X10B, action="GAME_OVER", no_log=false, no_survey=false, desc="BB" },
+        { address=0X082F, type="u8", condition="eq", value=0X10C, action="GAME_OVER", no_log=false, no_survey=false, desc="AA" },
+        { address=0X082F, type="u8", condition="eq", value=0X10D, action="GAME_OVER", no_log=false, no_survey=false, desc="B1" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0608, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Extra Lives increased" },
+        { address=0X0608, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Extra Lives decreased" },
+      },
+      health = {
+        { address=0X021E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health decreased" },
+        { address=0X021E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health increased" },
+        { address=0X0238, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Max Health decreased" },
+        { address=0X0238, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Max Health increased" },
+        { address=0X0924, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Monk 3's Health decreased" },
+        { address=0X0924, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Monk 3's Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0620, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit] Power Up (Yokuwakaran)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0604, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bits] Points it adds 00 at the end" },
+      },
+      collectibles = {
+        { address=0X08B4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Second Boss's Second Worm Health during the fight, Monk 2's Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0844, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] All Boss Health" },
+      },
+    },
+  },
+}

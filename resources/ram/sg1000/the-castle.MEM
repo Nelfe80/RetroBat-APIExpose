@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "The Castle",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-castle",
+    file = "the-castle.zip",
+    hashes = {
+      { hash = "d047c10d6b27cf34ccb66340a089523a", label = "Castle, The (Japan).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00ED, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Title Screen Check" },
+        { address=0X2AE4, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X2B21, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[8 Bit] Frames Until Transition | Game Over" },
+        { address=0X2B23, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Inactive" },
+        { address=0X2B23, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2336, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Total Lives increased" },
+        { address=0X2336, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Total Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X233D, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24 Bit BE] Score" },
+        { address=0X2340, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24 Bit BE] High Score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2343, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[8 Bit] Invincibility Duration" },
+      },
+    },
+  },
+}

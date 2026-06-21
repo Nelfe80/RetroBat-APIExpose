@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Super Boulder Dash",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "super-boulder-dash",
+    file = "super-boulder-dash.zip",
+    hashes = {
+      { hash = "1737dd102fd67908e9a28e124d8686f2", label = "Super Boulderdash (1986)(Electronic Arts)[cr Piracy Zone Software].dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0031, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X0031, type="u8", condition="eq", value=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X5013, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X5013, type="u8", condition="eq", value=0X60, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X7759, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0X7759, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X002C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X002C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X002C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X002C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0X002C, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0X002C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+  },
+}

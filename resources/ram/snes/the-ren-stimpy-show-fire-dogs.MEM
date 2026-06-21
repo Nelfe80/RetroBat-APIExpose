@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "The Ren & Stimpy Show: Fire Dogs",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-ren-stimpy-show-fire-dogs",
+    file = "the-ren-stimpy-show-fire-dogs.zip",
+    hashes = {
+      { hash = "79d5478811af9e29744ff3366f6a4e32", label = "Ren & Stimpy Show, The - Fire Dogs (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0012, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Current On The Job has stage been cleared" },
+        { address=0X0012, type="u8", condition="eq", value=0X45, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Current Fire Station stage has been cleared" },
+        { address=0X0757, type="u8", condition="eq", value=0XDE, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Up and moving around" },
+        { address=0X2558, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Level has begun" },
+      },
+      stage = {
+        { address=0X1FDE, type="u8", condition="eq", value=0XC6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Second Level Bonus Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2550, type="u8", condition="eq", value=0X04, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max before resetting back to 0x00 after collecting a 5th one for an extra life on the Fire Stati" },
+        { address=0X2550, type="u8", condition="eq", value=0X09, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max before resetting back to 0x00 after collecting a 10th one for an extra life on the On The Jo" },
+      },
+      health = {
+        { address=0X8597, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X8597, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power Up has been used" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0757, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

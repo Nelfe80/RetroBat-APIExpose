@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mary-Kate and Ashley: Girls Night Out",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "mary-kate-and-ashley-girls-night-out",
+    file = "mary-kate-and-ashley-girls-night-out.zip",
+    hashes = {
+      { hash = "4c3f934ea0a5c9683a8c82fa57ff1c00", label = "Mary-Kate and Ashley - Girls Night Out (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+  },
+}

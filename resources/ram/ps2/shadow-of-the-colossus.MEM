@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Shadow of the Colossus",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "shadow-of-the-colossus",
+    file = "shadow-of-the-colossus.zip",
+    hashes = {
+      { hash = "d4086e66d4a55a3381574d871a4ce562", label = "Shadow of the Colossus (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1289E78, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused 0x01" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X12D9BCC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Max HP [float] decreased" },
+        { address=0X12D9BCC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Max HP [float] increased" },
+        { address=0X12DE264, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [Float] decreased" },
+        { address=0X12DE264, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [Float] increased" },
+        { address=0X1466BD0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Colossi HP [float] decreased" },
+        { address=0X1466BD0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Colossi HP [float] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1466EB0, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X1466EB0, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bow" },
+        { address=0X1466EB0, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Whistle Arrow Bow" },
+        { address=0X1466EB0, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flash Arrows Bow" },
+        { address=0X1466EB0, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hand" },
+        { address=0X1466EB0, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Stick" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1466BD4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Float] Other Boss HP check (Ensures the player doesn't just walk out of the arena)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lilo and Stitch: Trouble in Paradise",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "lilo-and-stitch-trouble-in-paradise",
+    file = "lilo-and-stitch-trouble-in-paradise.zip",
+    hashes = {
+      { hash = "026ead58e6227ad1a726e8eec7e87543", label = "Disney's Lilo & Stitch (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

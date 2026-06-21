@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "O.D.T.: Escape... Or Die Trying",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "o-d-t-escape-or-die-trying",
+    file = "o-d-t-escape-or-die-trying.zip",
+    hashes = {
+      { hash = "a244895b60da82be7fab986e90a2b319", label = "O.D.T. (USA) (Anti-Cheat) (v1.0) (manakoDE)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA81E8, type="u8", condition="eq", value=0X4, action="DEMO_MODE", no_log=false, no_survey=false, desc="Watching the intro cinematic or a demo" },
+        { address=0XA96F0, type="u16le", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="on" },
+        { address=0XA9724, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[Bit0] Pause menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA963C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XA96FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amount of gas canisters collected on current level" },
+        { address=0XAA080, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[2-bit pairs] Spell level (1/8)" },
+        { address=0XAA082, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[2-bit pairs] Spell level (3/8)" },
+        { address=0XAA083, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[2-bit pairs] Spell level (4/8)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA9644, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Amount of items picked up in current level increased" },
+        { address=0XA9644, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amount of items picked up in current level decreased" },
+        { address=0XAA098, type="u16le", condition="eq", value=0X7FFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="max value" },
+        { address=0XAA098, type="u16le", condition="eq", value=0X31, action="LIVES_STATE", no_log=false, no_survey=false, desc="max value ingame" },
+        { address=0XAA098, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XAA098, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XA9EC0, type="u16le", condition="eq", value=0X7FFF, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max value" },
+        { address=0XA9EC0, type="u16le", condition="eq", value=0X64, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max value ingame" },
+        { address=0XA9EC0, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="HP bar" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAA049, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Light" },
+        { address=0XAA049, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fire" },
+        { address=0XAA049, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ionic" },
+        { address=0XAA049, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fusion" },
+        { address=0XAA04C, type="u8", condition="eq", value=0X7F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max value" },
+        { address=0XAA04C, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="min ingame value (this equals 0)" },
+        { address=0XAA04C, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max value ingame" },
+        { address=0XAA054, type="u8", condition="eq", value=0X7F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max value" },
+        { address=0XAA054, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="min ingame value (this equals 0)" },
+        { address=0XAA054, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max value ingame" },
+        { address=0XAA05C, type="u8", condition="eq", value=0X7F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max value" },
+        { address=0XAA05C, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="min ingame value (this equals 0)" },
+        { address=0XAA05C, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max value ingame" },
+        { address=0XAA064, type="u8", condition="eq", value=0X7F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max value" },
+        { address=0XAA064, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="min ingame value (this equals 0)" },
+        { address=0XAA064, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max value ingame" },
+        { address=0XAA0A3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon EXP bar - max value ingame = 64" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAA04A, type="u16le", condition="eq", value=0X7FFF, action="AMMO_STATE", no_log=true, no_survey=false, desc="max value" },
+        { address=0XAA04A, type="u16le", condition="eq", value=0X64, action="AMMO_STATE", no_log=true, no_survey=false, desc="max value ingame" },
+        { address=0XAA052, type="u16le", condition="eq", value=0X7FFF, action="AMMO_STATE", no_log=true, no_survey=false, desc="max value" },
+        { address=0XAA052, type="u16le", condition="eq", value=0X64, action="AMMO_STATE", no_log=true, no_survey=false, desc="max value ingame" },
+        { address=0XAA05A, type="u16le", condition="eq", value=0X7FFF, action="AMMO_STATE", no_log=true, no_survey=false, desc="max value" },
+        { address=0XAA05A, type="u16le", condition="eq", value=0X64, action="AMMO_STATE", no_log=true, no_survey=false, desc="max value ingame" },
+        { address=0XAA062, type="u16le", condition="eq", value=0X7FFF, action="AMMO_STATE", no_log=true, no_survey=false, desc="max value" },
+        { address=0XAA062, type="u16le", condition="eq", value=0X64, action="AMMO_STATE", no_log=true, no_survey=false, desc="max value ingame" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA96AE, type="u16le", condition="eq", value=0X2, action="BOSS_HIT", no_log=false, no_survey=false, desc="Trent boss room" },
+        { address=0XA96AE, type="u16le", condition="eq", value=0XD, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss area" },
+        { address=0XA96AE, type="u16le", condition="eq", value=0X8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Butcher boss area" },
+        { address=0XA96AE, type="u16le", condition="eq", value=0XA, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dragon boss 2 area" },
+        { address=0XAB014, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP % - max value ingame = 64" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XAA07D, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA96AE, type="u16le", condition="eq", value=0XA, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Orange door area" },
+        { address=0XA96AE, type="u16le", condition="eq", value=0XB, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Multikey door area" },
+        { address=0XA9706, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="First door key" },
+      },
+    },
+  },
+}

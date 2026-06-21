@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Where in North Dakota is Carmen Sandiego?",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "where-in-north-dakota-is-carmen-sandiego",
+    file = "where-in-north-dakota-is-carmen-sandiego.zip",
+    hashes = {
+      { hash = "f8390801d740b6537268e72cabc6cc5d", label = "Where in North Dakota is Carmen Sandiego side A.woz" },
+      { hash = "6cb0d076de2acd89366e053de6196ebe", label = "Where in North Dakota is Carmen Sandiego side B.woz" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0013, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current time (24 hour clock)" },
+      },
+    },
+  },
+}

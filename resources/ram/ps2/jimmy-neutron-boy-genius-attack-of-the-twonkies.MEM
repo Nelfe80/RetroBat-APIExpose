@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Jimmy Neutron: Boy Genius - Attack of the Twonkies",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "jimmy-neutron-boy-genius-attack-of-the-twonkies",
+    file = "jimmy-neutron-boy-genius-attack-of-the-twonkies.zip",
+    hashes = {
+      { hash = "150eefa1ae64015c22c2bee979a9ee76", label = "Nickelodeon Jimmy Neutron - Boy Genius - Attack of the Twonkies (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X480494, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is paused, Menu Is Open, Or Starting Level Cutscene is playing" },
+        { address=0X480514, type="u8", condition="eq", value=0X0A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Park Pandemonium" },
+        { address=0X480514, type="u8", condition="eq", value=0X11, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X480A88, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Player is playing the Game" },
+        { address=0X480A88, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo is playing along with Splash Screesns popping up for when the Game is booting up" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X48A794, type="u32le", condition="eq", value=0X00015200, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The result screen when the level results are all recorded in" },
+        { address=0X48BC00, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="A Level has fully loaded on the Loading Screen before sending the Player to set Level" },
+      },
+      stage = {
+        { address=0X48A794, type="u32le", condition="eq", value=0X00015270, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Result Screen has been pulled up after beating a Stage" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X480514, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Crater Boss" },
+        { address=0X480514, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Playground Boss" },
+        { address=0X480514, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Frozen Lake Boss" },
+        { address=0X480514, type="u8", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rollercoaster Boss" },
+        { address=0X480514, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+      },
+    },
+  },
+}

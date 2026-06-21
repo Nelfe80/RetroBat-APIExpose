@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "The Hunt for Red October",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "the-hunt-for-red-october",
+    file = "the-hunt-for-red-october.zip",
+    hashes = {
+      { hash = "47d7b7ba3419b894002b0402685a0960", label = "Hunt for Red October, The (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001F, type="u8", condition="eq", value=0X4E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Transition to Title" },
+        { address=0X001F, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X159E, type="u8", condition="eq", value=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X152D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Turns 01 at Mission Complete or end of bonus round" },
+        { address=0X1539, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X095A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Input for Cheat Codes decreased" },
+        { address=0X14E1, type="u16le", condition="eq", value=0X04B0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="max health (1200 hp)" },
+        { address=0X14E1, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="submarine/player health" },
+        { address=0X14E5, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Percent Damage to Sub" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X095A, type="u8", condition="eq", value=0X033F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Stage Complete" },
+        { address=0X095A, type="u8", condition="eq", value=0X94BC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Invincible" },
+        { address=0X095A, type="u8", condition="eq", value=0XA587, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Invincible All Map All Powerup" },
+        { address=0X095A, type="u8", condition="eq", value=0X9C9C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="All Power Ups" },
+        { address=0X095A, type="u8", condition="eq", value=0XEEBB, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Map Unlock" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X14E3, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="How many hits sub can take- 0c = destroyed" },
+        { address=0X1503, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="How many hits sub can take- 0c = destroyed" },
+      },
+    },
+  },
+}

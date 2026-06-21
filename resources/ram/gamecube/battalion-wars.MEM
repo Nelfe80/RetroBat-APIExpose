@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Battalion Wars",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "battalion-wars",
+    file = "battalion-wars.zip",
+    hashes = {
+      { hash = "c375d1851733931a688572ea39a45a6d", label = "Battalion Wars (USA)" },
+      { hash = "a30cea2acf030fa8216f59b4f877847e", label = "Battalion Wars (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

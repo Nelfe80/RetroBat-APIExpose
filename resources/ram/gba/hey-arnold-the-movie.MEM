@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Hey Arnold! The Movie",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "hey-arnold-the-movie",
+    file = "hey-arnold-the-movie.zip",
+    hashes = {
+      { hash = "a234f8b94fafc111ab29f235361baf50", label = "Hey Arnold! - The Movie (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10FC, type="u8", condition="eq", value=0X6D, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Screen" },
+        { address=0X168A, type="u8", condition="eq", value=0X09, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1A90, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game is currently being played after starting a new file" },
+        { address=0X1A90, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Over Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X168A, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Cutscene" },
+        { address=0X1ABA, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Helga's House" },
+        { address=0X7D10, type="u8", condition="eq", value=0X7C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage has been completed" },
+      },
+      stage = {
+        { address=0X168A, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X239C, type="u8", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X239C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total amount of Extra Lives increased" },
+        { address=0X239C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total amount of Extra Lives decreased" },
+        { address=0X3DDE, type="u8", condition="eq", value=0X1E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Animation" },
+        { address=0X3DDE, type="u8", condition="eq", value=0X22, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Falling Death Animation" },
+        { address=0X3DDE, type="u8", condition="eq", value=0X1C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Drowning Death Animation" },
+      },
+      health = {
+        { address=0X2398, type="u8", condition="eq", value=0X05, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0X2398, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health" },
+        { address=0X3DDE, type="u8", condition="eq", value=0X08, action="HIT", no_log=false, no_survey=false, desc="Taking damage Animation" },
+        { address=0X3DDE, type="u8", condition="eq", value=0X31, action="HIT", no_log=false, no_survey=false, desc="Bus taking some damage" },
+        { address=0X4159, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Donut Power Up has been picked up decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X4159, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Unobtained" },
+        { address=0X4159, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Obtained" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1AB8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflag] Stages Unlocked after clearing a previous stage increased" },
+        { address=0X1AB9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflag] Stages Unlocked after clearing a previous stage increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5C60, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3DDE, type="u8", condition="eq", value=0X05, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Animation Start" },
+        { address=0X4152, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Unobtained" },
+        { address=0X4152, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Obtained" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3DDE, type="u8", condition="eq", value=0X14, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Walking in and out of Doors Animation" },
+      },
+    },
+  },
+}

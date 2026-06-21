@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "X2: Wolverine's Revenge",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "x2-wolverines-revenge",
+    file = "x2-wolverines-revenge.zip",
+    hashes = {
+      { hash = "69662d33f665b2e00e4f95aa75b16a6a", label = "X2 - Wolverine's Revenge (USA, Europe).gba" },
+      { hash = "d591ab2bf2216e452298264b708664bd", label = "X2 - Wolverine's Revenge (USA) (Pt) (v1.0) (Ninho).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB78C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0XB85C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused (0 = no, 1 = yes)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB6F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (level_num - 1)" },
+        { address=0XB768, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Levels completed" },
+        { address=0XB7A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kills on current level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB790, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XB790, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XE3C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (max = 0x19) decreased" },
+        { address=0XE3C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (max = 0x19) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XB794, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powerups (0xff = all powerups)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB714, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Level area (0 = first, 1 = second, 2 = third, 3 = boss room)" },
+        { address=0XE6A0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health (not editable)" },
+      },
+    },
+  },
+}

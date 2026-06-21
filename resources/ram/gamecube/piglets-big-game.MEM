@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Piglet's Big Game",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "piglets-big-game",
+    file = "piglets-big-game.zip",
+    hashes = {
+      { hash = "d50f341088b0b5ea558e0aedb7b11853", label = "Disney's Piglet's Big Game (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Fire Emblem: Fuuin no Tsurugi",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "fire-emblem-fuuin-no-tsurugi",
+    file = "fire-emblem-fuuin-no-tsurugi.zip",
+    hashes = {
+      { hash = "8643fe7632d4895dcaaca230475e70fb", label = "Fire Emblem - Fuuin no Tsurugi (Japan).gba" },
+      { hash = "88f766fa2a21260400c400e215464bca", label = "Fire Emblem - Fuuin no Tsurugi (Japan) (En) (v1.1br7) (Gringe).gba" },
+      { hash = "9fc134a926a9f2fe84a141aba2ba25a9", label = "Fire Emblem - Fuuin no Tsurugi (Japan) (En) (v1.0) (Gringe).gba" },
+      { hash = "b7852693495694145a8a0afaac73e60d", label = "Fire Emblem - Fuuin no Tsurugi (Japan) (En) (v2.1) (Dark Twilkitri).gba" },
+      { hash = "254fafda5e314ca26d4001810f750c64", label = "Fire Emblem - Fuuin no Tsurugi (Japan) (En) (v1.2.1) (Gringe).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4130C, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="critical" },
+        { address=0X4130C, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="miss" },
+        { address=0X4130C, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="triangle attack" },
+        { address=0X41310, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 bytes] the rest of the battle rounds" },
+        { address=0X4801C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Unknown flag to check for proper NG+ clear Part 1" },
+        { address=0X4801D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Unknown flag to check for proper NG+ clear Part 2" },
+      },
+      stage = {
+        { address=0X32B80, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - Current Level - Character 1" },
+        { address=0X32BA9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 1st Support Level - Character 1" },
+        { address=0X32BAA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 2nd Support Level - Character 1" },
+        { address=0X32BAB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 3rd Support Level - Character 1" },
+        { address=0X32BAC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 4th Support Level - Character 1" },
+        { address=0X32BAD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 5th Support Level - Character 1" },
+        { address=0X32BAE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 6th Support Level - Character 1" },
+        { address=0X32BAF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 7th Support Level - Character 1" },
+        { address=0X32BB0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 8th Support Level - Character 1" },
+        { address=0X32BB1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] - 9th Support Level - Character 1" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X32B88, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] - Max HP - Character 1 decreased" },
+        { address=0X32B88, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] - Max HP - Character 1 increased" },
+        { address=0X32B89, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] - Current HP - Character 1 decreased" },
+        { address=0X32B89, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] - Current HP - Character 1 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X41230, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X32A50, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Gold increased" },
+      },
+    },
+  },
+}

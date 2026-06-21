@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Dragon Knight II",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dragon-knight-ii",
+    file = "dragon-knight-ii.zip",
+    hashes = {
+      { hash = "75793c796b6b8bd88698eec24842d7b5", label = "Dragon Knight II (Disk A) [Alt 1].d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC2F1, type="u8", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground" },
+        { address=0XC313, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4822, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Wolf Enemy HP decreased" },
+        { address=0X4822, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Wolf Enemy HP increased" },
+        { address=0X496E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Knight Enemy HP decreased" },
+        { address=0X496E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Knight Enemy HP increased" },
+        { address=0X4ACA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Slime Enemy HP decreased" },
+        { address=0X4ACA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Slime Enemy HP increased" },
+        { address=0XC315, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] HP decreased" },
+        { address=0XC315, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] HP increased" },
+        { address=0XC317, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] HP Max decreased" },
+        { address=0XC317, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] HP Max increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC077, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0+b4=chapter7/bubble + evil coins increased" },
+        { address=0XC0D6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] gold key increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC086, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] chest/kite shield + Chapter 10/Anaconda" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC06B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] big door opened" },
+        { address=0XC07C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] evil doors" },
+      },
+    },
+  },
+}

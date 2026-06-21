@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Castlevania: Aria of Sorrow [Subset - Bonus]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "castlevania-aria-of-sorrow-subset-bonus",
+    file = "castlevania-aria-of-sorrow-subset-bonus.zip",
+    hashes = {
+      { hash = "521fed769a79cc485b2463bfaad161b6", label = "Castlevania - Aria of Sorrow [Subset - Bonus].gba" },
+    }
+  },
+
+  events = {
+  },
+}

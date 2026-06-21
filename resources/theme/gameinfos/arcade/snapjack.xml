@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${red}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ACI        11700</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ADGKNNQUSR 11450</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 VSPMKIIPON 10610</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 CCEGHMMNOP 10260</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 -=♥♂♀♆♪♆♆♆ 2470</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

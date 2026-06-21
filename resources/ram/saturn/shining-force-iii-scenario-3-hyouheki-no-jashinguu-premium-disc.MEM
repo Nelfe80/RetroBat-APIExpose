@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Shining Force III: Scenario 3 - Hyouheki no Jashinguu + Premium Disc",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "shining-force-iii-scenario-3-hyouheki-no-jashinguu-premium-disc",
+    file = "shining-force-iii-scenario-3-hyouheki-no-jashinguu-premium-disc.zip",
+    hashes = {
+      { hash = "aa89cb6b73757d209aead63954a8ecce", label = "Shining Force III - Scenario 3 - Hyouheki no Jashinguu (Japan) (En) (v24) (SF3TP)" },
+      { hash = "52bc1202beb1c29434ab248b56aaefd6", label = "Shining Force III - Scenario 3 - Hyouheki no Jashinguu (Japan)" },
+      { hash = "9853f18eba1fe90b2192587e89581e42", label = "Shining Force III Premium Disc (Japan)" },
+      { hash = "b76c5076f4567d7cb479b988fe98e9c5", label = "Shining Force III - Premium Disc (Japan) (En) (v24) (SF3TP)" },
+    }
+  },
+
+  events = {
+  },
+}

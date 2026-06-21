@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Racer",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "racer",
+    file = "racer.zip",
+    hashes = {
+      { hash = "ddc6ce5c7624c1ff33537faef8ddae0e", label = "Racer (World) (v0.6) (Claudio Mattera).wasm" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5EB8, type="u8", condition="eq", value=0X0A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Main menu after game finish" },
+      },
+      stage = {
+        { address=0X5EB8, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="High score screen/Main menu" },
+        { address=0X5EB8, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Load High score screen" },
+        { address=0X5EB8, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Desert" },
+        { address=0X5EB8, type="u8", condition="eq", value=0X0F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mountain" },
+        { address=0X5EB8, type="u8", condition="eq", value=0X13, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="City" },
+        { address=0X5EB8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5DE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit float] Total game high score time" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X606C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32-bit float] Total level time" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mortal Kombat II",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-ii",
+    file = "mortal-kombat-ii.zip",
+    hashes = {
+      { hash = "c60f62f13a60bc585822bfd2d68ba75c", label = "Mortal Kombat II (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+  },
+}

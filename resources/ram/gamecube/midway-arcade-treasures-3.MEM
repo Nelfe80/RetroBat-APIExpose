@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Midway Arcade Treasures 3",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "midway-arcade-treasures-3",
+    file = "midway-arcade-treasures-3.zip",
+    hashes = {
+      { hash = "3b3b5759a00175126c349df58115362e", label = "Midway Arcade Treasures 3 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X004A, type="u16be", condition="eq", value=0X5AC0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X296397, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Midway" },
+      },
+    },
+  },
+}

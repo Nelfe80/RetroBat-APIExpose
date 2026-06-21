@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Xardion",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "xardion",
+    file = "xardion.zip",
+    hashes = {
+      { hash = "4369249d5f53fb9d70b1915cf533af03", label = "Xardion (USA).sfc" },
+      { hash = "6595db032bf24945df534415fe376625", label = "Xardion (USA) (MSU-1) (Conn,Kurrono,PepilloPEV) (1.5).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0EC7, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Xardian Hyper Beam: Used to determine player is past title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X090B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select and Current Level:" },
+        { address=0X0ED8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished Stage 3: 00->01" },
+        { address=0X0EE0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 6 Completed: 00->01" },
+      },
+      stage = {
+        { address=0X0865, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage:" },
+        { address=0X0D2C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Selected Character Level: Hex" },
+        { address=0X0EB6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act-Plasma Obtained - 01" },
+        { address=0X209E0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage-3 Beaten Save-File: 01" },
+        { address=0X209E2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage-4 Beaten Save-File: 01" },
+        { address=0X209E3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage-X? Beaten Save-File: 01" },
+        { address=0X209E5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Also Stage-5 Beaten Save-File: 01" },
+        { address=0X209FA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Also Stage-2 Beaten Save-File: 01" },
+        { address=0X20A02, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Also Stage-5 Beaten Save-File: 01" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0D1A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP: Hex decreased" },
+        { address=0X0D1A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP: Hex increased" },
+        { address=0X0D1B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Max HP: Hex decreased" },
+        { address=0X0D1B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Max HP: Hex increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0D2F, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo: Hex" },
+        { address=0X0D37, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo Shooting?" },
+        { address=0X0EB1, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo Item Amount: Hex" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X002B, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss 1 Defeated?: 04->00" },
+        { address=0X00FC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Wall Boss and Final phase 1 Start" },
+        { address=0X0BF0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Active: No-00, Yes-01" },
+        { address=0X0BF1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 Killed? - 00" },
+        { address=0X0BF2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss phase:" },
+        { address=0X0C26, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2,3,5,6,7Killed Animation" },
+        { address=0X0ED4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Killed? 00->01" },
+        { address=0X0EE7, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Face Wall Boss Defeated: 00->01" },
+        { address=0X0EE8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Room: 00->01" },
+        { address=0X0EEA, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Final Boss Defeated: 00->01" },
+        { address=0X0EEF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 Killed? 00->01" },
+        { address=0X0EF1, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Side Boss Defeated: 00->01" },
+        { address=0X0EF6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Ghost Ship Boss Killed: 00->01" },
+        { address=0X0EF9, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss 6 Defeated: 00->01" },
+        { address=0X0F1E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 6 Face 1 HP: Hex" },
+        { address=0X0F6D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Used for Boss retries" },
+        { address=0X0F7E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Left Pincher HP: Hex" },
+        { address=0X0FDE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 6 Face 3 HP: Hex" },
+        { address=0X103E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 6 Face 4 HP: Hex" },
+        { address=0X109E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Left Eye HP: Hex" },
+        { address=0X115E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Right Pincher HP: Hex" },
+        { address=0X127E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Right Eye HP: Hex" },
+        { address=0X1BCE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP - Hex" },
+        { address=0X1BD6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 and Parasite Start Condition" },
+        { address=0X1BE1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Start fighting? 00->08" },
+        { address=0X209F4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Also Stage-4 Boss Beaten Save-File: 01" },
+        { address=0X209F7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Blob Boss Beaten Save-File: 01" },
+        { address=0X209FB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Arms Boss Beaten Save-File: 01" },
+        { address=0X209FC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Crab Boss Beaten Save-File: 01" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0EB9, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Obtained - 01" },
+        { address=0X0EC5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inv-Shield Obtained - 01" },
+        { address=0X209C1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Save-File:" },
+        { address=0X209CD, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inv-Shield Save-File:" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0E95, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed Orb of Light? 0->1" },
+      },
+    },
+  },
+}

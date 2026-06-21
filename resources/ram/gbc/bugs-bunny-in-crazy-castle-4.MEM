@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Bugs Bunny in Crazy Castle 4",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "bugs-bunny-in-crazy-castle-4",
+    file = "bugs-bunny-in-crazy-castle-4.zip",
+    hashes = {
+      { hash = "0877a4b1765287c5b50ea53a47a1d7ad", label = "Bugs Bunny in - Crazy Castle 4 (USA).gbc" },
+      { hash = "30567b9d1cf0881fee0e15cdfdc250da", label = "Bugs Bunny - Crazy Castle 4 (Japan).gbc" },
+      { hash = "c8fafcbb7a673765ade44b404b734a92", label = "Bugs Bunny in - Crazy Castle 4 (Europe).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC8C0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Buttons Held This Frame (Demo Based)" },
+        { address=0XC8C1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Buttons Pressed This Frame (Demo Based)" },
+        { address=0XC92C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Loaded Title Screen Once?" },
+        { address=0XC981, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD00A, type="u8", condition="eq", value=0X71, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the Overworld" },
+      },
+      zone = {
+        { address=0XC8E0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID (0-Index)" },
+        { address=0XC8ED, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage ID Per World (0-Index)" },
+      },
+      stage = {
+        { address=0XC8E1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Continuous Stage ID (0-Index)" },
+        { address=0XC8EE, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Stage (some)" },
+        { address=0XC8EE, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Stage (some)" },
+        { address=0XC8EE, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Treasure Room" },
+        { address=0XC8EE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Alternate In-Stage State" },
+        { address=0XC92D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Continuous Stage ID (0-Index) (Duplicate of 0xc8e1)" },
+        { address=0XC963, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In a Treasure Room" },
+        { address=0XC963, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="On Main Stage. Sometimes flickers to 0x00." },
+        { address=0XC963, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Transitioning from Treasure Room to Main Stage" },
+        { address=0XC963, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage State (Limited)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC900, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bugs' Health increased" },
+        { address=0XC900, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bugs' Health decreased" },
+        { address=0XC901, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bugs' Life Count increased" },
+        { address=0XC901, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bugs' Life Count decreased" },
+      },
+      health = {
+        { address=0XC905, type="u8", condition="bit_true", bit=4, mask=0X10, action="HIT", no_log=false, no_survey=false, desc="Carrot Shield (Invincibility, cannot damage enemies with it.)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XD006, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="facing 'away' from the screen. Mainly for ladders and opening doors. Also used if on an interior" },
+      },
+      weapon = {
+        { address=0XD00A, type="u8", condition="eq", value=0X4F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Transporting Between Floors via Door OR Ladder OR firing a weapon (weapon firing animation happe" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC905, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Super Carrot Shield (Can defeat enemies with this.)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC905, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Hammer Found (Destroy rocks)" },
+        { address=0XC912, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Final Door Reminder" },
+        { address=0XD006, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 if trying to open/go through a door." },
+        { address=0XD006, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 if you fail to open the door. Mainly if you are short on keys on opening the final door." },
+        { address=0XD00D, type="u8", condition="eq", value=0X51, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bugs is walking." },
+        { address=0XD00D, type="u8", condition="eq", value=0X52, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bugs is traveling between floors." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC907, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Carrot Shield Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Zombie Shiki: Eigo Ryoku Sosei Jutsu - English of the Dead",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "zombie-shiki-eigo-ryoku-sosei-jutsu-english-of-the-dead",
+    file = "zombie-shiki-eigo-ryoku-sosei-jutsu-english-of-the-dead.zip",
+    hashes = {
+      { hash = "cfe2c47c566d3e8d244ee11ae1fee0f2", label = "Zombie Shiki - Eigo Ryoku Sosei Jutsu - English of the Dead (Japan).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1A4EB8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health decreased" },
+        { address=0X1A4EB8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health increased" },
+        { address=0X1A4EC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health decreased" },
+        { address=0X1A4EC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health increased" },
+      },
+    },
+  },
+}

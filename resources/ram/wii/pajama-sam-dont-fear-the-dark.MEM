@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Pajama Sam: Don't Fear the Dark",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure, Education"
+  },
+
+  rom = {
+    name = "pajama-sam-dont-fear-the-dark",
+    file = "pajama-sam-dont-fear-the-dark.zip",
+    hashes = {
+      { hash = "0ed6d891b440e766e21a6ec5078ab3f6", label = "Pajama Sam - Don't Fear the Dark (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XF178F4, type="u8", condition="eq", value=0X25, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mines (Gold Room)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF178F4, type="u8", condition="eq", value=0X22, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Mines (One-Way Door)" },
+        { address=0XF178F4, type="u8", condition="eq", value=0X2D, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Darkness' House (Floor 2, Doors of Knowledge)" },
+        { address=0XF178F4, type="u8", condition="eq", value=0X2F, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Past the Doors of Knowledge" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF178F4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

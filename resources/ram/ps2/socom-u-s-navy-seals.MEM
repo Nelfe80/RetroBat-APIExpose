@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "SOCOM: U.S. Navy SEALs",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "socom-u-s-navy-seals",
+    file = "socom-u-s-navy-seals.zip",
+    hashes = {
+      { hash = "3a7f85af76479c90659270979a081931", label = "SOCOM - U.S. Navy SEALs (USA) (v1.00)" },
+      { hash = "9156298a5eaaea61e3a153ae0c76ebda", label = "SOCOM - U.S. Navy SEALs (USA)" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X5D7D34, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit Objective] Mission 1: Eavesdrop Done flag" },
+        { address=0X5D7D5C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit Objective] Mission 1: Reach Freighter Fail flag" },
+        { address=0X5D80B8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit Objective] Mission 1: Dispatch Guard win flag state 2 0x01" },
+        { address=0X5D8BA8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit Objective] Mission 1: Dispatch Guard fail flag" },
+        { address=0X5D8BBC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit Objective] Mission 1: Dispatch Guard win flag 0x01" },
+      },
+    },
+  },
+}

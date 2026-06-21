@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "VMX Racing",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "vmx-racing",
+    file = "vmx-racing.zip",
+    hashes = {
+      { hash = "d31ca050919d0c0ccf4d06e8205161d0", label = "VMX Racing (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

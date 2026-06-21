@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Sushi Go-Round",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Construction and Management Simulation"
+  },
+
+  rom = {
+    name = "sushi-go-round",
+    file = "sushi-go-round.zip",
+    hashes = {
+      { hash = "16106b47c5b9466a11b4684c7911d53a", label = "Sushi Go-Round (USA) (En,Fr,De,Es,It) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X258600, type="u16le", condition="eq", value=0X6, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X258604, type="u32le", condition="eq", value=0X28, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+  },
+}

@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Duel Monsters",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-duel-monsters",
+    file = "yu-gi-oh-duel-monsters.zip",
+    hashes = {
+      { hash = "770a917f18e0aa1f3bb027d0783f548b", label = "Yu-Gi-Oh! Duel Monsters (Japan) (SGB Enhanced).gb" },
+      { hash = "dea982111cc284f28ec4c161e921bbcf", label = "Yu-Gi-Oh! Duel Monsters (Japan) (En) (v1.0) (Darrman).gb" },
+      { hash = "0c21cf8df56d55f0696036ed7508946b", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters (En).gb" },
+      { hash = "3adbda6de0b4edb496064d2e83449326", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters (Es).gb" },
+      { hash = "2534c95317a9c0324a5bcd0e4765ea23", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters (De).gb" },
+      { hash = "43cbc5b46fdd1c9825e0d8f3fdf17639", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters (Fr).gb" },
+      { hash = "9371994bab043a73d678776f84e526d0", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters (It).gb" },
+      { hash = "35e6e4336d8c1a1997cf7c4f047bc91a", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters (Ja).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XCF04, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 - Duelist selected [8bit]" },
+        { address=0XCF92, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Duelist selected [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCAB0, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Duel - Player's Life Points [16bit; BCD] increased" },
+        { address=0XCAB0, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Duel - Player's Life Points [16bit; BCD] decreased" },
+        { address=0XCAB3, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Duel - Opponent's Life Points [16bit; BCD] increased" },
+        { address=0XCAB3, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Duel - Opponent's Life Points [16bit; BCD] decreased" },
+        { address=0XCB2D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- #074 - Giant Rock Soldier" },
+        { address=0XCB53, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="--- #112 - Life Eater increased" },
+        { address=0XCB53, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- #112 - Life Eater decreased" },
+        { address=0XCBC8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="--- #229 - Hourglass of Life increased" },
+        { address=0XCBC8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- #229 - Hourglass of Life decreased" },
+        { address=0XCC0C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- #297 - Cyber Soldier of Darkworld" },
+        { address=0XCC4F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- #364 - Black Luster Soldier" },
+      },
+      health = {
+        { address=0XCC12, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="--- #303 - Dark Energy decreased" },
+        { address=0XCC12, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="--- #303 - Dark Energy increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XCC1E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="--- #315 - Dragon Treasure" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCB1E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="--- #059 - Mammoth Graveyard" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCC0B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="--- #296 - One-eyed Shield Dragon" },
+        { address=0XCC20, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="--- #317 - Cyber Shield" },
+        { address=0XCC4D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="--- #362 - Millennium Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCBB8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="--- #213 - Aqua Madoor" },
+        { address=0XCBF0, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="--- #269 - Versago the Destroyer" },
+      },
+    },
+  },
+}

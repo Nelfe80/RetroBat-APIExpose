@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Def Jam: Vendetta",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "def-jam-vendetta",
+    file = "def-jam-vendetta.zip",
+    hashes = {
+      { hash = "6514d51cd04720c57cb2b8de6149a8e8", label = "Def Jam - Vendetta (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X29E46C, type="u16le", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X23630C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Survival - Rounds Completed" },
+        { address=0X29F4C4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Survival - Rounds Completed" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2A02FC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Health Bonus decreased" },
+        { address=0X2A02FC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Health Bonus increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X29E46C, type="u16le", condition="eq", value=0X11, action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Scores" },
+        { address=0X29E474, type="u32le", condition="eq", value=0X06, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores" },
+        { address=0X29F524, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Survival - Running Total Score" },
+        { address=0X2A02D4, type="u16le", condition="eq", value=0X00, action="SCORE_STATE", no_log=false, no_survey=false, desc="Not Up" },
+        { address=0X2A02D4, type="u16le", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Solo Scorecard" },
+        { address=0X2A02D4, type="u16le", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Tag Team Scorecard" },
+        { address=0X2A02D4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Scorecard State" },
+        { address=0X2A02F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Score" },
+        { address=0X2A0300, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Total Points" },
+        { address=0X2A0304, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Cash From Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X22FD58, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Timer - Minutes" },
+        { address=0X22FD5C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Timer - Seconds" },
+        { address=0X22FD68, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Timer - Minutes - Total in Survival" },
+        { address=0X22FD6C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Timer - Seconds - Total in Survival" },
+        { address=0X29F4C8, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Survival - Total Time - Seconds" },
+        { address=0X2A02F8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Time Bonus" },
+      },
+    },
+  },
+}

@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Dragon Quest IX: Sentinels of the Starry Skies [Subset - Accolade Acquirer]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-quest-ix-sentinels-of-the-starry-skies-subset-accolade-acquirer",
+    file = "dragon-quest-ix-sentinels-of-the-starry-skies-subset-accolade-acquirer.zip",
+    hashes = {
+      { hash = "508c729c088dc166f3b188345e845936", label = "Dragon Quest IX - Sentinels of the Starry Skies [Subset - Accolade Acquirer].nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFA8E2, type="u8", condition="bit_true", bit=5, mask=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titled Peer" },
+        { address=0XFA8E2, type="u8", condition="bit_true", bit=6, mask=0X40, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titan of Titles" },
+        { address=0XFA912, type="u8", condition="bit_true", bit=4, mask=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Entitled Adventurer" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFA8E5, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dauntless Deadbeat" },
+        { address=0XFA8F2, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pole Soldier" },
+        { address=0XFA8F9, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diehard Fan" },
+        { address=0XFA903, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadeye" },
+        { address=0XFA905, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boreal Brigadier" },
+        { address=0XFA913, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Steady Eddie / Edwina" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFA8FD, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Hunter" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XFA8E6, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Sticker Saver" },
+        { address=0XFA8FC, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Digger" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFA90D, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bossy Bride" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XFA8E2, type="u8", condition="bit_true", bit=1, mask=0X02, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Winvincible" },
+        { address=0XFA8EE, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Wielder" },
+        { address=0XFA8EF, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Magnetic Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFA8EF, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Beater Blocker" },
+        { address=0XFA90A, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Outdoorsman" },
+      },
+    },
+  },
+}

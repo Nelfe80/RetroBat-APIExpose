@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Frogger",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "frogger",
+    file = "frogger.zip",
+    hashes = {
+      { hash = "88fb5e81bf58bc1195b31906ccebeff8", label = "Frogger (Europe).bin" },
+      { hash = "893cec7b572160e81eab8a6dad37f7d3", label = "Frogger (Brazil) (En).bin" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0021, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0025, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0025, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0098, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[lower4] Score 000x0" },
+        { address=0X0099, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[lower4] Score 00x00" },
+        { address=0X009A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[lower4] Score 0x000" },
+        { address=0X009B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[lower4] Score x0000" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0029, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Remaining" },
+      },
+    },
+  },
+}

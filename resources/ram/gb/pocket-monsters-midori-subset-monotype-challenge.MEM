@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Pocket Monsters Midori [Subset - Monotype Challenge]",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "pocket-monsters-midori-subset-monotype-challenge",
+    file = "pocket-monsters-midori-subset-monotype-challenge.zip",
+    hashes = {
+      { hash = "1af955dc4d4d7e02c3b5a051a54bd43a", label = "Pocket Monsters - Green Version (Japan) (En) (v1.0) (LandaR).gb" },
+      { hash = "e30ffbab1f239f09b226477d84db1368", label = "Pocket Monsters - Midori (Japan) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+  },
+}

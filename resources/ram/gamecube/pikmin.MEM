@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Pikmin",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "pikmin",
+    file = "pikmin.zip",
+    hashes = {
+      { hash = "f4161175374ef36d301f5b8eb43f7b4a", label = "Pikmin (USA) (Rev 1)" },
+      { hash = "7ce5f148c0e82f75918bf85fafbbaa9f", label = "Pikmin (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X39D90F, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X39D9AF, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X39DA50, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X39DA50, type="u32be", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not Paused" },
+        { address=0X39DAF0, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X39DAF0, type="u32be", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3D1E94, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(USA Rev 1) [32 BIT BE] Blue Pikmin in Ground" },
+        { address=0X3D1E98, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(USA Rev 1) [32 BIT BE] Red Pikmin In Ground" },
+        { address=0X3D1E9C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(USA Rev 1) [32 BIT BE] Yellow Pikmin In Ground" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X52C8D4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(USA Rev 1) [FLOAT BE] Smoky Progg Current Health decreased" },
+        { address=0X52C8D4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(USA Rev 1) [FLOAT BE] Smoky Progg Current Health increased" },
+        { address=0X5AA418, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(USA Rev 0) [FLOAT BE] Goolix Current Health decreased" },
+        { address=0X5AA418, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(USA Rev 0) [FLOAT BE] Goolix Current Health increased" },
+        { address=0X5AA58C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(USA Rev 1) [FLOAT BE] Goolix Current Health decreased" },
+        { address=0X5AA58C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(USA Rev 1) [FLOAT BE] Goolix Current Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X39D824, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D828, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D82C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D830, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D834, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D838, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D83C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D840, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D844, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D848, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D84C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D850, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D854, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D858, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D85C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D860, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D864, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D868, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D86C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D8C4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D8C8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D8CC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D8D0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D8D4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Impact Site (32-bit BE)" },
+        { address=0X39D8D8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D8DC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D8E0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D8E4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D8E8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest of Hope (32-bit BE)" },
+        { address=0X39D8EC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D8F0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D8F4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D8F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D8FC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Forest Navel (32-bit BE)" },
+        { address=0X39D900, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D904, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D908, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D90C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D910, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Distant Spring (32-bit BE)" },
+        { address=0X39D914, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Final Trial (32-bit BE)" },
+        { address=0X39D918, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Final Trial (32-bit BE)" },
+        { address=0X39D91C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Final Trial (32-bit BE)" },
+        { address=0X39D920, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Final Trial (32-bit BE)" },
+        { address=0X39D924, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode High Score - The Final Trial (32-bit BE)" },
+        { address=0X3E7D84, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 0) Challenge Mode Current Score (32-bit BE)" },
+        { address=0X3E7E24, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(USA Rev 1) Challenge Mode Current Score (32-bit BE)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1247E9C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(USA Rev 0 & 1) [8 BIT] Geiger Counter Collected" },
+      },
+    },
+  },
+}

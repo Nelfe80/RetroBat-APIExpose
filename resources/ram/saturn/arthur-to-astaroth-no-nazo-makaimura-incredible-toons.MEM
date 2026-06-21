@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Arthur to Astaroth no Nazo Makaimura: Incredible Toons",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "arthur-to-astaroth-no-nazo-makaimura-incredible-toons",
+    file = "arthur-to-astaroth-no-nazo-makaimura-incredible-toons.zip",
+    hashes = {
+      { hash = "82de1410221e2ba43856292dcd0f8d5d", label = "Arthur to Astaroth no Nazo Makaimura - Incredible Toons (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1DA852, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level ID" },
+        { address=0X1DA864, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 3" },
+        { address=0X1DA865, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 4" },
+        { address=0X1DA866, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear" },
+        { address=0X1DA867, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 2" },
+        { address=0X1DA868, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 7" },
+        { address=0X1DA869, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 8" },
+        { address=0X1DA86A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 5" },
+        { address=0X1DA86B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 6" },
+        { address=0X1DA86C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 11" },
+        { address=0X1DA86D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 12" },
+        { address=0X1DA86E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 9" },
+        { address=0X1DA86F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 10" },
+        { address=0X1DA872, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Level Clear 13" },
+      },
+    },
+  },
+}

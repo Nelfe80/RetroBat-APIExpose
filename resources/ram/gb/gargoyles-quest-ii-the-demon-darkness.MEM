@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Gargoyle's Quest II: The Demon Darkness",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "gargoyles-quest-ii-the-demon-darkness",
+    file = "gargoyles-quest-ii-the-demon-darkness.zip",
+    hashes = {
+      { hash = "3574c3ae7c83faeb018cb1c05950c25d", label = "Gargoyle's Quest II - The Demon Darkness (Japan) (En) (v1.0) (bailli).gb" },
+      { hash = "de731a5f2f4e7d16bcdc4b5953ddcc12", label = "Makaimura Gaiden - The Demon Darkness (Japan).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFFC8, type="u16le", condition="eq", value=0XBB, action="DEMO_MODE", no_log=false, no_survey=false, desc="demon extract, essence ghsto realm" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFFD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wing Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8805, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="alive" },
+        { address=0X8805, type="u8", condition="eq", value=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XC001, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x18 = death" },
+        { address=0XC01E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Firebrand's Life increased" },
+        { address=0XC01E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Firebrand's Life decreased" },
+        { address=0XC11F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Guardian Labirinth & Goza Death" },
+        { address=0XC120, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Doppelganger & King Breager Death" },
+        { address=0XC710, type="u8", condition="eq", value=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Normal Vial" },
+        { address=0XC710, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="proximity to life vial increased" },
+        { address=0XC710, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="proximity to life vial decreased" },
+        { address=0XC72A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Boss Animation" },
+        { address=0XFFC8, type="u16le", condition="eq", value=0X15, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Balloon Room" },
+        { address=0XFFD6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0XFFD6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+        { address=0XFFE0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Level increased" },
+        { address=0XFFE0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Level decreased" },
+        { address=0XFFEB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mini Boss Death" },
+      },
+      health = {
+        { address=0XC51E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Twin Gargoyle Left (HP) decreased" },
+        { address=0XC51E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Twin Gargoyle Left (HP) increased" },
+        { address=0XC61E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Twin Gasrgoyle Right (HP) decreased" },
+        { address=0XC61E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Twin Gasrgoyle Right (HP) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC11E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Monster & Boss HP" },
+        { address=0XDCE9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss fight" },
+        { address=0XFFC8, type="u16le", condition="eq", value=0X4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Grelim castle, 0x17 boss room" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XFFD4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump Level" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Marble Master",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "marble-master",
+    file = "marble-master.zip",
+    hashes = {
+      { hash = "2655fd8310a9214c48d40b9eccdf7f0f", label = "Marble Master (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6B254, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1FFB98, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="In-Game Score" },
+      },
+    },
+  },
+}

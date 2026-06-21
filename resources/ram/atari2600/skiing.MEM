@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Skiing",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "skiing",
+    file = "skiing.zip",
+    hashes = {
+      { hash = "b76fbadc8ffb1f83e2ca08b6fb4d6c9f", label = "Skiing (USA).a26" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X0060, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jump Height?" },
+        { address=0X0061, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jump Height?" },
+        { address=0X007E, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="in the ground, bit 6 = jumping" },
+      },
+    },
+  },
+}

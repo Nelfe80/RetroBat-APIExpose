@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "The OneeChamploo",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-oneechamploo",
+    file = "the-oneechamploo.zip",
+    hashes = {
+      { hash = "b76c29d51b659e363c9422b59140a5eb", label = "Simple 2000 Series Vol. 80 - The OneeChamploo - The Nee-chan Tokubetsu-hen (Japan)" },
+      { hash = "71a9533cab9af87dd43abab083d60669", label = "Zombie Zone - Other Side (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X389FA0, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X389FA0, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is paused" },
+        { address=0X38C39C, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X38C3A0, type="u8", condition="eq", value=0X5, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X3936A0, type="u8", condition="eq", value=0X5, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X21E65C, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="All Stages Unlocked" },
+        { address=0X21E65C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="JP - Stages Unlocked" },
+        { address=0X229630, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X229630, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="JP - All stages - Have Key item 1" },
+        { address=0X229634, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X229634, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="JP - All stages - Have Key item 2" },
+        { address=0X229638, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X229638, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="JP - All stages - Have Key item 3" },
+        { address=0X22963C, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X22963C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="JP - All stages - Have Key item 4" },
+        { address=0X229640, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X229640, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="JP - All stages - Have Key item 5" },
+        { address=0X38C39C, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Story stage select" },
+      },
+    },
+  },
+}

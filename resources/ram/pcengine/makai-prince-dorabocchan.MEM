@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Makai Prince Dorabocchan",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "makai-prince-dorabocchan",
+    file = "makai-prince-dorabocchan.zip",
+    hashes = {
+      { hash = "31b5597ed22d3d143f98d394ee4593ad", label = "Makai Prince Dorabocchan (Japan).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0085, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0085, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 (Mountain Town into a graveyard)" },
+        { address=0X0085, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 (City)" },
+        { address=0X0085, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 (Sand)" },
+        { address=0X0085, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 (Mountain Forest into a cave/swamp)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0864, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] decreased" },
+        { address=0X0867, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] decreased" },
+        { address=0X0870, type="u8", condition="eq", value=0X03, action="HIT", no_log=false, no_survey=false, desc="Silver (take no damage)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0864, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="not active" },
+        { address=0X0864, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="active" },
+        { address=0X0867, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X0867, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X0867, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Coin Purse" },
+        { address=0X0867, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cleats" },
+        { address=0X0867, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Wings" },
+        { address=0X0867, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Needles" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0085, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 5 (Castle and final boss)" },
+        { address=0X083A, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Posing (this happens when you beat a boss, but also before the boss when the tomatos are raining" },
+        { address=0X083B, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Posing (this happens when you beat a boss, but also before the boss when the tomatos are raining" },
+        { address=0X0870, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Gold (All of the above; only available for final boss)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0870, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Blue (double jump; same as cape but no time limit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0870, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]" },
+      },
+    },
+  },
+}

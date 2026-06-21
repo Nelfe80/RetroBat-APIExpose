@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Nazo Puyo 2",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "nazo-puyo-2",
+    file = "nazo-puyo-2.zip",
+    hashes = {
+      { hash = "2896235a36c793e99eeb1d18fb2b4a0b", label = "Nazo Puyo 2 (Japan).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1BBA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Last Puzzle Cleared; current puzzle is this value + 1" },
+        { address=0X1BBB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Puzzle Clear Indicator: goes to 0x01 when a puzzle is cleared, 0x00 when new puzzle gameplay sta" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1D2E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Puzzles Cleared - Save Data (updates on clearing a new puzzle) increased" },
+      },
+    },
+  },
+}

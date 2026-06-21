@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Ragnarok Tactics",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ragnarok-tactics",
+    file = "ragnarok-tactics.zip",
+    hashes = {
+      { hash = "4a566b3bae1a54a6ae8f6e53606be610", label = "Ragnarok Tactics (USA).iso" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0XBF348C, type="u16le", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="[Inventory (Weapons) Type] Slot 1" },
+        { address=0XBF348E, type="u16le", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="[Inventory (Weapons) Quantity] Slot 1" },
+      },
+    },
+  },
+}

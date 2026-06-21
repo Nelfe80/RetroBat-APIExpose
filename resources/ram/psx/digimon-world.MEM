@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Digimon World",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "digimon-world",
+    file = "digimon-world.zip",
+    hashes = {
+      { hash = "8bc2620ebf5b44d0cc96ae1e5b2dc66a", label = "Digimon World (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1BDFDB, type="u8", condition="eq", value=0X6, action="DEMO_MODE", no_log=false, no_survey=false, desc="Vademon Strange Circle First time" },
+        { address=0X1BDFE9, type="u8", condition="eq", value=0X4, action="DEMO_MODE", no_log=false, no_survey=false, desc="Vademon Recruited" },
+        { address=0X1BE010, type="u8", condition="eq", value=0X4, action="DEMO_MODE", no_log=false, no_survey=false, desc="Vademon" },
+        { address=0X1BE018, type="u8", condition="eq", value=0X0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Jijimon saying about Vademon on City" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X138460, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flower (Butterfly arround)" },
+        { address=0X1557A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tamer level 8-bit" },
+        { address=0X1BDFF2, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ClearAgumon" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1384A8, type="u32le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die" },
+        { address=0X1384A8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Digimon Lifetime to Reborn 32-bit increased" },
+        { address=0X1384A8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Digimon Lifetime to Reborn 32-bit decreased" },
+      },
+      health = {
+        { address=0X1557F0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Digimon Status HP 16-bit HEX decreased" },
+        { address=0X1557F0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Digimon Status HP 16-bit HEX increased" },
+        { address=0X1557F4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Digimon Current HP 16-bit HEX decreased" },
+        { address=0X1557F4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Digimon Current HP 16-bit HEX increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X134FC4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="ShogunGekomon Merit points 16-bit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X155874, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses: 16-bit" },
+        { address=0X1558DC, type="u16le", condition="eq", value=0X384, action="BOSS_HIT", no_log=false, no_survey=false, desc="Kunemon HP default" },
+        { address=0X155944, type="u16le", condition="eq", value=0X190, action="BOSS_HIT", no_log=false, no_survey=false, desc="Agumon HP default" },
+        { address=0X155944, type="u16le", condition="eq", value=0X384, action="BOSS_HIT", no_log=false, no_survey=false, desc="Palmon HP default" },
+        { address=0X1559AC, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses: 16-bit (Hex)" },
+        { address=0X155A14, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses: 16-bit" },
+        { address=0X155A7C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses: 16-bit" },
+        { address=0X155AE4, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses: 16-bit (Hex)" },
+        { address=0X1BDFCD, type="u8", condition="eq", value=0X1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle Fight (No Run)" },
+        { address=0X1BDFF3, type="u8", condition="eq", value=0X5, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Otamamon Defeated (BOSS)" },
+        { address=0X1BDFF5, type="u8", condition="eq", value=0X1, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Devimon Defeated (BOSS)" },
+        { address=0X1BDFF5, type="u8", condition="eq", value=0X6, action="BOSS_HIT", no_log=false, no_survey=false, desc="MetalGreymon Defetead (BOSS)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1BDFF8, type="u8", condition="eq", value=0X5, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Tinmon open Toy Mansion door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X138464, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Sleep Timer 8-bit" },
+        { address=0X138478, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Poop Timer" },
+        { address=0X155805, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Tech: Battle 8-bit (Bits)" },
+        { address=0X1BDFD3, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFD6, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFD9, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFDA, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFDB, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFDC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFDD, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFDE, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFDF, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFE4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFE5, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFEB, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFF5, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFF7, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFF9, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+        { address=0X1BDFFB, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Medals Chart 8-bit (Bits flag)" },
+        { address=0X1BE001, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Story 8-bit (Bits)" },
+      },
+    },
+  },
+}

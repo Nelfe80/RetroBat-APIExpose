@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Addams Family Values",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "addams-family-values",
+    file = "addams-family-values.zip",
+    hashes = {
+      { hash = "4a34ab48cc89b871d7b3e4c15fedf2b6", label = "Addams Family Values (Europe) (En,Fr,De).sfc" },
+      { hash = "7e52067e9cb3e6a190272a9d1d75a9af", label = "Addams Family Values (USA) (En,Fr,De).sfc" },
+      { hash = "a89681df8060e78bde0dd8340c209649", label = "Addams Family Values (Europe) (Es) (v1.0) (Darkn).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0BC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0X0BC0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+        { address=0X0BC2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max health decreased" },
+        { address=0X0BC2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max health increased" },
+        { address=0X0BC4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max health internal value decreased" },
+        { address=0X0BC4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max health internal value increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE9F5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sack of Gold increased" },
+        { address=0XEA06, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA63E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="46= first boss health" },
+        { address=0XA63F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="00 = first boss secondary health" },
+        { address=0XE8DE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="ff= kill first boss, unlock door to mansion" },
+        { address=0XE94F, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Final Boss Defeated" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X011A, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="01=Invincibility Cheat Activated" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XE921, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="greenhouse 3rd locked door?" },
+      },
+    },
+  },
+}

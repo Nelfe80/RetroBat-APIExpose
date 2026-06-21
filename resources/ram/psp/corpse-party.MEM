@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Corpse Party",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "corpse-party",
+    file = "corpse-party.zip",
+    hashes = {
+      { hash = "64608bcf2fb8f5914a051d2cbc527591", label = "Corpse Party (USA) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCF3610, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen validation" },
+        { address=0XD08438, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Max HP? Will be used for title validation" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD0843C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char HP decreased" },
+        { address=0XD0843C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char HP increased" },
+      },
+    },
+  },
+}

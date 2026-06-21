@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Picross NP Vol. 7",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picross-np-vol-7",
+    file = "picross-np-vol-7.zip",
+    hashes = {
+      { hash = "542d560b32b49dd9b040260e0113a976", label = "Picross NP Vol. 7 (Japan) (NP).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1EF6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background music" },
+      },
+    },
+  },
+}

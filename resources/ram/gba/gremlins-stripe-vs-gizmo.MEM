@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Gremlins: Stripe vs Gizmo",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "gremlins-stripe-vs-gizmo",
+    file = "gremlins-stripe-vs-gizmo.zip",
+    hashes = {
+      { hash = "66c238ea31904c09e2ee06bc465a8342", label = "Gremlins - Stripe vs Gizmo (Europe) (En,Fr,De,Es,It,Pt).gba" },
+      { hash = "e1303fccc44bdb8524e904f6b15b9856", label = "Gremlins - Stripe vs Gizmo (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0244, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flag for Level Status" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X01CC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Lives increased" },
+        { address=0X01CC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Lives decreased" },
+        { address=0X2CBC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Object/Enemy address 1 animation pt1 increased" },
+        { address=0X2CBC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Object/Enemy address 1 animation pt1 decreased" },
+        { address=0X2CC0, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Object/Enemy address 1 animation pt2 increased" },
+        { address=0X2CC0, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Object/Enemy address 1 animation pt2 decreased" },
+      },
+      health = {
+        { address=0X01B8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X01B8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0025, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss level" },
+        { address=0X011C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current Boss Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2CC4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object/Enemy address 1 animation pt3" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0240, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+  },
+}

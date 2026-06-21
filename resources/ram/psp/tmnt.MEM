@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "TMNT",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tmnt",
+    file = "tmnt.zip",
+    hashes = {
+      { hash = "9d170e552608e86b4763fbb3cfe05335", label = "TMNT (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

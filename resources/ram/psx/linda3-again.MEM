@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Linda³ Again",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "linda3-again",
+    file = "linda3-again.zip",
+    hashes = {
+      { hash = "414d062a37a13973e0966c40ef4e908c", label = "Linda^3 Again (Japan) (En) (v0.95.9) (EsperKnight)" },
+      { hash = "d20754903474297cccba5a63bfe2ef25", label = "Linda^3 Again (Japan) (Rev 1)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC2284, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="10" },
+        { address=0XC2284, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ken's level" },
+        { address=0XC2287, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dog 1's level" },
+        { address=0X1E9EAC, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="pre-level 3 visit Linda" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1E9EB1, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Nek dies" },
+      },
+      health = {
+        { address=0XBC5C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ken's current HP decreased" },
+        { address=0XBC5C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ken's current HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1E9EF7, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="secret chest ozport, Dog Blade [A]" },
+        { address=0X1E9EF8, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="left chest ezport = tissue" },
+        { address=0X1E9EF8, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="right chest ezport = tissue" },
+        { address=0X1E9EF9, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="right chest hospico = detox pill" },
+        { address=0X1E9EF9, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="left chest hospico = RecoTab 100" },
+        { address=0X1E9EFD, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="chest RecoTab100, Spurr Valley" },
+        { address=0X1E9EFD, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="chest RecoTab100, Spurr Valley" },
+      },
+      weapon = {
+        { address=0X19719A, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pig Whip" },
+        { address=0X19719A, type="u8", condition="eq", value=0X35, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Squid Javelin" },
+        { address=0X19719A, type="u8", condition="eq", value=0X65, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ostrich Club" },
+        { address=0X19719A, type="u8", condition="eq", value=0X66, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Swallow Cutter" },
+        { address=0X19719A, type="u8", condition="eq", value=0X67, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Squirrel Needle" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1E9EB5, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Linda remembers Ken bought her a Ring" },
+        { address=0X1E9EE3, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Toy Ring bought for Linda OzPort" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE87C0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter for secret Nebul birdline" },
+      },
+    },
+  },
+}

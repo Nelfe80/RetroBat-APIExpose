@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Biomotor Unitron",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "biomotor-unitron",
+    file = "biomotor-unitron.zip",
+    hashes = {
+      { hash = "f4bbe8cf42074b75c8a911bf7b0562d5", label = "Biomotor Unitron (USA, Europe).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11FF, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Discovered" },
+        { address=0X22AE, type="u8", condition="eq", value=0X34, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1023, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Experience to Level" },
+        { address=0X103E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Partner Development Level" },
+        { address=0X10AA, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Discovered" },
+      },
+      zone = {
+        { address=0X22AE, type="u8", condition="eq", value=0X35, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+      stage = {
+        { address=0X1022, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Character Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1DA5, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Enemy Max Health decreased" },
+        { address=0X1DA5, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Enemy Max Health increased" },
+        { address=0X1DA7, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Enemy Health decreased" },
+        { address=0X1DA7, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Enemy Health increased" },
+        { address=0X1DA9, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Enemy Max Energy decreased" },
+        { address=0X1DA9, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Enemy Max Energy increased" },
+        { address=0X1DAB, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Enemy Energy decreased" },
+        { address=0X1DAB, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Enemy Energy increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10BA, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Discovered" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1025, type="u8", condition="eq", value=0X12, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+      },
+    },
+  },
+}

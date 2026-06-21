@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "Duke Nukem 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Shooter, 1ere Personne"
+  },
+
+  rom = {
+    name = "duke-nukem-64",
+    file = "duke-nukem-64.zip",
+    hashes = {
+      { hash = "c7f1a43764a26da2e43f2a36a5f76e4c", label = "Duke Nukem 64 (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X101363, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X2A5AF5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration mode flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X246D87, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Darkness level of player/gun: 0 is brightest. (Level 3)" },
+        { address=0X2A5AAD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="on ground flag" },
+      },
+      stage = {
+        { address=0X1012EB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cheats menu - Go to level active" },
+        { address=0X24F696, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3 of 15 pool ball: sprite properties: xNxx: bit0=ball will interact, bit1=transparent (stacks wi" },
+        { address=0X26EC5F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Light level of gun/player, global but unstable. Use this to find a stable light level of player" },
+        { address=0X27B224, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(32bit) re: ground height (only stage 0?)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD3752, type="u16be", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Row" },
+        { address=0X1CE87E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="SFX flag string bit0='Ahh' (upon recieveing healing from a critical life state with a portible m" },
+        { address=0X1CE87E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="SFX flag string bit0='Ahh' (upon recieveing healing from a critical life state with a portible m" },
+        { address=0X1CE8D3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="SFX flag string bit0='I aint got time to bleed' (upon recieveing healing from a critical life st" },
+        { address=0X1CE8D3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="SFX flag string bit0='I aint got time to bleed' (upon recieveing healing from a critical life st" },
+        { address=0X21FC83, type="u8", condition="eq", value=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X24CDB0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="cueball sunk/death" },
+        { address=0X24F45C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 11 sunk/death" },
+        { address=0X24F488, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 15 sunk/death" },
+        { address=0X24F4B4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 9 sunk/death" },
+        { address=0X24F4E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 14 sunk/death" },
+        { address=0X24F50C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 8 sunk/death" },
+        { address=0X24F538, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 10 sunk/death" },
+        { address=0X24F564, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 13 sunk/death" },
+        { address=0X24F590, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 6 sunk/death" },
+        { address=0X24F5BC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 5 sunk/death" },
+        { address=0X24F5E8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 4 sunk/death" },
+        { address=0X24F614, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 7 sunk/death" },
+        { address=0X24F640, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 12 sunk/death" },
+        { address=0X24F66C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 2 sunk/death" },
+        { address=0X24F699, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3 of 15 pool balls, 4 when dead" },
+        { address=0X24F6C4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ball 1 sunk/death" },
+      },
+      health = {
+        { address=0X2A59E4, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="(16bit)Fade duration and intensity. 0x2a5ad4::Red, 0xa::Green, Oxb::Blue. See Respawn/Red or Gre" },
+        { address=0X2A59FE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X2A59FE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2A5A20, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon chosen" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1CE874, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SFX flag string bit3=collecting audio (ammo, cards, etc) increased" },
+        { address=0X1CE87B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SFX flag string bit2=deep breath (happens during shrinking and taking damage (sometimes)) increa" },
+        { address=0X1CE87B, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="SFX flag string bit2=deep breath (happens during shrinking and taking damage (sometimes)) empty" },
+        { address=0X1CE884, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SFX flag string bit0='Ow... that's gotta hurt' increased" },
+        { address=0X1CE884, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="SFX flag string bit0='Ow... that's gotta hurt' empty" },
+        { address=0X1CE8CF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SFX flag string bit0=I guess he didn't escape from LA (level 2) increased" },
+        { address=0X1CE8D1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SFX flag string bit0='Aw... Does it hurt?' increased" },
+        { address=0X1CE8D1, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="SFX flag string bit0='Aw... Does it hurt?' empty" },
+        { address=0X2A5A00, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shotgun ammo" },
+        { address=0X2A5A02, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Handgun ammo" },
+        { address=0X2A5A04, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Grenade Luncher ammo" },
+        { address=0X2A5A06, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="SMGs ammo" },
+        { address=0X2A5A08, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shrinker crystal ammo" },
+        { address=0X2A5A0A, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Pipe Bombs ammo" },
+        { address=0X2A5A0C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Missile ammo" },
+        { address=0X2A5A0E, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Expander crystal ammo" },
+        { address=0X2A5A10, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Plasma pack ammo" },
+        { address=0X2A5A12, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Laser Tripbomb Ammo" },
+        { address=0X2A5A14, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Dum dum ammo" },
+        { address=0X2A5A18, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Heat seeking misiles ammo" },
+        { address=0X2A5A1A, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Explosive Shells ammo" },
+        { address=0X2A5A2E, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Holuduke ammount" },
+        { address=0X2A5A48, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Portable Medkit ammount" },
+        { address=0X2A5A5E, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Night Vision Goggles ammount" },
+        { address=0X2A5A8C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Jetpack ammount" },
+        { address=0X2A5A8E, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Scuba Gear ammount" },
+        { address=0X2A5A90, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Armor ammount" },
+        { address=0X2A5A92, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Vitamin X Ammount" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1012DF, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheats menu - Invincibility active" },
+        { address=0X2AAA6B, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Off (Default)" },
+        { address=0X2AAA6B, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X24F694, type="u24be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ball 3 sprite id (writable) if=a24 ball is destroyed writes to 0x8, 0xa" },
+        { address=0X24F698, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ball 3 1=ball alive, 4=ball destroyed>>400=ball sunk" },
+        { address=0X24F69A, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="lighting effects? 16c=ball broken(inconsitent)>>291=ball sunk/gone, 4e=ball alive, If val >291>>" },
+        { address=0X24F69C, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="(16bit) 328>>66=ball destroyed" },
+      },
+    },
+  },
+}

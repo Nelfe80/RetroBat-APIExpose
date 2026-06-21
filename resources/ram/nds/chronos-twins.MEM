@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Chronos Twins",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "chronos-twins",
+    file = "chronos-twins.zip",
+    hashes = {
+      { hash = "1493ac9e3a74fd5328d970ac13e7a3fa", label = "Chronos Twin (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X18C23C, type="u16le", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tutorial or lab (for running out of lives OR getting upgrades OR starting a stage)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X18BBEA, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current life increased" },
+        { address=0X18BBEA, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current life decreased" },
+        { address=0X300B4E, type="u16le", condition="eq", value=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Set to this if bottom dies" },
+        { address=0X300C66, type="u16le", condition="eq", value=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Set to this if top dies" },
+      },
+      health = {
+        { address=0X18BBE8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current energy decreased" },
+        { address=0X18BBE8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current energy increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2FF686, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss hp, boss 3" },
+        { address=0X2FF9CE, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 4 HP" },
+        { address=0X2FFAE6, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Head HP boss 2" },
+        { address=0X3002B8, type="u16le", condition="eq", value=0X19, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max" },
+        { address=0X3002B8, type="u16le", condition="eq", value=0X0, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X300B4E, type="u16le", condition="eq", value=0X140, action="BOSS_HIT", no_log=false, no_survey=false, desc="Start" },
+        { address=0X300C66, type="u16le", condition="eq", value=0X140, action="BOSS_HIT", no_log=false, no_survey=false, desc="Start" },
+        { address=0X30672E, type="u16le", condition="eq", value=0X8C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full" },
+      },
+    },
+  },
+}

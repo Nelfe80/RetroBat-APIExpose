@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Toradora P!",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "toradora-p",
+    file = "toradora-p.zip",
+    hashes = {
+      { hash = "c684c8450fc81d88a45becf892afd55a", label = "Tora Dora Portable! (Japan).iso" },
+      { hash = "8b619e48ce3657e9f4e331880b5faedc", label = "ToraDora Portable! (Japan) (Pt) (v1.1) (Unknown).iso" },
+      { hash = "c7afd56e33e2eb24024f36915e5ffdd6", label = "ToraDora Portable! (Japan) (En) (v1.10) (verdelish, Chronoes, xyz)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9F1E7A, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Event Flag - Found a CD with Dubious Title - Student Council Room" },
+        { address=0XDD18A8, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9F1EA3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Taiga Battle Style Stage 1 - Complete Flag" },
+        { address=0X9F1EA4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Taiga Battle Style Stage 2 - Complete Flag" },
+        { address=0X9F1EA5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Taiga Battle Style Stage 3 - Complete Flag" },
+        { address=0X9F1EA6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Taiga Battle Style Stage 4 - Complete Flag" },
+        { address=0X9F1EA7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Midori Battle Style Stage 1 - Complete Flag" },
+        { address=0X9F1EA8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Midori Battle Style Stage 2 - Complete Flag" },
+        { address=0X9F1EA9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Midori Battle Style Stage 3 - Complete Flag" },
+        { address=0X9F1EAA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Midori Battle Style Stage 4 - Complete Flag" },
+        { address=0X9F1EAB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ami Battle Style Stage 1 - Complete Flag" },
+        { address=0X9F1EAC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ami Battle Style Stage 2 - Complete Flag" },
+        { address=0X9F1EAD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ami Battle Style Stage 3 - Complete Flag" },
+        { address=0X9F1EAE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ami Battle Style Stage 4 - Complete Flag" },
+        { address=0X9F1EAF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sumire Battle Style Stage 1 - Complete Flag" },
+        { address=0X9F1EB0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sumire Battle Style Stage 2 - Complete Flag" },
+        { address=0X9F1EB1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sumire Battle Style Stage 3 - Complete Flag" },
+        { address=0X9F1EB2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sumire Battle Style Stage 4 - Complete Flag" },
+        { address=0X9F1EB3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sakura Battle Style Stage 1 - Complete Flag" },
+        { address=0X9F1EB4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sakura Battle Style Stage 2 - Complete Flag" },
+        { address=0X9F1EB5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sakura Battle Style Stage 3 - Complete Flag" },
+        { address=0X9F1EB6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sakura Battle Style Stage 4 - Complete Flag" },
+        { address=0X9F1EB7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yasuko Battle Style Stage 1 - Complete Flag" },
+        { address=0X9F1EB8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yasuko Battle Style Stage 2 - Complete Flag" },
+        { address=0X9F1EB9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yasuko Battle Style Stage 3 - Complete Flag" },
+        { address=0X9F1EBA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yasuko Battle Style Stage 4 - Complete Flag" },
+        { address=0X9F1EBB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kitamura Battle Style Stage 1 - Complete Flag" },
+        { address=0X9F1EBC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kitamura Battle Style Stage 2 - Complete Flag" },
+        { address=0X9F1EBD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kitamura Battle Style Stage 3 - Complete Flag" },
+        { address=0X9F1EBE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kitamura Battle Style Stage 4 - Complete Flag" },
+        { address=0XA83564, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dialogue Background 32bits [1]" },
+        { address=0XA83DC0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dialogue Background 32bits [2]" },
+        { address=0XA841EC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dialogue Background 32bits [3]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDC5DF4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle Style - Lives 32bits save 1 increased" },
+        { address=0XDC5DF4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Style - Lives 32bits save 1 decreased" },
+        { address=0XDC70C4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle Style - Lives 32bits save 2 increased" },
+        { address=0XDC70C4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Style - Lives 32bits save 2 decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC0D574, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Battle Style - Points to end 32bits save 1" },
+        { address=0XDC9BB4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Battle Style - Points to end 32bits save 3" },
+        { address=0XDCF2F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Battle Style - Points to end 32bits save 2" },
+        { address=0XDD18D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tiger Pocket Mini Game - Points 32bits" },
+        { address=0XDD18DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tiger Pocket Mini Game - Points Added 32bits" },
+      },
+      collectibles = {
+        { address=0XE030FC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammount of Pencil save 1" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X9F1D62, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump Text" },
+      },
+    },
+  },
+}

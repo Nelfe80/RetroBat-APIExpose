@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Time Crisis: Project Titan",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Tir avec accessoire"
+  },
+
+  rom = {
+    name = "time-crisis-project-titan",
+    file = "time-crisis-project-titan.zip",
+    hashes = {
+      { hash = "d2ebeb76bc0c162cd5febfd614d636a2", label = "Time Crisis - Project Titan (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7D408, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X7D6D8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Results Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X7D5A2, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ship" },
+        { address=0X7D5A2, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Airport/mansion" },
+        { address=0X7D5A2, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunker" },
+        { address=0X7D5A2, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fortress" },
+        { address=0X7D5A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X7D418, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X7D52C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7D484, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X7D484, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XCFC1E, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7D40C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time remaining 16bits" },
+      },
+    },
+  },
+}

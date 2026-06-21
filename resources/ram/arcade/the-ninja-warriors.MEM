@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "The Ninja Warriors",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "the-ninja-warriors",
+    file = "the-ninja-warriors.zip",
+    hashes = {
+      { hash = "8e4198143ef5c65f18eaa3455272b28f", label = "ninjaw.7z <The Ninja Warriors (World, later version)>" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X23228, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Stage] [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6EF8, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Score P1] [16bit] increased" },
+        { address=0X6EF8, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Score P1] [16bit] decreased" },
+        { address=0X6EFC, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Score P2] [16bit] increased" },
+        { address=0X6EFC, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Score P2] [16bit] decreased" },
+        { address=0X23306, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Life Counter P1] [8bit] increased" },
+        { address=0X23306, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Life Counter P1] [8bit] decreased" },
+        { address=0X23386, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Life Counter P2] [8bit] increased" },
+        { address=0X23386, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Life Counter P2] [8bit] decreased" },
+      },
+      health = {
+        { address=0X2340C, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[ P1 Getting Damage] [16bit]" },
+        { address=0X2340E, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[ P2 Getting Damage] [16bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6EF6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Score P1] [16bit]" },
+        { address=0X6EFA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Score P2] [16bit]" },
+      },
+      collectibles = {
+        { address=0X22B6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Coins in Game] [8bit] increased" },
+      },
+    },
+  },
+}

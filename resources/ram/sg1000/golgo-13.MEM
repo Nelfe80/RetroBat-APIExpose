@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Golgo 13",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "golgo-13",
+    file = "golgo-13.zip",
+    hashes = {
+      { hash = "cb25a12e86c729f6a51ba3dea91c1547", label = "Golgo 13 (Japan).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0288, type="u8", condition="eq", value=0X56, action="GAME_OVER", no_log=false, no_survey=false, desc="Time remaining added to score / Game Over" },
+        { address=0X03FE, type="u8", condition="eq", value=0X48, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X03FE, type="u8", condition="eq", value=0XE8, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo intro" },
+        { address=0X03FE, type="u8", condition="eq", value=0X23, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X03FE, type="u8", condition="eq", value=0X58, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0204, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 1" },
+        { address=0X0204, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0288, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lost a life" },
+        { address=0X02AB, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Time remaining added to score / Lost a life" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0205, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24-bit BCD]" },
+        { address=0X0237, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score [24-bit BCD]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0232, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time remaining" },
+      },
+    },
+  },
+}

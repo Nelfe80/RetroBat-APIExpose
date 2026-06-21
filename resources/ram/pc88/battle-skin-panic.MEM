@@ -1,0 +1,34 @@
+return {
+  game = {
+    title = "Battle Skin Panic",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "battle-skin-panic",
+    file = "battle-skin-panic.zip",
+    hashes = {
+      { hash = "1f37c90372f768650491d33325a1e396", label = "Battle Skin Panic (Disk A).d88" },
+      { hash = "27d347480cc6dac3768297b6fd9defff", label = "Battle Skin Panic (Disk B).d88" },
+      { hash = "5205c480ce8b60ab3200067ae2d8923d", label = "Battle Skin Panic (Disk C).d88" },
+      { hash = "b89932234465e1bb1aa710bc8759b615", label = "Battle Skin Panic (Disk A) [Alt 1].d88" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X319B, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X319B, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+        { address=0X319D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Max HP decreased" },
+        { address=0X319D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Max HP increased" },
+        { address=0X31CF, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent HP decreased" },
+        { address=0X31CF, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent HP increased" },
+        { address=0X31D1, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Max HP decreased" },
+        { address=0X31D1, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Max HP increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "ESPN: Extreme Games | 1Xtreme",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "espn-extreme-games-1xtreme",
+    file = "espn-extreme-games-1xtreme.zip",
+    hashes = {
+      { hash = "52b9077fecad27ca2994548c19d73a6f", label = "1Xtreme (USA)" },
+      { hash = "c287af2c921d04384c3e89cd64212533", label = "ESPN Extreme Games (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E9043, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Season" },
+        { address=0X1E904A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing and Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E9004, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Gear Level - Inline Skates 00-04" },
+        { address=0X1E9005, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Gear Level - Bike 00-03" },
+        { address=0X1E9006, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Gear Level - Bob 00-03" },
+        { address=0X1E9007, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Gear Level - Skate Board 00-03" },
+        { address=0X1E9024, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Gear Level - Inline Skates 00-04" },
+        { address=0X1E9025, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Gear Level - Bike 00-03" },
+        { address=0X1E9026, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Gear Level - Bob 00-03" },
+        { address=0X1E9027, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Gear Level - Skate Board 00-03" },
+      },
+      stage = {
+        { address=0X1E9040, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="San Francisco" },
+        { address=0X1E9040, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Italy" },
+        { address=0X1E9040, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="South America" },
+        { address=0X1E9040, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Utah" },
+        { address=0X1E9040, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lake Tahoe" },
+        { address=0X1E9040, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cash Course" },
+        { address=0X1E9040, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage:" },
+        { address=0X1E9044, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Standing Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X46D4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X46D4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+        { address=0X473D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X473D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+      },
+    },
+  },
+}

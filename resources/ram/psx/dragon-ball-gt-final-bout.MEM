@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Dragon Ball GT: Final Bout",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-ball-gt-final-bout",
+    file = "dragon-ball-gt-final-bout.zip",
+    hashes = {
+      { hash = "c87a119f86093c836934fcfb9fdfb4b8", label = "Dragon Ball GT - Final Bout (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3BC77, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo on : 00" },
+        { address=0X4AA60, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Music played (01 and 02 for ending credits, only sound select, 80 otherwise)" },
+      },
+      events = {
+        { address=0X729C8, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Meteor Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3BC7A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Second player in the last round of the tournament ?" },
+        { address=0X3BC84, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Level in Build mode" },
+      },
+      stage = {
+        { address=0X3BC51, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ? 09 Bebi Stage" },
+        { address=0X3C006, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc=":(ff can be used for ending music, with stage variable)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3BC76, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life meter on : 00 increased" },
+        { address=0X3BC76, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life meter on : 00 decreased" },
+      },
+      health = {
+        { address=0X72840, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP Bar decreased" },
+        { address=0X72840, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP Bar increased" },
+        { address=0X72841, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP Bar color (01 : currently yellow, 00 : red) decreased" },
+        { address=0X72841, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP Bar color (01 : currently yellow, 00 : red) increased" },
+        { address=0X728BC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP Bar decreased" },
+        { address=0X728BC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP Bar increased" },
+        { address=0X728BD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP Bar color (01 : currently yellow, 00 : red) decreased" },
+        { address=0X728BD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP Bar color (01 : currently yellow, 00 : red) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3BC7C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Could be blocks that are unlocked, minus 1 since 1 Block doesn't count" },
+        { address=0X3BC7D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="In which block the player is fighting right now, starts at 0" },
+        { address=0X5BC78, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block number (starts at 0)" },
+        { address=0X5BC7C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Case number in the current block, starts at 0" },
+      },
+    },
+  },
+}

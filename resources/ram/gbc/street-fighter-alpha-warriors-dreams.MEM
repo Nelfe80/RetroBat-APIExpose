@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Street Fighter Alpha: Warriors' Dreams",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "street-fighter-alpha-warriors-dreams",
+    file = "street-fighter-alpha-warriors-dreams.zip",
+    hashes = {
+      { hash = "6acd649d8ab0ec4f26b8ca3930434264", label = "Street Fighter Alpha - Warriors' Dreams (Japan).gbc" },
+      { hash = "db1aeaa7135bd5707dbbccc427808cd7", label = "Street Fighter Alpha - Warriors' Dreams (USA).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC3EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number Rounds 02 - 1R | 01 - 3R | 00 - 5R" },
+        { address=0XC664, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amount of rounds won by P2" },
+      },
+      stage = {
+        { address=0XC47C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage | 8 - Final" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC3E3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="play1 bar | 37 - full | 00 - Death" },
+        { address=0XC3E4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="play2 bar | 37 - full | 00 - Death" },
+        { address=0XC451, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Play 1 | 00 - Ryu |01 - Ken |02 - Akuma |03 - Charlie |04 - Chun-Li |05 - Adon |06 - Sodom |07 -" },
+      },
+      health = {
+        { address=0XC3EF, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Setup - Damage" },
+        { address=0XC4B5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health decreased" },
+        { address=0XC4B5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health increased" },
+        { address=0XC6B5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health decreased" },
+        { address=0XC6B5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC598, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC3EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Limit 00 - Infinito | 01 - 99 seg | 02 - 75 seg | 03 - 50 seg | 04 - 25 seg" },
+      },
+    },
+  },
+}

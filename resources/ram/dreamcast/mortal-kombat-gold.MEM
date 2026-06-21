@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Mortal Kombat Gold",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-gold",
+    file = "mortal-kombat-gold.zip",
+    hashes = {
+      { hash = "fff3471a50a8070f33e7997a5ce747d1", label = "Mortal Kombat Gold (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X323FF0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X33620E, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Cheat Unabled Title Screen Flag" },
+        { address=0X336298, type="u8", condition="eq", value=0X06, action="PAUSE_ON", no_log=false, no_survey=false, desc="Main Menu / Pause Menu" },
+        { address=0X3369AC, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Options - Continues [02-09]" },
+        { address=0X337798, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="P1- Continues remaining" },
+        { address=0X33779C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="P2- Continues remaining" },
+      },
+      events = {
+        { address=0X30D410, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[TEMP3] P1 - Combo Received" },
+        { address=0X30D624, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[TEMP2] P1 - Combo Received / [TEMP3] P2 - Combo Received" },
+        { address=0X30D838, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[TEMP1] P1 - Combo Received / [TEMP2] P2 - Combo Received" },
+        { address=0X30DA4C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[TEMP1] P2 - Combo Received" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X31622C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fighting" },
+        { address=0X31622C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Wins" },
+        { address=0X31622C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Wins" },
+        { address=0X31622C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Result:" },
+        { address=0X316238, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round winner victory pose (when name is said) [00/01]" },
+        { address=0X316260, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current round" },
+        { address=0X316264, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goro's Lair" },
+        { address=0X316264, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire Well" },
+        { address=0X316264, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elder Gods (arena)" },
+        { address=0X316264, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Tomb" },
+        { address=0X316264, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Windworld" },
+        { address=0X316264, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptile's Lair" },
+        { address=0X316264, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shaolin Temple" },
+        { address=0X316264, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Living Forest" },
+        { address=0X316264, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Prison" },
+        { address=0X316264, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice Pit" },
+        { address=0X316264, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Temple" },
+        { address=0X316264, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Netherrealm (arena)" },
+        { address=0X316264, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Soul Chamber" },
+        { address=0X316264, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background ID:" },
+        { address=0X31626C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1- Round victories in current match" },
+        { address=0X316270, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2- Round victories in current match" },
+        { address=0X3369A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - Rounds to Win [02-09]" },
+      },
+      stage = {
+        { address=0X3364B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Practice Mode - Kombat Zone" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X316240, type="u24le", condition="eq", value=0X11, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Kiss of Death" },
+        { address=0X316240, type="u24le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Kiss" },
+        { address=0X316240, type="u24le", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hand of Death" },
+        { address=0X316248, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-Bits] Float P1 Life: increased" },
+        { address=0X316248, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-Bits] Float P1 Life: decreased" },
+        { address=0X31624C, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-Bits] Float P2 Life: increased" },
+        { address=0X31624C, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-Bits] Float P2 Life: decreased" },
+      },
+      health = {
+        { address=0X30D628, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-Bits] Float P1 % Damage Recieved" },
+        { address=0X30D83C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-Bits] Float P2 % Damage Recieved" },
+        { address=0X316240, type="u24le", condition="eq", value=0X15, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Johnny Cage's Torso Rip (Use HP after activating one button fatalities and perform the fatality" },
+        { address=0X316240, type="u24le", condition="eq", value=0X14, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Johnny Cage's Torso Rip (Use HP after activating one button fatalities and perform the fatality" },
+        { address=0X316240, type="u24le", condition="eq", value=0X16, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Johnny Cage's Torso Rip (Use HP after activating one button fatalities and perform the fatality" },
+        { address=0X316240, type="u24le", condition="eq", value=0X13, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Johnny Cage's Torso Rip (Use HP after activating one button fatalities and perform the fatality" },
+        { address=0X316240, type="u24le", condition="eq", value=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Reiko's Torso Kick (Use HP after activating one button fatalities)" },
+        { address=0X316240, type="u24le", condition="eq", value=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Reiko's Torso Kick (Use HP after activating one button fatalities)" },
+        { address=0X336220, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cheat Fatal 1 (HP) Flag decreased" },
+        { address=0X336220, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cheat Fatal 1 (HP) Flag increased" },
+        { address=0X336228, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cheat Pit Fatal (D+HP) Flag decreased" },
+        { address=0X336228, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cheat Pit Fatal (D+HP) Flag increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X335764, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon selected" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3369A4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Options - Jump Pack Disabled/Enabled [00/01]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X315474, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1- Number of times character icon is rotated (alternative outfit)" },
+        { address=0X315478, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2- Number of times character icon is rotated (alternative outfit)" },
+        { address=0X3249D8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Novice Tower is rotated [00-03]" },
+        { address=0X3249DC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Beginner Tower is rotated [00-03]" },
+        { address=0X3249E0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Warrior Tower is rotated [00-03]" },
+        { address=0X3249E4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Master Tower is rotated [00-03]" },
+        { address=0X3249E8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Master II Tower is rotated [00-03]" },
+        { address=0X328920, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Predator 2",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "predator-2",
+    file = "predator-2.zip",
+    hashes = {
+      { hash = "6413bc568d7750b308fe06a3c85e6ec8", label = "Predator 2 (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X02FD, type="u8", condition="eq", value=0X00000000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Screen" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X02BE, type="u8", condition="eq", value=0X1000000, action="HEALTH_STATE", no_log=false, no_survey=false, desc="ON" },
+        { address=0X02BE, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Cheat - Infinite Health / Persists until game is reset, or game is completed. Cannot be disabled" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X03E1, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="B (Fire without changing direction / Fire pistol when secondary weapon is selected)" },
+        { address=0X03E1, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="C (Select weapon)" },
+        { address=0X03E1, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="A (Fire while changing direction / Fire secondary weapon when selected)" },
+        { address=0X33B2, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol" },
+        { address=0X33B2, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Machine Gun" },
+        { address=0X33B2, type="u8", condition="eq", value=0X0E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade" },
+      },
+    },
+  },
+}

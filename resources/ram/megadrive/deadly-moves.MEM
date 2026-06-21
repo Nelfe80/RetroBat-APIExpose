@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Deadly Moves",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "deadly-moves",
+    file = "deadly-moves.zip",
+    hashes = {
+      { hash = "208652cf1e1f77405cf3e854f009d2b8", label = "Deadly Moves (USA).md" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Spy Hunter",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Racing, Shooter"
+  },
+
+  rom = {
+    name = "spy-hunter",
+    file = "spy-hunter.zip",
+    hashes = {
+      { hash = "f96a21f920e889d1e21abbf00f4d381d", label = "Spy Hunter (USA).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0142, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0188, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skill level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0142, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0142, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0207, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Amount of missile weapon" },
+        { address=0X020E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Amount of smoke weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0143, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24-bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0146, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

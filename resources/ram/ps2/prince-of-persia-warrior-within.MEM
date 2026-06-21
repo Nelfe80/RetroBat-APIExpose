@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "Prince of Persia: Warrior Within",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "prince-of-persia-warrior-within",
+    file = "prince-of-persia-warrior-within.zip",
+    hashes = {
+      { hash = "26a248c87402905ec86f74b7255ca874", label = "Prince of Persia - Warrior Within (Europe, Australia) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6388E8, type="u32le", condition="eq", value=0X00137580, action="GAME_OVER", no_log=false, no_survey=false, desc="= Game Over" },
+        { address=0X84A438, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="1 => Any menu is displayed (In-game menu's: options, combo list, game over... Title screen menu'" },
+        { address=0XA660B8, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="> During intro ship battle, during gameplay and also when in menu's" },
+        { address=0XA660B8, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="> During gameplay (past intro sequence)" },
+        { address=0XA660B8, type="u8", condition="eq", value=0X6, action="PAUSE_ON", no_log=false, no_survey=false, desc="> Pause menu, map or save menu is displayed" },
+        { address=0XCB7560, type="u32le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[PAL][Bit Flag {32-bit}] bit 0 => Is Game Over (alt 1)" },
+        { address=0XCB765C, type="u32le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[PAL][Bit Flag {32-bit}] bit 0 => Is Game Over (alt 2)" },
+        { address=0XCB7D0C, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="> Video is playing (refer to $0x637fe8) _OR_ Title screen menu/in-game menu is displayed _OR_ in" },
+        { address=0XCB7D64, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0 => at title screen" },
+        { address=0XCB7D6C, type="u16le", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="> at title screen" },
+        { address=0X10BF2D7, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Proper Pause flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1366814, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="> Breath of Fate (ground slam)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X82B96C, type="u32le", condition="eq", value=0X0, action="HIT", no_log=false, no_survey=false, desc="> is displayed (displays when weapons unsheathed OR taking damage)" },
+        { address=0XCB7D10, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince HP (Visual) decreased" },
+        { address=0XCB7D10, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince HP (Visual) increased" },
+        { address=0XCB7D2C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince HP (Visual) decreased" },
+        { address=0XCB7D2C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince HP (Visual) increased" },
+        { address=0XCB7D30, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince Max HP (Visual) decreased" },
+        { address=0XCB7D30, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince Max HP (Visual) increased" },
+        { address=0XEA9480, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Current Health (before combo damage taken)" },
+        { address=0XEA94A0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Max Health decreased" },
+        { address=0XEA94A0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Max Health increased" },
+        { address=0X1365844, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince HP (Functional) decreased" },
+        { address=0X1365844, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince HP (Functional) increased" },
+        { address=0X1366978, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="> Fortress Entrance (can also be achieved without EyeOfTheStorm power)" },
+        { address=0X1366978, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="> TBD" },
+        { address=0X1366978, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="> Antechamber" },
+        { address=0X1366978, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="> TBD" },
+        { address=0X1366978, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="> TBD" },
+        { address=0X1366978, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="> Activation Room" },
+        { address=0X1366978, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="> TBD" },
+        { address=0X1366979, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[PAL][Bit Flags] @Byte2 in Bitset: HP_Upgrades $0x1366978 decreased" },
+        { address=0X1366979, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[PAL][Bit Flags] @Byte2 in Bitset: HP_Upgrades $0x1366978 increased" },
+        { address=0X1366AE0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince Max HP (Functional) decreased" },
+        { address=0X1366AE0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[PAL][32-bit] Prince Max HP (Functional) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X7DDA48, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Allatum (0x0) <-- Secondary_Weapon_ID (refer to $0x13669a8)" },
+        { address=0X7DE448, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Gallery" },
+        { address=0X7DE449, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Gallery" },
+        { address=0X7DE44A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Gallery" },
+        { address=0X7DE44B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Gallery" },
+        { address=0X7DE44C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Gallery" },
+        { address=0X7DE44D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Gallery" },
+        { address=0X7DE44E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Gallery" },
+        { address=0X7DE44F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Gallery" },
+        { address=0X82B96C, type="u32le", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> is hidden/not displayed (becomes hidden after a 3-5 secs weapons sheathed)" },
+        { address=0XC5C3A0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL][136-byte Array] List of PrimaryWeapon_Pointers" },
+        { address=0XCB783C, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL][Bit Flag {32-bit}] bit 0 => Is Secondary Weapon Equipped" },
+        { address=0XCB7A88, type="u32le", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> weapons sheathed" },
+        { address=0XCB7A88, type="u32le", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> weapons unsheathed/in-hand" },
+        { address=0XCB7A88, type="u32le", condition="eq", value=0XFFFFFFFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> during cutscenes" },
+        { address=0XCB7DD0, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL][32-bit] Secondary Weapon Durability (Visual)" },
+        { address=0XCB830C, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32 Bit] Secondary Weapon Equipped Flag" },
+        { address=0XEA9508, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32 Bit] Secondary Weapon Equipped" },
+        { address=0XEA9540, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32 Bit] Secondary Weapon Durability" },
+        { address=0XEA958C, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32 Bit] Weapon Unsheathed flag" },
+        { address=0X1365FAC, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL][Bit Flag {32-bit}] bit 0 => Is Secondary Weapon Equipped (alt 1)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XEA950C, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32 Bit] Display Boss Health" },
+        { address=0X1366978, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="> Sacrificial Chamber (behind stone, after 2nd Shahdee boss fight)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7BBA8C, type="u8", condition="eq", value=0X28, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Activate the Second Tower" },
+        { address=0X7BC9F8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pin map objective" },
+        { address=0XB9F4D0, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[PAL][4-byte Struct:Area_ID] Checkpoint_SubArea_ID" },
+        { address=0XB9F598, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[PAL][4-byte Struct:Area_ID] Checkpoint_MainArea_ID" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCB7480, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[PAL][8-bit {32-bit}] Time Period State" },
+      },
+    },
+  },
+}

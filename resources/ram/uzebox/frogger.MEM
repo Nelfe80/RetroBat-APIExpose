@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Frogger",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "frogger",
+    file = "frogger.zip",
+    hashes = {
+      { hash = "d5a490a1c9e1cf14cc6807a2367f4bdb", label = "Frogger (World) (v1.0) (Paul McPhee).uze" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0C55, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title (clean boot only)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0B9B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0C32, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0C32, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0C56, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24-bit]" },
+      },
+    },
+  },
+}

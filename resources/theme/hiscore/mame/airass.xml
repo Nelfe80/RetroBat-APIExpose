@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 SHAKA      505000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 MACCOY     450000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 &amp;R AYA    400000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 YAMACHIN   350000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 DENCHAN    300000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 IKEI      250000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 HIYA       200000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 CORE_1     150000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 ♣♦♠[black-right-arrow-large]^)#(♥  136600</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 YUKI       100000</text>
+		</text>
+	</view>
+</theme>

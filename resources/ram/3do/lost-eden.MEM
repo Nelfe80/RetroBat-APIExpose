@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Lost Eden",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "lost-eden",
+    file = "lost-eden.zip",
+    hashes = {
+      { hash = "ffcdae9fd53f70a7cd5f55a8233b001f", label = "Lost Eden (USA, Korea)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X91F20, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="changing this value messed with the subtitles" },
+        { address=0X92303, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="(8 bit) Subtitles selected" },
+      },
+    },
+  },
+}

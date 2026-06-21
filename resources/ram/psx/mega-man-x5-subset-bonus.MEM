@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Mega Man X5 [Subset - Bonus]",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "mega-man-x5-subset-bonus",
+    file = "mega-man-x5-subset-bonus.zip",
+    hashes = {
+      { hash = "08dbcd7d7cb0e19acfd37dbcc7aaefdf", label = "Mega Man X5 [Subset - Bonus]" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0XD1C31, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="02 = Mattrex defeated at the boss rush" },
+      },
+    },
+  },
+}

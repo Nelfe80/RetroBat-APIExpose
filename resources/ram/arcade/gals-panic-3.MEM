@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Gals Panic 3",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Mature"
+  },
+
+  rom = {
+    name = "gals-panic-3",
+    file = "gals-panic-3.zip",
+    hashes = {
+      { hash = "92fcf7a4bda826ab9a380e667b80116d", label = "galpani3.7z <Gals Panic 3 (Euro)>" },
+    }
+  },
+
+  events = {
+  },
+}

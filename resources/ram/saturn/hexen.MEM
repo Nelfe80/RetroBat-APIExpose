@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "HeXen",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hexen",
+    file = "hexen.zip",
+    hashes = {
+      { hash = "899e743677badd953e83afb663edbca3", label = "Hexen (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18A83C, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-bit Swizzled] Is Paused" },
+        { address=0X19AD30, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[32-bit Swizzled] Is In Demo" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X1A9504, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32-bit Swizzled] This is the worldvar:0 for the second world. This tracks how many switches hav" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X19A57C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit Swizzled] Health Representation decreased" },
+        { address=0X19A57C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit Swizzled] Health Representation increased" },
+        { address=0X19A57E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Representation Lower decreased" },
+        { address=0X19A57E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Representation Lower increased" },
+        { address=0X19AE64, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit Swizzled] Some representation of your health but it's not really it decreased" },
+        { address=0X19AE64, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit Swizzled] Some representation of your health but it's not really it increased" },
+        { address=0X1DC018, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[INVESTIGATE] [16-bit] Ettin Health in save state 2 decreased" },
+        { address=0X1DC018, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[INVESTIGATE] [16-bit] Ettin Health in save state 2 increased" },
+        { address=0X1E19F0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[INVESTIGATE] [16-bit] First Ettin's health decreased" },
+        { address=0X1E19F0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[INVESTIGATE] [16-bit] First Ettin's health increased" },
+        { address=0X1F3B30, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[INVESTIGATE] [16-bit] First Ettin's health after dying and reloading decreased" },
+        { address=0X1F3B30, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[INVESTIGATE] [16-bit] First Ettin's health after dying and reloading increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X19AF9C, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit Swizzled] Final weapon piece bitmask" },
+        { address=0X19AFA8, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit Swizzled] Selected Weapon" },
+        { address=0X19AFAC, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit Swizzled] Weapon Switch State" },
+        { address=0X19AFB0, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit Swizzled] First Weapon Unlocked" },
+        { address=0X19AFB4, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit Swizzled] Second Weapon Unlocked" },
+        { address=0X19AFB8, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit Swizzled] Third Weapon Unlocked" },
+        { address=0X19AFBC, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit Swizzled] Fourth Weapon Unlocked" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X19AE6C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit Swizzled] Falcon Shield Value" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1FEAA4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[INVESTIGATE] [32-bit Swizzled] Seven Portals Two Halves Switch" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X19B034, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit Swizzled] Time Remaining of Message" },
+      },
+    },
+  },
+}

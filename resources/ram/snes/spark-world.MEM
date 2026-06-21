@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Spark World",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "spark-world",
+    file = "spark-world.zip",
+    hashes = {
+      { hash = "0da2ae976f1c4b08243d2419812ab3a4", label = "Spark World (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00A4, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00DA, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Desert 2" },
+        { address=0X00DA, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Desert 1" },
+        { address=0X00DA, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice 2" },
+        { address=0X00DA, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="River 1" },
+        { address=0X00DA, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="City 1" },
+        { address=0X00DA, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice 1" },
+        { address=0X00DA, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="River 2" },
+        { address=0X00DA, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle 1" },
+        { address=0X00DA, type="u8", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle 2" },
+        { address=0X00DA, type="u8", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="City 2" },
+        { address=0X00DA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level What are you in" },
+      },
+      stage = {
+        { address=0X006E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Battle Mode Stages" },
+        { address=0X00DE, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 1" },
+        { address=0X00DE, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 2" },
+        { address=0X00DE, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3" },
+        { address=0X00DE, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Act" },
+        { address=0X00DE, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Act in City 2" },
+        { address=0X00DE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act What are you in" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00D2, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifes Player 1 [16-bits] increased" },
+        { address=0X00D2, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifes Player 1 [16-bits] decreased" },
+        { address=0X00D4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifes Player 2 [16-bits] increased" },
+        { address=0X00D4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifes Player 2 [16-bits] decreased" },
+        { address=0X1046, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1048, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X1280, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X1280, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00CC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points [16-bits]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1044, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Alive" },
+        { address=0X1044, type="u8", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X009E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Timer" },
+        { address=0X00A9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time of Title to Demo" },
+        { address=0X1358, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy Death Timer" },
+      },
+    },
+  },
+}

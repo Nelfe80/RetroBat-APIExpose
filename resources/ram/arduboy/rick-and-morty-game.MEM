@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Rick and Morty Game",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rick-and-morty-game",
+    file = "rick-and-morty-game.zip",
+    hashes = {
+      { hash = "7c806db164a90b6cc7dda291d40c267b", label = "Rick and Morty Game (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0150, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+  },
+}

@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Ecco the Dolphin (Japan)",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ecco-the-dolphin",
+    file = "ecco-the-dolphin.zip",
+    hashes = {
+      { hash = "b951ed4208a1fd0a0798acb7ef066030", label = "Ecco the Dolphin (USA, Europe, Korea) (En) (Rev A) (Beta) (1993-06-29).md" },
+      { hash = "fdfc181b6f949788f336662dbabf5929", label = "Ecco the Dolphin (Japan).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA8ED, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo flag." },
+        { address=0XAB14, type="u16be", condition="eq", value=0X0000, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Normal play, unpaused." },
+        { address=0XAB14, type="u16be", condition="eq", value=0X3AD0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Normal play." },
+        { address=0XAB14, type="u16be", condition="eq", value=0X3B09, action="PAUSE_ON", no_log=false, no_survey=false, desc="Mute." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAB69, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Off." },
+        { address=0XAB69, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="On." },
+        { address=0XAB69, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Unlimited Life cheat. increased" },
+        { address=0XAB69, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unlimited Life cheat. decreased" },
+      },
+      health = {
+        { address=0XA928, type="u16be", condition="eq", value=0X8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="1 bar minimum." },
+        { address=0XA928, type="u16be", condition="eq", value=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="2 bar minimum." },
+        { address=0XA928, type="u16be", condition="eq", value=0X18, action="HEALTH_STATE", no_log=false, no_survey=false, desc="3 bar minimum." },
+        { address=0XA928, type="u16be", condition="eq", value=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="4 bar minimum." },
+        { address=0XA928, type="u16be", condition="eq", value=0X28, action="HEALTH_STATE", no_log=false, no_survey=false, desc="5 bar minimum." },
+        { address=0XA928, type="u16be", condition="eq", value=0X38, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Maximum." },
+        { address=0XA928, type="u16be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health." },
+        { address=0XA92A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Breath. decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA92A, type="u16be", condition="eq", value=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 bar minimum." },
+        { address=0XA92A, type="u16be", condition="eq", value=0X100, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="2 bar minimum." },
+        { address=0XA92A, type="u16be", condition="eq", value=0X180, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="3 bar minimum." },
+        { address=0XA92A, type="u16be", condition="eq", value=0X200, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="4 bar minimum." },
+        { address=0XA92A, type="u16be", condition="eq", value=0X280, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="5 bar minimum." },
+        { address=0XA92A, type="u16be", condition="eq", value=0X380, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Maximum." },
+        { address=0XA92A, type="u16be", condition="eq", value=0X381, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cheat and maybe power up?" },
+      },
+    },
+  },
+}

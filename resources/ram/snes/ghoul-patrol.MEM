@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Ghoul Patrol",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "ghoul-patrol",
+    file = "ghoul-patrol.zip",
+    hashes = {
+      { hash = "657fa94cff4464cbc58c476ea642299a", label = "Ghoul Patrol (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1CDD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (Up to 0x12 or 18)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1DA1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[2 Byte] P1 - Lives (BCD) increased" },
+        { address=0X1DA1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[2 Byte] P1 - Lives (BCD) decreased" },
+        { address=0X1DA3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[2 Byte] P2 - Lives (BCD) increased" },
+        { address=0X1DA3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[2 Byte] P2 - Lives (BCD) decreased" },
+        { address=0X65E0, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="On" },
+        { address=0X65E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Infinite Life/Item/Ammo Cheat increased" },
+        { address=0X65E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Infinite Life/Item/Ammo Cheat decreased" },
+      },
+      health = {
+        { address=0X1D09, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health decreased" },
+        { address=0X1D09, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health increased" },
+        { address=0X1D0B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health decreased" },
+        { address=0X1D0B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1D0D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P1 - WEAPON Selected: 0=Crossbow, 1=Ping-Pong Gun, 2=Heat Seeker, 3=Laser, 6=Mortar" },
+        { address=0X1D0F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P2 - WEAPON Selected" },
+        { address=0X1D1F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] P1 - Weapon 01: Ping-Pong Ball Machine Gun (BCD)" },
+        { address=0X1D21, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] P1 - Weapon 02: Martian Heatseeker Gun (BCD)" },
+        { address=0X1D23, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] P1 - Weapon 03: Laser Beam Gun (BCD)" },
+        { address=0X1D25, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] *P1 - Weapon 04: Dummy (BCD)" },
+        { address=0X1D27, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] *P1 - Weapon 05: Dummy (BCD)" },
+        { address=0X1D29, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] P1 - Weapon 06: Mortar (BCD)" },
+        { address=0X1D2B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] *P1 - Weapon 07 - Dummy (BCD)" },
+        { address=0X1D2D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] *P1 - Weapon 08: Dummy (BCD)" },
+        { address=0X1D2F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] *P1 - Weapon 09: Dummy (BCD)" },
+        { address=0X1D31, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] *P1 - Weapon 0A: Dummy (BCD)" },
+        { address=0X1D33, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] *P1 - Weapon 0B: Dummy (BCD)" },
+        { address=0X1D35, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] *P1 - Weapon 0C: Dummy (BCD)" },
+        { address=0X1D3F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] P2 - Weapon 01 (BCD)" },
+        { address=0X1D41, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] P2 - Weapon 02 (BCD)" },
+        { address=0X1D43, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] P2 - Weapon 03 (BCD)" },
+        { address=0X1D49, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[2 Byte] P2 - Weapon 06 (BCD)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1D01, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] P1 Score (BCD)" },
+        { address=0X1D05, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] P2 Score (BCD)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0000, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16bit] HP for Bosses?!" },
+        { address=0X147D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Status" },
+        { address=0X1F49, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16bit] Boss HP" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0A50, type="u16le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="[16bit] Invincibility Timer (After getting hit & Blue Potion)" },
+      },
+    },
+  },
+}

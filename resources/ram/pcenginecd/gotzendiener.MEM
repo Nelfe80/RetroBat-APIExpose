@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Götzendiener",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "gotzendiener",
+    file = "gotzendiener.zip",
+    hashes = {
+      { hash = "ac3500d1a4cd9efc7fe97a3bbb120ad0", label = "Goetzendiener (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0745, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id (0x00 on menu)" },
+        { address=0X0760, type="u24le", condition="eq", value=0X71, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abandoned Mine 1" },
+        { address=0X0760, type="u24le", condition="eq", value=0X81, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abandoned Mine 2" },
+        { address=0X0760, type="u24le", condition="eq", value=0X91, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abandoned Mine 3" },
+        { address=0X0760, type="u24le", condition="eq", value=0XA1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abandoned Mine 4" },
+        { address=0X0760, type="u24le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0751, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (hud only) decreased" },
+        { address=0X0751, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (hud only) increased" },
+        { address=0X1831, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X1831, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X1B31, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Random Enemy HP (blue ball in mines) decreased" },
+        { address=0X1B31, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Random Enemy HP (blue ball in mines) increased" },
+        { address=0X1B71, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Random Enemy HP (blue beetle in mines) decreased" },
+        { address=0X1B71, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Random Enemy HP (blue beetle in mines) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1931, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss HP (resurrected demon god)" },
+        { address=0X1971, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss HP (the other dude)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1839, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="non attack object (statues...)" },
+      },
+    },
+  },
+}

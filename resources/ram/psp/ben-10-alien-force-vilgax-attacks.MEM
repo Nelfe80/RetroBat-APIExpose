@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Ben 10: Alien Force - Vilgax Attacks",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ben-10-alien-force-vilgax-attacks",
+    file = "ben-10-alien-force-vilgax-attacks.zip",
+    hashes = {
+      { hash = "99295a38a664fa36ffc461a05514db38", label = "Ben 10 - Alien Force - Vilgax Attacks (Europe) (En,Fr,De,Es,It).iso" },
+      { hash = "a328a82c700f4deea4499020e29fdd5e", label = "Ben 10 - Alien Force - Vilgax Attacks (USA) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1DE7FD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level?" },
+      },
+    },
+  },
+}

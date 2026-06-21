@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Phantasy Star 0",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "phantasy-star-0",
+    file = "phantasy-star-0.zip",
+    hashes = {
+      { hash = "113c2fd7665b28122be821b1809230ac", label = "Phantasy Star 0 (Europe).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A233F, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Menu" },
+        { address=0X242958, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Activation Requirements [Single Bits]" },
+        { address=0X24295E, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X24295F, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242960, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242961, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242962, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242963, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242964, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242965, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242966, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242967, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242968, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242969, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X24296A, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles - Single Bit" },
+        { address=0X242ACE, type="u16le", condition="eq", value=0X100, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Indomitable Spirit Title" },
+      },
+      events = {
+        { address=0X242AE0, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1A212A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+        { address=0X1A212B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Attack - Fire Level" },
+        { address=0X1A212C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Attack - Ice Level" },
+        { address=0X1A212D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Attack - Thunder Level" },
+        { address=0X1A212E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Attack - Light Level" },
+        { address=0X1A212F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Attack - Dark Level" },
+        { address=0X1A2130, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Healing - HP Restore Level" },
+        { address=0X1A2131, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Healing - Status Heal Level" },
+        { address=0X1A2132, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Support - ATP & MST Up Level" },
+        { address=0X1A2133, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Support - DFP & Resist Up Level" },
+        { address=0X1A2134, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Support - ATP & MST Down Level" },
+        { address=0X1A2135, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Technique - Support - DFP & Resist Down Level" },
+        { address=0X2415F2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+        { address=0X242AE8, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Field Clears - Gurhacia Valley" },
+        { address=0X242AEA, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Field Clears - Rioh Snowfields" },
+        { address=0X242AEC, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Field Clears - Ozette Wetlands" },
+        { address=0X242AEE, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Field Clears - Paru" },
+        { address=0X242AF0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Field Clears - Makara" },
+        { address=0X242AF2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Field Clears - Arca Plant" },
+        { address=0X242AF4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Field Clears - Dark Shrine" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1A210C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Max Health decreased" },
+        { address=0X1A210C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Max Health increased" },
+        { address=0X1A21FE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Current HP decreased" },
+        { address=0X1A21FE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Current HP increased" },
+        { address=0X1A234E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Current Health decreased" },
+        { address=0X1A234E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Current Health increased" },
+        { address=0X2415EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of HP Upgrades decreased" },
+        { address=0X2415EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of HP Upgrades increased" },
+        { address=0X242AD0, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Max Damage" },
+        { address=0X242AD4, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Max Damage Taken" },
+        { address=0X37A994, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Data - Health? decreased" },
+        { address=0X37A994, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Data - Health? increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1A1ED8, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shop Item 1 Price Displayed" },
+        { address=0X25BD94, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shop Item 1 Actual Price" },
+        { address=0X27D9FC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Items - Weapon selected" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X37BEC8, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy Data - Boss Enrage Health?" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2429B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Item Catalog - Shields - Single Bit" },
+        { address=0X2429BA, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Item Catalog - Shields - Single Bit" },
+        { address=0X2429BD, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Item Catalog - Shields" },
+      },
+    },
+  },
+}

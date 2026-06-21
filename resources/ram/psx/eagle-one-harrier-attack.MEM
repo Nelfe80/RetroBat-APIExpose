@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Eagle One: Harrier Attack",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "eagle-one-harrier-attack",
+    file = "eagle-one-harrier-attack.zip",
+    hashes = {
+      { hash = "61665a0c4ca263f6095600be06934a00", label = "Eagle One - Harrier Attack (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDB934, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Set to 1 when screen darkens on mission complete or game over, also in pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10E830, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Automatic Level:" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XDA6B0, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Unlimited Ammo cheat:" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XDA6AC, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility cheat:" },
+      },
+    },
+  },
+}

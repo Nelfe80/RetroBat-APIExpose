@@ -1,0 +1,129 @@
+return {
+  game = {
+    title = "Metroid II: Return of Samus",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Adventure, Platform, Shooter"
+  },
+
+  rom = {
+    name = "metroid-ii-return-of-samus",
+    file = "metroid-ii-return-of-samus.zip",
+    hashes = {
+      { hash = "693fabbcb14ebe1ad65d6735adb7133a", label = "Metroid II - Return of Samus (USA) (Colorization) (v1.3) (EJRTQ) (Canon Samus) (triforce141).gb" },
+      { hash = "9639948ad274fa15281f549e5f9c4d87", label = "Metroid II - Return of Samus (World).gb" },
+      { hash = "f005cbcb60f4d9f3e4f6190e809cff1d", label = "Metroid II - Return of Samus (USA) (Colorization) (v1.3) (EJRTQ).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCEC1, type="u16le", condition="eq", value=0X1E, action="PAUSE_OFF", no_log=false, no_survey=false, desc="unpause" },
+        { address=0XCF2F, type="u8", condition="eq", value=0X70, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Theme" },
+        { address=0XCF2F, type="u8", condition="eq", value=0X74, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Staff Credits" },
+        { address=0XCFC8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="pause sfx" },
+        { address=0XD092, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0XD0A7, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="--" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X4, action="PAUSE_ON", no_log=false, no_survey=false, desc="normal" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X8, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X12, action="PAUSE_ON", no_log=false, no_survey=false, desc="end starts" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X13, action="PAUSE_ON", no_log=false, no_survey=false, desc="end credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD07A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1: on title: fire clear selected" },
+        { address=0XD092, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="zone song change, not affected by metroid fights" },
+        { address=0XD0A4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ff: file clear? flag" },
+      },
+      zone = {
+        { address=0XD023, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="governs or helps govern which direction of the world to load" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC465, type="u8", condition="eq", value=0X2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Metroid dead" },
+        { address=0XCED6, type="u16le", condition="eq", value=0X2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="tiny death" },
+        { address=0XCED6, type="u16le", condition="eq", value=0X4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="block death" },
+        { address=0XD0A1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life shown here when at critical increased" },
+        { address=0XD0A1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life shown here when at critical decreased" },
+      },
+      health = {
+        { address=0XC3D3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="queen hp decreased" },
+        { address=0XC3D3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="queen hp increased" },
+        { address=0XC60C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Metroid hp energy decreased" },
+        { address=0XC60C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Metroid hp energy increased" },
+        { address=0XCEC1, type="u16le", condition="eq", value=0XE, action="HEALTH_STATE", no_log=false, no_survey=false, desc="small health" },
+        { address=0XCEC1, type="u16le", condition="eq", value=0X17, action="HEALTH_STATE", no_log=false, no_survey=false, desc="big hp" },
+        { address=0XCEC1, type="u16le", condition="eq", value=0X18, action="HIT", no_log=false, no_survey=false, desc="max hp ball/damage from queen" },
+        { address=0XCED6, type="u16le", condition="eq", value=0X6, action="HIT", no_log=false, no_survey=false, desc="take damage" },
+        { address=0XCED6, type="u16le", condition="eq", value=0X8, action="HIT", no_log=false, no_survey=false, desc="metal door damaged" },
+        { address=0XD051, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(BCD) Energy decreased" },
+        { address=0XD051, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(BCD) Energy increased" },
+        { address=0XD084, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy display decreased" },
+        { address=0XD084, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy display increased" },
+        { address=0XD085, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy tank display decreased" },
+        { address=0XD085, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy tank display increased" },
+        { address=0XE60C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Metroid hp alt decreased" },
+        { address=0XE60C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Metroid hp alt increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XD070, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="20 when shot powerup orb" },
+        { address=0XD071, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="c6 when shot powerup orb" },
+      },
+      weapon = {
+        { address=0XD04D, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ice" },
+        { address=0XD04D, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="wave" },
+        { address=0XD04D, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="spazer" },
+        { address=0XD04D, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="plasma" },
+        { address=0XD04D, type="u8", condition="eq", value=0X7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="bomb gun" },
+        { address=0XD04D, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="missile" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCEDD, type="u16le", condition="eq", value=0X2, action="BOSS_HIT", no_log=false, no_survey=false, desc="queen boss fight" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XC388, type="u8", condition="eq", value=0X91, action="JUMPING", no_log=false, no_survey=false, desc="space jump" },
+        { address=0XC388, type="u8", condition="eq", value=0X8F, action="JUMPING", no_log=false, no_survey=false, desc="hi-jump boots" },
+        { address=0XCEC1, type="u16le", condition="eq", value=0X1, action="JUMPING", no_log=false, no_survey=false, desc="jump, ball bounce" },
+        { address=0XCEC1, type="u16le", condition="eq", value=0X2, action="JUMPING", no_log=false, no_survey=false, desc="hi-jump" },
+        { address=0XD00F, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="ff spin jumped left" },
+        { address=0XD093, type="u8", condition="eq", value=0X8, action="JUMPING", no_log=false, no_survey=false, desc="high jump boots" },
+        { address=0XD093, type="u8", condition="eq", value=0X9, action="JUMPING", no_log=false, no_survey=false, desc="space jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC400, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="samus object?" },
+        { address=0XC603, type="u8", condition="eq", value=0X93, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="spider" },
+        { address=0XC603, type="u8", condition="eq", value=0X97, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="etank" },
+        { address=0XC603, type="u8", condition="eq", value=0X99, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="missile" },
+        { address=0XC603, type="u8", condition="eq", value=0XB0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Gamma Metroid" },
+        { address=0XC603, type="u8", condition="eq", value=0XB3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Omega Metroid" },
+        { address=0XC604, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="object orientation" },
+        { address=0XC605, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="object orientation" },
+        { address=0XCEC1, type="u16le", condition="eq", value=0XF, action="DOOR_OPENED", no_log=false, no_survey=false, desc="metal door plink" },
+        { address=0XCEC1, type="u16le", condition="eq", value=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="metal door open" },
+        { address=0XCEC1, type="u16le", condition="eq", value=0X15, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="missile switch" },
+        { address=0XCEDD, type="u16le", condition="eq", value=0X6, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Caverns 2 (area 2, area 1 one bugged door)" },
+        { address=0XD00E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="pass through doorway direction" },
+        { address=0XD08E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="loads areas, informs door id" },
+        { address=0XD900, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="cooldown on healing shot block" },
+        { address=0XD901, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="data on block, perhaps block id" },
+        { address=0XF700, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="block informs area loading? not sure how it works" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD066, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="regulates screen flashes at title, timer for other pauses including screen lockout" },
+      },
+    },
+  },
+}

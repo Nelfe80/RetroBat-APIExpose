@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Garfield",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "garfield",
+    file = "garfield.zip",
+    hashes = {
+      { hash = "26816c48298bf478dc78a94e3700ac4c", label = "Garfield (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5F4C74, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Jigsaw Pieces Spawned Status | Windup Roundup" },
+        { address=0X5F4C9C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Jigsaw Pieces Spawned Status | Windup Roundup" },
+        { address=0X5F4CC4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Jigsaw Pieces Spawned Status | Windup Roundup" },
+        { address=0X5F4CEC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Jigsaw Pieces Spawned Status | Windup Roundup" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5F3F54, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] Picture Status | Garfield and Odie - Den" },
+        { address=0X5F44CC, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] Item Status | Odie's Bed" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5EB62C, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32 Bit] Object Related Root" },
+        { address=0X5F4544, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32 Bit] Item Status | Monitor" },
+        { address=0X5F4968, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[32 Bit] Door Unlock Status | Small Bedroom" },
+        { address=0X5F4990, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[32 Bit] Door Unlock Status | Jon's Bedroom" },
+        { address=0X5F49CC, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[32 Bit] Door Unlock Status | Bathroom" },
+        { address=0X5F4A1C, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[32 Bit] Door Unlock Status | Greenhouse" },
+      },
+    },
+  },
+}

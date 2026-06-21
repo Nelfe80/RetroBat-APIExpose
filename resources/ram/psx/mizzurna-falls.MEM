@@ -1,0 +1,119 @@
+return {
+  game = {
+    title = "Mizzurna Falls",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure, Sandbox"
+  },
+
+  rom = {
+    name = "mizzurna-falls",
+    file = "mizzurna-falls.zip",
+    hashes = {
+      { hash = "15c0fdfff9a4a7c5144df8ce25c78829", label = "Mizzurna Falls (Japan) (En) (v1.0) (Cirosan)" },
+      { hash = "4a2d97a8a5da058a105cbbd6acd07b75", label = "Mizzurna Falls (Japan)" },
+      { hash = "2b9284213974904ff4f7e34587dd00c6", label = "Mizzurna Falls (Japan) (Es) (v1.1) (Mr. Nobody)" },
+      { hash = "357abaa6ae6ead049fbeca62b510ad9d", label = "Mizzurna Falls (Japan) (En) (v1.0) (Owl)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA396C, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="0 Off" },
+        { address=0XA396C, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="1 On" },
+        { address=0X101BAC, type="u8", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF6917, type="u8", condition="eq", value=0X1D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Phone to Captain Nozz' General Store and Nozz tells you that he's about to close and go see Morg" },
+        { address=0XF6918, type="u8", condition="eq", value=0X1D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Phone to Captain Nozz' General Store and Nozz tells you that he's about to close and go see Morg" },
+        { address=0XF691F, type="u8", condition="eq", value=0X1F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Phone to Nozz's Apartment and he says that his apartment has become a hellhole with all the dodg" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA3774, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XA3776, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XF6921, type="u8", condition="eq", value=0X31, action="LIVES_STATE", no_log=false, no_survey=false, desc="Phone to Liz's House and she says that the key to everything is what Emma was looking for in her" },
+        { address=0XF69C8, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Talk to Dr. Samuel Gruber at Church about Kathy's death (Key event)" },
+        { address=0XF6AB0, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Talk to James about Kathy's cause of death at Gruber Hospital (Key event)" },
+        { address=0XF6AB8, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Talk to James and he'll tell you that the wall painting depicts an ancient tribal ritual invol" },
+        { address=0X103850, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X103858, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X107857, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X107859, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0XA3774, type="u8", condition="eq", value=0X78, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0XA3774, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Enemies HP (Fight game)" },
+        { address=0XA3776, type="u8", condition="eq", value=0X78, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0XA3776, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mathew's HP (Fight game)" },
+        { address=0X103850, type="u8", condition="eq", value=0X78, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0X103850, type="u8", condition="eq", value=0X5A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="75%" },
+        { address=0X103850, type="u8", condition="eq", value=0X3C, action="HEALTH_STATE", no_log=false, no_survey=false, desc="50%" },
+        { address=0X103850, type="u8", condition="eq", value=0X1E, action="HEALTH_STATE", no_log=false, no_survey=false, desc="25%" },
+        { address=0X103850, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mathew's HP (Dog Chase)" },
+        { address=0X103858, type="u8", condition="eq", value=0X78, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0X103858, type="u8", condition="eq", value=0X5A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="75%" },
+        { address=0X103858, type="u8", condition="eq", value=0X3C, action="HEALTH_STATE", no_log=false, no_survey=false, desc="50%" },
+        { address=0X103858, type="u8", condition="eq", value=0X1E, action="HEALTH_STATE", no_log=false, no_survey=false, desc="25%" },
+        { address=0X103858, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mathew's HP UI (Dog Chase)" },
+        { address=0X107857, type="u8", condition="eq", value=0X64, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0X107857, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mathew's HP (Bear hunt)" },
+        { address=0X107859, type="u8", condition="eq", value=0X5A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0X107859, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Bear's HP (Bear hunt)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF68BB, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Captain Mozz the Ring with Initial 'I'" },
+        { address=0XF68BF, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Cohen the Ring with Initial 'I'" },
+        { address=0XF68C3, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Isabella the Ring with Initial 'I'" },
+        { address=0XF68C7, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Samuel the Ring with Initial 'I'" },
+        { address=0XF68CB, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to James the Ring with Initial 'I'" },
+        { address=0XF68CF, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Hudson the Ring with Initial 'I'" },
+        { address=0XF68D3, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Mary Lou the Ring with Initial 'I'" },
+        { address=0XF68D7, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Barbara the Ring with Initial 'I'" },
+        { address=0XF68E3, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Steve the Ring with Initial 'I'" },
+        { address=0XF68E7, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Mel the Ring with Initial 'I'" },
+        { address=0XF68EB, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Father Barton the Ring with Initial 'I'" },
+        { address=0XF68EF, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Winona the Ring with Initial 'I'" },
+        { address=0XF68FB, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Dennis the Ring with Initial 'I'" },
+        { address=0XF68FF, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Robert the Ring with Initial 'I'" },
+        { address=0XF6903, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Liz the Ring with Initial 'I'" },
+        { address=0XF6907, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Wolf the Ring with Initial 'I'" },
+        { address=0XF690B, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show to Lorraine the Ring with Initial 'I'" },
+        { address=0XF6933, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Show the man in the Boathouse the ring (Key Event)" },
+        { address=0XF6939, type="u8", condition="bit_true", bit=3, mask=0X08, action="COIN_GAIN", no_log=false, no_survey=false, desc="1 Get the Ring at Emma's House Bathroom" },
+        { address=0XF6945, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Make the phone ring at Isabella's Apartment stop" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA3804, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="0 Door of the Farm Workers Lodgings Hut open" },
+        { address=0XA3948, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Knocked at doors" },
+        { address=0XA4418, type="u32le", condition="eq", value=0X0008CA10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Front of Farm Workers Lodgings Hut door" },
+        { address=0XA4420, type="u32le", condition="eq", value=0X000369D0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Front of Farm Workers Lodgings Hut door" },
+        { address=0XF66F0, type="u16le", condition="eq", value=0X9EB8, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Open the door of the Farm Workers Lodgings Hut" },
+        { address=0XF6914, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1 Talk to guard at the blocked road (day 1)" },
+        { address=0XF6914, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1 Talk to guard at the blocked road (day 2)" },
+        { address=0XF6914, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1 Talk to guard at the blocked road (day 3)" },
+        { address=0XF6930, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="0 After Winona got the photos at Print Service she show you a photo of a No Entry sign blocking" },
+        { address=0XF6940, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Eavesdrop through the door of the Haines Diner Lorraine and Mel talking about rob the diner(Da" },
+        { address=0XF6944, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Peep through Isabella's Apartment Door and get knocked out (Key Event)" },
+        { address=0XF6A44, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="1 Talk to Mel (seems to be broken in Bar Wolves or Haines Diner, works only at the sheriff stati" },
+        { address=0X108594, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Knocked at Sheriff's door at Mizzurna Falls Sheriff's Department" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA387C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Related to continuity of events" },
+        { address=0XF66F0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Related to texts/animations" },
+        { address=0XF691C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Events" },
+        { address=0XF691F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Events" },
+      },
+    },
+  },
+}

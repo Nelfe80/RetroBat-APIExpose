@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Dezeni World",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dezeni-world",
+    file = "dezeni-world.zip",
+    hashes = {
+      { hash = "b951d24c58e13ce81267cfcac433c6d0", label = "Dezeni World (mkII) {V1 mode}.d88" },
+      { hash = "283563f6202914596439481f86c7b42d", label = "Dezeni World.d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X020F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Get paper (from ground)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X021D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Give money to pumpkin king increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0233, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door hammered open" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0234, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Hit door (# times)" },
+      },
+    },
+  },
+}

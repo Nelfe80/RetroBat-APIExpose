@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Where in the World is Carmen Sandiego?",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "where-in-the-world-is-carmen-sandiego",
+    file = "where-in-the-world-is-carmen-sandiego.zip",
+    hashes = {
+      { hash = "29dcfcf773ceb9ef29b524183ad89d8c", label = "Where in the World is Carmen Sandiego (USA).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006D, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Title Screen Status" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X004C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 Bit] Stolen Treasure ID increased" },
+      },
+    },
+  },
+}

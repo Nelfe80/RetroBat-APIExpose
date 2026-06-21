@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Command & Conquer",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "command-conquer",
+    file = "command-conquer.zip",
+    hashes = {
+      { hash = "42da4c7d040f9e7cd046a42ec3e68027", label = "Command & Conquer (Europe) (En,Fr).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X934E0, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending Credits" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X934E4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Score" },
+      },
+    },
+  },
+}

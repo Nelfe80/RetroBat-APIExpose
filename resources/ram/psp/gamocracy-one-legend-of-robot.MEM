@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Gamocracy One: Legend of Robot",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "gamocracy-one-legend-of-robot",
+    file = "gamocracy-one-legend-of-robot.zip",
+    hashes = {
+      { hash = "bc8cfa66a9d609da0e3c788d19bf8d69", label = "Gamocracy One - Legend of Robot (Europe) (minis) (PSN).iso" },
+      { hash = "46a8f9600bf6d199c6132a2d762a36a0", label = "Gamocracy One - Legend of Robot (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XD7D200, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Current Time Remaining in the level (32bits)" },
+      },
+    },
+  },
+}

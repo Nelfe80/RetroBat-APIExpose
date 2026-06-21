@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "SD Gundam Gaiden: Knight Gundam Monogatari",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "sd-gundam-gaiden-knight-gundam-monogatari",
+    file = "sd-gundam-gaiden-knight-gundam-monogatari.zip",
+    hashes = {
+      { hash = "37d12504c2527f6996269afeada57b45", label = "SD Gundam Gaiden - Knight Gundam Monogatari (Japan) (En) (v1.03) (Stardust Crusaders).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0404, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gundam Level" },
+        { address=0X0423, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amuro Level" },
+        { address=0X0442, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cannon Level" },
+        { address=0X0461, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tank Level" },
+        { address=0X0480, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sayla Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0181, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bitflags] Treasures increased" },
+        { address=0X0181, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bitflags] Treasures decreased" },
+      },
+      health = {
+        { address=0X026E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy A HP decreased" },
+        { address=0X026E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy A HP increased" },
+        { address=0X0405, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gundam HP decreased" },
+        { address=0X0405, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gundam HP increased" },
+        { address=0X0424, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Amuro HP decreased" },
+        { address=0X0424, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Amuro HP increased" },
+        { address=0X0443, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cannon HP decreased" },
+        { address=0X0443, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cannon HP increased" },
+        { address=0X0462, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tank HP decreased" },
+        { address=0X0462, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tank HP increased" },
+        { address=0X0481, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sayla HP decreased" },
+        { address=0X0481, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sayla HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X017D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X017E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X017F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X0180, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X0182, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X0183, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X0184, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X0185, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X0186, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+      },
+      weapon = {
+        { address=0X03F3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Active char Weapon Slot ?" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X04F8, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24-bit] Gold increased" },
+        { address=0X04F9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Mid Values increased" },
+        { address=0X04FA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold High Values increased" },
+        { address=0X0512, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Target Gold Low Values increased" },
+        { address=0X0513, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Target Gold Mid Values increased" },
+        { address=0X0514, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Target Gold High Values increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X03F2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Active char Shield Slot ?" },
+      },
+    },
+  },
+}

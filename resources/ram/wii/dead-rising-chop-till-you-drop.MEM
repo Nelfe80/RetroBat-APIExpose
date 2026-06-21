@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Dead Rising: Chop Till You Drop",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Horror, Shooter"
+  },
+
+  rom = {
+    name = "dead-rising-chop-till-you-drop",
+    file = "dead-rising-chop-till-you-drop.zip",
+    hashes = {
+      { hash = "d5d740d553128ffe97a59369235a67e0", label = "Dead Rising - Chop Till You Drop (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6E180C, type="u32be", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Shades Outfit" },
+        { address=0X10000990, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Helipad" },
+        { address=0X10000990, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Zone ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6D86B4, type="u32be", condition="eq", value=0X0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="elevator death match" },
+        { address=0X6D86D8, type="u32be", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="elevator death match" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X01000000, action="LIVES_STATE", no_log=false, no_survey=false, desc="[Mission] Love Lasts a lifetime started" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X01000001, action="LIVES_STATE", no_log=false, no_survey=false, desc="[Mission] Love Lasts a lifetime follower joined" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X01000004, action="LIVES_STATE", no_log=false, no_survey=false, desc="[Mission] Love Lasts a lifetime follower joined" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6E1800, type="u32be", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Default" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shirtless with Blue Boxers and Barefoot" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ammo Belt (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Prisoner Outfit (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mall Employee Uniform (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pro Wrestling Briefs (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Special Forces Uniform (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mega Man Torso (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Arthur's Boxers (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X09, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Brown Jacket with Fur Trim Tan Shirt and Black Pants [P203]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Weekender Outfit [E106]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pink Paparazzi Outfit" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X0C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pure White Outfit [E202]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X0D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Burgundy Wine Outfit [E202]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X0E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Grandpa Outfit [E202]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X0F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Strike Outfit [E106]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Accountant Outfit [E106]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Miami Nights Outfit [E106],[E202]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X12, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Man in Black Outfit [E106],[E202]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X13, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cold Hearted Snake Outfit" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Casual Outfit" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X15, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Grey Business Suit with Striped Tie [E111],[E202], [P107]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X16, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="White Business Suit and Striped Tie [P103]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X17, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Yellow Suit with Yellow Striped Tie [E202]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="White Dress Shirt, Black Tie, and Grey Dress Pants [E202], [P107]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X19, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Black and Brown Checkered Dress Shirt, Black Tie, and Striped Pants [E111]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X1A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="USA Track Outfit [E104]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X1B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Blue Vest with Tan Shorts [E102] [E208]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X1C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red and White Sleeveless Shirt with Red and Black Checkered Shorts [E214]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X1D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Green Ratman T-shirt and Blue Jean Shorts [P109]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X1E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Blue T-shirt with White Stars and Red Shorts" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X1F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="White Skirt (A102), [E103]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pink Skirt [E112]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X21, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="White Teddy [E212], [E204]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X22, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Blue and White Flowery Dress [E110], [E216]" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X23, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bionic Commando (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X24, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Roll (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X25, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bikini (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X26, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="School Uniform (Reward)" },
+        { address=0X6E1800, type="u32be", condition="eq", value=0X27, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Apocalypse Frank (Reward)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6E9940, type="u32be", condition="eq", value=0X01000900, action="AMMO_STATE", no_log=false, no_survey=false, desc="[Secret Mission] Gun Shop Standoff started (Outfit - Ammo Belt: S rank)" },
+        { address=0X1000098B, type="u8", condition="bit_true", bit=3, mask=0X08, action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Belt" },
+        { address=0X10001393, type="u8", condition="bit_true", bit=3, mask=0X08, action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Belt" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6E9940, type="u32be", condition="eq", value=0X01000401, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Mission] Out of Control Boss trigger" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X01000402, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Mission] Out of Control Boss done" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X00010201, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Case File] Case 1-2, Player 'killed' boss Case 1-2 done, Case 1-3 engaged" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X00010501, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Otis Favor] Cletus Boss fight start" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X00010502, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Otis Favor] Cletus Boss fight done" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X00020100, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Case File] Case 2-1 done, Case 2-2 engaged 'Boss'" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X00020200, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Case File] Case 2-2 done, Case 2-3 engaged 'Boss'" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X00020300, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Case File] Case 2-3 'Boss' started" },
+        { address=0X6E9940, type="u32be", condition="eq", value=0X00020301, action="BOSS_HIT", no_log=false, no_survey=false, desc="[Case File] Case 2-3 'Boss' done" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6E1800, type="u32be", condition="eq", value=0X22, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into Blue and White Flowery Dress [E110], [E216]" },
+      },
+    },
+  },
+}

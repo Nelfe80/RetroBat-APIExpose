@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Rupupu Cube: Lup Salad",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rupupu-cube-lup-salad",
+    file = "rupupu-cube-lup-salad.zip",
+    hashes = {
+      { hash = "3757446364dcdff18ae30a5103897ae0", label = "Rupupu Cube - Lup Salad (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC02EC, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X1B5455, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC0EA0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X1480EC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 1 Complete" },
+        { address=0X1480ED, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 2 Complete" },
+        { address=0X1480EE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 3 Complete" },
+        { address=0X1480EF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 4 Complete" },
+        { address=0X1480F0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 5 Complete" },
+        { address=0X1480F1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 6 Complete" },
+        { address=0X1480F2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 7 Complete" },
+        { address=0X1480F3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 8 Complete" },
+        { address=0X1480F4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 9 Complete" },
+        { address=0X1480F5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 1 Stage 10 Complete" },
+        { address=0X1480F6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 2 Stage 1 Complete" },
+        { address=0X148100, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 3 Stage 1 Complete" },
+        { address=0X14810A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 4 Stage 1 Complete" },
+        { address=0X148114, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story 5 Stage 1 Complete" },
+        { address=0X1E205E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E205E, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E205E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 1" },
+        { address=0X1E205F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E205F, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E205F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 2" },
+        { address=0X1E2060, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E2060, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E2060, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 3" },
+        { address=0X1E2061, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E2061, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E2061, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 4" },
+        { address=0X1E2062, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E2062, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E2062, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 5" },
+        { address=0X1E2063, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E2063, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E2063, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 6" },
+        { address=0X1E2064, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E2064, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E2064, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 7" },
+        { address=0X1E2065, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E2065, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E2065, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 8" },
+        { address=0X1E2066, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E2066, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E2066, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 9" },
+        { address=0X1E2067, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X1E2067, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X1E2067, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backworld Chapter 10" },
+      },
+      stage = {
+        { address=0XC0E9C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XC1318, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XC1318, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 10" },
+        { address=0XC1318, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 20" },
+        { address=0XC1318, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action mode starting level" },
+        { address=0X1E5550, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Tries" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC0EA8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score, divided by 100" },
+        { address=0XC0EB0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score, divided by 100" },
+      },
+    },
+  },
+}

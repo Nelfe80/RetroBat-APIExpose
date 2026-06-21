@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Coraline",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "coraline",
+    file = "coraline.zip",
+    hashes = {
+      { hash = "0ca05f29b0e1c28eeb5b44c1221f79ea", label = "Coraline (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X475188, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+        { address=0X19E4380, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+  },
+}

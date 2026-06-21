@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#60529 YUKIO.   35000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#60537 KYOKO.   30000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#60545 MASATUGU 25000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#60553 CAPCOM   20000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#60561 ♥7!      51390</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

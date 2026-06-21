@@ -1,0 +1,18 @@
+return {
+  game = {
+    title = "~Z~ No Hash 25753",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-no-hash-25753",
+    file = "z-no-hash-25753.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Sesame Street: Countdown",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Education, Puzzle"
+  },
+
+  rom = {
+    name = "sesame-street-countdown",
+    file = "sesame-street-countdown.zip",
+    hashes = {
+      { hash = "7f0aa12ef5d1d71af69b06d22fbcbbf1", label = "Sesame Street - Countdown (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X064E, type="u8", condition="eq", value=0X8, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0016, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Warp to level 3" },
+        { address=0X064E, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sesame Street" },
+        { address=0X064E, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Forest" },
+        { address=0X064E, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zoo" },
+        { address=0X064E, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fair" },
+        { address=0X064E, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Moon" },
+        { address=0X064E, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Desert" },
+        { address=0X064E, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Prehistoric Times" },
+        { address=0X064E, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Counts Castle" },
+        { address=0X064E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X002C, type="u8", condition="eq", value=0X11, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hitting an object" },
+      },
+    },
+  },
+}

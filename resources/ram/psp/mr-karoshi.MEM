@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Mr. Karoshi",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mr-karoshi",
+    file = "mr-karoshi.zip",
+    hashes = {
+      { hash = "68220b8cd557ecb6c31179bb2a013542", label = "Karoshi (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X927C0C, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused (always 1 in menu)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X962F54, type="u8", condition="eq", value=0X00FFFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on the main menu" },
+        { address=0X962F54, type="u8", condition="eq", value=0X00C0C0C0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="restarting/cutscene" },
+        { address=0X962F54, type="u8", condition="eq", value=0X21000001, action="NEW_LEVEL", no_log=false, no_survey=false, desc="transistioning between/to cutscenes" },
+        { address=0X962F54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 = in a level" },
+        { address=0X1FFA46E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="lower4 is tens digits of level" },
+        { address=0X1FFA46F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="lower4 is ones digits of level" },
+        { address=0X1FFE978, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="in air" },
+        { address=0X1FFE978, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0= on ground" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X153C000, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1FFA7A0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="lower4 is yen coin amount increased" },
+        { address=0X1FFA7A1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="lower4 is yen coin amount increased" },
+      },
+    },
+  },
+}

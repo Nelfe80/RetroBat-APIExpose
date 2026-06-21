@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Youkai Douchuuki",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "youkai-douchuuki",
+    file = "youkai-douchuuki.zip",
+    hashes = {
+      { hash = "3b8405f971329a37d70fa1fd82da9034", label = "Youkai Douchuuki (Japan).nes" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X03DA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 100s [Lower4]" },
+        { address=0X03DB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 1,000s [Lower4]" },
+        { address=0X03DC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 10,000s [Lower4]" },
+        { address=0X03DD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 100,000s [Lower4]" },
+        { address=0X03DE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 1,000,000s [Lower4]" },
+        { address=0X03DF, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 10,000,000s [Lower4]" },
+      },
+    },
+  },
+}

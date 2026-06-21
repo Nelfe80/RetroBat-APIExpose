@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Golvellius",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "golvellius",
+    file = "golvellius.zip",
+    hashes = {
+      { hash = "9fc9ee41ce35ce4e1068e22277265f6d", label = "Golvellius (Japan) (En) (v1.0) (Novalia Spirit).rom" },
+      { hash = "ab0fe259831647da8f6e8dcf24fb0b45", label = "Golvellius (Japan).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2080, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Input Buffer for Title Screen Easter Egg [8 bytes ASCII]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1000, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X101E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="sword attack on overworld" },
+        { address=0X2043, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Screen ID [8 bit]" },
+        { address=0X2048, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="cave is opened" },
+        { address=0X2048, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Is Overworld Cave Opened? [8 bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2022, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power (Health) Max [8 bit] decreased" },
+        { address=0X2022, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Power (Health) Max [8 bit] increased" },
+        { address=0X203D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power (Health) [8 bit] decreased" },
+        { address=0X203D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Power (Health) [8 bit] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X204E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Find (Money) Max [16 bit] increased" },
+        { address=0X2050, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Find (Money) [16 bit] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1000, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight Arena" },
+        { address=0X201E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses Killed [8 bit]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X101A, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames [8 bit]" },
+        { address=0X201F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Progressive Shield [8 bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X101E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Sword Drawn [8 bit]" },
+      },
+    },
+  },
+}

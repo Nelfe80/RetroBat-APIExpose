@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "MySims: Agents",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "mysims-agents",
+    file = "mysims-agents.zip",
+    hashes = {
+      { hash = "1925c5dac465bba91ea85e4b75eda890", label = "MySims - Agents (USA) (En,Fr,Es).nds" },
+      { hash = "b0ef93d6f5543caaa2734effa91cd9fa", label = "MySims - Agents (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cosmic Ark",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "cosmic-ark",
+    file = "cosmic-ark.zip",
+    hashes = {
+      { hash = "ab5bf1ef5e463ad1cbb11b6a33797228", label = "Cosmic Ark (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

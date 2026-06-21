@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Discworld II: Mortality Bytes! | Discworld II: Missing Presumed...!?",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "discworld-ii-mortality-bytes-discworld-ii-missing-presumed",
+    file = "discworld-ii-mortality-bytes-discworld-ii-missing-presumed.zip",
+    hashes = {
+      { hash = "5e6bea315213927ff74db4c89ef59d30", label = "Discworld II - Mortality Bytes! (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X58060, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode: 0 - Off, 1 - On" },
+        { address=0X6C118, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles: Subtitle Speed (0x00 to 0x64)" },
+        { address=0X6C120, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles: Display Subtitles (0x00 or 0x01)" },
+        { address=0X6C8D8, type="u24le", condition="eq", value=0X0824, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X99908, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="University Garden Imp (Act 1 - Birdhouse)" },
+        { address=0X9A448, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="University Garden Imp (Act 1 - Birdhouse)" },
+        { address=0XF9B18, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Act: 0x01-0x05" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6C4DC, type="u16le", condition="eq", value=0X0009, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Rights Club - Sheep" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X001A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's Garden" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X001B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's Realm" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X001C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's House (Hallway)" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X001D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's House (Exterior)" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X001E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's House (Kitchen)" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X001F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's House (Study)" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X0032, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's House (Library Alcove)" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X0033, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's House (Library)" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X004F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Rights Club" },
+        { address=0X6C8D8, type="u24le", condition="eq", value=0X01D6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Windle and Death" },
+      },
+      health = {
+        { address=0X6C4DC, type="u16le", condition="eq", value=0X0006, action="HEALTH_STATE", no_log=false, no_survey=false, desc="High Energy Facility - Ponder Stibbons" },
+        { address=0X6C4DC, type="u16le", condition="eq", value=0X0007, action="HEALTH_STATE", no_log=false, no_survey=false, desc="High Energy Facility - Skazz" },
+        { address=0X6C4DC, type="u16le", condition="eq", value=0X0008, action="HEALTH_STATE", no_log=false, no_survey=false, desc="High Energy Facility - Mad Drongo" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X0015, action="HEALTH_STATE", no_log=false, no_survey=false, desc="High Energy Facility (Ants)" },
+        { address=0X6C8D0, type="u16le", condition="eq", value=0X002C, action="HEALTH_STATE", no_log=false, no_survey=false, desc="High Energy Facility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9A418, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Last object/person interacted with (combine with area):" },
+      },
+    },
+  },
+}

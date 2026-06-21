@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Reservoir Dogs",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter, Stealth"
+  },
+
+  rom = {
+    name = "reservoir-dogs",
+    file = "reservoir-dogs.zip",
+    hashes = {
+      { hash = "f98c26064903cb2fad3e19b472d4f38c", label = "Reservoir Dogs (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

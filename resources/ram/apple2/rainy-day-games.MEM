@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Rainy Day Games",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rainy-day-games",
+    file = "rainy-day-games.zip",
+    hashes = {
+      { hash = "e256e4abeaf9af224902ca7c6bb8654d", label = "Rainy Day Games (1985)(Baudville)[cr First Class].do" },
+    }
+  },
+
+  events = {
+  },
+}

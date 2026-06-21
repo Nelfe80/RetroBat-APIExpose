@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Lifeline",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lifeline",
+    file = "lifeline.zip",
+    hashes = {
+      { hash = "1430b448db28abec42d640d73fdb9093", label = "Life Line (USA)" },
+      { hash = "ffd17618958f7f2c4ec99a9abda90c89", label = "Life Line (USA) (Widescreen) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3E5160, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Combat] Guest Level Elevator Hall" },
+        { address=0X3E5168, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Item] ID card (Security Level 1)" },
+        { address=0X3E522D, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Scen] Naomi isn't around..." },
+        { address=0X51BA94, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Minigame - Current Round Number [32 bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3E5137, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Staff Hall Area A dead end #2 (EC)" },
+        { address=0X3E5161, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Staff Hall Area A dead end #1 (EC)" },
+        { address=0X3E516E, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Mirror] Restrooms Ladies' Washstands left" },
+        { address=0X3E516E, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Mirror] Restrooms Ladies' Washstands middle" },
+        { address=0X3E516E, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Mirror] Restrooms Ladies' Washstands right" },
+        { address=0X3E5199, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Restrooms - Ladies' Stalls #2 (EC)" },
+        { address=0X3E5233, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Scen] The announcer was dead..." },
+      },
+      health = {
+        { address=0X6E3918, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health [32 bit] decreased" },
+        { address=0X6E3918, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health [32 bit] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3E5163, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Outfit change (Armored Suit)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X50E78C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Voice Score [16 bit]" },
+        { address=0X6E3D78, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Word Jumble High Score [32 bit]" },
+        { address=0X6E3D98, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Complete the Phrases High Score [32 bit]" },
+        { address=0X6E3DB8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="The Calc High Score [32 bit]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3E5179, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Exhibit Room door unlocked" },
+      },
+    },
+  },
+}

@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Treasure Planet",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "treasure-planet",
+    file = "treasure-planet.zip",
+    hashes = {
+      { hash = "a1a1200869187d2f3fb447c685c2c55c", label = "Disney's Treasure Planet (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB48F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (De)" },
+        { address=0XB493C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (Es)" },
+        { address=0XB494C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (US)" },
+        { address=0XC49A9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="First 3 Movie clipboards in level 1" },
+        { address=0XC49AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="First 3 scrolls in level 1" },
+        { address=0XC49AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of credit crystals collected in Montressor level 1 (US)" },
+        { address=0XC49B1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The other 3 Movie clipboards in level 1" },
+        { address=0XC49B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The other 3 scrolls in level 1" },
+        { address=0XEBE00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 generators" },
+        { address=0XEBF88, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 generators display number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC765D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (EU) increased" },
+        { address=0XC765D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (EU) decreased" },
+        { address=0XC766D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (US) increased" },
+        { address=0XC766D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (US) decreased" },
+      },
+      health = {
+        { address=0XC765E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (EU) decreased" },
+        { address=0XC765E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (EU) increased" },
+        { address=0XC766E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (US) decreased" },
+        { address=0XC766E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (US) increased" },
+        { address=0XD70AA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Silver's health (US) decreased" },
+        { address=0XD70AA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Silver's health (US) increased" },
+        { address=0XE6E24, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Scroop's health (Es) decreased" },
+        { address=0XE6E24, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Scroop's health (Es) increased" },
+        { address=0XE6E64, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage done to Scroop (US)" },
+        { address=0XE6E68, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Scroop's health (US) decreased" },
+        { address=0XE6E68, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Scroop's health (US) increased" },
+        { address=0XEACEE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Silver's health (EU,Es,It,Sv,Da) decreased" },
+        { address=0XEACEE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Silver's health (EU,Es,It,Sv,Da) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC4997, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure collected in Montressor part 1(EU,Es,It,Sv,Da)" },
+        { address=0XC49D7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Drubloons collected in Treasure Planet part 1 (US)" },
+        { address=0XC49DF, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Drubloons collected in Treasure Planet part 2 (US)" },
+        { address=0XC4A0F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Drubloons collected in Treasure Planet Race (US)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XEFE64, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility cheat (US)" },
+        { address=0XEFE74, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility cheat (De)" },
+        { address=0XEFED0, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility cheat (Es)" },
+      },
+    },
+  },
+}

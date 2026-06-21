@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Puzzle Quest 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-quest-2",
+    file = "puzzle-quest-2.zip",
+    hashes = {
+      { hash = "7655f14ee6ee774a2536e960f4a2a454", label = "Puzzle Quest 2 (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X0000, type="u32le", condition="eq", value=0X52, action="TREASURE", no_log=false, no_survey=false, desc="Lucky Dip (Side - Dwarven Lab) (Note: This one seems to be an infinite treasure chest minigame," },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0000, type="u32le", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goblin Boss (Main)" },
+        { address=0X0000, type="u32le", condition="eq", value=0X3A, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeat the Dark Elven Boss (Main)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0000, type="u32le", condition="eq", value=0X0A, action="DOOR_OPENED", no_log=false, no_survey=false, desc="A Door for a Key (Main)" },
+        { address=0X0000, type="u32le", condition="eq", value=0X22, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Royal Door (Main)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0000, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Note: Front-loading the indeces and enumerations within the system memory region, to reduce the" },
+      },
+    },
+  },
+}

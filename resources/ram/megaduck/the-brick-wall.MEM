@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Brick Wall",
+    system = "megaduck",
+    system_name = "Mega Duck",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "the-brick-wall",
+    file = "the-brick-wall.zip",
+    hashes = {
+      { hash = "48170b7d77fc96d4f72adccb51299b87", label = "The Brick Wall (World).bin" },
+    }
+  },
+
+  events = {
+  },
+}

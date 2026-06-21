@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Wonder Boy",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "wonder-boy",
+    file = "wonder-boy.zip",
+    hashes = {
+      { hash = "917c3e4f4c50d6506e64e2f05b945d9c", label = "Wonder Boy (Japan).gg" },
+    }
+  },
+
+  events = {
+  },
+}

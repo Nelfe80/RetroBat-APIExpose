@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Gauntlet Legends",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "gauntlet-legends",
+    file = "gauntlet-legends.zip",
+    hashes = {
+      { hash = "9cb963e8b71f18568f78ec1af120362e", label = "Gauntlet Legends (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4EFC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Entered Level ID" },
+        { address=0X4EFC1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Entered Zone ID" },
+        { address=0XFD31B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 - Level" },
+        { address=0XFD374, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="kill count on single level - resets to 0 on loading screens" },
+        { address=0XFD50B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 - Level" },
+        { address=0XFD6FB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 3 - Level" },
+        { address=0XFD8EB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 4 - Level" },
+        { address=0X10F4F1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level select area code" },
+      },
+      stage = {
+        { address=0X10F4E8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="FFFA -the standard level select zone value between all stages" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X133B38, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HEALTH [16-bit, likely reserved for 32-bit] decreased" },
+        { address=0X133B38, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HEALTH [16-bit, likely reserved for 32-bit] increased" },
+        { address=0X136310, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Health decreased" },
+        { address=0X136310, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Health increased" },
+        { address=0X136394, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Health decreased" },
+        { address=0X136394, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC5D74, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 Minotaur Coins increased" },
+        { address=0X143C92, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Special item number - shifts between 100 and 200. changes on pickup for special weapons, but als" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF1AB4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bozz 2 (partial) Shifting values for boss identification ----Used As a Reset Value workaround (b" },
+        { address=0X28E56C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSS HEALTH! (UI) [float]" },
+        { address=0X28ECFC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSS HEALTH! (Logic) [float]" },
+        { address=0X28F32D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Chimera Boss Health-only goes down to value 8000" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC5BF2, type="u16be", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Inventory Slot 1 Type ID" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEED8, type="u32be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Some sort of Level Transition Counter?" },
+        { address=0X1056B4, type="u32be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time in Current Level (divided by 2)" },
+        { address=0X1056B5, type="u16be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time in Current Level ('Seconds-like')" },
+      },
+    },
+  },
+}

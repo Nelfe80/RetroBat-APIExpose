@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Donald Duck: Goin' Quackers",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "donald-duck-goin-quackers",
+    file = "donald-duck-goin-quackers.zip",
+    hashes = {
+      { hash = "1d3ea7b437bea2420cb6e1b9462ea345", label = "Disney's Donald Duck - Goin' Quackers (USA)" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0XEAD90, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Ceremonial Room Boss HP" },
+        { address=0XEE9BC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Magica's Devilish Dome Boss HP" },
+        { address=0XEEA38, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Beagle Boy's Tower Boss HP" },
+        { address=0XF4524, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bernadette's Peak Boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X994E4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Beagle Boy's Tower (see note @ 0x0 for relative offsets)" },
+        { address=0X9AC20, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Bernadette's Peak (see note @ 0x0 for relative offsets)" },
+        { address=0X9B8B0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Magica's Devilish Dome (see note @ 0x0 for relative offsets)" },
+        { address=0X9BBBC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Head Alley (see note @ 0x0 for relative offsets)" },
+        { address=0X9D588, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Bears' Path (see note @ 0x0 for relative offsets)" },
+        { address=0X9E084, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Under 'Hand'ed (see note @ 0x0 for relative offsets)" },
+        { address=0X9F5D4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Dangerous Cliff (see note @ 0x0 for relative offsets)" },
+        { address=0XA01D8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Huey's Track (see note @ 0x0 for relative offsets)" },
+        { address=0XA027C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in The Gorge (see note @ 0x0 for relative offsets)" },
+        { address=0XA091C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Dewey's Rooftops (see note @ 0x0 for relative offsets)" },
+        { address=0XA0924, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in hub (Gyro's Lab) (see note @ 0x0 for relative offsets)" },
+        { address=0XA1148, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Ceremonial Room (see note @ 0x0 for relative offsets)" },
+        { address=0XA12A8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Main Street (see note @ 0x0 for relative offsets)" },
+        { address=0XA177C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Earie Alley (see note @ 0x0 for relative offsets)" },
+        { address=0XA1890, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Urban High-Rises (see note @ 0x0 for relative offsets)" },
+        { address=0XA1C00, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in The Nephew's Murky Way (see note @ 0x0 for relative offsets)" },
+        { address=0XA2368, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Artifact Way (see note @ 0x0 for relative offsets)" },
+        { address=0XA2A18, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Haunted Hall (see note @ 0x0 for relative offsets)" },
+        { address=0XA2F88, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Temple's Entrance (see note @ 0x0 for relative offsets)" },
+        { address=0XA3138, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Louie's Creepy Corridor (see note @ 0x0 for relative offsets)" },
+        { address=0XA3570, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Ghostly Path (see note @ 0x0 for relative offsets)" },
+        { address=0XA35F0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in The Roofs (see note @ 0x0 for relative offsets)" },
+        { address=0XA3AA0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Ancient Fate (see note @ 0x0 for relative offsets)" },
+        { address=0XA4284, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in First Avenue (see note @ 0x0 for relative offsets)" },
+        { address=0XA7EF8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[200 bytes] Game state object in Forest Edge (see note @ 0x0 for relative offsets)" },
+      },
+    },
+  },
+}

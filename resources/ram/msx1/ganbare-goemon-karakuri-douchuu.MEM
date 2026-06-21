@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Ganbare Goemon! Karakuri Douchuu",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ganbare-goemon-karakuri-douchuu",
+    file = "ganbare-goemon-karakuri-douchuu.zip",
+    hashes = {
+      { hash = "44c47ae77d38ee95d311f90204ed4ac5", label = "Ganbare Goemon! - Karakuri Douchuu (Japan) (Wii U Virtual Console).rom" },
+      { hash = "c5ec0e2d716c3ba652b5cdfa908546e5", label = "Ganbare Goemon! - Karakuri Douchuu (Japan) (En) (v0.9.5) (MSX Translations).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0X0000, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+        { address=0X0000, type="u8", condition="eq", value=0X07, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0X0000, type="u8", condition="eq", value=0X0A, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0000, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="between levels cutscene" },
+        { address=0X0000, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="loading zone" },
+        { address=0X0281, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Screen [8 bit]" },
+        { address=0X0483, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Underground? [8 bit] (0/1)" },
+      },
+      zone = {
+        { address=0X0280, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Zone [8 bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0000, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death" },
+        { address=0X0260, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Rest (lives) [8 bit BCD] increased" },
+        { address=0X0260, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rest (lives) [8 bit BCD] decreased" },
+        { address=0X0D8D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die #2 [8 bit]" },
+        { address=0X0D8E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die #1 [8 bit]" },
+      },
+      health = {
+        { address=0X0480, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Max [8 bit] decreased" },
+        { address=0X0480, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Max [8 bit] increased" },
+        { address=0X0481, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [8 bit] decreased" },
+        { address=0X0481, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [8 bit] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0257, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score [24 bit BCD]" },
+        { address=0X025A, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score [24 bit BCD]" },
+      },
+      collectibles = {
+        { address=0X0265, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Koban (money) [16 bit BCD] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0500, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - pass, talisman, inrou" },
+        { address=0X0500, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - clock, sandals, slingshot" },
+        { address=0X0500, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - helmet, armor, straw hat" },
+        { address=0X0500, type="u8", condition="eq", value=0X03, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - candle, sandals, onigiri" },
+        { address=0X0500, type="u8", condition="eq", value=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - helmet, sandals, talisman" },
+        { address=0X0500, type="u8", condition="eq", value=0X05, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - strawhat, slingshot, inrou" },
+        { address=0X0500, type="u8", condition="eq", value=0X06, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - onigiri, sandals, armor" },
+        { address=0X0500, type="u8", condition="eq", value=0X07, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - helmet, slingshot, straw hat" },
+        { address=0X0500, type="u8", condition="eq", value=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - (empty), onigiri, pass" },
+        { address=0X0500, type="u8", condition="eq", value=0X09, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - (empty), slingshot, inrou" },
+        { address=0X0500, type="u8", condition="eq", value=0X0A, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - (empty), armor, talisman" },
+        { address=0X0500, type="u8", condition="eq", value=0X0B, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - (empty), straw hat, onigiri" },
+        { address=0X0500, type="u8", condition="eq", value=0X0C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - (empty), ramen, dango" },
+        { address=0X0500, type="u8", condition="eq", value=0X0D, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - (empty), onigiri, (empty)" },
+        { address=0X0500, type="u8", condition="eq", value=0X0E, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - (empty), pass, (empty)" },
+        { address=0X0500, type="u8", condition="eq", value=0X0F, action="DOOR_OPENED", no_log=false, no_survey=false, desc="shop - (empty), candle, (empty)" },
+        { address=0X0500, type="u8", condition="eq", value=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="secret passage" },
+        { address=0X0500, type="u8", condition="eq", value=0X11, action="DOOR_OPENED", no_log=false, no_survey=false, desc="gambling house" },
+        { address=0X0500, type="u8", condition="eq", value=0X12, action="DOOR_OPENED", no_log=false, no_survey=false, desc="inn" },
+        { address=0X0500, type="u8", condition="eq", value=0X13, action="DOOR_OPENED", no_log=false, no_survey=false, desc="pawn shop" },
+        { address=0X0500, type="u8", condition="eq", value=0X14, action="DOOR_OPENED", no_log=false, no_survey=false, desc="informant" },
+        { address=0X0510, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Shop/Indoor #2 [8 bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0288, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Loop/Province [8 bit]" },
+        { address=0X0500, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Shop/Indoor #1 [8 bit]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Ultraman: Hikari no Kyojin Densetsu",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "ultraman-hikari-no-kyojin-densetsu",
+    file = "ultraman-hikari-no-kyojin-densetsu.zip",
+    hashes = {
+      { hash = "d34373410e47029bfd485c524c8da042", label = "Ultraman - Hikari no Kyojin Densetsu (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X113EB8, type="u8", condition="eq", value=0XA, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0X113EB8, type="u8", condition="eq", value=0XB, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue?" },
+        { address=0X113EB8, type="u8", condition="eq", value=0XC, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits" },
+        { address=0X113EB8, type="u8", condition="eq", value=0XE, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X113EEA, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1R" },
+        { address=0X113EEA, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2" },
+        { address=0X113EEA, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0X113EEA, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4" },
+        { address=0X113EEA, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5" },
+        { address=0X113EEA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round limit" },
+      },
+      stage = {
+        { address=0X113ED9, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Random Stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X113EEB, type="u8", condition="eq", value=0X0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="10" },
+        { address=0X113EEB, type="u8", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="30" },
+        { address=0X113EEB, type="u8", condition="eq", value=0X2, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="60" },
+        { address=0X113EEB, type="u8", condition="eq", value=0X3, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="90" },
+        { address=0X113EEB, type="u8", condition="eq", value=0X4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="infinite" },
+        { address=0X113EEB, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time limit in seconds" },
+      },
+    },
+  },
+}

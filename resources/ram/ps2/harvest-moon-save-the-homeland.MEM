@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Harvest Moon: Save the Homeland",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "harvest-moon-save-the-homeland",
+    file = "harvest-moon-save-the-homeland.zip",
+    hashes = {
+      { hash = "ee9dac6dff0f564fbb53b70c5c1e372b", label = "Harvest Moon - Save the Homeland (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X859FE3, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round up Cows" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X80D985, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lyla found that the flower died" },
+        { address=0X80D996, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Horse Dead" },
+        { address=0X859E65, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Days until chicken 1 is dead" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X80D980, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Tim finds a treasure map" },
+        { address=0X80D980, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Helping Tim with the treasure map" },
+        { address=0X80D980, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Tim finds a second treasure map" },
+        { address=0X80D980, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Found the treasure of the sacred land" },
+        { address=0X80DA17, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Hunt I Ending Achieved" },
+        { address=0X80DA17, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Hunt II Ending Achieved" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X267864, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X26776C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Action" },
+        { address=0X859961, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Treasure Map Story Day Counter" },
+      },
+    },
+  },
+}

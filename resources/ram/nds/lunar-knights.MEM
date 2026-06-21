@@ -1,0 +1,142 @@
+return {
+  game = {
+    title = "Lunar Knights",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "lunar-knights",
+    file = "lunar-knights.zip",
+    hashes = {
+      { hash = "84f07e5edfc8fb80de8f3bba166f393c", label = "Lunar Knights (USA) (En,Es).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X55A41, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X55A41, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not Paused" },
+        { address=0X55B9C, type="u32le", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X55B9C, type="u32le", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Normally" },
+        { address=0XA2F32, type="u16le", condition="eq", value=0X2B, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XA2F32, type="u16le", condition="eq", value=0X1, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In a level" },
+        { address=0X1EBF97, type="u8", condition="eq", value=0XA, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits, Menu" },
+        { address=0X1EBF97, type="u8", condition="eq", value=0X1, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In a level or city" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA2F32, type="u16le", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld and cities" },
+        { address=0X1EBF97, type="u8", condition="eq", value=0X43, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X1EBFA7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of normal clears" },
+        { address=0X1EBFA8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of hard clears" },
+        { address=0X1EBFA9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of nightmare clears" },
+        { address=0X1EBFEC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aaron Level" },
+        { address=0X1EBFEE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lucian Level" },
+        { address=0X1EC821, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dark Castle Level 1" },
+        { address=0X1EC821, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dark Castle Level 2" },
+        { address=0X1EDBE7, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Warrior's Ethic Sewer (underground ruins, hard)" },
+      },
+      zone = {
+        { address=0X1EC820, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+      stage = {
+        { address=0X1EC830, type="u32le", condition="eq", value=0X29810, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S Rank" },
+        { address=0X1EC830, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shooting Battle Best Score Stage 1" },
+        { address=0X1EC834, type="u32le", condition="eq", value=0X445C0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S Rank" },
+        { address=0X1EC834, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shooting Battle Best Score Stage 2" },
+        { address=0X1EC838, type="u32le", condition="eq", value=0X68FB0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S Rank" },
+        { address=0X1EC838, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shooting Battle Best Score Stage 3" },
+        { address=0X1EC83C, type="u32le", condition="eq", value=0X9EB10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S Rank" },
+        { address=0X1EC83C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shooting Battle Best Score Stage 4" },
+        { address=0X1EC840, type="u32le", condition="eq", value=0X99CF0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S Rank" },
+        { address=0X1EC840, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shooting Battle Best Score Stage 5" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1EBFD4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Aaron Current Life increased" },
+        { address=0X1EBFD4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Aaron Current Life decreased" },
+        { address=0X1EBFD6, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lucian Life increased" },
+        { address=0X1EBFD6, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lucian Life decreased" },
+        { address=0X1EBFD8, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Aaron Max Life increased" },
+        { address=0X1EBFD8, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Aaron Max Life decreased" },
+        { address=0X1EBFDA, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lucian Max Life increased" },
+        { address=0X1EBFDA, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lucian Max Life decreased" },
+      },
+      health = {
+        { address=0X1EBFDC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Aaron Current Energy decreased" },
+        { address=0X1EBFDC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Aaron Current Energy increased" },
+        { address=0X1EBFDE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lucian Current Energy decreased" },
+        { address=0X1EBFDE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lucian Current Energy increased" },
+        { address=0X1EBFE0, type="u16le", condition="eq", value=0X154, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Starting maximum" },
+        { address=0X1EBFE0, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Aaron Maximum Energy" },
+        { address=0X1EBFE2, type="u16le", condition="eq", value=0X00FE, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Starting Maximum" },
+        { address=0X1EBFE2, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Lucian maximum energy" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1EC080, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[40 bytes] Item Box 1. Array of 20 [16-bit] values. Refer to 0x1ec058 for content" },
+        { address=0X1EC0A8, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[40 bytes] Item Box 2. Array of 20 [16-bit] values. Refer to 0x1ec058 for content" },
+        { address=0X1EC0D0, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[40 bytes] Item Box 3. Array of 20 [16-bit] values. Refer to 0x1ec058 for content" },
+        { address=0X1EC0F8, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[40 bytes] Item Box 4. Array of 20 [16-bit] values. Refer to 0x1ec058 for content" },
+        { address=0X1EC120, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Storage Item Box 1. Array of 20 [16-bit] values. Refer to 0x1ec058 for content" },
+        { address=0X1EC148, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Storage Item Box 2. Array of 20 [16-bit] values. Refer to 0x1ec058 for content" },
+        { address=0X1EC170, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Storage Item Box 3. Array of 20 [16-bit] values for its content. Refer to 0x1ec058 for content" },
+        { address=0X1EC198, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Storage Item Box 4. Array of 20 [16-bit] values. Refer to 0x1ec058 for content" },
+        { address=0X1EDBEA, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Planet Eater Warrior's Ethic (treasure room, hard)" },
+        { address=0X1EDBF3, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Planet Eater Warrior's Ethic (second treasure room, nightmare)" },
+      },
+      weapon = {
+        { address=0X1EBFFC, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Aaron Weapon 0x1ec028+2*Value" },
+        { address=0X1EBFFE, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Lucian Weapon 0x1ec018+2*Value" },
+        { address=0X1EC018, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16 bytes] Lucian Weapon Slots" },
+        { address=0X1EC028, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16 bytes] Aaron Weapon Slots" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1EBFF0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Aaron Status Points" },
+        { address=0X1EBFF2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lucian Status Points" },
+        { address=0X1EC000, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Aaron Current Terrenial. Points to Terrenial slot: 0x1ec038+2*value" },
+        { address=0X1EC002, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lucian Current Terrenial. Points to Terrenial slot: 0x1ec038+2*value" },
+        { address=0X1EC004, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Aaron Equipped Headgear. Points to the accessory slot. 0x1ec650+2*value" },
+        { address=0X1EC006, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Aaron Equipped Armor. Points to the accessory slot. 0x1ec650+2*value" },
+        { address=0X1EC008, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Aaron Equipped Boots. Points to the accessory slot. 0x1ec650+2*value" },
+        { address=0X1EC00A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Aaron Equipped Shield. Points to the accessory slot. 0x1ec650+2*value" },
+        { address=0X1EC00C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lucian Equipped Headgear. Points to the accessory slot. 0x1ec650+2*value" },
+        { address=0X1EC00E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lucian Equipped Armor. Points to the accessory slot. 0x1ec650+2*value" },
+        { address=0X1EC010, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lucian Equipped Boots. Points to the accessory slot. 0x1ec650+2*value" },
+        { address=0X1EC012, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lucian Equipped Shield. Points to the accessory slot. 0x1ec650+2*value" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1EC815, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[11 bytes] Number of bosses killed" },
+        { address=0X1EC920, type="u16le", condition="eq", value=0X0, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1EC920, type="u16le", condition="eq", value=0X1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stays at 1 instead of dying between phases" },
+        { address=0X1EC924, type="u16le", condition="eq", value=0X3E8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Antlion lvl3" },
+        { address=0X1EC924, type="u16le", condition="eq", value=0X1D6A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Antlion lvl34" },
+        { address=0X1EC924, type="u16le", condition="eq", value=0X960, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goat chimera lvl3" },
+        { address=0X1EC924, type="u16le", condition="eq", value=0X0AF0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Twins in sewer" },
+        { address=0X1EC924, type="u16le", condition="eq", value=0X0ED8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stoker on train" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1EC670, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8 bytes] Shield Slots" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1EC7C4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Silver Star Shield XP" },
+        { address=0X1EC7C5, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Red Cross Shield XP" },
+        { address=0X1EC7C6, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Snake Eyes Shield XP" },
+      },
+    },
+  },
+}

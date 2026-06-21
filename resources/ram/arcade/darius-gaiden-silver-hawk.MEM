@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Darius Gaiden: Silver Hawk",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "darius-gaiden-silver-hawk",
+    file = "darius-gaiden-silver-hawk.zip",
+    hashes = {
+      { hash = "0bcf46bb45ce206dd7fb32fb8fc400a5", label = "dariusg.7z <Darius Gaiden - Silver Hawk (Ver 2.5O 1994/09/19)>" },
+      { hash = "1a80fc344526b04325db74c021ce34f4", label = "dariusgu.7z <Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)>" },
+      { hash = "c41a7383877548437af91a9d2f99c45f", label = "dariusgj.7z <Darius Gaiden - Silver Hawk (Ver 2.5J 1994/09/19)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5E79, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode" },
+        { address=0X5E79, type="u8", condition="eq", value=0X80, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="In-Game (incl. Continue and Score Entry)" },
+        { address=0X5E7A, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode" },
+        { address=0X5E7A, type="u8", condition="eq", value=0X0F, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (After Credits)" },
+        { address=0X5E7A, type="u8", condition="eq", value=0XFF, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1B1C5, type="u8", condition="eq", value=0XFF, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1B1DC, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5E7A, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zone Select / Clear Bonus" },
+        { address=0X5E7A, type="u8", condition="eq", value=0X16, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="High Score Entry (Clear)" },
+        { address=0X6C68, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Upper4] Round 3 Difficulty" },
+        { address=0X6C69, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Upper4] Round 1 Difficulty" },
+        { address=0X6C6A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Upper4] Round 7 Difficulty" },
+        { address=0X6C6B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Upper4] Round 5 Difficulty" },
+      },
+      stage = {
+        { address=0X2258, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Frame" },
+        { address=0XB2DE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number (i.e Stage 3, Zone D)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6C6D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bit3-5] Lives Setting increased" },
+        { address=0X6C6D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bit3-5] Lives Setting decreased" },
+        { address=0XB18E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Data related to King Fossil. Sets to 0x99 when the boss dies" },
+        { address=0X1B1C5, type="u8", condition="eq", value=0XFE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1B1DC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X1B1DC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0X1B266, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives increased" },
+        { address=0X1B266, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives decreased" },
+      },
+      health = {
+        { address=0X12904, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Risk Storage HP decreased" },
+        { address=0X12904, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Risk Storage HP increased" },
+        { address=0X14470, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="King Fossil's top left fin HP decreased" },
+        { address=0X14470, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="King Fossil's top left fin HP increased" },
+        { address=0X144DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="King Fossil's top right fin HP decreased" },
+        { address=0X144DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="King Fossil's top right fin HP increased" },
+        { address=0X14548, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="King Fossil's bottom middle fin HP decreased" },
+        { address=0X14548, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="King Fossil's bottom middle fin HP increased" },
+        { address=0X145B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="King Fossil's bottom right fin HP decreased" },
+        { address=0X145B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="King Fossil's bottom right fin HP increased" },
+        { address=0X14764, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="King Fossil's bottom left fin HP decreased" },
+        { address=0X14764, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="King Fossil's bottom left fin HP increased" },
+        { address=0X158B0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Risk Storage Tail HP, scales with rank. decreased" },
+        { address=0X158B0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Risk Storage Tail HP, scales with rank. increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1B1E6, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Power Up" },
+        { address=0X1B1E8, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shield Power Up" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B1D8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1P Score (Hex) Leading 4 hex digits. Counterstop at 99,999,999 (05f5)" },
+        { address=0X1B1DA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1P Score (Hex) 0 - 65,535" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB19C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current Boss HP" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1B1DE, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="1P Shield Durability" },
+        { address=0X1B1E0, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Player 1 invincibility timer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB318, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Boss Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Bouncers",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "bouncers",
+    file = "bouncers.zip",
+    hashes = {
+      { hash = "fd7720c80cb080541cfbddaca02c173a", label = "Bouncers (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0C2C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+        { address=0X3634, type="u32be", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Main Menu/Credits" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0170, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] decreased" },
+        { address=0X01B8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] decreased" },
+        { address=0X01C0, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0170, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powerups" },
+        { address=0X0170, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="More Powerups" },
+        { address=0X0170, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No Powerups" },
+        { address=0X01B8, type="u16be", condition="eq", value=0XC000, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="nothing" },
+        { address=0X01B8, type="u16be", condition="eq", value=0XC4A3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Jam" },
+        { address=0X01B8, type="u16be", condition="eq", value=0XC49F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Parachute" },
+        { address=0X01B8, type="u16be", condition="eq", value=0XC4AB, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Wing Shoes" },
+        { address=0X01B8, type="u16be", condition="eq", value=0XC4A7, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sticky Shoes" },
+        { address=0X01B8, type="u16be", condition="eq", value=0XC4AF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Jam" },
+        { address=0X01C0, type="u16be", condition="eq", value=0XC000, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="nothing" },
+        { address=0X01C0, type="u16be", condition="eq", value=0XC4A3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Jam" },
+        { address=0X01C0, type="u16be", condition="eq", value=0XC49F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Parachute" },
+        { address=0X01C0, type="u16be", condition="eq", value=0XC4AB, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Wing Shoes" },
+        { address=0X01C0, type="u16be", condition="eq", value=0XC4A7, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sticky Shoes" },
+        { address=0X01C0, type="u16be", condition="eq", value=0XC4AF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Jam" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1EA4, type="u32be", condition="eq", value=0X00000040, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken-Orbit Moon" },
+      },
+    },
+  },
+}

@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Pac-in-Time",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "pac-in-time",
+    file = "pac-in-time.zip",
+    hashes = {
+      { hash = "54ef4bb8c3d272af5bb78b4306f37248", label = "Pac-In-Time (USA) (SGB Enhanced).gb" },
+      { hash = "e3b7b3649e52ee6aa6fd98baf88d50de", label = "Pac-In-Time (Europe) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD5E6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01 - Stage finished" },
+        { address=0XD840, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Playing" },
+        { address=0XD840, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Either dying OR finishing a level." },
+        { address=0XD840, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backup State: Playing the Level?" },
+      },
+      stage = {
+        { address=0XD5E4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage value" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD5FD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XD5FD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XD60C, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+  },
+}

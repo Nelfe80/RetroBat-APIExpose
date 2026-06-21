@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Wolfenstein 3D",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "wolfenstein-3d",
+    file = "wolfenstein-3d.zip",
+    hashes = {
+      { hash = "71841df1c47503cce8a735dffd3898db", label = "Wolfenstein 3D (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X85E90, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="(8 bit) - 01 inside level, 00 - between levels and intro/credits screen (sometimes = 06 and 02)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X85ED0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - number of levels player beat in a row without loading" },
+        { address=0X85FAF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(8 bit) - 01 - level completed" },
+        { address=0X86458, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) - number of letter highlighted in 'level password input screen'" },
+        { address=0X8645C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) - number of letter highlighted in 'level password input screen' ver.2" },
+        { address=0X86460, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) - ASCII Text first 4 letters of 'level password' - also used for cheat input" },
+        { address=0X86464, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) - ASCII Text letters from 5 to 8 of 'level password' - also used for cheat input" },
+        { address=0X86468, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) - ASCII Text letters from 9 to 12 of 'level password' - also used for cheat input" },
+        { address=0X8646C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32 bit) - ASCII Text letters from 13 to 16 of 'level password' - also used for cheat input" },
+        { address=0X86896, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Controls the Level Completion Ratio" },
+        { address=0X86A28, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on the level after visintg menu once" },
+        { address=0X8FB00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - Number of Secrets Found in a level" },
+        { address=0X8FB04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - number of items found in a level" },
+        { address=0X8FB08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Number of Enemies Killed in a level" },
+        { address=0X8FB0C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - Number of secrets overall in a level" },
+        { address=0X8FB10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - Number of items overall in a level" },
+        { address=0X8FB14, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - Number of enemies overall in a level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X86578, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die, Fuhrer, Die!" },
+        { address=0X8FACC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(32 bit) - Items (every 50 items counter goes to 0 granting extra life) increased" },
+        { address=0X8FACC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(32 bit) - Items (every 50 items counter goes to 0 granting extra life) decreased" },
+        { address=0X8FAD0, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(32 bit) - Number of Lives (+1) increased" },
+        { address=0X8FAD0, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(32 bit) - Number of Lives (+1) decreased" },
+      },
+      health = {
+        { address=0X8FAD4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) - Health decreased" },
+        { address=0X8FAD4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) - Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X8FAEC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon found - Flamethrower (01 if yes)" },
+        { address=0X8FAED, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon found - Rocket launcher (01 if yes)" },
+        { address=0X8FAEE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon found - Chaingun (01 if yes)" },
+        { address=0X8FAEF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon found - Machine gun (01 if yes)" },
+        { address=0X8FAF0, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(32 bit) - current weapon selected (var. 1)" },
+        { address=0X8FAF4, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(32 bit) - current weapon selected (var. 2)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8FAB4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+      collectibles = {
+        { address=0X869A2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) - 0x01 during 'get psyched' screen, 0x50 during level increased" },
+        { address=0X8FAD8, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="(32 bit) - Ammo for pistol-machinegun-chaingun" },
+        { address=0X8FADC, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="(32 bit) - Max Ammo" },
+        { address=0X8FAE0, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="(32 bit) - Ammo for flamethrower" },
+        { address=0X9FF11, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) - ff during credits screens increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X85FBB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8 bit) - 01 - demo active, 00 - other time" },
+        { address=0X86578, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8 bit) - not an actual Scenario number, but a marker from episode select. not working properly" },
+        { address=0X8688E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Increases every time you pick up ammo" },
+      },
+    },
+  },
+}

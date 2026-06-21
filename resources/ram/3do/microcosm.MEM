@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Microcosm",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "microcosm",
+    file = "microcosm.zip",
+    hashes = {
+      { hash = "8b250c1c00d0ce9ab33ffdd0b5a01e62", label = "Microcosm (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

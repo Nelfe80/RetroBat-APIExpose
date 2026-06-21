@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Elementary Volume 6",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "elementary-volume-6",
+    file = "elementary-volume-6.zip",
+    hashes = {
+      { hash = "4c955356c7440142453928ab08208680", label = "MECC-A725 Elementary Vol. 6 v1.3 (4am crack)\MECC-A725 Elementary Vol. 6 v1.3 (4am crack).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

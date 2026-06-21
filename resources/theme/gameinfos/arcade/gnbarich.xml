@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 BFK 25647400</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 :/( 195300</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 )09 5901</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ,-. 336</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 AA 320</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 IKA 304</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 TKE 288</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 YMA 272</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 KJI 256</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 TNI 144</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 HSI 128</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 KBA 112</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 FJI 96</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 TKA 80</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 SKA 64</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Air Ranger: Rescue Helicopter",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Flight Simulator"
+  },
+
+  rom = {
+    name = "air-ranger-rescue-helicopter",
+    file = "air-ranger-rescue-helicopter.zip",
+    hashes = {
+      { hash = "ea41384c1d195b0ba00aff55af821469", label = "Air Ranger - Rescue Helicopter (Europe)" },
+      { hash = "c6d180e4a0628828addb070710a9c587", label = "Air Ranger - Rescue Helicopter (Japan)" },
+      { hash = "ea78f6fddc2b37b46fac5a47a03641a3", label = "Air Ranger - Rescue Helicopter (Europe) (Widescreen) (v1.0) (Souzooka)" },
+      { hash = "fd000c8c9b5f069a3b0740a0876aebd3", label = "Air Ranger - Rescue Helicopter (Japan) (Widescreen) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X237738, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2373B8, type="u16le", condition="eq", value=0X2, action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission Complete (before points tally)" },
+        { address=0X2373B8, type="u16le", condition="eq", value=0X3, action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission Complete (tallying points)" },
+      },
+      collectibles = {
+        { address=0X1EB5F58, type="u32le", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+  },
+}

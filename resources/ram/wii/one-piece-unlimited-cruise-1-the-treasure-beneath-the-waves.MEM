@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "One Piece: Unlimited Cruise 1 - The Treasure Beneath the Waves",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure, Fighting"
+  },
+
+  rom = {
+    name = "one-piece-unlimited-cruise-1-the-treasure-beneath-the-waves",
+    file = "one-piece-unlimited-cruise-1-the-treasure-beneath-the-waves.zip",
+    hashes = {
+      { hash = "d265c7919bbc2ddb350624ae6b4f2f3d", label = "One Piece - Unlimited Cruise 1 - The Treasure Beneath the Waves (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

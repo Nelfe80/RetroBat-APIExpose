@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Shining Force Feather",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "shining-force-feather",
+    file = "shining-force-feather.zip",
+    hashes = {
+      { hash = "2f1e6b8a24e47d61df569a83ba9f8182", label = "Shining Force Feather (Japan).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X280040, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jin's current HP decreased" },
+        { address=0X280040, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jin's current HP increased" },
+        { address=0X280044, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jin's max HP decreased" },
+        { address=0X280044, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jin's max HP increased" },
+        { address=0X28048C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's current HP decreased" },
+        { address=0X28048C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's current HP increased" },
+        { address=0X280568, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's current HP decreased" },
+        { address=0X280568, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's current HP increased" },
+        { address=0X28056C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's max HP decreased" },
+        { address=0X28056C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's max HP increased" },
+        { address=0X280644, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's current HP decreased" },
+        { address=0X280644, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's current HP increased" },
+      },
+    },
+  },
+}

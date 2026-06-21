@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ningyo no Rakuin",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ningyo-no-rakuin",
+    file = "ningyo-no-rakuin.zip",
+    hashes = {
+      { hash = "8f93d735c91e73cc4743979fe3285025", label = "Ningyo no Rakuin (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "The Crawl",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-crawl",
+    file = "the-crawl.zip",
+    hashes = {
+      { hash = "cdd759fc287232a1633cf75702ab6ac8", label = "Crawl, The (World) (v1.01).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X02D0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="bit0 = 'B' input (pause)" },
+        { address=0X02D2, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0X02D2, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X02D1, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="bit0 = 'A' input (jump)" },
+      },
+    },
+  },
+}

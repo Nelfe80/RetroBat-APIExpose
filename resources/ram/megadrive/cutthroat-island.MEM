@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Cutthroat Island",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "cutthroat-island",
+    file = "cutthroat-island.zip",
+    hashes = {
+      { hash = "f1e6ec5e3bf9c04670d10fbc89fb549c", label = "CutThroat Island (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1D25, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[NBit] Bit2=Game Paused" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X20EC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[NBit] Bit7=Health Shown/Stage Objective Collected" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X20E4, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16bit] Player Lives - Morgan increased" },
+        { address=0X20E4, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16bit] Player Lives - Morgan decreased" },
+        { address=0X20E6, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16bit] Player Lives - Shaw increased" },
+        { address=0X20E6, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16bit] Player Lives - Shaw decreased" },
+      },
+      health = {
+        { address=0X07CC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Health decreased" },
+        { address=0X07CC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1E36, type="u32be", condition="eq", value=0X22, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chamber (Start)" },
+        { address=0X1E36, type="u32be", condition="eq", value=0X24, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chamber" },
+        { address=0X1E36, type="u32be", condition="eq", value=0X26, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chamber" },
+        { address=0X1E36, type="u32be", condition="eq", value=0X2A, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chamber (Final Room)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X20CC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Ones - Morgan" },
+        { address=0X20CE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Tens - Morgan" },
+        { address=0X20D0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Hundreds - Morgan" },
+        { address=0X20D2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Thousands - Morgan" },
+        { address=0X20D4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Ten-Thousands - Morgan" },
+        { address=0X20D6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Ones - Shaw" },
+        { address=0X20D8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Tens - Shaw" },
+        { address=0X20DA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Hundreds - Shaw" },
+        { address=0X20DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Thousands - Shaw" },
+        { address=0X20DE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - Ten-Thousands - Shaw" },
+      },
+      collectibles = {
+        { address=0X0A72, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16bit] Pistol - Ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1DD8, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[16bit] Offhand Object ID - Shaw" },
+      },
+    },
+  },
+}

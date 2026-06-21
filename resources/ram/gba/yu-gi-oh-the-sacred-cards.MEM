@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! The Sacred Cards",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-the-sacred-cards",
+    file = "yu-gi-oh-the-sacred-cards.zip",
+    hashes = {
+      { hash = "0a7c58069d5390165482e88a22158bd2", label = "Yu-Gi-Oh! - The Sacred Cards (USA).gba" },
+      { hash = "c43587fca1f7e02f611baab02d26716d", label = "Yu-Gi-Oh! - The Sacred Cards (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X28C40, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Duelist Level]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X28AB1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Slifer the Sky Dragon - Trunk Quantity] increased" },
+        { address=0X28AB1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Slifer the Sky Dragon - Trunk Quantity] decreased" },
+        { address=0X2B47C, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Player's Life Points] increased" },
+        { address=0X2B47C, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Player's Life Points] decreased" },
+        { address=0X2B47E, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Opponent's Life Points] increased" },
+        { address=0X2B47E, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Opponent's Life Points] decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X28DA0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Money] increased" },
+      },
+    },
+  },
+}

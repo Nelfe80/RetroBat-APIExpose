@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Shanghai Mini",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shanghai-mini",
+    file = "shanghai-mini.zip",
+    hashes = {
+      { hash = "7c262a2c6390445170d0bf83290c939c", label = "Shanghai Mini (World) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0238, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="- Classic Paused: pre retry" },
+        { address=0X023E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x50 when in demo mode" },
+        { address=0X02BC, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="- 00=start -- 01=continue" },
+        { address=0X0CB4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="- Paused:" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0FB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Classic Level[Difficulty] on layout menu" },
+        { address=0X1BD4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Tournament levels" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X25B6, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="- What powerup used:" },
+        { address=0X25B8, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="- Powerup used by:" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X022D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Demo timer" },
+        { address=0X0CEE, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="- Level 1 Time starts at 0x07" },
+        { address=0X0D1C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="- Level 2 and 4 Time starts at 0x07" },
+        { address=0X0D20, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="- Level 3 Time starts at 0x07" },
+        { address=0X25BA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Powerup Timer" },
+      },
+    },
+  },
+}

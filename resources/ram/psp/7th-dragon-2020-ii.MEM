@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "7th Dragon 2020-II",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "7th-dragon-2020-ii",
+    file = "7th-dragon-2020-ii.zip",
+    hashes = {
+      { hash = "1ceab5df977adc63c953053eb3296698", label = "7th Dragon 2020-II (Japan) (PSP) (PSN).iso" },
+      { hash = "11b6f6177c86f563775c6cd8771d8275", label = "7th Dragon 2020-II (Japan) (En) (v0.91) (Pokeytax).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAB6903, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="bit0 - Tokyo Skytower title card" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAB6A98, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit bitflags] Purple Overworld Enemies" },
+      },
+      stage = {
+        { address=0XABE980, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character One - Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAB6904, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="bit1 - Chapter 0 - Tiny cutscene after defeating the Purple Overworld enemy on the 2nd floor of" },
+      },
+    },
+  },
+}

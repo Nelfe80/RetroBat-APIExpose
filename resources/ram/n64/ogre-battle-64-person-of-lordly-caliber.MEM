@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Ogre Battle 64: Person of Lordly Caliber",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "ogre-battle-64-person-of-lordly-caliber",
+    file = "ogre-battle-64-person-of-lordly-caliber.zip",
+    hashes = {
+      { hash = "f666e020218392e52662fddfa1ea4f21", label = "Ogre Battle 64 - Person of Lordly Caliber (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1936A9, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Alba/Also the Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X193695, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Gateway to Another World (Temple of Berthe II) - Complete" },
+        { address=0X193E38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dio Level (8-Bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X19368C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Obtained the Sword of Tiamat" },
+        { address=0X19368C, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Purchased the Dragon Helm" },
+        { address=0X19368C, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Had Dragon Armor Forged at Mount Ithaca, Kynora" },
+        { address=0X19368C, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Listened to the Story about Dragoons in Mylesia - Dragoon Quest" },
+        { address=0X196A48, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Cup of Life" },
+        { address=0X196A4B, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Cup of Life" },
+      },
+      health = {
+        { address=0X193C0C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) hero max HP decreased" },
+        { address=0X193C0C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) hero max HP increased" },
+        { address=0X193C12, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) hero current HP decreased" },
+        { address=0X193C12, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) hero current HP increased" },
+        { address=0X193E3C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dio MAX HP (16-Bit) decreased" },
+        { address=0X193E3C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dio MAX HP (16-Bit) increased" },
+        { address=0X193E42, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dio current HP (16-Bit) decreased" },
+        { address=0X193E42, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dio current HP (16-Bit) increased" },
+        { address=0X195886, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Unit Leader in one of the Formation's Current HP (16-bit) decreased" },
+        { address=0X195886, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Unit Leader in one of the Formation's Current HP (16-bit) increased" },
+        { address=0X1958EE, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Unit Leader in one of the Formation's Current HP (16-bit) decreased" },
+        { address=0X1958EE, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Unit Leader in one of the Formation's Current HP (16-bit) increased" },
+        { address=0X195922, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Current HP decreased" },
+        { address=0X195922, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Current HP increased" },
+        { address=0X1A1CA6, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Leader In Battle HP(16-bit) decreased" },
+        { address=0X1A1CA6, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Leader In Battle HP(16-bit) increased" },
+        { address=0X1A1E96, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy in Battle HP. Place 9 (16-bit) decreased" },
+        { address=0X1A1E96, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy in Battle HP. Place 9 (16-bit) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X193C21, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="hero weapon slot" },
+        { address=0X196B03, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons (8-Bit)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X196A4D, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Branding" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1955AD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current Boss ID? - Investigating..." },
+        { address=0X1955AE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current Boss HP?" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X193689, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Hallowed Shield - Troi Special Item" },
+        { address=0X196A3F, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Kite Shield" },
+        { address=0X196A41, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dragon Shield" },
+        { address=0X196A45, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Tower Shield" },
+        { address=0X196A45, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dragon Shield" },
+        { address=0X196A47, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dragon Shield" },
+        { address=0X196A48, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dragon Shield" },
+        { address=0X196A4B, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Electric Shield" },
+        { address=0X196A4B, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dragon Shield" },
+        { address=0X196A4C, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Electric Shield" },
+        { address=0X196A4C, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dragon Shield" },
+        { address=0X196A50, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield of Nue" },
+        { address=0X196A52, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Saint's Shield" },
+        { address=0X196B13, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shields (8-Bit)" },
+      },
+    },
+  },
+}

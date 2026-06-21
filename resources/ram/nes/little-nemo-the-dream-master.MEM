@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Little Nemo: The Dream Master",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "little-nemo-the-dream-master",
+    file = "little-nemo-the-dream-master.zip",
+    hashes = {
+      { hash = "17011178435d247aba5039141674ec1c", label = "Little Nemo - The Dream Master (USA) (Restoration) (Final) (SCD).nes" },
+      { hash = "9f4bcf0e3e2f67d0e1bd21f22452df34", label = "Little Nemo - The Dream Master (USA).nes" },
+      { hash = "caea65d1f251ff394e8670b60b6c7827", label = "Little Nemo - The Dream Master (Europe).nes" },
+      { hash = "eaa13aaccf8a1475aa9ce75fed61933d", label = "Pajama Hero - Nemo (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0002, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1b = paused" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0010, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Music or something, constant and different for most stages." },
+        { address=0X0096, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mushroom Forest" },
+        { address=0X0096, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Flower Garden" },
+        { address=0X0096, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="House Of Toys" },
+        { address=0X0096, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Night Sea" },
+        { address=0X0096, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nemo's House" },
+        { address=0X0096, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cloud Ruins" },
+        { address=0X0096, type="u8", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Topsy-Turvy" },
+        { address=0X0096, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nightmare Land Zone 1" },
+        { address=0X0096, type="u8", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nightmare Land Zone 2" },
+        { address=0X0096, type="u8", condition="eq", value=0X9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nightmare Land Zone 3" },
+        { address=0X0096, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage [Japan/Europe] (8-bit)" },
+        { address=0X0097, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mushroom Forest" },
+        { address=0X0097, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Flower Garden" },
+        { address=0X0097, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="House Of Toys" },
+        { address=0X0097, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Night Sea" },
+        { address=0X0097, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nemo's House" },
+        { address=0X0097, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cloud Ruins" },
+        { address=0X0097, type="u8", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Topsy-Turvy" },
+        { address=0X0097, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nightmare Land Zone 1" },
+        { address=0X0097, type="u8", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nightmare Land Zone 2" },
+        { address=0X0097, type="u8", condition="eq", value=0X9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nightmare Land Zone 3" },
+        { address=0X0097, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage [USA] (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X008D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Locks [USA], Lives [Japan/Europe] (8-bit) increased" },
+        { address=0X008D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Locks [USA], Lives [Japan/Europe] (8-bit) decreased" },
+        { address=0X008E, type="u8", condition="eq", value=0X0, action="LIVES_STATE", no_log=false, no_survey=false, desc="Candy selected" },
+        { address=0X008E, type="u8", condition="eq", value=0X88, action="LIVES_STATE", no_log=false, no_survey=false, desc="Wand selected" },
+        { address=0X008E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [USA], Wand [Japan/Europe] (8-bit) increased" },
+        { address=0X008E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [USA], Wand [Japan/Europe] (8-bit) decreased" },
+      },
+      health = {
+        { address=0X05D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X05D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X05D1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Capacity decreased" },
+        { address=0X05D1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Capacity increased" },
+        { address=0X05D4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X05D4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0X05D5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 HP decreased" },
+        { address=0X05D5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0490, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Current Form: 0=Nemo, 1=Toad, 2=Lizard, 3=Mole, 4=Crab, 5=Fish, 6=Gorilla, 7=Mouse, 8=Bee" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X05D2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy 1 HP (also used for HP of 1st two Stage 8 bosses)" },
+        { address=0X05D3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy 2 HP (also used for HP of Final Boss in Stage 8)" },
+      },
+    },
+  },
+}

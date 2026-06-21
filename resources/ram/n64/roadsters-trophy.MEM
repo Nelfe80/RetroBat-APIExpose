@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Roadsters Trophy",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Role-Playing, Racing, Driving"
+  },
+
+  rom = {
+    name = "roadsters-trophy",
+    file = "roadsters-trophy.zip",
+    hashes = {
+      { hash = "d3644b398c090528e0ed9eb3c140366e", label = "Roadsters (USA) (En,Fr,Es).z64" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X691A0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Miliseconds Time" },
+        { address=0XC2004, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Minutes Time" },
+        { address=0XC200A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Seconds Time" },
+        { address=0XC201C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Minutes Time" },
+        { address=0XC2022, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Seconds Time" },
+      },
+    },
+  },
+}

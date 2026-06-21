@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Who Wants to Be a Millionaire: Junior",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "who-wants-to-be-a-millionaire-junior",
+    file = "who-wants-to-be-a-millionaire-junior.zip",
+    hashes = {
+      { hash = "94194788e55c1d3c256d816601ee7530", label = "Who Wants to Be a Millionaire Junior (Europe).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0108, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ask the Audience" },
+        { address=0X0118, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="50/50" },
+        { address=0X0118, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ask the audience" },
+        { address=0X0118, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Phone a friend" },
+      },
+    },
+  },
+}

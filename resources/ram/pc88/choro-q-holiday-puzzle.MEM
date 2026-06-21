@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Choro Q Holiday Puzzle",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "choro-q-holiday-puzzle",
+    file = "choro-q-holiday-puzzle.zip",
+    hashes = {
+      { hash = "5ceb3452093a933175f9f29022e84587", label = "Choro Q Holiday Puzzle.d88" },
+    }
+  },
+
+  events = {
+  },
+}

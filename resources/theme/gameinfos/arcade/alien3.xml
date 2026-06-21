@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>lightgun</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Secondary Weapon</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Secondary Weapon</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 MIY 10000000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 SIM 9500000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 TFF 9000000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 KMA 8500000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 WIN 8000000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 JIN 7500000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 TNM 7000000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 BAB 6500000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 IKE 6000000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 KOY 5500000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 TKO 5000000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 AKA 4500000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 KWT 4000000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 REI 3500000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 MIM 3000000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

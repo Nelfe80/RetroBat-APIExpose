@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Rollercoaster World",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Construction and Management Simulation"
+  },
+
+  rom = {
+    name = "rollercoaster-world",
+    file = "rollercoaster-world.zip",
+    hashes = {
+      { hash = "227f1ef42b7a4e61e6284604315055e5", label = "Rollercoaster World (Europe)" },
+      { hash = "5ab197e98f003c3e1d9350281e671887", label = "Simple 2000 Series Vol. 33 - The Jet Coaster - Yuuenchi o Tsukurou! (Japan)" },
+      { hash = "4b19e1d972c9e5b368e4808e7f5786b7", label = "Simple 2000 Series Vol. 33: The Jet Coaster: Yuuenchi o Tsukurou! (Japan) [ELF]" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X52B6B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[EU] [32-bit] Points in management mode" },
+      },
+      collectibles = {
+        { address=0X52B6B4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[EU] [32-bit float] Gold in management mode increased" },
+      },
+    },
+  },
+}

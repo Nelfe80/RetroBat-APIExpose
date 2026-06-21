@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Coven",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-coven",
+    file = "the-coven.zip",
+    hashes = {
+      { hash = "39090a0d74dcb1908cc7ddcb92ebc458", label = "Coven, The (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8FD50, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Coming Attractions" },
+      },
+    },
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Prince of Persia",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "prince-of-persia",
+    file = "prince-of-persia.zip",
+    hashes = {
+      { hash = "0d636c8d86dafd4f2c337e34e94b1e41", label = "Prince of Persia (USA, Europe).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0290, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0290, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Intro Cutscene/Credits" },
+        { address=0X0290, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X02F4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X02ED, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level flag" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0292, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player life increased" },
+        { address=0X0292, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player life decreased" },
+        { address=0X0293, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max life increased" },
+        { address=0X0293, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max life decreased" },
+        { address=0X0294, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Guard life increased" },
+        { address=0X0294, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Guard life decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X10E1, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Options time" },
+      },
+    },
+  },
+}

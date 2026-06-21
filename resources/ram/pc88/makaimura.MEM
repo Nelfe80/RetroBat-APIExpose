@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Makaimura",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "makaimura",
+    file = "makaimura.zip",
+    hashes = {
+      { hash = "06901a21b5a11b88edcf09ab381906e0", label = "Makaimura.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0260, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Entrance of the Demon Realm Castle" },
+        { address=0X0260, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="In the Demon Realm Castle" },
+        { address=0X0260, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Top at the Demon Realm Castle" },
+        { address=0X0260, type="u8", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Lord Astaroth Throne Room" },
+        { address=0X0274, type="u8", condition="eq", value=0X0C, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0274, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X0274, type="u8", condition="eq", value=0X01, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X0274, type="u8", condition="eq", value=0X02, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X0274, type="u8", condition="eq", value=0X03, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X0274, type="u8", condition="eq", value=0X07, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Last Stage" },
+        { address=0X2935, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[ASCII Text 9 bytes] GAME OVER" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0001, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Loop 1" },
+        { address=0X0001, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Loop 2" },
+        { address=0X0001, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Loop 3" },
+        { address=0X0260, type="u8", condition="eq", value=0XDD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main menu" },
+        { address=0X0260, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Graveyard - Forest" },
+        { address=0X0260, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ghost Town" },
+        { address=0X0260, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground Passage" },
+        { address=0X0260, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0X0298, type="u8", condition="eq", value=0X4F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Key Acquired / Stage Cleared" },
+      },
+      stage = {
+        { address=0X021A, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Distance moved in the stage" },
+        { address=0X0298, type="u8", condition="eq", value=0X4E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Exiting Stage" },
+        { address=0XB806, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XB806, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tombstone Disturbed - #1 (Graveyard - Stage 1)" },
+        { address=0XB816, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XB816, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tombstone Disturbed - #2 (Graveyard - Stage 1)" },
+        { address=0XB826, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XB826, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tombstone Disturbed - #3 (Graveyard - Stage 1)" },
+        { address=0XB836, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XB836, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tombstone Disturbed - #4 (Graveyard - Stage 1)" },
+        { address=0XB846, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XB846, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tombstone Disturbed - #5 (Graveyard - Stage 1)" },
+        { address=0XB856, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XB856, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tombstone Disturbed - #6 (Graveyard - Stage 1)" },
+        { address=0XB866, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XB866, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tombstone Disturbed - #7 (Graveyard - Stage 1)" },
+        { address=0XB876, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XB876, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tombstone Disturbed - #8 (Graveyard - Stage 1)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2962, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[ASCII Text] Lives increased" },
+        { address=0X2962, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[ASCII Text] Lives decreased" },
+        { address=0XF1D0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XF1D0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0207, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X0207, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Arthur's Hp" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X020B, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lance" },
+        { address=0X020B, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Torch" },
+        { address=0X020B, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Axe" },
+        { address=0X020B, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cross" },
+        { address=0X020B, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dagger" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0010, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] BCD Score" },
+      },
+    },
+  },
+}

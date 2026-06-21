@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Beavis and Butt-Head",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "beavis-and-butt-head",
+    file = "beavis-and-butt-head.zip",
+    hashes = {
+      { hash = "8e4d7397374cb03528f4c886120dc3e9", label = "Beavis and Butt-Head (USA).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0XAEFA, type="u24be", condition="eq", value=0X0D, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Burger World Entrance" },
+        { address=0XAEFA, type="u24be", condition="eq", value=0X0E, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Burger World" },
+        { address=0XAEFA, type="u24be", condition="eq", value=0X0F, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Burger World Drive Thru" },
+        { address=0XAEFA, type="u24be", condition="eq", value=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Burger World Dumpster" },
+        { address=0XAEFA, type="u24be", condition="eq", value=0X11, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Burger World Kitchen" },
+        { address=0XAF0C, type="u8", condition="eq", value=0X1E, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="burger world straw" },
+        { address=0XAF2D, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="burger world ticket piece" },
+      },
+      stage = {
+        { address=0XBE2F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gwar Backstage goon dead =ff" },
+        { address=0XFFC6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Television Channel - Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBE0C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Drive In Woman Dead =ff" },
+      },
+      health = {
+        { address=0X9D41, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 Health decreased" },
+        { address=0X9D41, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 Health increased" },
+        { address=0X9D7D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 Health decreased" },
+        { address=0X9D7D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 Health increased" },
+        { address=0X9DB9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 5 health decreased" },
+        { address=0X9DB9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 5 health increased" },
+        { address=0X9DF5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 6 Health decreased" },
+        { address=0X9DF5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 6 Health increased" },
+        { address=0X9E31, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 7 Health decreased" },
+        { address=0X9E31, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 7 Health increased" },
+        { address=0X9E6D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 8 Health decreased" },
+        { address=0X9E6D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 8 Health increased" },
+        { address=0X9EA9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 9 Health decreased" },
+        { address=0X9EA9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 9 Health increased" },
+        { address=0X9EE5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 10 Health decreased" },
+        { address=0X9EE5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 10 Health increased" },
+        { address=0XAEEA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Beavis' Health decreased" },
+        { address=0XAEEA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Beavis' Health increased" },
+        { address=0XAEED, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Butt-head's Health decreased" },
+        { address=0XAEED, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Butt-head's Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAF26, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Butt-head's Weapon Slot" },
+        { address=0XAF27, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Beavis' Weapon Slot" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAEEE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money x 10 [hex] 0x40 max (6.40) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBE0E, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mall Toilet Destroyed =ff" },
+        { address=0XBE0F, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Drive In Snack Bar Destroyed =ff" },
+        { address=0XBE10, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="High School Toilet Destroyed =ff" },
+        { address=0XBE11, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Drive In Toilet Destroyed =ff" },
+      },
+    },
+  },
+}

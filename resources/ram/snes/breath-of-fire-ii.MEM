@@ -1,0 +1,132 @@
+return {
+  game = {
+    title = "Breath of Fire II",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "breath-of-fire-ii",
+    file = "breath-of-fire-ii.zip",
+    hashes = {
+      { hash = "0ea349408473e47006fa2ad4471f4108", label = "Breath of Fire II - Shimei no Ko (Japan).sfc" },
+      { hash = "299e96968accb96b9e0d9a4154e220a5", label = "Breath of Fire II (USA) (En) (d4s) (1.2b).sfc" },
+      { hash = "a18df6ae219a46d957b015ebac23e366", label = "Breath of Fire II (USA) (Pt) (Various) (0.9).sfc" },
+      { hash = "e1ff1ed4ad5dbdbe86774920dfb5e9d4", label = "Breath of Fire II (USA).sfc" },
+      { hash = "a9efc9834c84eff40e1f7b771c6d5a7b", label = "Breath of Fire II (USA) (Ru) (v1.0) (Dreamy Owl).sfc" },
+      { hash = "bec5c898cf36639ff22f121768424efd", label = "Breath of Fire II (USA) (PT-BR) (v1.00) (Dindo).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0CC0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(8 bit) 2a = demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0C86, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Overworld Event loading" },
+        { address=0X0C91, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="ground 25 = flying" },
+        { address=0X0C9D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) 00 - worldmap 01 - into a town" },
+        { address=0X5050, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 1st char - as seen in worldmap" },
+        { address=0X5051, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 2nd char - in worldmap" },
+        { address=0X5052, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 3rd char - in worldmap" },
+        { address=0X5053, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 4th char - in worldmap" },
+        { address=0X51E7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 1st char - level" },
+        { address=0X55E0, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Wooden town 1st stage" },
+        { address=0X55E0, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Arabian town 1st stage" },
+        { address=0X5621, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(8 bit) queen body 80 - room in clear 82 - room with monstsers" },
+      },
+      stage = {
+        { address=0X1047, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8 bit) 1st character - level" },
+        { address=0X10E7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2nd character - level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X55DC, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="he is dead" },
+        { address=0X55DD, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="oldman died" },
+      },
+      health = {
+        { address=0X1048, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st character - current Hp decreased" },
+        { address=0X1048, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st character - current Hp increased" },
+        { address=0X104A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st character - Max Hp decreased" },
+        { address=0X104A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st character - Max Hp increased" },
+        { address=0X10E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2nd character - current Hp decreased" },
+        { address=0X10E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2nd character - current Hp increased" },
+        { address=0X10EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2nd character - Max Hp decreased" },
+        { address=0X10EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2nd character - Max Hp increased" },
+        { address=0X1188, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 3rd character - current Hp decreased" },
+        { address=0X1188, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 3rd character - current Hp increased" },
+        { address=0X118A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 3rd character - current Hp decreased" },
+        { address=0X118A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 3rd character - current Hp increased" },
+        { address=0X1228, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4th character - current Hp decreased" },
+        { address=0X1228, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4th character - current Hp increased" },
+        { address=0X122A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4th character - max Hp decreased" },
+        { address=0X122A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4th character - max Hp increased" },
+        { address=0X128C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rod HP?! decreased" },
+        { address=0X128C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rod HP?! increased" },
+        { address=0X1296, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power / Fish HP decreased" },
+        { address=0X1296, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Power / Fish HP increased" },
+        { address=0X1448, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st enemy - current HP decreased" },
+        { address=0X1448, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st enemy - current HP increased" },
+        { address=0X144A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st enemy - max HP decreased" },
+        { address=0X144A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st enemy - max HP increased" },
+        { address=0X1472, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(16 bit) damage 1st enemy received" },
+        { address=0X14C8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 2nd enemy - current HP decreased" },
+        { address=0X14C8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 2nd enemy - current HP increased" },
+        { address=0X14CA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 2nd enemy - max HP decreased" },
+        { address=0X14CA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 2nd enemy - max HP increased" },
+        { address=0X1548, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 3rd enemy - current HP decreased" },
+        { address=0X1548, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 3rd enemy - current HP increased" },
+        { address=0X154A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 3rd enemy - max HP decreased" },
+        { address=0X154A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 3rd enemy - max HP increased" },
+        { address=0X15C8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 4th enemy - current HP decreased" },
+        { address=0X15C8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 4th enemy - current HP increased" },
+        { address=0X15CA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 4th enemy - max HP decreased" },
+        { address=0X15CA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 4th enemy - max HP increased" },
+        { address=0X51E8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 1st character - current HP decreased" },
+        { address=0X51E8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 1st character - current HP increased" },
+        { address=0X51EA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) 1st character - max HP decreased" },
+        { address=0X51EA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) 1st character - max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X128F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Item fished: 0F=Treasure Box" },
+        { address=0X56B5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(8 bit) Treasures obtained - Total" },
+        { address=0X007E, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="1CC3 When cooking, this is the item slot from the item list of what item you're hovering over. i" },
+        { address=0X00BE, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="what item the cook will result in after a recipe is chosen." },
+      },
+      weapon = {
+        { address=0X51F6, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) 1st char - weapon equiped" },
+        { address=0X5236, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) 2st char - weapon equiped" },
+        { address=0X5276, type="u16le", condition="eq", value=0X7E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="EmpireSD" },
+        { address=0X52B6, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) 4th char - weapon equiped" },
+        { address=0X55CA, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapons removed" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1458, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16 bit) coins awarded increased" },
+        { address=0X504A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) money 3/3 increased" },
+        { address=0X504B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) money 2/3 increased" },
+        { address=0X504C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) money 1/3 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1440, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) 1st creature/boss name - text 1/2" },
+        { address=0X1442, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) 1st creature/boss name - text 2/2" },
+        { address=0X14C0, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) 2nd creature/boss name - text 1/2" },
+        { address=0X14C2, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) 2nd creature/boss name - text 2/2" },
+        { address=0X1540, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) 3rd creature/boss name - text 1/2" },
+        { address=0X1542, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) 3rd creature/boss name - text 2/2" },
+        { address=0X15C0, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) 4th creature/boss name - text 1/2" },
+        { address=0X15C2, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) 4th creature/boss name - text 2/2" },
+      },
+    },
+  },
+}

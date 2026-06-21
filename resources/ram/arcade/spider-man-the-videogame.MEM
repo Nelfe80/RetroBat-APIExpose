@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Spider-Man: The Videogame",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "spider-man-the-videogame",
+    file = "spider-man-the-videogame.zip",
+    hashes = {
+      { hash = "00985a70a83ae188aae0632834b4a792", label = "spidmanu.7z <Spider-Man: The Videogame (US, Rev A)>" },
+      { hash = "2748ea9d5ed36485f2386dc298838697", label = "spidmanj.7z <Spider-Man: The Videogame (Japan)>" },
+      { hash = "b941a3d48abe86d690a93261002f6e2d", label = "spidman.7z <Spider-Man: The Videogame (World)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X80A0, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits 8 Bits" },
+        { address=0XA0B4, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA036, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XA040, type="u16le", condition="eq", value=0X190, action="LIVES_STATE", no_log=false, no_survey=false, desc="Initial HP/Time" },
+        { address=0XA040, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life/Time 16 Bits increased" },
+        { address=0XA040, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life/Time 16 Bits decreased" },
+      },
+      health = {
+        { address=0X3AC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 8 Bits decreased" },
+        { address=0X3AC0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 8 Bits increased" },
+        { address=0X3EC0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 16 Bits decreased" },
+        { address=0X3EC0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 16 Bits increased" },
+        { address=0X40C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 16 Bits decreased" },
+        { address=0X40C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 16 Bits increased" },
+        { address=0X44C0, type="u8", condition="eq", value=0XDC, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Venom (1st time - Chapter 1)" },
+        { address=0X44C0, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Enemy 1 HP 8 Bits" },
+        { address=0X45C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP 8 Bits decreased" },
+        { address=0X45C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP 8 Bits increased" },
+        { address=0X48C0, type="u16le", condition="eq", value=0X010E, action="HEALTH_STATE", no_log=true, no_survey=false, desc="The Lizard full HP" },
+        { address=0X48C0, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Enemy 3 HP 16 Bits" },
+        { address=0X4940, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 HP 8 Bits decreased" },
+        { address=0X4940, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 HP 8 Bits increased" },
+        { address=0X4A40, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 HP 8 Bits decreased" },
+        { address=0X4A40, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 HP 8 Bits increased" },
+        { address=0X4DC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 HP 8 Bits decreased" },
+        { address=0X4DC0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 HP 8 Bits increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3C40, type="u16le", condition="eq", value=0X0104, action="BOSS_HIT", no_log=false, no_survey=false, desc="Venom Full HP" },
+        { address=0XC14E, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="One boss in the screen" },
+        { address=0X4F096, type="u16le", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X4F096, type="u16le", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="0" },
+        { address=0X4F096, type="u16le", condition="eq", value=0X41, action="BOSS_HIT", no_log=false, no_survey=false, desc="A" },
+        { address=0X4F096, type="u16le", condition="eq", value=0X42, action="BOSS_HIT", no_log=false, no_survey=false, desc="B" },
+        { address=0X4F096, type="u16le", condition="eq", value=0X43, action="BOSS_HIT", no_log=false, no_survey=false, desc="C" },
+        { address=0X4F096, type="u16le", condition="eq", value=0X44, action="BOSS_HIT", no_log=false, no_survey=false, desc="D" },
+        { address=0X4F096, type="u16le", condition="eq", value=0X45, action="BOSS_HIT", no_log=false, no_survey=false, desc="E" },
+        { address=0X4F098, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Second letter of the boss name on the screen 16 Bits" },
+        { address=0X4F09A, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Third letter of the boss name on the screen 16 Bits" },
+        { address=0X4F09C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Fourth letter of the boss name on the screen 16 Bits" },
+        { address=0X4F09E, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Fifth letter of the boss name on the screen 16 Bits" },
+        { address=0X4F0A0, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Sixth letter of the boss name on the screen 16 Bits" },
+        { address=0X4F0A2, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Seventh letter of the boss name on the screen 16 Bits" },
+        { address=0X4F0A4, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Eighth letter of the boss name on the screen 16 Bits" },
+        { address=0X4F0A6, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Nineth letter of the boss name on the screen 16 Bits" },
+        { address=0X4F0A8, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Tenth letter of the boss name on the screen 16 Bits" },
+      },
+    },
+  },
+}

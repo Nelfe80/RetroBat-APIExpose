@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Etrian Odyssey",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "etrian-odyssey",
+    file = "etrian-odyssey.zip",
+    hashes = {
+      { hash = "71cbe0d1a0765e01c45b594c6dbe40e6", label = "Sekaiju no Meikyuu (Japan).nds" },
+      { hash = "f597552b23cf6f19a4af191cc2686eac", label = "Etrian Odyssey (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDC4E0, type="u16le", condition="eq", value=0X17, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2082E8, type="u8", condition="eq", value=0XB1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="chest b7f" },
+        { address=0X2082E8, type="u8", condition="eq", value=0XB2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="chest b7f" },
+        { address=0X2082E8, type="u8", condition="eq", value=0XB3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="chest b7f" },
+        { address=0X2082E8, type="u8", condition="eq", value=0XB4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="chest b7f" },
+        { address=0X2082E8, type="u8", condition="eq", value=0XB5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="chest b7f" },
+      },
+      stage = {
+        { address=0X205A7C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level of first character" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X20812C, type="u8", condition="eq", value=0XB3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="probably event with soldier in b2f" },
+        { address=0X2081F2, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="quest ready to report" },
+        { address=0X2081F2, type="u8", condition="eq", value=0XB5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="quest completed" },
+      },
+      health = {
+        { address=0X205A60, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 current hp decreased" },
+        { address=0X205A60, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 current hp increased" },
+        { address=0X205AC4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 2 current hp decreased" },
+        { address=0X205AC4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 2 current hp increased" },
+        { address=0X205B28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 3 current hp decreased" },
+        { address=0X205B28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 3 current hp increased" },
+        { address=0X205B8C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 4 current hp decreased" },
+        { address=0X205B8C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 4 current hp increased" },
+        { address=0X205BF0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 5 current hp decreased" },
+        { address=0X205BF0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 5 current hp increased" },
+        { address=0X25618C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage dealt by enemy?" },
+        { address=0X256270, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="damage dealt to enemy?" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X208248, type="u8", condition="eq", value=0XB2, action="TREASURE", no_log=false, no_survey=false, desc="quest ready to report" },
+        { address=0X208248, type="u8", condition="eq", value=0XB3, action="TREASURE", no_log=false, no_survey=false, desc="quest completed" },
+        { address=0X208340, type="u24le", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="treasure" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB5CE0, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points to battle stuff (ally and enemy stats, moves...) (24bit, but requires to check for 16bit" },
+      },
+      collectibles = {
+        { address=0X206074, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (32 bit?) increased" },
+        { address=0X2071B4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="exploring b12f starts (each exploring block is 132 bytes long) increased" },
+        { address=0X2081AA, type="u8", condition="eq", value=0XB4, action="MONEY_STATE", no_log=false, no_survey=false, desc="ready to report" },
+        { address=0X2081AA, type="u8", condition="eq", value=0XB5, action="MONEY_STATE", no_log=false, no_survey=false, desc="completed" },
+        { address=0X20821A, type="u8", condition="eq", value=0XB3, action="MONEY_STATE", no_log=false, no_survey=false, desc="quest ready to report" },
+        { address=0X20821A, type="u8", condition="eq", value=0XB4, action="MONEY_STATE", no_log=false, no_survey=false, desc="quest completed" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XDC4E0, type="u16le", condition="eq", value=0X0F, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss battle" },
+        { address=0X20815A, type="u8", condition="eq", value=0XB3, action="BOSS_HIT", no_log=false, no_survey=false, desc="unlock entrance to claret hollows" },
+        { address=0X20815B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="b6=obtain the town medal (after final boss)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X208340, type="u24le", condition="eq", value=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="door" },
+      },
+    },
+  },
+}

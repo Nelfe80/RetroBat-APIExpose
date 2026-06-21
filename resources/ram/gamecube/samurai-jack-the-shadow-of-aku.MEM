@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Samurai Jack: The Shadow of Aku",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "samurai-jack-the-shadow-of-aku",
+    file = "samurai-jack-the-shadow-of-aku.zip",
+    hashes = {
+      { hash = "d411f20e21155a105a62e68d70f24857", label = "Samurai Jack - The Shadow of Aku (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X14D26A3, type="u32be", condition="eq", value=0X66726F6E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2E479C, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X2E479C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Backgrounds" },
+        { address=0X14D0998, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Villagers Rescued - Worldwide" },
+        { address=0X14D09B0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Relics Found - Worldwide" },
+        { address=0X14D269C, type="u24be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[24 bytes, ASCII] Levels" },
+      },
+      zone = {
+        { address=0X14D0988, type="u32be", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The Village" },
+        { address=0X14D0988, type="u32be", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The Grove" },
+        { address=0X14D0988, type="u32be", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The Mines" },
+        { address=0X14D0988, type="u32be", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The City" },
+        { address=0X14D0988, type="u32be", condition="eq", value=0XFFFFFFFF, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Hub" },
+        { address=0X14D0988, type="u32be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32-bit BE] World Tracker" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1461274, type="u32be", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Cheat" },
+        { address=0X14C3444, type="u32be", condition="eq", value=0X03, action="HIT", no_log=false, no_survey=false, desc="Undamaged" },
+        { address=0X14C3444, type="u32be", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="Slighty Damaged" },
+        { address=0X14C3444, type="u32be", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Very Damaged" },
+        { address=0X14D09C0, type="u32be", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="No Upgrade" },
+        { address=0X14D09C0, type="u32be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Health Shrine" },
+        { address=0X14D26F0, type="u32be", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Not Completed" },
+        { address=0X14D26F0, type="u32be", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X14D26F0, type="u32be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Zen Energy Tutorial" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X14C3448, type="u32be", condition="eq", value=0X00, action="SCORE_STATE", no_log=false, no_survey=false, desc="No Armor" },
+        { address=0X14C3448, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Armor Points" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2D5E70, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2D5E70, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2D5EAC, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2D5EAC, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2D60E0, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2D60E0, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2D611C, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2D611C, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2E64F0, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2E64F0, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2E652C, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2E652C, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2E6760, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2E6760, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2E679C, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2E679C, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2F6B70, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2F6B70, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2F6BAC, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2F6BAC, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2F6DE0, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2F6DE0, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X2F6E1C, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X2F6E1C, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X3071F0, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X3071F0, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X30722C, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X30722C, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X307460, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X307460, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X30749C, type="u32be", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In Progress" },
+        { address=0X30749C, type="u32be", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X14D098C, type="u32be", condition="eq", value=0X03, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Statue" },
+        { address=0X14D0C4C, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE] Destroy the Statue - Relics Found" },
+        { address=0X14D0C50, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE] Destroy the Statue - Rescues" },
+        { address=0X14D0C54, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE] Destroy the Statue - Total Relics" },
+        { address=0X14D0C58, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE] Destroy the Statue - Total Rescues" },
+        { address=0X14D2740, type="u32be", condition="eq", value=0X00, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Not Completed" },
+        { address=0X14D2740, type="u32be", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Completed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2D732C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Save 1 - Find the Time Portal" },
+        { address=0X2E79AC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Save 2 - Find the Time Portal" },
+        { address=0X2F802C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Save 3 - Find the Time Portal" },
+        { address=0X3086AC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Save 4 - Find the Time Portal" },
+        { address=0X14D098C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Mission Tracker" },
+      },
+    },
+  },
+}

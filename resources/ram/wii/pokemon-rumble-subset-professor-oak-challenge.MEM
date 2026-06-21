@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Rumble [Subset - Professor Oak Challenge]",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-rumble-subset-professor-oak-challenge",
+    file = "pokemon-rumble-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "fcb031da3e58707047582c3157e5c26f", label = "Pokemon Rumble [Subset - Professor Oak Challenge]" },
+    }
+  },
+
+  events = {
+  },
+}

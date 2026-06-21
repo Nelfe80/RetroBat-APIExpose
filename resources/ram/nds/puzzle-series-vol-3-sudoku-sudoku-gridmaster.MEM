@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Puzzle Series Vol. 3: Sudoku | Sudoku Gridmaster",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-series-vol-3-sudoku-sudoku-gridmaster",
+    file = "puzzle-series-vol-3-sudoku-sudoku-gridmaster.zip",
+    hashes = {
+      { hash = "6abc79fc352978d412fcb2c81dad6e3d", label = "Sudoku Gridmaster (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF56FC, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In Title Screen" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF5708, type="u32le", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XF570C, type="u32le", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rank" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF56FC, type="u16le", condition="eq", value=0XFF, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Loading/Switching Screens" },
+      },
+    },
+  },
+}

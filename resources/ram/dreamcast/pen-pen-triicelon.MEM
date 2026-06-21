@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Pen Pen TriIcelon",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pen-pen-triicelon",
+    file = "pen-pen-triicelon.zip",
+    hashes = {
+      { hash = "085679291df1b35468901c89fc874775", label = "PenPen (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X1B79F6, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mogutan's Mask (all gold medals)" },
+      },
+    },
+  },
+}

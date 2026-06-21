@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Wild Arms 5",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "wild-arms-5",
+    file = "wild-arms-5.zip",
+    hashes = {
+      { hash = "87b2f895bedd197110e4f962af5cffa7", label = "Wild Arms 5 (Europe) (En,Fr,It)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X44571C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dean Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X43FD2B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bitflags] Treasures increased" },
+        { address=0X43FD2B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bitflags] Treasures decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X43FCBA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FCC2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FCC4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FCC5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FCC6, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FCC7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FCDA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FCE3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD16, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD17, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD18, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD19, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD1A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD1B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD1C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD1D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD1E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD1F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD20, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD21, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD22, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD23, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD24, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD25, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD26, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD27, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD28, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD29, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD2C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD2D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD2E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD2F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD30, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD31, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD32, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD33, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD34, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD35, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD36, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD38, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD39, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD3A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD3B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD3D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD3E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD40, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD41, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD42, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD43, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD44, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD46, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD47, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+        { address=0X43FD9D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X43FD2A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Treasures increased" },
+        { address=0X43FD37, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Treasures increased" },
+        { address=0X43FD3C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Treasures increased" },
+        { address=0X43FD3F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Treasures increased" },
+        { address=0X43FD45, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Treasures increased" },
+      },
+    },
+  },
+}

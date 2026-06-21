@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Solstice: The Quest for the Staff of Demnos",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "solstice-the-quest-for-the-staff-of-demnos",
+    file = "solstice-the-quest-for-the-staff-of-demnos.zip",
+    hashes = {
+      { hash = "4808d7cf5d9f20304bde285a7ebf446e", label = "Solstice - The Quest for the Staff of Demnos (Europe).nes" },
+      { hash = "79130862501091b3923e71af3cfc3032", label = "Solstice - The Quest for the Staff of Demnos (USA).nes" },
+      { hash = "fb0110dc807037d7bc7846e9ec66531a", label = "Solstice - The Quest for the Staff of Demnos (USA) (Ru) (MJOLNIR Vlad).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="upper4=rooms visited (while paused)" },
+        { address=0X079F, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits found" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X063A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="platforms on the foreground known start" },
+        { address=0X06F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="platforms on the foreground" },
+        { address=0X0754, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ff=on the ground" },
+      },
+      stage = {
+        { address=0X07B7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1=on stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0789, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0789, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0798, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="couts to hex 40 on death" },
+        { address=0X0799, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="will cause a fluctuating visual glitch" },
+        { address=0X07BA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Cheat input for unlimited lives and refill potions: increased" },
+        { address=0X07BA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cheat input for unlimited lives and refill potions: decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1FC8, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item pickups (one bit per item)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0758, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="see 0x000754, also responsive to jumps" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X033B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="room 1 front door" },
+        { address=0X034B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="room 1 front door" },
+        { address=0X07E9, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="ff=on switch for audio channels/voices" },
+      },
+    },
+  },
+}

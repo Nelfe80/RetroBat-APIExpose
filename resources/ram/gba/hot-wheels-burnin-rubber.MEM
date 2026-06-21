@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Hot Wheels: Burnin' Rubber",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "hot-wheels-burnin-rubber",
+    file = "hot-wheels-burnin-rubber.zip",
+    hashes = {
+      { hash = "218700b79a0ae3e9d69abf00fe06eb97", label = "Hot Wheels - Burnin' Rubber (Europe) (En,Fr).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0850, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Time Trial - Garage, Car Select, Tuning, Gran Prix/Free Race - Stage Select" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X24F8, type="u8", condition="eq", value=0X09, action="AMMO_STATE", no_log=true, no_survey=false, desc="Backgammon" },
+        { address=0X4256, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Cup Available increased" },
+        { address=0X42D9, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Backgammon Course Unlocked" },
+        { address=0X46D0, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Earned increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0850, type="u8", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Options, Time Trial - Course Select, Cup Select" },
+        { address=0X0850, type="u8", condition="eq", value=0X06, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gran Prix/Free Race - Garage, Car Select, Tuning, Time Trial - in race" },
+        { address=0X0850, type="u8", condition="eq", value=0X07, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial - best record" },
+        { address=0X0850, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Screen ID (less consistent)" },
+      },
+    },
+  },
+}

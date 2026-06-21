@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Nicktoons Unite!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "nicktoons-unite",
+    file = "nicktoons-unite.zip",
+    hashes = {
+      { hash = "b8a651f0fc9080bf42044c93a746b5e7", label = "SpongeBob SquarePants and Friends Unite! (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X44F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked [US]" },
+        { address=0X4528, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked [EU]" },
+        { address=0X82A8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed Check [US]" },
+        { address=0X8424, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed Check [EU]" },
+      },
+      stage = {
+        { address=0X1148, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select / Level ID [US]" },
+        { address=0X1158, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select / Level ID [EU]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X8240, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [US] decreased" },
+        { address=0X8240, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [US] increased" },
+        { address=0X83BC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [EU] decreased" },
+        { address=0X83BC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [EU] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8250, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current Boss Health [US]" },
+        { address=0X8254, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Active Full Boss Health [US]" },
+        { address=0X83CC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current Boss Health [EU]" },
+        { address=0X83D0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Active Full Boss Health [EU]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X83B9, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Portals Destroyed [US]" },
+        { address=0X8535, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Portals Destroyed [EU]" },
+      },
+    },
+  },
+}

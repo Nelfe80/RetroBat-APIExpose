@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 TAK 19999</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 KOB 17000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 TOS 15000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 KBO 13000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MNM 11000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 OKI 10000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 REV 7770</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 ENG 6800</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 ER. 6510</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 BW3 5953</text>
+		</text>
+	</view>
+</theme>

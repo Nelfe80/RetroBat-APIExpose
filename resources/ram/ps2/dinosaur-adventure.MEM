@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dinosaur Adventure",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "dinosaur-adventure",
+    file = "dinosaur-adventure.zip",
+    hashes = {
+      { hash = "0a8a6eaa1bf8c26937db19fea22bb0f2", label = "Dinosaur Adventure (Europe) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+  },
+}

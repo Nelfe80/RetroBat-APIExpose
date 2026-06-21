@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Winnie the Pooh: Adventures in the 100 Acre Wood",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Board Game, Strategy"
+  },
+
+  rom = {
+    name = "winnie-the-pooh-adventures-in-the-100-acre-wood",
+    file = "winnie-the-pooh-adventures-in-the-100-acre-wood.zip",
+    hashes = {
+      { hash = "d05a3c8e6af26686166b5049f1438dff", label = "Winnie the Pooh - Adventures in the 100 Acre Wood (Europe) (En,Fr,De,Es,It,Nl,Da).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC862, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Yes (But also this on scene transitions, during the tigger movie sequence, and on title screen)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCEEB, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Minigame, Book Obtained Screen, ...overworld after free card" },
+        { address=0XCEEB, type="u8", condition="eq", value=0X63, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld / Free Card Spots /Home" },
+      },
+      zone = {
+        { address=0XC70A, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Dialog Open/In Board Game/In Minigame" },
+        { address=0XC70A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="0x00=on World Map" },
+        { address=0XC724, type="u8", condition="eq", value=0X12, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map, Story Cutscenes, Given Cards" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC23C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total Seedling Cards Lifetime increased" },
+        { address=0XC23C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total Seedling Cards Lifetime decreased" },
+        { address=0XC23D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total Water Can Cards Lifetime increased" },
+        { address=0XC23D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total Water Can Cards Lifetime decreased" },
+        { address=0XC23E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total Bridge Cards Lifetime increased" },
+        { address=0XC23E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total Bridge Cards Lifetime decreased" },
+        { address=0XC23F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(Also total Bridges, lifetime) increased" },
+        { address=0XC23F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(Also total Bridges, lifetime) decreased" },
+        { address=0XD18A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Board Games - Number Rolled on Die" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC20B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Have Blue Clock?" },
+        { address=0XC20C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Have Yellow Clock?" },
+        { address=0XC240, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock in House" },
+        { address=0XD3E6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Fishing Minigame - Daylight Status" },
+      },
+    },
+  },
+}

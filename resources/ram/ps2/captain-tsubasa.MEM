@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Captain Tsubasa",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "captain-tsubasa",
+    file = "captain-tsubasa.zip",
+    hashes = {
+      { hash = "3cf308ceb71b975734d8c727c6845424", label = "Captain Tsubasa (Japan)" },
+      { hash = "b038084dfd2c0637c5b3be10a690c04b", label = "Captain Tsubasa (Japan) (En) (TeamBT4)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X2E77C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Team 1 Score" },
+        { address=0X2E8AA8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Team 2 Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2E9028, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Stopped" },
+      },
+    },
+  },
+}

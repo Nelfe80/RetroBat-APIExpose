@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Gyruss",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Flying"
+  },
+
+  rom = {
+    name = "gyruss",
+    file = "gyruss.zip",
+    hashes = {
+      { hash = "0a9374acd05251a6b904092cca0a7554", label = "gyruss.7z <Gyruss>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X140B, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [8-bit Value]" },
+        { address=0X166E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo=0 Playing = 1 [8-bit Value]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1362, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Formation Clear bonus value [8-bit Value]" },
+      },
+      stage = {
+        { address=0X1183, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Stage Hits 99= Perfect [8-bit Value]" },
+        { address=0X160E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Display stage zero indexed [8-bit Value]" },
+        { address=0X1610, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage - zero indexed - loops back to 0 at stage 25 [8-bit Value]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1446, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dip setting for Starting Lives 03 for default 3 lives FF = 255 lives [8-bit Value] increased" },
+        { address=0X1446, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dip setting for Starting Lives 03 for default 3 lives FF = 255 lives [8-bit Value] decreased" },
+        { address=0X1448, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dip setting for Bonus life score 00 =default of 30k 90k 60k+ [8-bit Value] increased" },
+        { address=0X1448, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dip setting for Bonus life score 00 =default of 30k 90k 60k+ [8-bit Value] decreased" },
+        { address=0X1605, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Display lives [8-bit Value] increased" },
+        { address=0X1605, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Display lives [8-bit Value] decreased" },
+        { address=0X1625, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Initial lives left 00 = gameover mode [8-bit Value] increased" },
+        { address=0X1625, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Initial lives left 00 = gameover mode [8-bit Value] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1410, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score [32-bit Value] (BCD)" },
+        { address=0X1668, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32-bit Value] (BCD)" },
+        { address=0X1410, type="u32le", condition="change", action="SCORE_STATE", color="cyan", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Satelite" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1075, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemy Ship Animation including Rightmost satelite 00 = Destroyed [8-bit Value]" },
+        { address=0X1085, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemy Ship Animation including Mid satellite 00 = Destroyed [8-bit Value]" },
+        { address=0X1095, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemy Ship Animation including Left satellite 00 = destroyed [8-bit Value]" },
+        { address=0X1410, type="u32le", condition="change", action="OBJECT_DESTROYED", min=50, max=50, no_log=false, no_survey=false, desc="Score delta 50-50: Ship Still" },
+        { address=0X1410, type="u32le", condition="change", action="OBJECT_DESTROYED", color="blue", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Ship Moving" },
+      },
+    },
+  },
+}

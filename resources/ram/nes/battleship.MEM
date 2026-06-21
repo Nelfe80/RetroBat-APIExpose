@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Battleship",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "battleship",
+    file = "battleship.zip",
+    hashes = {
+      { hash = "ebaf268d47a21f47e04863a7d5413972", label = "Battleship (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X05C7, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="00 = Title Screen, 01 = Ship Placement, 02 = Battle, 03 = Victory, 04 = Defeat" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0097, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round (0 = Round 1)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X009B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Submarine HP (Player) decreased" },
+        { address=0X009B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Submarine HP (Player) increased" },
+        { address=0X009C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Frigate HP (Player) decreased" },
+        { address=0X009C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Frigate HP (Player) increased" },
+        { address=0X009E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cruiser HP (Player) decreased" },
+        { address=0X009E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cruiser HP (Player) increased" },
+        { address=0X009F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battleship HP (Player) decreased" },
+        { address=0X009F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battleship HP (Player) increased" },
+        { address=0X00A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Carrier HP (Player) decreased" },
+        { address=0X00A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Carrier HP (Player) increased" },
+        { address=0X00B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Submarine HP (Enemy) decreased" },
+        { address=0X00B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Submarine HP (Enemy) increased" },
+        { address=0X00B5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Frigate HP (Enemy) decreased" },
+        { address=0X00B5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Frigate HP (Enemy) increased" },
+        { address=0X00B7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cruiser HP (Enemy) decreased" },
+        { address=0X00B7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cruiser HP (Enemy) increased" },
+        { address=0X00B8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battleship HP (Enemy) decreased" },
+        { address=0X00B8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battleship HP (Enemy) increased" },
+        { address=0X00B9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Carrier HP (Enemy) decreased" },
+        { address=0X00B9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Carrier HP (Enemy) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X00F1, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Talos" },
+        { address=0X065A, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="01 = Infinite Weapons On" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X009D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyer HP (Player)" },
+        { address=0X00B6, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyer HP (Enemy)" },
+      },
+    },
+  },
+}

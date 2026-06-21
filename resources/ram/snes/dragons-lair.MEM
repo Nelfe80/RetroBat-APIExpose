@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Dragon's Lair",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "dragons-lair",
+    file = "dragons-lair.zip",
+    hashes = {
+      { hash = "872a1839a3a2ab9b0d2bce272feba1b7", label = "Dragon's Lair (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1003, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background vertical scrolling" },
+        { address=0X1034, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1028, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="player lives? increased" },
+        { address=0X1028, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player lives? decreased" },
+      },
+      health = {
+        { address=0X1036, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health decreased" },
+        { address=0X1036, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1035, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sub-weapon (Axe = 00, Knife = 01, Shuriken = 02)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1029, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 1st digit" },
+        { address=0X102A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 2nd digit" },
+        { address=0X102B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 3rd digit" },
+        { address=0X102C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 4th digit" },
+        { address=0X102D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 5th digit" },
+        { address=0X102E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 6th digit" },
+      },
+      collectibles = {
+        { address=0X102F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold coins (10-90) increased" },
+        { address=0X1030, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold coins (1-9) increased" },
+      },
+    },
+  },
+}

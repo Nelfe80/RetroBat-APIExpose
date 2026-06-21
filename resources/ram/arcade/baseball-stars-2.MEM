@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Baseball Stars 2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Baseball"
+  },
+
+  rom = {
+    name = "baseball-stars-2",
+    file = "baseball-stars-2.zip",
+    hashes = {
+      { hash = "f0235aca225c29b7b47409be3db976b7", label = "bstars2.7z <Baseball Stars 2>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0004, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo playing" },
+        { address=0X0004, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Player controlling" },
+        { address=0X0038, type="u8", condition="eq", value=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X003C, type="u8", condition="eq", value=0XE8, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X008B, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Your place in the World Championship" },
+      },
+      stage = {
+        { address=0X443B, type="u8", condition="eq", value=0XC0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="has contacted ground that play" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X4423, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-ups left" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X43F2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Computer/Player 2 score BCD" },
+        { address=0X43F3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 score BCD" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4456, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Inning change timer" },
+      },
+    },
+  },
+}

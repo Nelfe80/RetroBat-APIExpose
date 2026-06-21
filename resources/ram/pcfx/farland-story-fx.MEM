@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Farland Story FX",
+    system = "pcfx",
+    system_name = "PC-FX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "farland-story-fx",
+    file = "farland-story-fx.zip",
+    hashes = {
+      { hash = "33ceed42dba0b58bec1e0e1249cd4582", label = "Farland Story FX (Japan) (En) (v2.0) (Djlpap)" },
+      { hash = "6be42cbb531a2102b275ccf9e9007322", label = "Farland Story FX (Japan) (En) (v1.0) (Djlpap)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X16E9B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arc Level" },
+        { address=0X16E9EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alicia Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X16E9B8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 Max HP decreased" },
+        { address=0X16E9B8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 Max HP increased" },
+        { address=0X16E9BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 HP decreased" },
+        { address=0X16E9BA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 HP increased" },
+        { address=0X16E9F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Alicia Max HP decreased" },
+        { address=0X16E9F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Alicia Max HP increased" },
+        { address=0X16E9F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Alicia Current HP decreased" },
+        { address=0X16E9F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Alicia Current HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X16F4F6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] Money increased" },
+      },
+    },
+  },
+}

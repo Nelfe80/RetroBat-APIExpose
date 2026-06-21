@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Nobunaga's Ambition",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "nobunagas-ambition",
+    file = "nobunagas-ambition.zip",
+    hashes = {
+      { hash = "e4d7ca6333e7a05acfd409b169f1a1c2", label = "Nobunaga's Ambition (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0010, type="u8", condition="eq", value=0XC0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Boot up / Title Screen" },
+        { address=0X004C, type="u8", condition="eq", value=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Intro Sequence/Title Screen" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X46B6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Leader HP decreased" },
+        { address=0X46B6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Leader HP increased" },
+        { address=0X46B8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Cabalry - HP decreased" },
+        { address=0X46B8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Cabalry - HP increased" },
+        { address=0X46BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Rifles HP decreased" },
+        { address=0X46BA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Rifles HP increased" },
+        { address=0X46BC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Infantry I HP decreased" },
+        { address=0X46BC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Infantry I HP increased" },
+        { address=0X46BE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Infantry II HP decreased" },
+        { address=0X46BE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Infantry II HP increased" },
+        { address=0X46C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Leader HP decreased" },
+        { address=0X46C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Leader HP increased" },
+        { address=0X46C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Cavalry HP decreased" },
+        { address=0X46C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Cavalry HP increased" },
+        { address=0X46C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Rifles HP decreased" },
+        { address=0X46C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Rifles HP increased" },
+        { address=0X46C6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Infantry I HP decreased" },
+        { address=0X46C6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Infantry I HP increased" },
+        { address=0X46C8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Infantry II HP decreased" },
+        { address=0X46C8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Infantry II HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2E6D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Battle] Red Army - Gold increased" },
+        { address=0X2E73, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Battle] Blue Army - Gold increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Tails Adventure",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "tails-adventure",
+    file = "tails-adventure.zip",
+    hashes = {
+      { hash = "a8bdb1beed088ff83c725c5af6b85e1f", label = "Tails Adventure (World) (En,Ja).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1136, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="00 = Game Paused; ff = Game running" },
+        { address=0X14AC, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Tileset for current map (Changes from 0b to 0c when using Night Vision) (25 in credits sequence)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1038, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maximum Health decreased" },
+        { address=0X1038, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maximum Health increased" },
+        { address=0X1039, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health (Updates when you change maps) - changes to 'ff' upon beating the game decreased" },
+        { address=0X1039, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health (Updates when you change maps) - changes to 'ff' upon beating the game increased" },
+        { address=0X12F7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X12F7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0X1526, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health in Decimal (can be edited) decreased" },
+        { address=0X1526, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health in Decimal (can be edited) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1032, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Yellow C. Emerald" },
+        { address=0X1032, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="White C. Emerald" },
+        { address=0X1032, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Red C. Emerald" },
+        { address=0X1032, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Purple C. Emerald" },
+        { address=0X1032, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Green C. Emerald" },
+        { address=0X1032, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Blue C. Emerald" },
+        { address=0X103A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Number of Chaos Emeralds obtained (updates when you change maps)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1726, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy HP (on screen) - can be used for Poloy Forest, Lake Rocky, and Volcanic Tunnel bosses' HP," },
+        { address=0X1766, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Volcanic Tunnel Boss HP 2" },
+        { address=0X17A6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Volcanic Tunnel Boss HP 3" },
+        { address=0X18A6, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Cavern Island Boss HP (10 = 16HP)" },
+        { address=0X1E44, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Music ID (Boss Music - Intro Bar: 77; Main Theme: 78) (Final Boss Music - 7b/7c)" },
+      },
+    },
+  },
+}

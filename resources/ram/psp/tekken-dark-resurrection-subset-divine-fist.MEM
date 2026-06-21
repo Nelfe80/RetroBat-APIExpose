@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Tekken: Dark Resurrection [Subset - Divine Fist]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tekken-dark-resurrection-subset-divine-fist",
+    file = "tekken-dark-resurrection-subset-divine-fist.zip",
+    hashes = {
+      { hash = "2b5e241cc87c5773098d90ac85e21fbd", label = "Tekken - Dark Resurrection [Subset - Divine Fist].iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XB75FDD, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P health max 9100 decreased" },
+        { address=0XB75FDD, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P health max 9100 increased" },
+        { address=0XB768AD, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P health max 9100 decreased" },
+        { address=0XB768AD, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P health max 9100 increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1B5BE78, type="u8", condition="eq", value=0X18, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyer" },
+      },
+    },
+  },
+}

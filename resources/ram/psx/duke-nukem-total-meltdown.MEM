@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Duke Nukem: Total Meltdown",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "duke-nukem-total-meltdown",
+    file = "duke-nukem-total-meltdown.zip",
+    hashes = {
+      { hash = "a007606dad987e332170924a214f3d7b", label = "Duke Nukem - Total Meltdown (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB22B8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] Pause flag" },
+        { address=0XB272E, type="u8", condition="eq", value=0XD6, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo True" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XEC98E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Level finished trigger. Related to Duke's fist raise animation when interacting with the" },
+        { address=0XEC98F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Progresses 1 Level ID value when higher than 0x00." },
+        { address=0XECA37, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level kills" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB5DAA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player life increased" },
+        { address=0XB5DAA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player life decreased" },
+      },
+      health = {
+        { address=0XEC936, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health Display (16-bit) decreased" },
+        { address=0XEC936, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health Display (16-bit) increased" },
+        { address=0X13434E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health cheat decreased" },
+        { address=0X13434E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health cheat increased" },
+        { address=0X159092, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health cheat decreased" },
+        { address=0X159092, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health cheat increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XB5DAE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+        { address=0XEC958, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol" },
+        { address=0XEC958, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0XEC958, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Chaingun Cannon" },
+        { address=0XEC958, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="RPG" },
+        { address=0XEC958, type="u8", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pipe Bomb" },
+        { address=0XEC958, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shrinker" },
+        { address=0XEC958, type="u8", condition="eq", value=0X7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Devastator" },
+        { address=0XEC958, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Tripbomb" },
+        { address=0XEC958, type="u8", condition="eq", value=0X9, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Freezethrower" },
+        { address=0XEC958, type="u8", condition="eq", value=0XA, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pipe Bomb Detonator" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB5DB2, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo" },
+        { address=0XEC93C, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Pistol Ammo (16-bit)" },
+        { address=0XEC93E, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shotgun Ammo (16-bit)" },
+        { address=0XEC940, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Chaingun Cannon Ammo (16-bit)" },
+        { address=0XEC942, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="RPG Ammo (16-bit)" },
+        { address=0XEC944, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Pipe Bomb Ammo (16-bit)" },
+        { address=0XEC946, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shrinker Ammo (16-bit)" },
+        { address=0XEC948, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Devastator Ammo (16-bit)" },
+        { address=0XEC94A, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Laser Tripbomb Ammo (16-bit)" },
+        { address=0XEC94C, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Freezethrower Ammo (16-bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XEC99E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] The Boss Level finished (Counts down to 0x01 after the Boss is killed)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEC90C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32bit] Level Timer / by 30 for 1sec" },
+      },
+    },
+  },
+}

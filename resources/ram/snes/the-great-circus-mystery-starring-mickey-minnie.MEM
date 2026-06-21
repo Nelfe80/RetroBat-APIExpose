@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "The Great Circus Mystery Starring Mickey & Minnie",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-great-circus-mystery-starring-mickey-minnie",
+    file = "the-great-circus-mystery-starring-mickey-minnie.zip",
+    hashes = {
+      { hash = "a4d68c20ac1567834403cde9d590357f", label = "Great Circus Mystery Starring Mickey & Minnie, The (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0056, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Menu/Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8404, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01- Level Completed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X029F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Counter increased" },
+        { address=0X029F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Counter decreased" },
+        { address=0X0D00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Part of the 1UP flag? increased" },
+        { address=0X0D00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Part of the 1UP flag? decreased" },
+      },
+      health = {
+        { address=0X0220, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Current Health decreased" },
+        { address=0X0220, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Current Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0290, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Vacuum Ammo (P1) [16 bit]" },
+        { address=0X0293, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Western Ammo (P1)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0552, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1 Boss Mane" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0200, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility?" },
+        { address=0X0201, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+      },
+    },
+  },
+}

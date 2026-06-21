@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Scooby-Doo! and the Spooky Swamp",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "scooby-doo-and-the-spooky-swamp",
+    file = "scooby-doo-and-the-spooky-swamp.zip",
+    hashes = {
+      { hash = "6708cb9012c6fb89cf56df643e786272", label = "Scooby-Doo! and the Spooky Swamp (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Radical Rex",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "radical-rex",
+    file = "radical-rex.zip",
+    hashes = {
+      { hash = "b4f33dda22f00c5b6c4017bcbe5a4641", label = "Radical Rex (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F97E, type="u16be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[16 Bit] Total Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1F964, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Level ID" },
+        { address=0X7CC1C, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Level Select Code Progress" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1F980, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bit] Total Lives increased" },
+        { address=0X1F980, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bit] Total Lives decreased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1F9A0, type="u16be", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[16 Bit] Invincibility Frames" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1F982, type="u16be", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[16 Bit] Current Checkpoint in Level" },
+        { address=0X3FFCE, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[16 Bit] Eggs Destroyed | Bonus" },
+      },
+    },
+  },
+}

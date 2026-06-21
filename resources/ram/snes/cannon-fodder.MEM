@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Cannon Fodder",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "cannon-fodder",
+    file = "cannon-fodder.zip",
+    hashes = {
+      { hash = "8a61ea1d3b53375aae00cc69367dec7e", label = "Cannon Fodder (Europe).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XFAE4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level Skip Cheat Part 2: 98 = Active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X05B3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="First Soldier" },
+        { address=0X05BF, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Second Soldier" },
+        { address=0X05CB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Third soldier" },
+        { address=0X05D7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fourth Soldier" },
+        { address=0X0919, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deaths" },
+        { address=0X0D85, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Soldiers in the First Army" },
+        { address=0X0D86, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Soldiers in the Second Army" },
+        { address=0X0D87, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Soldiers in the Third Army" },
+        { address=0X149E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier in army 1" },
+        { address=0X149F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldiers in army 2" },
+        { address=0X14A0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier in army 3" },
+        { address=0X14A1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier in army 4" },
+      },
+    },
+  },
+}

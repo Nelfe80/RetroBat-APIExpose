@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "The Dynastic Hero",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-dynastic-hero",
+    file = "the-dynastic-hero.zip",
+    hashes = {
+      { hash = "d120a2d1099b1101a1897b8cb3996f83", label = "Dynastic Hero, The (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X09D5, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Castle Underground Chest (big heart);" },
+        { address=0X0DC5, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Door Open after defeating Fat Toad Boss;" },
+        { address=0X0DC5, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Princess saved in castle sewers;" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X09C5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Potion increased" },
+        { address=0X09C5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Potion decreased" },
+      },
+      health = {
+        { address=0X09A5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Hearts regardless of HP decreased" },
+        { address=0X09A5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Hearts regardless of HP increased" },
+        { address=0X0C55, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Start of HP Hearts; each Heart is 0x14 when full, 0x0c when half, 0x04 when empty. decreased" },
+        { address=0X0C55, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Start of HP Hearts; each Heart is 0x14 when full, 0x0c when half, 0x04 when empty. increased" },
+        { address=0X0DC3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dungeon Scratchpad; reused door-controls and other switches for nearly every dungeon, which are" },
+        { address=0X0DC3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dungeon Scratchpad; reused door-controls and other switches for nearly every dungeon, which are" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X09B0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X09A0, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24-Bit] Gold increased" },
+        { address=0X09BA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X09C9, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Chest in Poseidon Ocean;" },
+        { address=0X09C9, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Chest Left First Ocean Path;" },
+        { address=0X09C9, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Chest Middle First Ocean Path;" },
+        { address=0X09C9, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Chest Right First Ocean Path;" },
+        { address=0X09D0, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Crystal Chest at Brizzard" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X09AE, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="FireShield;" },
+        { address=0X09AE, type="u8", condition="bit_true", bit=2, mask=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="KnightShield;" },
+        { address=0X09AE, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="SteelShield;" },
+        { address=0X09AE, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="HardShield;" },
+        { address=0X09AE, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="ShellShield;" },
+        { address=0X09AE, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Buckler;" },
+        { address=0X09AE, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="MicroShield" },
+        { address=0X09B2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X09D1, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Hard Shield Chest in Jungle Temple;" },
+        { address=0X09D5, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Desert Well Shield-Magic Chest" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X09D6, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hidden-door Chest in Pyramid;" },
+      },
+    },
+  },
+}

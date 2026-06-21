@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Gargoyle's Quest II: The Demon Darkness",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "gargoyles-quest-ii-the-demon-darkness",
+    file = "gargoyles-quest-ii-the-demon-darkness.zip",
+    hashes = {
+      { hash = "23db13aa5b926f4491db060967229c04", label = "Gargoyle's Quest II (Europe).nes" },
+      { hash = "8645942fbed0a79192543abf3840e508", label = "Gargoyle's Quest II (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0029, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level?" },
+        { address=0X0040, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Side-Scrolling Level ID" },
+        { address=0X0063, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wing Level (04 = Max?)" },
+      },
+      zone = {
+        { address=0X00FC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="X Coordinates (World Map)" },
+        { address=0X033C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="X Coordinates 2 (World Map)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0038, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X0038, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0X0039, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0039, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X041C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X041C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X041D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X041D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0037, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X05A0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="World Map Vials Bit String increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X00B4, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Defeated Flag (FF)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0544, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+      },
+      player = {
+        { address=0X007D, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump Level" },
+      },
+    },
+  },
+}

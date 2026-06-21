@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "River City Ransom EX",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Beat 'em Up"
+  },
+
+  rom = {
+    name = "river-city-ransom-ex",
+    file = "river-city-ransom-ex.zip",
+    hashes = {
+      { hash = "0b95fb20b9f487eb64431e9db9f75c7f", label = "River City Ransom EX (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0038, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="equals 02 when game is paused" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X8416, type="u8", condition="eq", value=0X64, action="WEAPON_STATE", no_log=false, no_survey=false, desc="100" },
+        { address=0X84B2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ryan weapon" },
+        { address=0X8992, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Conan weapon stats" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8454, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money (in cents) increased" },
+        { address=0X84F0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money (in cents) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X841A, type="u8", condition="eq", value=0X64, action="JUMPING", no_log=false, no_survey=false, desc="100" },
+        { address=0X84B6, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="ryan jump" },
+      },
+    },
+  },
+}

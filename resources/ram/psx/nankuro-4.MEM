@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Nankuro 4",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "nankuro-4",
+    file = "nankuro-4.zip",
+    hashes = {
+      { hash = "1bc0069ba9e27caceae17338791c9bb8", label = "SuperLite 1500 Series - NumCro 4 (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1B0042, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="False" },
+        { address=0X1B0042, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="True" },
+        { address=0X1B0042, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Frozen" },
+      },
+    },
+  },
+}

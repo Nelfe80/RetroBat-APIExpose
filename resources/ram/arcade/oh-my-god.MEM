@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Oh My God!",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "oh-my-god",
+    file = "oh-my-god.zip",
+    hashes = {
+      { hash = "5802ae899e406453f3ad93e37f9d26a8", label = "ohmygod.7z <Oh My God!>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC061, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On title screen, or in game, or multiplayer demo" },
+        { address=0XC061, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In other demos" },
+      },
+    },
+  },
+}

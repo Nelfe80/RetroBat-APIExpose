@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Sonic Drift 2",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "sonic-drift-2",
+    file = "sonic-drift-2.zip",
+    hashes = {
+      { hash = "b39d1e9a40dfd3508ee4003cd28da452", label = "Sonic Drift 2 (World).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0095, type="u8", condition="bit_true", bit=7, mask=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="0 if not paused, 1 if paused." },
+        { address=0X030C, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Up, Bit 1= Down, Bit 2 = Left, Bit 3= Right" },
+        { address=0X030C, type="u8", condition="bit_true", bit=4, mask=0X10, action="PAUSE_OFF", no_log=false, no_survey=false, desc="B, Bit 5= A" },
+        { address=0X030D, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="Buttons Tapped This Frame (Racing, Unpaused)" },
+        { address=0X17A2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0100, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="raw level number" },
+        { address=0X0101, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level number per course" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1721, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Player 1 Emeralds" },
+        { address=0X1725, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Rival 1 Emeralds" },
+        { address=0X1729, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Rival 2 Emeralds" },
+        { address=0X172D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Rival 3 Emeralds" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1720, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="True Player 1 Points" },
+        { address=0X1724, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="True Rival 1 Points" },
+        { address=0X1728, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="True Rival 2 Points" },
+        { address=0X172C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="True Rival 3 Points" },
+        { address=0X1740, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="player 1 points" },
+        { address=0X1748, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="rival ? points" },
+      },
+      collectibles = {
+        { address=0X1CC3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="ring count increased" },
+      },
+    },
+  },
+}

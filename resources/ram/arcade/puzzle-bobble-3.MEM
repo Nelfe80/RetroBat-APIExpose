@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Puzzle Bobble 3",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-bobble-3",
+    file = "puzzle-bobble-3.zip",
+    hashes = {
+      { hash = "d4e733d8b3cff7a9f023ab86ebf66230", label = "pbobble3.7z <Puzzle Bobble 3 (Ver 2.1O 1996/09/27)>" },
+      { hash = "e685edadac15ccc7e21e055f2fd224f2", label = "pbobble3j.7z <Puzzle Bobble 3 (Ver 2.1J 1996/09/27)>" },
+      { hash = "f7d698a06d72ea3eeffa866f14e60887", label = "pbobble3u.7z <Puzzle Bobble 3 (Ver 2.1A 1996/09/27)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F85E, type="u8", condition="eq", value=0X0, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1F6BE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Decimal Seconds at End of Round" },
+        { address=0X1F776, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Total Round" },
+      },
+      zone = {
+        { address=0X1F780, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8 Bit] Current Round Within Specific World (i.e World A Round X)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X13488, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] P1 Score" },
+        { address=0X1348A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] P1 Score" },
+        { address=0X13588, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score (hundred thousands to hundred millions)" },
+        { address=0X1358A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] P2 Score (tens to ten thousands)" },
+      },
+    },
+  },
+}

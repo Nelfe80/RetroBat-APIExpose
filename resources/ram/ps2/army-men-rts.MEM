@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Army Men: RTS",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "army-men-rts",
+    file = "army-men-rts.zip",
+    hashes = {
+      { hash = "3953f9193679d628bb54a559f67c970c", label = "Army Men - RTS (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X614BE4, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal 1 Completed" },
+        { address=0X614BE4, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal 2 Completed" },
+      },
+    },
+  },
+}

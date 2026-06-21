@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "RoboCop Versus The Terminator",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Fighting"
+  },
+
+  rom = {
+    name = "robocop-versus-the-terminator",
+    file = "robocop-versus-the-terminator.zip",
+    hashes = {
+      { hash = "2ad4d6968d6be1727f198475497e8069", label = "RoboCop versus The Terminator (Europe).sfc" },
+      { hash = "3683319beeba73ad6deb851ef72bf3d3", label = "RoboCop versus The Terminator (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00CC, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="0b = different credits" },
+        { address=0X00E1, type="u8", condition="eq", value=0X20, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="staff photograph after credits?" },
+        { address=0X186F, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="in game" },
+      },
+      events = {
+        { address=0X021C, type="u8", condition="eq", value=0X05, action="COMBO_HIT", no_log=false, no_survey=false, desc="combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0019, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="07 stage finished?" },
+        { address=0X002F, type="u8", condition="eq", value=0X38, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="stage completed screen" },
+        { address=0X0057, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage finished = 1?" },
+        { address=0X3135, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage finished = 1? 0c?" },
+      },
+      stage = {
+        { address=0X0B58, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage part?" },
+        { address=0X1A89, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00D8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="7b get a life credit? increased" },
+        { address=0X00D8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="7b get a life credit? decreased" },
+        { address=0X0204, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIVES increased" },
+        { address=0X0204, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIVES decreased" },
+        { address=0X10C5, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0X10C5, type="u8", condition="eq", value=0X0A, action="HEALTH_STATE", no_log=true, no_survey=false, desc="full" },
+        { address=0X10C5, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X021C, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="pistol" },
+        { address=0X021C, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ED 209" },
+        { address=0X021C, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Seeker" },
+        { address=0X021C, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rocket" },
+        { address=0X021C, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Plasma" },
+        { address=0X0226, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="WEAPON GOT?" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0200, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE 000000XX" },
+        { address=0X0201, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE 0000XX00" },
+        { address=0X0202, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE 00XX0000" },
+        { address=0X0203, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE XX000000" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X10C7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health?" },
+      },
+    },
+  },
+}

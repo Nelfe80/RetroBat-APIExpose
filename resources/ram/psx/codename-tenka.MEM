@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Codename: Tenka",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "codename-tenka",
+    file = "codename-tenka.zip",
+    hashes = {
+      { hash = "46c74e9ec7435900df4b853f3356e947", label = "Codename - Tenka (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18F70, type="u32le", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X18F70, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+        { address=0X18F80, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="False" },
+        { address=0X18F80, type="u16le", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="True" },
+        { address=0X19AFC, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="False" },
+        { address=0X19AFC, type="u16le", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="True" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X662C6, type="u32le", condition="eq", value=0X00000000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Disabled" },
+        { address=0X662C6, type="u32le", condition="eq", value=0X00000001, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Wepons" },
+        { address=0X662C6, type="u32le", condition="eq", value=0X00010000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Warp" },
+        { address=0X662C6, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cheat Code All Weapons/Level Warp" },
+      },
+      stage = {
+        { address=0X662C6, type="u32le", condition="eq", value=0X00010001, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Both Cheats Active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X19DD0, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Life increased" },
+        { address=0X19DD0, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Life decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X59CEC, type="u32le", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Simple Shot" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Double Shot" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rapid Fire" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Simple Laser" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Double Laser" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Burst Laser" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade" },
+        { address=0X59CEC, type="u32le", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mine" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X59A64, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Clip Ammo Count" },
+        { address=0X59A68, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Remaining Laser Ammo in Weapon" },
+      },
+    },
+  },
+}

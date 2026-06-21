@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "My Spanish Coach: Level 1 - Learn to Speak Spanish",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "my-spanish-coach-level-1-learn-to-speak-spanish",
+    file = "my-spanish-coach-level-1-learn-to-speak-spanish.zip",
+    hashes = {
+      { hash = "3f139488f3f6f8feb4727e23a9bb5322", label = "My Spanish Coach - Level 1 (Europe) (En,Es).nds" },
+    }
+  },
+
+  events = {
+  },
+}

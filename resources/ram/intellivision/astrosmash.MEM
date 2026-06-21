@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Astrosmash",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "astrosmash",
+    file = "astrosmash.zip",
+    hashes = {
+      { hash = "8f6a5b5b65d84f947236e503d378370b", label = "Astrosmash (USA, Europe).int" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0620, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (Multiplier)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0D90, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Deaths [hex]" },
+        { address=0X0DB0, type="u16le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0DB0, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Remaining [16-bit] hex increased" },
+        { address=0X0DB0, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Remaining [16-bit] hex decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0D10, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [16-bit] hex" },
+        { address=0X0D30, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [16-bit] hex" },
+        { address=0X0D50, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Peak Score [16-bit] hex" },
+        { address=0X0D70, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Peak Score [16-bit] hex" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0D54, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 1: Graphic" },
+        { address=0X0D58, type="u8", condition="eq", value=0X34, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Asteroid" },
+        { address=0X0D58, type="u8", condition="eq", value=0X3B, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Gun Destroyed" },
+        { address=0X0D58, type="u8", condition="eq", value=0X42, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Spinner" },
+        { address=0X0D58, type="u8", condition="eq", value=0X49, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Guided Missile" },
+        { address=0X0D58, type="u8", condition="eq", value=0X5A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X0D58, type="u8", condition="eq", value=0X6B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="UFO" },
+        { address=0X0D64, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 1: y-speed" },
+        { address=0X0D65, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 1: x-speed" },
+        { address=0X0D74, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 2: Graphic" },
+        { address=0X0D78, type="u8", condition="eq", value=0X34, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Asteroid" },
+        { address=0X0D78, type="u8", condition="eq", value=0X3B, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Gun Destroyed" },
+        { address=0X0D78, type="u8", condition="eq", value=0X42, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Spinner" },
+        { address=0X0D78, type="u8", condition="eq", value=0X49, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Guided Missile" },
+        { address=0X0D78, type="u8", condition="eq", value=0X5A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X0D78, type="u8", condition="eq", value=0X6B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="UFO" },
+        { address=0X0D84, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 2: y-speed" },
+        { address=0X0D85, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 2: x-speed" },
+        { address=0X0D94, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 3: Graphic" },
+        { address=0X0D98, type="u8", condition="eq", value=0X34, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Asteroid" },
+        { address=0X0D98, type="u8", condition="eq", value=0X3B, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Gun Destroyed" },
+        { address=0X0D98, type="u8", condition="eq", value=0X42, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Spinner" },
+        { address=0X0D98, type="u8", condition="eq", value=0X49, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Guided Missile" },
+        { address=0X0D98, type="u8", condition="eq", value=0X5A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X0D98, type="u8", condition="eq", value=0X6B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="UFO" },
+        { address=0X0DA4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 3: y-speed" },
+        { address=0X0DA5, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 3: x-speed" },
+        { address=0X0DB4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 4: Graphic" },
+        { address=0X0DB8, type="u8", condition="eq", value=0X34, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Asteroid" },
+        { address=0X0DB8, type="u8", condition="eq", value=0X3B, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Gun Destroyed" },
+        { address=0X0DB8, type="u8", condition="eq", value=0X42, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Spinner" },
+        { address=0X0DB8, type="u8", condition="eq", value=0X49, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Guided Missile" },
+        { address=0X0DB8, type="u8", condition="eq", value=0X5A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X0DB8, type="u8", condition="eq", value=0X6B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="UFO" },
+        { address=0X0DC4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 4: y-speed" },
+        { address=0X0DC5, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 4: x-speed" },
+        { address=0X0DD4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 5: Graphic" },
+        { address=0X0DD8, type="u8", condition="eq", value=0X34, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Asteroid" },
+        { address=0X0DD8, type="u8", condition="eq", value=0X3B, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Gun Destroyed" },
+        { address=0X0DD8, type="u8", condition="eq", value=0X42, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Spinner" },
+        { address=0X0DD8, type="u8", condition="eq", value=0X49, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Guided Missile" },
+        { address=0X0DD8, type="u8", condition="eq", value=0X5A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X0DD8, type="u8", condition="eq", value=0X6B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="UFO" },
+        { address=0X0DE4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 5: y-speed" },
+        { address=0X0DE5, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 5: x-speed" },
+      },
+    },
+  },
+}

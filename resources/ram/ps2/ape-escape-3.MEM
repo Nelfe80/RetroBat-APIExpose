@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Ape Escape 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "ape-escape-3",
+    file = "ape-escape-3.zip",
+    hashes = {
+      { hash = "c3df7ec88cc45a6f1d23a17db4e3740b", label = "Ape Escape 3 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X649D12, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Not Acquired" },
+        { address=0X649D12, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Acquired" },
+        { address=0X795588, type="u32le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6354E1, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On" },
+        { address=0X6354E1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dark mode + Object hitboxes + Level regions view" },
+        { address=0X6354E5, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On" },
+        { address=0X6354E5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Regions view" },
+        { address=0X649AB0, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Captured" },
+        { address=0X649AB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Molzone Caught? [8-bit] (Eversummer Island)" },
+        { address=0X649B23, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Captured" },
+        { address=0X649B23, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zonelin Caught? [8-bit] (Space-TV Fortress)" },
+        { address=0X73FF28, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Selected (On Level Select)" },
+        { address=0X8519E4, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loading in Level" },
+      },
+      stage = {
+        { address=0X6478F0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="More Specific Stage ID [256-bit] [ASCII]" },
+        { address=0X649548, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SUPER Specific STATE/STAGE ID [256-bit]" },
+        { address=0X649908, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="EU Stage ID 1st part" },
+        { address=0X8519E0, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="You're in Monkey Pink's Stage (I think)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X649914, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X649914, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X649998, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slingback Exploding Pellets Ammo" },
+        { address=0X64999C, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slingback Guided Pellets Ammo" },
+        { address=0X6499D4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gotcha Coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X649B6F, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Not Captured" },
+        { address=0X649B6F, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Captured" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X152CE0C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Kei Crouch Jump Strength [Float]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6354EB, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="On" },
+        { address=0X6354ED, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="On" },
+        { address=0X6354EE, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="On" },
+        { address=0X649ADF, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not Captured" },
+        { address=0X649ADF, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Captured" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X699D74, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Leaving/Retry Time Trial" },
+        { address=0X73FF38, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial Active?" },
+      },
+    },
+  },
+}

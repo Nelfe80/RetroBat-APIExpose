@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Skylanders: Spyro's Adventure",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "skylanders-spyros-adventure",
+    file = "skylanders-spyros-adventure.zip",
+    hashes = {
+      { hash = "f1794d9a8cb80c91ebbf058a0a1af6fc", label = "Skylanders - Spyro's Adventure (Europe, Australia) (En,Fr,De,Es,It,Nl) (Rev 3)" },
+      { hash = "be9ca2db44eaf64d7c69ff8024f75d0e", label = "Skylanders - Spyro's Adventure (USA) (En,Fr) (Rev 1)" },
+      { hash = "22f79d983871d1e52a164dc721184a9c", label = "Skylanders - Spyro's Adventure (Scandinavia) (Sv,No,Da,Fi) (Rev 3)" },
+      { hash = "02b85939df279ddfedd75c0ee6e3434b", label = "Skylanders - Spyro's Adventure (Brazil) (En,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X849AB8, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit BE] Game Paused Check" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X89C93C, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Level Complete Check" },
+      },
+    },
+  },
+}

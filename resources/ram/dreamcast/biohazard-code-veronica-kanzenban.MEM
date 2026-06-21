@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "BIOHAZARD CODE: Veronica Kanzenban",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "biohazard-code-veronica-kanzenban",
+    file = "biohazard-code-veronica-kanzenban.zip",
+    hashes = {
+      { hash = "1085232889d7467fdd3584dbc9bfa4de", label = "Resident Evil - Code - Veronica X (Japan) (Fr) (Final) (Fafadou) (Widescreen) (Disc 1)" },
+      { hash = "134628d0a307b81894b697d18ef6ba39", label = "Resident Evil - Code - Veronica X (Japan) (En) (Clone GDEMU Fix) (truemaster1) (Disc 2)" },
+      { hash = "1431a4e76cee8d3f5cd4148c27689c08", label = "Resident Evil - Code - Veronica X (Japan) (Fr) (Final) (Fafadou) (Disc 2)" },
+      { hash = "1fee2b728919b6ba2e1c5ab6dc8c6264", label = "Biohazard - Code - Veronica Kanzenban (Japan) (Jp) (Widescreen) (Disc 1)" },
+      { hash = "26cde520c1f9d34acb827d1562998481", label = "Biohazard - Code - Veronica Kanzenban (Japan) (Jp) (Disc 2)" },
+      { hash = "2f81c543f96b5c0d87cb1e0ea4af42b4", label = "Resident Evil - Code - Veronica X (Japan) (En) (Final) (truemaster1) (Widescreen) (Disc 2)" },
+      { hash = "39375c10b2daefe40896de2af5054681", label = "Resident Evil - Code - Veronica X (Japan) (Es) (Clone GDEMU Fix) (Pitito) (Widescreen) (Disc 2)" },
+      { hash = "4f692826f0907696517e7baadbc015ad", label = "Biohazard - Code - Veronica Kanzenban (Japan) (Jp) (Widescreen) (Disc 2)" },
+      { hash = "62a1e2f97fe414ed5e8f1cc4aa5e0918", label = "Resident Evil - Code - Veronica X (Japan) (Fr) (Final) (Fafadou) (Disc 1)" },
+      { hash = "6f8127cf7adf8eefbca9e7965b10d57f", label = "Resident Evil - Code - Veronica X (Japan) (En) (Final) (truemaster1) (Widescreen) (Disc 1)" },
+      { hash = "70eac7a42fa92431f4310705bcdb1d07", label = "Biohazard - Code - Veronica Kanzenban (Japan) (Jp) (Disc 1)" },
+      { hash = "74c5b43005b2986ced3d6dc0b5c14794", label = "Resident Evil - Code - Veronica X (Japan) (Es) (Final) (Pitito) (Widescreen) (Disc 2)" },
+      { hash = "7e6cf01c246aff37b9dea8cdbf37636e", label = "Resident Evil - Code - Veronica X (Japan) (Es) (Clone GDEMU Fix) (Pitito) (Disc 1)" },
+      { hash = "80076159f28a062edf928d53b07eb2e7", label = "Resident Evil - Code - Veronica X (Japan) (En) (Clone GDEMU Fix) (truemaster1) (Widescreen) (Disc 1)" },
+      { hash = "96309a2142797e9e31a84da0775b1051", label = "Resident Evil - Code - Veronica X (Japan) (En) (Clone GDEMU Fix) (truemaster1) (Widescreen) (Disc 2)" },
+      { hash = "9d9af10c3e852e5666456875768e03e7", label = "Resident Evil - Code - Veronica X (Japan) (Es) (Final) (Pitito) (Disc 1)" },
+      { hash = "aca03c0c4395236f3a3acea96ad12a95", label = "Resident Evil - Code - Veronica X (Japan) (En) (Clone GDEMU Fix) (truemaster1) (Disc 1)" },
+      { hash = "b2dca7bf3dddba49ef036e98366b4fa8", label = "Resident Evil - Code - Veronica X (Japan) (Es) (Clone GDEMU Fix) (Pitito) (Widescreen) (Disc 1)" },
+      { hash = "b35b683749ea211bcd47de5e785f1aba", label = "Resident Evil - Code - Veronica X (Japan) (En) (Final) (truemaster1) (Disc 1)" },
+      { hash = "b602d175560777f55db64aeb442bd63d", label = "Resident Evil - Code - Veronica X (Japan) (Es) (Final) (Pitito) (Widescreen) (Disc 1)" },
+      { hash = "b643657cc1013e82d67fac80e77d783f", label = "Resident Evil - Code - Veronica X (Japan) (Es) (Clone GDEMU Fix) (Pitito) (Disc 2)" },
+      { hash = "bf21c8caec2037ee405b3cb94705204a", label = "Resident Evil - Code - Veronica X (Japan) (En) (Final) (truemaster1) (Disc 2)" },
+      { hash = "c6db2dc40552d6dc19feb59a4dbffbad", label = "Resident Evil - Code - Veronica X (Japan) (Es) (Final) (Pitito) (Disc 2)" },
+      { hash = "dd42a2c178f4065d9dee8ed4923b4543", label = "Resident Evil - Code - Veronica X (Japan) (Fr) (Final) (Fafadou) (Widescreen) (Disc 2)" },
+    }
+  },
+
+  events = {
+  },
+}

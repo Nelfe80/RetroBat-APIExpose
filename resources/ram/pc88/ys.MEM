@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Ys",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ys",
+    file = "ys.zip",
+    hashes = {
+      { hash = "734fe755f206208b2de2fdf9a4c60ca4", label = "Ys [Set 1] (Disk A).d88" },
+      { hash = "8be6d4d610808cc192b53103f72a40f5", label = "Ys [Set 1] (Disk B).d88" },
+      { hash = "b838e8767516ffaa5b469bb9e319f5a5", label = "Ys (Disk A).d88" },
+      { hash = "5ba646701048b2c0aaca6f6b077aa84e", label = "Ys (En) (v1.0) (Fishbone, Rednaxela) (Disk A).d88" },
+      { hash = "68882481623e84b8bb80aba60bccad4f", label = "Ys (En) (v1.0) (Fishbone, Rednaxela) (Disk B).d88" },
+      { hash = "f73ecb4451453a45adb14f99c82decf3", label = "Ys (Disk B).d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4B10, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Area ID (title = 0xba, 0x40, 0x48) unreliable, sinden=minea" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4B08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (0x01 ~ 0x1d)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2D64, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alive: 0x00 / Dead: 0xff" },
+      },
+      health = {
+        { address=0X46EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Disk B - Enemy health (actual) decreased" },
+        { address=0X46EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Disk B - Enemy health (actual) increased" },
+        { address=0X46EB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Disk B - Total enemy health decreased" },
+        { address=0X46EB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Disk B - Total enemy health increased" },
+        { address=0X48D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Disk A - Enemy health (actual) decreased" },
+        { address=0X48D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Disk A - Enemy health (actual) increased" },
+        { address=0X48D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Disk A - Enemy max health decreased" },
+        { address=0X48D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Disk A - Enemy max health increased" },
+        { address=0X48E2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Disk B - Enemy health (displayed) decreased" },
+        { address=0X48E2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Disk B - Enemy health (displayed) increased" },
+        { address=0X4AD5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Disk A - Enemy health (displayed) decreased" },
+        { address=0X4AD5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Disk A - Enemy health (displayed) increased" },
+        { address=0X4B00, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="current hp decreased" },
+        { address=0X4B00, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="current hp increased" },
+        { address=0X4B01, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max hp decreased" },
+        { address=0X4B01, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max hp increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X4B24, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure flag (bit 0 = ruby)" },
+      },
+      weapon = {
+        { address=0X4B16, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Owned weapons (bit 0 = short sword...)" },
+        { address=0X4B17, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4B04, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="GOLD (16-bit) increased" },
+        { address=0X4B1E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Owned rings increased" },
+        { address=0X4B1F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Equipped ring increased" },
+        { address=0X4B27, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Chests opened (bit 0 = takarabako no kagi, 1 = rouya no kagi, 2 = heal potion (haikou 2), 3 = ru" },
+        { address=0X4B29, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Chests opened (bit 0 = heal ring, 1 = necklace, 2 = silver shield, 3 = ys no hon (sinden), 4 = y" },
+        { address=0X4B2C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Chests opened (bit 0 = hammer, 1 = rod, 2 = evil ring, 3 = mirror, 4 = heal potion (darm 1), 5 =" },
+        { address=0X4B2D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Event flags (bit 0 = returned sapphire ring, 1 = rescued Feena, 2 = returned gin no suzu, 3 = re" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4B30, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bosses defeated (bit flags)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4B18, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Owned shields (bit 0 = small-shield...)" },
+        { address=0X4B19, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Equipped shield" },
+        { address=0X4B2B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Chests opened (bit 0 = ys no hon (darm 2), 1 = ys no hon (darm 1), 2 = silver sword, 3 = silver" },
+      },
+    },
+  },
+}

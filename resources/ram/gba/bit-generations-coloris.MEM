@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "bit Generations: Coloris",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "bit-generations-coloris",
+    file = "bit-generations-coloris.zip",
+    hashes = {
+      { hash = "facea584a4c4465bcb9e028c7b36a481", label = "bit Generations - Coloris (Japan) (En).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6474, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="demo/title" },
+        { address=0X6500, type="u8", condition="eq", value=0X80, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X131E8, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X131E8, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 9" },
+        { address=0X138AC, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X138AC, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10" },
+      },
+    },
+  },
+}

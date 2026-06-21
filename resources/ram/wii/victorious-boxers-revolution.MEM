@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Victorious Boxers: Revolution",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "victorious-boxers-revolution",
+    file = "victorious-boxers-revolution.zip",
+    hashes = {
+      { hash = "1007f7866e550bf4f8c1789fc250b534", label = "Victorious Boxers Challenge (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X34CA18, type="u32be", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X34CA2B, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X50C478, type="u32be", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4R" },
+        { address=0X50C478, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="6R" },
+        { address=0X50C478, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="8R" },
+        { address=0X50C478, type="u32be", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="10R" },
+        { address=0X50C478, type="u32be", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="12R" },
+        { address=0X50C478, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sparring Settings - Number of Rounds (32-bit BE)" },
+      },
+    },
+  },
+}

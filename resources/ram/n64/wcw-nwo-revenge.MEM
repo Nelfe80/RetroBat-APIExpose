@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "WCW/nWo Revenge",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "wcw-nwo-revenge",
+    file = "wcw-nwo-revenge.zip",
+    hashes = {
+      { hash = "c1384f3637d7a381b29341fed3ef3ceb", label = "WCW-nWo Revenge (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X603D0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="- 01 if paused" },
+        { address=0X7EF60, type="u8", condition="eq", value=0XD4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="TV Title" },
+        { address=0XEB2A8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="- When paused:" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X7EF60, type="u8", condition="eq", value=0XC0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Heavyweight" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEA238, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="- 1st wrestler Life Bonus points increased" },
+        { address=0XEA238, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="- 1st wrestler Life Bonus points decreased" },
+        { address=0XEA264, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="- 2nd wrestler Life Bonus points increased" },
+        { address=0XEA264, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="- 2nd wrestler Life Bonus points decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X7E010, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="- Weapon held:" },
+        { address=0X7E011, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="- Weapon held by which wrestler" },
+        { address=0X7E012, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="- 02 when a weapon held 04 when weapon gotten from back" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7F0A8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 1 of tournament" },
+        { address=0X7F0AC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 2 of tournament" },
+        { address=0X7F0B0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 3 of tournament" },
+        { address=0X7F0B4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 4 of tournament" },
+        { address=0X7F0B8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 5 of tournament" },
+        { address=0X7F0BC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 6 of tournament" },
+        { address=0X7F0C0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 7 of tournament" },
+        { address=0X7F0C4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 8 of tournament" },
+        { address=0X7F0C8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points from match 9 of tournament" },
+        { address=0XEA220, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Striking Move points" },
+        { address=0XEA224, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Grapple points" },
+        { address=0XEA228, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Reversal points" },
+        { address=0XEA22C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Ground Attack points" },
+        { address=0XEA230, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Flying Attack points" },
+        { address=0XEA234, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Special Move points" },
+        { address=0XEA23C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Time Limit points" },
+        { address=0XEA240, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Win Bonus points" },
+        { address=0XEA244, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler Finishing Move points" },
+        { address=0XEA248, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 1st wrestler total points at end of match" },
+        { address=0XEA24C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Striking Move points" },
+        { address=0XEA250, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Grapple points" },
+        { address=0XEA254, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Reversal points" },
+        { address=0XEA258, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Ground Attack points" },
+        { address=0XEA25C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Flying Attack points" },
+        { address=0XEA260, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Special Move points" },
+        { address=0XEA268, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Time Limit points" },
+        { address=0XEA26C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Win Bonus points" },
+        { address=0XEA270, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler Finishing Move points" },
+        { address=0XEA274, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 2nd wrestler total points at end of match" },
+        { address=0XEA2A0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- 3rd wrestler total points at end of match" },
+      },
+      collectibles = {
+        { address=0X7E864, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="- P1 times eliminated during battle royal increased" },
+        { address=0X7F0D2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="- Ring Out: increased" },
+        { address=0X7F0D2, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="- Ring Out: empty" },
+        { address=0XE8B18, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="- out of ring count increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7F0D3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Time Limit:" },
+        { address=0XF9B58, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="- Time, Seconds resets at 3b" },
+        { address=0XF9B5A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="- Time, Minutes" },
+      },
+    },
+  },
+}

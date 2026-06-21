@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Robotron 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "robotron-64",
+    file = "robotron-64.zip",
+    hashes = {
+      { hash = "c4a9bbf989ddfaf5f389e4adc6195dbc", label = "Robotron 64 (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9B1AC, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0XA464C, type="u8", condition="eq", value=0X38, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In gameplay (stays consistent during bonus rounds, deaths, level transitions, etc.)" },
+        { address=0XA464C, type="u8", condition="eq", value=0X40, action="GAME_OVER", no_log=false, no_survey=false, desc="Easy ending" },
+        { address=0XA464C, type="u8", condition="eq", value=0XF8, action="GAME_OVER", no_log=false, no_survey=false, desc="Normal/Insane ending (also briefly during the intro animation when the guy walks up to the arcad" },
+        { address=0XB7106, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Level transition/demo mode flags" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAD160, type="u8", condition="eq", value=0X13, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 1" },
+        { address=0XAD160, type="u8", condition="eq", value=0X28, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 2" },
+        { address=0XAD160, type="u8", condition="eq", value=0X3D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 3" },
+        { address=0XAD160, type="u8", condition="eq", value=0X52, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 4" },
+        { address=0XAD160, type="u8", condition="eq", value=0X7C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 5" },
+        { address=0XAD160, type="u8", condition="eq", value=0X91, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 6" },
+        { address=0XAD160, type="u8", condition="eq", value=0XA6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 7" },
+        { address=0XAD160, type="u8", condition="eq", value=0XBB, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 8" },
+        { address=0XAD508, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 1 Level" },
+        { address=0XAD6C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 2 Level" },
+        { address=0XAD880, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 3 Level" },
+        { address=0XADA3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 4 Level" },
+        { address=0XADBF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 5 Level" },
+        { address=0XADDB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 6 Level" },
+        { address=0XADF70, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 7 Level" },
+        { address=0XAE12C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 8 Level" },
+        { address=0XAE350, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round kill count for 2nd enemy type on results screen" },
+        { address=0XAE352, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round kill count for 1st enemy type on results screen" },
+        { address=0XAE360, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round kill count for 3rd enemy type on results screen" },
+        { address=0XAE366, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round kill count for 4th enemy type on results screen" },
+        { address=0XAE4F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round tally of current enemy type killed on results screen" },
+      },
+      stage = {
+        { address=0X9E574, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit0: Level Select code activated" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9B1AC, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="0 Lives Left" },
+        { address=0X9B1AC, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Life Left" },
+        { address=0X9B1AC, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives Left (value the game starts at unless passwords are used)" },
+        { address=0X9B1AC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives increased" },
+        { address=0X9B1AC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives decreased" },
+        { address=0X9B20C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Speed (from the speedy shoes powerup, resets to 0x00 when the player dies)" },
+        { address=0X9BF60, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives increased" },
+        { address=0X9BF60, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9B1A8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score" },
+        { address=0X9BF5C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Score" },
+        { address=0XAD184, type="u32be", condition="eq", value=0X00, action="SCORE_STATE", no_log=false, no_survey=false, desc="starting value each wave" },
+        { address=0XAD184, type="u32be", condition="eq", value=0X3E8, action="SCORE_STATE", no_log=false, no_survey=false, desc="1000 points (1 human rescued)" },
+        { address=0XAD184, type="u32be", condition="eq", value=0X7D0, action="SCORE_STATE", no_log=false, no_survey=false, desc="2000 points (2 humans rescued)" },
+        { address=0XAD184, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Amount of points the last rescued human gave" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAD160, type="u8", condition="eq", value=0X68, action="BOSS_HIT", no_log=false, no_survey=false, desc="Wave 100/Yellow Guardian (Easy final boss)" },
+        { address=0XAD160, type="u8", condition="eq", value=0XD1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Wave 200/Blue Guardian (Normal/Insane final boss)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBAE8C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Number of times any cheat code was activated in a single level" },
+      },
+    },
+  },
+}

@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Pokémon FireRed Version | Pokémon LeafGreen Version [Subset - Shiny Pokémon+]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "pokemon-firered-version-pokemon-leafgreen-version-subset-shiny-pokemon",
+    file = "pokemon-firered-version-pokemon-leafgreen-version-subset-shiny-pokemon.zip",
+    hashes = {
+      { hash = "0f75499bd326e95b40d4880955157660", label = "Pokemon - FireRed Version [Shinies & Stuff].gba" },
+      { hash = "b3b8da81bbf9fe06ba40bf15c3beaffd", label = "Pokemon - LeafGreen Version [Shinies & Stuff].gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0F9C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x01=Pause Player Movement" },
+        { address=0X2088, type="u8", condition="eq", value=0X1F1EEDE4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="FireRed" },
+        { address=0X20D8, type="u8", condition="eq", value=0X15430A20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Cry" },
+        { address=0X5098, type="u16le", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2B3F2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Pokemon Level" },
+      },
+    },
+  },
+}

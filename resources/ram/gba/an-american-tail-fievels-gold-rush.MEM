@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "An American Tail: Fievel's Gold Rush",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "an-american-tail-fievels-gold-rush",
+    file = "an-american-tail-fievels-gold-rush.zip",
+    hashes = {
+      { hash = "0051c7b9d4a3908afea19da18813fcbc", label = "American Tail, An - Fievel's Gold Rush (USA) (En,Es).gba" },
+      { hash = "2d434f2b0392f91f7715841a122621c1", label = "American Tail, An - Fievel's Gold Rush (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3A0C, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="In Game" },
+        { address=0X3A0C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X3A14, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="00 - Transition into level" },
+        { address=0X3A50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Number of Hat Attacks in Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3A98, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X3A98, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3A74, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Score. Multiply by 100" },
+      },
+      collectibles = {
+        { address=0X3A10, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Gold Bars Collected increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X13476, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="invincibility counter" },
+      },
+      player = {
+        { address=0X3A7C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[8bit] Number of Jump Attacks Bonus" },
+      },
+    },
+  },
+}

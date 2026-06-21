@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Zork II: The Wizard of Frobozz",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "zork-ii-the-wizard-of-frobozz",
+    file = "zork-ii-the-wizard-of-frobozz.zip",
+    hashes = {
+      { hash = "fd40f31ccfd801186a02160b9fa51f05", label = "Zork II r48 (4am crack)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X35E8, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="On player" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X50E6, type="u8", condition="eq", value=0X15, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Room of Red Mist (dead)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X50E7, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Score" },
+      },
+      collectibles = {
+        { address=0X31E6, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="On player" },
+        { address=0X31E6, type="u8", condition="eq", value=0XDF, action="MONEY_STATE", no_log=false, no_survey=false, desc="Not obtained yet" },
+        { address=0X332A, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="On player" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X35A6, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Closed" },
+        { address=0X35A6, type="u8", condition="eq", value=0X12, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Open" },
+      },
+    },
+  },
+}

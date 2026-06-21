@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Medarot 4: Kabuto Version",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "medarot-4-kabuto-version",
+    file = "medarot-4-kabuto-version.zip",
+    hashes = {
+      { hash = "c5effc311c2248d6de58b487e729406b", label = "Medarot 4 - Kabuto Version (Japan).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

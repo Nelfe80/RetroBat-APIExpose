@@ -1,0 +1,105 @@
+return {
+  game = {
+    title = "Wolverine: Adamantium Rage",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Action, Beat 'em Up"
+  },
+
+  rom = {
+    name = "wolverine-adamantium-rage",
+    file = "wolverine-adamantium-rage.zip",
+    hashes = {
+      { hash = "8d2cfb56c792e03df5b423e73b86fec0", label = "Wolverine - Adamantium Rage (USA).sfc" },
+      { hash = "b34d1223d4756aa1074069dd807a237f", label = "Wolverine - Adamantium Rage (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0126, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause - 01?" },
+        { address=0X01FA, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause - 09?" },
+        { address=0X085C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Level Selected from Title screen" },
+        { address=0X0E02, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Number" },
+        { address=0X0E0A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo - 01" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0463, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0464, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0465, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0466, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0467, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0468, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0469, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X046A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X046B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X046C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X046D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X046E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X046F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0470, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0471, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0472, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0473, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+        { address=0X0474, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground 2 - Bug" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1027, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1027, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X109A, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Cyber Barrell Damage (Right)" },
+        { address=0X137C, type="u8", condition="eq", value=0X12, action="HIT", no_log=false, no_survey=false, desc="Max Damage" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0423, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 3 - Gun" },
+        { address=0X0424, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Guard" },
+        { address=0X0425, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 3 - Guard" },
+        { address=0X0426, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun" },
+        { address=0X0427, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun" },
+        { address=0X0428, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun" },
+        { address=0X0429, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Guard" },
+        { address=0X042A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun" },
+        { address=0X042B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun" },
+        { address=0X042C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Guard" },
+        { address=0X042D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun" },
+        { address=0X042E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun" },
+        { address=0X042F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Guard" },
+        { address=0X0430, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 3 - Gun Generator" },
+        { address=0X0431, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 3 - Gun Generator" },
+        { address=0X0432, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 3 - Gun Generator" },
+        { address=0X0433, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Guard" },
+        { address=0X0434, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 3 - Gun Generator" },
+        { address=0X0435, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X0436, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X0437, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X0438, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X0439, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X043A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X043B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X043C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X043D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Gun Generator" },
+        { address=0X043E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X 2 Lab - Guard" },
+        { address=0X0442, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Guard" },
+        { address=0X0443, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X Lab 2 - Guard" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0122, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health (Displayed)" },
+        { address=0X135B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health 2" },
+        { address=0X13AD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X00B8, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+      },
+    },
+  },
+}

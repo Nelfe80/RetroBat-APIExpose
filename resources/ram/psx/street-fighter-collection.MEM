@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Street Fighter Collection",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "street-fighter-collection",
+    file = "street-fighter-collection.zip",
+    hashes = {
+      { hash = "90d5727db99e2fc47a61dba24149ee99", label = "Street Fighter Collection (USA) (Disc 1)" },
+      { hash = "84d853c37537bd8c50f8769e150f0068", label = "Street Fighter Collection (USA) (Disc 2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X178A86, type="u8", condition="eq", value=0X0C, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X178ACA, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[TNC] P1 - Number of Arcade Continues (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1D3A82, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Disc 2] Settings - Rounds (8-bit)" },
+      },
+      stage = {
+        { address=0X178A86, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[TNC] Arcade Ladder Stage (8-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1750E8, type="u16le", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0X1750E8, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[TNC] P1 Health (16-bit)" },
+        { address=0X1750EA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[TNC] P1 Max Health (16-bit) decreased" },
+        { address=0X1750EA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[TNC] P1 Max Health (16-bit) increased" },
+        { address=0X175454, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[TNC] P2 Health (16-bit) decreased" },
+        { address=0X175454, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[TNC] P2 Health (16-bit) increased" },
+        { address=0X175456, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[TNC] P2 Max Health (16-bit) decreased" },
+        { address=0X175456, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[TNC] P2 Max Health (16-bit) increased" },
+        { address=0X1D3A83, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[Disc 2] Settings - Damage (8-bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X178A86, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X152F6B, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="On" },
+        { address=0X152F6B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Disc 1] Time Limit (8-bit)" },
+        { address=0X1C1195, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Timer [Seconds] (8-bit)" },
+        { address=0X1D3A81, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Disc 2] Settings - Time Limit(8-bit)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Lumines",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lumines",
+    file = "lumines.zip",
+    hashes = {
+      { hash = "28068885ebb93f8873d999fed21ce278", label = "Lumines - Puzzle Fusion (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8ABEB0, type="u32le", condition="eq", value=0X2B, action="DEMO_MODE", no_log=false, no_survey=false, desc="'Demon King'," },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X8ABEB0, type="u32le", condition="eq", value=0X30, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="'Starman'" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8ABEB0, type="u32le", condition="eq", value=0X17, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="'Delete Over 20 Blocks'," },
+        { address=0X8ABEB0, type="u32le", condition="eq", value=0X31, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="'Delete Over 20 Blocks x2'," },
+      },
+    },
+  },
+}

@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "Forbidden Siren",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "forbidden-siren",
+    file = "forbidden-siren.zip",
+    hashes = {
+      { hash = "c22486cab3656f3ef652f0a4f9c81920", label = "Siren (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A97CB0, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Cutscene Tutorial / Title Flag" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1A97B40, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Custom Note] addresses below related to the 100 game files and right next to it is something re" },
+        { address=0X1A97C60, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Unbeaten" },
+        { address=0X1A97C60, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mission 1 Beaten" },
+        { address=0X1A97C60, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mission 1 and 2 Beaten" },
+        { address=0X1A97C60, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Yesterday - 23:00 - Mission Stage" },
+        { address=0X1A97C80, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Yesterday - 09:00 - Movie Stage - (1)" },
+        { address=0X1A97C81, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Day 1 - 00:00 - Movie Stage - (1)" },
+        { address=0X1A97C82, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Day 1 - 07:00 - Movie Stage - (1)" },
+        { address=0X1A97C83, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Day 1 - 18:00 - Movie Stage - (1)" },
+        { address=0X1A97C84, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Day 2 - 09:00 - Movie Stage (1)" },
+        { address=0X1A97C85, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Day 3 - 02:00 - Movie Stage (1)" },
+        { address=0X1A97C86, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Day 3 - 09:00 - Movie Stage (1)" },
+        { address=0X1A97C87, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Day 3 - 18:00 - Movie Stage (1)" },
+        { address=0X1A97C88, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - Day 3 - 20:00 - Movie Stage (1)" },
+        { address=0X1A97C89, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - X Days Later - 00:00 - Movie Stage (1)" },
+        { address=0X1A97C8A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kyoya Suda - X Days Later - 04:00 - Movie Stage (1)" },
+        { address=0X1A97C8B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Tamon Takeuchi - 1976 - Movie Stage (1)" },
+        { address=0X1A97C8C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Tamon Takeuchi - 1976 - Movie Stage (1)" },
+        { address=0X1A97C8D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Tamon Takeuchi - Day 3 - 18:00 - Movie Stage (1)" },
+        { address=0X1A97C8E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Tamon Takeuchi - Day 3 - 23:00 - Movie Stage (1)" },
+        { address=0X1A97C8F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kei Makino - X Days Ago - Movie Stage (1)" },
+        { address=0X1A97C90, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kei Makino - Day 2 - 04:00 - Movie Stage (1)" },
+        { address=0X1A97C91, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kei Makino - Day 2 - 06:00 - Movie Stage (1)" },
+        { address=0X1A97C92, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kei Makino - Day 3 - 07:00 - Movie Stage (1)" },
+        { address=0X1A97C93, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kei Makino - Day 3 - 18:00 - Movie Stage (1)" },
+        { address=0X1A97C94, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Kei Makino - Day 3 - 18:00 - Movie Stage (1)" },
+        { address=0X1A97C95, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Shiro Miyata - Day 1 - 19:00 - Movie Stage (1)" },
+        { address=0X1A97C96, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Shiro Miyata - Day 1 - 23:00 - Movie Stage (1)" },
+        { address=0X1A97C97, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Shiro Miyata - Day 2 - 16:00 - Movie Stage (1)" },
+        { address=0X1A97C98, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Risa Onda - Day 1 - 10:00 - Movie Stage (1)" },
+        { address=0X1A97C99, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Harumi Yomoda - X Days Later - 00:00 - Movie Stage (1)" },
+        { address=0X1A97C9A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Akira Shimura - Day 2 - 00:00 - Movie Stage (1)" },
+        { address=0X1A97C9B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Tomoko Maeda - Day 1 - 21:00 - Movie Stage (1)" },
+        { address=0X1A97C9C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Tomoko Maeda - Day 2 - 06:00 - Movie Stage (1)" },
+        { address=0X1A97C9D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Naoko Mihama - Day 1 - 11:00 - Movie Stage (1)" },
+        { address=0X1A97C9E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Naoko Mihama - Day 2 - 03:00 - Movie Stage (1)" },
+        { address=0X1A97C9F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Miyako Kajiro - Day 1 - 07:00 - Movie Stage (1)" },
+        { address=0X1A97CA0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Miyako Kajiro - Day 2 - 00:00 - Movie Stage (1)" },
+        { address=0X1A97CA1, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Miyako Kajiro - Day 2 - 16:00 - Movie Stage (1)" },
+        { address=0X1A97CA2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Ayako Kajiro - Day 1 - 23:00 - Movie Stage (1)" },
+        { address=0X1A97CA3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Yoriko Anno - Day 1 - 17:00 - Movie Stage (1)" },
+        { address=0X1A97CA4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Yoriko Anno - Day 2 - 11:00 - Movie Stage (1)" },
+        { address=0X1A97CA5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Yoriko Anno - Day 3 - 18:00 - Movie Stage (1)" },
+        { address=0X1A97CA6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Hisako Yao - Day 1 - 17:00 - Movie Stage (1)" },
+        { address=0X1A97CA7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Hisako Yao - Day 2 - 06:00 - Movie Stage (1)" },
+        { address=0X1A97CA8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Hisako Yao - Day 2 - 10:00 - Movie Stage (1)" },
+        { address=0X1A97CA9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Hisako Yao - Day 2 - 19:00 - Movie Stage (1)" },
+        { address=0X1A97CAA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Hisako Yao - Day 3 - 00:00 - Movie Stage (1)" },
+        { address=0X1A97CAB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Hisako Yao - Day 3 - 23:00 - Movie Stage (1)" },
+        { address=0X1A97CAC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Mina Onda - Day 2 - 00:00 - Movie Stage (1)" },
+        { address=0X1A97CAD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Datatsushi - 684 A.D. - Movie Stage (1)" },
+        { address=0X1A97DD4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage - In Game" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0000, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[Custom Note] Everything related to the game's events or characters is in a linked list structur" },
+        { address=0X1A97BAE, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="No. 079 - Signpost Containing Map of Arato" },
+        { address=0X1A97BF6, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Event Flag - Broken Ground with the Girl - Kyoya Suda - Day 2 - 01:00" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1A97E12, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(16 bit) change screen color to red [act as a timer]" },
+      },
+    },
+  },
+}

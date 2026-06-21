@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Mario & Luigi: Partners in Time [Subset - Perfect Dodges]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "mario-luigi-partners-in-time-subset-perfect-dodges",
+    file = "mario-luigi-partners-in-time-subset-perfect-dodges.zip",
+    hashes = {
+      { hash = "4342d1a56045a83f471eb2f1d60dfc2f", label = "Mario & Luigi - Partners in Time [Subset - Perfect Dodges]" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XD2040, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X33F6CC, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Overworld" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD1E06, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mario HP decreased" },
+        { address=0XD1E06, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mario HP increased" },
+        { address=0XD1E9A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Luigi HP decreased" },
+        { address=0XD1E9A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Luigi HP increased" },
+        { address=0XD1F2E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Baby Mario HP decreased" },
+        { address=0XD1F2E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Baby Mario HP increased" },
+        { address=0XD1FC2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Baby Luigi HP decreased" },
+        { address=0XD1FC2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Baby Luigi HP increased" },
+        { address=0XD2066, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 current HP decreased" },
+        { address=0XD2066, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 current HP increased" },
+        { address=0XD2304, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 Max HP decreased" },
+        { address=0XD2304, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 Max HP increased" },
+        { address=0XD2306, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 current HP decreased" },
+        { address=0XD2306, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 current HP increased" },
+        { address=0XD25A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 Max HP decreased" },
+        { address=0XD25A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 Max HP increased" },
+        { address=0XD25A6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 current HP decreased" },
+        { address=0XD25A6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 current HP increased" },
+        { address=0XD2844, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 Max HP decreased" },
+        { address=0XD2844, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 Max HP increased" },
+        { address=0XD2846, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 current HP decreased" },
+        { address=0XD2846, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 current HP increased" },
+        { address=0XD2AE4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 Max HP decreased" },
+        { address=0XD2AE4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 Max HP increased" },
+        { address=0XD2AE6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 HP decreased" },
+        { address=0XD2AE6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 HP increased" },
+        { address=0XD2D86, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 HP decreased" },
+        { address=0XD2D86, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X33C434, type="u24le", condition="eq", value=0X1E, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Badge" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X33C434, type="u24le", condition="eq", value=0X06, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Badge" },
+        { address=0X33C434, type="u24le", condition="eq", value=0X17, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Badge A" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X33C433, type="u16le", condition="eq", value=0X0A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Trousers" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X33C434, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mario - Badge Equipped" },
+      },
+    },
+  },
+}

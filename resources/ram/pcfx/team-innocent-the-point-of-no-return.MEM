@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Team Innocent: The Point of No Return",
+    system = "pcfx",
+    system_name = "PC-FX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "team-innocent-the-point-of-no-return",
+    file = "team-innocent-the-point-of-no-return.zip",
+    hashes = {
+      { hash = "3827b255e716ef0670378fb6e0b47fb1", label = "Team Innocent - The Point of No Return - G.C.P.O.SS (Japan)" },
+      { hash = "02ebdbd5b1a2193143b45296ea15fbb8", label = "Team Innocent - The Point of No Return - G.C.P.O.SS (Japan) (En) (v0.9.1) (Derek Pascarella)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X16A8, type="u16le", condition="eq", value=0X0000013A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8124, type="u32le", condition="eq", value=0X6978, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Minimum to clear the mission" },
+        { address=0X8124, type="u32le", condition="eq", value=0XAFC8, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Perfect clear" },
+        { address=0X8124, type="u32le", condition="eq", value=0XBB80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Minimum to clear the mission" },
+        { address=0X8124, type="u32le", condition="eq", value=0X11170, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Perfect clear" },
+        { address=0X8124, type="u32le", condition="eq", value=0X128E0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Minimum to clear the mission" },
+        { address=0X8124, type="u32le", condition="eq", value=0X186A0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Perfect clear" },
+        { address=0X8129, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission clear screen" },
+        { address=0X81C9, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nuclear missiles found" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X81A5, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Opened the airlock and died (section 0x45)" },
+        { address=0X81A5, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Died from decompression (section 0x44)" },
+        { address=0X81A6, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Died from Auto-Igniter fire" },
+        { address=0X81A6, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Died from Heeps in Storeroom 04" },
+        { address=0X81AC, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Heep in Sub Observatory is dead (section 0x42)" },
+        { address=0X81AC, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Heep in Sub Control Room is dead (section 0x4f)" },
+        { address=0X81AE, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Trigger Heep death in Storeroom 04 game over (section 0x4b, room 0x0b)" },
+        { address=0X81C9, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ariel dies by Time Bomb" },
+        { address=0X81CD, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Zombie in Bridge dead (section 0x66)" },
+        { address=0X81CE, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Zombie in Con. 2 Control dead (section (0x66)" },
+        { address=0X81CE, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Zombie in No.1 Container (Bit3) dead (section 0x67)" },
+        { address=0X81CE, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Zombie in No.1 Container (Bit5) dead (section 0x67)" },
+        { address=0X81CF, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Zombie in No.2 Container dead (section 0x69)" },
+      },
+      health = {
+        { address=0X81A4, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained Health Drink in Gold's Bedroom (section 0x49)" },
+        { address=0X81A4, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Interacted with Health Drink in Kitchen (section 0x4a)" },
+        { address=0X81A4, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained Health Drink in Shower Room (section 0x4d)" },
+        { address=0X81C3, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained Health Drink in Radar Control Room (section 0x64)" },
+        { address=0X81C3, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained Health Drink in No.2 Container (section 0x69)" },
+        { address=0X81C4, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained Health Drink in No.2 Container (section 0x69)" },
+        { address=0X81C4, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained Health Drink in Sick Bay (section 0x6c)" },
+        { address=0X81E3, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained Health Drink from bar in Cafeteria (section 0x95)" },
+        { address=0X81E3, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained Health Drink from Ariel's Room (section 0x8f)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8124, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission score" },
+      },
+      collectibles = {
+        { address=0X24D4, type="u16le", condition="eq", value=0X49, action="MONEY_STATE", no_log=false, no_survey=false, desc="3F - Gold's Bedroom, Gold's Private Room, Gold's Study, Storeroom 03" },
+        { address=0X819E, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="3F - Gold's Study visited" },
+        { address=0X819E, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="3F - Gold's Private Room visited" },
+        { address=0X819E, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="3F - Gold's Room visited" },
+        { address=0X81A2, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Obtained Gold's Note (section 0x49)" },
+        { address=0X81A8, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Discover Gold's corpse (section 0x4b)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X81C6, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="Ariel arrives in Air Duct skit (section 0x67)" },
+        { address=0X81C8, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Jump over beams in Passage 04 skit (section 0x76)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X81A5, type="u8", condition="bit_true", bit=7, mask=0X80, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Meet Rabbit outside of ITS door (section 0x47)" },
+        { address=0X81A8, type="u8", condition="bit_true", bit=6, mask=0X40, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Failed to enter ITS door because of no card skit (section 0x47)" },
+        { address=0X81AC, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door between Deck Control Room and Terrace is unlocked (section 0x4f)" },
+        { address=0X81C6, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Ariel opened bridge door skit (section 0x64)" },
+        { address=0X81C7, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Ariel talks to Saki through Bridge door skit (section 0x65)" },
+        { address=0X81C9, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Air Vent destroyed by cutting" },
+        { address=0X81C9, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Air Vent destroyed by Time Bomb" },
+        { address=0X81CA, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Missiles destroy home base game over (various)" },
+        { address=0X81CD, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Catcher in Hall 01 destroyed (section 0x65)" },
+        { address=0X81CD, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Catcher in Hall 02 destroyed (section 0x6f)" },
+        { address=0X81CD, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Turret in Passage 03 destroyed (section 0x65)" },
+        { address=0X81E6, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed Flying Robot in Director's Room (section 0x87)" },
+        { address=0X81E7, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Saki destroys human samples skit (section 0x8b)" },
+        { address=0X81E9, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Golem with Aural Gun skit (section 0xa0)" },
+        { address=0X81ED, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed plant monster (section 0x8c)" },
+      },
+    },
+  },
+}

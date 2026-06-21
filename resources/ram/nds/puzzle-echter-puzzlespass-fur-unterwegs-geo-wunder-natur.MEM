@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Puzzle - Echter Puzzlespass für Unterwegs: GEO - Wunder Natur",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-echter-puzzlespass-fur-unterwegs-geo-wunder-natur",
+    file = "puzzle-echter-puzzlespass-fur-unterwegs-geo-wunder-natur.zip",
+    hashes = {
+      { hash = "02c9f9c47581edadc5d374caf6f11d8b", label = "GEO Puzzle - Wunder Natur - Echter Puzzlespass fuer Unterwegs (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "d957d7734e4bbb0f92cde4cb58f72cb6", label = "GEO Puzzle - Wunder Natur - Echter Puzzlespass fuer Unterwegs (Europe) (Puzzle 21 Fix).nds" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X49854, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mode - Time Mode [32bit]" },
+      },
+    },
+  },
+}

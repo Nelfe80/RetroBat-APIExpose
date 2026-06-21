@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Alien Trilogy",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "alien-trilogy",
+    file = "alien-trilogy.zip",
+    hashes = {
+      { hash = "fde0ddbe2c6840f86cfbf58862b955ba", label = "Alien Trilogy (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6CA38, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Address???" },
+        { address=0X9A053, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Indicates the demo?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6C3C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Indicates what level you're on (cheat menu)" },
+        { address=0X8D378, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Indicates what level you're on" },
+        { address=0X1FFFA2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reads as cc whenever the player is prompted to press X to begin the level." },
+        { address=0X1FFFC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alternate Level Address, used for checking for results screen." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9A086, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Controls the number of Company Soldiers Killed" },
+      },
+      health = {
+        { address=0X9A040, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X9A040, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X9A041, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Indicates Health Overcharge decreased" },
+        { address=0X9A041, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Indicates Health Overcharge increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X8D1A8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Indicates what weapon you have equipped" },
+        { address=0X9A036, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Indicates what weapon you're holding" },
+        { address=0X9A03C, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="?" },
+        { address=0X9A03C, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="?" },
+        { address=0X9A03C, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol (Default)" },
+        { address=0X9A03C, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X9A03C, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pulse Rifle" },
+        { address=0X9A03C, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flamethrower" },
+        { address=0X9A03C, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Smartgun" },
+        { address=0X9A03C, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Auto Mapper" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8CD74, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Becomes active during Demo Mode, goes inactive displaying 00 during gameplay increased" },
+        { address=0X9A046, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count for Pistol" },
+        { address=0X9A04A, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count for Shotgun" },
+        { address=0X9A04C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count for Pulse Rifle" },
+        { address=0X9A052, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count for Flamethrower" },
+        { address=0X9A054, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count for Smartgun" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1FFFB4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Completion percentage for objectives completed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X72C6C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Seems to control weapon/item pickups" },
+        { address=0X72C6D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Seems to control weapon/item pickups" },
+        { address=0X72C6E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Seems to control weapon/item pickups" },
+      },
+    },
+  },
+}

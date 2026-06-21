@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Jetpack Joyride",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "jetpack-joyride",
+    file = "jetpack-joyride.zip",
+    hashes = {
+      { hash = "9ecd62e81ac92b131b658a5127d3373c", label = "Jetpack Joyride + 150K Coins (USA) (v2.00) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XE0CA44, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="My Profile - Gadgets - Special Gadget Combos found (32bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA3D85C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Level - Stars" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB4A8B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore (32bit)" },
+        { address=0XB4A8C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Last Run - Endscore (32bit)" },
+        { address=0XE0C784, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="My Profile - Personal Bests - Best Score (32bit)" },
+      },
+      collectibles = {
+        { address=0XB4A8D0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Run - Coins collected (32bit) increased" },
+        { address=0XE0C7C4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="My Profile - Personal Bests - Most Coins collected (32bit) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XE0CAC4, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="My Profile - Gadgets - Tumbleweeds destroyed (32bit)" },
+      },
+    },
+  },
+}

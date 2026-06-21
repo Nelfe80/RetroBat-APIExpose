@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Anticipation",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "anticipation",
+    file = "anticipation.zip",
+    hashes = {
+      { hash = "a51090f9622c4665b82937201c90d261", label = "Anticipation (Europe).nes" },
+      { hash = "b6d2c6c3196dca33a689df4f02c9832e", label = "Anticipation (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00BC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X007F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="die face" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0573, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="player 1 score (x100)" },
+        { address=0X0577, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="player 1 score (x10)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X007A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Die countdown timer" },
+      },
+    },
+  },
+}

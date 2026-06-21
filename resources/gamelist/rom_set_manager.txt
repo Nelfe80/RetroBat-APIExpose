@@ -1,0 +1,259 @@
+Rom Set Manager = moteur de masquage, regroupement et résolution d’affichage
+
+Il faut penser le menu comme une cascade d’options, avec peu de choix au premier niveau, puis des sous-menus spécialisés.
+
+APIEXPOSE
+└── ROM SET MANAGER
+    ├── GENERAL
+    ├── GROUPING
+    ├── REGION & LANGUAGE
+    ├── VERSION PRIORITY
+    ├── SPECIAL VERSIONS
+    ├── ARCADE
+    ├── OUTPUT
+    └── DEBUG
+Structure recommandée des sous-menus
+GENERAL
+- ROM SET MANAGER ENABLED        switch
+- MODE                           select: off / display_only / hide_variants / grouped_view
+- APPLY TO CURRENT SYSTEM ONLY   switch
+- KEEP ALTERNATIVES ACCESSIBLE   switch
+
+Ici, MODE est le plus important :
+
+off
+→ aucun traitement
+
+display_only
+→ analyse et rapport, mais aucun masquage
+
+hide_variants
+→ masque les variantes non retenues
+
+grouped_view
+→ affiche une entrée principale + alternatives accessibles
+
+Ensuite :
+
+GROUPING
+- GROUPING METHOD                select: filename / gamelist / dat / hybrid
+- NORMALIZE TITLES               switch
+- IGNORE ARTICLES                switch
+- IGNORE REGION TAGS             switch
+- USE CLONE LIST                 switch
+
+Ce sous-menu sert à définir comment APIExpose reconnaît que deux ROMs sont le même jeu.
+
+REGION & LANGUAGE
+- REGION PROFILE                 select: france / europe / usa / japan / world / custom
+- LANGUAGE PROFILE               select: french / english / multilingual / custom
+- REGION BEFORE LANGUAGE         switch
+- ACCEPT MULTI REGION            switch
+- UNKNOWN REGION POLICY          select: keep / penalize / hide
+- UNKNOWN LANGUAGE POLICY        select: keep / penalize / hide
+
+Ici, la cascade importante est :
+
+REGION PROFILE = france
+→ France > Europe > World > USA > Japan
+
+LANGUAGE PROFILE = french
+→ fr > multi > en > unknown > others
+
+Puis :
+
+VERSION PRIORITY
+- PREFER LATEST REVISION         switch
+- PREFER RETAIL VERSION          switch
+- PREFER RETROACHIEVEMENTS       switch
+- PREFER WORLD VERSION           select: first / after_preferred / last
+- TIE BREAKER                    select: newest / shortest_name / alphabetical / smallest_file
+
+Ce sous-menu sert quand plusieurs ROMs sont équivalentes.
+
+SPECIAL VERSIONS
+- TRANSLATIONS                   select: hide / keep / prefer_if_language_match
+- HACKS                          select: hide / keep / prefer_never
+- PROTOTYPES                     select: hide / keep
+- BETAS                          select: hide / keep
+- DEMOS                          select: hide / keep
+- HOMEBREW                       select: hide / keep
+- AFTERMARKET                    select: hide / keep
+- PIRATE / UNLICENSED            select: hide / keep
+
+Je préfère ici des select plutôt que des simples switch, car translation n’est pas juste oui/non.
+
+Exemple :
+
+TRANSLATIONS = prefer_if_language_match
+
+veut dire :
+
+Si la ROM officielle est japonaise
+et qu’une traduction française existe
+alors la traduction FR peut devenir la ROM principale.
+
+Pour l’arcade :
+
+ARCADE
+- ARCADE HANDLING                select: disabled / parent_only / best_clone / parent_clone_group
+- PREFER PARENT                  switch
+- CLONE REGION PRIORITY          select: world / usa / europe / japan / custom
+- KEEP BOOTLEGS                  select: hide / keep
+- KEEP HACKS                     select: hide / keep
+- KEEP MECHANICAL                select: hide / keep
+- KEEP BIOS / DEVICE             select: hide / keep
+
+L’arcade doit être séparé, car MAME/FBNeo n’obéissent pas à la même logique que les consoles.
+
+OUTPUT
+- OUTPUT MODE                    select: gamelist_hidden / collection / api_filter / report_only
+- WRITE GAMELIST HIDDEN FLAGS    switch
+- CREATE CLEAN COLLECTION        switch
+- CREATE ALTERNATIVES COLLECTION switch
+- BACKUP BEFORE WRITE            switch
+
+Comme tu ne supprimes jamais les ROMs, les sorties possibles sont :
+
+gamelist_hidden
+→ ajoute hidden=true sur les variantes
+
+collection
+→ crée une collection propre 1 jeu visible par rom groupé
+
+api_filter
+→ APIExpose filtre l’affichage sans toucher aux fichiers
+
+report_only
+→ génère seulement un rapport
+
+Et enfin :
+
+DEBUG
+- GENERATE REPORT                switch
+- REPORT FORMAT                  select: json / txt / html
+- LOG DECISION SCORE             switch
+- LOG GROUP DETAILS              switch
+- DRY RUN                        switch
+Options réellement à mettre dans es_features.cfg
+
+Je ferais un premier set assez propre :
+
+<feature name="ROM SET MANAGER" value="global.apiexpose.romset.enabled" description="Enable APIExpose ROM Set Manager." preset="switch"/>
+
+<feature name="ROM SET MODE" value="global.apiexpose.romset.mode" description="Choose how ROM variants are handled.">
+  <choice name="OFF" value="off"/>
+  <choice name="DISPLAY ONLY" value="display_only"/>
+  <choice name="HIDE VARIANTS" value="hide_variants"/>
+  <choice name="GROUPED VIEW" value="grouped_view"/>
+</feature>
+
+<feature name="GROUPING METHOD" value="global.apiexpose.romset.grouping_method" description="Choose how variants are grouped.">
+  <choice name="FILENAME" value="filename"/>
+  <choice name="GAMELIST" value="gamelist"/>
+  <choice name="DAT" value="dat"/>
+  <choice name="HYBRID" value="hybrid"/>
+</feature>
+
+<feature name="REGION PROFILE" value="global.apiexpose.romset.region_profile" description="Preferred region order.">
+  <choice name="FRANCE" value="france"/>
+  <choice name="EUROPE" value="europe"/>
+  <choice name="USA" value="usa"/>
+  <choice name="JAPAN" value="japan"/>
+  <choice name="WORLD" value="world"/>
+  <choice name="CUSTOM" value="custom"/>
+</feature>
+
+<feature name="LANGUAGE PROFILE" value="global.apiexpose.romset.language_profile" description="Preferred language order.">
+  <choice name="FRENCH" value="french"/>
+  <choice name="ENGLISH" value="english"/>
+  <choice name="MULTILINGUAL" value="multilingual"/>
+  <choice name="CUSTOM" value="custom"/>
+</feature>
+
+<feature name="TRANSLATIONS" value="global.apiexpose.romset.translations" description="How fan translations are handled.">
+  <choice name="HIDE" value="hide"/>
+  <choice name="KEEP" value="keep"/>
+  <choice name="PREFER IF LANGUAGE MATCH" value="prefer_if_language_match"/>
+</feature>
+
+<feature name="SPECIAL VERSIONS" value="global.apiexpose.romset.special_versions" description="How beta, proto, demo and hack versions are handled.">
+  <choice name="HIDE MOST" value="hide_most"/>
+  <choice name="KEEP ALL" value="keep_all"/>
+  <choice name="KEEP TRANSLATIONS ONLY" value="keep_translations_only"/>
+</feature>
+
+<feature name="ARCADE HANDLING" value="global.apiexpose.romset.arcade_handling" description="How arcade parent and clone sets are handled.">
+  <choice name="DISABLED" value="disabled"/>
+  <choice name="PARENT ONLY" value="parent_only"/>
+  <choice name="BEST CLONE" value="best_clone"/>
+  <choice name="PARENT CLONE GROUP" value="parent_clone_group"/>
+</feature>
+
+<feature name="OUTPUT MODE" value="global.apiexpose.romset.output_mode" description="How APIExpose applies the result.">
+  <choice name="REPORT ONLY" value="report_only"/>
+  <choice name="GAMELIST HIDDEN" value="gamelist_hidden"/>
+  <choice name="COLLECTION" value="collection"/>
+  <choice name="API FILTER" value="api_filter"/>
+</feature>
+
+<feature name="ROM SET DEBUG REPORT" value="global.apiexpose.romset.debug_report" description="Generate a report explaining selected and hidden ROMs." preset="switch"/>
+Affichage dans les sous-menus
+<sharedFeature group="APIEXPOSE" submenu="ROM SET MANAGER" value="global.apiexpose.romset.enabled"/>
+<sharedFeature group="APIEXPOSE" submenu="ROM SET MANAGER" value="global.apiexpose.romset.mode"/>
+
+<sharedFeature group="APIEXPOSE" submenu="ROM SET - GROUPING" value="global.apiexpose.romset.grouping_method"/>
+
+<sharedFeature group="APIEXPOSE" submenu="ROM SET - REGION & LANGUAGE" value="global.apiexpose.romset.region_profile"/>
+<sharedFeature group="APIEXPOSE" submenu="ROM SET - REGION & LANGUAGE" value="global.apiexpose.romset.language_profile"/>
+<sharedFeature group="APIEXPOSE" submenu="ROM SET - REGION & LANGUAGE" value="global.apiexpose.romset.translations"/>
+
+<sharedFeature group="APIEXPOSE" submenu="ROM SET - VERSIONS" value="global.apiexpose.romset.special_versions"/>
+
+<sharedFeature group="APIEXPOSE" submenu="ROM SET - ARCADE" value="global.apiexpose.romset.arcade_handling"/>
+
+<sharedFeature group="APIEXPOSE" submenu="ROM SET - OUTPUT" value="global.apiexpose.romset.output_mode"/>
+
+<sharedFeature group="APIEXPOSE" submenu="ROM SET - DEBUG" value="global.apiexpose.romset.debug_report"/>
+
+Cascade logique
+1. Lire global.apiexpose.romset.enabled.
+2. Si OFF, ne rien faire.
+3. Lire global.apiexpose.romset.mode.
+4. Si display_only, scanner + rapport seulement.
+5. Lire grouping_method.
+6. Si système arcade, lire arcade_handling.
+7. Si arcade_handling != disabled, utiliser parent/clone.
+8. Sinon utiliser grouping_method console.
+9. Lire region_profile.
+10. Lire language_profile.
+11. Lire translations.
+12. Lire special_versions.
+13. Calculer score.
+14. Choisir ROM principale.
+15. Masquer les variantes selon output_mode.
+16. Générer rapport si debug_report=1.
+
+Pour les menus, je garderais cette règle :
+
+Premier niveau = peu d’options compréhensibles.
+Sous-menus = options spécialisées.
+Pas de suppression, uniquement masquage ou filtrage.
+
+La version la plus propre à tester d’abord :
+
+ROM SET MANAGER
+- Enabled
+- Mode
+
+ROM SET - REGION & LANGUAGE
+- Region Profile
+- Language Profile
+- Translations
+
+ROM SET - ARCADE
+- Arcade Handling
+
+ROM SET - OUTPUT
+- Output Mode
+- Debug Report

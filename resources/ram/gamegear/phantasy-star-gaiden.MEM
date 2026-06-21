@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Phantasy Star Gaiden",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "phantasy-star-gaiden",
+    file = "phantasy-star-gaiden.zip",
+    hashes = {
+      { hash = "39aa719b13cd1c50c30232cf5ac80059", label = "Phantasy Star Gaiden (Japan) (En) (v1.012) (Dynamic Designs).gg" },
+      { hash = "54be96ca21885145108f1c02e4d88eba", label = "Phantasy Star Gaiden (Japan).gg" },
+      { hash = "ba091114cbc5a4b3482e6887094070bb", label = "Phantasy Star Gaiden (Japan) (En) (Wide Font) (v1.012) (Dynamic Designs).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X05D8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+      stage = {
+        { address=0X0530, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="First Character Level" },
+        { address=0X054D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Second Character Level" },
+        { address=0X056A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Third Character Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0533, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="First Character HP decreased" },
+        { address=0X0533, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="First Character HP increased" },
+        { address=0X0534, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="First Character Max HP decreased" },
+        { address=0X0534, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="First Character Max HP increased" },
+        { address=0X0550, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Second Character Current HP decreased" },
+        { address=0X0550, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Second Character Current HP increased" },
+        { address=0X0551, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Second Character Max HP decreased" },
+        { address=0X0551, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Second Character Max HP increased" },
+        { address=0X056D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Third Character Current HP decreased" },
+        { address=0X056D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Third Character Current HP increased" },
+        { address=0X056E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Third Character Max HP decreased" },
+        { address=0X056E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Third Character Max HP increased" },
+        { address=0X0814, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP decreased" },
+        { address=0X0814, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP increased" },
+        { address=0X0831, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X0831, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0506, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cave NW of Tedo" },
+        { address=0X050F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cave east of forest" },
+        { address=0X0510, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cave east of forest" },
+        { address=0X0511, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0X0512, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0X0513, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0X0515, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure (Left Cave)" },
+        { address=0X0516, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure (Left Cave)" },
+        { address=0X0517, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure (Middle Cave)" },
+        { address=0X0518, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure (Middle Cave)" },
+        { address=0X0519, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure (Middle Cave)" },
+        { address=0X051A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure (Right Cave)" },
+        { address=0X051B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure (Right Cave)" },
+        { address=0X051C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Daedalus Mine" },
+        { address=0X051D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Daedalus Mine" },
+        { address=0X051E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 1F" },
+        { address=0X0520, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 1F" },
+        { address=0X0521, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 2F" },
+        { address=0X0522, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 2F" },
+        { address=0X0523, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 2F" },
+        { address=0X0524, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 3F" },
+        { address=0X0525, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 3F" },
+        { address=0X0526, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 4F" },
+        { address=0X0527, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 4F" },
+        { address=0X0528, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 4F" },
+        { address=0X0529, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 4F" },
+      },
+      weapon = {
+        { address=0X053F, type="u24le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="First Character Weapon" },
+        { address=0X055C, type="u24le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Second Character Weapon" },
+        { address=0X0579, type="u24le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Third Character Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0514, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures increased" },
+        { address=0X051F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasure - Cablon's Castle 1F increased" },
+        { address=0X058B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X058C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Overflow increased" },
+        { address=0X05C7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Laser Ring increased" },
+        { address=0X05CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Patriot Ring increased" },
+        { address=0X080B, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Enemy 1 - Gold Dropped increased" },
+        { address=0X080B, type="u16le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Enemy 1 - Gold Dropped empty" },
+        { address=0X083E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total gold earned after battle increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0541, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="First Character Shield" },
+        { address=0X055E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Second Character Shield" },
+        { address=0X057B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Third Character Shield" },
+        { address=0X05B6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Leather Shield" },
+        { address=0X05B7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield" },
+        { address=0X05B8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ceramic Shield" },
+        { address=0X05B9, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Perseus Shield" },
+        { address=0X05BA, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Laser Shield" },
+        { address=0X05BB, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Laconian Shield" },
+      },
+    },
+  },
+}

@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Snow Bros.",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "snow-bros",
+    file = "snow-bros.zip",
+    hashes = {
+      { hash = "3d675e5adfa038f68598b9f4d1a37a80", label = "Snow Brothers (USA).nes" },
+      { hash = "b4180d139a98ed939e67ab0aae955ca2", label = "Snow Bros. (Japan).nes" },
+      { hash = "c7a7be2231e861b0d142ac67f987cc0c", label = "Snow Brothers (Europe).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0048, type="u8", condition="eq", value=0X18, action="GAME_OVER", no_log=false, no_survey=false, desc="game over screen" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0515, type="u8", condition="eq", value=0X13, action="COIN_GAIN", no_log=false, no_survey=false, desc="eating hidden fruit, 0b = before it" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0138, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="00 Start Menu, 08 Cutscenes, 1A In Game" },
+      },
+    },
+  },
+}

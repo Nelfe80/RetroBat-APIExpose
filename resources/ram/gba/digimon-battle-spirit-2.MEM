@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Digimon Battle Spirit 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "digimon-battle-spirit-2",
+    file = "digimon-battle-spirit-2.zip",
+    hashes = {
+      { hash = "898914fe623432c8cf062764cab39b9e", label = "Digimon - Battle Spirit 2 (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "db4a8ed843dfb471622f37a8efb35111", label = "Digimon - Battle Spirit 2 (USA) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0D50, type="u16le", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0X0D50, type="u16le", condition="eq", value=0X0D, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CAE, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+      },
+      stage = {
+        { address=0X0D6E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (CR)" },
+        { address=0X1CAE, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="last Stage" },
+        { address=0X1CAE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Digimon Shoot Stage (CR)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X39AC0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life on boss fight (SR) increased" },
+        { address=0X39AC0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life on boss fight (SR) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0D50, type="u16le", condition="eq", value=0X13, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking Screen/Records" },
+        { address=0X0D50, type="u16le", condition="eq", value=0X18, action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Score (Tamer Tag given here)" },
+        { address=0X0D72, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Total Points (CR) (16-bit)" },
+        { address=0X39AC2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1P Points (SR) (16-bit)" },
+        { address=0X39C02, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="CPU Points (SR) (16-bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X39C00, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss HP (SR)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0D60, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="90" },
+        { address=0X0D60, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="120" },
+        { address=0X0D60, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="180" },
+        { address=0X0D60, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Option (CR)" },
+        { address=0X2660, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time (CR) (16-bit)" },
+      },
+    },
+  },
+}

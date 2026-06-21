@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Activision Decathlon",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "the-activision-decathlon",
+    file = "the-activision-decathlon.zip",
+    hashes = {
+      { hash = "db88c443599a57c1f436f146b632caa7", label = "Activision Decathlon, The (USA).col" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X02EC, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player Score [24bit BE BCD]" },
+      },
+    },
+  },
+}

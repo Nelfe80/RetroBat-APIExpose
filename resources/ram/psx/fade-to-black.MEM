@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Fade to Black",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "fade-to-black",
+    file = "fade-to-black.zip",
+    hashes = {
+      { hash = "7c31208695c240edba09d91fc5f84cb3", label = "Fade to Black (USA) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X10018, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Selected on Menu" },
+        { address=0XAF2C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XDC62C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Another Level ID" },
+        { address=0X185F3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cutscene ID - Level 4" },
+        { address=0X18673C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cutscene ID - Level 1" },
+        { address=0X1B37DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Health - Level 2" },
+        { address=0X1B8D80, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 - Teleport Out (10)" },
+        { address=0X1BB7E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Teleport Out (10)" },
+        { address=0X1BCCCC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 9 Armory Guy Status" },
+        { address=0X1C0330, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Health - Level 1" },
+        { address=0X1C7610, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - Cafeteria Passageway Door Opened (01)" },
+        { address=0X1CA460, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - Escape Ship Door" },
+        { address=0X1CF7E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bullets - Level 1" },
+      },
+      stage = {
+        { address=0X1BBEE4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Interacting Object ID (Level 2)" },
+        { address=0X1BCE94, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 9 Drones Deactivated" },
+        { address=0X1BCEDC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 9 Drones Deactivated" },
+        { address=0X1BD23C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 9 Drones Deactivated" },
+        { address=0X1BD284, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 9 Drones Deactivated" },
+        { address=0X1CD478, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Interacting Object ID? (Level 1)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XAEF40, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of Objects in Locker" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1C00B4, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level 2 Self-Destruct Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy2wayhorizontal</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Jump</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Jump</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${red}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 CBR 19830</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 CBX 11980</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 GPZ 10900</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 GSX 9900</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 RGF 9200</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 XJZ 8900</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 RZR 7900</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

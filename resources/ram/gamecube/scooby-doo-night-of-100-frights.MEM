@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Scooby-Doo! Night of 100 Frights",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "scooby-doo-night-of-100-frights",
+    file = "scooby-doo-night-of-100-frights.zip",
+    hashes = {
+      { hash = "3851ce18f4019a596e158ae4745639dc", label = "Scooby-Doo! Night of 100 Frights (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2106FB, type="u8", condition="bit_true", bit=4, mask=0X10, action="PAUSE_OFF", no_log=false, no_survey=false, desc="0 Off" },
+        { address=0X2106FB, type="u8", condition="bit_true", bit=4, mask=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="1 On" },
+        { address=0X270FF3, type="u8", condition="bit_true", bit=0, mask=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="0 Normal credits sequence" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C698F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Warp Gate (Gusts Abound Underground!) [8 bits]" },
+        { address=0X24548B, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster Gallery/Lighthouse Fright House! (Part 1)/Gloom & Doom Down in the Tomb! (Part 2)/Who's" },
+        { address=0X24548B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Scares Upstairs! (Part 4)/Don't Look Down, Scooby-Doo! (Part 2)/Panic in the Attic! (Part 2/" },
+        { address=0X24548B, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mind Your Manors! (Part 1)/All Scares Upstairs! (Part 1/Part 3)/Cower in the Tower! (Part 1)/Pan" },
+        { address=0X24548B, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fear on the Pier! (Part 1/Part 3)/It's a Mean Greenhouse, Scooby! (Part 2)/All Scares Upstairs!" },
+        { address=0X24548B, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fear on the Pier (Part 2)/Mind Your Manors! (Part 2)/A Dark and Stormy Knight! (Part 3)/Going Do" },
+        { address=0X24548B, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu/Shock on the Dock! (Part 1)/A Dark and Stormy Knight! (Part 1/Part 2)/Fishy Clues For" },
+        { address=0X24548B, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clamor in the Manor! (Part 4)/Shock on the Dock! (Part 2)/Don't Look Down, Scooby-Doo! (Part 1)/" },
+        { address=0X24548B, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clamor in the Manor! (Part 1)/It's a Mean Greenhouse, Scooby! (Part 1)/Fishy Clues For Scooby-Do" },
+        { address=0X24548B, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clamor in the Manor! (Part 2/Part 3)/Mastemind Unmasked! (Part 2)" },
+        { address=0X24548B, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mind Your Manors! (Part 3)/Scared Stiff at Skull Cliff! (Part 4)/Little Lab of Horrors! (Part 1)" },
+        { address=0X24548B, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chills & Spills On Haunted Hill! (Part 2/Part 3)" },
+        { address=0X24548B, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chills & Spills On Haunted Hill! (Part 1)" },
+        { address=0X24548B, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On Edge in the Hedge! (Part 1/Part 3)" },
+        { address=0X24548B, type="u8", condition="eq", value=0X0D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On Edge in the Hedge! (Part 2/Part 4)" },
+        { address=0X24548B, type="u8", condition="eq", value=0X11, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Mystery Machine (Part 1/Part 2)" },
+        { address=0X24548B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level [8 bits]" },
+        { address=0X2474FF, type="u8", condition="eq", value=0X6E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Snacks" },
+        { address=0X2474FF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="QTY of Collected Snacks at Gusts Abound Underground! [8 bits]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X24547B, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X24547B, type="u8", condition="eq", value=0X05, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X24547B, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="HP [8 bits]" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X24574A, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Springs" },
+        { address=0X24574A, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Super Smash" },
+        { address=0X24574A, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Helmet" },
+        { address=0X24574A, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Umbrella" },
+        { address=0X24574A, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Shovel" },
+        { address=0X24574A, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Super Sonic Smash" },
+        { address=0X24574B, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Bubble Gum" },
+        { address=0X24574B, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Soap Bubble" },
+        { address=0X24574B, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Galoshes" },
+        { address=0X24574B, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Plunger" },
+        { address=0X24574B, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Slippers" },
+        { address=0X24574B, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Lampshade" },
+        { address=0X24574B, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Black Knight's Armor Costume" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1C60DB, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="1 Green Ghost boss at 'Gloom & Doom Down in the Tomb!'" },
+        { address=0X1C640B, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="1 Mastermind boss at 'Mastermind Unmasked!'" },
+        { address=0X1C651B, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="1 Defeated Mastermind boss at 'Mastermind Unmasked!'" },
+        { address=0X271047, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="1 Dark Knight boss at 'A Dark and Stormy Knight!'/Redbeard's Ghost boss at 'Shiver your Timbers," },
+        { address=0X6D3863, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X6D3863, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full" },
+        { address=0X7558E3, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X7558E3, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full" },
+        { address=0X75FD73, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X75FD73, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full" },
+      },
+    },
+  },
+}

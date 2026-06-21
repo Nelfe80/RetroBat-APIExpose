@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Game no Kanzume: Sega Games Can Vol. 1",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "game-no-kanzume-sega-games-can-vol-1",
+    file = "game-no-kanzume-sega-games-can-vol-1.zip",
+    hashes = {
+      { hash = "a0542fd897d36e4ca1f3fc3de566463c", label = "Game no Kandume Vol. 1 (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

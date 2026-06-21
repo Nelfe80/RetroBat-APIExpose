@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "invaders",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "space-invaders-space-invaders-m",
+    file = "space-invaders-space-invaders-m.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X21FF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X20F8, type="u16be", condition="change", action="SCORE_STATE", color="orange", min=20, max=20, no_log=false, no_survey=false, desc="Score delta 20-20: Score 20" },
+        { address=0X20F8, type="u16be", condition="change", action="SCORE_STATE", color="yellow", min=30, max=30, no_log=false, no_survey=false, desc="Score delta 30-30: Score 30" },
+        { address=0X20F8, type="u16be", condition="change", action="SCORE_STATE", min=40, max=400, no_log=false, no_survey=false, desc="Score delta 40-400: Mystery" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X20F8, type="u16be", condition="change", action="OBJECT_DESTROYED", color="white", min=10, max=10, no_log=false, no_survey=false, desc="Score delta 10-10: Ship Scores" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "American Pool",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "american-pool",
+    file = "american-pool.zip",
+    hashes = {
+      { hash = "402324bf2483f0c9e65371011b7cbed5", label = "American Pool (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

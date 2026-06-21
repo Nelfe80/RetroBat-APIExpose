@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Mario & Wario",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "mario-wario",
+    file = "mario-wario.zip",
+    hashes = {
+      { hash = "8582a153318bafe2058533f8d2b46fd2", label = "Mario & Wario (Japan) (Controller Hack) (v1.0) (KingMike).sfc" },
+      { hash = "b1774f03700dfc311bfd86411db629c3", label = "Mario to Wario (Japan) (En).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1BEB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Counts up completed levels bit by bit" },
+        { address=0X1C1D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level number [starts at 00]" },
+        { address=0X1D1B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in course 1? [Starts at 00]" },
+        { address=0X1D1D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Course 2 current level [starts at 00]" },
+        { address=0X1D1F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Course 3 Current Level" },
+        { address=0X1D21, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in course 4?" },
+        { address=0X1D23, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in course 5" },
+        { address=0X1D25, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in course 6" },
+        { address=0X1D27, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in course 7" },
+        { address=0X1D29, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in course 8" },
+        { address=0X1D2B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in course 9" },
+        { address=0X1D2D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in course 10" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1C31, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Left Display Value increased" },
+        { address=0X1C31, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Left Display Value decreased" },
+        { address=0X1C35, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives left True Value [00=game over] increased" },
+        { address=0X1C35, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives left True Value [00=game over] decreased" },
+        { address=0X1D2F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01=death, pre-course, game over" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1CC3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins from Wario increased" },
+        { address=0X1D3B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin count [Hex] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1CE9, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level clear time [minutes]" },
+        { address=0X1CEB, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level clear time [seconds] [hex]" },
+      },
+    },
+  },
+}

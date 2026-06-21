@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "Ihatovo Monogatari",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "ihatovo-monogatari",
+    file = "ihatovo-monogatari.zip",
+    hashes = {
+      { hash = "b9ae4d372bee326846b0778e3b34533b", label = "Ihatovo Monogatari (Japan).sfc" },
+      { hash = "cd1dc363d60a273fe1df960364601c8f", label = "Ihatovo Monogatari (Japan) (En) (v2.0) (Tom, FlashPV, DDSTranslation).sfc" },
+      { hash = "6114b9d7e4170aaa82c1e0f36f4d863e", label = "Ihatovo Monogatari (Japan) (Fr) (v1.0) (FlashPV, Killy, pinktagada).sfc" },
+      { hash = "8f530a73c86309657ae063f69c63150d", label = "Ihatovo Monogatari (Japan) (De) (v1.20) (POE).sfc" },
+      { hash = "adac9d0d57fa28ca9833df0f96928643", label = "Ihatovo Monogatari (Japan) (Es) (v1.0) (semco).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

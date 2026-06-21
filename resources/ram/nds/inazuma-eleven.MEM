@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "Inazuma Eleven",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Sports"
+  },
+
+  rom = {
+    name = "inazuma-eleven",
+    file = "inazuma-eleven.zip",
+    hashes = {
+      { hash = "2f38059ca51afe6b60d7b5dbaf32d92a", label = "Inazuma Eleven (Italy).nds" },
+      { hash = "4702546135632ade9155fa9be1c6c0ba", label = "Inazuma Eleven (France).nds" },
+      { hash = "62cfb5a200f41ff1b82cf08248820b94", label = "Inazuma Eleven (Germany).nds" },
+      { hash = "ae31bac8d49b10583320a1fb18597fe0", label = "Inazuma Eleven (Spain).nds" },
+      { hash = "b1dad154ab63dcef7c946824e7e5161a", label = "Inazuma Eleven (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

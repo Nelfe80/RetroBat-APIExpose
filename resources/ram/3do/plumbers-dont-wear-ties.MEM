@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Plumbers Don't Wear Ties",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "plumbers-dont-wear-ties",
+    file = "plumbers-dont-wear-ties.zip",
+    hashes = {
+      { hash = "4570e692ac07d2242ab9141f1bb9000d", label = "Plumbers Don't Wear Ties (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

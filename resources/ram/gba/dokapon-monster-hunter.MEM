@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Dokapon: Monster Hunter",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dokapon-monster-hunter",
+    file = "dokapon-monster-hunter.zip",
+    hashes = {
+      { hash = "18317fa6e27ea0ea7509f1319bc0865c", label = "Dokapon - Monster Hunter! (Europe) (En,Fr,De).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4A88, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hero Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4A90, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero current HP decreased" },
+        { address=0X4A90, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero current HP increased" },
+        { address=0X4A98, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero Max HP decreased" },
+        { address=0X4A98, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero Max HP increased" },
+        { address=0X4B60, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 1 HP decreased" },
+        { address=0X4B60, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 1 HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X49BE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Start of Weapon Data - Starts at bit 1" },
+        { address=0X49CA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="End of Weapons 100 at bit 4" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X49D6, type="u8", condition="eq", value=0X1, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Regular Shield" },
+        { address=0X49DC, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="End of Shields - Bit 2" },
+        { address=0X4A86, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Equipped By Hero" },
+      },
+    },
+  },
+}

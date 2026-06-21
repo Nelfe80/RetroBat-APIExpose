@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Treasure Planet",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "treasure-planet",
+    file = "treasure-planet.zip",
+    hashes = {
+      { hash = "ccf5c29c865838338ccc58cc005c5c6b", label = "Disney's Treasure Planet (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2D0E7C, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2DB490, type="u16le", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clifftops level completed" },
+        { address=0X2E9CD0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(USA) Max Beacons in current level (useless)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2E8864, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(USA) Life bars (3 max) increased" },
+        { address=0X2E8864, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(USA) Life bars (3 max) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2FCE80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="tricks mini-game score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2E9AF2, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X2E9AF2, type="u8", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="full health" },
+        { address=0X2E9AF3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss active at 0x80" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X11ED2F0, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current checkpoint lap(0x00 to 0x05) (for Ore Refinery)" },
+      },
+    },
+  },
+}

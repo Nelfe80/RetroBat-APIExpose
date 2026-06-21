@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Deep Forest",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "deep-forest",
+    file = "deep-forest.zip",
+    hashes = {
+      { hash = "dc9c2178fec7958fdde3f7762ffe0b2e", label = "Deep Forest (Japan).rom" },
+      { hash = "1a3227251205b0f6efd10b10859fdbf2", label = "Deep Forest (Japan) (En) (v1.0) (Django).rom" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X2B1A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - 0x00 - 0xFF decreased" },
+        { address=0X2B1A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - 0x00 - 0xFF increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2B31, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Current Weapon Upgrades" },
+        { address=0X2B39, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Equipped Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2B1B, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-Bit BE] Decimal - Gold x10 increased" },
+      },
+    },
+  },
+}

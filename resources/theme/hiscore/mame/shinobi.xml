@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 AAA 100000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 BBB 90000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 CCC 80000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 DDD 70000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 EEE 60000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FFF 50000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 GGG 40000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HHH 30000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 ·'  26350</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 III 25000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 JJJ 20000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 [man][woman]0 19010</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 -=. 17330</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 /() 15970</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 KKK 15000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 LLL 14000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 MMM 13000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 NNN 12000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 OOO 11000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 PPP 10000</text>
+		</text>
+	</view>
+</theme>

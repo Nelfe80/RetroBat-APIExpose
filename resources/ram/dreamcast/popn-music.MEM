@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Pop'n Music",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "popn-music",
+    file = "popn-music.zip",
+    hashes = {
+      { hash = "a2e09b9b28c2ca6a2a2de2302c5258ed", label = "Pop'n Music (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9DD98, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="5 Button Mode" },
+        { address=0X9DD98, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="7 Button Mode" },
+        { address=0X9DD98, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="9 Button Mode" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X09, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo is Rolling" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X06, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Tutorial Level" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X0E, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Level is active" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X11, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over timer screen" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X13, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X08, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Level is active" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Timer Screen" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X0A, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Level Active" },
+        { address=0X15E504, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo not running" },
+        { address=0X15E504, type="u8", condition="eq", value=0X0C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo running" },
+        { address=0X15E504, type="u8", condition="eq", value=0X3C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Training Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9DE8C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Game Option - Game Level" },
+        { address=0XC8404, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Beginner Mode - Intruction Level" },
+      },
+      stage = {
+        { address=0X9FE22, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Congratulations Screen" },
+        { address=0X9FE22, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Stages - Normal Mode" },
+        { address=0X9FE3E, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Congratulations Screen" },
+        { address=0X9FE3E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Stages - Hard Mode" },
+        { address=0X9FE5A, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Congratulations Screen" },
+        { address=0X9FE5A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Stages - Beginner Mode" },
+        { address=0XA7080, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[In Single Bits] Level Active" },
+        { address=0XC8404, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA004C, type="u16le", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Empty" },
+        { address=0XA004C, type="u16le", condition="eq", value=0X1A4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Winning" },
+        { address=0XA004C, type="u16le", condition="eq", value=0X26C, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0XA004C, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[16bit] Health Bar" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA0000, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] High Score" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X16, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Screen" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X0F, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Input" },
+        { address=0XA7A98, type="u16le", condition="eq", value=0X10, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Screen" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9BD40, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16bit] Game Over Timer" },
+        { address=0XA7A98, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16bit] Game State" },
+      },
+    },
+  },
+}

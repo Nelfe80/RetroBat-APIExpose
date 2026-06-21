@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Metal Combat: Falcon's Revenge",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Tir avec accessoire"
+  },
+
+  rom = {
+    name = "metal-combat-falcons-revenge",
+    file = "metal-combat-falcons-revenge.zip",
+    hashes = {
+      { hash = "44a7735d6dceed9fb4eab61113daa410", label = "Metal Combat - Falcon's Revenge (Europe).sfc" },
+      { hash = "d4bc4f3cb46cc09d8db58f0ce0142646", label = "Metal Combat - Falcon's Revenge (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X02C9, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="00 - Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X036D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level: 00 = Standard, 01 = Low, 02 = Medium, 03 = High" },
+      },
+      stage = {
+        { address=0X0365, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X0367, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1885, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rola death flag" },
+        { address=0X1052B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deaths" },
+        { address=0X2007C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Also Deaths" },
+      },
+      health = {
+        { address=0X1866, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP? decreased" },
+        { address=0X1866, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP? increased" },
+        { address=0X1968, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (1d = Your HP Critical) decreased" },
+        { address=0X1968, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (1d = Your HP Critical) increased" },
+        { address=0X1B13, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Bolt charge? decreased" },
+        { address=0X1B13, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Bolt charge? increased" },
+        { address=0X1B17, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Treble energy bolts? decreased" },
+        { address=0X1B17, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Treble energy bolts? increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X12AA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Use for the 3 different dyying bosses" },
+      },
+    },
+  },
+}

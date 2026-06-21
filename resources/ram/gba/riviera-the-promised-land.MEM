@@ -1,0 +1,126 @@
+return {
+  game = {
+    title = "Riviera: The Promised Land",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "riviera-the-promised-land",
+    file = "riviera-the-promised-land.zip",
+    hashes = {
+      { hash = "16b5f1c6f8567cbe42f7562fccbb6426", label = "Riviera - The Promised Land (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA788, type="u8", condition="eq", value=0X09, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Lord" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10170, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Immoral Rosary (changed description after chapter 1 clear)" },
+        { address=0X10EF0, type="u8", condition="eq", value=0X3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="C" },
+        { address=0X10EF0, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="B" },
+        { address=0X10EF0, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="A" },
+        { address=0X10EF0, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="S" },
+        { address=0X10EF1, type="u8", condition="eq", value=0X3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="C" },
+        { address=0X10EF1, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="B" },
+        { address=0X10EF1, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="A" },
+        { address=0X10EF1, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="S" },
+        { address=0X10EF2, type="u8", condition="eq", value=0X3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="C" },
+        { address=0X10EF2, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="B" },
+        { address=0X10EF2, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="A" },
+        { address=0X10EF2, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="S" },
+      },
+      stage = {
+        { address=0XE9B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (Chapter)" },
+        { address=0XE9B9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (Chapter)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA788, type="u8", condition="eq", value=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0XA788, type="u8", condition="eq", value=0X81, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death (v2)" },
+        { address=0XA788, type="u8", condition="eq", value=0X82, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dark Death" },
+      },
+      health = {
+        { address=0XFA14, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 HP (In fight) - current decreased" },
+        { address=0XFA14, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 HP (In fight) - current increased" },
+        { address=0XFA16, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 HP (In fight) - total decreased" },
+        { address=0XFA16, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 HP (In fight) - total increased" },
+        { address=0XFA17, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 HP (In fight) - total [Partial] decreased" },
+        { address=0XFA17, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 HP (In fight) - total [Partial] increased" },
+        { address=0XFA4C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 2 HP (In fight) - current decreased" },
+        { address=0XFA4C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 2 HP (In fight) - current increased" },
+        { address=0XFA4E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 2 HP (In fight) - total decreased" },
+        { address=0XFA4E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 2 HP (In fight) - total increased" },
+        { address=0XFA84, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 3 HP - current (In fight) decreased" },
+        { address=0XFA84, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 3 HP - current (In fight) increased" },
+        { address=0XFA86, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 3 HP - total (In fight) decreased" },
+        { address=0XFA86, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 3 HP - total (In fight) increased" },
+        { address=0XFABC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 4 HP - current (In fight) decreased" },
+        { address=0XFABC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 4 HP - current (In fight) increased" },
+        { address=0XFABE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 4 HP - total (In fight) decreased" },
+        { address=0XFABE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 4 HP - total (In fight) increased" },
+        { address=0XFAF4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 5 HP - current (In fight) decreased" },
+        { address=0XFAF4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 5 HP - current (In fight) increased" },
+        { address=0XFAF6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 5 HP - total (In fight) decreased" },
+        { address=0XFAF6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 5 HP - total (In fight) increased" },
+        { address=0XFB2C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP - current decreased" },
+        { address=0XFB2C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP - current increased" },
+        { address=0XFB2E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP - total decreased" },
+        { address=0XFB2E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP - total increased" },
+        { address=0XFB64, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP - current decreased" },
+        { address=0XFB64, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP - current increased" },
+        { address=0XFB66, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemey 2 HP - total decreased" },
+        { address=0XFB66, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemey 2 HP - total increased" },
+        { address=0XFB9C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP - current decreased" },
+        { address=0XFB9C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP - current increased" },
+        { address=0XFB9E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP - total decreased" },
+        { address=0XFB9E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP - total increased" },
+        { address=0XFF58, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 HP - current decreased" },
+        { address=0XFF58, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 HP - current increased" },
+        { address=0XFF5A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 HP - total decreased" },
+        { address=0XFF5A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 HP - total increased" },
+        { address=0XFF90, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 2 HP - current decreased" },
+        { address=0XFF90, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 2 HP - current increased" },
+        { address=0XFF92, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 2 HP - total decreased" },
+        { address=0XFF92, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 2 HP - total increased" },
+        { address=0XFFC8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 3 HP - current decreased" },
+        { address=0XFFC8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 3 HP - current increased" },
+        { address=0XFFCA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 3 HP - total decreased" },
+        { address=0XFFCA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 3 HP - total increased" },
+        { address=0X10000, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 4 HP - current decreased" },
+        { address=0X10000, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 4 HP - current increased" },
+        { address=0X10002, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 4 HP - total decreased" },
+        { address=0X10002, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 4 HP - total increased" },
+        { address=0X10038, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 5 HP - current decreased" },
+        { address=0X10038, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 5 HP - current increased" },
+        { address=0X1003A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 5 HP - total decreased" },
+        { address=0X1003A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 5 HP - total increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X111CA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score in hundreds" },
+      },
+      collectibles = {
+        { address=0XEDBC, type="u8", condition="eq", value=0X6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mage Ring" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XEDBC, type="u8", condition="eq", value=0X6F, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEDBC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[64 byte] [Array] Inventory * initially found by Fraise" },
+      },
+    },
+  },
+}

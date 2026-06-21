@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Who Wants to Be a Millionaire",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "who-wants-to-be-a-millionaire",
+    file = "who-wants-to-be-a-millionaire.zip",
+    hashes = {
+      { hash = "204f81fba1f395db9e7966039ef48840", label = "Who Wants to Be a Millionaire (Europe).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0118, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="50:50" },
+        { address=0X0118, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ask the Audience" },
+        { address=0X0118, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Phone a Friend" },
+        { address=0X7E5C, type="u16le", condition="eq", value=0X988, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Audience Clapping" },
+      },
+    },
+  },
+}

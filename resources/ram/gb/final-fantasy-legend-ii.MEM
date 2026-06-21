@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Final Fantasy Legend II",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "final-fantasy-legend-ii",
+    file = "final-fantasy-legend-ii.zip",
+    hashes = {
+      { hash = "2bb0df1b672253aaa5f9caf9aab78224", label = "Final Fantasy Legend II (USA).gb" },
+      { hash = "d8d941968ab9fd236f91003b79c82fbf", label = "Final Fantasy Legend II (USA) (Es) (v1.0) (Tanero).gb" },
+      { hash = "edd6ce2651b74977bbff376233ff4119", label = "Final Fantasy Legend II (USA) (Text Cleanup) (v0.1) (vivify93).gb" },
+      { hash = "66bcd8472c6aba72843920822a856deb", label = "FFL2 - Final Fantasy Legend II DX (v1.0) (theadamrippon).gb" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC207, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 1st char - Current HP 1/2 decreased" },
+        { address=0XC207, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 1st char - Current HP 1/2 increased" },
+        { address=0XC208, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 1st char - Current HP 2/2 decreased" },
+        { address=0XC208, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 1st char - Current HP 2/2 increased" },
+        { address=0XC209, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 1st char - Max HP 1/2 decreased" },
+        { address=0XC209, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 1st char - Max HP 1/2 increased" },
+        { address=0XC20A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 1st char - Max HP 2/2 decreased" },
+        { address=0XC20A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 1st char - Max HP 2/2 increased" },
+        { address=0XD50C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st enemy max hp decreased" },
+        { address=0XD50C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st enemy max hp increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCF77, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) possible amount of gold you steal increased" },
+        { address=0XD041, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) 1st player HP during combat 2/2 increased" },
+        { address=0XD042, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) 1st player HP during combat 1/2 increased" },
+        { address=0XD141, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) 2nd player HP during combat 2/2 increased" },
+        { address=0XD142, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) 2nd player HP during combat 1/2 increased" },
+        { address=0XD241, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) 3rd player HP during combat 2/2 increased" },
+        { address=0XD242, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) 3rd player HP during combat 1/2 increased" },
+        { address=0XD341, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) 4th player HP during combat 2/2 increased" },
+        { address=0XD342, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) 4th player HP during combat 1/2 increased" },
+        { address=0XD848, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) possible way to count the rounds during increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC2FC, type="u8", condition="eq", value=0X49, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="final boss" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC2A1, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(8 bit) 1=died for the first time" },
+      },
+    },
+  },
+}

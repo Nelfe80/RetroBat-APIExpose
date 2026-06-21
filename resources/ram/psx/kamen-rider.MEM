@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Kamen Rider",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Beat 'em Up, Fighting"
+  },
+
+  rom = {
+    name = "kamen-rider",
+    file = "kamen-rider.zip",
+    hashes = {
+      { hash = "fed89712d418cb5efe34b2ffc96fe9f2", label = "Kamen Rider (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X915E0, type="u8", condition="eq", value=0X0A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X736BE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of rounds" },
+        { address=0X91320, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Rounds in Team Battle" },
+        { address=0X91600, type="u8", condition="eq", value=0X0A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed arcade mode" },
+        { address=0X105760, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Number of rounds won/Number of Combatmen Defeated in Fight the Army" },
+        { address=0X1057E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2/CPU Number of rounds won" },
+      },
+      stage = {
+        { address=0X91600, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Story Mode Stage (From 9 to 0 after winning)" },
+        { address=0X91600, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1057A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP (16-bit) decreased" },
+        { address=0X1057A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP (16-bit) increased" },
+        { address=0X105830, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2/CPU HP (16-Bit) decreased" },
+        { address=0X105830, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2/CPU HP (16-Bit) increased" },
+      },
+    },
+  },
+}

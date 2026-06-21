@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "The Uncanny X-Men",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "the-uncanny-x-men",
+    file = "the-uncanny-x-men.zip",
+    hashes = {
+      { hash = "1c890ba198df5082fa320a362f04af5e", label = "Uncanny X-Men, The (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0503, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Futurecity Street Fight" },
+        { address=0X0503, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Subterranean Confrontation" },
+        { address=0X0503, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle Through a Living Starship" },
+        { address=0X0503, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Asteroid M" },
+        { address=0X0503, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0X0514, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete - 01" },
+      },
+      stage = {
+        { address=0X0503, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Practice" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X053E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health decreased" },
+        { address=0X053E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health increased" },
+        { address=0X055E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health decreased" },
+        { address=0X055E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00C7, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Wolverine Score x10" },
+        { address=0X00C9, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cyclops Score x10" },
+        { address=0X00CB, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Nightcrawler Score x10" },
+        { address=0X00CD, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Iceman Score x10" },
+        { address=0X00CF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Colossus Score x10" },
+        { address=0X00D1, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Storm Score x10" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0516, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Level Boss Killed (01)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0544, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="P1 - Invincibility timer" },
+        { address=0X0564, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="P2 - Invincibility timer" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0503, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Search & Destroy the Robot Factory" },
+        { address=0X050C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Search & Destroy the Robot Factory Complete (01)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Vigilante",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "vigilante",
+    file = "vigilante.zip",
+    hashes = {
+      { hash = "0910ab7b7ff971b35fa63294c3e66a9c", label = "vigilanta.7z <Vigilante (World, Rev A)>" },
+      { hash = "092fca50b286862609bd82accbfe35cd", label = "vigilantd.7z <Vigilante (Japan, Rev D)>" },
+      { hash = "45a7e89075cd49a0358ee904eae3d140", label = "vigilant.7z <Vigilante (World, Rev E)>" },
+      { hash = "4ae2c6199ea539d2a0721d3cb9b63ee8", label = "vigilanto.7z <Vigilante (US)>" },
+      { hash = "5b1ff2974a679c08be4634568fc9d77b", label = "vigilantg.7z <Vigilante (US, Rev G)>" },
+      { hash = "5f6c8eb95fd2b3b366a33030b26571a2", label = "vigilantb.7z <Vigilante (US, Rev B)>" },
+      { hash = "b504d9d8acd58c5a5e4b8844221eeae5", label = "vigilantc.7z <Vigilante (World, Rev C)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0025, type="u8", condition="eq", value=0X2, action="DEMO_MODE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X0025, type="u8", condition="eq", value=0X0, action="DEMO_MODE", no_log=false, no_survey=false, desc="default DIPs" },
+        { address=0X0025, type="u8", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="allow continue" },
+        { address=0X0025, type="u8", condition="eq", value=0X4, action="DEMO_MODE", no_log=false, no_survey=false, desc="invulnerable" },
+        { address=0X008B, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="no lifes (game over)" },
+        { address=0X0091, type="u8", condition="eq", value=0X0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+        { address=0X3BDA, type="u8", condition="eq", value=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo or Play modes" },
+        { address=0X3BDA, type="u8", condition="eq", value=0X30, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Play countdown screen" },
+        { address=0X3BDC, type="u8", condition="eq", value=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo or Play modes" },
+        { address=0X3BDC, type="u8", condition="eq", value=0X30, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Play countdown screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0089, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1 (first stage)" },
+        { address=0X0089, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5 (last stage)" },
+        { address=0X0089, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[4-bitL] - Current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0038, type="u8", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 lives (min)" },
+        { address=0X0038, type="u8", condition="eq", value=0X4, action="LIVES_STATE", no_log=false, no_survey=false, desc="5 lives (max)" },
+        { address=0X0038, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[4-bitL] - DIP switch starting lives increased" },
+        { address=0X0038, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[4-bitL] - DIP switch starting lives decreased" },
+        { address=0X008B, type="u8", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 lives (current and one extra left)" },
+        { address=0X008B, type="u8", condition="eq", value=0X0, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 life (only current)" },
+        { address=0X008B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="- Current Lives increased" },
+        { address=0X008B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="- Current Lives decreased" },
+        { address=0X0149, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="player is dead" },
+      },
+      health = {
+        { address=0X0024, type="u8", condition="eq", value=0X0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="normal and slow" },
+        { address=0X0024, type="u8", condition="eq", value=0X4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="hard and slow" },
+        { address=0X0024, type="u8", condition="eq", value=0X8, action="HEALTH_STATE", no_log=true, no_survey=false, desc="normal and fast" },
+        { address=0X0024, type="u8", condition="eq", value=0XC, action="HEALTH_STATE", no_log=true, no_survey=false, desc="hard and fast" },
+        { address=0X0024, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[4-bitL] - DIP switch difficulty and health decrease" },
+        { address=0X0149, type="u8", condition="eq", value=0X70, action="HEALTH_STATE", no_log=true, no_survey=false, desc="player's max health" },
+        { address=0X0149, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="- Player Health" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X089F, type="u8", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="last stick throwed, so boss comes down" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X013C, type="u8", condition="eq", value=0XC, action="JUMPING", no_log=false, no_survey=false, desc="jump kick" },
+        { address=0X013C, type="u8", condition="eq", value=0XD, action="JUMPING", no_log=false, no_survey=false, desc="jump kick hits an enemy" },
+      },
+    },
+  },
+}

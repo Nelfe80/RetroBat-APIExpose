@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "G-LOC: Air Battle",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Flying"
+  },
+
+  rom = {
+    name = "g-loc-air-battle",
+    file = "g-loc-air-battle.zip",
+    hashes = {
+      { hash = "5b7f2be0359b0770eb844e6518769a68", label = "gloc.7z <G-LOC Air Battle (World)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFD01, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[8bit] Credits" },
+      },
+    },
+  },
+}

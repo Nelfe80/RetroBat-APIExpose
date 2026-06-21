@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Legend of Mulan",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "legend-of-mulan",
+    file = "legend-of-mulan.zip",
+    hashes = {
+      { hash = "4d47e0c2cb948135a0ef2a6dd2cd2396", label = "Legend of Mulan (Europe) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F835C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] MenuIsPaused" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1F7F90, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Puzzle Timer" },
+      },
+    },
+  },
+}

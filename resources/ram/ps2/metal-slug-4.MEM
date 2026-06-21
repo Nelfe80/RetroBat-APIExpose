@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Metal Slug 4",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "metal-slug-4",
+    file = "metal-slug-4.zip",
+    hashes = {
+      { hash = "87c1457c8ca3f8e832334ebf8d999b28", label = "Metal Slug 4 & 5 (USA) (Disc 1) (Metal Slug 4)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X1080CB0, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X106F1A4, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Super Shotgun" },
+        { address=0X106F1A4, type="u8", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Super Grenade" },
+        { address=0X106F1A4, type="u8", condition="eq", value=0X12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Heavy Machine Gun" },
+      },
+    },
+  },
+}

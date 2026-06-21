@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "GALDR",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "galdr",
+    file = "galdr.zip",
+    hashes = {
+      { hash = "00e3c7577b124f20dbf667e5c2bc3d11", label = "GALDR (World) (jonathand).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X940E, type="u8", condition="eq", value=0X59, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X940E, type="u8", condition="eq", value=0X4D, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9428, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Current Level" },
+      },
+      zone = {
+        { address=0X940E, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="You save the world" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X940E, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier" },
+        { address=0X940E, type="u8", condition="eq", value=0X17, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sun Soldiers" },
+        { address=0X940E, type="u8", condition="eq", value=0X4B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Dead" },
+      },
+      health = {
+        { address=0X96B8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Current HP decreased" },
+        { address=0X96B8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Current HP increased" },
+        { address=0X96BA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Max HP decreased" },
+        { address=0X96BA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Max HP increased" },
+        { address=0X9954, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Enemy Current Health decreased" },
+        { address=0X9954, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Enemy Current Health increased" },
+        { address=0X9956, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Enemy Max Health decreased" },
+        { address=0X9956, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Enemy Max Health increased" },
+        { address=0X9964, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Enemy's Damage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X940E, type="u8", condition="eq", value=0X0C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Chest - 10 Coins" },
+        { address=0X940E, type="u8", condition="eq", value=0X15, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Muncher" },
+        { address=0X96C0, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Player's Money increased" },
+        { address=0X9AB0, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Shop's Money increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X940E, type="u8", condition="eq", value=0X49, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Bat, Use Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X940E, type="u8", condition="eq", value=0X3A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sun Altar, Destroy?" },
+        { address=0X940E, type="u8", condition="eq", value=0X3D, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy" },
+        { address=0X940E, type="u8", condition="eq", value=0X2F, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy" },
+      },
+    },
+  },
+}

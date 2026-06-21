@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Monsters, Inc. Scream Arena",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "monsters-inc-scream-arena",
+    file = "monsters-inc-scream-arena.zip",
+    hashes = {
+      { hash = "5307de287b94db337e223e843f28b252", label = "Disney-Pixar Monsters, Inc. - Scream Arena (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

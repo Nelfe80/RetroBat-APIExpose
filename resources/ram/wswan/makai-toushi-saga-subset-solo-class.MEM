@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Makai Toushi SaGa [Subset - Solo Class]",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "makai-toushi-saga-subset-solo-class",
+    file = "makai-toushi-saga-subset-solo-class.zip",
+    hashes = {
+      { hash = "1edff9c7eb20454dcd2cd6c6e23fc7c6", label = "Makai Toushi Sa-Ga (Japan) (En) [Subset - Solo Class]" },
+      { hash = "ac0b4121ead3c4b1ec102a57d1bb697d", label = "Makai Toushi Sa-Ga (Japan) [Subset - Solo Class].wsc" },
+    }
+  },
+
+  events = {
+  },
+}

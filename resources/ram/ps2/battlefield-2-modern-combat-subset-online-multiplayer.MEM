@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Battlefield 2: Modern Combat [Subset - Online Multiplayer]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "battlefield-2-modern-combat-subset-online-multiplayer",
+    file = "battlefield-2-modern-combat-subset-online-multiplayer.zip",
+    hashes = {
+      { hash = "6d65c3b493042b13378def3ccf120869", label = "Battlefield 2 - Modern Combat (USA) [Subset - Online Multiplayer]" },
+      { hash = "5ee532f46b617a57567377b9bbd6d9a3", label = "Battlefield 2 - Modern Combat (SLUS-21026) [AE1F3119]" },
+    }
+  },
+
+  events = {
+  },
+}

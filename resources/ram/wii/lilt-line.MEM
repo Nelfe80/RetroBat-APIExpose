@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Lilt Line",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Music, Racing"
+  },
+
+  rom = {
+    name = "lilt-line",
+    file = "lilt-line.zip",
+    hashes = {
+      { hash = "4a3319e52d7e91292dc693b8b588d342", label = "Lilt Line (USA) (WiiWare)" },
+      { hash = "1a1e3a924b1564d6b5799e5a51d25a98", label = "Lilt Line (Europe) (WiiWare)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X25331B, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X25331B, type="u8", condition="eq", value=0X05, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X25A8FB, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X25A8FB, type="u8", condition="eq", value=0X05, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X279BA8, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Bike High Score (EU) [32-bit BE] increased" },
+        { address=0X279BA8, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Bike High Score (EU) [32-bit BE] decreased" },
+        { address=0X281128, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Bike High Score (US) [32-bit BE] increased" },
+        { address=0X281128, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Bike High Score (US) [32-bit BE] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X25331B, type="u8", condition="eq", value=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="- High Scores" },
+        { address=0X253F28, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score (EU) [32-bit BE]" },
+        { address=0X25A8FB, type="u8", condition="eq", value=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="- High Scores" },
+        { address=0X25B508, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score (US) [32-bit BE]" },
+        { address=0X279BA0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Training High Score (EU) [32-bit BE]" },
+        { address=0X279BB0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bloome High Score (EU) [32-bit BE]" },
+        { address=0X279BB8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="One In High Score (EU) [32-bit BE]" },
+        { address=0X279BC0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Right Over High Score (EU) [32-bit BE]" },
+        { address=0X279BC8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dirt Shirt High Score (EU) [32-bit BE]" },
+        { address=0X279BD0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Seesaw High Score (EU) [32-bit BE]" },
+        { address=0X279BD8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cinap High Score (EU) [32-bit BE]" },
+        { address=0X279BE0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Spirit Dust High Score (EU) [32-bit BE]" },
+        { address=0X279BE8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Two Byte High Score (EU) [32-bit BE]" },
+        { address=0X279BF0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="What High Score (EU) [32-bit BE]" },
+        { address=0X279BF8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Betamax High Score (EU) [32-bit BE]" },
+        { address=0X279C00, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Trottalong High Score (EU) [32-bit BE]" },
+        { address=0X279C08, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Xplodofist High Score (EU) [32-bit BE]" },
+        { address=0X279C10, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Srpnt High Score (EU) [32-bit BE]" },
+        { address=0X281120, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Training High Score (US) [32-bit BE]" },
+        { address=0X281130, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bloome High Score (US) [32-bit BE]" },
+        { address=0X281138, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="One In High Score (US) [32-bit BE]" },
+        { address=0X281140, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Right Over High Score (US) [32-bit BE]" },
+        { address=0X281148, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dirt Shirt High Score (US) [32-bit BE]" },
+        { address=0X281150, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Seesaw High Score (US) [32-bit BE]" },
+        { address=0X281158, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cinap High Score (US) [32-bit BE]" },
+        { address=0X281160, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Spirit Dust High Score (US) [32-bit BE]" },
+        { address=0X281168, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Two Byte High Score (US) [32-bit BE]" },
+        { address=0X281170, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="What High Score (US) [32-bit BE]" },
+        { address=0X281178, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Betamax High Score (US) [32-bit BE]" },
+        { address=0X281180, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Trottalong High Score (US) [32-bit BE]" },
+        { address=0X281188, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Xplodofist High Score (US) [32-bit BE]" },
+        { address=0X281190, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Srpnt High Score (US) [32-bit BE]" },
+      },
+    },
+  },
+}

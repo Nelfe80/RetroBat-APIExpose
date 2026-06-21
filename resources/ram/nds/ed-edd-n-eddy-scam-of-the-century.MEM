@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Ed, Edd n Eddy: Scam of the Century",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ed-edd-n-eddy-scam-of-the-century",
+    file = "ed-edd-n-eddy-scam-of-the-century.zip",
+    hashes = {
+      { hash = "0a37f245cdd675bb4684334f3d038926", label = "Ed, Edd n Eddy - Scam of the Century (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A83D4, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Is game paused? [32 bit]" },
+        { address=0X1A83E4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Beginning of the 'phase table'; the phase table is a table of functions and i believe arguments" },
+        { address=0X1A90D7, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1A8ECC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level [32 bits]" },
+        { address=0X1A8ED4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background panning X [32 bits]" },
+        { address=0X1A8ED8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background panning Y [32 bits]" },
+        { address=0X1A93A8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Is grounded? [32 bits]" },
+        { address=0X32733A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="visual level tiles around here! each is 16 bits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X322AFC, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01010101 if the first stone pile in ed-1 is alive, 00000000 if its dead [32 bits]" },
+      },
+      health = {
+        { address=0X1A8F35, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X1A8F35, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1A90A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (32 bit)" },
+        { address=0X1AA3FC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Yeshmiyek's Bounty of Meat Score" },
+        { address=0X1AA4A4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Whack-A-Zit Score / Zits popped" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1A93B0, type="u32le", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Can jump? [32 bits]" },
+      },
+    },
+  },
+}

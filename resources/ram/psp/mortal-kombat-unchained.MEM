@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Mortal Kombat: Unchained",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mortal-kombat-unchained",
+    file = "mortal-kombat-unchained.zip",
+    hashes = {
+      { hash = "e32cf7e69a717ff9d6c80e6c2ca24656", label = "Mortal Kombat - Unchained (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD953EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Wins" },
+        { address=0XD95458, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds Wins" },
+        { address=0XD95D84, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Rounds To Win" },
+        { address=0XD95D88, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Puzzle Rounds" },
+        { address=0XD99407, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Talked to Apep after 3rd school cleared" },
+        { address=0X10863DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puzzle Kombat - P2 Rounds Wins" },
+        { address=0X11549F8, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Outworld" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD953BA, type="u16le", condition="eq", value=0X0000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XD95426, type="u16le", condition="eq", value=0X0000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XD95D98, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="On (Default)" },
+        { address=0XD99444, type="u8", condition="eq", value=0X0D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Reached Nexus 8th time (Deadly Alliance Begins)" },
+        { address=0XD996C2, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="HJ Key (Tiles of Death and Whimsh Soundtrack)" },
+      },
+      health = {
+        { address=0XD953BA, type="u16le", condition="eq", value=0X3F80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0XD953BA, type="u16le", condition="eq", value=0X3C00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="No HP" },
+        { address=0XD953BA, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="P1 - HP [16-bits]" },
+        { address=0XD95426, type="u16le", condition="eq", value=0X3F80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0XD95426, type="u16le", condition="eq", value=0X3C00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="No HP" },
+        { address=0XD95426, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="P2 - HP [16-bits]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X10C5754, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Puzzle Kombat - P2 Score [1]" },
+        { address=0X10C5E70, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Puzzle Kombat - P1 Score [2]" },
+      },
+      collectibles = {
+        { address=0XD992A4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Game - Gold Koins [32-bits] increased" },
+        { address=0XD99673, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="[Item] Ring (Wedding Ring)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD99308, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<Starting Block for Krypt Unlockables>" },
+        { address=0XD99339, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="489 Jade Koins (TM)" },
+        { address=0XD99339, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1214 Ruby Koins (TT)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD954F0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round - Time" },
+        { address=0XD95D8C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Settings - Round Time" },
+        { address=0XD99444, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Konquest - Realm Progress" },
+        { address=0XD9AD5C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Chess Kombat - Last Fight Encounter Winner" },
+      },
+    },
+  },
+}

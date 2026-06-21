@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Wipeout Pulse",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "wipeout-pulse",
+    file = "wipeout-pulse.zip",
+    hashes = {
+      { hash = "993207ad5c5e6a29cf04ab8b8fc17dc7", label = "WipEout Pulse (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0XD94310, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon/Item Pads Run Over" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD94440, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Race Campaign Total Points Won" },
+        { address=0XDC0EEC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Assegai Team Loyalty Points" },
+        { address=0XDC0F6C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Qirex Team Loyalty Points" },
+        { address=0XDC0FEC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Feisar Team Loyalty Points" },
+        { address=0XDC106C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="AG Systems Team Loyalty Points" },
+        { address=0XDC10EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="EG-X Team Loyalty Points" },
+        { address=0XDC116C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Goteki 45 Team Loyalty Points" },
+        { address=0XDC11EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Triakis Team Loyalty Points" },
+        { address=0XDC126C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Piranha Team Loyalty Points" },
+        { address=0XDC12EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Harimau Team Loyalty Points" },
+        { address=0XDC136C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Icarus Team Loyalty Points" },
+        { address=0XDC13EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mirage Team Loyalty Points" },
+        { address=0XDC146C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Auricom Team Loyalty Points" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD943B4, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shields Asborbed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD9431C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Spent Looking at Stats (in Seconds)" },
+        { address=0XD94324, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Single Race Game Time (In Seconds)" },
+        { address=0XD94328, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Trial Game Time (In Seconds)" },
+        { address=0XD9432C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Zone Game Time (In Seconds)" },
+        { address=0XD9444C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Race Campaign Game Time (In Seconds)" },
+        { address=0XD94450, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Racebox Game Time (In Seconds)" },
+      },
+    },
+  },
+}

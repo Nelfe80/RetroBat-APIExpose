@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Pictionary",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "pictionary",
+    file = "pictionary.zip",
+    hashes = {
+      { hash = "908c10a68cfe39c4d9eeeb20bf1c8e66", label = "Pictionary - The Game of Video Quick Draw (USA).nes" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0004, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] somekind of timer" },
+        { address=0X0042, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Inactivity Timer" },
+        { address=0X0084, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X0085, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Picture Timer" },
+        { address=0X0086, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Picture Timer" },
+        { address=0X008A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] how many times played a mini game" },
+        { address=0X00AE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] slow timer ?" },
+      },
+    },
+  },
+}

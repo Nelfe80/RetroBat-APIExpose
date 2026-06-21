@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Lemmings",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "lemmings",
+    file = "lemmings.zip",
+    hashes = {
+      { hash = "10efb60b347ba59d0003fa35f076dd49", label = "Lemmings (USA).nes" },
+      { hash = "e6b128e9cfac2560652b993d45114163", label = "Lemmings (Europe).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00B8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Skill: Blockers" },
+      },
+    },
+  },
+}

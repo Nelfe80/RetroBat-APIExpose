@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "Altered Beast",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "altered-beast",
+    file = "altered-beast.zip",
+    hashes = {
+      { hash = "bc80ce3199cfe7265644e711e7919013", label = "altbeast2.7z <Altered Beast (set 2, MC-8123B 317-0066)>" },
+      { hash = "ffd3fe067fcc35a30e5ba34415e01507", label = "altbeast.7z <Altered Beast (set 8, 8751 317-0078)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3094, type="u16le", condition="eq", value=0XFF01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/GameOver/Off" },
+        { address=0X3094, type="u16le", condition="eq", value=0XFF03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X3509, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Gameplay Stage 1" },
+        { address=0X3509, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Gameplay Stage 2" },
+        { address=0X3509, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Gameplay Stage 3" },
+        { address=0X353B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Test Demo Mode?" },
+        { address=0X14D72, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="FF = Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X006A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power level 2" },
+      },
+      stage = {
+        { address=0X3094, type="u16le", condition="eq", value=0XFD01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X3094, type="u16le", condition="eq", value=0XF901, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 [2-Player]" },
+        { address=0X3094, type="u16le", condition="eq", value=0XFC01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X3094, type="u16le", condition="eq", value=0XF801, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 [2-Player]" },
+        { address=0X3094, type="u16le", condition="eq", value=0XFC02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X3094, type="u16le", condition="eq", value=0XF802, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 [2-Player]" },
+        { address=0X3094, type="u16le", condition="eq", value=0XFD02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X3094, type="u16le", condition="eq", value=0XF902, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage5 [2-Player]" },
+        { address=0X3143, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages [00 = Stage 1; 01 = Stage 2; 02 = Stage 3]" },
+        { address=0X3146, type="u16le", condition="eq", value=0X0008, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Started" },
+        { address=0X3146, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE IN GAME SCREEN PROGRESSION" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFFE018, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+        { address=0XFFC06A, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: select power-up/beast" },
+        { address=0XFFE01B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: select power-up/beast" },
+        { address=0X004B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Energy Meter [00=dead; 10=1 bar; 20=2 bars; 30=deafult; 40=4 bars; 50=5 bars]" },
+        { address=0X2019, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1P LIVES IN GAME increased" },
+        { address=0X2019, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1P LIVES IN GAME decreased" },
+        { address=0X3018, type="u24le", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Live" },
+        { address=0X3018, type="u24le", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0X3018, type="u24le", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 Lives" },
+        { address=0X3018, type="u24le", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="4 Lives" },
+        { address=0X3018, type="u24le", condition="eq", value=0XF0, action="LIVES_STATE", no_log=false, no_survey=false, desc="240 Lives" },
+        { address=0X3018, type="u24le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="OPTION - LIVES increased" },
+        { address=0X3018, type="u24le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="OPTION - LIVES decreased" },
+        { address=0X315D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="FLAG BOSS DEATH" },
+      },
+      health = {
+        { address=0XFFC04A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: energy" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFFE000, type="u32be", condition="change", action="TREASURE", color="cyan", min=20000, max=50000, no_log=false, no_survey=false, desc="Score delta 20000-50000: Round clear bonus" },
+        { address=0X2000, type="u8", condition="change", action="TREASURE", color="cyan", min=20000, max=50000, no_log=false, no_survey=false, desc="Score delta 20000-50000: Round clear bonus" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFFE000, type="u32be", condition="change", action="SCORE_STATE", color="white", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Simple monster/corpse" },
+        { address=0XFFE000, type="u32be", condition="change", action="SCORE_STATE", color="white", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Flying gargoyle" },
+        { address=0XFFE000, type="u32be", condition="change", action="SCORE_STATE", color="white", min=300, max=300, no_log=false, no_survey=false, desc="Score delta 300-300: Blue monster/corpse,terran bird" },
+        { address=0XFFE000, type="u32be", condition="change", action="SCORE_STATE", color="white", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Dragon/giant snake" },
+        { address=0XFFE000, type="u32be", condition="change", action="SCORE_STATE", color="white", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Brilliant wolf" },
+        { address=0X2000, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE POINT" },
+        { address=0X2001, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE POINT" },
+        { address=0X2002, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE POINT" },
+        { address=0X2003, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE POINT" },
+        { address=0X14142, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Time to enter the score initials" },
+        { address=0X2000, type="u8", condition="change", action="SCORE_STATE", color="white", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Simple monster/corpse" },
+        { address=0X2000, type="u8", condition="change", action="SCORE_STATE", color="white", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Flying gargoyle" },
+        { address=0X2000, type="u8", condition="change", action="SCORE_STATE", color="white", min=300, max=300, no_log=false, no_survey=false, desc="Score delta 300-300: Blue monster/corpse,terran bird" },
+        { address=0X2000, type="u8", condition="change", action="SCORE_STATE", color="white", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Dragon/giant snake" },
+        { address=0X2000, type="u8", condition="change", action="SCORE_STATE", color="white", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Brilliant wolf" },
+      },
+      collectibles = {
+        { address=0XFFF000, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+        { address=0X3001, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins [00 = default] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X144B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+        { address=0X15CB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 3 Boss health" },
+        { address=0X3146, type="u16le", condition="eq", value=0X0180, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1 - Boss Step 1" },
+        { address=0X3146, type="u16le", condition="eq", value=0X02F0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1 - Boss Step 2" },
+        { address=0X3146, type="u16le", condition="eq", value=0X0508, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1 - Boss Step 3" },
+        { address=0X3146, type="u16le", condition="eq", value=0X0168, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 3 - Boss Step 1" },
+        { address=0X3146, type="u16le", condition="eq", value=0X0200, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 4 - Boss Step 1" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2028, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X141C8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Continue Counter [9= 39; 8= 38...]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Pinball 3D",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-pinball-3d",
+    file = "the-pinball-3d.zip",
+    hashes = {
+      { hash = "b4274a818a208a91ef712a2944e2b2fa", label = "Simple 1500 Series Vol. 11 - The Pinball 3D (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

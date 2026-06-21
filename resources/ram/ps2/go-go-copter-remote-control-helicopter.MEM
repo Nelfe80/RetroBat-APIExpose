@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Go Go Copter: Remote Control Helicopter",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Flight Simulator"
+  },
+
+  rom = {
+    name = "go-go-copter-remote-control-helicopter",
+    file = "go-go-copter-remote-control-helicopter.zip",
+    hashes = {
+      { hash = "dfe1be841c66666720aea795c502908f", label = "Go Go Copter - Remote Control Helicopter (Europe) (En,Fr,De)" },
+      { hash = "7e9d79815a4c1496fb625aaab7216bae", label = "Go Go Copter - Remote Control Helicopter (Europe) (En,Fr,De) (RA Compatibility) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+  },
+}

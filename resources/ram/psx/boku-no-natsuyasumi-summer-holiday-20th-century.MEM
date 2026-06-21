@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Boku no Natsuyasumi: Summer Holiday 20th Century",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "boku-no-natsuyasumi-summer-holiday-20th-century",
+    file = "boku-no-natsuyasumi-summer-holiday-20th-century.zip",
+    hashes = {
+      { hash = "6d3b89e87e22cb747cc65ff5af8544f6", label = "Boku no Natsuyasumi - Summer Holiday 20th Century (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

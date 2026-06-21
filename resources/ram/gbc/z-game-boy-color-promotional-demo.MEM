@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "~Z~ Game Boy Color Promotional Demo",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-game-boy-color-promotional-demo",
+    file = "z-game-boy-color-promotional-demo.zip",
+    hashes = {
+      { hash = "0b4f167d39212f40f793fe1ec19421d7", label = "Game Boy Color (World) (Demo) (Kiosk).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Bionicle Heroes",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "bionicle-heroes",
+    file = "bionicle-heroes.zip",
+    hashes = {
+      { hash = "f9080070fb6d6644e7bf5f42fb41fa0d", label = "Bionicle Heroes (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6AE618, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Bit 0 = works as title screen indicator" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X65E071, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Canister - Shadow Kraata Level 1" },
+        { address=0X65E078, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Canister - Shadow Kraata Level 2" },
+        { address=0X65E07F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Canister - Shadow Kraata Level 3" },
+        { address=0X65E086, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Canister - Shadow Kraata Level 4" },
+        { address=0X65E08D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Canister - Shadow Kraata Level 5" },
+        { address=0X65E094, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Canister - Shadow Kraata Level 6" },
+        { address=0X65E2F5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Bonus level 1" },
+        { address=0X65E2F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Bonus level 2" },
+        { address=0X65E2F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Bonus level 3" },
+        { address=0X65E32A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked Piraka Playground" },
+        { address=0X65E35A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Standard" },
+        { address=0X65E35A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X65E35A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X65E35A, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X65E35A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extra Level 1" },
+        { address=0X65E35B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extra Level 2" },
+        { address=0X65E35C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extra Level 3" },
+        { address=0X65E38A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="bonus level 1 unlocked" },
+        { address=0X65E41C, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max" },
+        { address=0X65E41C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Jaller - Toa Armour Level" },
+        { address=0X65E41D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Hahli - Toa Armour Level" },
+        { address=0X65E41E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Kongu - Toa Armour Level" },
+        { address=0X65E41F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Matoro - Toa Armour Level" },
+        { address=0X65E420, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Hewkii - Toa Armour Level" },
+        { address=0X65E421, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Nuparu - Toa Armour Level" },
+        { address=0X65E422, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Jaller - Toarch Ability Level" },
+        { address=0X65E423, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Hahli - Drench Ability Level" },
+        { address=0X65E424, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Kongu - Gust Ability Level" },
+        { address=0X65E425, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Matoro - Freeze Ability Level" },
+        { address=0X65E426, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Hewkii - Fragment Ability Level" },
+        { address=0X65E427, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Nuparu - Excavate Ability Level" },
+        { address=0X65E428, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Jaller - Vakama's Launcher Level" },
+        { address=0X65E429, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Hahli - Nokama's Hydro Blade Level" },
+        { address=0X65E42A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Kongu - Matau's Aero Slicer Level" },
+        { address=0X65E42B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Matoro - Crystal Spike Level" },
+        { address=0X65E42C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop - Hewkii - Proto Piton Level" },
+        { address=0X65E454, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extra Level 1 - Bohrok Defeated" },
+        { address=0X65E458, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extra Level 2 - Visorak Defeated" },
+        { address=0X65E45C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extra Level 3 - Vahki Defeated" },
+        { address=0X65E75D, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Opened First Level" },
+        { address=0X6B0D74, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bits] Enemies defeated in extra levels" },
+      },
+      stage = {
+        { address=0X4AC8D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X65E17B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Golden Canister - Mask of Elemental Energy decreased" },
+        { address=0X65E17B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Golden Canister - Mask of Elemental Energy increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X65DFEC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Golden Canister - Gold Kanohi Vahi increased" },
+        { address=0X65E27E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Golden Canister - Solid Gold Hau increased" },
+        { address=0X65E345, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X65E3A0, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6B0D70, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(Float) Timer on extra levels" },
+      },
+    },
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Agent Hugo: RoboRumble",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "agent-hugo-roborumble",
+    file = "agent-hugo-roborumble.zip",
+    hashes = {
+      { hash = "02fe9812bc5022835d55ce2ddfee95d7", label = "Agent Hugo - Roborumble (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB405, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] ADDITIONAL Nubmer level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA8C0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score level 1/3" },
+        { address=0XA8D8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score level 2/3" },
+        { address=0XABD0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score level 3/3" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA8C4, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8bit] Count destroy robots 1/2" },
+        { address=0XA8DC, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[16bit] Count destroy robots 2/2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XABDC, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16bit] Timer in level" },
+        { address=0XABDE, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16bit] Timer in level" },
+        { address=0XB404, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16bit] Nubmer level" },
+      },
+    },
+  },
+}

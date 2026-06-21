@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Alice-tachi no Gogo Vol. 1",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "alice-tachi-no-gogo-vol-1",
+    file = "alice-tachi-no-gogo-vol-1.zip",
+    hashes = {
+      { hash = "33c6528aa913b240817410b31556be44", label = "Alice-tachi no Gogo Vol. 1 (System disk).d88" },
+      { hash = "fc40d59e5bd3e42aecce8d36c11e8b89", label = "Alice-tachi no Gogo Vol. 1 (Disk 1).d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0005, type="u8", condition="eq", value=0XA3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Text Screen or Battle" },
+        { address=0X0005, type="u8", condition="eq", value=0XE4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Text Screen or Battle" },
+        { address=0X0005, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] 0xc=Walking Around" },
+        { address=0X6215, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Battle Level" },
+        { address=0X6ECA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4D90, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Enemy HP? decreased" },
+        { address=0X4D90, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Enemy HP? increased" },
+        { address=0X6213, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Battle HP decreased" },
+        { address=0X6213, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Battle HP increased" },
+        { address=0X67D5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Enemy HP? decreased" },
+        { address=0X67D5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Enemy HP? increased" },
+        { address=0X6EC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Energy (Out of Battle HP) decreased" },
+        { address=0X6EC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Energy (Out of Battle HP) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X339A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X339B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X339C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X339D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X339E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X339F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X33A0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X33A1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X33A2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Expo Screen increased" },
+        { address=0X33A3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Screen increased" },
+        { address=0X33A4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Screen increased" },
+        { address=0X33A5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Screen increased" },
+        { address=0X33A6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Screen increased" },
+        { address=0X33A7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Screen increased" },
+        { address=0X33A8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Screen increased" },
+        { address=0X33A9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] b0=Money Taken on Screen increased" },
+        { address=0X6EC6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] Money increased" },
+      },
+    },
+  },
+}

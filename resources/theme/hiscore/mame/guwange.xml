@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 いろはにいろはに 21191351</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 [jp-h-ho][jp-h-he][jp-h-to][jp-h-so][jp-h-ho][jp-h-he][jp-h-to][jp-h-so] 2321183</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 [jp-h-handakuten][jp-h-dakuten][jp-h-handakuten][jp-h-sokuon][jp-h-handakuten][jp-h-dakuten][jp-h-handakuten][jp-h-sokuon] 539186</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 [jp-h-youon-a][jp-h-youon-u][jp-h-youon-o][jp-h-youon-o][jp-h-handakuten][jp-h-youon-a][jp-h-youon-u][jp-h-youon-o][jp-h-youon-o][jp-h-handakuten] 483576</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 [jp-h-n][jp-h-n][jp-h-handakuten][jp-h-n][jp-h-dakuten][jp-h-si][jp-h-n][jp-h-n][jp-h-handakuten][jp-h-n][jp-h-dakuten][jp-h-si] 470133</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 いい[jp-h-dakuten]い[jp-h-handakuten][jp-h-youon-o][jp-h-handakuten]いい[jp-h-dakuten]い[jp-h-handakuten][jp-h-youon-o][jp-h-handakuten] 236291</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7  228204</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 [jp-h-ki][jp-h-no][jp-h-e][jp-h-ki][jp-h-no][jp-h-e] 200000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 [jp-h-ki][jp-h-no][jp-h-to][jp-h-ki][jp-h-no][jp-h-to] 180000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 [jp-h-hi][jp-h-no][jp-h-e][jp-h-hi][jp-h-no][jp-h-e] 160000</text>
+		</text>
+	</view>
+</theme>

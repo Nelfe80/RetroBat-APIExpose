@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Blonde Justice",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "blonde-justice",
+    file = "blonde-justice.zip",
+    hashes = {
+      { hash = "22a0c9aeb60c52dd8beaf63d76dca267", label = "Blonde Justice (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9E9CC, type="u8", condition="eq", value=0X35, action="DEMO_MODE", no_log=false, no_survey=false, desc="Coming Attractions" },
+        { address=0X9ED0B, type="u8", condition="eq", value=0X35, action="DEMO_MODE", no_log=false, no_survey=false, desc="Coming Attractions" },
+        { address=0XA7F20, type="u8", condition="eq", value=0X2C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Coming Attractions" },
+      },
+    },
+  },
+}

@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Magical Drop II",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "magical-drop-ii",
+    file = "magical-drop-ii.zip",
+    hashes = {
+      { hash = "522314f93c7d9827bc1aa1b2dae0f1ed", label = "magdrop2.7z <Magical Drop II>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X004D, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[BCD] Credits (total for both sides in USA set)" },
+        { address=0XFD8B, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[1-bit] CONTINUE" },
+        { address=0XFD8D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[1-bit] DEMO SOUND" },
+        { address=0XFEC4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[1-bit] User Allowed (so if this is 0, we're in demo mode and must stop tracking)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0073, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round for either VS. COM or Flash" },
+        { address=0X011B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round in 1P VS. Starts on 0. Doubles as wins for 1P in Multiplayer" },
+        { address=0X0A5E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puzzle level" },
+        { address=0X1700, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Has the screen just been cleared? wrt Puzzle" },
+        { address=0XFD8A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Lower4] LEVEL setting per the BIOS (l=x+1)" },
+        { address=0XFD8F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[1-bit] LEVEL DISP." },
+      },
+      stage = {
+        { address=0X02F3, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage still ongoing" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X007A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Left half of 1P score" },
+        { address=0X007C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Right half of 1P score" },
+        { address=0X0080, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Left half of 2P score" },
+        { address=0X0082, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Right half of 2P score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Dr. Slump",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure, Platform, Role-Playing"
+  },
+
+  rom = {
+    name = "dr-slump",
+    file = "dr-slump.zip",
+    hashes = {
+      { hash = "8c548d32e757bb27c49585e282b76e5c", label = "Dr. Slump (Japan) (En) (v1.1) (Hilltop)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDADA0, type="u16le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[16Bit] main menu / game over text screen bounce animation" },
+        { address=0XDAE38, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8Bit] Demo Mode" },
+        { address=0XDAE84, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8Bit] Pause" },
+        { address=0X1B3100, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8Bit] Continue / new game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X130F7C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8Bit] Been to first level id" },
+        { address=0X130F7D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8Bit] Been to second level id" },
+        { address=0X130F7E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8Bit] Been to third level id" },
+        { address=0X130F7F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8Bit] Been to fourth level id" },
+        { address=0X130F80, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8Bit] Been to fith level id" },
+        { address=0X130F81, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8Bit] Been to sixth level id" },
+        { address=0X130F82, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8Bit] Been to seventh level id" },
+        { address=0X130FCE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8Bit] action stages completed" },
+      },
+      stage = {
+        { address=0X130F46, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8Bit] Stage 1 Golden Poop Count" },
+        { address=0X130F48, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8Bit] Stage 2 Golden Poop Count" },
+        { address=0X130F4A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8Bit] Stage 3 Golden Poop Count" },
+        { address=0X130F4C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8Bit] Stage 4 Golden Poop Count" },
+        { address=0X130F4E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8Bit] Stage 5 Golden Poop Count" },
+        { address=0X130F50, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8Bit] Stage 6 Golden Poop Count" },
+        { address=0X130F52, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8Bit] Stage 7 Golden Poop Count" },
+        { address=0X131064, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8Bit] Potential pink poop collected per stage ?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1E95EE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16Bit] Arale Health decreased" },
+        { address=0X1E95EE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16Bit] Arale Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X130EFB, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8Bit] Unlocked Ninja Suit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X172A8A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8Bit] All Boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X130EEF, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8Bit] Audio Monitor Unlocked" },
+      },
+    },
+  },
+}

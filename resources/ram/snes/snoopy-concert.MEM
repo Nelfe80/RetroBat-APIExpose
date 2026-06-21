@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Snoopy Concert",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "snoopy-concert",
+    file = "snoopy-concert.zip",
+    hashes = {
+      { hash = "64e20693431cbf71b52a872e6ee53430", label = "Snoopy Concert (Japan).sfc" },
+      { hash = "b3797d105b8f1fb60f5564077c634a35", label = "Snoopy Concert (Japan) (En) (v1.0) (Aeon Genesis).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X00C7, type="u8", condition="eq", value=0X6E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main menu" },
+        { address=0X00C7, type="u8", condition="eq", value=0X3C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Linus 1" },
+        { address=0X00C7, type="u8", condition="eq", value=0X5D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rerun 1" },
+        { address=0X00C7, type="u8", condition="eq", value=0X60, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rerun 2" },
+        { address=0X00C7, type="u8", condition="eq", value=0X64, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rerun 3" },
+        { address=0X00C7, type="u8", condition="eq", value=0X62, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rerun loading" },
+        { address=0X00C7, type="u8", condition="eq", value=0X48, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Charlie Brown" },
+        { address=0X00C7, type="u8", condition="eq", value=0X25, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Concert Hall" },
+        { address=0X00C7, type="u8", condition="eq", value=0X15, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lazy Gym" },
+        { address=0X00C7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage tracker (sort of...)" },
+        { address=0X02D7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Woodstock X value (on stage select)" },
+        { address=0X02D9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Woodstock Y value (on stage select)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00C7, type="u8", condition="eq", value=0X67, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rerun death" },
+        { address=0X0459, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Rerun stage lives counter increased" },
+        { address=0X0459, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rerun stage lives counter decreased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0663, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Menu cursor object graphic" },
+      },
+    },
+  },
+}

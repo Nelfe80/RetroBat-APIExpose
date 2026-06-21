@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Donald Duck Advance!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "donald-duck-advance",
+    file = "donald-duck-advance.zip",
+    hashes = {
+      { hash = "028807ea1e01c6645d38e228f6915a31", label = "Donald Duck Advance (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "8384aa8735b5a036fdddb5da430cb25b", label = "Donald Duck Advance (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0804, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Game is Playing (Including Demo) = 01" },
+        { address=0X3EE7, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode = 08" },
+        { address=0X5C65, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Gallery Unlock (Continued):" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5426, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Related to What Level You Are On?" },
+        { address=0X5BFC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Related to Levels Completed" },
+        { address=0X5F16, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Star Count from Level Itself" },
+        { address=0X5F1A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Star Count from Enemies in Level" },
+      },
+      stage = {
+        { address=0X5C00, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5D55, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X5D55, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X5F10, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Also Lives increased" },
+        { address=0X5F10, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Also Lives decreased" },
+        { address=0X5F1E, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X5F1E, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Hit Once" },
+        { address=0X5F1E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="00 = All Health" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5D64, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5ED0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password Block _1 (23 when not in use)" },
+        { address=0X5ED4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password Block _2 (23 when not in use)" },
+        { address=0X5ED8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password Block _3 (23 when not in use)" },
+        { address=0X5EDC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password Block _4 (23 when not in use)" },
+        { address=0X5EE0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password Block _5 (23 when not in use)" },
+        { address=0X5EE4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password Block _6 (23 when not in use)" },
+        { address=0X5EE8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password Block _7 (23 when not in use)" },
+        { address=0X5EEC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password Block _8 (23 when not in use)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5954, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer for Credits (0d60 when not in use. Goes to 0000 and then up to 0d60)" },
+      },
+    },
+  },
+}

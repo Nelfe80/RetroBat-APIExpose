@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Global Champion",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "global-champion",
+    file = "global-champion.zip",
+    hashes = {
+      { hash = "a91f3cf795d192e70c8d81092e3e69b7", label = "gblchmp.7z <Global Champion (Ver 2.1A 1994/07/29)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE174, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X113A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number" },
+      },
+      stage = {
+        { address=0X113A6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1342C, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X1322C, type="u8", condition="eq", value=0X64, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X1322C, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player Health" },
+        { address=0X1342C, type="u8", condition="eq", value=0X64, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X1342C, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Enemy Health" },
+      },
+    },
+  },
+}

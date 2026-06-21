@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Caesars Palace 2000: Millennium Gold Edition",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "caesars-palace-2000-millennium-gold-edition",
+    file = "caesars-palace-2000-millennium-gold-edition.zip",
+    hashes = {
+      { hash = "12889c82ed9fb6481c2a767e676c4aed", label = "Caesars Palace 2000 - Millennium Gold Edition (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

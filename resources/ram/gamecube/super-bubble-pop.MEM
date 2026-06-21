@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Super Bubble Pop",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "super-bubble-pop",
+    file = "super-bubble-pop.zip",
+    hashes = {
+      { hash = "7d8c4170e1cd3498305b146ba253e0d6", label = "Super Bubble Pop (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15E1C0, type="u32be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues [32-bit BE]" },
+        { address=0X15F01C, type="u32be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="1 if demo mode active, 0 otherwise [32-bit BE]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X15E54C, type="u32be", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chilled" },
+        { address=0X15E54C, type="u32be", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Groovin" },
+        { address=0X15E54C, type="u32be", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hardcore" },
+        { address=0X15E54C, type="u32be", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training" },
+        { address=0X15E54C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="One player skill level [32-bit BE]" },
+        { address=0X15F000, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level [32-bit BE]" },
+        { address=0XE39770, type="u32be", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level token" },
+        { address=0XEDEE74, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level tokens [32-bit BE]" },
+        { address=0XEDF6F0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of perfect clears in current run [32-bit BE]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XE3974C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Color energy [Float BE] decreased" },
+        { address=0XE3974C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Color energy [Float BE] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE39604, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32-bit BE]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE396EC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level timer [Float BE]" },
+      },
+    },
+  },
+}

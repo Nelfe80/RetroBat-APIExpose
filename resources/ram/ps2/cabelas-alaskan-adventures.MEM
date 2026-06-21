@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Cabela's Alaskan Adventures",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "cabelas-alaskan-adventures",
+    file = "cabelas-alaskan-adventures.zip",
+    hashes = {
+      { hash = "07307fc7fd8932cd2d12fd54f7719f50", label = "Cabela's Alaskan Adventures (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X17FA7B8, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Save State - Ammo" },
+      },
+    },
+  },
+}

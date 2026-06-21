@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "International Superstar Soccer 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Sports, Football"
+  },
+
+  rom = {
+    name = "international-superstar-soccer-64",
+    file = "international-superstar-soccer-64.zip",
+    hashes = {
+      { hash = "6a345402ae1db5ce1041365e36126bce", label = "International Superstar Soccer 64 (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1A80DA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Player goals" },
+        { address=0X1A92C2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Opponent goals" },
+      },
+    },
+  },
+}

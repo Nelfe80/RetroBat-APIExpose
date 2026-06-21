@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Risk: Global Domination",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "risk-global-domination",
+    file = "risk-global-domination.zip",
+    hashes = {
+      { hash = "4632e2cb764b4589288e375ada74d6ef", label = "Risk - Global Domination (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X75A1F0, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag" },
+      },
+    },
+  },
+}

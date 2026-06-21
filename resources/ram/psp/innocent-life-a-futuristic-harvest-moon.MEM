@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Innocent Life: A Futuristic Harvest Moon",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "innocent-life-a-futuristic-harvest-moon",
+    file = "innocent-life-a-futuristic-harvest-moon.zip",
+    hashes = {
+      { hash = "8fb071c9ebae940de401b0fca29c33a0", label = "Innocent Life - A Futuristic Harvest Moon (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8B6C04, type="u8", condition="eq", value=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X97EFE8, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="cleared forest mist" },
+        { address=0X97EFEA, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="caves fumes cleared" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X97EFE5, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hopes cat died" },
+        { address=0XA3542E, type="u16le", condition="eq", value=0X3601, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Plant" },
+        { address=0XA3542E, type="u16le", condition="eq", value=0X6501, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Milk" },
+        { address=0XA3542E, type="u16le", condition="eq", value=0X6581, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Cheese" },
+        { address=0XA3542E, type="u16le", condition="eq", value=0X6601, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Mayonaise" },
+        { address=0XA3542E, type="u16le", condition="eq", value=0X6681, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Egg" },
+        { address=0XA3542E, type="u16le", condition="eq", value=0X6701, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Wool (Unobtainable)" },
+      },
+      health = {
+        { address=0XA3542E, type="u16le", condition="eq", value=0X6201, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Healthy Color" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X97F0DC, type="u32le", condition="eq", value=0XFFFFFFFF, action="MONEY_STATE", no_log=false, no_survey=false, desc="0" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA3542E, type="u16le", condition="eq", value=0X6781, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Crop" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X97F0F8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="time of day" },
+      },
+    },
+  },
+}

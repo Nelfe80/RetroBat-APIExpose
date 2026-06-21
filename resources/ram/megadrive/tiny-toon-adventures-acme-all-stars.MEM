@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Tiny Toon Adventures: ACME All-Stars",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "tiny-toon-adventures-acme-all-stars",
+    file = "tiny-toon-adventures-acme-all-stars.zip",
+    hashes = {
+      { hash = "1def1d7dbe4ab6b9e1fc90093292de6a", label = "Tiny Toon Adventures - ACME All-Stars (USA, Korea) (En).md" },
+      { hash = "abddd42b2548e9b708991f689d726c9a", label = "Tiny Toon Adventures - ACME All-Stars (Europe) (En,Fr,De).md" },
+    }
+  },
+
+  events = {
+  },
+}

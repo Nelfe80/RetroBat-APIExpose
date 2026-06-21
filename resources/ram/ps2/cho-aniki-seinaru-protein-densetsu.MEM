@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Cho Aniki: Seinaru Protein Densetsu",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cho-aniki-seinaru-protein-densetsu",
+    file = "cho-aniki-seinaru-protein-densetsu.zip",
+    hashes = {
+      { hash = "47279ff3aa0e3555a5432ad7bbee43df", label = "Chou Aniki - Seinaru Protein Densetsu (Japan)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X97BCBC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] current score" },
+      },
+    },
+  },
+}

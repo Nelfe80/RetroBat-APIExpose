@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "Pop'n Music 2 | Pop'n Music 3 | Pop'n Music 4",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "popn-music-2-popn-music-3-popn-music-4",
+    file = "popn-music-2-popn-music-3-popn-music-4.zip",
+    hashes = {
+      { hash = "f2eef7d45e265baab06b473677257aff", label = "Pop'n Music 2 (Japan)" },
+      { hash = "1ec0835e87528f2d758d31ee52cd8d30", label = "Pop'n Music 3 - Append Disc (Japan)" },
+      { hash = "a515d03cdc648d115c649d9d0dfd596c", label = "Pop'n Music 4 - Append Disc (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC562D, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XC5E64, type="u16le", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Main Menu" },
+        { address=0XC5E64, type="u16le", condition="eq", value=0X0F, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XC5E64, type="u16le", condition="eq", value=0X11, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XCF09D, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XCF81C, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Main Menu" },
+        { address=0XCF81C, type="u16le", condition="eq", value=0X09, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XCF81C, type="u16le", condition="eq", value=0X15, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XCFD3F, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XD035C, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Main Menu" },
+        { address=0XD035C, type="u16le", condition="eq", value=0X09, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XD035C, type="u16le", condition="eq", value=0X0E, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XD035C, type="u16le", condition="eq", value=0X10, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XD035C, type="u16le", condition="eq", value=0X0C, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XD035C, type="u16le", condition="eq", value=0X14, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC5928, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 3] Options - Game Level" },
+        { address=0XCF4E8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 4] Options - Game Level" },
+        { address=0XCFD56, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="AKIBA - E.C.M. - Clear Beginner Marathon" },
+        { address=0XCFD56, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="AVANTGARDE - Bee's Eye - Clear Half Marathon" },
+        { address=0XCFD56, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="LIVE - Theme of staff roll～special mix～ - Clear Full Marathon" },
+        { address=0XCFFC0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 2] Options - Game Level" },
+        { address=0XD0214, type="u16le", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Normal (Either failing through normally or clear)" },
+        { address=0XD2578, type="u16le", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Normal (Either failing through normally or clear)" },
+        { address=0XD2E7C, type="u16le", condition="eq", value=0X1A4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XDBFFC, type="u16le", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Normal (Either failing through normally or clear)" },
+        { address=0XDE5DC, type="u16le", condition="eq", value=0X1A4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XDEC2A, type="u16le", condition="eq", value=0X1A4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+      stage = {
+        { address=0X8CEF8, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 2] Stage Selection Highlighted Song" },
+        { address=0X8E938, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 4] Stage Selection Highlighted Song" },
+        { address=0XC5E8E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 3] Current Stages" },
+        { address=0XD0004, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] [Pop'n 2] Survival Stage Stars" },
+        { address=0XD0005, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] [Pop'n 2] Survival Stage Stars" },
+        { address=0XD0006, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] [Pop'n 2] Survival Stage Stars" },
+        { address=0XD0007, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] [Pop'n 2] Survival Stage Stars" },
+        { address=0XD0008, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Survival Stage Stars" },
+        { address=0XD0386, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 2] Normal Stages" },
+        { address=0XD03AE, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 2] Excite Stages" },
+        { address=0XD03D2, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 2] Beginner Stages" },
+        { address=0XD0422, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 2] Party Stages" },
+        { address=0XD043E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 2] Survival Stages" },
+        { address=0XD044E, type="u16le", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Beginner/Half End" },
+        { address=0XD044E, type="u16le", condition="eq", value=0X25, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Full End" },
+        { address=0XD044E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 2] Marathon Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8CED4, type="u16le", condition="eq", value=0X0E, action="LIVES_STATE", no_log=false, no_survey=false, desc="J-POP - Life" },
+        { address=0XC5638, type="u24le", condition="eq", value=0X21, action="LIVES_STATE", no_log=false, no_survey=false, desc="HYPER J-POP - Life" },
+        { address=0XC564C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="J-POP - Life (Default)" },
+        { address=0XCFD51, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="J-POP - Life" },
+      },
+      health = {
+        { address=0X8CED4, type="u16le", condition="eq", value=0X13, action="HIT", no_log=false, no_survey=false, desc="POPS - I REALLY WANT TO HURT YOU" },
+        { address=0XC5638, type="u24le", condition="eq", value=0X22, action="HIT", no_log=false, no_survey=false, desc="HYPER POPS - I REALLY WANT TO HURT YOU" },
+        { address=0XC564C, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="POPS - I REALLY WANT TO HURT YOU" },
+        { address=0XCF0A8, type="u16le", condition="eq", value=0X13, action="HIT", no_log=false, no_survey=false, desc="POPS M-MIX - I REALLY WANT TO HURT YOU ～僕らは完璧さ Single edit" },
+        { address=0XCF0BA, type="u8", condition="bit_true", bit=3, mask=0X08, action="HIT", no_log=false, no_survey=false, desc="POPS M-MIX - I REALLY WANT TO HURT YOU ～僕らは完璧さ Single edit (Hidden)" },
+        { address=0XCFD52, type="u8", condition="bit_true", bit=3, mask=0X08, action="HIT", no_log=false, no_survey=false, desc="POPS - I REALLY WANT TO HURT YOU" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD2E80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] [Pop'n 3] Stage Score" },
+        { address=0XD2E90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] [Pop'n 3] Total Score" },
+        { address=0XDE5E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] [Pop'n 4] Stage Score" },
+        { address=0XDE5F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] [Pop'n 4] Total Score" },
+        { address=0XDEC2C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] [Pop'n 2] Stage Score" },
+        { address=0XDEC38, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] [Pop'n 2] Total Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCF0A8, type="u16le", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSSA - coastline" },
+        { address=0XCF0BC, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSSA - coastline" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC5638, type="u24le", condition="eq", value=0X0C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="DANCEPOP - TILL THE END OF TIME" },
+        { address=0XC5638, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] [Pop'n 3] Song ID" },
+        { address=0XC5649, type="u8", condition="bit_true", bit=4, mask=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="DANCEPOP - TILL THE END OF TIME" },
+      },
+    },
+  },
+}

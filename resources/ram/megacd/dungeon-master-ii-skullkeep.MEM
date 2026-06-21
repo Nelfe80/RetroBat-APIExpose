@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Dungeon Master II: Skullkeep",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dungeon-master-ii-skullkeep",
+    file = "dungeon-master-ii-skullkeep.zip",
+    hashes = {
+      { hash = "ac7d80dee578e35e7011b54c5f0fb993", label = "Dungeon Master II - Skullkeep (USA) (RE3)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X781D8, type="u16be", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X261B2, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] First Slot Current Health decreased" },
+        { address=0X261B2, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] First Slot Current Health increased" },
+        { address=0X262B8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Second Slot Current Health decreased" },
+        { address=0X262B8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Second Slot Current Health increased" },
+        { address=0X262BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Second Slot Max Health decreased" },
+        { address=0X262BA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Second Slot Max Health increased" },
+        { address=0X263BE, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Third Slot Current Health decreased" },
+        { address=0X263BE, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Third Slot Current Health increased" },
+        { address=0X264C4, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Fourth Slot Current Health decreased" },
+        { address=0X264C4, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Fourth Slot Current Health increased" },
+        { address=0X77F98, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] West Courtyard Slime Health decreased" },
+        { address=0X77F98, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] West Courtyard Slime Health increased" },
+        { address=0X77FD8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Mines Guardian Health decreased" },
+        { address=0X77FD8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Mines Guardian Health increased" },
+        { address=0X781D8, type="u16be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[16bit] First Slime Health" },
+        { address=0X785B8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Plaza Slime Health decreased" },
+        { address=0X785B8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Plaza Slime Health increased" },
+        { address=0X78698, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Dragoth Health decreased" },
+        { address=0X78698, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Dragoth Health increased" },
+        { address=0X787C8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Plaza Slime Health decreased" },
+        { address=0X787C8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Plaza Slime Health increased" },
+        { address=0X78AD8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] West Corridor Slime Health decreased" },
+        { address=0X78AD8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] West Corridor Slime Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2623E, type="u24be", condition="eq", value=0X240B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Box" },
+        { address=0X77374, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] First Item Put Into Money Box increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X751D1, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] First door leading outside" },
+        { address=0X797E6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] bit2=Solid Key unlocked first door" },
+      },
+    },
+  },
+}

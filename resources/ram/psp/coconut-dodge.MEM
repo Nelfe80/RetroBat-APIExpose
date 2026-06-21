@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Coconut Dodge",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "coconut-dodge",
+    file = "coconut-dodge.zip",
+    hashes = {
+      { hash = "a61931356be098ff5cf17b68f3075e99", label = "Coconut Dodge (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XACD3A4, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="menu, paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XACD3DC, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="normal on Level ID 0x84 and higher" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XACD3F4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XACD3F4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XACD408, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="One Life" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X10CE870, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score - Easter Egg 1 (16-bit, hex)" },
+        { address=0X1E68BE8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score (32-bit, hex)" },
+      },
+    },
+  },
+}

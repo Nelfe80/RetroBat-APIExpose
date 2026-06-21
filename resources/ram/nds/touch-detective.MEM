@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Touch Detective",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "touch-detective",
+    file = "touch-detective.zip",
+    hashes = {
+      { hash = "fbbc35646b8051f61277512f5107883f", label = "Touch Detective (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X482B4, type="u16le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Player is loading game/on title screen?" },
+      },
+    },
+  },
+}

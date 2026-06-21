@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Spindizzy Worlds",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle-Game, Action"
+  },
+
+  rom = {
+    name = "spindizzy-worlds",
+    file = "spindizzy-worlds.zip",
+    hashes = {
+      { hash = "038ef30004f4d6fc77576878b1743bf8", label = "Spindizzy Worlds (Europe).sfc" },
+      { hash = "4c0fce9368b807e09df98f5bbbc047ce", label = "Spindizzy Worlds (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1D60A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Worlds Complete Tally" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1CF40, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death?" },
+      },
+      health = {
+        { address=0X1CFF0, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[24-bit] Fuel(Health) decreased" },
+        { address=0X1CFF0, type="u24le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[24-bit] Fuel(Health) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1CF85, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Level/Area of Planet Currently On (or hovering in test mode) (is used for demo and test mode) (v" },
+        { address=0X1D081, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Planet Hovering or Currently On (is used for demo and test mode) (value lingers) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1CF6E, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible" },
+      },
+    },
+  },
+}

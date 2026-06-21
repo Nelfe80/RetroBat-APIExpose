@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Hercules: The Legendary Journeys",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "hercules-the-legendary-journeys",
+    file = "hercules-the-legendary-journeys.zip",
+    hashes = {
+      { hash = "6bbd8c42f6ef8f5b9541d6f4db657dd7", label = "Hercules - The Legendary Journeys (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB5498, type="u32be", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Hidden" },
+        { address=0XB5498, type="u32be", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Page 1 (3 lines)" },
+        { address=0XBCC58, type="u32be", condition="eq", value=0X2C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XBCC58, type="u32be", condition="eq", value=0X30, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo [Road to Traycus]" },
+        { address=0XBCC58, type="u32be", condition="eq", value=0X3C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo2 - Temple Ruins" },
+        { address=0XBCC58, type="u32be", condition="eq", value=0X3D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo3 - San Tomanicus" },
+        { address=0XBCCB8, type="u32be", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="N/A - Title Screen" },
+        { address=0XCE0C4, type="u32be", condition="eq", value=0XFFFFFFFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0XCE0C4, type="u32be", condition="eq", value=0X0D, action="PAUSE_ON", no_log=false, no_survey=false, desc="Displayed" },
+      },
+      events = {
+        { address=0XCF92C, type="u32be", condition="eq", value=0X155, action="COMBO_HIT", no_log=false, no_survey=false, desc="Hercules: Punch Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD0E40, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Full" },
+        { address=0XD0E40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Float] Asterius Magma Pool Level" },
+      },
+      zone = {
+        { address=0XCE11C, type="u32be", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+        { address=0X1507B8, type="u32be", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCF93C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0XCF93C, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+        { address=0XCF940, type="u32be", condition="eq", value=0X7D0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Hercules" },
+        { address=0XCF940, type="u32be", condition="eq", value=0X5DC, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Iolaus/The Golden Hind" },
+        { address=0XCF940, type="u32be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Max HP" },
+        { address=0XCFDAC, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Target HP Display decreased" },
+        { address=0XCFDAC, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Target HP Display increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1507DC, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest: Forest Path - Swamp: 100 Dinars" },
+        { address=0X1507DC, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest: Forest Path - Swamp: 100 Dinars" },
+        { address=0X1507DC, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest: Forest Path - Grasslands: 100 Dinars" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB5B20, type="u32be", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Start" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XCF92C, type="u32be", condition="eq", value=0X13C, action="JUMPING", no_log=false, no_survey=false, desc="Hercules: Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCF92C, type="u32be", condition="eq", value=0X177, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hercules: Block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB5B20, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Ares Phase Counter" },
+        { address=0X151F00, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Training Timer" },
+      },
+    },
+  },
+}

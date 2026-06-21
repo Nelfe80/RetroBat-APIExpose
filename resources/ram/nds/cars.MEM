@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cars",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cars",
+    file = "cars.zip",
+    hashes = {
+      { hash = "9bea8e03b94be9e7ea805598698b56a4", label = "Cars (Europe, Australia).nds" },
+    }
+  },
+
+  events = {
+  },
+}

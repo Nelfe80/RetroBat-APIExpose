@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Armored Core: Master of Arena",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "armored-core-master-of-arena",
+    file = "armored-core-master-of-arena.zip",
+    hashes = {
+      { hash = "33928b871c7ab7240a996d954c9bc4f5", label = "Armored Core - Master of Arena (USA) (Disc 2)" },
+      { hash = "3a2bb3fd58bd51e415a4b42325c1aaf6", label = "Armored Core - Master of Arena (USA) (Disc 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3E720, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game active" },
+        { address=0X3E720, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game paused" },
+        { address=0X3EA74, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-Bits] Player Credits" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X451AE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-Bits] Player Energy decreased" },
+        { address=0X451AE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-Bits] Player Energy increased" },
+        { address=0X1D8D70, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-Bits] Arena Mode Health decreased" },
+        { address=0X1D8D70, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-Bits] Arena Mode Health increased" },
+        { address=0X1D8EE8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-Bits] Arena Mode Enemy Health decreased" },
+        { address=0X1D8EE8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-Bits] Arena Mode Enemy Health increased" },
+        { address=0X1E73B0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-Bits] Player Health Mission Mode decreased" },
+        { address=0X1E73B0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-Bits] Player Health Mission Mode increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3EC54, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bits] Hidden score value for defeating enemies" },
+      },
+      collectibles = {
+        { address=0X45480, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[16-Bits] Ammo" },
+        { address=0X454BE, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[16-Bits] Ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4AC50, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Berserk MTs" },
+        { address=0X4AC50, type="u8", condition="eq", value=0X03, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Cannon" },
+        { address=0X4AC50, type="u8", condition="eq", value=0X0F, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Giant Tank" },
+        { address=0X4AC66, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X4AC66, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X4AC66, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Leaved/Failure" },
+        { address=0X4AC67, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X4AC67, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X4AC67, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Leaved/Failure" },
+        { address=0X4AC73, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X4AC73, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X4AC73, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Leaved/Failure" },
+      },
+    },
+  },
+}

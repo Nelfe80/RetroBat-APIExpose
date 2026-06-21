@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "Dual Hearts",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "dual-hearts",
+    file = "dual-hearts.zip",
+    hashes = {
+      { hash = "3dbdc7eb102f3ba55672527d12789efa", label = "Dual Hearts (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6FD6C0, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0X6FD6C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sword Level" },
+        { address=0X6FD6C1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hammer Level" },
+        { address=0X6FD6C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spear Level" },
+        { address=0X6FD6C3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bow Level" },
+        { address=0X70C35C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Baku Diary - Tossing Around" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X6FD678, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X6FD678, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X6FD679, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X6FD679, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X6FD6C8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Up Fragments decreased" },
+        { address=0X6FD6C8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Up Fragments increased" },
+        { address=0X6FD6DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dream Energy decreased" },
+        { address=0X6FD6DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dream Energy increased" },
+        { address=0X706365, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b3 = Val's Dream - Dream Energy (1/1) decreased" },
+        { address=0X706365, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b3 = Val's Dream - Dream Energy (1/1) increased" },
+        { address=0X70637B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b7-b2 = Florence's Dream - Dream Energy (6/9) decreased" },
+        { address=0X70637B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b7-b2 = Florence's Dream - Dream Energy (6/9) increased" },
+        { address=0X706565, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[b7-b3] Sheep's Dream - Dream Energy (5/5) decreased" },
+        { address=0X706565, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[b7-b3] Sheep's Dream - Dream Energy (5/5) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6BB5F0, type="u8", condition="eq", value=0X6, action="TREASURE", no_log=false, no_survey=false, desc="Pirate King's Treasure" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6FD6DA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dream Coins increased" },
+        { address=0X6FD6DD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Esamons increased" },
+        { address=0X70635E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b7-b6 = Val's Dream - Gold Esamons (2/8) increased" },
+        { address=0X70635F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b3-b0 = Val's Dream - Gold Esamons (6/8) increased" },
+        { address=0X70637E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b7-b3 = Florence's Dream - Gold Esamons (5/8) increased" },
+        { address=0X70637F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b2-b0 = Florence's Dream - Gold Esamons (3/8) increased" },
+        { address=0X70655F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[b5-b1] Sheep's Dream - Gold Esamons (5/5) increased" },
+        { address=0X73CEE5, type="u8", condition="eq", value=0X50, action="MONEY_STATE", no_log=false, no_survey=false, desc="50 Dream Coin bitflags exist in Florence's Dream starting at 0x73dcd2" },
+        { address=0X73CEEA, type="u8", condition="eq", value=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="40 Dream Coin bitflags exist in Val's Dream starting at 0x73dec6" },
+        { address=0X73CEF3, type="u8", condition="eq", value=0X50, action="MONEY_STATE", no_log=false, no_survey=false, desc="50 Dream Coin bitflags exist in Sheep's Dream starting at 0x73e682" },
+        { address=0X73CF25, type="u8", condition="eq", value=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="10 Dream Coin boxes exist in Sheep's Dream starting at 0x73e682" },
+        { address=0X73DCD2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[50-bytes/~b0] Florence's Dream - Dream Coins (50/100) increased" },
+        { address=0X73DEC6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[40-bytes/~b0] Val's Dream - Dream Coins (40/100) increased" },
+        { address=0X73E24A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[50-bytes/~b0] Sheep's Dream - Dream Coins (50/100) increased" },
+        { address=0X73E682, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[10-bytes/~b5-b1] Sheep's Dream - Dream Coins (50/100) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6FD63C, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+        { address=0X6FD640, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Max Boss HP" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6FD6CC, type="u8", condition="eq", value=0XB6, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Bakuna Shield" },
+      },
+      player = {
+        { address=0X70C32A, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Baku Diary - Jumping" },
+        { address=0X70C33E, type="u8", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="Baku Diary - Swimming Desperately" },
+        { address=0X70C342, type="u8", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="Baku Diary - Swimming Underwater" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X706310, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="b2 = Exit Dream Option Blocked" },
+        { address=0X706558, type="u8", condition="eq", value=0XB6, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Temple of Dreams - Left Switch (0x65)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6FCAC8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Clock" },
+      },
+    },
+  },
+}

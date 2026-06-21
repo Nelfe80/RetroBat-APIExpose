@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Yoshi's Safari",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "yoshis-safari",
+    file = "yoshis-safari.zip",
+    hashes = {
+      { hash = "044d6d9860e635d55bbb6192b5cbb121", label = "Yoshi's Safari (Europe).sfc" },
+      { hash = "70db2519602d9d6e6dc6fa0069ed54da", label = "Yoshi's Safari (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0000, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Check - Level 1 Beat?" },
+        { address=0X0338, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1, etc., just for first area" },
+        { address=0X03A8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Progress: 00 = Stage Finished, 80 = Stage in Progress" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X030F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Count (Yoshi starts with 3 lives) increased" },
+        { address=0X030F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Count (Yoshi starts with 3 lives) decreased" },
+      },
+      health = {
+        { address=0X031B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health: Max is 60 (which means Yoshi has 96 health) decreased" },
+        { address=0X031B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health: Max is 60 (which means Yoshi has 96 health) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X02D2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Unsure what this does, but only changes value from 0 during a stage clear... increased" },
+        { address=0X030A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0242, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health: First Form or Body Part" },
+        { address=0X0244, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health: Second Form or Body Part" },
+        { address=0X0246, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health: Third Body Part" },
+        { address=0X0248, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health: Fourth Body Part" },
+        { address=0X024A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health: Fifth Body Part" },
+        { address=0X024C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health: Sixth Body Part (Bowser only)" },
+        { address=0X05E2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Level Tracker: 01 = 1, 02 = 2, 03 = 3, 04 = 4 (Above Water), 05 = 4 (Underwater), 06 = 5, 07 = 6" },
+        { address=0X0CA4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0301, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Changes when killing an enemy, item, or object" },
+      },
+    },
+  },
+}

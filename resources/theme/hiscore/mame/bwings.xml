@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 T.F 40000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 KAN 38000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 YOK 37500</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 KIT 35000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 KAD 34280</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 GON 34260</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 AKI 34000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 KAT 33840</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 HOS 30100</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 NAK 28080</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 SUB 27500</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 &amp;[woman][man] 25370</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 MIM 22000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 NAM 21701</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 AKO 20520</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 YOU 20200</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 YUM 20001</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 KAZ 19040</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 KOB 17200</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 FUK 17000</text>
+		</text>
+	</view>
+</theme>

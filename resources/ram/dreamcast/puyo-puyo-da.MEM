@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Puyo Puyo Da!",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "puyo-puyo-da",
+    file = "puyo-puyo-da.zip",
+    hashes = {
+      { hash = "809e6a8441753d6a6871a3382ccb8089", label = "Puyo Puyo Da! Featuring Ellena System (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X78E6DC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Combo" },
+        { address=0X78E7E0, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Highest Combo This Song" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X787518, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X787518, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X787518, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1P Mode: Stage Number" },
+        { address=0X787634, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1P Mode: Stage Tracker" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X78753C, type="u32le", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Full Health/Meter" },
+        { address=0X787540, type="u32le", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Full Health" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X78D938, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score" },
+        { address=0X78D95C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Opponent Score?" },
+        { address=0X7B0E04, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="True Score" },
+      },
+    },
+  },
+}

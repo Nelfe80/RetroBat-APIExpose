@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Side by Side: Special 2000",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "side-by-side-special-2000",
+    file = "side-by-side-special-2000.zip",
+    hashes = {
+      { hash = "c678c7f9d3255cc35593b0ff268cafae", label = "Side by Side Special 2000 (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8B424, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="0 Off;" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8B34C, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack;" },
+        { address=0X8B34C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game modes 8Bits" },
+        { address=0X8B38C, type="u16le", condition="eq", value=0X0708, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="60 seconds." },
+        { address=0X8B38C, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time 16Bits" },
+        { address=0X8B3C0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap time 16Bits" },
+        { address=0X8B418, type="u16le", condition="eq", value=0X1770, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="1 minute." },
+        { address=0X8B418, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Total race time 16Bits" },
+        { address=0XC6BE8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Registered lap 1 time 16Bits" },
+        { address=0XC6BEC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Registered lap 2 time 16Bits" },
+        { address=0XC6BF0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Registered lap 3 time 16Bits" },
+        { address=0XC6BF4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Registered lap 4 time 16Bits" },
+        { address=0XC6BF8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Registered lap 5 time 16Bits" },
+        { address=0XC6D3C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Registered total race time (Except last track) 16Bits" },
+        { address=0XCEDF8, type="u16le", condition="eq", value=0X1162, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEDF8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Spring best lap time 16Bits" },
+        { address=0XCEDFC, type="u16le", condition="eq", value=0X1388, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEDFC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Summer best lap time 16Bits" },
+        { address=0XCEE00, type="u16le", condition="eq", value=0X1806, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEE00, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Autumm best lap time 16Bits" },
+        { address=0XCEE04, type="u16le", condition="eq", value=0X170C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEE04, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Winter best lap time 16Bits" },
+        { address=0XCEE08, type="u16le", condition="eq", value=0X1AF4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEE08, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Special best lap time 16Bits" },
+        { address=0XCEE0C, type="u16le", condition="eq", value=0X0BB8, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEE0C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 April best lap time 16Bits" },
+        { address=0XCEE10, type="u16le", condition="eq", value=0X1450, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEE10, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 March best lap time 16Bits" },
+        { address=0XCEE14, type="u16le", condition="eq", value=0X1A90, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEE14, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 October best lap time 16Bits" },
+        { address=0XCEE18, type="u24le", condition="eq", value=0X24B8, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEE18, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 July best lap time 16Bits" },
+        { address=0XCEE54, type="u16le", condition="eq", value=0X361A, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEE54, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Spring best race time 16Bits" },
+        { address=0XCEEB4, type="u16le", condition="eq", value=0X3C8C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEEB4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Summer best race time 16Bits" },
+        { address=0XCEF14, type="u16le", condition="eq", value=0X4A06, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEF14, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Autumm best race time 16Bits" },
+        { address=0XCEF74, type="u16le", condition="eq", value=0X4718, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEF74, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Winter best race time 16Bits" },
+        { address=0XCEFD4, type="u16le", condition="eq", value=0X52D0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCEFD4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 1 Special best race time 16Bits" },
+        { address=0XCF034, type="u16le", condition="eq", value=0X3C8C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCF034, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 April best race time 16Bits" },
+        { address=0XCF094, type="u16le", condition="eq", value=0X3EE4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCF094, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 March best race time 16Bits" },
+        { address=0XCF0F4, type="u16le", condition="eq", value=0X51A4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCF0F4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 October best race time 16Bits" },
+        { address=0XCF154, type="u16le", condition="eq", value=0X4B64, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best CPU time." },
+        { address=0XCF154, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 July best race time 16Bits" },
+        { address=0XCF1B4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Side by Side 2 22:00 best race time 16Bits" },
+      },
+    },
+  },
+}

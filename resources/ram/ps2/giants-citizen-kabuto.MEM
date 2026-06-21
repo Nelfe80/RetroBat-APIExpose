@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Giants: Citizen Kabuto",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "giants-citizen-kabuto",
+    file = "giants-citizen-kabuto.zip",
+    hashes = {
+      { hash = "6f9d6f496d79571eed706b5e96a9e860", label = "Giants - Citizen Kabuto (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

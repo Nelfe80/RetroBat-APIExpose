@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle - Echter Puzzlespass für Unterwegs: Blumen & Muster",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-echter-puzzlespass-fur-unterwegs-blumen-muster",
+    file = "puzzle-echter-puzzlespass-fur-unterwegs-blumen-muster.zip",
+    hashes = {
+      { hash = "7d54ac30acf54e887adfde4111c9862b", label = "Blumen & Muster Puzzle - Echter Puzzlespass fuer Unterwegs (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

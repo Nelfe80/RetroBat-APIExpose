@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Dragon Slayer Level 2.0",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dragon-slayer-level-2-0",
+    file = "dragon-slayer-level-2-0.zip",
+    hashes = {
+      { hash = "87417127a5ba7ac8dd9a67bb9f83ef6c", label = "Dragon Slayer (Level 2.0) {V1 mode} (Clean Save Data) (Euclide) (1.0).d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00FD, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="State (6: demo; 1: in-game; 5: menu; 2: dead/won phase)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4F4A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hit Point (16-bit, units of 10 points)" },
+        { address=0X4F4C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Strength (16-bit, units of 10 points)" },
+        { address=0X4F4E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Experience (16-bit, units of 10 points)" },
+      },
+      collectibles = {
+        { address=0X00E1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="When killing by kicking a block, 0x11 during experience gain (not very stable) increased" },
+        { address=0X0E60, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item under player (ring = 0x11, money = 0x0d, magic = 0x13, stone = 0x10, cross = 0x0f, chest =" },
+        { address=0X4F50, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (16-bit) increased" },
+      },
+    },
+  },
+}

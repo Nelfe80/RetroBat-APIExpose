@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Yie Ar Kung-Fu",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "yie-ar-kung-fu",
+    file = "yie-ar-kung-fu.zip",
+    hashes = {
+      { hash = "3c811b8b45949925cb02cc90befbfa35", label = "Yie Ar Kung-Fu (Japan) (Rev 1.4).nes" },
+      { hash = "e035b66df685b4c5a59d66e4bc491b3a", label = "Yie Ar Kung-Fu (Japan) (Rev 1.2).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0050, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0050, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+      },
+    },
+  },
+}

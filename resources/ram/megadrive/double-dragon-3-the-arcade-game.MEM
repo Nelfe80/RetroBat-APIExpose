@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Double Dragon 3: The Arcade Game",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Beat 'em Up"
+  },
+
+  rom = {
+    name = "double-dragon-3-the-arcade-game",
+    file = "double-dragon-3-the-arcade-game.zip",
+    hashes = {
+      { hash = "783a70fd1a6339d947a2ba8556bd7bba", label = "Double Dragon 3 - The Arcade Game (USA, Europe).md" },
+    }
+  },
+
+  events = {
+  },
+}

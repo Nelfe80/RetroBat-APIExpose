@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Dai-3-Ji Super Robot Taisen",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "dai-3-ji-super-robot-taisen",
+    file = "dai-3-ji-super-robot-taisen.zip",
+    hashes = {
+      { hash = "1ffe2a6b125893801450475504acf980", label = "Dai-3-Ji Super Robot Taisen (Japan) (En) (v2.0) (Aeon Genesis).sfc" },
+      { hash = "b5974f5306e8daee96d5fc625e960f0a", label = "Dai-3-ji Super Robot Taisen (Japan).sfc" },
+      { hash = "bd16589d0737460e26af9ea2425410fc", label = "Dai-3-Ji Super Robot Taisen (Japan) (En) (v1.0) (Aeon Genesis).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1806, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Start] Ally1 Current HP decreased" },
+        { address=0X1806, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Start] Ally1 Current HP increased" },
+        { address=0X1834, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[End] Ally 24 Current HP decreased" },
+        { address=0X1834, type="u24le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[End] Ally 24 Current HP increased" },
+        { address=0X1886, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Start] Ally 1 Max HP decreased" },
+        { address=0X1886, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Start] Ally 1 Max HP increased" },
+        { address=0X18B4, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[End] Ally 24 Max HP decreased" },
+        { address=0X18B4, type="u24le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[End] Ally 24 Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1008, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24-bit] Money increased" },
+        { address=0X1B06, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[Start] Weapon Remaining Ammo" },
+      },
+    },
+  },
+}

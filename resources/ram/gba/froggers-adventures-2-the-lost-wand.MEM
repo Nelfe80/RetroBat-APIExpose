@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Frogger's Adventures 2: The Lost Wand",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "froggers-adventures-2-the-lost-wand",
+    file = "froggers-adventures-2-the-lost-wand.zip",
+    hashes = {
+      { hash = "0c508e4785e89f25f5a746cba838ed4b", label = "Frogger's Adventures 2 - The Lost Wand (USA) (En,Es).gba" },
+      { hash = "fd3690a50be799b40f00bc8989229c07", label = "Frogger's Adventures 2 - The Lost Wand (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4F6A, type="u8", condition="eq", value=0X0F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Movie" },
+        { address=0X4F6A, type="u8", condition="eq", value=0X11, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Movie" },
+        { address=0X4F6A, type="u8", condition="eq", value=0X12, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X4F6A, type="u8", condition="eq", value=0X14, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X4F6A, type="u8", condition="eq", value=0X18, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X4F83, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="(not paused)" },
+        { address=0X4F83, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X4F83, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit Game" },
+        { address=0X4F83, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X4F83, type="u8", condition="eq", value=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X4F83, type="u8", condition="eq", value=0X05, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X4F83, type="u8", condition="eq", value=0X06, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X4F83, type="u8", condition="eq", value=0X07, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X80BC, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X80BC, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="New Game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB1BB, type="u8", condition="eq", value=0X00, action="LEVEL_JUNGLE_RIVER", no_log=false, no_survey=false, desc="jungle river" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X01, action="LEVEL_TRAMPOLAND", no_log=false, no_survey=false, desc="trampoland" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X02, action="LEVEL_DOZEY_DRAGON", no_log=false, no_survey=false, desc="dozey dragon" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X03, action="LEVEL_SNOWY_PEAK", no_log=false, no_survey=false, desc="snowy peak" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X04, action="LEVEL_ICE_MINES", no_log=false, no_survey=false, desc="ice mines" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X05, action="LEVEL_FROSTBITE", no_log=false, no_survey=false, desc="frostbite" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X06, action="LEVEL_LAVA_TEMPLE", no_log=false, no_survey=false, desc="lava temple" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X07, action="LEVEL_MAGMA_CAVERN", no_log=false, no_survey=false, desc="magma cavern" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X08, action="LEVEL_FIERY_GUARDIAN", no_log=false, no_survey=false, desc="fiery guardian" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X09, action="LEVEL_PATH_THROUGH_TOWN", no_log=false, no_survey=false, desc="path through town" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X0A, action="LEVEL_CREEPY_CASTLE", no_log=false, no_survey=false, desc="creepy castle" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X0B, action="LEVEL_FRIGHT_FLIGHT", no_log=false, no_survey=false, desc="fright flight" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X0C, action="LEVEL_TECHNOPOLIS", no_log=false, no_survey=false, desc="technopolis" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X0D, action="LEVEL_DIGITAL_DOMINION", no_log=false, no_survey=false, desc="digital dominion" },
+        { address=0XB1BB, type="u8", condition="eq", value=0X0E, action="LEVEL_SHORT_CIRCUIT", no_log=false, no_survey=false, desc="short circuit" },
+        { address=0XC342, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total number of Crystal Droplets & Crystal Frogs in current level/bonus level" },
+      },
+      zone = {
+        { address=0XB1BB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map - Level selected" },
+        { address=0XB1BC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map - furthest level unlocked (on level select only)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB6AB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0XB6AB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC340, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Crystal Droplets & Crystal Frogs collected since entering level (resets on bonus level" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X139D8, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Default/Fully Asleep" },
+        { address=0X139D8, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="White z's" },
+        { address=0X139D8, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Yellow z's" },
+        { address=0X139D8, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Black z's" },
+        { address=0X139D8, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Awake" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4F6A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current Scene" },
+        { address=0X4F96, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Fade-in/Fade-out Counter" },
+        { address=0X7561, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Magical Mixup Time Attack unlocked via cheat code" },
+        { address=0X80BA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Main Menu option selected" },
+      },
+    },
+  },
+}

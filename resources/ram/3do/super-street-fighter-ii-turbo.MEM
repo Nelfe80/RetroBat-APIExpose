@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Super Street Fighter II Turbo",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "super-street-fighter-ii-turbo",
+    file = "super-street-fighter-ii-turbo.zip",
+    hashes = {
+      { hash = "c2a97a18e2db5297518bd25fdf047c85", label = "Super Street Fighter II Turbo (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2FA4C, type="u8", condition="eq", value=0X60, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0X2FA4C, type="u8", condition="eq", value=0X90, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="victory screen, loss screen, or continue screen" },
+        { address=0XBC48C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Check (0x05 on title screen, 0x00 otherwise)" },
+        { address=0XBCBF8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Used" },
+        { address=0XBCF08, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Used; duplicate of 0x0bcbf8" },
+        { address=0XBDD78, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="Pause Flag (0x01 - on, 0x00 - off)" },
+        { address=0XC23A2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode Check (0x00 - on, 0x01 - off)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2FA4C, type="u8", condition="eq", value=0XD0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="during or after a double KO, including 'F. Round'" },
+        { address=0XBCFE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round (0x00-0x04)" },
+        { address=0XC9615, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Rounds Won (0x00-0x02)" },
+        { address=0XC9A31, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 Rounds Won (0x00-0x02)" },
+      },
+      stage = {
+        { address=0XBCE2C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Character Stage (for values see 0x0c9614)" },
+        { address=0XBCE30, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (Super Battle)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC92B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Health (0x00-0x90, 0xff when KO'ed) decreased" },
+        { address=0XC92B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Health (0x00-0x90, 0xff when KO'ed) increased" },
+        { address=0XC96D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 Health (0x00-0x90, 0xff when KO'ed) decreased" },
+        { address=0XC96D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 Health (0x00-0x90, 0xff when KO'ed) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC9628, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BCD] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBAAD4, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo Counter; updates only when combo is over, stays at value until another combo ends" },
+        { address=0XBC5FB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Limit (0x00 - on, 0x01 - off)" },
+        { address=0XBD058, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Match Timer (0x0000-0x9928)" },
+        { address=0XC9604, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Continue Timer (Seconds) (0x00-0x09)" },
+      },
+    },
+  },
+}

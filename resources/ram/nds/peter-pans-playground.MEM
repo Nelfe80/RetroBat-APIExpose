@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Peter Pan's Playground",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "peter-pans-playground",
+    file = "peter-pans-playground.zip",
+    hashes = {
+      { hash = "ff8f8297d9e03095285fcbc6fad65eb6", label = "Peter Pan's Playground (Europe).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5AD64, type="u16le", condition="eq", value=0X5549, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X3D2E80, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In Title Screen" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3D2E80, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="In Game" },
+      },
+    },
+  },
+}

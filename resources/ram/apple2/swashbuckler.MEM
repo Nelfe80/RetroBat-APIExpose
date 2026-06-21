@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Swashbuckler",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "swashbuckler",
+    file = "swashbuckler.zip",
+    hashes = {
+      { hash = "6f44d0ab68ebcc8c72b8082e15dba419", label = "Swashbuckler (1982)(Datamost).do" },
+    }
+  },
+
+  events = {
+  },
+}

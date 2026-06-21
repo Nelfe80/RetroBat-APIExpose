@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Worms Blast",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "worms-blast",
+    file = "worms-blast.zip",
+    hashes = {
+      { hash = "caf46477c33a49dacf2d08aed205909b", label = "Worms Blast (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0X2944, type="u16le", condition="eq", value=0X0000, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Far Left of the screen" },
+        { address=0X2944, type="u16le", condition="eq", value=0X3CB0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Far Right of the screen" },
+        { address=0X2948, type="u16le", condition="eq", value=0X0000, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Top of the Screen" },
+        { address=0X2948, type="u16le", condition="eq", value=0X3200, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bottom of the Screen" },
+        { address=0X2984, type="u16le", condition="eq", value=0X0000, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Far Left of the screen" },
+        { address=0X2984, type="u16le", condition="eq", value=0X3CB0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Far Right of the screen" },
+        { address=0X2988, type="u16le", condition="eq", value=0X0000, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Top of the Screen" },
+        { address=0X2988, type="u16le", condition="eq", value=0X3200, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bottom of the Screen" },
+        { address=0X29C4, type="u16le", condition="eq", value=0X0000, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Far Left of the screen" },
+        { address=0X29C4, type="u16le", condition="eq", value=0X3CB0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Far Right of the screen" },
+        { address=0X29C8, type="u16le", condition="eq", value=0X0000, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Top of the Screen" },
+        { address=0X29C8, type="u16le", condition="eq", value=0X3200, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bottom of the Screen" },
+      },
+    },
+  },
+}

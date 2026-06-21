@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Pokémon Party mini",
+    system = "pokemini",
+    system_name = "Pokemon Mini",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-party-mini",
+    file = "pokemon-party-mini.zip",
+    hashes = {
+      { hash = "0823b8d49dc88033659f0d4eae114907", label = "Snorlax's Lunch Time (Europe) (GameCube).min" },
+      { hash = "199aaed9afb5851c4d39ef78c29b86d1", label = "Lunch Time (USA) (GameCube).min" },
+      { hash = "4266d987e4203c3da2a2da1b3c2e2d39", label = "Pokemon Party Mini (Japan).min" },
+      { hash = "96f6a0cedc7471a0357271dc799ed342", label = "Snorlax's Lunch Time (Japan) (GameCube).min" },
+      { hash = "e0a064e6d758f958752a49c0ce798388", label = "Pokemon Party Mini (USA).min" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X0674, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0508, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Pikachu's Rocket Start] Current Round" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0673, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Snorlax - Extra Health decreased" },
+        { address=0X0673, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Snorlax - Extra Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0667, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Snorlax - Current Score" },
+        { address=0X0679, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Snorlax - Score 1" },
+        { address=0X0681, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Snorlax - Score 2" },
+        { address=0X0E0E, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit pikachu high scores (and next 32)" },
+        { address=0X0E14, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit slowpoke high scores (and next 32)" },
+        { address=0X0E1A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit chansey high score" },
+        { address=0X0FF5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Slowking's Judge Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X04F8, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Light Level" },
+      },
+    },
+  },
+}

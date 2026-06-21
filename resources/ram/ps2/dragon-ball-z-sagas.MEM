@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Sagas",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up, Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-ball-z-sagas",
+    file = "dragon-ball-z-sagas.zip",
+    hashes = {
+      { hash = "ee70b54c25dc8bff5395fe426c98d317", label = "Dragon Ball Z - Sagas (USA)" },
+      { hash = "4d3ad2bc5500b4cb10a0216575edb4c7", label = "Dragon Ball Z - Sagas (USA) (60fps) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X5C2408, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Capsules - Arrival decreased" },
+        { address=0X5C2408, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Capsules - Arrival increased" },
+        { address=0X5D2488, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Capsules - Mighty Nappa decreased" },
+        { address=0X5D2488, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Capsules - Mighty Nappa increased" },
+        { address=0X194FB86, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Radtiz's Health decreased" },
+        { address=0X194FB86, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Radtiz's Health increased" },
+        { address=0X1A05DB6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Goku's Health decreased" },
+        { address=0X1A05DB6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Goku's Health increased" },
+        { address=0X1AB8CA6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gohan's Health decreased" },
+        { address=0X1AB8CA6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gohan's Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X48243C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Z Coins increased" },
+      },
+    },
+  },
+}

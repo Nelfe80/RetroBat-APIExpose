@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Thrillville: Off the Rails",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "thrillville-off-the-rails",
+    file = "thrillville-off-the-rails.zip",
+    hashes = {
+      { hash = "e7b92df24ef159d0ef6d4eb7294d443a", label = "Thrillville - Off the Rails (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X250260, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32bit Money increased" },
+      },
+    },
+  },
+}

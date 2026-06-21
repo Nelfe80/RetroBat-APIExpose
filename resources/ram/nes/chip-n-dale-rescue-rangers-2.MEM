@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Chip 'n Dale: Rescue Rangers 2",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "chip-n-dale-rescue-rangers-2",
+    file = "chip-n-dale-rescue-rangers-2.zip",
+    hashes = {
+      { hash = "127befa80556dc47012d2cb784a09d1f", label = "Chip 'n Dale Rescue Rangers 2 (USA) (Sv).nes" },
+      { hash = "4a500d8989dd238a51a29e1d5eb7d820", label = "Chip 'n Dale - Rescue Rangers 2 (Europe).nes" },
+      { hash = "71e7ef754a716ced5b306a1e5b6e93c1", label = "Chip 'n Dale - Rescue Rangers 2 (USA).nes" },
+      { hash = "7e69985bb43db4686ba59c08406c716c", label = "Chip to Dale no Daisakusen 2 (Japan).nes" },
+      { hash = "c96c89ef8cd2c2421fb586615bfa7fc5", label = "Chip 'n Dale Rescue Rangers 2 (USA) (Ru) (Shedevr) (Fixes) (Guyver).nes" },
+      { hash = "d145af52544bd98c31a2da8956402b51", label = "Chip 'n Dale Rescue Rangers 2 (USA) (Ru) (Shedevr).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002E, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Seconds since game turned on, does not reset on Game Over." },
+        { address=0X0076, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Remaining" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0072, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+        { address=0X0073, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage Section" },
+        { address=0X00A5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ranger Emblems (50 RR cards post-stage = 1 emblem)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00A7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 Life Count increased" },
+        { address=0X00A7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 Life Count decreased" },
+        { address=0X00A8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 Life Count increased" },
+        { address=0X00A8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 Life Count decreased" },
+        { address=0X0788, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Various sound effects (including 1-up gain) increased" },
+        { address=0X0788, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Various sound effects (including 1-up gain) decreased" },
+      },
+      health = {
+        { address=0X03D4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X03D4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+        { address=0X03D5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health decreased" },
+        { address=0X03D5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X03D7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0605, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Movement (02 = standing, 0e = walking, 11 = jumping, 1b = carrying object)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00E4, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Single bit KEYS for the three level select stages bit0 is clock, bit1 is western, bit2 is future" },
+      },
+    },
+  },
+}

@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Radiant Historia",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "radiant-historia",
+    file = "radiant-historia.zip",
+    hashes = {
+      { hash = "0e22a9f70a23f3b5661eb052f657b557", label = "Radiant Historia (USA) (Es) (v1.1) (Tales Translations).nds" },
+      { hash = "be435c50ad90c6e365b8bcbc18bfdf42", label = "Radiant Historia (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X220E54, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Current-Mission data seen on the pause menu." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X21F6BB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stocke current level" },
+        { address=0X21FB5B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aht Level" },
+        { address=0X21FDAB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raynie Level" },
+        { address=0X21FED3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Marco Level" },
+      },
+      zone = {
+        { address=0X220DDB, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The World's Betrayal" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X220D23, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit2=Death of a Friend" },
+        { address=0X220DD9, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Premature Invasion" },
+        { address=0X220DD9, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Front of Despair" },
+        { address=0X220DD9, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Lion General" },
+        { address=0X220DD9, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Assassination of Raul" },
+        { address=0X220DD9, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Eternal War" },
+        { address=0X220DD9, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Divine Judgement" },
+        { address=0X220DD9, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hugo the Omnipotent" },
+        { address=0X220DFD, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Warlord in Black" },
+        { address=0X220DFD, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Monstrocity in Black" },
+        { address=0X220DFD, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Valkyrie in Black" },
+        { address=0X220DFD, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="A Promise (defeat Apocrypha)" },
+        { address=0X220E41, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier Recruit" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X220DF9, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Secret Weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X21F668, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X220D17, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit4=Sand Fortress Battle (boss defeat)" },
+        { address=0X220D6C, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit1=Overcoming the Trial (boss defeat)" },
+        { address=0X220D81, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit0=Viola's Decision (Save Rosch boss battle)" },
+        { address=0X220DF2, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="The Sister (boss battle)" },
+        { address=0X220DF8, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="A Beastkind Warrior (learn chi)" },
+        { address=0X220E0C, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Preparing a Meal (boss battle)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X220D41, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="bit4=Secret Weapons (first two ballistas destroyed)" },
+        { address=0X220DC1, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="bit7=Checkpoint for Journey's End" },
+        { address=0X220DC2, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint for Journey's End" },
+      },
+    },
+  },
+}

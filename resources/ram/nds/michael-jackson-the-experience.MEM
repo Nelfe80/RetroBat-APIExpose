@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Michael Jackson: The Experience",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "michael-jackson-the-experience",
+    file = "michael-jackson-the-experience.zip",
+    hashes = {
+      { hash = "4ea5969ed532a49774b68b61fcc15953", label = "Michael Jackson - The Experience (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X1B7CE0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Another Part of Me - Score [Easy]" },
+        { address=0X3DB314, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Ingame Score?" },
+      },
+    },
+  },
+}

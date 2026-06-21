@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Bomber Man",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bomber-man",
+    file = "bomber-man.zip",
+    hashes = {
+      { hash = "7a277f7ac3fcc30b995cbd672c8fc094", label = "Bomberman (Japan).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2304, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen [0x00]" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X2310, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X230F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0X230F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2300, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points (HEX) x10" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X23AD, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="First destructible block (brick sprite)" },
+        { address=0X2666, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The last destructible block (brick sprite)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X231C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="status dead enemy 1 [01 - alive, 00 - dead, 02-09 - dying timer]" },
+        { address=0X2323, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="status dead enemy 2 [01 - alive, 00 - dead, 02-09 - dying timer]" },
+        { address=0X232A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="status dead enemy 3 [01 - alive, 00 - dead, 02-09 - dying timer]" },
+        { address=0X2331, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="status dead enemy 4 [01 - alive, 00 - dead, 02-09 - dying timer]" },
+        { address=0X2338, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="status dead enemy 5 [01 - alive, 00 - dead, 02-09 - dying timer]" },
+        { address=0X233F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="status dead enemy 6 [01 - alive, 00 - dead, 02-09 - dying timer]" },
+        { address=0X2346, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="status dead enemy 7 [01 - alive, 00 - dead, 02-09 - dying timer]" },
+        { address=0X234D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="status dead enemy 8 [01 - alive, 00 - dead, 02-09 - dying timer]" },
+      },
+    },
+  },
+}

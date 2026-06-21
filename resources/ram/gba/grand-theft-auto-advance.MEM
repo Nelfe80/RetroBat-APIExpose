@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Grand Theft Auto Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "grand-theft-auto-advance",
+    file = "grand-theft-auto-advance.zip",
+    hashes = {
+      { hash = "2c8ef9cce9f46b55247468ea449aeade", label = "Grand Theft Auto (USA).gba" },
+      { hash = "b4d933095f1be113f2b64f61e21b4055", label = "Grand Theft Auto (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X81AA, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen =00" },
+        { address=0X8D8E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Races: bit 0 = race 17, bit 1 = race 18, Demolition F: bit 2, Missions: bit 3= 1st mission, ..." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8DC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Taxi level" },
+        { address=0X8DCC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Paramedic level" },
+        { address=0X2D81A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wanted level" },
+        { address=0X38340, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wanted level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X8F22, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health (also used for intro rom stabiltiy) decreased" },
+        { address=0X8F22, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health (also used for intro rom stabiltiy) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2D810, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon 0=fist, 1=bat, 2 = katana, 3 = pistol, 4 = shotgun, 5 = uzi, 6 = A. rifle, 7 = FlameT 8 =" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X909E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="reloads ammo! (dynamic)" },
+        { address=0X2D812, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="ammo(not dynamic)" },
+      },
+    },
+  },
+}

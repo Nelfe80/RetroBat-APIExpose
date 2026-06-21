@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Berzerk",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "berzerk",
+    file = "berzerk.zip",
+    hashes = {
+      { hash = "5095a576fc147accb6ec751030acc2fc", label = "berzerk.7z <Berzerk (revision RC31A)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X036E, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0349, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0349, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X033E, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24-bit BE]" },
+      },
+    },
+  },
+}

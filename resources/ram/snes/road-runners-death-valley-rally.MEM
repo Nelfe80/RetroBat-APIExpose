@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Road Runner's Death Valley Rally",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "road-runners-death-valley-rally",
+    file = "road-runners-death-valley-rally.zip",
+    hashes = {
+      { hash = "18b5e9f9d628fd23cc0ed31ce7089737", label = "Road Runner's Death Valley Rally (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

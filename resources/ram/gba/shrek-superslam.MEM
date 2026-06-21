@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Shrek: SuperSlam",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "shrek-superslam",
+    file = "shrek-superslam.zip",
+    hashes = {
+      { hash = "ec43565bffb4d418164b85e007de7e17", label = "Shrek - Super Slam (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+  },
+}

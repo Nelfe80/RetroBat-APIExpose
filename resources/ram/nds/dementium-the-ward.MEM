@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Dementium: The Ward",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Horror, Shooter"
+  },
+
+  rom = {
+    name = "dementium-the-ward",
+    file = "dementium-the-ward.zip",
+    hashes = {
+      { hash = "46ddaa7e77fd48a7ef475cb8921418ef", label = "Dementium - The Ward (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X23AA84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X23AA84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X23AA94, type="u8", condition="bit_true", bit=4, mask=0X10, action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Key" },
+        { address=0X266B48, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Gun - Current Ammo (32bit, mirror)" },
+        { address=0X266B4C, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Gun - Max Ammo (32bit, mirror)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X23AA95, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Handle" },
+      },
+    },
+  },
+}

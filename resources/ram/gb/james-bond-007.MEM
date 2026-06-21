@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "James Bond 007",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "james-bond-007",
+    file = "james-bond-007.zip",
+    hashes = {
+      { hash = "669a4ecf89794505591b36d617e51f8a", label = "James Bond 007 (USA, Europe) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD376, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XD38B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Events Sumo Room 1 Cleared" },
+        { address=0XD38C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Events Sumo Room 2 Cleared" },
+        { address=0XD38D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Events Sumo Room 3 Cleared" },
+        { address=0XD38E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Events Sumo Room 4 Cleared" },
+        { address=0XD38F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Events Sumo Room 5 Cleared" },
+        { address=0XD390, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Events Sumo Room 6 Cleared" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCA64, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) decreased" },
+        { address=0XCA64, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) increased" },
+        { address=0XCA84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) decreased" },
+        { address=0XCA84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) increased" },
+        { address=0XCAA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) decreased" },
+        { address=0XCAA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) increased" },
+        { address=0XCAC4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) decreased" },
+        { address=0XCAC4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) increased" },
+        { address=0XCAE4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) decreased" },
+        { address=0XCAE4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) increased" },
+        { address=0XCB04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) decreased" },
+        { address=0XCB04, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) increased" },
+        { address=0XCB24, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) decreased" },
+        { address=0XCB24, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) increased" },
+        { address=0XCB44, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) decreased" },
+        { address=0XCB44, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (Enemy's on screen data section) increased" },
+        { address=0XD374, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - 0x10 Maxed decreased" },
+        { address=0XD374, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - 0x10 Maxed increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC55C, type="u8", condition="eq", value=0X31, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ring" },
+        { address=0XC55D, type="u8", condition="eq", value=0X24, action="AMMO_STATE", no_log=true, no_survey=false, desc="Gun Ammo" },
+        { address=0XC55D, type="u8", condition="eq", value=0X25, action="AMMO_STATE", no_log=true, no_survey=false, desc="Uzi Ammo" },
+        { address=0XC55D, type="u8", condition="eq", value=0X26, action="AMMO_STATE", no_log=true, no_survey=false, desc="Bazooka Ammo" },
+        { address=0XC55D, type="u8", condition="eq", value=0X31, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ring" },
+        { address=0XD31F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[item] Gold Ring Obtained increased" },
+        { address=0XD372, type="u16le", condition="eq", value=0X64, action="MONEY_STATE", no_log=false, no_survey=false, desc="$1000" },
+        { address=0XD372, type="u16le", condition="eq", value=0XFA, action="MONEY_STATE", no_log=false, no_survey=false, desc="$2500" },
+        { address=0XD372, type="u16le", condition="eq", value=0XFF, action="MONEY_STATE", no_log=false, no_survey=false, desc="$2550" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD2ED, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Bosses Killed" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC55C, type="u8", condition="eq", value=0X09, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0XD2F7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[item] Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC55C, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block" },
+        { address=0XC55D, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-22: Slot Machine",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Gambling"
+  },
+
+  rom = {
+    name = "videocart-22-slot-machine",
+    file = "videocart-22-slot-machine.zip",
+    hashes = {
+      { hash = "dfb66ee145fab65062fdeadafc8dc34c", label = "Slot Machine (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

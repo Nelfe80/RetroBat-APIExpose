@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Aaahh!!! Real Monsters",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "aaahh-real-monsters",
+    file = "aaahh-real-monsters.zip",
+    hashes = {
+      { hash = "e4e77b581700a6cd58e711ee02b1a61f", label = "Aaahh!!! Real Monsters (USA).sfc" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X0B0D, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="idle/walking , 1=jumping , 3=hurt , 2=Idle ani/scare , 5=team move" },
+        { address=0X0B0E, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="walking/jumping/hurt , 01=scare/Idle ani , 2=idle , 3=crouch , 06=team move" },
+        { address=0X0B0F, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="idle/idle ani/walking , 01=jumping/crouch , 02=scare/juggle ani , 04=sniffing ani , 05=team move" },
+      },
+    },
+  },
+}

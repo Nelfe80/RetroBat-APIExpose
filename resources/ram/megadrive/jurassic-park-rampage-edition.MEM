@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Jurassic Park: Rampage Edition",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jurassic-park-rampage-edition",
+    file = "jurassic-park-rampage-edition.zip",
+    hashes = {
+      { hash = "67c489b34827bb4fae2ba93e8d2a919e", label = "Jurassic Park - Rampage Edition (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9751, type="u8", condition="eq", value=0X06, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="In-Game" },
+        { address=0X9751, type="u8", condition="eq", value=0X07, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XC1FC, type="u24be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="24 = Paused" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X98B2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage:" },
+        { address=0XC976, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="DNA Samples - Current stage" },
+        { address=0XC977, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Eggs - Current stage" },
+        { address=0XC979, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Embrio containers - Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC968, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XC968, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XC294, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Raptor's Health decreased" },
+        { address=0XC294, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Raptor's Health increased" },
+        { address=0XC969, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Grant Health decreased" },
+        { address=0XC969, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Grant Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC952, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16 Bit] Tranquilizer ammo" },
+        { address=0XC954, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16 Bit] Shot Gun ammo" },
+        { address=0XC956, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16 Bit] Machine Tranquilizer Gun ammo" },
+        { address=0XC958, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16 Bit] Flame-thrower ammo" },
+        { address=0XC95A, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16 Bit] Shock Rifle ammo" },
+        { address=0XC95C, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16 Bit] Rocket Launcher ammo" },
+        { address=0XC95E, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16 Bit] Gas Grenade ammo" },
+      },
+    },
+  },
+}

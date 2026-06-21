@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Klax",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "klax",
+    file = "klax.zip",
+    hashes = {
+      { hash = "b8969ba5f8dc60823da59aa511a593c9", label = "KLAX (USA, Europe).gg" },
+    }
+  },
+
+  events = {
+  },
+}

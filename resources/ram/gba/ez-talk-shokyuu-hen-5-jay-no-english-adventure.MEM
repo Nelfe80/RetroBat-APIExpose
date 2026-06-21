@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "EZ-Talk: Shokyuu Hen 5 - Jay no English Adventure",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ez-talk-shokyuu-hen-5-jay-no-english-adventure",
+    file = "ez-talk-shokyuu-hen-5-jay-no-english-adventure.zip",
+    hashes = {
+      { hash = "0ec6477593e4c9273b91676e464488f6", label = "EZ-Talk - Shokyuu Hen 5 (Japan).gba" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X80C4, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Episode 23 - Total Requests to open the Door [32bit]" },
+      },
+    },
+  },
+}

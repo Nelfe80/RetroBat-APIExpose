@@ -1,0 +1,105 @@
+return {
+  game = {
+    title = "Final Fantasy Origins",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "final-fantasy-origins",
+    file = "final-fantasy-origins.zip",
+    hashes = {
+      { hash = "b6df71391f98d3c3640986c858c01d44", label = "Final Fantasy Origins (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAC4F8, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen, Event Map Overworld" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAF931, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Josef Death" },
+        { address=0XBDE95, type="u8", condition="eq", value=0X12, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life1" },
+        { address=0XBDE9E, type="u8", condition="eq", value=0X1D, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life2" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XBDE84, type="u8", condition="eq", value=0X4A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Crosier" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X4B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Saber" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X4C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Long Sword" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X4D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Great Axe" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X4E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Falchion" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X4F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mythril Knife" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X50, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mythril Sword" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X51, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mythril Hammer" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X52, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mythril Axe" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X53, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Sword" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X54, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ice Brand" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X55, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Wyrmkiller" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X56, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Claymore" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X57, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sunblade" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X58, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Coral Sword" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X59, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Werebane" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X5A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rune Blade" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X5B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Power Staff" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X5C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Light Axe" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X5D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Healing Staff" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X5E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mage's Staff" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X5F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Defender" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X60, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spellbinder" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X61, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Vorpal Sword" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X62, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cat Claws" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X63, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Thor's Hammer" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X64, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Venom Blade" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X65, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sasuke" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X66, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Excalibur" },
+        { address=0XBDE84, type="u8", condition="eq", value=0X67, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Masamune" },
+        { address=0XBDF96, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Elfheim - Weapon Shop" },
+        { address=0XBDF96, type="u8", condition="eq", value=0X31, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Crescent - Weapon Shop" },
+        { address=0XBDF96, type="u8", condition="eq", value=0X3C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cornelia - Weapon Shop" },
+        { address=0XBDF96, type="u8", condition="eq", value=0X49, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gaia - Weapon & Armor Shop" },
+        { address=0XBDF96, type="u8", condition="eq", value=0X64, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pravoca - Weapon Shop" },
+        { address=0XBDF96, type="u8", condition="eq", value=0X6C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Melmond - Weapon Shop" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBDE88, type="u8", condition="eq", value=0X97, action="MONEY_STATE", no_log=false, no_survey=false, desc="Protect Ring" },
+        { address=0XBE209, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Needle(Temple of Chaos)" },
+        { address=0XBE214, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Needle(Mt. Gulg)" },
+        { address=0XBE219, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Needle (Dragon's Cave)" },
+        { address=0XBE224, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Needle(Flying Fortress)" },
+        { address=0XBE224, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Needle(Flying Fortress)" },
+        { address=0XBE226, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Protect Ring(Flying Fortress)" },
+        { address=0XBE226, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Protect Ring(Flying Fortress)" },
+        { address=0XBE227, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Protect Ring(Temple of Chaos Past)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XBDE85, type="u8", condition="eq", value=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Leather Shield" },
+        { address=0XBDE85, type="u8", condition="eq", value=0X81, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield" },
+        { address=0XBDE85, type="u8", condition="eq", value=0X82, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Mythril Shield" },
+        { address=0XBDE85, type="u8", condition="eq", value=0X83, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Flame Shield" },
+        { address=0XBDE85, type="u8", condition="eq", value=0X84, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Shield" },
+        { address=0XBDE85, type="u8", condition="eq", value=0X85, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Diamond Shield" },
+        { address=0XBDE85, type="u8", condition="eq", value=0X86, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Aegis Shield" },
+        { address=0XBDE85, type="u8", condition="eq", value=0X87, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Buckler" },
+        { address=0XBDE85, type="u8", condition="eq", value=0X88, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Protect Cloak" },
+        { address=0XBE208, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield(Castle Cornelia)" },
+        { address=0XBE211, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Leather Shield(Terra Cavern)" },
+        { address=0XBE215, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Mythril Shield(Mt. Gulg)" },
+        { address=0XBE216, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Flame Shield(Mt. Gulg)" },
+        { address=0XBE217, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Shield(Ice Cavern)" },
+        { address=0XBE21E, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Diamond Shield(Suken Shrine)" },
+        { address=0XBE221, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Aegis Shield(Tower of Mirage)" },
+        { address=0XBE226, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Diamond Shield(Flying Fortress)" },
+      },
+    },
+  },
+}

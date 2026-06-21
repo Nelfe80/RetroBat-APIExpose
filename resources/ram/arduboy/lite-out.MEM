@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lite Out",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lite-out",
+    file = "lite-out.zip",
+    hashes = {
+      { hash = "988974684f69c6ae42a0a64d3785cd9e", label = "Lite Out (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Lucifer Ring",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "lucifer-ring",
+    file = "lucifer-ring.zip",
+    hashes = {
+      { hash = "9f13db64b4bb2c01ea05fa01353fa564", label = "Lucifer Ring (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC1B01, type="u8", condition="eq", value=0X01, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Selecting Stage" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA67C8, type="u8", condition="eq", value=0X25, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0XC214C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+      },
+      stage = {
+        { address=0X8375C, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Third Loop (stage select)" },
+        { address=0XA67C8, type="u8", condition="eq", value=0X45, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Playing" },
+        { address=0XA67C8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage State" },
+        { address=0X12F0CA, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X12F0CA, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Valley Forest" },
+        { address=0X12F0CA, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Remains" },
+        { address=0X12F0CA, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cave" },
+        { address=0X12F0CA, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Castle" },
+        { address=0X12F0CA, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hell's Gate" },
+        { address=0X12F0CA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X7F296, type="u16le", condition="eq", value=0X3E8, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X7F296, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player HP (16-bit)" },
+      },
+    },
+  },
+}

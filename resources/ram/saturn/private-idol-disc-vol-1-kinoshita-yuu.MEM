@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 1: Kinoshita Yuu",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-1-kinoshita-yuu",
+    file = "private-idol-disc-vol-1-kinoshita-yuu.zip",
+    hashes = {
+      { hash = "d721146d446fc15df1d817fd22332446", label = "Private Idol Disc Vol. 1 - Yuu Kinoshita (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X136A16, type="u8", condition="eq", value=0X6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X136A16, type="u8", condition="eq", value=0X8, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X136A16, type="u8", condition="eq", value=0XC, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Load credits" },
+        { address=0X13C796, type="u8", condition="eq", value=0X0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

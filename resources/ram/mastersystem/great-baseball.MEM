@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Great Baseball",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "great-baseball",
+    file = "great-baseball.zip",
+    hashes = {
+      { hash = "1d126c6ac8e4d7b612e9db3d56d9e78e", label = "Great Baseball (USA, Europe).sms" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X00F2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Innings Counter" },
+        { address=0X0108, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Away Team Run Counter" },
+        { address=0X0109, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Home Team Run Counter" },
+        { address=0X010A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Away Team Hit Counter" },
+        { address=0X010B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Home Team Hit Counter" },
+        { address=0X010F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Strike Counter" },
+        { address=0X0110, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ball Counter" },
+        { address=0X0111, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Out Counter" },
+        { address=0X0115, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Home Run Counter (Home Run Derby)" },
+      },
+    },
+  },
+}

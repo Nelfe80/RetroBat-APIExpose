@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Alien vs. Predator",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "alien-vs-predator",
+    file = "alien-vs-predator.zip",
+    hashes = {
+      { hash = "1fc2ead45eadcac586d65e218b895912", label = "Alien vs Predator (USA).sfc" },
+      { hash = "2ead975340211e3f6893fde8dd279689", label = "Alien vs Predator (Europe).sfc" },
+      { hash = "5ab8ab43964decdfc2b15ecd41d50d2a", label = "Alien vs. Predator (USA) (Pt).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0938, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1024, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Bar increased" },
+        { address=0X1024, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Bar decreased" },
+        { address=0X105C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Count increased" },
+        { address=0X105C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Count decreased" },
+      },
+      health = {
+        { address=0X1026, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X1026, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0D0E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score(decimal vlaue * 100)" },
+        { address=0X0D10, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score(decimal vlaue * 100)" },
+        { address=0X0D12, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score(decimal vlaue * 100)" },
+        { address=0X0D14, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score(decimal vlaue * 100)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Crazy Taxi: Catch a Ride",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "crazy-taxi-catch-a-ride",
+    file = "crazy-taxi-catch-a-ride.zip",
+    hashes = {
+      { hash = "603470cb171bc53491b0a8643f1302ef", label = "Crazy Taxi - Catch a Ride (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "8bcf4e0da6be539f2099c683ff897b43", label = "Crazy Taxi - Catch a Ride (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9708, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="No demo" },
+        { address=0X9708, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo playing" },
+        { address=0XB898, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not on title screen" },
+        { address=0XB898, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On title screen" },
+        { address=0XDF20, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0XDF20, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XDF22, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0XDF22, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit" },
+        { address=0XDF23, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XDF23, type="u8", condition="eq", value=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+      },
+      events = {
+        { address=0X11AA6, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Number" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X953C, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Uncleared" },
+        { address=0X953C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X7EB3, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=true, no_survey=false, desc="Crazy Jump" },
+        { address=0X9541, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Crazy Jump - Meter Value" },
+        { address=0X9F1C, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[12 Bytes][32-bit] Profile 1 - Crazy Jump Records" },
+        { address=0X9FEC, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[12 Bytes][32-bit] Profile 2 - Crazy Jump Records" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X96BC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Crazy Box - Results Screen Flag" },
+        { address=0X9EB3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="General Options" },
+        { address=0X9EB5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="General Options - Time" },
+        { address=0XB87F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="General Options - Highlighted button" },
+        { address=0XD31C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Lower4] Crazy Taxi Main Timer - First Digit" },
+        { address=0XD31D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Lower4] Crazy Taxi Main Timer - Second Digit" },
+        { address=0XD31E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Lower4] Crazy Taxi Main Timer - Third Digit" },
+        { address=0XD31F, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Lower4] Crazy Box Timer - First Digit of Seconds" },
+        { address=0XD320, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Lower4] Crazy Box Timer - Second Digit of Seconds" },
+        { address=0XD322, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Lower4] Crazy Box Timer - First Digit of Centiseconds" },
+        { address=0XD323, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Lower4] Crazy Box Timer - Second Digit of Centiseconds" },
+      },
+    },
+  },
+}

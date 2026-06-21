@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Cats and Kittens",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cats-and-kittens",
+    file = "cats-and-kittens.zip",
+    hashes = {
+      { hash = "20fc206a764f060755f9a6739711fa40", label = "Cats and Kittens.woz" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X030A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="showtime - score display tens - for all rounds" },
+        { address=0X030B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="showtime score display ones - for all rounds" },
+        { address=0X030C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="showtime score - actual for current round" },
+        { address=0X030F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="showtime - current round" },
+        { address=0X85CA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Teb Thousands - word catcher" },
+        { address=0X85CB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Thousands - word catcher" },
+        { address=0X85CC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Hundreds - word catcher" },
+        { address=0X85CD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Tens - word catcher" },
+        { address=0X85CE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score - Ones - word catcher" },
+      },
+    },
+  },
+}

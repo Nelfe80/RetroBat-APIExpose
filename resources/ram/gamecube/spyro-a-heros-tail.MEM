@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Spyro: A Hero's Tail",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "spyro-a-heros-tail",
+    file = "spyro-a-heros-tail.zip",
+    hashes = {
+      { hash = "268d01a5d0f77427471b38734df2cdc9", label = "Spyro - A Hero's Tail (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X465B8B, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Extra Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X465B8C, type="u8", condition="bit_true", bit=5, mask=0X20, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Active" },
+        { address=0X465B8C, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wing Shield" },
+      },
+      player = {
+        { address=0X465B8B, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Double Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X465CCB, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="See Nanny | Dragon Village [Unlocked]" },
+        { address=0X465CCB, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="See Nanny | Dragon Village [Completed]" },
+        { address=0X465CCB, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Visit Elder Tomas | Dragon Village [Unlocked]" },
+        { address=0X465CCB, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Visit Elder Tomas | Dragon Village [Completed]" },
+        { address=0X465CCB, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy all the Dark Gems | Dragon Kingdom [Unlocked]" },
+        { address=0X465CCB, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy all the Dark Gems | Dragon Kingdom [Completed]" },
+        { address=0X465CCB, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Collect 8 Light Gems | Dragon Village [Unlocked]" },
+        { address=0X465CCB, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Collect 8 Light Gems | Dragon Village [Completed]" },
+        { address=0X4662FA, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Dragon Village Cave Wall Broken" },
+      },
+    },
+  },
+}

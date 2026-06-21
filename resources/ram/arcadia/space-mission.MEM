@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Space Mission",
+    system = "arcadia",
+    system_name = "Arcadia 2001",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "space-mission",
+    file = "space-mission.zip",
+    hashes = {
+      { hash = "bcb44b9296aad132d54d6e3a362131e6", label = "Space Mission (USA, Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Battle Garegga",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "battle-garegga",
+    file = "battle-garegga.zip",
+    hashes = {
+      { hash = "c0830de50cdf83cbe0f5e44e70c7dbf9", label = "bgaregga.7z <Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0038, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Stage edit, continues, and regional dip switches" },
+        { address=0X00AD, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1688, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Total game overs" },
+        { address=0X1780, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Total game overs - player 2" },
+        { address=0XA6A8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Determines which of the 10 demos play." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00BE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level scrolling speed" },
+      },
+      stage = {
+        { address=0XA6B2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Something related to the stages, useful for telling if the player is on a loop." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0039, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Various dip switches increased" },
+        { address=0X0039, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Various dip switches decreased" },
+        { address=0X1687, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1687, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X177F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - Player 2 increased" },
+        { address=0X177F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - Player 2 decreased" },
+      },
+      health = {
+        { address=0X4818, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Object 1 decreased" },
+        { address=0X4818, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Object 1 increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1683, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Big weapon fragments (Those blue power ups.. but bigger) (Maximum obtainable value 4)" },
+        { address=0X1685, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Weapon fragments (Those blue power ups) (Maximum obtainable value 28)" },
+        { address=0X168B, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Options (Those green power ups) (Maximum obtainable value 04)" },
+        { address=0X1783, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Options (Those green power ups) (Maximum obtainable value 04) - Player 2" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X166E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - The initial 65535 points earned" },
+        { address=0X1677, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Timer for inputting initials in the high score board." },
+        { address=0X1764, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Player 2" },
+        { address=0XA6B5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Something related to the stages, useful for telling when the player beats the game." },
+        { address=0X10C4C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sometimes displays total continues used" },
+      },
+      collectibles = {
+        { address=0X0036, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Credits per play and test mode dip switches increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1689, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility frames. ff is maximum, 00 is none." },
+        { address=0X1781, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility frames. ff is maximum, 00 is none. Player 2" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6ABA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Registry number - Object 80 (0x006a4b-0x006ac7)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X002A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer - related to demo/title/game over screen" },
+        { address=0X4824, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer 2 - Object 1" },
+        { address=0X4825, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer 1 - Object 1" },
+        { address=0X482A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Registry number - Object 1 (0x0047c8-0x004837)" },
+      },
+    },
+  },
+}

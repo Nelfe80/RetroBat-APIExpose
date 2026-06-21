@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Army Men: Sarge's War",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "army-men-sarges-war",
+    file = "army-men-sarges-war.zip",
+    hashes = {
+      { hash = "c80cef71b7ba14824d6467062763f86c", label = "Army Men - Sarge's War (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

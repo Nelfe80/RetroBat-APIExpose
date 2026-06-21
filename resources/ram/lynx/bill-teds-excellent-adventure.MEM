@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Bill & Ted's Excellent Adventure",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "bill-teds-excellent-adventure",
+    file = "bill-teds-excellent-adventure.zip",
+    hashes = {
+      { hash = "87dff4f4d5e1e4a7132d19f94d4e9b3a", label = "Bill & Ted's Excellent Adventure (USA, Europe).lnx" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0038, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X0038, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X004E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Bitflags] Music Notes [1] | Current stage until you receive page" },
+        { address=0X004F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Bitflags] Music Notes [2] | Current stage until you receive page" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X005C, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] Score" },
+      },
+      collectibles = {
+        { address=0X022B, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gave Gold Nugget | Egypt 1700BC" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0049, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Bitflags] (Area ID) Choosen Destination in Booth and current time" },
+      },
+    },
+  },
+}

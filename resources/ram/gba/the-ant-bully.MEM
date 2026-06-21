@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "The Ant Bully",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "the-ant-bully",
+    file = "the-ant-bully.zip",
+    hashes = {
+      { hash = "3a64d744d25a221e3f10099a5d55f155", label = "Ant Bully, The (USA) (En,Fr).gba" },
+      { hash = "b9d1da4a076ac3ff5f08fc3a2ab76fc9", label = "Ant Bully, The (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

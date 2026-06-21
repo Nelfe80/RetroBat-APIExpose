@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "The Simpsons Game",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-simpsons-game",
+    file = "the-simpsons-game.zip",
+    hashes = {
+      { hash = "0a909602291308d929748bf7fd09d900", label = "Simpsons Game, The (Europe).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC03A45, type="u8", condition="bit_true", bit=7, mask=0X80, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (36-37)" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XC03A44, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites (6-7)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC03B00, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cliche 16: Chasm Death" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC03AFF, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cliche 15: Temporary Power Up" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC03B00, type="u8", condition="bit_true", bit=5, mask=0X20, action="AMMO_STATE", no_log=true, no_survey=false, desc="Cliche 21: Ammo Box" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XC03AFE, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Cliche 1: Double Jump!" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC03AFE, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cliche 2: Switches and Levers" },
+        { address=0XC03AFE, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cliche 3: The Doors" },
+      },
+    },
+  },
+}

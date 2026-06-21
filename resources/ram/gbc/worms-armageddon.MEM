@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Worms Armageddon",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "worms-armageddon",
+    file = "worms-armageddon.zip",
+    hashes = {
+      { hash = "b6b81d98a27596443792f47812f15b67", label = "Worms Armageddon (Europe) (En,Fr,De,Es,It,Nl).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCEC8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of rounds" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCEC4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Starting energy decreased" },
+        { address=0XCEC4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Starting energy increased" },
+        { address=0XD029, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Worm 1 health [8bit] decreased" },
+        { address=0XD029, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Worm 1 health [8bit] increased" },
+        { address=0XD085, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Worm 2 Health [8bit] decreased" },
+        { address=0XD085, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Worm 2 Health [8bit] increased" },
+        { address=0XD0E1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Worm 3 Health [8bit] decreased" },
+        { address=0XD0E1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Worm 3 Health [8bit] increased" },
+        { address=0XD13D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Worm 4 health [8bit] decreased" },
+        { address=0XD13D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Worm 4 health [8bit] increased" },
+        { address=0XD199, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Worm 1 Health [8bit] decreased" },
+        { address=0XD199, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Worm 1 Health [8bit] increased" },
+        { address=0XD1F5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Worm 2 health [8bit] decreased" },
+        { address=0XD1F5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Worm 2 health [8bit] increased" },
+        { address=0XD251, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Worm 3 health [8bit] decreased" },
+        { address=0XD251, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Worm 3 health [8bit] increased" },
+        { address=0XD2AD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Worm 4 health [8bit] decreased" },
+        { address=0XD2AD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Worm 4 health [8bit] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XCC93, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon [8bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCEC7, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round time" },
+      },
+    },
+  },
+}

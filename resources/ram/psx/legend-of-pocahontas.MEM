@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Legend of Pocahontas",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "legend-of-pocahontas",
+    file = "legend-of-pocahontas.zip",
+    hashes = {
+      { hash = "a366f0ab040079ddedbc601a8d575bd7", label = "Legend of Pocahontas (Europe) (En,De,Nl)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X42A14, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Movie Timer - 957e" },
+        { address=0X4CA90, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Puzzle Timer" },
+      },
+    },
+  },
+}

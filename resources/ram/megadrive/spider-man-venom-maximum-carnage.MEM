@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Spider-Man & Venom: Maximum Carnage",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat'em Up"
+  },
+
+  rom = {
+    name = "spider-man-venom-maximum-carnage",
+    file = "spider-man-venom-maximum-carnage.zip",
+    hashes = {
+      { hash = "75af3f1e3b16d725cac258bfafaaea8a", label = "Spider-Man . Venom - Maximum Carnage (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0782, type="u16be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X07FF, type="u8", condition="bit_true", bit=5, mask=0X20, action="GAME_OVER", no_log=false, no_survey=false, desc="Entered Secret Room Flag [0->1]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X07FF, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Clear Flag [0->1]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X077E, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X077E, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0966, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0966, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0768, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 2nd Digit" },
+        { address=0X076A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 3rd Digit" },
+        { address=0X076C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 4th Digit" },
+        { address=0X076E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 5th Digit" },
+        { address=0X0770, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 6th Digit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0B46, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X07FC, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level ID" },
+      },
+    },
+  },
+}

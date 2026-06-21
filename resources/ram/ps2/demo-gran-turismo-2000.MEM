@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "~Demo~ Gran Turismo 2000",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "demo-gran-turismo-2000",
+    file = "demo-gran-turismo-2000.zip",
+    hashes = {
+      { hash = "a833df39162f5f3ee5a9888ae3e2024b", label = "Gran Turismo 2000 (Japan) (Taikenban)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FFFC50, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="In-game paused" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB711C4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time set by player (in msec)" },
+      },
+    },
+  },
+}

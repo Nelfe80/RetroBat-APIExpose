@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Blade",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Beat 'em Up, Shooter"
+  },
+
+  rom = {
+    name = "blade",
+    file = "blade.zip",
+    hashes = {
+      { hash = "6b3ceb7bb280c0c0cb7543fe33925cb7", label = "Blade (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE447, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XE448, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Part of Level" },
+        { address=0XE45A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Status?" },
+        { address=0XE46B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Subway 2 (0 = unbeaten, 1 = beaten)" },
+        { address=0XE472, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Subway (1 = unbeaten, 2 = beaten)" },
+        { address=0XE473, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 China Town (1 = unbeaten, 2 = beaten)" },
+        { address=0XE474, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8 The Harbor (1 = unbeaten, 2 = beaten)" },
+        { address=0XE475, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 9 The Sewers (1 = unbeaten, 2 = beaten)" },
+        { address=0XE476, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 11 The Fortress (1 = unbeaten, 2 = beaten)" },
+        { address=0XE477, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Serum Level" },
+        { address=0XE478, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Armor Level" },
+        { address=0XE479, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ammo Level" },
+        { address=0XE47A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kung Fu Level" },
+        { address=0XE47B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sword Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XE440, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XE440, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XE445, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Switch to Serum Hp Bar decreased" },
+        { address=0XE445, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Switch to Serum Hp Bar increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE47C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Scores & Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD072, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+        { address=0XE45C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enter Rooms, Boss Room = 01" },
+      },
+    },
+  },
+}

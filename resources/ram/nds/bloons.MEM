@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Bloons",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bloons",
+    file = "bloons.zip",
+    hashes = {
+      { hash = "a127c3e097c358c7ee99628da826bbb8", label = "Bloons (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCD496, type="u16le", condition="eq", value=0X0000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a Main Level" },
+        { address=0XCD496, type="u16le", condition="eq", value=0XFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Menus or Custom Level" },
+      },
+    },
+  },
+}

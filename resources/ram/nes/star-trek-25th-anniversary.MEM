@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Star Trek: 25th Anniversary",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "star-trek-25th-anniversary",
+    file = "star-trek-25th-anniversary.zip",
+    hashes = {
+      { hash = "e8db29ba3ddabbcb5361c65ad0f86510", label = "Star Trek - 25th Anniversary (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone ID" },
+      },
+      zone = {
+        { address=0X0082, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID (On Enterprise Only)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0790, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kirk Health decreased" },
+        { address=0X0790, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kirk Health increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X008E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enterprise Shields" },
+        { address=0X00B0, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Romulan Ship Shields" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0094, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Number of Romulan Ships Destroyed" },
+      },
+    },
+  },
+}

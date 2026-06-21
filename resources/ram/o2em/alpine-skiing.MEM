@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Alpine Skiing",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "alpine-skiing",
+    file = "alpine-skiing.zip",
+    hashes = {
+      { hash = "55d7b6575645bfb5890a39491f823fea", label = "Alpine Skiing (USA, Europe).bin" },
+      { hash = "ea86b958c37da876bb178dcaa92a8ee7", label = "Faire du ski (France).bin" },
+    }
+  },
+
+  events = {
+  },
+}

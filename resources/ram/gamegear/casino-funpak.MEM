@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Casino FunPak",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "casino-funpak",
+    file = "casino-funpak.zip",
+    hashes = {
+      { hash = "3072b95caff526a8a7a7b7f9a23f9383", label = "Casino FunPak (USA).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0244, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Bet for This Hand/Round [3 bytes BCD]" },
+      },
+    },
+  },
+}

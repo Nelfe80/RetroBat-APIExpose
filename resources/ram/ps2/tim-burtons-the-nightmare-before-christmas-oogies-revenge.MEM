@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Tim Burton's The Nightmare Before Christmas: Oogie's Revenge",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "tim-burtons-the-nightmare-before-christmas-oogies-revenge",
+    file = "tim-burtons-the-nightmare-before-christmas-oogies-revenge.zip",
+    hashes = {
+      { hash = "a546b3f60dd3ae0f8a61d1a9bc1751ea", label = "Tim Burton's The Nightmare Before Christmas - Oogie's Revenge (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4074A8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="(8 bit) Paused Menu Flag" },
+        { address=0X4E4E20, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="(8 bit) Subtitles Flag" },
+        { address=0X4E5124, type="u8", condition="eq", value=0X06, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+      events = {
+        { address=0X49BD44, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(8 bit) Current Combo Rank" },
+        { address=0X49BD46, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(16 bits) Current combo count" },
+        { address=0X4E4E54, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32 bit) Highest combo on current chapter" },
+        { address=0X4E4E61, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(8 bit) Combo Rank Current Chapter" },
+        { address=0X4E4E84, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32 bit) Chapter 1 - Highest combo count" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X48DC9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bits) Soul Robber Level" },
+        { address=0X48DCA4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Pumpkin King Level" },
+        { address=0X48DCAC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Re-Possesion Level" },
+        { address=0X48DCB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Scared Stiff Level (0xff if locked)" },
+        { address=0X48DCB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Cold Front Level (0xff if locked)" },
+        { address=0X48DCB8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Pumpkin Shield Level (0xff if locked)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4E4E21, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) Enemy Life Gauge increased" },
+        { address=0X4E4E21, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) Enemy Life Gauge decreased" },
+      },
+      health = {
+        { address=0X48DC94, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Max Health decreased" },
+        { address=0X48DC94, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Max Health increased" },
+        { address=0X48DC98, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Current Health decreased" },
+        { address=0X48DC98, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Current Health increased" },
+        { address=0X4993FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Health HUD decreased" },
+        { address=0X4993FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Health HUD increased" },
+        { address=0X4E4E58, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32 bit) Damage recieved on chapter" },
+        { address=0X4E4E62, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Damage Rank Current Chapter" },
+        { address=0X4E4E88, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32 bit) Chapter 1 - Damage Received" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4E4E24, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon Targeting" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X48DCD4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16 bit) Pumpkin Coins Quantity increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X49BBB8, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit) Boss Health HUD" },
+        { address=0X178D5D4, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(32 bit) Boss Health [Float]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X48DD70, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8 bit) Item - Halloween Door" },
+        { address=0X48DD74, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8 bit) Item - Valentine Door" },
+        { address=0X48DD78, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8 bit) Item - St Partricks Door" },
+        { address=0X48DD7C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8 bit) Item - Thanksgiving Door" },
+        { address=0X48DD80, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8 bit) Item - Independance Day Door" },
+        { address=0X48DD84, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8 bit) Item - Easter Door" },
+        { address=0X48DD88, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8 bit) Item - Christmas Door" },
+      },
+    },
+  },
+}

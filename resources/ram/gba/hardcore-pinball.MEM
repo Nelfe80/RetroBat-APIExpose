@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Hardcore Pinball",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "hardcore-pinball",
+    file = "hardcore-pinball.zip",
+    hashes = {
+      { hash = "84a1007a744a784bb16c98f1ce04f94e", label = "Hardcore Pinball (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB4E0, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode of Sorts" },
+        { address=0XB4E0, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XB4EC, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode of Sorts" },
+        { address=0XB4EC, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XB4F0, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode of Sorts" },
+        { address=0XB4F0, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB8F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1st Place Score for Station" },
+        { address=0XB908, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1st Place Score for Robomech" },
+        { address=0XB910, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2nd Place Score for Robomech" },
+        { address=0XB99C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

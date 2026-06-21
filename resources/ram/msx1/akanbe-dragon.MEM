@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Akanbe Dragon",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "akanbe-dragon",
+    file = "akanbe-dragon.zip",
+    hashes = {
+      { hash = "2231a0ff5ee28704e8d5163a81a72c21", label = "Akanbe Dragon (1988) (Winky Soft).dsk" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XE165, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Battle Health [8 bit] decreased" },
+        { address=0XE165, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Battle Health [8 bit] increased" },
+        { address=0XE288, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Battle Health [8 bit] decreased" },
+        { address=0XE288, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Battle Health [8 bit] increased" },
+      },
+    },
+  },
+}

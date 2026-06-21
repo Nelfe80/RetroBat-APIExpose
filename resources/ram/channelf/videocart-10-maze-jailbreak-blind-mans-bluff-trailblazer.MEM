@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-10: Maze, Jailbreak, Blind-Man's-Bluff, Trailblazer",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "videocart-10-maze-jailbreak-blind-mans-bluff-trailblazer",
+    file = "videocart-10-maze-jailbreak-blind-mans-bluff-trailblazer.zip",
+    hashes = {
+      { hash = "6565df74539476d66fd78de1bac0259c", label = "Maze, Jailbreak, Blind-man's-bluff, Trailblazer (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

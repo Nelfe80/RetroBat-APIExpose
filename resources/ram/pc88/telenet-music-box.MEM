@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Telenet Music Box",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "telenet-music-box",
+    file = "telenet-music-box.zip",
+    hashes = {
+      { hash = "0e03bc5a0ca5d3756d154f1de40f9876", label = "Telenet Music Box (Disk B).d88" },
+      { hash = "bbfdb481c69c5f58a227da667adbcd16", label = "Telenet Music Box (Disk A).d88" },
+    }
+  },
+
+  events = {
+  },
+}

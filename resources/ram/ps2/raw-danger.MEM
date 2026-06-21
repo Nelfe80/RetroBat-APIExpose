@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Raw Danger!",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "raw-danger",
+    file = "raw-danger.zip",
+    hashes = {
+      { hash = "37b2c1219a6a4eeed07825ce1e396cd4", label = "Zettai Zetsumei Toshi 2 - Itetsuita Kioku-tachi (Japan)" },
+      { hash = "3539a17fbf8ae4da980542e91707118a", label = "Raw Danger (Europe)" },
+      { hash = "7b31d93ddcc8a2907c0029a9ca2a726d", label = "Raw Danger (Europe) (NTSC Mode) (v1.0) (Souzooka)" },
+      { hash = "79a6c918d2300d6683705fcc7b50955a", label = "Raw Danger (Europe) (NTSC Mode + Performance) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X70F9C0, type="u8", condition="eq", value=0X8, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Exit to title; Player requested to exit to the title while inside the item menu" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0001, type="u16le", condition="eq", value=0X0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="IDLE" },
+        { address=0X0001, type="u16le", condition="eq", value=0X1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="MOVE" },
+        { address=0X0001, type="u16le", condition="eq", value=0X2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X0001, type="u16le", condition="eq", value=0X3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="JUMP" },
+        { address=0X0001, type="u16le", condition="eq", value=0X4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="FALLDAMAGE" },
+        { address=0X0001, type="u16le", condition="eq", value=0X5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="CLIMBLEDGE" },
+        { address=0X0001, type="u16le", condition="eq", value=0X6, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="HANGLEDGE" },
+        { address=0X0001, type="u16le", condition="eq", value=0X7, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="YELL" },
+        { address=0X0001, type="u16le", condition="eq", value=0X8, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="CRAWL" },
+        { address=0X0001, type="u16le", condition="eq", value=0X9, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="PRECRAWL" },
+        { address=0X0001, type="u16le", condition="eq", value=0XA, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="CLING" },
+        { address=0X0001, type="u16le", condition="eq", value=0XB, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X0001, type="u16le", condition="eq", value=0XC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="SHOCK_UNK" },
+        { address=0X0001, type="u16le", condition="eq", value=0XD, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="KNOCKBACK" },
+        { address=0X0001, type="u16le", condition="eq", value=0XE, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="FIRSTPERSON" },
+        { address=0X0001, type="u16le", condition="eq", value=0XF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="TALK" },
+        { address=0X0001, type="u16le", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="LOOK" },
+        { address=0X0001, type="u16le", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X0001, type="u16le", condition="eq", value=0X12, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X0001, type="u16le", condition="eq", value=0X13, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="ITEMPICK" },
+        { address=0X0001, type="u16le", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="PUSHCART" },
+        { address=0X0001, type="u16le", condition="eq", value=0X15, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="WARM" },
+        { address=0X0001, type="u16le", condition="eq", value=0X16, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="WARMEXEC" },
+        { address=0X0001, type="u16le", condition="eq", value=0X17, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="CUTSCENE" },
+        { address=0X0001, type="u16le", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="LADDER" },
+        { address=0X0001, type="u16le", condition="eq", value=0X19, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="DOOR" },
+        { address=0X0001, type="u16le", condition="eq", value=0X1A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X0001, type="u16le", condition="eq", value=0X1B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="DEATH" },
+        { address=0X0001, type="u16le", condition="eq", value=0X1C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="ELECTRIC_SHOCK" },
+        { address=0X0001, type="u16le", condition="eq", value=0X1D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X0001, type="u16le", condition="eq", value=0X1E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="DRIVE" },
+        { address=0X0001, type="u16le", condition="eq", value=0X1F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="MOVERAIL" },
+        { address=0X0001, type="u16le", condition="eq", value=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X0001, type="u16le", condition="eq", value=0X21, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="HANGROPE" },
+        { address=0X0001, type="u16le", condition="eq", value=0X22, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="SLIPANDFALL" },
+        { address=0X0001, type="u16le", condition="eq", value=0X23, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X0001, type="u16le", condition="eq", value=0X190, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Assembled Oars" },
+      },
+    },
+  },
+}

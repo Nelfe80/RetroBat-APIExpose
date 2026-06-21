@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Love Hina Advance: Shukufuku no Kane wa Naru Kana",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "love-hina-advance-shukufuku-no-kane-wa-naru-kana",
+    file = "love-hina-advance-shukufuku-no-kane-wa-naru-kana.zip",
+    hashes = {
+      { hash = "4f1e7c60d4fe54fea13aacb135ab745a", label = "Love Hina Advance - Shukufuku no Kane ha Naru Kana (Japan) (En) (v0.985) (Mandom&Gangis).gba" },
+      { hash = "53bfc207dd7320ad7db94e299adca245", label = "Love Hina Advance - Shukufuku no Kane wa Naru Kana (Japan).gba" },
+      { hash = "9029326a45e051b43e1480d8f1cb9136", label = "Love Hina Advance - Shukufuku no Kane ha Naru Kana (Japan) (En) (v0.98L) (Mandom&Gangis).gba" },
+      { hash = "9893ecef0083de3f7235359ce29b7a73", label = "Love Hina Advance - Shukufuku no Kane ha Naru Kana (Japan) (Fr) (pockettrad).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X3968, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X3968, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X3969, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maximum Health decreased" },
+        { address=0X3969, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maximum Health increased" },
+        { address=0X396F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mutsumi - Health decreased" },
+        { address=0X396F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mutsumi - Health increased" },
+        { address=0X3970, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sarah - Health decreased" },
+        { address=0X3970, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sarah - Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3A5C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Chapter" },
+      },
+    },
+  },
+}

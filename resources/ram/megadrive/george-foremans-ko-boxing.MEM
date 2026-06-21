@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "George Foreman's KO Boxing",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "george-foremans-ko-boxing",
+    file = "george-foremans-ko-boxing.zip",
+    hashes = {
+      { hash = "901918b93f0286a4c961ae60ab72d360", label = "George Foreman's KO Boxing (USA).md" },
+    }
+  },
+
+  events = {
+  },
+}

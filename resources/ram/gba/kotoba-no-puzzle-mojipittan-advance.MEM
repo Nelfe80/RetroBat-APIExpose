@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Kotoba no Puzzle: Mojipittan Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "kotoba-no-puzzle-mojipittan-advance",
+    file = "kotoba-no-puzzle-mojipittan-advance.zip",
+    hashes = {
+      { hash = "25ead20d8d3cfedb35393740b3a36b74", label = "Kotoba no Puzzle - Mojipittan Advance (Japan).gba" },
+      { hash = "9fee0cf88cb21f2009636b0581a3a502", label = "Kotoba no Puzzle - Mojipittan Advance (Japan) (Virtual Console).gba" },
+    }
+  },
+
+  events = {
+  },
+}

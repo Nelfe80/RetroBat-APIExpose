@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "ajax",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "ajax",
+    file = "ajax.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X209B, type="u40be", condition="change", action="SCORE_STATE", min=10, max=100, no_log=false, no_survey=false, desc="Score delta 10-100: Score delta 10-100" },
+        { address=0X209B, type="u40be", condition="change", action="SCORE_STATE", color="orange", min=110, max=200, no_log=false, no_survey=false, desc="Score delta 110-200: Score delta 110-200" },
+        { address=0X209B, type="u40be", condition="change", action="SCORE_STATE", color="cyan", min=210, max=400, no_log=false, no_survey=false, desc="Score delta 210-400: Score delta 210-400" },
+        { address=0X209B, type="u40be", condition="change", action="SCORE_STATE", color="green", min=410, max=1000, no_log=false, no_survey=false, desc="Score delta 410-1000: Score delta 410-1000" },
+        { address=0X209B, type="u40be", condition="change", action="SCORE_STATE", color="blue", min=1100, max=10000, no_log=false, no_survey=false, desc="Score delta 1100-10000: Score delta 1100-10000" },
+      },
+      collectibles = {
+        { address=0X208C, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

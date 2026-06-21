@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Kanon",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kanon",
+    file = "kanon.zip",
+    hashes = {
+      { hash = "fdb0a29887c6690723f483e826871ac7", label = "Kanon (Japan) (v1.02).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Ultimate Battle 22",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-ball-z-ultimate-battle-22",
+    file = "dragon-ball-z-ultimate-battle-22.zip",
+    hashes = {
+      { hash = "8f06b320f625e18eb7290f483e4aac3a", label = "Dragon Ball Z - Ultimate Battle 22 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X74C8, type="u16le", condition="eq", value=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title-Character select" },
+        { address=0X74C8, type="u16le", condition="eq", value=0XCD00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits P1 vs COM mode (16 bit)" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X10128, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Martial Arts Tournament" },
+        { address=0X10128, type="u8", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Martial Arts Tournament Noon" },
+        { address=0X10128, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Martial Arts Tournament Sunset" },
+      },
+      stage = {
+        { address=0X10128, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cell Games Arena" },
+        { address=0X10128, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Desert" },
+        { address=0X10128, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Plain" },
+        { address=0X10128, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Namek" },
+        { address=0X10128, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Barren Planet" },
+        { address=0X10128, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Crystal Room" },
+        { address=0X10128, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hyperbolic Time Chamber" },
+        { address=0X10128, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kami's Lookout" },
+        { address=0X10128, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Coast" },
+        { address=0X10128, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ruined City" },
+        { address=0X10128, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="BATTLE STAGE" },
+        { address=0X10134, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Level?" },
+        { address=0X10135, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Level?" },
+        { address=0X1063A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character level?" },
+        { address=0X106F6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Build Up level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X95A48, type="u8", condition="eq", value=0XEE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X95A4A, type="u8", condition="eq", value=0XEE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XA9EF8, type="u16le", condition="eq", value=0XFFEE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XA9EF9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1P dead = FF" },
+        { address=0XAA268, type="u16le", condition="eq", value=0XFFEE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XAA269, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P dead = FF" },
+      },
+      health = {
+        { address=0X95A48, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="full" },
+        { address=0X95A48, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="1P Health (on screen)" },
+        { address=0X95A4A, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="full" },
+        { address=0X95A4A, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="2P - CPU Health (on screen)" },
+        { address=0XA9EF8, type="u16le", condition="eq", value=0X190, action="HEALTH_STATE", no_log=true, no_survey=false, desc="full" },
+        { address=0XA9EF8, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="1P Health (16bit)" },
+        { address=0XAA268, type="u16le", condition="eq", value=0X190, action="HEALTH_STATE", no_log=true, no_survey=false, desc="full" },
+        { address=0XAA268, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="2P - CPU Health (16bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X10710, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1st block" },
+        { address=0X10710, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="2nd block" },
+        { address=0X10710, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="3rd lock" },
+        { address=0X10710, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="4th block" },
+      },
+    },
+  },
+}

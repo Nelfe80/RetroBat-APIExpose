@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "2048",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "2048",
+    file = "2048.zip",
+    hashes = {
+      { hash = "e8ec91f0a78813a95e17f56cf0b94525", label = "2048 (World) (v0.5) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01CE, type="u8", condition="eq", value=0X31, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over (Old board persists until 0x10)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X01CE, type="u8", condition="eq", value=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Board" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01BF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score" },
+        { address=0X01C1, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+      },
+    },
+  },
+}

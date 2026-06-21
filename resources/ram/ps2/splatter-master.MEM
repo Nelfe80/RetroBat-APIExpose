@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Splatter Master",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "splatter-master",
+    file = "splatter-master.zip",
+    hashes = {
+      { hash = "16fe5a80960560364a6c5851529d65dd", label = "Simple 2000 Series Vol. 64 - The Splatter Action (Japan)" },
+      { hash = "0710c069a79a36c1a0e541331ee92ce2", label = "Splatter Master (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X238D21, type="u32be", condition="eq", value=0X474F5645, action="GAME_OVER", no_log=false, no_survey=false, desc="GOVE, game over screen" },
+        { address=0X238D21, type="u32be", condition="eq", value=0X5449544C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="TITL, title screen" },
+        { address=0X252288, type="u16le", condition="eq", value=0X2, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage starting" },
+        { address=0X252288, type="u16le", condition="eq", value=0X3, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In stage" },
+        { address=0X252288, type="u16le", condition="eq", value=0X6, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage clear" },
+        { address=0X252288, type="u16le", condition="eq", value=0X9, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X252288, type="u16le", condition="eq", value=0XA, action="GAME_PLAYING", no_log=false, no_survey=false, desc="First entering shop in stage 2" },
+        { address=0X252288, type="u16le", condition="eq", value=0XB, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In shop in stage 2" },
+        { address=0X252288, type="u16le", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In shop between stages, or continue screen. Also title if quit mid-game; beating the game will k" },
+        { address=0X277AC8, type="u8", condition="eq", value=0XB, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X277AC8, type="u8", condition="eq", value=0XD, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Returned to title, either by dying or menu" },
+      },
+      events = {
+        { address=0X252DF4, type="u16le", condition="eq", value=0X7, action="COMBO_HIT", no_log=false, no_survey=false, desc="First hit in a combo" },
+        { address=0X252DF4, type="u16le", condition="eq", value=0X1C, action="COMBO_HIT", no_log=false, no_survey=false, desc="Chainsaw, first hit in a combo" },
+        { address=0X252DF4, type="u16le", condition="eq", value=0X20, action="COMBO_HIT", no_log=false, no_survey=false, desc="Chainsaw spin, from activating, deactivating, or Just Attack; 0x283e32 will be 9 for activating/" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X252288, type="u16le", condition="eq", value=0X6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage clear" },
+      },
+      stage = {
+        { address=0X238D21, type="u32be", condition="eq", value=0X53484F50, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SHOP, shop between stages (the shop during stage 2 will still have COMN)" },
+        { address=0X253138, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID (16-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X252288, type="u16le", condition="eq", value=0X7, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X252EC0, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life (16-bit) increased" },
+        { address=0X252EC0, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life (16-bit) decreased" },
+        { address=0X252EC2, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max Life (16-bit) increased" },
+        { address=0X252EC2, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max Life (16-bit) decreased" },
+        { address=0X252EE0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Mask Obtained (Bit0)" },
+        { address=0X25310C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Gem Collected (Bit0) increased" },
+        { address=0X25310C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Gem Collected (Bit0) decreased" },
+        { address=0X26F774, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Shop Life Sold Out (Bit0) increased" },
+        { address=0X26F774, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shop Life Sold Out (Bit0) decreased" },
+        { address=0X26F7EC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shop Death Mask Sold Out (Bit0)" },
+        { address=0X277AC8, type="u8", condition="eq", value=0X7, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X252EC8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (32-bit) increased" },
+        { address=0X2530D8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold In Shop (32-bit) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X238D21, type="u32be", condition="eq", value=0X434F5353, action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSS, survival mode" },
+        { address=0X252288, type="u16le", condition="eq", value=0X5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss cutscene" },
+        { address=0X2523F4, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health (16-bit)" },
+        { address=0X2523F6, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Max Health (16-bit)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X252DF4, type="u16le", condition="eq", value=0X3, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X252DF4, type="u16le", condition="eq", value=0X4, action="JUMPING", no_log=false, no_survey=false, desc="Double jump" },
+        { address=0X252DF4, type="u16le", condition="eq", value=0XD, action="JUMPING", no_log=false, no_survey=false, desc="Double jump dive" },
+        { address=0X252DF4, type="u16le", condition="eq", value=0X1A, action="JUMPING", no_log=false, no_survey=false, desc="Chainsaw, double jump dive" },
+        { address=0X252ED4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Double Jump Obtained (Bit0)" },
+        { address=0X26F7A4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Shop Double Jump Sold Out (Bit0)" },
+      },
+    },
+  },
+}

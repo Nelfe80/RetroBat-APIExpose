@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "WLOKU",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "wloku",
+    file = "wloku.zip",
+    hashes = {
+      { hash = "5e470ef900a385018294e521798555f8", label = "WLOKU (World) (12Boti).wasm" },
+    }
+  },
+
+  events = {
+  },
+}

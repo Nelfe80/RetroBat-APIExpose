@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Fluffles Rainy Day",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fluffles-rainy-day",
+    file = "fluffles-rainy-day.zip",
+    hashes = {
+      { hash = "e432835a71588e7a1e4499f175f78881", label = "Fluffle's Rainy Day (World).hex" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X05BF, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+  },
+}

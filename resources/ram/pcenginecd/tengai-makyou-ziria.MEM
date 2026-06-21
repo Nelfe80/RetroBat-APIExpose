@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Tengai Makyou: Ziria",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "tengai-makyou-ziria",
+    file = "tengai-makyou-ziria.zip",
+    hashes = {
+      { hash = "6a5357c92dd8313ca3ebc80593f77cea", label = "Far East of Eden - Tengai Makyou - Ziria (Japan) (Rev 7)" },
+      { hash = "80703df09e4bfb3f46fabd4cc1c359ce", label = "Far East of Eden - Tengai Makyou - Ziria (Japan) (Rev 7) (En) (v1.0) (LIPEMCO! Translations)" },
+      { hash = "0ad5651a92e838d5174ebc3078440200", label = "Far East of Eden - Tengai Makyou - Ziria (Japan) (Rev 7) (En) (v1.2) (LIPEMCO! Translations)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X005A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Y coordnate" },
+        { address=0X0774, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ziria's level" },
+        { address=0X0778, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[24-bit] Ziria's Virtue needed for next level" },
+      },
+      stage = {
+        { address=0X0727, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bit 3 - found secret passage to underground factory" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X076C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ziria's current HP decreased" },
+        { address=0X076C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ziria's current HP increased" },
+        { address=0X0770, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ziria's max HP decreased" },
+        { address=0X0770, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ziria's max HP increased" },
+        { address=0X0788, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Orochimaru's current HP decreased" },
+        { address=0X0788, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Orochimaru's current HP increased" },
+        { address=0X078C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Orochimaru's max HP decreased" },
+        { address=0X078C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Orochimaru's max HP increased" },
+        { address=0X07A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tsunade's current HP decreased" },
+        { address=0X07A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tsunade's current HP increased" },
+        { address=0X07A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tsunade's max HP decreased" },
+        { address=0X07A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tsunade's max HP increased" },
+        { address=0X151E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ziria's HP in battle decreased" },
+        { address=0X151E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ziria's HP in battle increased" },
+        { address=0X151F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Orochimaru's HP in battle decreased" },
+        { address=0X151F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Orochimaru's HP in battle increased" },
+        { address=0X1520, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tsunade's HP in battle decreased" },
+        { address=0X1520, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tsunade's HP in battle increased" },
+        { address=0X1522, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0X1522, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0X1523, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X1523, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X1524, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X1524, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0X1525, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ziria's HP in battle overflow decreased" },
+        { address=0X1525, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ziria's HP in battle overflow increased" },
+        { address=0X1526, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Orochimaru's HP in battle overflow decreased" },
+        { address=0X1526, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Orochimaru's HP in battle overflow increased" },
+        { address=0X1527, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Orochimaru's HP in battle overflow decreased" },
+        { address=0X1527, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Orochimaru's HP in battle overflow increased" },
+        { address=0X1529, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP in battle overflow decreased" },
+        { address=0X1529, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP in battle overflow increased" },
+        { address=0X1530, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 max HP decreased" },
+        { address=0X1530, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 max HP increased" },
+        { address=0X1537, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 max HP overflow decreased" },
+        { address=0X1537, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 max HP overflow increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X144C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ziria's equipped weapon" },
+        { address=0X1454, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tsunade's equipped weapon" },
+      },
+    },
+  },
+}

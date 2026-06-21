@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ,-. 201600</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 019 139000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 /() 125200</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 BXW 91800</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 ( 81700</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 --- 70000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 --- 60000</text>
+		</text>
+	</view>
+</theme>

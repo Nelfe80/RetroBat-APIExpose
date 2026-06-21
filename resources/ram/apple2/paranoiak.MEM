@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Paranoiak",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "paranoiak",
+    file = "paranoiak.zip",
+    hashes = {
+      { hash = "9771f313dda522e8c65407e94c173fb2", label = "Paranoiak (1984)(Froggy Software)(fr)(Side A)[cr Binary Crack Band].dsk" },
+      { hash = "ddc76a12c8dcd197b8d5395bf80f9461", label = "Paranoiak (1984)(Froggy Software)(fr)(Side B)[cr Binary Crack Band].dsk" },
+      { hash = "fc40e6016f06eb748ead9b072c53b6aa", label = "Paranoiak (1984) (Froggy Software) (Chip Select Crack) (Disk 2).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3300, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Hint title text?" },
+      },
+    },
+  },
+}

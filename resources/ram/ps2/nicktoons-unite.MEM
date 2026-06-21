@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Nicktoons Unite!",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "nicktoons-unite",
+    file = "nicktoons-unite.zip",
+    hashes = {
+      { hash = "beaf6c61db1a240c52e3d306707246bc", label = "Nicktoons Unite! (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X48E748, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Indicator (32-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4884A8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Cheat Flags - Infinite Lives (32-bit) increased" },
+        { address=0X4884A8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cheat Flags - Infinite Lives (32-bit) decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X892E20, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892E44, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892E68, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892E8C, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892EB0, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892ED4, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892EF8, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892F1C, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892F40, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892F64, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892F88, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892FAC, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892FD0, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X892FF4, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X893018, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X89303C, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X8930A8, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X8930CC, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X8930F0, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X893114, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X893138, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X89315C, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X893180, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X8931A4, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X8931C8, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X8931EC, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X893210, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X893234, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X893258, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X89327C, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X8932A0, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X8932C4, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X893318, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cheat Flags - Give All Weapons (32-bit)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X893AD4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Upgrade Points - Player 1 (32-bit)" },
+      },
+    },
+  },
+}

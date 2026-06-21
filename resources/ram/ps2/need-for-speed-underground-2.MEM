@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Need for Speed: Underground 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "need-for-speed-underground-2",
+    file = "need-for-speed-underground-2.zip",
+    hashes = {
+      { hash = "f45e0a19d50c42dbf2870fa34ae708f4", label = "Need for Speed - Underground 2 (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4F9D08, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Bool - Tutorial Completed/Stage 1 Unlocked" },
+        { address=0X4F9E14, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit][140 bytes] Race IDs Completed in Stage 2" },
+        { address=0X4F9F18, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit][140 bytes] Race IDs Completed in Stage 3" },
+        { address=0X4FA01C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit][140 bytes] Race IDs Completed in Stage 4" },
+        { address=0X4FA120, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit][140 bytes] Race IDs Completed in Stage 5" },
+      },
+      zone = {
+        { address=0X4FA1A8, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32 Bit] 35th World Event - Stage 5" },
+      },
+      stage = {
+        { address=0X4F9AFC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[256-byte array] of 64 [32-bit pointers] to race event information (object size 0x88) for curren" },
+        { address=0X4F9EA0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit][12bytes] Race IDs for Sponsor Events - Stage 2" },
+        { address=0X4F9EB0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit][12 bytes] Race IDs for URL Events - Stage 2" },
+        { address=0X4F9EF0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Stage 2 Outruns Won" },
+        { address=0X4F9FAC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] 3rd Sponsor Event - Stage 3" },
+        { address=0X4F9FF4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Stage 3 Outruns Won" },
+        { address=0X4FA0B8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit][28 bytes] Race IDs for URL Events - Stage 4" },
+        { address=0X4FA0E0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Event ID For Magazine Covers - Stage 4" },
+        { address=0X4FA0F8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Stage 4 Outruns Won" },
+        { address=0X4FA100, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Races Won While in Stage 4 Career Overworld" },
+        { address=0X4FA1B4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] 3rd Sponsor Event - Stage 5" },
+        { address=0X4FA1DC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] 9th URL Race - Stage 5" },
+        { address=0X4FA1FC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Stage 5 Outruns Won" },
+        { address=0X4FA42C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Current Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X511280, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Highest Single Drift Score in Most Recent Drift" },
+      },
+    },
+  },
+}

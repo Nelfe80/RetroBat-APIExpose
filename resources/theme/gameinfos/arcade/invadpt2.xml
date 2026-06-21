@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1   TAITO    5000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy2wayhorizontal</text>
+			<color>${white}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire Laser</text>
+			<color>${white}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire Laser</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

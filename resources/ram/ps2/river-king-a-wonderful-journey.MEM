@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "River King: A Wonderful Journey",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "river-king-a-wonderful-journey",
+    file = "river-king-a-wonderful-journey.zip",
+    hashes = {
+      { hash = "773e90947db4bd136212806800720dc4", label = "River King - A Wonderful Journey (USA)" },
+      { hash = "6114f4fe587848151aea8269b3f10e83", label = "Harvest Fishing (Europe)" },
+      { hash = "ce8ce8bf51cffdf606e0851b26879a19", label = "Kawa no Nushi Tsuri - Wonderful Journey (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2003FF8, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Met Gray" },
+        { address=0X2003FF8, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="None written" },
+        { address=0X2003FF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Notes] Under Ground Lake Diary Entries" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2003FF3, type="u16le", condition="eq", value=0XA, action="TREASURE", no_log=false, no_survey=false, desc="Got the treasure map" },
+        { address=0X2003FF3, type="u16le", condition="eq", value=0XB, action="TREASURE", no_log=false, no_survey=false, desc="Got the treasure" },
+        { address=0X2003FF6, type="u8", condition="eq", value=0X9, action="TREASURE", no_log=false, no_survey=false, desc="Got Treasure map, finished errand" },
+        { address=0X2003FF7, type="u8", condition="eq", value=0XE, action="TREASURE", no_log=false, no_survey=false, desc="Got treasure map" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2003FFD, type="u16le", condition="eq", value=0X3, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Buna" },
+        { address=0X2003FFF, type="u32le", condition="eq", value=0X82, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Buna" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2003FFF, type="u32le", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fly Rod" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2003FF3, type="u16le", condition="eq", value=0X17, action="SWIMMING", no_log=true, no_survey=false, desc="You can't swim yet message" },
+        { address=0X2003FF3, type="u16le", condition="eq", value=0X18, action="SWIMMING", no_log=true, no_survey=false, desc="Swimming lessons" },
+      },
+    },
+  },
+}

@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Super Robot Taisen: Alpha",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "super-robot-taisen-alpha",
+    file = "super-robot-taisen-alpha.zip",
+    hashes = {
+      { hash = "27906dc14a3b02f8fd030292ab0dbfd2", label = "Super Robot Taisen Alpha (Japan)" },
+      { hash = "2fa46b5484021e969d3d9a76cc41ba6a", label = "Super Robot Taisen Alpha (Japan) (Limited Edition)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X138252, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Unit 1 Max HP decreased" },
+        { address=0X138252, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Unit 1 Max HP increased" },
+        { address=0X1384FC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Unit 1 Current HP decreased" },
+        { address=0X1384FC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Unit 1 Current HP increased" },
+      },
+    },
+  },
+}

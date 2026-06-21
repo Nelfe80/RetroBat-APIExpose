@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Ai to Yuujou no Neko Monogatari: Jingle Cats: Love Para Daisakusen no Maki",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Sandbox"
+  },
+
+  rom = {
+    name = "ai-to-yuujou-no-neko-monogatari-jingle-cats-love-para-daisakusen-no-maki",
+    file = "ai-to-yuujou-no-neko-monogatari-jingle-cats-love-para-daisakusen-no-maki.zip",
+    hashes = {
+      { hash = "495331083f6c5969305f014a8ce586ac", label = "Ai to Yuujou no Neko Monogatari. Jingle Cats - Love Para Daisakusen no Maki (Japan) (En) (v2025-06-02) (Hilltop)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBB6AC, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Pause when a title screen appears? (love attack, stats, cleaning, etc)" },
+      },
+    },
+  },
+}

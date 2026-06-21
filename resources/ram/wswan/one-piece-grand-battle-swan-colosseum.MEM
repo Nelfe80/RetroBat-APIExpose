@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "One Piece: Grand Battle Swan Colosseum",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "one-piece-grand-battle-swan-colosseum",
+    file = "one-piece-grand-battle-swan-colosseum.zip",
+    hashes = {
+      { hash = "7fa6a3034b8c03fca0b756fb5526ce62", label = "From TV Animation One Piece - Grand Battle Swan Colosseum (Japan).wsc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X101CA, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Left" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X101A6, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1st stage" },
+        { address=0X101A6, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage" },
+        { address=0X101A6, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ending cutscene" },
+        { address=0X101A6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC9FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP Value decreased" },
+        { address=0XC9FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP Value increased" },
+        { address=0XCA52, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP Graphical Indicator decreased" },
+        { address=0XCA52, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP Graphical Indicator increased" },
+        { address=0XCB0C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP Actual decreased" },
+        { address=0XCB0C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP Actual increased" },
+        { address=0XCB62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP Graphical indicator decreased" },
+        { address=0XCB62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP Graphical indicator increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10637, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Roger Card [End of Cards] increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCA00, type="u8", condition="eq", value=0X7F, action="SPEED_START", no_log=false, no_survey=false, desc="P-meter fully charged" },
+        { address=0XCA00, type="u8", condition="decrease", action="SPEED_STOP", no_log=false, no_survey=false, desc="P-meter draining down" },
+        { address=0XCA00, type="u8", condition="change", action="SPEED_TIMER", no_log=true, no_survey=false, desc="Power Meter (2d = full)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1018B, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer" },
+        { address=0X1018D, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time left in match" },
+      },
+    },
+  },
+}

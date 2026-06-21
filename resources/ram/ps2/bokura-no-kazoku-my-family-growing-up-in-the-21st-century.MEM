@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bokura no Kazoku: My Family Growing Up in the 21st Century",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bokura-no-kazoku-my-family-growing-up-in-the-21st-century",
+    file = "bokura-no-kazoku-my-family-growing-up-in-the-21st-century.zip",
+    hashes = {
+      { hash = "3d8b75f6b4515e7dec9cfb49c1447eb4", label = "Bokura no Kazoku - My Family Growing Up in the 21st Century (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

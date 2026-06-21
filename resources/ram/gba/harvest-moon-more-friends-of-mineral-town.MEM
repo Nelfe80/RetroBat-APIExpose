@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Harvest Moon: More Friends of Mineral Town",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Simulation, Strategy"
+  },
+
+  rom = {
+    name = "harvest-moon-more-friends-of-mineral-town",
+    file = "harvest-moon-more-friends-of-mineral-town.zip",
+    hashes = {
+      { hash = "fcbf93f8859d8500319e0d80a8c02150", label = "Harvest Moon - More Friends of Mineral Town (USA).gba" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X0004, type="u24le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="=== Field Object ID ===" },
+      },
+    },
+  },
+}

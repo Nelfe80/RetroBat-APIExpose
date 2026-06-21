@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Legacy of Kain: Defiance",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "legacy-of-kain-defiance",
+    file = "legacy-of-kain-defiance.zip",
+    hashes = {
+      { hash = "8a896e95c83ef1d9209dfc2bfd416da1", label = "Legacy of Kain - Defiance (USA)" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X7B8F7C, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Chapter 1 Events - Sealed Door 2" },
+      },
+    },
+  },
+}

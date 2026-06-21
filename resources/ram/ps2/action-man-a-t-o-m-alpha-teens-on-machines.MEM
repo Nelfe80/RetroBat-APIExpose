@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Action Man A.T.O.M.: Alpha Teens on Machines",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing, Shooter"
+  },
+
+  rom = {
+    name = "action-man-a-t-o-m-alpha-teens-on-machines",
+    file = "action-man-a-t-o-m-alpha-teens-on-machines.zip",
+    hashes = {
+      { hash = "c5486381c41bf8f7c4a95ba4cbd171dc", label = "Action Man A.T.O.M. - Alpha Teens on Machines (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi)" },
+    }
+  },
+
+  events = {
+  },
+}

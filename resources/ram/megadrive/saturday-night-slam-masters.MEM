@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Saturday Night Slam Masters",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "saturday-night-slam-masters",
+    file = "saturday-night-slam-masters.zip",
+    hashes = {
+      { hash = "6531e481e57e9243f492718a88a2419b", label = "Saturday Night Slammasters (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2631, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Status" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XB8D4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage number" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XBEA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0XBEA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+        { address=0XBF2E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hp opponent decreased" },
+        { address=0XBF2E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hp opponent increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XBC29, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Status" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBAB4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Overflow" },
+        { address=0XBAB6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBB76, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0XE04C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Mirror" },
+        { address=0XF0B2, type="u16be", condition="eq", value=0XC5B7, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="20" },
+        { address=0XF0B2, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Count out timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,124 @@
+return {
+  game = {
+    title = "Clock Tower 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Horror"
+  },
+
+  rom = {
+    name = "clock-tower-3",
+    file = "clock-tower-3.zip",
+    hashes = {
+      { hash = "0c89e76898f5e8f2330309d005b960c2", label = "Clock Tower 3 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X47E0F8, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Resume Game" },
+        { address=0X47E0F8, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Return to Title Screen" },
+        { address=0X193F750, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (Bit0)" },
+        { address=0X193FC60, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (Bit0)" },
+        { address=0X1941800, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (Bit0)" },
+        { address=0X1941804, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (Bit0)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X194160C, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="After Chopper Battle" },
+        { address=0X194160C, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Last Cutscene" },
+        { address=0X1941616, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Book of Entities 5 (Castle Underground) [F]" },
+        { address=0X1941616, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alyssa's Drawings (Castle Underground) [F]" },
+        { address=0X194161F, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kitchen Key (Gloomy House) [I]" },
+        { address=0X194161F, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hexagonal Wrench (Gloomy House) [I]" },
+        { address=0X194161F, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hexagonal Wrench used" },
+        { address=0X194164D, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Invisibility Band (Castle Undreground) [I]" },
+        { address=0X194164E, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lavender Water (Underground Cave) [I]" },
+      },
+      stage = {
+        { address=0X1941605, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting 5th Stage" },
+        { address=0X1941605, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Cutscene (Darcy)" },
+        { address=0X1941605, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chopper defeated" },
+        { address=0X1941608, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit1=Starting 2nd Stage" },
+        { address=0X194160B, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting 4th Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X51F300, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) increased" },
+        { address=0X51F300, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) decreased" },
+        { address=0X531200, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) increased" },
+        { address=0X531200, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) decreased" },
+        { address=0X53CA00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) increased" },
+        { address=0X53CA00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) decreased" },
+        { address=0X559200, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) increased" },
+        { address=0X559200, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) decreased" },
+        { address=0X55FA00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) increased" },
+        { address=0X55FA00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) decreased" },
+        { address=0X564200, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) increased" },
+        { address=0X564200, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alyssa - Life Bar (Float) decreased" },
+        { address=0X1A4CFE4, type="u32le", condition="eq", value=0X6D6, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4CFE4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Sledgehammer - Life Bar (32-bit) increased" },
+        { address=0X1A4CFE4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sledgehammer - Life Bar (32-bit) decreased" },
+        { address=0X1A4CFE8, type="u32le", condition="eq", value=0X6D6, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4CFE8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Sledgehammer - Life Bar (32-bit) increased" },
+        { address=0X1A4CFE8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sledgehammer - Life Bar (32-bit) decreased" },
+        { address=0X1A4D564, type="u32le", condition="eq", value=0X960, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4D564, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Corroder - Life Bar (32-bit) increased" },
+        { address=0X1A4D564, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Corroder - Life Bar (32-bit) decreased" },
+        { address=0X1A4D568, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Corroder - Max Life (32-bit) increased" },
+        { address=0X1A4D568, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Corroder - Max Life (32-bit) decreased" },
+        { address=0X1A4DAE4, type="u32le", condition="eq", value=0X9C4, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4DAE4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Chopper - Life Bar (32-bit) increased" },
+        { address=0X1A4DAE4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chopper - Life Bar (32-bit) decreased" },
+        { address=0X1A4DAE8, type="u32le", condition="eq", value=0X9C4, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4DAE8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Chopper - Max Life Bar (32-bit) increased" },
+        { address=0X1A4DAE8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chopper - Max Life Bar (32-bit) decreased" },
+        { address=0X1A4E064, type="u32le", condition="eq", value=0XBB8, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4E064, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ralph - Life Bar (32-bit) increased" },
+        { address=0X1A4E064, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ralph - Life Bar (32-bit) decreased" },
+        { address=0X1A4E068, type="u32le", condition="eq", value=0XBB8, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4E068, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ralph - Life Bar (32-bit) increased" },
+        { address=0X1A4E068, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ralph - Life Bar (32-bit) decreased" },
+        { address=0X1A4E5E4, type="u32le", condition="eq", value=0X12C, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4E5E4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Jemima - Life Bar (32-bit) increased" },
+        { address=0X1A4E5E4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Jemima - Life Bar (32-bit) decreased" },
+        { address=0X1A4E5E8, type="u32le", condition="eq", value=0X12C, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A4E5E8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Jemima - Life Bar (32-bit) increased" },
+        { address=0X1A4E5E8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Jemima - Life Bar (32-bit) decreased" },
+        { address=0X1A574E4, type="u32le", condition="eq", value=0X1770, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A574E4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lord Burroughs - Life Bar (32-bit) increased" },
+        { address=0X1A574E4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lord Burroughs - Life Bar (32-bit) decreased" },
+        { address=0X1A574E8, type="u32le", condition="eq", value=0X1770, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life" },
+        { address=0X1A574E8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lord Burroughs - Life Bar (32-bit) increased" },
+        { address=0X1A574E8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lord Burroughs - Life Bar (32-bit) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X194160E, type="u8", condition="bit_true", bit=7, mask=0X80, action="SCORE_STATE", no_log=false, no_survey=false, desc="Evade Points and Hide Points (Tailor's) [G]" },
+      },
+      collectibles = {
+        { address=0X194161D, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Engagement Ring returned (High Street) [I]" },
+        { address=0X194161D, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="1st Corpse - Engagement Ring (High Street) [I]" },
+        { address=0X194161D, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Dick's Desk Key (Ghost Town) [I]" },
+        { address=0X1941622, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Fountain Pen (The Promenade) [I]" },
+        { address=0X1941622, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Fountain Pen returned (The Promenade) [I]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X194160C, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Last Boss defeated" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X194163D, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Free Spirit - Film [E]" },
+        { address=0X194163F, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Picture (Gloomy House) [E]" },
+        { address=0X194163F, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cutscene - Corroder (Sewers) [E]" },
+      },
+    },
+  },
+}

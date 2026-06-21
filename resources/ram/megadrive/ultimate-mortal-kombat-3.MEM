@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Ultimate Mortal Kombat 3",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "ultimate-mortal-kombat-3",
+    file = "ultimate-mortal-kombat-3.zip",
+    hashes = {
+      { hash = "3dcf09e58870a2cf850f9788078684be", label = "Ultimate Mortal Kombat 3 (Europe).md" },
+      { hash = "5a129779699f8b388e97c9c0d703d503", label = "Ultimate Mortal Kombat 3 (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X021E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Current Char Bio (Demo)" },
+        { address=0X0222, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues - start number (Update after exit from cheat menu)" },
+        { address=0X0223, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues - 05 - 95 = 05 - 5f" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X02A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Won - Enemy" },
+        { address=0XF22E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Won - Player" },
+        { address=0XF51C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+      },
+      stage = {
+        { address=0X01EC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select - Secrets" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9F7A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health (Display) decreased" },
+        { address=0X9F7A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health (Display) increased" },
+        { address=0XEE7A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health (Display) decreased" },
+        { address=0XEE7A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health (Display) increased" },
+        { address=0XF228, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0XF228, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+        { address=0XF39A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health decreased" },
+        { address=0XF39A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X02E2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Select 00 - 09" },
+      },
+    },
+  },
+}

@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Match It",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Tabletop"
+  },
+
+  rom = {
+    name = "match-it",
+    file = "match-it.zip",
+    hashes = {
+      { hash = "5695d715317703c490686296f9fe0644", label = "matchit.7z <Match It>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E18, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[BCD] Credits" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0182, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8-bit[ Stage" },
+        { address=0X0183, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sub stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0A04, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score" },
+      },
+    },
+  },
+}

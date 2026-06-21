@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Zombi Terror Reloaded",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "zombi-terror-reloaded",
+    file = "zombi-terror-reloaded.zip",
+    hashes = {
+      { hash = "642e8006c69daddb08e0168975d170a7", label = "Zombi Terror Reloaded (2016)(Bitzarro Games).dsk" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X4EFE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X4EFE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+  },
+}

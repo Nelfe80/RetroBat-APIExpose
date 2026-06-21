@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Thanatos",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "thanatos",
+    file = "thanatos.zip",
+    hashes = {
+      { hash = "4111f851557f2eb4cc97e7d1108de3b1", label = "Thanatos (1986)(Durell Software).dsk" },
+      { hash = "a1b22ddcdb0a85c20fbd062eba3c6485", label = "Thanatos (1986)(Durell Software).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X61AA, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Near Eros, approaches if grounded." },
+        { address=0X61B4, type="u8", condition="eq", value=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sorceress present (grounded or riding)." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X61B4, type="u8", condition="eq", value=0XB0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sorceress dead." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBE08, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score." },
+      },
+    },
+  },
+}

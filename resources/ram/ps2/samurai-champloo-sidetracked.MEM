@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Samurai Champloo: Sidetracked",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Beat 'em Up"
+  },
+
+  rom = {
+    name = "samurai-champloo-sidetracked",
+    file = "samurai-champloo-sidetracked.zip",
+    hashes = {
+      { hash = "a34efb6b12307c75974e7b1b8b168161", label = "Samurai Champloo - Sidetracked (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3F4E90, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title / Cutscenes" },
+        { address=0X44C03C, type="u32le", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X44C03C, type="u32le", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1CB6F50, type="u32le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 1" },
+        { address=0X1CB6F50, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 2" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3F4E90, type="u16le", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Room?" },
+      },
+    },
+  },
+}

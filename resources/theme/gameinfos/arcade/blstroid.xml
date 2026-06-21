@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>spinner</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Thrust</text>
+			<color>${red}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Transform:  Armor, Shots, Speed</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Thrust</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Transform:  Armor, Shots, Speed</text>
+			<color>${green}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 RIP 412300</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 EDR 389950</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 BIF 284100</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 DIB 262100</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 LVR 157250</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 RAT 134650</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 COW 128500</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 ANT 107500</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 DOG 94000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10  &lt;  74900</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Shiryou Sensen: War of the Dead Part 2",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shiryou-sensen-war-of-the-dead-part-2",
+    file = "shiryou-sensen-war-of-the-dead-part-2.zip",
+    hashes = {
+      { hash = "50680ac1f866db69210a303e107c85cc", label = "Shiryou Sensen 2. War of the Dead 2 (1990)(Victor)(JP)(Disk 1 of 2).dsk" },
+      { hash = "9d28564dabc83bd16c8ea5f2a1f3c7aa", label = "Shiryou Sensen 2. War of the Dead 2 (1990)(Victor)(JP)(Disk 2 of 2).dsk" },
+      { hash = "944f1ce2379ada901bf8865502d0b246", label = "Shiryou Sensen - War of the Dead Part 2 (Japan) (En) (Oasis) (Disk 1).dsk" },
+      { hash = "0b734fd45423da00a2c981c30281a20f", label = "Shiryou Sensen - War of the Dead Part 2 (Japan) (En) (Oasis) (Disk 2).dsk" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XF7BA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Death Flag" },
+        { address=0XF7BB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Death Flag" },
+      },
+      health = {
+        { address=0XF702, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0XF702, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0XF714, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0XF714, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0XF715, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0XF715, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+      },
+    },
+  },
+}

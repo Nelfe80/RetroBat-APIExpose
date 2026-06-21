@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Doshin the Giant",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Construction and Management Simulation"
+  },
+
+  rom = {
+    name = "doshin-the-giant",
+    file = "doshin-the-giant.zip",
+    hashes = {
+      { hash = "c84468779c1698c88f3feb1f46d3d503", label = "Doshin the Giant (Europe) (En,Fr,De,Es,It)" },
+      { hash = "f4ff473d668c6be5af8cfac42347936c", label = "Doshin the Giant (Europe) (En,Fr,De,Es,It) (60Hz) (v1.0) (Maeson)" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X14AF08, type="u32be", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Stat - Game 0 - JUMP [32bit BE]" },
+      },
+    },
+  },
+}

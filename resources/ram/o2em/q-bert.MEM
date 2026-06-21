@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Q*Bert",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "q-bert",
+    file = "q-bert.zip",
+    hashes = {
+      { hash = "18cabe4f94787a8a8e9f1ec6c6451e4c", label = "Q-Bert (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

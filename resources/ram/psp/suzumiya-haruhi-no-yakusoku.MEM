@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Suzumiya Haruhi no Yakusoku",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "suzumiya-haruhi-no-yakusoku",
+    file = "suzumiya-haruhi-no-yakusoku.zip",
+    hashes = {
+      { hash = "5def5289ff00ec37ef18f3a89e7890d4", label = "Suzumiya Haruhi no Yakusoku (Japan) (Super Premium Box) (En) (v1.0) (EsperKnight).iso" },
+      { hash = "4809ffbaac7e7ee84911a25f692e3ae8", label = "Suzumiya Haruhi no Yakusoku (Japan) (Super Premium Box).iso" },
+      { hash = "148936f86c7938377e213e2a0979b4dc", label = "Suzumiya Haruhi no Yakusoku (Japan) (En) (v1) (EsperKnight et al.)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X9911C5, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The World's in Your Hands" },
+        { address=0X9911C6, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Dreams in a Dream World (Haruhi Version)" },
+        { address=0X9911C6, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Dreams in a Dream World (Mikuru Version)" },
+        { address=0X9911C7, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Dreams in a Dream World (Yuki Version)" },
+        { address=0X9911C7, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Dreams in a Dream World (Trio Version)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9911C4, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Unchanging Daily Life" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X992C2D, type="u8", condition="bit_true", bit=0, mask=0X01, action="SWIMMING", no_log=true, no_survey=false, desc="Swimsuit {Yuki)" },
+        { address=0X992C2D, type="u8", condition="bit_true", bit=2, mask=0X04, action="SWIMMING", no_log=true, no_survey=false, desc="Swimsuit (Koizumi)" },
+        { address=0X992C2D, type="u8", condition="bit_true", bit=4, mask=0X10, action="SWIMMING", no_log=true, no_survey=false, desc="Swimsuit (Tsuruya)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9780AA, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time of day" },
+        { address=0X9B5650, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Yuki Nagato's Talking Timer - Yuki speaking state" },
+        { address=0X9B56E0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Yuki Nagato's Talking Timer - Start alarm" },
+      },
+    },
+  },
+}

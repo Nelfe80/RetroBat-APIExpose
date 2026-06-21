@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Asmik-Kun Land",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "asmik-kun-land",
+    file = "asmik-kun-land.zip",
+    hashes = {
+      { hash = "eb3a7aa48ef40d8d5ee4e9b74d96b903", label = "Asmik-kun Land (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0310, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="<8-bit> Pause flag; 01 = Paused" },
+        { address=0X0640, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="<8-bit> This address is used for title screen selection" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0069, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<8-bit> Amount of pixels Asmik moves when his X subpixels wrap around?" },
+        { address=0X0074, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<8-bit> Amount of pixels Asmik moves when his Y subpixels wrap around?" },
+        { address=0X0093, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<8-bit> Asmik's flight ability status? 00 = Cannot fly, 01 = On ground and can fly, 02 = Is flyi" },
+        { address=0X03E9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="<8-bit> This starts counting up after Asmik leaves the screen when finishing a stage (although i" },
+      },
+      stage = {
+        { address=0X0317, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="<8-bit> Current stage?" },
+        { address=0X053C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="<Flags> Stage completion flags are here? Setting these while on the map screen does not open up" },
+        { address=0X067C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="<Area?> This area of memory is used to keep track of path flags when on the overworld; 4 bytes p" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0545, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="<8-bit> Life counter increased" },
+        { address=0X0545, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="<8-bit> Life counter decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0307, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="<8-bit> Asmik's attack animation bank? (changes when you equip a weapon ability)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0542, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="<24-bit> Actual score value, stored in hexadecimal (maximum value is 0x7f9698)" },
+        { address=0X0547, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="<32-bit> Score displayed in the bottom-right corner of the screen" },
+      },
+      collectibles = {
+        { address=0X0688, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="<8-bit> 01 = You have locked your option in during boss 'fights'? increased" },
+        { address=0X0689, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="<8-bit> The option currently selected during boss 'fights'; 00 = Rock, 01 = Scissors, 02 = Paper" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0540, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="<???> Boomer crosses the finish line in the boss 'stages'?" },
+        { address=0X068B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="<8-bit> The boss reveals his choice?" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0070, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="<8-bit> Asmik's jump state; 00 = is on ground, 01 = is rising in the air, 02 = is falling" },
+        { address=0X0088, type="u8", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="<8-bit> Possible 'swimming' flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00AA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<8-bit> Related to Asmik riding on a moving platform (i.e. standing on an object)" },
+        { address=0X00B4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<8-bit> 01 = Asmik is riding on an object?" },
+        { address=0X0418, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<8-bit> Object existance flag; 00 = Does not exist, 01 = Exists (each object slot spans 26 bytes" },
+        { address=0X041A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<8-bit> Object type" },
+        { address=0X0426, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<8-bit> Object/sprite's animation data?" },
+        { address=0X0429, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<8-bit> Object's orientation?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0420, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="<8-bit?> This byte and the next seem to be used as some form of timer for this object...?" },
+      },
+    },
+  },
+}

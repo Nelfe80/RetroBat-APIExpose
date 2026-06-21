@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Ben 10: Galactic Racing",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "ben-10-galactic-racing",
+    file = "ben-10-galactic-racing.zip",
+    hashes = {
+      { hash = "2fb56cb844c6a550cbf0ba203c90fa3d", label = "Ben 10 - Galactic Racing (USA) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0554, type="u8", condition="eq", value=0X06, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3C2EB4, type="u8", condition="bit_true", bit=1, mask=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+      },
+    },
+  },
+}

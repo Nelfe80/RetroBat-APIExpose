@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Battle Gear 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "battle-gear-3",
+    file = "battle-gear-3.zip",
+    hashes = {
+      { hash = "29261ed63f3ed07d23320de89d6ba03c", label = "Battle Gear 3 (Japan, Asia)" },
+    }
+  },
+
+  events = {
+  },
+}

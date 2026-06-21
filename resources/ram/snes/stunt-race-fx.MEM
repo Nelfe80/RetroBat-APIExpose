@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Stunt Race FX",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "stunt-race-fx",
+    file = "stunt-race-fx.zip",
+    hashes = {
+      { hash = "128b316a74caf17fdc216b3ab46d4a9a", label = "Stunt Race FX (USA) (Rev 1).sfc" },
+      { hash = "4f5449c5a1db9eced78a9573affffed9", label = "Stunt Race FX (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19BA, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X19BA, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2FC0B, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Expert, Unlock Free Trax;" },
+        { address=0X2FC0B, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Master, Unlock 2WD for Speed Trax" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0DF9, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 1 Damage, 0x40 is max" },
+        { address=0X21D5A, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Amount of damage taken" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0DDA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Speed MPH (sometimes a bit different to the graphic)" },
+        { address=0X0E74, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bonus Flags or Time-to-be-added in Stunt Trax" },
+        { address=0X0E78, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bonus Game time, but does not convert after time expires" },
+        { address=0X0EEC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timers 32-bit" },
+        { address=0X0F7F, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time Any Course Milliseconds DEC" },
+        { address=0X0F80, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time Any Course Seconds DEC" },
+        { address=0X0F81, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time Any Course Minutes DEC" },
+        { address=0X19EE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bonus Flags or Time-to-be-added in Stunt Trax" },
+      },
+    },
+  },
+}

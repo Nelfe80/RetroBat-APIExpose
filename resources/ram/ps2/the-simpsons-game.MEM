@@ -1,0 +1,134 @@
+return {
+  game = {
+    title = "The Simpsons Game",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-simpsons-game",
+    file = "the-simpsons-game.zip",
+    hashes = {
+      { hash = "8a304a19578bd9425f3393431c6e79a0", label = "Simpsons Game, The (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3D8159, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Options - Audio - Subtitles" },
+        { address=0X3EB191, type="u8", condition="bit_true", bit=2, mask=0X04, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 1" },
+        { address=0X3EB191, type="u8", condition="bit_true", bit=3, mask=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 2" },
+        { address=0X3EB191, type="u8", condition="bit_true", bit=4, mask=0X10, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 3" },
+        { address=0X3EB191, type="u8", condition="bit_true", bit=5, mask=0X20, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 4" },
+        { address=0X3EB191, type="u8", condition="bit_true", bit=6, mask=0X40, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 5" },
+        { address=0X3EB191, type="u8", condition="bit_true", bit=7, mask=0X80, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 6" },
+        { address=0X3EB197, type="u8", condition="bit_true", bit=7, mask=0X80, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 1" },
+        { address=0X3EB198, type="u8", condition="bit_true", bit=0, mask=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 2" },
+        { address=0X3EB198, type="u8", condition="bit_true", bit=1, mask=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 3" },
+        { address=0X3EB198, type="u8", condition="bit_true", bit=2, mask=0X04, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 4" },
+        { address=0X3EB198, type="u8", condition="bit_true", bit=3, mask=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 5" },
+        { address=0X3EB198, type="u8", condition="bit_true", bit=4, mask=0X10, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over 6" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3D60CC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level clear flag" },
+        { address=0X3EB0E0, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Land of Chocolate" },
+        { address=0X3EB0E0, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bartman Begins" },
+        { address=0X3EB0E0, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Around the World in 80 Bites" },
+        { address=0X3EB0E0, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Lisa the Tree Hugger" },
+        { address=0X3EB0E0, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mob Rules" },
+        { address=0X3EB0E0, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Enter the Cheatrix" },
+        { address=0X3EB0E0, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Day of the Dolphin" },
+        { address=0X3EB0E0, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shadow of the Colossal Donut" },
+        { address=0X3EB0E1, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Invasion of the Yokel-Snatchers" },
+        { address=0X3EB0E1, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bargain Bin" },
+        { address=0X3EB0E1, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="NeverQuest" },
+        { address=0X3EB0E1, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Grand Theft Scratchy" },
+        { address=0X3EB0E1, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Medal of Homer" },
+        { address=0X3EB0E1, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Big Super Happy Fun Fun Game" },
+        { address=0X3EB0E1, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Five Characters in Search of an Author" },
+        { address=0X3EB0E1, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      zone = {
+        { address=0X3EB17D, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 1" },
+        { address=0X3EB17D, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 2" },
+        { address=0X3EB17D, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 3" },
+        { address=0X3EB17D, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 4" },
+        { address=0X3EB17E, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 5" },
+        { address=0X3EB189, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 1" },
+        { address=0X3EB189, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 2" },
+        { address=0X3EB18A, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 3" },
+        { address=0X3EB18A, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 4" },
+        { address=0X3EB18A, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 5" },
+        { address=0X3EB18A, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Around the World in 80 Bites 6" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3EB134, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Land of Chocolate - Least deaths" },
+        { address=0X3EB138, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bartman Begins - Least deaths" },
+        { address=0X3EB13C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Around the World in 80 Bites - Least deaths" },
+        { address=0X3EB140, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lisa the Tree Hugger - Least deaths" },
+        { address=0X3EB144, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mob Rules - Least deaths" },
+        { address=0X3EB148, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enter the Cheatrix - Least deaths" },
+        { address=0X3EB14C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Day of the Dolphin - Least deaths" },
+        { address=0X3EB150, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shadow of the Colossal Donut - Least deaths" },
+        { address=0X3EB154, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Invasion of the Yokel-Snatchers - Least deaths" },
+        { address=0X3EB158, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bargain Bin - Least deaths" },
+        { address=0X3EB15C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="NeverQuest - Least deaths" },
+        { address=0X3EB160, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Grand Theft Scratchy - Least deaths" },
+        { address=0X3EB164, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Medal of Homer - Least deaths" },
+        { address=0X3EB168, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Big Super Happy Fun Fun Game - Least deaths" },
+        { address=0X3EB16C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Five Characters in Search of an Author - Least deaths" },
+        { address=0X3EB170, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game Over - Least deaths" },
+        { address=0X3EB19C, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chasm Death" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3EB19B, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Temporary Power Up" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3EB19C, type="u8", condition="bit_true", bit=5, mask=0X20, action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo Box" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3EB19A, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=true, no_survey=false, desc="Double Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3EB19A, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switches and Levers" },
+        { address=0X3EB19A, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Doors" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3D60D8, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level time" },
+        { address=0X3EB0EC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time" },
+        { address=0X3EB0F0, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - The Land of Chocolate" },
+        { address=0X3EB0F4, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Bartman Begins" },
+        { address=0X3EB0F8, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Around the World in 80 Bites" },
+        { address=0X3EB0FC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Lisa the Tree Hugger" },
+        { address=0X3EB100, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Mob Rules" },
+        { address=0X3EB104, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Enter the Cheatrix" },
+        { address=0X3EB108, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - The Day of the Dolphin" },
+        { address=0X3EB10C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Shadow of the Colossal Donut" },
+        { address=0X3EB110, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Invasion of the Yokel-Snatchers" },
+        { address=0X3EB114, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Bargain Bin" },
+        { address=0X3EB118, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - NeverQuest" },
+        { address=0X3EB11C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Grand Theft Scratchy" },
+        { address=0X3EB120, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Medal of Homer" },
+        { address=0X3EB124, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Big Super Happy Fun Fun Game" },
+        { address=0X3EB128, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Five Characters in Search of an Author" },
+        { address=0X3EB12C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level completion time - Game Over" },
+      },
+    },
+  },
+}

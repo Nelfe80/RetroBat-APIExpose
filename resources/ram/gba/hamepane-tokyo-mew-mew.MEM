@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Hamepane: Tokyo Mew Mew",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "hamepane-tokyo-mew-mew",
+    file = "hamepane-tokyo-mew-mew.zip",
+    hashes = {
+      { hash = "c45cde25dc1427df5896ae5ed8959fa0", label = "Hamepane - Tokyo Mew Mew (Japan).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X33E8, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X5400, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X33E8, type="u8", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+      },
+    },
+  },
+}

@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Märchen Maze",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "marchen-maze",
+    file = "marchen-maze.zip",
+    hashes = {
+      { hash = "887b9fa8296ff3c98839e11cc7039763", label = "Maerchen Maze (Japan).pce" },
+      { hash = "f34299acd4a789ad51e7b10be3a8947d", label = "Maerchen Maze (Japan) (En) (v1.1) (MooZ & Shubibiman).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0619, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen, opening scene, level select, sound test" },
+        { address=0X1F55, type="u8", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0619, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X0619, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X0619, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X0619, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X0619, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X0619, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X0619, type="u8", condition="eq", value=0X0E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0X0619, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8" },
+        { address=0X0619, type="u8", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9" },
+        { address=0X0619, type="u8", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ending" },
+        { address=0X0619, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Stage Loaded" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1F89, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Crystal (spin and turbo fire)" },
+        { address=0X1F89, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Green Crystal (triple shot)" },
+        { address=0X1F89, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Blue Crystal (big projectiles)" },
+        { address=0X1F89, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rabbit (barrier)" },
+        { address=0X1F89, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Black Crystal (no ice physics)" },
+        { address=0X1F89, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Purple Crystal (speed)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0627, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="0x02 = Riding platform to boss area" },
+        { address=0X1F55, type="u8", condition="eq", value=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss defeated" },
+        { address=0X1F55, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+        { address=0X1F55, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0769, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="0x01 = Invincibility active" },
+      },
+      player = {
+        { address=0X1F89, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Boots (high jump)" },
+      },
+    },
+  },
+}

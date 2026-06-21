@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "DreamWorks Super Star Kartz",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "dreamworks-super-star-kartz",
+    file = "dreamworks-super-star-kartz.zip",
+    hashes = {
+      { hash = "e8ad0999b4083664aea9daae252fa251", label = "DreamWorks Super Star Kartz (Europe) (En,Fr,De,Es,It,Nl,Sv)" },
+      { hash = "835231cfbba26152380269273149f48f", label = "DreamWorks Super Star Kartz (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X585D8D, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII 164-bits] Level Name" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X57FBE0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Tournament points" },
+      },
+      collectibles = {
+        { address=0X10793CC0, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793CCC, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793CD8, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793CE4, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793CF0, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793CFC, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D08, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D14, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D20, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D2C, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D38, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D44, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D50, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D5C, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D68, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X10793D74, type="u32be", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X58438C, type="u32be", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X58438C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Mode type" },
+      },
+    },
+  },
+}

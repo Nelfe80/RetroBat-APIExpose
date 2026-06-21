@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Esper Dream",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "esper-dream",
+    file = "esper-dream.zip",
+    hashes = {
+      { hash = "186a5441980125aba8ed852da123adc9", label = "Esper Dream (Japan) (En) (v1.0) (Mute).fds" },
+      { hash = "6b6cf238668429511a027b1739403975", label = "Esper Dream (Japan) (Rev 1) (Disk Writer).fds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0400, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0059, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Current HP decreased" },
+        { address=0X0059, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Current HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0413, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24-bit] [BCD] Gold increased" },
+        { address=0X041F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Ring in inventory increased" },
+        { address=0X0420, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Silver Ring in inventory increased" },
+        { address=0X0421, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Gold Ring in inventory increased" },
+        { address=0X0436, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 100 Gold (Computer Lab) increased" },
+        { address=0X0437, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 500 Gold (Forest Isle) increased" },
+        { address=0X0438, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Box (Ice World) increased" },
+        { address=0X043A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 2 - Box (Sky World) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X043E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit 0 - Computer lab boss capsule obtained" },
+        { address=0X0526, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[BCD] Boss health" },
+      },
+    },
+  },
+}

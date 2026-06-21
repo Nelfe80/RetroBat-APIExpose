@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Animal Snap: Rescue Them 2 by 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "animal-snap-rescue-them-2-by-2",
+    file = "animal-snap-rescue-them-2-by-2.zip",
+    hashes = {
+      { hash = "59efe4673056b6385379b83883b30e47", label = "Animal Snap - Rescue Them 2 by 2 (Europe).gba" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0010, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Challenge" },
+      },
+    },
+  },
+}

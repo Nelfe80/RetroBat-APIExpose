@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Fatal Run",
+    system = "atari7800",
+    system_name = "Atari 7800",
+    genre = "Action, Racing, Driving"
+  },
+
+  rom = {
+    name = "fatal-run",
+    file = "fatal-run.zip",
+    hashes = {
+      { hash = "d25d5d19188e9f149977c49eb0367cd1", label = "Fatal Run (USA).a78" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X2254, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24 bit BE BCD]" },
+      },
+    },
+  },
+}

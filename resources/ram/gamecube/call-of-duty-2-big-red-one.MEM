@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Call of Duty 2: Big Red One",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "call-of-duty-2-big-red-one",
+    file = "call-of-duty-2-big-red-one.zip",
+    hashes = {
+      { hash = "7c4ee60627c130859b7d04031dad9bcd", label = "Call of Duty 2 - Big Red One (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFF7A74, type="u32be", condition="eq", value=0X0, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFF7B4C, type="u32be", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles" },
+        { address=0XFF7BB4, type="u32be", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Settings: Subtitles" },
+        { address=0X143F28C, type="u32be", condition="eq", value=0X0, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Resume" },
+        { address=0X143F28C, type="u32be", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Options" },
+        { address=0X143F28C, type="u32be", condition="eq", value=0X2, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0X143F28C, type="u32be", condition="eq", value=0X3, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit" },
+        { address=0X143F2F4, type="u32be", condition="eq", value=0X7, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X41241C, type="u32be", condition="eq", value=0X0D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chapter 13" },
+        { address=0X41241C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Levels Unlocked (while on main menu)" },
+        { address=0XFF8BCC, type="u32be", condition="eq", value=0X00, action="LEVEL_PROLOGUE", no_log=false, no_survey=false, desc="Prologue" },
+        { address=0XFF8BCC, type="u32be", condition="eq", value=0X0D, action="LEVEL_CH_13_THE_DRAGON_S_TEETH", no_log=false, no_survey=false, desc="Ch.13: The Dragon's Teeth" },
+        { address=0XFF8BCC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Main Menu Level Selection" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFF7A74, type="u32be", condition="eq", value=0X4, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Profile" },
+      },
+    },
+  },
+}

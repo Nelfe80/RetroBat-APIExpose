@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Sexy Poker",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "sexy-poker",
+    file = "sexy-poker.zip",
+    hashes = {
+      { hash = "4d9073d15872bdd70c7d3a2d5ee09f5e", label = "Sexy Poker (USA) (WiiWare)" },
+      { hash = "a380d10d3b3347645b8f3c1b0f7ca72f", label = "Sexy Poker (Europe) (WiiWare)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X3211E8, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Player Blackjack Money increased" },
+      },
+    },
+  },
+}

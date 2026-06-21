@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Star Ocean: Second Evolution",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "star-ocean-second-evolution",
+    file = "star-ocean-second-evolution.zip",
+    hashes = {
+      { hash = "7789b31d1c449b1525604208a974e873", label = "Star Ocean - Second Evolution (USA).iso" },
+      { hash = "9e9e4c7ca3bae7a00a14519e32eb2269", label = "Star Ocean - Second Evolution (Europe).iso" },
+      { hash = "cbe6162f28e548bfc1947bb4e529dff3", label = "Star Ocean - Second Evolution (USA) (Undub) (v1.0) (Unknown).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X116243C, type="u32le", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not on Title Screen" },
+        { address=0X116243C, type="u32le", condition="eq", value=0X9204C00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On Title Screen" },
+        { address=0X11624AC, type="u32le", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not on Title Screen" },
+        { address=0X11624AC, type="u32le", condition="eq", value=0X9E53B40, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On Title Screen" },
+        { address=0X1204C20, type="u16le", condition="eq", value=0X283, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End Credits Location" },
+        { address=0X1F72A38, type="u32le", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not on Title" },
+        { address=0X1F72A38, type="u32le", condition="eq", value=0XFFFFFFFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not on Title but starting from a new game" },
+        { address=0X1F72A38, type="u32le", condition="eq", value=0X9E7AD28, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On Title Screen" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1204080, type="u16le", condition="eq", value=0X28, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Goodie Box" },
+        { address=0X1204080, type="u16le", condition="eq", value=0X189, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bunny Shoes" },
+        { address=0X1204080, type="u16le", condition="eq", value=0X1FB, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Aeterna (Claude Sword)" },
+        { address=0X1204080, type="u16le", condition="eq", value=0X2B9, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Battle Suit" },
+        { address=0X1204080, type="u16le", condition="eq", value=0X303, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sprite's Bracelet" },
+      },
+    },
+  },
+}

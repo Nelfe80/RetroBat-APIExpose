@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Major League Baseball",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "major-league-baseball",
+    file = "major-league-baseball.zip",
+    hashes = {
+      { hash = "0640aecbbd601402ce4a2de44711e67d", label = "Major League Baseball (USA) (Rev 1).nes" },
+    }
+  },
+
+  events = {
+  },
+}

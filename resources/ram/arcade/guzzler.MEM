@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Guzzler",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Maze"
+  },
+
+  rom = {
+    name = "guzzler",
+    file = "guzzler.zip",
+    hashes = {
+      { hash = "afc680b34c218f57be693835c79d693d", label = "guzzler.7z <Guzzler>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X801E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+        { address=0X001E, type="u8", condition="eq", value=0X81, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Extra Life (gained from the bonus chance)" },
+        { address=0X0075, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X800D, type="u48be", condition="change", action="TREASURE", color="white", min=30000, max=30000, no_log=false, no_survey=false, desc="Score delta 30000-30000: Bonus" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X800D, type="u48be", condition="change", action="SCORE_STATE", min=0, max=50, no_log=false, no_survey=false, desc="Score delta 0-50: Score delta 0-50" },
+        { address=0X800D, type="u48be", condition="change", action="SCORE_STATE", color="orange", min=100, max=500, no_log=false, no_survey=false, desc="Score delta 100-500: Score delta 100-500" },
+        { address=0X800D, type="u48be", condition="change", action="SCORE_STATE", color="cyan", min=600, max=1000, no_log=false, no_survey=false, desc="Score delta 600-1000: Score delta 600-1000" },
+        { address=0X800D, type="u48be", condition="change", action="SCORE_STATE", color="blue", min=2000, max=9500, no_log=false, no_survey=false, desc="Score delta 2000-9500: Score delta 2000-9500" },
+        { address=0X001E, type="u8", condition="eq", value=0X40, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking" },
+        { address=0X0536, type="u8", condition="eq", value=0X07, action="SCORE_STATE", no_log=false, no_survey=false, desc="Fully spelled GUZZLER, X2 points active" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0536, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit]" },
+      },
+    },
+  },
+}

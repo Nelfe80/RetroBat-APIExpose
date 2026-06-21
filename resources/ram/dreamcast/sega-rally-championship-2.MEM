@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Sega Rally Championship 2",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "sega-rally-championship-2",
+    file = "sega-rally-championship-2.zip",
+    hashes = {
+      { hash = "7e024a6b068b5fdf0998ca777a3f416d", label = "Sega Rally 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC5810C, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD5F4C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cones minigame high score" },
+        { address=0XD5F4C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cones minigame current score" },
+      },
+      collectibles = {
+        { address=0XD6025C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="The constant static string 'LAP TIME' [9-bytes] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD5F3F8, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="32-bit Lap Times (in milliseconds) [32-byte array]" },
+        { address=0XD5F44C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Fastest Lap Time (Time Attack; in milliseconds)" },
+        { address=0XD5F450, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Car Record (Time Attack; in milliseconds)" },
+        { address=0XD5F460, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Course Record (Time Attack; in milliseconds)" },
+        { address=0XD5F468, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="32-bit Area Times (in milliseconds) [32-byte array]" },
+        { address=0XD5F4C0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Remaining time (cones minigame)" },
+        { address=0XD7A904, type="u16le", condition="eq", value=0X3, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0XD7A904, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mode Select" },
+        { address=0XD7A910, type="u8", condition="eq", value=0XA, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Over (timeout or finish)" },
+        { address=0XD7A911, type="u8", condition="eq", value=0X6, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Timeout" },
+        { address=0XD7A911, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race State (similar to 0xXX910)" },
+        { address=0XD7A914, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Event total time (in milliseconds)" },
+        { address=0XD7A970, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of Laps" },
+        { address=0XD88C7C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Array of 4 [32-bit] arcade (& 10year?) stage times (in milliseconds; all items set to 0 when eve" },
+        { address=0XD88CDC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Millisecond counter (Pauses intermittently on loads -- gets stuck on crash). Tries to match 0xe8" },
+      },
+    },
+  },
+}

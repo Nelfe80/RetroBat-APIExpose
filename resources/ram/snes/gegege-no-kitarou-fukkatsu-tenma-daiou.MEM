@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "GeGeGe no Kitarou: Fukkatsu! Tenma Daiou",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "gegege-no-kitarou-fukkatsu-tenma-daiou",
+    file = "gegege-no-kitarou-fukkatsu-tenma-daiou.zip",
+    hashes = {
+      { hash = "8d3cda486dc901ebc546c57513131323", label = "Gegege no Kitarou - Fukkatsu! Tenma Daiou (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0739, type="u8", condition="eq", value=0X35, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Pos credits" },
+        { address=0X11D2, type="u8", condition="eq", value=0X0C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Auto pilot - DEMO 1p" },
+        { address=0X11D2, type="u8", condition="eq", value=0X44, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X072D, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Cristal Ball" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X07EF, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Tatanboh 01 boss" },
+      },
+    },
+  },
+}

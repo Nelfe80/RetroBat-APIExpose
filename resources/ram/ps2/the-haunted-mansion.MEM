@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "The Haunted Mansion",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-haunted-mansion",
+    file = "the-haunted-mansion.zip",
+    hashes = {
+      { hash = "ef27f75c1a7db9d4fef71c93cf6a8771", label = "Disney's The Haunted Mansion (USA) (Anti-Cheat) (v1.0) (Raeyene)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3CC540, type="u8", condition="eq", value=0X5B, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3BCB38, type="u8", condition="eq", value=0X0, action="LEVEL_OFF", no_log=false, no_survey=false, desc="Off" },
+        { address=0X3BCB38, type="u8", condition="eq", value=0X1, action="LEVEL_ACTIVATED", no_log=false, no_survey=false, desc="Activated" },
+        { address=0X3BCB38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select cheat flag" },
+        { address=0X3CAFD0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Level ID 1" },
+        { address=0X3CAFD4, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Level ID 2" },
+        { address=0X794CFC, type="u8", condition="eq", value=0XBF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pirate's Ring - Attic" },
+        { address=0X794CFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beacon upgrade level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3CC540, type="u8", condition="eq", value=0X24, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Certificate popup" },
+        { address=0X794D2C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives counter increased" },
+        { address=0X794D2C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives counter decreased" },
+      },
+      health = {
+        { address=0X794D0C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health decreased" },
+        { address=0X794D0C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health increased" },
+        { address=0X794D1C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health decreased" },
+        { address=0X794D1C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health increased" },
+        { address=0X79549C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit Float] Atticus Thorn HP - Seems to work the same for every room he appears in. decreased" },
+        { address=0X79549C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit Float] Atticus Thorn HP - Seems to work the same for every room he appears in. increased" },
+      },
+    },
+  },
+}

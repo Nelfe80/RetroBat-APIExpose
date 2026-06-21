@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Jigsaw World",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "jigsaw-world",
+    file = "jigsaw-world.zip",
+    hashes = {
+      { hash = "1c6ca4f6779f68c7810da0e0281f1167", label = "Jigsaw World (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X110B8, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Paintings/Demons" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X15016, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X15016, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X15016, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X15016, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(8-bit) Difficulty Selected for Alice in Puzzle world" },
+      },
+    },
+  },
+}

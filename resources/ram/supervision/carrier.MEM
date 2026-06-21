@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Carrier",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "carrier",
+    file = "carrier.zip",
+    hashes = {
+      { hash = "d365fedc3073ad3e9231ecb763ed3072", label = "Carrier (USA, Europe) (Rev 1).sv" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0063, type="u8", condition="eq", value=0X14, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level complete animation" },
+        { address=0X0075, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu" },
+        { address=0X0075, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0075, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sub Level 8-bit" },
+        { address=0X0077, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8-bit" },
+        { address=0X0078, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X0079, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X007A, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X007B, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X007C, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X007D, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X007E, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X007F, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X0080, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X0081, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+      },
+    },
+  },
+}

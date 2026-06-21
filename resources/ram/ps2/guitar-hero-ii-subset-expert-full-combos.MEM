@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Guitar Hero II [Subset - Expert Full Combos]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "guitar-hero-ii-subset-expert-full-combos",
+    file = "guitar-hero-ii-subset-expert-full-combos.zip",
+    hashes = {
+      { hash = "ae2e8e31651ddd0eca1606e9edb91928", label = "Guitar Hero II [Subset - Expert Full Combos (NTSC)]" },
+      { hash = "38fc17670c3b4ac98f41b17e60f5f102", label = "Guitar Hero II [Subset - Expert Full Combos (PAL)]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X473860, type="u32le", condition="eq", value=0X00AC2E00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Replay" },
+        { address=0X473860, type="u32le", condition="eq", value=0X00AC60C0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Gameplay (Paused)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XABE8E4, type="u32le", condition="eq", value=0X0054E3B0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Every Time I Die - The New Black" },
+        { address=0XABF164, type="u32le", condition="eq", value=0X00552F40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Every Time I Die - The New Black" },
+        { address=0XAC0518, type="u32le", condition="eq", value=0X005425D1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Knox" },
+        { address=0XAC051C, type="u32le", condition="eq", value=0X00542652, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Knox | Reno" },
+        { address=0XAC051C, type="u32le", condition="eq", value=0X0054265D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Knox | Vegas" },
+        { address=0XAC0D98, type="u32le", condition="eq", value=0X0054715A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Knox" },
+        { address=0XAC0D9C, type="u32le", condition="eq", value=0X005471DB, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Knox | Reno" },
+        { address=0XAC0D9C, type="u32le", condition="eq", value=0X005471E6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Knox | Vegas" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XABE8E4, type="u32le", condition="eq", value=0X0054E2A2, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Iggy Pop and the Stooges - Search and Destroy" },
+        { address=0XABF164, type="u32le", condition="eq", value=0X00552E32, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Iggy Pop & the Stooges - Search and Destroy" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XABE8E4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[PAL]" },
+        { address=0XABF164, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[NTSC]" },
+      },
+    },
+  },
+}

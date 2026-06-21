@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "Cars 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cars-2",
+    file = "cars-2.zip",
+    hashes = {
+      { hash = "0854b5c9cee81e6cd099817fb6cd5059", label = "Cars 2 (Europe) (En,Es) (NDSi Enhanced).nds" },
+      { hash = "0a9f26fe517264171f8dd38c819fab12", label = "Cars 2 (Europe) (Fr,Nl) (NDSi Enhanced).nds" },
+      { hash = "2cadb7c00f93f3f04ed9fe809c4107b1", label = "Cars 2 (Europe) (En,Sv,Fi) (NDSi Enhanced).nds" },
+      { hash = "6c7473b8cc99d582c94cd462988bba69", label = "Cars 2 (Europe) (Sv,No,Da) (NDSi Enhanced).nds" },
+      { hash = "8d03a96a97068ebef0fd93d537c0b5cb", label = "Cars 2 (Europe) (Fr,De,It) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Cookie Monster Munch",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Ludo-Educatif"
+  },
+
+  rom = {
+    name = "cookie-monster-munch",
+    file = "cookie-monster-munch.zip",
+    hashes = {
+      { hash = "ba403a44966fd8307aac08214ac73bdd", label = "Cookie Monster Munch (USA) (Joystick Patch).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0014, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="32-bit Game Paused Flag" },
+        { address=0X001F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="8-bit Cookies in Jar Count / Current Mode (When Game is Paused)" },
+        { address=0X0020, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="8-bit Difficulty Mode (When Game Is Paused)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0008, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32-bit Background Color RGBA" },
+      },
+      stage = {
+        { address=0X0000, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit Global Stages (Each of these correspond with Game Mode + Difficulty)" },
+        { address=0X0004, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit Stage Count" },
+      },
+    },
+  },
+}

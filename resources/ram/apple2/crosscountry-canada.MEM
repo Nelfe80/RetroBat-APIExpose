@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Crosscountry Canada",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "crosscountry-canada",
+    file = "crosscountry-canada.zip",
+    hashes = {
+      { hash = "9bf7e54d925a21cf26a8184733ef31f6", label = "Crosscountry Canada v4.0 (4am crack) side A.dsk" },
+      { hash = "629886c68b28b103275402a1f32e16c6", label = "Crosscountry Canada v4.0 (4am crack) side B.dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X005F, type="u8", condition="eq", value=0X14, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="You hear rock music | You hear a weather report- Clear and very cold" },
+      },
+    },
+  },
+}

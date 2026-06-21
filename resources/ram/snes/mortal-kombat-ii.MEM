@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Mortal Kombat II",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-ii",
+    file = "mortal-kombat-ii.zip",
+    hashes = {
+      { hash = "9873c45bf77eb06262e9b8d8c4b841b4", label = "Mortal Kombat II (USA).sfc" },
+      { hash = "a0b9bebbc80958e36292abd9b8fb758e", label = "Mortal Kombat II (USA) (Rev 1).sfc" },
+      { hash = "ac0da762c2d05b6b041e55b21a4007ae", label = "Mortal Kombat II (USA) (MSU-1) (Arcade OST) (Relikk) (v1.1) (Conn,Kurrono) (2018-04-01).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A0E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Screen Values: 00 = Logos, 01 = Babality, 02 = Liu Kang's Friendship, 03 = Friendship, 04 = Mile" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2F04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds won" },
+        { address=0X30B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds won" },
+        { address=0X3270, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kombat Zone: 00=Dead Pool, 01=Kombat Tomb, 02=Wasteland, 03=Tower, 04=Living Forest, 05=Armory," },
+        { address=0X3278, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level: 0=Very Easy, 1=East, 2=Medium, 3=Hard, 4=Very Hard" },
+        { address=0X327C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+        { address=0X328C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Total rounds won in a row" },
+        { address=0X328E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Total rounds won in a row" },
+      },
+      stage = {
+        { address=0XBCE1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2EFC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health (starts A1, drops to 00) decreased" },
+        { address=0X2EFC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health (starts A1, drops to 00) increased" },
+        { address=0X30AA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health (starts A1, drops to 00) decreased" },
+        { address=0X30AA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health (starts A1, drops to 00) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0232, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] *Fatality Timer" },
+        { address=0X1906, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] Timer?!" },
+        { address=0X2E9C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Cheat Flags: Bit0 = More Time on End Fight Active, Bit1 = Super Damage Active" },
+        { address=0X3254, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] Counter to walk through each other" },
+      },
+    },
+  },
+}

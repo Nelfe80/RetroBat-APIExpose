@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Wily & Right no RockBoard: That's Paradise",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "wily-right-no-rockboard-thats-paradise",
+    file = "wily-right-no-rockboard-thats-paradise.zip",
+    hashes = {
+      { hash = "8404aa28b5068a0a6071c092f2420200", label = "Wily and Light no Rockboard - That's Paradise (Japan) (En - Mega Man Names) (v1.1) (Interordi Software).nes" },
+      { hash = "d26ceaecfed4881ec513000e160b1eb6", label = "Wily and Light no Rockboard - That's Paradise (Japan) (En - Rockman Names) (v1.1) (Interordi Software).nes" },
+    }
+  },
+
+  events = {
+  },
+}

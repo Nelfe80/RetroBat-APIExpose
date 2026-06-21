@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Looney Tunes: Space Race",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "looney-tunes-space-race",
+    file = "looney-tunes-space-race.zip",
+    hashes = {
+      { hash = "70fa62084bbfa1bf067468ee934c325d", label = "Looney Tunes - Space Race (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X389B40, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X389B40, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X836454, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X389700, type="u16le", condition="eq", value=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Off-World City Limits 1" },
+        { address=0X389702, type="u16le", condition="eq", value=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Off-World City Limits 1" },
+        { address=0X389704, type="u16le", condition="eq", value=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Off-World City Limits 1" },
+        { address=0X3932AD, type="u8", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Concept Art" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9EEFB0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(8-bit) Current Cup Score" },
+      },
+      collectibles = {
+        { address=0X393280, type="u32le", condition="eq", value=0X80000000, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mega Carrot The Gold Rush Cup" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X31C400, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Daffy Duck" },
+        { address=0X31C400, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bugs Bunny" },
+        { address=0X31C400, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sylvester" },
+        { address=0X31C400, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Wile E. Coyote" },
+        { address=0X31C400, type="u8", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Yosemite Sam" },
+        { address=0X31C400, type="u8", condition="eq", value=0X05, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Elmer Fudd" },
+        { address=0X31C400, type="u8", condition="eq", value=0X06, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Porky Pig" },
+        { address=0X31C400, type="u8", condition="eq", value=0X07, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Marvin the Martian" },
+        { address=0X31C400, type="u8", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The King" },
+        { address=0X31C400, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Character Select Time Trial" },
+        { address=0X31D024, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) # of laps selected in time trial mode" },
+        { address=0X31D02C, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="on" },
+        { address=0X31D02C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Tubro boost toggle for time trial" },
+        { address=0X389700, type="u16le", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Planet ACME 1" },
+        { address=0X389700, type="u16le", condition="eq", value=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Planet ACME 2" },
+        { address=0X389700, type="u16le", condition="eq", value=0X2, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The Pyramids of Mars 1" },
+        { address=0X389700, type="u16le", condition="eq", value=0X8, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TPOM 2" },
+        { address=0X389700, type="u16le", condition="eq", value=0X4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Asteroid belt" },
+        { address=0X389700, type="u16le", condition="eq", value=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="OWCL 2" },
+        { address=0X389700, type="u16le", condition="eq", value=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Wild West Quadrant" },
+        { address=0X389700, type="u16le", condition="eq", value=0X100, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="WWQ 2" },
+        { address=0X389700, type="u16le", condition="eq", value=0X200, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The Nebula" },
+        { address=0X389700, type="u16le", condition="eq", value=0X400, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Galactorama Park 1" },
+        { address=0X389700, type="u16le", condition="eq", value=0X800, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Galactorama Park 2" },
+        { address=0X389700, type="u16le", condition="eq", value=0X1000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The North Pole Star 1" },
+        { address=0X389700, type="u16le", condition="eq", value=0X2000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TNPS 2" },
+        { address=0X389700, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-bit) Track id time trials mode" },
+        { address=0X389D37, type="u8", condition="eq", value=0X3D, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="beginning of crossing the starting line" },
+        { address=0X389D37, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Check for time trials" },
+        { address=0X393280, type="u32le", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial Mode" },
+        { address=0X393280, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32-bit) Mode Selection" },
+      },
+    },
+  },
+}

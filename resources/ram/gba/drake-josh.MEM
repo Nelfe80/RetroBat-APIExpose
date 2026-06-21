@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Drake & Josh",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "drake-josh",
+    file = "drake-josh.zip",
+    hashes = {
+      { hash = "ca1e7ca13fc27ec962b8163d8e94dce0", label = "Drake & Josh (USA) (En,Fr).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X16040, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is not paused" },
+        { address=0X16040, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu is on-screen" },
+        { address=0X16B73, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Text?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X25F46, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-2 (Drake)" },
+        { address=0X37AF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Player State Level 3-1" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC4A4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Food Fight Minigame Escaped Enemy Counter in Bottom Right Corner" },
+        { address=0XC528, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level Ending Timer (00xx)" },
+        { address=0XC52C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level Timer (xx:00)" },
+      },
+    },
+  },
+}

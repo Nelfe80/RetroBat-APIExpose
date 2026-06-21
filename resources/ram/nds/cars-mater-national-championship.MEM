@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Cars: Mater-National Championship",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cars-mater-national-championship",
+    file = "cars-mater-national-championship.zip",
+    hashes = {
+      { hash = "60cf00632d7de86980b29b7c676f097e", label = "Cars - Mater-National Championship (USA).nds" },
+      { hash = "cf7f53905194e81dc05934eb7e355e4b", label = "Cars - Mater-National Championship (Europe) (En,Sv,Da).nds" },
+      { hash = "98c3af692102672824287ff29b2f85e1", label = "Cars - Hook International (Germany).nds" },
+      { hash = "7a089d3ab75131fbf1ff87ff79abc27c", label = "Cars - Mater-National Championship (Europe) (Fr,Nl).nds" },
+      { hash = "1efa2789728d9b491d485f6f27dcbec6", label = "Cars - La Coppa Internazionale di Carl Attrezzi (Italy).nds" },
+      { hash = "d260266481a4a69d8d9b2f846b75128d", label = "Cars - La Copa Internacional de Mate (Spain).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3C2C0A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground Run - Gudmund - Rank (8-bit)" },
+        { address=0X3C2C0B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground Mines - Rank (8-bit)" },
+      },
+      stage = {
+        { address=0X3ADEBC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Selected (resets to 0xcc in race)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3C2C18, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Tokens (8-bit) increased" },
+        { address=0X3C2C19, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Tokens (8-bit) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3C2BDC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Demo Timer (32-bit)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Lethal Weapon",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "lethal-weapon",
+    file = "lethal-weapon.zip",
+    hashes = {
+      { hash = "20bf4f66a39977bba99a570f1a51d3d4", label = "Lethal Weapon (Europe).sfc" },
+      { hash = "29a70ecf317ede4ec1c19365a76e8201", label = "Lethal Weapon (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0210, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0248, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X0D28, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="XX" },
+        { address=0X0D28, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Time Of Stage (Decimal)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0226, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifebar increased" },
+        { address=0X0226, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifebar decreased" },
+        { address=0X022B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Murtaugh/Riggs Is Dead (Depending Of The Character That The Player Does Not Control)" },
+      },
+      health = {
+        { address=0X1282, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Indicate If The Player Take Damage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0268, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32 bits Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1124, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X024A, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0D29, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Of Stage (Decimal)" },
+        { address=0X0D2A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Of Stage (Miliseconds)" },
+      },
+    },
+  },
+}

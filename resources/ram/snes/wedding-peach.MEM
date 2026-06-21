@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Wedding Peach",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Party"
+  },
+
+  rom = {
+    name = "wedding-peach",
+    file = "wedding-peach.zip",
+    hashes = {
+      { hash = "026314480d07c1670197d34fcca725b1", label = "Wedding Peach (Japan).sfc" },
+      { hash = "c2ae0b5bc7edd2e496aaa39b7d14f7e8", label = "Wedding Peach (Japan) (En) (v0.9) (Chaotic).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X022C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4 Games" },
+        { address=0X022C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="6 Games" },
+        { address=0X022C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="8 Games" },
+        { address=0X022C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="How Many Rounds?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0422, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Final Game: Jama-P's Health decreased" },
+        { address=0X0422, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Final Game: Jama-P's Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0210, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Transformed (and thus earns bonus points on the next game)" },
+        { address=0X023A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Total Score [16-bit BCD]" },
+        { address=0X023C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Total Score [16-bit BCD]" },
+        { address=0X023E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 3 Total Score [16-bit BCD]" },
+        { address=0X0246, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Current Game Score [16-bit BCD]" },
+        { address=0X0248, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Current Game Score [16-bit BCD]" },
+        { address=0X024A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 3 Current Game Score [16-bit BCD]" },
+        { address=0X042C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Total Score (Summary, Stable) [16-bit BCD]" },
+        { address=0X042E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Total Score (Summary, Stable) [16-bit BCD]" },
+        { address=0X0430, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 3 Total Score (Summary, Stable) [16-bit BCD]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0023, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="What Minigame/State?" },
+        { address=0X002F, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time Remaining (Seconds * 100)" },
+        { address=0X0031, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time Remaining (Seconds * 10)" },
+        { address=0X0033, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time Remaining (Seconds)" },
+      },
+    },
+  },
+}

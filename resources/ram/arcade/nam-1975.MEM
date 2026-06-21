@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "NAM-1975",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "nam-1975",
+    file = "nam-1975.zip",
+    hashes = {
+      { hash = "4087b322e11ed40d6566bda0a1be11fe", label = "nam1975.7z <NAM-1975 (NGM-001)(NGH-001)>" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X44AC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Third pillar level 1" },
+        { address=0X49AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2nd monument level 2 (adress vl 03)" },
+        { address=0X696D, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="camion pompier" },
+        { address=0X696D, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="eneny planes" },
+        { address=0X696D, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="we landed safely" },
+        { address=0X696D, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="rouleau compresseur + level" },
+        { address=0X696D, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="communications intercepted" },
+        { address=0X696D, type="u8", condition="eq", value=0X0D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="they're coming again" },
+        { address=0X696D, type="u8", condition="eq", value=0X0E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="your real enemy is + fight with 's daughter" },
+        { address=0X696D, type="u8", condition="eq", value=0X0F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="how do you know your plans" },
+        { address=0X696D, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="51 hours of operation" },
+        { address=0X696D, type="u8", condition="eq", value=0X14, action="NEW_LEVEL", no_log=false, no_survey=false, desc="ending" },
+        { address=0X696D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X109F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives: increased" },
+        { address=0X109F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives: decreased" },
+      },
+      health = {
+        { address=0X45AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rouleau compressor 3 health decreased" },
+        { address=0X45AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rouleau compressor 3 health increased" },
+        { address=0X4AAC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Nancy's health decreased" },
+        { address=0X4AAC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Nancy's health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X10E6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Other weapon:" },
+        { address=0X1109, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Second weapon?" },
+        { address=0X1353, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Second weapon?" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X46AC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss hostage right" },
+        { address=0X696D, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="big plane (boss)" },
+        { address=0X696D, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="jetpack boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X10F1, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="02: invincible" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X44AC, type="u16le", condition="eq", value=0X3F, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken" },
+        { address=0X4CAC, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="2nd pillar lvl 1broken is 3f" },
+      },
+    },
+  },
+}

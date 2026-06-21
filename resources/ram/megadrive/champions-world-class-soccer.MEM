@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Champions World Class Soccer",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "champions-world-class-soccer",
+    file = "champions-world-class-soccer.zip",
+    hashes = {
+      { hash = "c54221bede5aef9e1cbba5b851e0ebdf", label = "Champions World Class Soccer (World) (En,Fr,De,Es).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X04C0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="CPU goals?" },
+        { address=0X04C1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Player goals?" },
+      },
+    },
+  },
+}

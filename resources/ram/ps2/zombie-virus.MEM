@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Zombie Virus",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Horror, Racing"
+  },
+
+  rom = {
+    name = "zombie-virus",
+    file = "zombie-virus.zip",
+    hashes = {
+      { hash = "22c4332468dc5bd65b57ebbeaeb51afd", label = "Zombie Virus (Europe)" },
+      { hash = "fd7b14395c82e6331a355a6c1bbf9075", label = "Simple 2000 Series Vol. 95 - The Zombie vs. Kyuukyuusha (Japan)" },
+      { hash = "1c1a4708c6ce3ddc0056b61ef1dbe42b", label = "Zombie Virus (Europe) (Widescreen) (v1.0) (Souzooka)" },
+      { hash = "06bb3cf8f75b152ad0091919cee7f5af", label = "Simple 2000 Series Vol. 95: The Zombie vs. Kyuukyuusha (Japan) (Widescreen) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X206D18, type="u32le", condition="eq", value=0X4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X206C08, type="u16le", condition="eq", value=0X8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Start" },
+        { address=0X206C08, type="u16le", condition="eq", value=0X9, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 Start (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0XA, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Start (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0XB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 4 Start (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0XC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 5 Start (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0XD, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 6 Start (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0XE, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 End" },
+        { address=0X206C08, type="u16le", condition="eq", value=0XF, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 End (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 End (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 4 End (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 5 End (?)" },
+        { address=0X206C08, type="u16le", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 6 End (?)" },
+      },
+    },
+  },
+}

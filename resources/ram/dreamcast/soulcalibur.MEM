@@ -1,0 +1,123 @@
+return {
+  game = {
+    title = "Soulcalibur",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "soulcalibur",
+    file = "soulcalibur.zip",
+    hashes = {
+      { hash = "50844bc6a7fc8d09b21cd213403dd432", label = "Soulcalibur (Europe) (En,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2BFA58, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo flag Change to 0x01 and left character (P1) is controlled by CPU // Tele" },
+        { address=0X2CAC70, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag" },
+        { address=0X2CAD60, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Character Change at Continue Flag" },
+      },
+      events = {
+        { address=0X2CA380, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Number of hits in current combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2C1B0C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Right Player - Round Win Flag" },
+        { address=0X2DC224, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Mode - Proving Grounds 1 Attempts" },
+        { address=0X2DC230, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Mode - Proving Grounds 2 Attempts" },
+        { address=0X2DC232, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Mode - Proving Grounds 3 Attempts" },
+        { address=0X2DC234, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Mode - Proving Grounds 4 Attempts" },
+        { address=0X2DC3B4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Mode - Proving Grounds 1 Wins" },
+        { address=0X2DC3C0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Mode - Proving Grounds 2 Wins" },
+        { address=0X2DC3C2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Mode - Proving Grounds 3 Wins" },
+        { address=0X2DC3C4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission Mode - Proving Grounds 4 Wins" },
+      },
+      stage = {
+        { address=0X2C8144, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Stage Number" },
+        { address=0X2C8160, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Opponent ID - Stage 1" },
+        { address=0X2C8164, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Opponent ID - Stage 2" },
+        { address=0X2C8168, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Opponent ID - Stage 3" },
+        { address=0X2C816C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Opponent ID - Stage 4" },
+        { address=0X2C8170, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Opponent ID - Stage 5" },
+        { address=0X2C8174, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Opponent ID - Stage 6" },
+        { address=0X2C8178, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Opponent ID - Stage 7" },
+        { address=0X2C817C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode - Opponent ID - Stage 8" },
+        { address=0X2CAD58, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Selection" },
+        { address=0X2CB0DC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Player Right Character (True address - Changes to 0x74 when round starts // This address frozen" },
+        { address=0X3A63E5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Stages] Unlocks" },
+        { address=0X3A63E6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Stages] Unlocks" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2CAD42, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Bar <1P Game> increased" },
+        { address=0X2CAD42, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Bar <1P Game> decreased" },
+        { address=0X2CAD46, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Bar <Vs Game> increased" },
+        { address=0X2CAD46, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Bar <Vs Game> decreased" },
+        { address=0X2DC24E, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission Mode - Maze of the Dead 1 - Attempts" },
+        { address=0X2DC250, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission Mode - Maze of the Dead 2 - Attempts" },
+        { address=0X2DC252, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission Mode - Maze of the Dead 3 - Attempts" },
+        { address=0X2DC254, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission Mode - Maze of the Dead 4 - Attempts" },
+        { address=0X2DC3DE, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission Mode - Maze of the Dead 1 - Wins" },
+        { address=0X2DC3E0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission Mode - Maze of the Dead 2 - Wins" },
+        { address=0X2DC3E2, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission Mode - Maze of the Dead 3 - Wins" },
+        { address=0X2DC3E4, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission Mode - Maze of the Dead 4 - Wins" },
+      },
+      health = {
+        { address=0X2C1B9E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Left Player Health // 0x436f - MAX decreased" },
+        { address=0X2C1B9E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Left Player Health // 0x436f - MAX increased" },
+        { address=0X2CA27E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Right Player Health // 0x436f - MAX decreased" },
+        { address=0X2CA27E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Right Player Health // 0x436f - MAX increased" },
+        { address=0X2CA394, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage percentage [32-bit float]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2DC174, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points (EU Version) - Used to buy cards" },
+      },
+      collectibles = {
+        { address=0X10110, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Replay Active (also 0x01 during Continue countdown) increased" },
+        { address=0X2CA1EC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Left Player - Round Win Flag increased" },
+        { address=0X2CA3B8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Opponent ring out bitflag? increased" },
+        { address=0X2DC1FC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Mode - Money Pit 1 - Attempts increased" },
+        { address=0X2DC1FE, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Mode - Money Pit 2 - Attempts increased" },
+        { address=0X2DC200, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Mode - Money Pit 3 - Attempts increased" },
+        { address=0X2DC202, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Mode - Money Pit 4 - Attempts increased" },
+        { address=0X2DC38C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Mode - Money Pit 1 - Wins increased" },
+        { address=0X2DC38E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Mode - Money Pit 2 - Wins increased" },
+        { address=0X2DC390, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Mode - Money Pit 3 - Wins increased" },
+        { address=0X2DC392, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission Mode - Money Pit 4 - Wins increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2CAC90, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Timer" },
+        { address=0X2CAD3C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Time" },
+        { address=0X3A6380, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Mitsurugi" },
+        { address=0X3A6384, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Seungmina" },
+        { address=0X3A6388, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Taki" },
+        { address=0X3A638C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Maxi" },
+        { address=0X3A6390, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Voldo" },
+        { address=0X3A6394, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Sophitia" },
+        { address=0X3A6398, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Siegfried" },
+        { address=0X3A639C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Rock" },
+        { address=0X3A63A0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Hwang" },
+        { address=0X3A63A8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Ivy" },
+        { address=0X3A63AC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Kilik" },
+        { address=0X3A63B0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Xianghua" },
+        { address=0X3A63B4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Lizardman" },
+        { address=0X3A63B8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Yoshimitsu" },
+        { address=0X3A63BC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Edge Master" },
+        { address=0X3A63C0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Nightmare" },
+        { address=0X3A63C4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Astaroth" },
+        { address=0X3A63C8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Inferno" },
+        { address=0X3A63CC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Counter for Cervantes" },
+      },
+    },
+  },
+}

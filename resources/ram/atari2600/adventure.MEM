@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Adventure",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "adventure",
+    file = "adventure.zip",
+    hashes = {
+      { hash = "157bddb7192754a45372be196797f284", label = "Adventure (USA).a26" },
+      { hash = "4b27f5397c442d25f0c418ccdacf1926", label = "Adventure (Europe).a26" },
+    }
+  },
+
+  events = {
+  },
+}

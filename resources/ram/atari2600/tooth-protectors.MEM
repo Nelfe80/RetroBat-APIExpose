@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Tooth Protectors",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tooth-protectors",
+    file = "tooth-protectors.zip",
+    hashes = {
+      { hash = "fa2be8125c3c60ab83e1c0fe56922fcb", label = "Tooth Protectors (USA).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0003, type="u8", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X002F, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Healthy" },
+      },
+    },
+  },
+}

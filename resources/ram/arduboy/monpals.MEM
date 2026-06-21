@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Monpals",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "monpals",
+    file = "monpals.zip",
+    hashes = {
+      { hash = "8cff835493bf90ca063d03bbed4671f2", label = "Monpals (World).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0187, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Your First Party Slot Mon's Level" },
+        { address=0X0188, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Your Second Party Slot Mon's Level" },
+        { address=0X0189, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Your Third Party Slot Mon's Level" },
+        { address=0X018A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy Mon Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X018D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Your Total HP decreased" },
+        { address=0X018D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Your Total HP increased" },
+        { address=0X0190, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Total HP decreased" },
+        { address=0X0190, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Total HP increased" },
+        { address=0X0193, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Your Current HP decreased" },
+        { address=0X0193, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Your Current HP increased" },
+        { address=0X0196, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Current HP decreased" },
+        { address=0X0196, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Current HP increased" },
+        { address=0X0199, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Your Total Energy decreased" },
+        { address=0X0199, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Your Total Energy increased" },
+        { address=0X019C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemies Total Energy decreased" },
+        { address=0X019C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemies Total Energy increased" },
+        { address=0X019F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Your Current Energy decreased" },
+        { address=0X019F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Your Current Energy increased" },
+        { address=0X01A2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemies Current Energy decreased" },
+        { address=0X01A2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemies Current Energy increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0167, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+  },
+}

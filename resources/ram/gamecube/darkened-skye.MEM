@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Darkened Skye",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "darkened-skye",
+    file = "darkened-skye.zip",
+    hashes = {
+      { hash = "d64af30fe7e9474e4fbabbeffcf9fa80", label = "Darkened Skye (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X16F098, type="u32be", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Intro, Title Screen, Main Menu" },
+        { address=0X16F0BC, type="u32be", condition="eq", value=0X0, action="PAUSE_OFF", no_log=false, no_survey=false, desc="<Unpaused>" },
+        { address=0X16F0BC, type="u32be", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Spell List" },
+        { address=0X16F0BC, type="u32be", condition="eq", value=0X2, action="PAUSE_ON", no_log=false, no_survey=false, desc="Item Collection" },
+        { address=0X16F0BC, type="u32be", condition="eq", value=0X3, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quests, Notes, Quotes" },
+        { address=0X16F0BC, type="u32be", condition="eq", value=0X4, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue, New Game, etc" },
+        { address=0X16F0BC, type="u32be", condition="eq", value=0X5, action="PAUSE_ON", no_log=false, no_survey=false, desc="File Save/Load Screen" },
+        { address=0X16F0BC, type="u32be", condition="eq", value=0X6, action="PAUSE_ON", no_log=false, no_survey=false, desc="Options" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X16F08C, type="u32be", condition="eq", value=0X0, action="BOSS_HIT", no_log=false, no_survey=false, desc="No, 1 = Yes" },
+      },
+    },
+  },
+}

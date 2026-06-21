@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Apollo Justice: Ace Attorney",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Visual Novel"
+  },
+
+  rom = {
+    name = "apollo-justice-ace-attorney",
+    file = "apollo-justice-ace-attorney.zip",
+    hashes = {
+      { hash = "8fed72027fdab469a320acb30ced3426", label = "Apollo Justice - Ace Attorney (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X124230, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="< CONTINUE and THE END >" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XF286C, type="u16le", condition="eq", value=0X13, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Stage" },
+        { address=0XF286C, type="u16le", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Backstage Hallwary" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF285A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="HP or odds bar" },
+      },
+    },
+  },
+}

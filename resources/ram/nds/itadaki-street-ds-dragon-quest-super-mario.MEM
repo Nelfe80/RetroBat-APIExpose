@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Itadaki Street DS: Dragon Quest Super Mario",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "itadaki-street-ds-dragon-quest-super-mario",
+    file = "itadaki-street-ds-dragon-quest-super-mario.zip",
+    hashes = {
+      { hash = "607c06a9fc248c079c203c2e86a4f6c8", label = "Itadaki Street DS - Dragon Quest Super Mario (Japan).nds" },
+      { hash = "f3199979834dc2e83da938abbdb272ef", label = "Itadaki Street DS - Dragon Quest Super Mario (Japan) (En) (v0.11) (Darrman).nds" },
+    }
+  },
+
+  events = {
+  },
+}

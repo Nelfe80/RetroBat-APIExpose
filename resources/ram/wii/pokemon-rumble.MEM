@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Rumble",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-rumble",
+    file = "pokemon-rumble.zip",
+    hashes = {
+      { hash = "ea1b12d8f685a5e35854ee9e2f910747", label = "Pokemon Rumble (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

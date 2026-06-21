@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Orcs and Elves",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "orcs-and-elves",
+    file = "orcs-and-elves.zip",
+    hashes = {
+      { hash = "1571df908134eac3f37101ce0bf1df11", label = "Orcs & Elves (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3014C4, type="u16le", condition="eq", value=0X31, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Playing" },
+        { address=0X3014C4, type="u16le", condition="eq", value=0X32, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA7CBC, type="u16le", condition="eq", value=0X4012, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Levers Left" },
+        { address=0XA7CBC, type="u16le", condition="eq", value=0X400E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 Levers Left" },
+        { address=0XA7CBC, type="u16le", condition="eq", value=0X400A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Levers Left" },
+        { address=0XA7CBC, type="u16le", condition="eq", value=0X4000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Drained" },
+        { address=0XA7CBC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Level 2 Water Drained" },
+        { address=0X2D9864, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0xa0" },
+        { address=0X2D9864, type="u16le", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0x4d8" },
+        { address=0X2D9864, type="u16le", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0x2e40" },
+        { address=0X2D9864, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Player: Next Level XP" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3014C4, type="u16le", condition="eq", value=0X22, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+  },
+}

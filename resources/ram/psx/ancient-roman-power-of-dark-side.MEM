@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "Ancient Roman: Power of Dark Side",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ancient-roman-power-of-dark-side",
+    file = "ancient-roman-power-of-dark-side.zip",
+    hashes = {
+      { hash = "6db3a11b1b167904453e4717f7235e48", label = "Ancient Roman - Power of Dark Side (Japan) (En) (v1.0) (Eight Mansions) (Disc 1)" },
+      { hash = "4be9b880a03e334815af43740edeb739", label = "Ancient Roman - Power of Dark Side (Japan) (En) (v1.0) (Eight Mansions) (Disc 2)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X157288, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD2) Kai's Level" },
+        { address=0X1572FC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD2) Michelia's Level" },
+        { address=0X157370, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD2) Burke's Level" },
+        { address=0X1573D0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD1) Kai's Level" },
+        { address=0X1573D8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kai's Exp for Next Level" },
+        { address=0X157444, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD1) Michelia's Level" },
+        { address=0X15744C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Michelia's Exp for Next Level" },
+        { address=0X157458, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD2) Minna's Level" },
+        { address=0X1574B8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD1) Burke's Level" },
+        { address=0X1574C0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Burke's Exp for Next Level" },
+        { address=0X15752C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD1) Fara's Level" },
+        { address=0X157540, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD2) Sarina's Level" },
+        { address=0X1575A0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD1) Minna's Level" },
+        { address=0X1575B4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD2) Baroa's Level" },
+        { address=0X157614, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD1) McLeod's Level" },
+        { address=0X157688, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD1) Sarina's Level" },
+        { address=0X1576FC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(CD1) Baroa's Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XFF6BA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD2) In Battle: Character 1 - Current HP decreased" },
+        { address=0XFF6BA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD2) In Battle: Character 1 - Current HP increased" },
+        { address=0XFF7F6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD2) In Battle: Character 2 - Current HP decreased" },
+        { address=0XFF7F6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD2) In Battle: Character 2 - Current HP increased" },
+        { address=0XFF802, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD1) In Battle: Character 1 - Current HP decreased" },
+        { address=0XFF802, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD1) In Battle: Character 1 - Current HP increased" },
+        { address=0XFF932, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD2) In Battle: Character 3 - Current HP decreased" },
+        { address=0XFF932, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD2) In Battle: Character 3 - Current HP increased" },
+        { address=0XFF93E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD1) Character 2 - Current HP decreased" },
+        { address=0XFF93E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD1) Character 2 - Current HP increased" },
+        { address=0XFFA6E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD2) Enemy 1 - Current HP decreased" },
+        { address=0XFFA6E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD2) Enemy 1 - Current HP increased" },
+        { address=0XFFA7A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD1) Character 3 - Current HP decreased" },
+        { address=0XFFA7A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD1) Character 3 - Current HP increased" },
+        { address=0XFFBAA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD2) Enemy 2 - Current HP decreased" },
+        { address=0XFFBAA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD2) Enemy 2 - Current HP increased" },
+        { address=0XFFBB6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD1) Enemy 1 - Current HP decreased" },
+        { address=0XFFBB6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD1) Enemy 1 - Current HP increased" },
+        { address=0XFFCE6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD2) Enemy 3 - Current HP decreased" },
+        { address=0XFFCE6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD2) Enemy 3 - Current HP increased" },
+        { address=0XFFCF2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD1) Enemy 2 - Current HP decreased" },
+        { address=0XFFCF2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD1) Enemy 2 - Current HP increased" },
+        { address=0XFFE2E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(CD1) Enemy 3 - Current HP decreased" },
+        { address=0XFFE2E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(CD1) Enemy 3 - Current HP increased" },
+        { address=0X1573DC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kai's Total HP decreased" },
+        { address=0X1573DC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kai's Total HP increased" },
+        { address=0X1573E0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kai's Current HP decreased" },
+        { address=0X1573E0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kai's Current HP increased" },
+        { address=0X157450, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Michelia's Total HP decreased" },
+        { address=0X157450, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Michelia's Total HP increased" },
+        { address=0X157454, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Michelia's Current HP decreased" },
+        { address=0X157454, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Michelia's Current HP increased" },
+        { address=0X1574C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Burke's Total HP decreased" },
+        { address=0X1574C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Burke's Total HP increased" },
+        { address=0X1574C8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Burke's Current HP decreased" },
+        { address=0X1574C8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Burke's Current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1573B2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(CD2) Burke's Weapon equipped. 0x34 = Sleep Axe" },
+        { address=0X1573B3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(CD2) Burke has weapon equipped? 0x0 - no, 0x10 - yes." },
+        { address=0X1574FA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(CD1) Burke's Weapon equipped. 0x34 = Sleep Axe" },
+        { address=0X1574FB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(CD1) Burke has weapon equipped? 0x0 - no, 0x10 - yes." },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X122028, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(CD1) Current Gahme (money) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X157587, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="(CD2) Sarina has Shield equipped? 0x0 - no, 0x30 - yes" },
+      },
+      player = {
+        { address=0X157346, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Michelia's Trinket 1 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsu" },
+        { address=0X157348, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Michelia's Trinket 2 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsu" },
+        { address=0X15734A, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Michelia's Trinket 3 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsu" },
+        { address=0X1574A2, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Minna's Trinket 1 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsuit" },
+        { address=0X1574A4, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Minna's Trinket 2 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsuit" },
+        { address=0X1574A6, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Minna's Trinket 3 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsuit" },
+        { address=0X15758A, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Sarina's Trinket 1 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsuit" },
+        { address=0X15758C, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Sarina's Trinket 2 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsuit" },
+        { address=0X15758E, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="(CD2) Sarina's Trinket 3 equipped. 0x1c - Gym Clothes F, 0x25 - Bloomers, 0x29 - School Swimsuit" },
+      },
+    },
+  },
+}

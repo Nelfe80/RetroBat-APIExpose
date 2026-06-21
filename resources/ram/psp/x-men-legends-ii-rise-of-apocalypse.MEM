@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "X-Men Legends II: Rise of Apocalypse",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "x-men-legends-ii-rise-of-apocalypse",
+    file = "x-men-legends-ii-rise-of-apocalypse.zip",
+    hashes = {
+      { hash = "f4cf708cd5d0ae3006ed98917e1bf03c", label = "X-Men Legends II - Rise of Apocalypse (Europe) (En,Fr,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

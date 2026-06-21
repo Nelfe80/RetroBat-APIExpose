@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Super Skidmarks",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "super-skidmarks",
+    file = "super-skidmarks.zip",
+    hashes = {
+      { hash = "533b890ed1113547691f36ad1c59e346", label = "Super Skidmarks (Europe) (J-Cart).md" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XECC6, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Options] Display Laptimes, 0xffff=Enabled" },
+      },
+    },
+  },
+}

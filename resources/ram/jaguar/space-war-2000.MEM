@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Space War 2000",
+    system = "jaguar",
+    system_name = "Atari Jaguar",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "space-war-2000",
+    file = "space-war-2000.zip",
+    hashes = {
+      { hash = "8045ac181d02e3fc92eae066607073f3", label = "Space War 2000 (World) (Aftermarket) (Unl).j64" },
+    }
+  },
+
+  events = {
+  },
+}

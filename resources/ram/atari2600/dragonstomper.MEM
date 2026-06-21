@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Dragonstomper",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragonstomper",
+    file = "dragonstomper.zip",
+    hashes = {
+      { hash = "90ccf4f30a5ad8c801090b388ddd5613", label = "Dragonstomper (USA).a26" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X002A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="STR (BCD, wraps around on death, i.e. larger than max STR when dead)" },
+        { address=0X0044, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(Village/Cave) Dragon STR (BCD, 99 max, wraps around on death)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X004B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Village/Cave) Gold (ones and tens, BCD) increased" },
+        { address=0X004C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Village/Cave) Gold (hundreds and thousands, BCD) increased" },
+        { address=0X005C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Countryside) Gold (ones and tens, BCD) increased" },
+        { address=0X005D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Countryside) Gold (hundreds and thousands, BCD) increased" },
+        { address=0X0064, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring count increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0061, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield count" },
+      },
+    },
+  },
+}

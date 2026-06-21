@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Star Trek: The Next Generation",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "star-trek-the-next-generation",
+    file = "star-trek-the-next-generation.zip",
+    hashes = {
+      { hash = "5ad7b8cc37618f350faaadbaf8a013cb", label = "Star Trek - The Next Generation - Future's Past (Europe).sfc" },
+      { hash = "6a5200b72e82c8e376ef3f498d3c716f", label = "Star Trek - The Next Generation - Future's Past (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X004F, type="u8", condition="eq", value=0X0000, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8435, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select Enabled - 01" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8389, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enterprise - Life Support Damage increased" },
+        { address=0X8389, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enterprise - Life Support Damage decreased" },
+        { address=0X83B1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enterprise - Life Support Resources increased" },
+        { address=0X83B1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enterprise - Life Support Resources decreased" },
+      },
+      health = {
+        { address=0X2579, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Away Team Member 1 Health decreased" },
+        { address=0X2579, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Away Team Member 1 Health increased" },
+        { address=0X257B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Away Team Member 2 Health decreased" },
+        { address=0X257B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Away Team Member 2 Health increased" },
+        { address=0X257D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Away Team Member 3 Health decreased" },
+        { address=0X257D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Away Team Member 3 Health increased" },
+        { address=0X257F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Away Team Member 4 Health decreased" },
+        { address=0X257F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Away Team Member 4 Health increased" },
+        { address=0X2581, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Away Team Member 1 Phaser Energy/Medpacks decreased" },
+        { address=0X2581, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Away Team Member 1 Phaser Energy/Medpacks increased" },
+        { address=0X2583, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Away Team Member 2 Phaser Energy/Medpacks decreased" },
+        { address=0X2583, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Away Team Member 2 Phaser Energy/Medpacks increased" },
+        { address=0X2585, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Away Team Member 3 Phaser Energy/Medpacks decreased" },
+        { address=0X2585, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Away Team Member 3 Phaser Energy/Medpacks increased" },
+        { address=0X2587, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Away Team Member 4 Phaser Energy/Medpacks decreased" },
+        { address=0X2587, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Away Team Member 4 Phaser Energy/Medpacks increased" },
+        { address=0X836F, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Foward Shields Damage" },
+        { address=0X8371, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Forward Starboard Shields Damage" },
+        { address=0X8373, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Forward Port Shields Damage" },
+        { address=0X8375, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Aft Shields Damage" },
+        { address=0X8377, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Aft Starboard Shields Damage" },
+        { address=0X8379, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Aft Port Shields Damage" },
+        { address=0X837B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Forward Phasers Damage" },
+        { address=0X837D, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Forward Photon Damage" },
+        { address=0X837F, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Aft Phasers Damage" },
+        { address=0X8381, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Aft Photon Damage" },
+        { address=0X8383, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Warp Engines Damage" },
+        { address=0X8385, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Impulse Engines Damage" },
+        { address=0X8387, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Auxillary Power Damage" },
+        { address=0X838B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Sensors Damage" },
+        { address=0X838D, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Navigation Damage" },
+        { address=0X838F, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Hull Damage" },
+        { address=0X8391, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Transporter Damage" },
+        { address=0X8393, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Computer Damage" },
+        { address=0X8395, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enterprise - Communications Damage" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X08A3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enemy Shields (00 = Full Shields)" },
+        { address=0X8397, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enterprise - Forward Shields Resources" },
+        { address=0X8399, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enterprise - Forward Starboard Shields Resources" },
+        { address=0X839B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enterprise - Forward Port Shields Resources" },
+        { address=0X839D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enterprise - Aft Shields Resources" },
+        { address=0X839F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enterprise - Aft Starboard Shields Resources" },
+        { address=0X83A1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enterprise - Aft Port Shields Resources" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X80CB, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Game Progress? (Not manipulatable)" },
+      },
+    },
+  },
+}

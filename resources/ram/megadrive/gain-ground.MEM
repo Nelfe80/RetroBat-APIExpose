@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Gain Ground",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "gain-ground",
+    file = "gain-ground.zip",
+    hashes = {
+      { hash = "3b0ad9167e152ed3719ae0d45e50db6a", label = "Gain Ground (Japan) (En).md" },
+      { hash = "fa43881a792fadf1ab737294fff1bcc3", label = "Gain Ground (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA292, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA200, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number: 05 = End Game" },
+        { address=0XA325, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select Round" },
+        { address=0XF000, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level, 0-1-2 Easy, Normal, Hard" },
+      },
+      stage = {
+        { address=0XA202, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sub Stage Number" },
+        { address=0XA324, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level Select Stage" },
+        { address=0XA332, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="6 = Round Select Active (Lower4)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA834, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0C = Warrior's Death flag (1P)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA2EE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Demo Counter" },
+      },
+    },
+  },
+}

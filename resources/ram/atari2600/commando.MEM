@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Commando",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "commando",
+    file = "commando.zip",
+    hashes = {
+      { hash = "5d2cc33ca798783dee435eb29debf6d6", label = "Commando (USA).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0043, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0046, type="u8", condition="eq", value=0XF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0046, type="u8", condition="eq", value=0X7, action="LIVES_STATE", no_log=false, no_survey=false, desc="max" },
+        { address=0X0046, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Upper4: lives (decimal) increased" },
+        { address=0X0046, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Upper4: lives (decimal) decreased" },
+      },
+    },
+  },
+}

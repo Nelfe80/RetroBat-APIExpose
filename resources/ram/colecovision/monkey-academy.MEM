@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Monkey Academy",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Education, Platform"
+  },
+
+  rom = {
+    name = "monkey-academy",
+    file = "monkey-academy.zip",
+    hashes = {
+      { hash = "6cd6a23e951c0ec6da23d1335812bff2", label = "Monkey Academy (USA).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X0000, type="u8", condition="eq", value=0X0A, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage/substage loading" },
+        { address=0X0000, type="u8", condition="eq", value=0X0F, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X0000, type="u8", condition="eq", value=0X15, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X0001, type="u8", condition="eq", value=0X00, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Menus/stage complete" },
+        { address=0X0001, type="u8", condition="eq", value=0X05, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Actively playing stage" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0001, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Menus/stage complete" },
+        { address=0X0045, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0045, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X0045, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X0045, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0X0047, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0047, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X0047, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X0047, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+      },
+      stage = {
+        { address=0X0054, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1" },
+        { address=0X0054, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2" },
+        { address=0X0054, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3" },
+        { address=0X0054, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Substage (3 substages per stage, stages are tracked at 0x01b0)" },
+        { address=0X005A, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X005A, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X005A, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X005A, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0X01B0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (each stage has 3 substages tracked at 0x0054)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0000, type="u8", condition="eq", value=0X0D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Died" },
+        { address=0X0050, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Active player lives increased" },
+        { address=0X0050, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Active player lives decreased" },
+        { address=0X0057, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die due to too many strikes" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0048, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] Player 1 score" },
+        { address=0X004B, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] Player 2 score" },
+      },
+    },
+  },
+}

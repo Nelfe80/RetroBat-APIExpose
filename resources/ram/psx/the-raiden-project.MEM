@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "The Raiden Project",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-raiden-project",
+    file = "the-raiden-project.zip",
+    hashes = {
+      { hash = "695db7cb2f2f5c032f99998e89fe1a31", label = "Raiden Project, The (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4D600, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="none (game over or continue screen)" },
+        { address=0X101370, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="none (game over or continue screen)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XECF28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+        { address=0XECF2A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+        { address=0XECF2C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+        { address=0XECF30, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+        { address=0XECF32, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+        { address=0X12F7FE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+        { address=0X12F800, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XECF28, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="min" },
+        { address=0XECF28, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="max" },
+        { address=0XECF2A, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="min" },
+        { address=0XECF2A, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="max" },
+        { address=0XECF2C, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="min" },
+        { address=0XECF2C, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="max" },
+        { address=0XECF30, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="min" },
+        { address=0XECF30, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="max" },
+        { address=0XECF32, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="min" },
+        { address=0XECF32, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="max" },
+        { address=0X12F7FE, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="min" },
+        { address=0X12F7FE, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="max" },
+        { address=0X12F800, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="min" },
+        { address=0X12F800, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="max" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X12D476, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss music" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12DEA3, type="u8", condition="eq", value=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="When shoot, bomb or the player destroyed ship is in the screen" },
+      },
+    },
+  },
+}

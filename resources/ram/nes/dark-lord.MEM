@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Dark Lord",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "dark-lord",
+    file = "dark-lord.zip",
+    hashes = {
+      { hash = "feaac8aefe1d953040b85c0ba78aa3fe", label = "Dark Lord (Japan).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X70E4, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X70F4, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X7104, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X7114, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X7301, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Not Completed" },
+        { address=0X7301, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X7311, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Accepted" },
+        { address=0X751C, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X751C, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X751D, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X751D, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X751E, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X751E, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X76C0, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character didn't complete 'Vanished Soldier'" },
+        { address=0X76C0, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character completed 'Vanished Soldier'" },
+        { address=0X76D0, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character didn't complete 'Vanished Soldier'" },
+        { address=0X76D0, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character completed 'Vanished Soldier'" },
+        { address=0X76E0, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character didn't complete 'Vanished Soldier'" },
+        { address=0X76E0, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character completed 'Vanished Soldier'" },
+        { address=0X76F0, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character didn't complete 'Vanished Soldier'" },
+        { address=0X76F0, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character completed 'Vanished Soldier'" },
+        { address=0X7700, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character didn't complete 'Vanished Soldier'" },
+        { address=0X7700, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character completed 'Vanished Soldier'" },
+        { address=0X7710, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character didn't complete 'Vanished Soldier'" },
+        { address=0X7710, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="That character completed 'Vanished Soldier'" },
+      },
+      health = {
+        { address=0X70E4, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="First party member's current HP [value]" },
+        { address=0X70F4, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Second party member's current HP [value]" },
+        { address=0X7104, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Third party member's current HP [value]" },
+        { address=0X7114, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Fourth party member's current HP [value]" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X762D, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X7630, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X7633, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X7636, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X7639, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X763C, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X7331, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="ElfShield not collected" },
+        { address=0X7331, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="ElfShield collected" },
+        { address=0X735E, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield isn't spawn" },
+        { address=0X735E, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield is spawned" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7322, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door is opened" },
+        { address=0X7322, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door is locked by the cave in" },
+        { address=0X7324, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not interacted with dhe door" },
+        { address=0X7324, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Interacted with the door" },
+        { address=0X7340, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Secret door is close" },
+        { address=0X7340, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Secret door is open" },
+        { address=0X7341, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Right door is closed" },
+        { address=0X7341, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Right door is open" },
+        { address=0X7342, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Not Kicked" },
+        { address=0X7342, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Kicked" },
+        { address=0X7344, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door not opened" },
+        { address=0X7346, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Not opened" },
+        { address=0X7346, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door before heloyrobe opened" },
+      },
+    },
+  },
+}

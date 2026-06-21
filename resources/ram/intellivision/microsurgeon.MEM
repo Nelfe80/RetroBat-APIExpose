@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Microsurgeon",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Life Simulation, Shooter"
+  },
+
+  rom = {
+    name = "microsurgeon",
+    file = "microsurgeon.zip",
+    hashes = {
+      { hash = "137d6101ec260405d3d5339822e172f7", label = "Microsurgeon (USA, Europe).int" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X067C, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Status/Title" },
+        { address=0X0DF0, type="u16le", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+  },
+}

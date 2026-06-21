@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "International Superstar Soccer Deluxe",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "international-superstar-soccer-deluxe",
+    file = "international-superstar-soccer-deluxe.zip",
+    hashes = {
+      { hash = "494d00e7c0a3ee5448e6b82fa091bac8", label = "International Superstar Soccer Deluxe (Europe, Brazil) (En).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1270, type="u16be", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round of 16" },
+        { address=0X1270, type="u16be", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round of 8 (Bit3)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X175E, type="u8", condition="eq", value=0X2A, action="SCORE_STATE", no_log=false, no_survey=false, desc="League Points" },
+      },
+    },
+  },
+}

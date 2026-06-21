@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hunter x Hunter: Kindan no Hihou",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "hunter-x-hunter-kindan-no-hihou",
+    file = "hunter-x-hunter-kindan-no-hihou.zip",
+    hashes = {
+      { hash = "8ac8f913b5f1e31582de191b367648a9", label = "Hunter x Hunter - Kindan no Hihou (Japan).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Rock Band",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "rock-band",
+    file = "rock-band.zip",
+    hashes = {
+      { hash = "9754ba1daf213ff9f416aab111d357dc", label = "Rock Band (Europe, Australia) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

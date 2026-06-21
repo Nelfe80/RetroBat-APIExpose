@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Conker's Bad Fur Day [Subset - Bonus]",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "conkers-bad-fur-day-subset-bonus",
+    file = "conkers-bad-fur-day-subset-bonus.zip",
+    hashes = {
+      { hash = "b0b19810c17e754d0d4e42d41b9f5a27", label = "Conker's Bad Fur Day [Subset - Bonus].z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBEE14, type="u8", condition="eq", value=0X18, action="GAME_OVER", no_log=false, no_survey=false, desc="Intro/Game Over screen" },
+        { address=0XBEEE2, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not paused" },
+        { address=0XBEEE2, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game paused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC3F94, type="u16be", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Greg apeared (plus 2)" },
+        { address=0XC3F94, type="u16be", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Greg left (plus 4)" },
+        { address=0XC3F94, type="u16be", condition="eq", value=0X16, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Conker back to life (plus 10)" },
+        { address=0XE11B0, type="u32be", condition="eq", value=0XE000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mouse dead" },
+        { address=0XEA131, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="50 Lives" },
+      },
+      health = {
+        { address=0XCC776, type="u32be", condition="eq", value=0X00EF, action="HIT", no_log=false, no_survey=false, desc="Damage while in Honey Comb Turret" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE11B0, type="u32be", condition="eq", value=0X6F80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money talking (Bats Tower top)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE11B0, type="u32be", condition="eq", value=0XF030, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Final boss defeated" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XCC776, type="u32be", condition="eq", value=0X00CE, action="SWIMMING", no_log=false, no_survey=false, desc="Swimming underwater" },
+        { address=0XCC776, type="u32be", condition="eq", value=0X00EB, action="JUMPING", no_log=false, no_survey=false, desc="Z plus A jump" },
+        { address=0XCC776, type="u32be", condition="eq", value=0X0032, action="JUMPING", no_log=false, no_survey=false, desc="jump 1" },
+        { address=0XCC776, type="u32be", condition="eq", value=0X0037, action="JUMPING", no_log=false, no_survey=false, desc="jump 2" },
+        { address=0XCC776, type="u32be", condition="eq", value=0X020E, action="JUMPING", no_log=false, no_survey=false, desc="Matrix jump (to the left)" },
+        { address=0XCC776, type="u32be", condition="eq", value=0X020F, action="JUMPING", no_log=false, no_survey=false, desc="Matrix jump (to the right)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC3F94, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Conker died for 1st time cutscenes:" },
+        { address=0XC40BB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Last cutscene played ID 1 8bits" },
+        { address=0XE11B0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dialogs ID 1 16bits" },
+      },
+    },
+  },
+}

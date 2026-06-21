@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Rock Band [Subset - Expert Full Combos]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "rock-band-subset-expert-full-combos",
+    file = "rock-band-subset-expert-full-combos.zip",
+    hashes = {
+      { hash = "4ea69d47666c3f1e0b0ac236665eb082", label = "Rock Band [Subset - Expert Full Combos]" },
+    }
+  },
+
+  events = {
+  },
+}

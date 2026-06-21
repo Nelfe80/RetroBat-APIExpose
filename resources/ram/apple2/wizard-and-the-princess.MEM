@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Wizard and the Princess",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "wizard-and-the-princess",
+    file = "wizard-and-the-princess.zip",
+    hashes = {
+      { hash = "9110002bfa805d4c87712ca5c508efce", label = "Wizard and the Princess (1986)(Green Valley Publishing)[cr Late Night Crew].dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X897A, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over triggered \ Completed game" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0027, type="u8", condition="eq", value=0XE2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rattlesnake bite" },
+        { address=0X0027, type="u8", condition="eq", value=0XE4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Scorpion sting / Crocodiles in castle moat" },
+        { address=0X0027, type="u8", condition="eq", value=0XE7, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rowboat sinking" },
+        { address=0X0027, type="u8", condition="eq", value=0XE8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Thirst / Dehydration" },
+        { address=0X0027, type="u8", condition="eq", value=0XED, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rickety bridge collapsing" },
+        { address=0X0027, type="u8", condition="eq", value=0XEE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Consuming poisoned apple" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0977, type="u8", condition="eq", value=0XFD, action="MONEY_STATE", no_log=false, no_survey=false, desc="Used/consumed (given to peddler)" },
+        { address=0X0977, type="u8", condition="eq", value=0XFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="In inventory" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X891C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8-bit Boolean] Maze Door Unlocked (0 = no, 1 = yes)" },
+      },
+    },
+  },
+}

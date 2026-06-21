@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Ignition Factor",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "the-ignition-factor",
+    file = "the-ignition-factor.zip",
+    hashes = {
+      { hash = "06e616e05363fb24d54409d12cda7a35", label = "Ignition Factor, The (USA).sfc" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1CB9, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Game/Level Time Seconds" },
+      },
+    },
+  },
+}

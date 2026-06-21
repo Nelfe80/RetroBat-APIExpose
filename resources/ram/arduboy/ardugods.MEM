@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "ArduGods",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ardugods",
+    file = "ardugods.zip",
+    hashes = {
+      { hash = "c221e3fb053b088512941b91380cdd0a", label = "ArduGods (World).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0338, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0102, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage/Healing shown on notification screen" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Zoop",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "zoop",
+    file = "zoop.zip",
+    hashes = {
+      { hash = "1516a213225c93bb6d411651ba5a5be1", label = "Zoop (USA).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0A91, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Play Difficulty [8bit]" },
+      },
+    },
+  },
+}

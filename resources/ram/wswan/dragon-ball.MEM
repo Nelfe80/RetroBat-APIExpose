@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dragon Ball",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dragon-ball",
+    file = "dragon-ball.zip",
+    hashes = {
+      { hash = "7209acaa3415a4f179ac17fd574453a6", label = "Dragon Ball (Japan).wsc" },
+    }
+  },
+
+  events = {
+  },
+}

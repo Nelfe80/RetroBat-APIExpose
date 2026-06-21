@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Star Trek: Starfleet Academy - Starship Bridge Simulator",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "star-trek-starfleet-academy-starship-bridge-simulator",
+    file = "star-trek-starfleet-academy-starship-bridge-simulator.zip",
+    hashes = {
+      { hash = "78086fba202066ff4f968d35e7c21c11", label = "Star Trek - Starfleet Academy - Starship Bridge Simulator (USA).32x" },
+    }
+  },
+
+  events = {
+  },
+}

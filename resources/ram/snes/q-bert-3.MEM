@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Q*bert 3",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "q-bert-3",
+    file = "q-bert-3.zip",
+    hashes = {
+      { hash = "e926be5b5c41c5bc1d001daf948f27ef", label = "Q-bert 3 (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X004E, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="GO/MM/C" },
+        { address=0X004E, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="In-game" },
+        { address=0X0584, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[8bit) Game over screen that doesn't switch in cutscenes let's FUCKING go" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0548, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Round ID" },
+        { address=0X1FDA, type="u8", condition="eq", value=0X28, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on" },
+        { address=0X1FDA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Cheat Level 11" },
+      },
+      stage = {
+        { address=0X008C, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="on" },
+        { address=0X008C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Cheat Stage select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0582, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X0582, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1FA0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Score (Hex)" },
+      },
+    },
+  },
+}

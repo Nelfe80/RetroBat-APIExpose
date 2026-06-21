@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Nibbler",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nibbler",
+    file = "nibbler.zip",
+    hashes = {
+      { hash = "e1c816373c793c50c96b62ad5fb7500f", label = "Nibbler (1983)(Datasoft).nib" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00E9, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not Playing/Demo" },
+      },
+    },
+  },
+}

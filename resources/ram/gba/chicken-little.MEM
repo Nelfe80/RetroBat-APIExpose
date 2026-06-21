@@ -1,0 +1,119 @@
+return {
+  game = {
+    title = "Chicken Little",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "chicken-little",
+    file = "chicken-little.zip",
+    hashes = {
+      { hash = "a64cd7fa9c84da61a4a358c321f248df", label = "Chicken Little (USA, Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C180, type="u16le", condition="eq", value=0X11, action="PAUSE_ON", no_log=false, no_survey=false, desc="Main pause menu" },
+        { address=0X1C938, type="u8", condition="eq", value=0X13, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Title Screen" },
+        { address=0X1C938, type="u8", condition="eq", value=0X18, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Screen and sub-menus" },
+        { address=0X1C938, type="u8", condition="eq", value=0X19, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C180, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select. Entering level does not change this from 0x07" },
+        { address=0X1C180, type="u16le", condition="eq", value=0X13, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Are you sure you want to quit level menu. Selecting yes changes value to 0xFFFF before changing" },
+        { address=0X1C8A6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Acorns collected in current level" },
+        { address=0X1C8CD, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cluck House" },
+        { address=0X1C8CD, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Town Hall" },
+        { address=0X1C8CD, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Baseball" },
+        { address=0X1C8CD, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cornfield" },
+        { address=0X1C8CD, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alien Mothership" },
+        { address=0X1C8CD, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alien Spaceship" },
+        { address=0X1C8CD, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Movie Theater 1" },
+        { address=0X1C8CE, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Movie Theater 2 Completion" },
+        { address=0X1C8CE, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Movie Theater 3 Completion" },
+        { address=0X1C8CE, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dodgeball Level Completion" },
+        { address=0X1C8CE, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Race Level Completion" },
+        { address=0X1C8CE, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cluck House start" },
+        { address=0X1C8D0, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Baseball Foxy Mid-Level Scene" },
+      },
+      zone = {
+        { address=0X1C8D1, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Alien Spaceship End (happens in world map)" },
+        { address=0X1C8D2, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Race End (happens in world map)" },
+      },
+      stage = {
+        { address=0X1C8C3, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chicken Little Stage 1" },
+        { address=0X1C8C3, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chicken Little Stage 2" },
+        { address=0X1C8C3, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chicken Little Stage 3" },
+        { address=0X1C8C3, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chicken Little Stage 4" },
+        { address=0X1C8C3, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chicken Little Stage 5" },
+        { address=0X1C8C3, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chicken Little Stage 6" },
+        { address=0X1C8C4, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Foxy Loxy Stage 1" },
+        { address=0X1C8C4, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Foxy Loxy Stage 2" },
+        { address=0X1C8C4, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Foxy Loxy Stage 3" },
+        { address=0X1C8C4, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Foxy Loxy Stage 4" },
+        { address=0X1C8C4, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Foxy Loxy Stage 5" },
+        { address=0X1C8C4, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Foxy Loxy Stage 6" },
+        { address=0X1C8C4, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abby Mallard Stage 1" },
+        { address=0X1C8C4, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abby Mallard Stage 2" },
+        { address=0X1C8C5, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abby Mallard Stage 3" },
+        { address=0X1C8C5, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abby Mallard Stage 4" },
+        { address=0X1C8C5, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abby Mallard Stage 5" },
+        { address=0X1C8C5, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Abby Mallard Stage 6" },
+        { address=0X1C8C5, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Runt of the Litter Stage 1" },
+        { address=0X1C8C5, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Runt of the Litter Stage 2" },
+        { address=0X1C8C5, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Runt of the Litter Stage 3" },
+        { address=0X1C8C5, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Runt of the Litter Stage 4" },
+        { address=0X1C8C6, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Runt of the Litter Stage 5" },
+        { address=0X1C8C6, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Runt of the Litter Stage 6" },
+        { address=0X1C8C6, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Commander Ace Stage 1" },
+        { address=0X1C8C6, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Commander Ace Stage 2" },
+        { address=0X1C8C6, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Commander Ace Stage 3" },
+        { address=0X1C8C6, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Commander Ace Stage 4" },
+        { address=0X1C8C6, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Commander Ace Stage 5" },
+        { address=0X1C8C6, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Commander Ace Stage 6" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1C938, type="u8", condition="eq", value=0X0B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Jingle" },
+      },
+      health = {
+        { address=0X1C8A7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1C8A7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X1C8AE, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Chicken Little Health 1" },
+        { address=0X1C8AE, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Chicken Little Health 2" },
+        { address=0X1C8AF, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Chicken Little Health 3" },
+        { address=0X1C8AF, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Commander Ace Health 1" },
+        { address=0X1C8AF, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Commander Ace Health 2" },
+        { address=0X1C8AF, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Commander Ace Health 3" },
+        { address=0X1C8AF, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Fish out of Water Health 1" },
+        { address=0X1C8AF, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Fish out of Water Health 2" },
+        { address=0X1C8AF, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Fish out of Water Health 3" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1C8D1, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Movie Theater 1 Before Boss Cutscene" },
+        { address=0X1C8D2, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Movie Theater 2 Before Boss" },
+        { address=0X1C8D2, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Movie Theater 2 After Boss" },
+        { address=0X1C8D3, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Alien Mothership Before Boss" },
+        { address=0X1C8D3, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Alien Mothership After Boss" },
+        { address=0X1C938, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Movie Theater 1 Boss" },
+        { address=0X1C938, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Movie Theater 2 Boss" },
+        { address=0X1C938, type="u8", condition="eq", value=0X17, action="BOSS_HIT", no_log=false, no_survey=false, desc="Alien Mothership Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1C8CF, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cluck House reset fuse switches" },
+        { address=0X1C8CF, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cluck House tried to exit without resetting all switches" },
+      },
+    },
+  },
+}

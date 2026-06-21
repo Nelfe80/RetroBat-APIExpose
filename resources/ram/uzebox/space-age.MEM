@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Space Age",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "space-age",
+    file = "space-age.zip",
+    hashes = {
+      { hash = "c7aff8b3e124b02b124e320ebedbbbd6", label = "Space Age (World) (Pitfall Jones).uze" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0DD6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X0E11, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E21, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E3E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E42, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E4B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E4D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E4E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E55, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E56, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E57, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E5E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E60, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E62, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E81, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+        { address=0X0E91, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Assets" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0DB9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemies/Player Deaths" },
+        { address=0X0DF8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0DF8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Excitebike: World Rally",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "excitebike-world-rally",
+    file = "excitebike-world-rally.zip",
+    hashes = {
+      { hash = "7ebe37e19fed626e5d5cf8e5df7ac572", label = "Excitebike - World Rally (USA) (v512) (WiiWare)" },
+      { hash = "98365e96dea418045d57a273c23372ef", label = "Excitebike - World Challenge (Europe) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

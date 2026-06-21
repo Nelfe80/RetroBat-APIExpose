@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Pokémon Puzzle Collection Vol. 2",
+    system = "pokemini",
+    system_name = "Pokemon Mini",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-puzzle-collection-vol-2",
+    file = "pokemon-puzzle-collection-vol-2.zip",
+    hashes = {
+      { hash = "302c418edc3e9d4ff8430b9662a11d1b", label = "Pokemon Puzzle Collection Vol. 2 (Japan) (En) (Mr. Blinky) (1.2).min" },
+      { hash = "66809741517a2f0809cacd6acdd77b27", label = "Pokemon Puzzle Collection Vol. 2 (Japan).min" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0A15, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Motion Puzzle Level 1" },
+        { address=0X0A16, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Motion Puzzle Level 3" },
+        { address=0X0A17, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Motion Puzzle Level 5" },
+        { address=0X0A18, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pick-Up Puzzle Level 1" },
+        { address=0X0A19, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pick-Up Puzzle Level 3" },
+        { address=0X0A1A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pick-Up Puzzle Level 5" },
+        { address=0X0A1B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stretch Puzzle Level 1" },
+        { address=0X0A1C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stretch Puzzle Level 3" },
+        { address=0X0A1D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stretch Puzzle Level 5" },
+        { address=0X0A1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shadow Puzzle Level 1" },
+        { address=0X0A1F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shadow Puzzle Level 3" },
+        { address=0X0A20, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shadow Puzzle Level 5" },
+      },
+    },
+  },
+}

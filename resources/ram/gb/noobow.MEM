@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Noobow",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "noobow",
+    file = "noobow.zip",
+    hashes = {
+      { hash = "15449adf4a457462d59c92ed0ac49d5a", label = "Noobow (Japan) (En) (v1.0) (Stardust Crusaders).gb" },
+      { hash = "ccd0cf7cc240714a9694e1fe296afb7c", label = "Noobow (Japan).gb" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0XD4C2, type="u8", condition="eq", value=0X64, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mole: Up from Start, two blocks and parachute" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Dead of the Brain 1 and 2",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "dead-of-the-brain-1-and-2",
+    file = "dead-of-the-brain-1-and-2.zip",
+    hashes = {
+      { hash = "e441fad7de8fdc71d25b104ae45d90fb", label = "Dead of the Brain 1&2 (Japan) (En) (v1.0e) (Dave Shadoff)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1C01, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[Bitflags] Events - From game start to leaving for the police station" },
+        { address=0X1C02, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[Bitflags] Events - From game start to leaving for the police station" },
+        { address=0X1C03, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[Bitflags] Events - From game start to leaving for the police station" },
+        { address=0X1C04, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[Bitflags] Events - Chief's Room" },
+        { address=0X1C05, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[Bitflags] Events - Chief's room" },
+        { address=0X1C06, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[Bitflags] Events - Police station - 2F - Second room on right" },
+      },
+    },
+  },
+}

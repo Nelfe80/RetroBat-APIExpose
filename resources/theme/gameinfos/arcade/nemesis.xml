@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>power-up</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>missile</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>shoot</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 H.M 57300</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 S.T 48530</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 K.Y 33300</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 K.K 25700</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 K.N 21500</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 M.N 17700</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 K.O 13200</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 E - 11900</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 M.I 10000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 T.K 9500</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

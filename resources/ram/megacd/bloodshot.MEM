@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Bloodshot",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "bloodshot",
+    file = "bloodshot.zip",
+    hashes = {
+      { hash = "50ab41923e9edb04e7d047975f5a90cc", label = "Bloodshot ~ Battle Frenzy (Europe) (En,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X65B90, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Main Menu/Continue Screen" },
+        { address=0X65B90, type="u8", condition="eq", value=0X01, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In Level" },
+        { address=0X65B90, type="u8", condition="eq", value=0X03, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0X65C90, type="u8", condition="eq", value=0XFF, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0X65CE8, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="True" },
+        { address=0X65CE8, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="False" },
+        { address=0X69C9E, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Remaining" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X65B90, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0X6610C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Closed" },
+        { address=0X6610C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Opening" },
+        { address=0X6610C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Open" },
+        { address=0X6610C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Closing" },
+        { address=0X6610C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1/9/11: Secret Door Status" },
+        { address=0X6611C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 12: Secret Door Status" },
+        { address=0X6612C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3/10: Secret Door Status" },
+        { address=0X6614C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4/5/6/13: Secret Door Status" },
+        { address=0X6616C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7/14: Secret Door Status" },
+        { address=0X6617C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 16: Secret Door Status (1/2)" },
+        { address=0X6618C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 15: Secret Door Status" },
+        { address=0X661DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 16: Secret Door Status (2/2)" },
+        { address=0X69CA8, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X69CA8, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 16" },
+        { address=0X69CA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X69DA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Enemies Killed in Current Level" },
+        { address=0X69DAA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Bonuses Received in Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X65B90, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Died/Respawning" },
+        { address=0X65C90, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Remaining increased" },
+        { address=0X65C90, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Remaining decreased" },
+        { address=0X65C96, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X65C96, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0X65C96, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player HP" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X65BFA, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Default Weapon" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ricochet" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lock-On" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cannon" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rapid" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tri-Bolt" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Piercer" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Breaker" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Kinghell" },
+        { address=0X65BFA, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spray" },
+        { address=0X65C02, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Slot 2 Type" },
+        { address=0X65C0A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Slot 3 Type" },
+        { address=0X65C12, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Slot 4 Type" },
+        { address=0X65C1A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Slot 5 Type" },
+        { address=0X65C8C, type="u8", condition="eq", value=0XFA, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 1" },
+        { address=0X65C8C, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 2" },
+        { address=0X65C8C, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 3" },
+        { address=0X65C8C, type="u8", condition="eq", value=0X12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 4" },
+        { address=0X65C8C, type="u8", condition="eq", value=0X1A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 5" },
+        { address=0X65C8C, type="u8", condition="eq", value=0X22, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 6" },
+        { address=0X65C8C, type="u8", condition="eq", value=0X2A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 7" },
+        { address=0X65C8C, type="u8", condition="eq", value=0X32, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 8" },
+        { address=0X65C8C, type="u8", condition="eq", value=0X3A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 9" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ricochet" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lock-On" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cannon" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rapid" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tri-Bolt" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Piercer" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Breaker" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Kinghell" },
+        { address=0X65CD8, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spray" },
+        { address=0X65CD8, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Default Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X65BFC, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Weapon Slot 1 Ammo Remaining" },
+        { address=0X65C04, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Weapon Slot 2 Ammo Remaining" },
+        { address=0X65C0C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Weapon Slot 3 Ammo Remaining" },
+        { address=0X65C14, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Weapon Slot 4 Ammo Remaining" },
+        { address=0X65C1C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Weapon Slot 5 Ammo Remaining" },
+      },
+    },
+  },
+}

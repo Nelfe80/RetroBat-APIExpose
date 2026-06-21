@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Amazing Arithmetricks",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "amazing-arithmetricks",
+    file = "amazing-arithmetricks.zip",
+    hashes = {
+      { hash = "a54e005dcf69d58ae74e2e65245b0563", label = "Amazing Arithmetricks.woz" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X186B9, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[MBF32] Tent 1 level (possibly a dynamic address)" },
+        { address=0X1885A, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[MBF32] Tent 3 level (possibly a dynamic address)" },
+        { address=0X18C79, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[MBF32] Tent 4 level (possibly a dynamic address)" },
+        { address=0X19543, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[MBF32] Tent 2 level (possibly a dynamic address)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1862D, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[MBF32] Score (use $1b70a instead)" },
+        { address=0X1B70A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Updates by $1862d)" },
+      },
+    },
+  },
+}

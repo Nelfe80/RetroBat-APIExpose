@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Yakuman [Subset - Yakumaster]",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "yakuman-subset-yakumaster",
+    file = "yakuman-subset-yakumaster.zip",
+    hashes = {
+      { hash = "9bed09b0e79f10907d014671a64ca6b9", label = "Yakuman (Japan) [Subset - Yakumaster].gb" },
+      { hash = "fca62b15796f06348621aca99d08c6a7", label = "Yakuman (Japan) (Rev 1) [Subset - Yakumaster].gb" },
+      { hash = "99faa610157c2771a0ce43dbc6e134d6", label = "Yakuman (Japan) (En) (v1.2) (Marvo) [Subset - Yakumaster].gb" },
+    }
+  },
+
+  events = {
+  },
+}

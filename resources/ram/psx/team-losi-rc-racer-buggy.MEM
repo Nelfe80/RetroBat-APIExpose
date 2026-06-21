@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Team Losi RC Racer | Buggy",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "team-losi-rc-racer-buggy",
+    file = "team-losi-rc-racer-buggy.zip",
+    hashes = {
+      { hash = "ce4e57cab6b1339173b26efa60f55020", label = "Team Losi RC Racer (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

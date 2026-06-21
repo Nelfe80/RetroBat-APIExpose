@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Knight Move",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "knight-move",
+    file = "knight-move.zip",
+    hashes = {
+      { hash = "b29f86eea51fb11bc388a09c4f09e43f", label = "Knight Move (World) (v0.11) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X018B, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="playing, menu, game over" },
+        { address=0X018B, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+        { address=0X01A6, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="not playing (menu, game over)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0153, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X0159, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game A" },
+        { address=0X0159, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game B" },
+        { address=0X0159, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game B" },
+        { address=0X0159, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game B" },
+        { address=0X0159, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game B" },
+        { address=0X0159, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game mode (don't return to 0 after going back to menu) (related to the amount of hearts needed t" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0149, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X01AB, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score for scoreboard (updates only when dying)" },
+      },
+    },
+  },
+}

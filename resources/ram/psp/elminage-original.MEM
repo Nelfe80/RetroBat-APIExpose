@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Elminage: Original",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "elminage-original",
+    file = "elminage-original.zip",
+    hashes = {
+      { hash = "172f5ed90bf186e90e4040b8f145437a", label = "Elminage Original (USA) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB884EC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Register 1 Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB8850B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Register 1 Deaths" },
+        { address=0XB88519, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Register 1 Status (Dead/Ash/Fear)" },
+      },
+      health = {
+        { address=0XB884F6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Register 1 HP decreased" },
+        { address=0XB884F6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Register 1 HP increased" },
+        { address=0XB884F8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Register 1 HP Max decreased" },
+        { address=0XB884F8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Register 1 HP Max increased" },
+      },
+    },
+  },
+}

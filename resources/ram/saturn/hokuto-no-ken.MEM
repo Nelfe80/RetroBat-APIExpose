@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Hokuto no Ken",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Adventure, Strategy"
+  },
+
+  rom = {
+    name = "hokuto-no-ken",
+    file = "hokuto-no-ken.zip",
+    hashes = {
+      { hash = "538ae1d1ef192d38af0ea8caea0cd8f0", label = "Hokuto no Ken (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X14BFF9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause [00/01]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1510B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kenshiro health decreased" },
+        { address=0X1510B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kenshiro health increased" },
+        { address=0X1510B6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy health bar decreased" },
+        { address=0X1510B6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy health bar increased" },
+      },
+    },
+  },
+}

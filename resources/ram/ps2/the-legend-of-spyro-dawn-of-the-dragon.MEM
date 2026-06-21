@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "The Legend of Spyro: Dawn of the Dragon",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-legend-of-spyro-dawn-of-the-dragon",
+    file = "the-legend-of-spyro-dawn-of-the-dragon.zip",
+    hashes = {
+      { hash = "b7765bc5255c91f18039ec399b978aaa", label = "Legend of Spyro, The - Dawn of the Dragon (USA) (Anti-cheat) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7A4770, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X9FE0A8, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+        { address=0X9FE2ED, type="u8", condition="eq", value=0X07, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X9FE2ED, type="u8", condition="eq", value=0X08, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X9FE308, type="u8", condition="eq", value=0X0F, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X9FE308, type="u8", condition="eq", value=0X11, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XA42DC0, type="u8", condition="bit_true", bit=1, mask=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Active" },
+        { address=0XA45CE0, type="u8", condition="bit_true", bit=1, mask=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Active" },
+      },
+      events = {
+        { address=0X9FE624, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16bit] Combo Count - Spyro" },
+        { address=0X9FE628, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16bit] Combo Count - Cynder" },
+        { address=0X9FEBA8, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32bit] Player Stats: Spyro - Maximum Combo Achieved" },
+        { address=0X9FEBAC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32bit] Player Stats: Cynder - Maximum Combo Achieved" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9FE274, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Catacombs" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X14, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Twilight Falls" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X1E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Valley of Avalar" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X28, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dragon City" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Attack of the Golem" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X3C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruins of Warfang" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X50, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Dam" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X64, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Burned Lands" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X6E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Floating Islands" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0X78, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Malefor's Lair" },
+        { address=0X9FE274, type="u16le", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loading Screens" },
+        { address=0X9FE274, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Current Level" },
+        { address=0X9FE308, type="u8", condition="eq", value=0X15, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Bonus" },
+        { address=0X9FE308, type="u8", condition="eq", value=0X17, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options (Level)" },
+        { address=0X9FE46A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Controls Menu Background" },
+        { address=0X9FECD3, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECD4, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECD5, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECD6, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECD7, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECD8, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECDA, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECDB, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECDC, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECDD, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X9FECDE, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0XA5E2F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level select - Armor Pieces left" },
+        { address=0XA5E30C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level select - Blue Crystals left" },
+      },
+      stage = {
+        { address=0X9FE4C5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Bitflag - Level Active" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9FE025, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Active" },
+        { address=0X9FEAE0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Spyro Current HP decreased" },
+        { address=0X9FEAE0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Spyro Current HP increased" },
+        { address=0X9FEAE8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Cynder Current HP decreased" },
+        { address=0X9FEAE8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Cynder Current HP increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9FE274, type="u16le", condition="eq", value=0X5A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="The Destroyer" },
+        { address=0XA3E11C, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E164, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E188, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E1AC, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E1D0, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E1F4, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E218, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E2A8, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E2CC, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E2F0, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E314, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E338, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E35C, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA3E380, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0XA45320, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+  },
+}

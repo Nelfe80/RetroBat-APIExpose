@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Virtua Fighter Remix",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "virtua-fighter-remix",
+    file = "virtua-fighter-remix.zip",
+    hashes = {
+      { hash = "6fc3d526f2480ae335a0aba97a6159a2", label = "Virtua Fighter Remix (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19F9A5, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Continue ?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19E0AE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Round Indicator" },
+        { address=0X19EA90, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Also round indicator" },
+        { address=0X19F9A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Enemy Level" },
+      },
+      stage = {
+        { address=0X19F9B0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Hidden Option Stage Size" },
+        { address=0X19F9B1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Hidden Option Stage Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X192072, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Life increased" },
+        { address=0X192072, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Life decreased" },
+        { address=0X1940CE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] 2P Life increased" },
+        { address=0X1940CE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] 2P Life decreased" },
+        { address=0X19ED86, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Life bar indication (not life) increased" },
+        { address=0X19ED86, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Life bar indication (not life) decreased" },
+        { address=0X19F9A1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] 1P Life Gauge increased" },
+        { address=0X19F9A1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] 1P Life Gauge decreased" },
+        { address=0X19F9AD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] 2P Life Gauge increased" },
+        { address=0X19F9AD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] 2P Life Gauge decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X19F9A3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Time Limit" },
+      },
+    },
+  },
+}

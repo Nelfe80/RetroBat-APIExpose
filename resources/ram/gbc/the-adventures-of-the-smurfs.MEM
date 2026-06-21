@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "The Adventures of the Smurfs",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "the-adventures-of-the-smurfs",
+    file = "the-adventures-of-the-smurfs.zip",
+    hashes = {
+      { hash = "29deff80e9e8d734f77d8590ac5cdce9", label = "Adventures of the Smurfs, The (Europe) (En,Fr,De,Es,It,Nl).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCCBA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blinking asterisk in level select" },
+      },
+      zone = {
+        { address=0XCCB3, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Which level the player is in (including base world, smurf houses, actual levels and menu)." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCCB7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives (smurf heads). Maximum is 9. increased" },
+        { address=0XCCB7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives (smurf heads). Maximum is 9. decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCCB6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of rings (leaves if on bonus level) collected. Maximum in game is 99, after which the cha" },
+        { address=0XCCD4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Index of card unlocked. It's 0x00 throughout the level, then changes to the index of (not number" },
+        { address=0XD231, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="If this address is changed from 0x04 to 0x00 a ring appears in a specific place in the Swamps, b" },
+        { address=0XFF8C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of rings collected in a level. The initial value is not always the same, thus one should" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC044, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility countdown" },
+      },
+    },
+  },
+}

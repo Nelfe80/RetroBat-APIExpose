@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "hal21",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "hal21",
+    file = "hal21.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X2C7C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2C00, type="u64be", condition="change", action="SCORE_STATE", min=10, max=50, no_log=false, no_survey=false, desc="Score delta 10-50: Score delta 10-50" },
+        { address=0X2C00, type="u64be", condition="change", action="SCORE_STATE", color="orange", min=60, max=100, no_log=false, no_survey=false, desc="Score delta 60-100: Score delta 60-100" },
+        { address=0X2C00, type="u64be", condition="change", action="SCORE_STATE", color="cyan", min=110, max=200, no_log=false, no_survey=false, desc="Score delta 110-200: Score delta 110-200" },
+        { address=0X2C00, type="u64be", condition="change", action="SCORE_STATE", color="green", min=300, max=2000, no_log=false, no_survey=false, desc="Score delta 300-2000: Score delta 300-2000" },
+      },
+    },
+  },
+}

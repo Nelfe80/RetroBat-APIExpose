@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Alone in the Dark II",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Action, Adventure, Horror"
+  },
+
+  rom = {
+    name = "alone-in-the-dark-ii",
+    file = "alone-in-the-dark-ii.zip",
+    hashes = {
+      { hash = "2b8f6037654255aac56ff5c12c0b44e6", label = "Alone in the Dark 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XABF78, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x01=title screen after quitting game" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD9D30, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) enemy HP decreased" },
+        { address=0XD9D30, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) enemy HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XBB7D8, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="santa no weapon" },
+        { address=0XBB7D8, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="normal no weapon" },
+      },
+    },
+  },
+}

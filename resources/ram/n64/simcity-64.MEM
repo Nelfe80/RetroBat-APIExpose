@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "SimCity 64 (64DD)",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "simcity-64",
+    file = "simcity-64.zip",
+    hashes = {
+      { hash = "4372f74477fe54cd363fe4f14984625a", label = "SimCity 64 (Japan) (En) (v0.6.38).ndd" },
+      { hash = "ebba03f20096fc2bc178fc3a1f4ec2b6", label = "SimCity 64 (Japan).ndd" },
+      { hash = "ef25a70d775ed6d2d42a3f31dc7c2928", label = "Sim City 64 (Japan) (IPL v1.2 Patch).ndd" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X23D19E, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nuclear Free Zone" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X23D19E, type="u8", condition="eq", value=0X0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Energy Conservation" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X23D190, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (32-Bit) increased" },
+      },
+    },
+  },
+}

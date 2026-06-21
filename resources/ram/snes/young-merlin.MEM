@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Young Merlin",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "young-merlin",
+    file = "young-merlin.zip",
+    hashes = {
+      { hash = "20d12565abe667a0624004c134f79065", label = "Young Merlin (Europe).sfc" },
+      { hash = "b2c941607e09ab246b5cb110756ddb9a", label = "Young Merlin (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF08E, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="ingame" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12A6, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground Palace Entrance" },
+        { address=0X12A6, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground Palace" },
+      },
+      zone = {
+        { address=0X12A6, type="u8", condition="eq", value=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Rainbow World Underground" },
+        { address=0X12A6, type="u8", condition="eq", value=0X09, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Rainbow World Surface" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XEDDB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health (0x00-0x10) decreased" },
+        { address=0XEDDB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health (0x00-0x10) increased" },
+        { address=0XEDDC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health (mirror) decreased" },
+        { address=0XEDDC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health (mirror) increased" },
+        { address=0XEDDD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Partial Heart decreased" },
+        { address=0XEDDD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Partial Heart increased" },
+        { address=0XEDDE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Full Hearts decreased" },
+        { address=0XEDDE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Full Hearts increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4D4D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="B Weapon Slots (START)" },
+        { address=0X4D55, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="B Weapon Slots (END)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4D03, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Key (Gold) increased" },
+        { address=0X4D10, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Cave Herring (Dead) increased" },
+        { address=0X4D15, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Gold Sparkly Thing (not ingame?) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1070, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss: Spider 1 HP" },
+        { address=0X120F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2: Pig HP" },
+        { address=0X1262, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1: Tree HP" },
+      },
+    },
+  },
+}

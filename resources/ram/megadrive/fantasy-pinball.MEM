@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fantasy Pinball",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "fantasy-pinball",
+    file = "fantasy-pinball.zip",
+    hashes = {
+      { hash = "d73fe3485046f73af4852cd24a2642b0", label = "Fantasy Pinball (Brazil) (Mega Drive 4).md" },
+    }
+  },
+
+  events = {
+  },
+}

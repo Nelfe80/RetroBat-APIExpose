@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Puzzle Maniacs",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-maniacs",
+    file = "puzzle-maniacs.zip",
+    hashes = {
+      { hash = "86ab7460176b063508e33d6d96047bf1", label = "Puzzle Maniacs (Europe)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X1893207, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Main Mode - Countries of the World (6x6)" },
+        { address=0X1893225, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Main Mode - World-famous Places (6x6)" },
+        { address=0X1893234, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Main Mode - Heroes of the World (6x6)" },
+        { address=0X18933AB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Main Mode - Kamogawa Sea World (8x8)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X18933BA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Time Challenge Page 1 Flags (4x4)" },
+        { address=0X18933C9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Time Challenge Page 2 Flags (4x4)" },
+        { address=0X18933D8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Time Challenge Page 3 Flags (6x6)" },
+        { address=0X18933E7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Time Challenge Page 4 Flags (6x6)" },
+        { address=0X18933F6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Time Challenge Page 5 Flags (6x6)" },
+        { address=0X1893405, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[15 bytes] Jigsaw - Time Challenge Page 6 Flags (8x8)" },
+        { address=0X1893414, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[10 bytes] Jigsaw - Time Challenge Page 7 Flags (8x8)" },
+        { address=0X189386A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Picross Time Attack" },
+        { address=0X1893934, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[400 bytes] Jigsaw - Time Attack Record Times" },
+        { address=0X1893AC4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[400 bytes] Sliding Puzzle - Time Attack Record Times" },
+        { address=0X1893C54, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[400 bytes] Picross - Time Attack Record Times" },
+      },
+    },
+  },
+}

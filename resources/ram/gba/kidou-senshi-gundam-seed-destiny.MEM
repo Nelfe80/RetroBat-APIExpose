@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Kidou Senshi Gundam: Seed Destiny",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Fighting"
+  },
+
+  rom = {
+    name = "kidou-senshi-gundam-seed-destiny",
+    file = "kidou-senshi-gundam-seed-destiny.zip",
+    hashes = {
+      { hash = "fa72eb309a2c87d0cc50a00d0775950c", label = "Kidou Senshi Gundam - Seed Destiny (Japan).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X0D6E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0CFF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] P1 Rounds Won" },
+        { address=0X0D5F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] P2 Rounds Won" },
+        { address=0X75E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Survival Level" },
+        { address=0X7640, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Main Mode Clears" },
+        { address=0X7641, type="u24le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Main Mode Clears" },
+        { address=0X7643, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Main Mode Clears" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0D05, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP decreased" },
+        { address=0X0D05, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP increased" },
+        { address=0X0D65, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 HP decreased" },
+        { address=0X0D65, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7664, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+      },
+      collectibles = {
+        { address=0X75F0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 Mobile Suit Selected increased" },
+        { address=0X7642, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Main Mode Clears increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,18 @@
+return {
+  game = {
+    title = "~Z~ Dragon Warrior Monsters 2: Tara's Adventure",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-dragon-warrior-monsters-2-taras-adventure",
+    file = "z-dragon-warrior-monsters-2-taras-adventure.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+  },
+}

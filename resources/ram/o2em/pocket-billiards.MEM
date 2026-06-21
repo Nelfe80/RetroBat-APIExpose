@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Pocket Billiards",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pocket-billiards",
+    file = "pocket-billiards.zip",
+    hashes = {
+      { hash = "3f0223dd8609fe320264e45eeeefe367", label = "Pocket Billiards (USA, Europe).bin" },
+      { hash = "7bf1a49928971514a73e674ff0356e02", label = "Billiard Americain (France).bin" },
+    }
+  },
+
+  events = {
+  },
+}

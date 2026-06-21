@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Dream Square: Hinagata Akiko",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "dream-square-hinagata-akiko",
+    file = "dream-square-hinagata-akiko.zip",
+    hashes = {
+      { hash = "88a6b0747ebaec675654081b97d09ee6", label = "Dream Square - Hinagata Akiko (Japan) (2M)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X140150, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X140150, type="u8", condition="eq", value=0X10, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Puzzle: Level 1" },
+        { address=0X140150, type="u8", condition="eq", value=0X11, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Puzzle: Level 2" },
+        { address=0X140150, type="u8", condition="eq", value=0X12, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Puzzle: Level 3" },
+        { address=0X140150, type="u8", condition="eq", value=0X17, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1442D2, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X1442D2, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fail" },
+        { address=0X1442D2, type="u8", condition="eq", value=0X3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X1442D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puzzle Level 1 status" },
+        { address=0X1442D4, type="u16le", condition="eq", value=0X3B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 seconds left, fail" },
+        { address=0X1442D4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puzzle Level 1 timer" },
+        { address=0X1443AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puzzle level 2 status" },
+        { address=0X1444DA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puzzle level 3 status" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X140172, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Goes from 0 > 1 when interacting with object" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1443AC, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Puzzle Level 2 timer" },
+        { address=0X1444DC, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Puzzle level 3 timer" },
+      },
+    },
+  },
+}

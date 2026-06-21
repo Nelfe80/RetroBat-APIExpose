@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Bust-A-Move Deluxe",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bust-a-move-deluxe",
+    file = "bust-a-move-deluxe.zip",
+    hashes = {
+      { hash = "d6a9063af0c2e9fd87b601ee23655fad", label = "Bust-A-Move - Deluxe (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X887BF4, type="u16le", condition="eq", value=0X0E, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0X887BF4, type="u16le", condition="eq", value=0X0F, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X8BDBA4, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Boot / Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X887BF4, type="u16le", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X8AC634, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+        { address=0X8BDB90, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected Round" },
+      },
+      stage = {
+        { address=0X8BDBA4, type="u16le", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X8BDC04, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage Select for current mode" },
+        { address=0X8BDC14, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Highest Stage that can be selected in current mode" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8AC3D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+      },
+    },
+  },
+}

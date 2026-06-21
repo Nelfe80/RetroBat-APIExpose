@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Fire Emblem: Radiant Dawn",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "fire-emblem-radiant-dawn",
+    file = "fire-emblem-radiant-dawn.zip",
+    hashes = {
+      { hash = "7e6ee7afb477e752f12f53b5dc16b332", label = "Fire Emblem - Radiant Dawn (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3C3577, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU game clears]" },
+        { address=0X886D8E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Micaiah Level" },
+        { address=0X886D8F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Micaiah XP (caps at 99 before a level up)" },
+        { address=0X88717E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Edward Level" },
+        { address=0X88FB4E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Fiona Level" },
+      },
+      zone = {
+        { address=0X3CAAC8, type="u8", condition="eq", value=0X26, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Part 4 - Ch.2, Silent World" },
+      },
+      stage = {
+        { address=0X8861BE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] enemy actor 1 level?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X886DA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Micaiah HP Current decreased" },
+        { address=0X886DA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Micaiah HP Current increased" },
+        { address=0X889504, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8BIT] use as Ike's health on 3-13 decreased" },
+        { address=0X889504, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8BIT] use as Ike's health on 3-13 increased" },
+        { address=0X88FB64, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Fiona HP decreased" },
+        { address=0X88FB64, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Fiona HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3CAAD8, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit BE] Gold increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3CAB57, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Number of times that the game has been cleared" },
+      },
+    },
+  },
+}

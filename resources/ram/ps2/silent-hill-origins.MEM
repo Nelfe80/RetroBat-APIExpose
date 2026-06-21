@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Silent Hill: Origins",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "silent-hill-origins",
+    file = "silent-hill-origins.zip",
+    hashes = {
+      { hash = "9804ffe7580d7818b3675dd41b1ab0d0", label = "Silent Hill Origins (USA) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3382EC, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+        { address=0X3382EC, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X338984, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+        { address=0X339C74, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X6BF9A0, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit float] Total Enemies Killed using Melee Weapons" },
+        { address=0X6BF9D4, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit float] % of Enemies Killed with Melee Weapons" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3400F0, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Motel: Underneath Room 500 (OW boss)" },
+        { address=0X3404B0, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Theater: Inside Backstage (OW Boss)" },
+        { address=0X340510, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hospital: Room 204/Dr's Office (OW boss)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X340510, type="u8", condition="eq", value=0X21, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Theater: 2F Door Puzzle (OW)" },
+      },
+    },
+  },
+}

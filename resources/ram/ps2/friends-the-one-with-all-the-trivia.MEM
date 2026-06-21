@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Friends: The One with All the Trivia",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Party, Quiz"
+  },
+
+  rom = {
+    name = "friends-the-one-with-all-the-trivia",
+    file = "friends-the-one-with-all-the-trivia.zip",
+    hashes = {
+      { hash = "b01b7698dbd6c6ac6972957032cccaf7", label = "Friends - The One with All the Trivia (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

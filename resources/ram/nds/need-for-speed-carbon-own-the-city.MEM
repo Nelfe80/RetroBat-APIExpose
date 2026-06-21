@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Need for Speed: Carbon - Own the City",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "need-for-speed-carbon-own-the-city",
+    file = "need-for-speed-carbon-own-the-city.zip",
+    hashes = {
+      { hash = "21262503de91c4b74a4c7779bac9edd1", label = "Need for Speed Carbon - Own the City (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "6879cc7733fe5c83307896c6dfd9933d", label = "Need for Speed Carbon - Own the City (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBDEC8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01=Pause" },
+        { address=0XBEE7C, type="u16le", condition="eq", value=0X27A, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB6238, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Career - Selected Zone" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2187B8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB72B4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Lucky 7s - Boss 1" },
+        { address=0XB72F4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Lucky 7s - Boss 2" },
+        { address=0XB75B4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Eastsiders - Boss 1" },
+        { address=0XB75F4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Eastsiders - Boss 2" },
+        { address=0XB78B4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Syrens - Boss 1" },
+        { address=0XB78F4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Syrens - Boss 2" },
+        { address=0XB7BB4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Corps - Boss 1" },
+        { address=0XB7BF4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Corps - Boss 2" },
+        { address=0XB7EB4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Krimson 1 - Boss 1" },
+        { address=0XB7EF4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Krimson 1 - Boss 2" },
+        { address=0XB8074, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Krimson 2 - Boss" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X218F54, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Inner City Run (Sprint 1) - Best Time" },
+        { address=0X218F58, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Inner City Run (Sprint 2) - Best Time" },
+        { address=0X218F5C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Inner City Run (Sprint 3) - Best Time" },
+        { address=0X218F60, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Inner City Run (Circuit) - Best Time" },
+        { address=0X218F64, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Railyard Run (Sprint 1) - Best Time" },
+        { address=0X218F68, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Railyard Run (Sprint 2) - Best Time" },
+        { address=0X218F6C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Railyard Run (Sprint 3) - Best Time" },
+        { address=0X218F70, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Railyard Run (Circuit) - Best Time" },
+        { address=0X218F74, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stadium Express (Sprint 1) - Best Time" },
+        { address=0X218F78, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stadium Express (Sprint 2) - Best Time" },
+        { address=0X218F7C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stadium Express (Sprint 3) - Best Time" },
+        { address=0X218F80, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stadium Express (Circuit) - Best Time" },
+        { address=0X218F84, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reactor Loop (Sprint 1) - Best Time" },
+        { address=0X218F88, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reactor Loop (Sprint 2) - Best Time" },
+        { address=0X218F8C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reactor Loop (Sprint 3) - Best Time" },
+        { address=0X218F90, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reactor Loop (Circuit) - Best Time" },
+        { address=0X218F94, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Industrial Freeway (Sprint 1) - Best Time" },
+        { address=0X218F98, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Industrial Freeway (Sprint 2) - Best Time" },
+        { address=0X218F9C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Industrial Freeway (Sprint 3) - Best Time" },
+        { address=0X218FA0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Industrial Freeway (Circuit) - Best Time" },
+        { address=0X218FA4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="East Tunnel (Sprint 1) - Best Time" },
+        { address=0X218FA8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="East Tunnel (Sprint 2) - Best Time" },
+        { address=0X218FAC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="East Tunnel (Sprint 3) - Best Time" },
+        { address=0X218FB0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="East Tunnel (Circuit) - Best Time" },
+        { address=0X218FB4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="North Bridge (Sprint 1) - Best Time" },
+        { address=0X218FB8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="North Bridge (Sprint 2) - Best Time" },
+        { address=0X218FBC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="North Bridge (Sprint 3) - Best Time" },
+        { address=0X218FC0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="North Bridge (Circuit) - Best Time" },
+        { address=0X218FC4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Spillway (Sprint 1) - Best Time" },
+        { address=0X218FC8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Spillway (Sprint 2) - Best Time" },
+        { address=0X218FCC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Spillway (Sprint 3) - Best Time" },
+        { address=0X218FD0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Spillway (Circuit) - Best Time" },
+        { address=0X218FD4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Coastal Highway (Sprint 1) - Best Time" },
+        { address=0X218FD8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Coastal Highway (Sprint 2) - Best Time" },
+        { address=0X218FDC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Coastal Highway (Sprint 3) - Best Time" },
+        { address=0X218FE0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Coastal Highway (Circuit) - Best Time" },
+        { address=0X218FE4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Junktown Scramble (Sprint 1) - Best Time" },
+        { address=0X218FE8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Junktown Scramble (Sprint 2) - Best Time" },
+        { address=0X218FEC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Junktown Scramble (Sprint 3) - Best Time" },
+        { address=0X218FF0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Junktown Scramble (Circuit) - Best Time" },
+        { address=0X218FF4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Perimiter (Sprint 1) - Best Time" },
+        { address=0X218FF8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Perimiter (Sprint 2) - Best Time" },
+        { address=0X218FFC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Perimiter (Sprint 3) - Best Time" },
+        { address=0X219000, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Perimiter (Circuit) - Best Time" },
+        { address=0X219004, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chinatown Technical (Sprint 1) - Best Time" },
+        { address=0X219008, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chinatown Technical (Sprint 2) - Best Time" },
+        { address=0X21900C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chinatown Technical (Sprint 3) - Best Time" },
+        { address=0X219010, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chinatown Technical (Circuit) - Best Time" },
+      },
+    },
+  },
+}

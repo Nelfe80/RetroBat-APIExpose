@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fun 'n Games - Soft no Omochabako",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fun-n-games-soft-no-omochabako",
+    file = "fun-n-games-soft-no-omochabako.zip",
+    hashes = {
+      { hash = "f20e7ca35bf55272d31eeb60efbff294", label = "Fun 'n Games - Soft no Omochabako (Japan) (En,Ja)" },
+    }
+  },
+
+  events = {
+  },
+}

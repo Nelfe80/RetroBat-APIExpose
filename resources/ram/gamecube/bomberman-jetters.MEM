@@ -1,0 +1,111 @@
+return {
+  game = {
+    title = "Bomberman Jetters",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "bomberman-jetters",
+    file = "bomberman-jetters.zip",
+    hashes = {
+      { hash = "e9444fbcaab7c7cd40a077616a4f47c3", label = "Bomberman Jetters (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X46ABAC, type="u16be", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X46ABAD, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X413166, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Sharkun Level" },
+        { address=0X413169, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Sparkun Level" },
+        { address=0X41316C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Kai-Man Level" },
+        { address=0X41316F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Charbomb] Pommy Level" },
+        { address=0X413172, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Pox Level" },
+        { address=0X413175, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] PomyuDragon Level" },
+        { address=0X413178, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Ceedrun Level" },
+        { address=0X41317B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Battra Level" },
+        { address=0X41317E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Dorako Level" },
+        { address=0X413181, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Elfan Level" },
+        { address=0X413184, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Toughguy Level" },
+        { address=0X413187, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Charbomb] Yuono Level" },
+        { address=0X4131A4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Flow World - Area 1 Cleared" },
+        { address=0X4131A8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Flow World - Area 2 Cleared" },
+        { address=0X4131AC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Flow World - Area 3 Cleared" },
+        { address=0X4131B0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Flow World - Area 4 Cleared" },
+        { address=0X4131B4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Flow World - Area 5 Cleared" },
+        { address=0X4131B8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Flow World - Area 6 Cleared" },
+        { address=0X4131BC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Green World - Area 1 Cleared" },
+        { address=0X4131C0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Green World - Area 2 Cleared" },
+        { address=0X4131C4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Green World - Area 3 Cleared" },
+        { address=0X4131C8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Green World - Area 4 Cleared" },
+        { address=0X4131CC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Green World - Area 5 Cleared" },
+        { address=0X4131D0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Green World - Area 6 Cleared" },
+        { address=0X4131D4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Hot World - Area 1 Cleared" },
+        { address=0X4131D8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Hot World - Area 2 Cleared" },
+        { address=0X4131DC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Hot World - Area 3 Cleared" },
+        { address=0X4131E0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Hot World - Area 4 Cleared" },
+        { address=0X4131E4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Hot World - Area 5 Cleared" },
+        { address=0X4131E8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Hot World - Area 6 Cleared" },
+        { address=0X4131EC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] UnderWorld - Area 1 Cleared" },
+        { address=0X4131F0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] UnderWorld - Area 2 Cleared" },
+        { address=0X4131F4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] UnderWorld - Area 3 Cleared" },
+        { address=0X4131F8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] UnderWorld - Area 4 Cleared" },
+        { address=0X4131FC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] HIGE Central - Area 1 Cleared" },
+        { address=0X413200, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] HIGE Central - Area 2 Cleared" },
+        { address=0X413204, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] HIGE Central - Area 3 Cleared" },
+        { address=0X413208, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] HIGE Central - Area 4 Cleared" },
+        { address=0X41320C, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Planet Bomber - Area 1 Cleared" },
+        { address=0X41321C, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit BE] Planet Bomber Cleared" },
+      },
+      zone = {
+        { address=0X431ED4, type="u16be", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Flow World" },
+        { address=0X431ED4, type="u16be", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Green World" },
+        { address=0X431ED4, type="u16be", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Hot World" },
+        { address=0X431ED4, type="u16be", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="UnderWorld" },
+        { address=0X431ED4, type="u16be", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="HIGE Central" },
+        { address=0X431ED4, type="u16be", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Planet Bomber" },
+        { address=0X431ED4, type="u16be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[16 Bit BE] World ID" },
+      },
+      stage = {
+        { address=0X431ED6, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit BE] Stage ID" },
+        { address=0X8A1614, type="u32be", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Standard Stage" },
+        { address=0X8A1614, type="u32be", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Go Go Lorry" },
+        { address=0X8A1614, type="u32be", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="See-Saw Park" },
+        { address=0X8A1614, type="u32be", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Changing Weather" },
+        { address=0X8A1614, type="u32be", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rocket de Boom" },
+        { address=0X8A1614, type="u32be", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bouncing Ring" },
+        { address=0X8A1614, type="u32be", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mini Mini Light" },
+        { address=0X8A1614, type="u32be", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Zoom-Up Stage" },
+        { address=0X8A1614, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit BE] [Battle Mode] Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8A15AC, type="u32be", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Random" },
+        { address=0X8A15AC, type="u32be", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X8A15AC, type="u32be", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Super" },
+      },
+      health = {
+        { address=0X914FDC, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit BE] Health decreased" },
+        { address=0X914FDC, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit BE] Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X454BA4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit BE] Bomber Mansion Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X49DF2C, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32 Bit BE] Boss Health" },
+      },
+    },
+  },
+}

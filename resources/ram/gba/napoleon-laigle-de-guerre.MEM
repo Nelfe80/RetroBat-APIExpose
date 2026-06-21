@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Napoleon: L'Aigle de Guerre",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "napoleon-laigle-de-guerre",
+    file = "napoleon-laigle-de-guerre.zip",
+    hashes = {
+      { hash = "9703b3d78d3492241ef353876ca40bba", label = "Aigle de Guerre, L' (France) (En) (v1.0) (Mkol103).gba" },
+      { hash = "dec3b16b1a70bca1b467654c01b486d3", label = "Aigle de Guerre, L' (France).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XCDC8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Max Amount Of Soldiers" },
+        { address=0XCDC9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Current Amount Of Soldiers" },
+      },
+    },
+  },
+}

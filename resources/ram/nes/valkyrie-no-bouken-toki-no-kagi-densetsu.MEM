@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Valkyrie no Bouken: Toki no Kagi Densetsu",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "valkyrie-no-bouken-toki-no-kagi-densetsu",
+    file = "valkyrie-no-bouken-toki-no-kagi-densetsu.zip",
+    hashes = {
+      { hash = "6d7f0b19c764a04d2af762a4791b096c", label = "Valkyrie no Bouken - Toki no Kagi Densetsu (Japan).nes" },
+      { hash = "f424b8776a3c8a43b89ab23fa95df9a4", label = "Valkyrie no Bouken - Toki no Kagi Densetsu (Japan) (En) (v1.0) (SGST).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00B9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X00C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X00C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X00C1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP Overflow decreased" },
+        { address=0X00C1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP Overflow increased" },
+        { address=0X00C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X00C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X00C5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP Overflow decreased" },
+        { address=0X00C5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP Overflow increased" },
+        { address=0X00D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Ten-Thousands Digit decreased" },
+        { address=0X00D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Ten-Thousands Digit increased" },
+        { address=0X00D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Hundred Thousands Digit decreased" },
+        { address=0X00D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Hundred Thousands Digit increased" },
+        { address=0X00DA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - Millions Digit decreased" },
+        { address=0X00DA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - Millions Digit increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X00D0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money - Ones digit increased" },
+        { address=0X00D1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money - Tens digit increased" },
+        { address=0X00D2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money - Hundreds digit increased" },
+        { address=0X00D3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money - Thousands Digit increased" },
+        { address=0X00D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money - Ten-Thousands digit increased" },
+      },
+    },
+  },
+}

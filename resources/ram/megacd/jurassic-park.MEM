@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Jurassic Park",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "jurassic-park",
+    file = "jurassic-park.zip",
+    hashes = {
+      { hash = "11ed30d2074ccd20ac6187d8271ca6e8", label = "Jurassic Park (USA) (RE)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1645E, type="u32be", condition="eq", value=0X3154, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over/Credits" },
+        { address=0X21232, type="u24be", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X21232, type="u24be", condition="eq", value=0X19, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X2123C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits =01" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X218E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stunner charge level:" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAA7E, type="u8", condition="eq", value=0X0, action="LIVES_STATE", no_log=false, no_survey=false, desc="red" },
+        { address=0XAA7E, type="u8", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="yellow" },
+        { address=0XAA7E, type="u8", condition="eq", value=0X2, action="LIVES_STATE", no_log=false, no_survey=false, desc="green" },
+        { address=0XAA7E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Blocks 64-bit increased" },
+        { address=0XAA7E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Blocks 64-bit decreased" },
+        { address=0X200A1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Slot 1: Egg Dead Qty" },
+        { address=0X200A9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Slot 2: Egg Dead Qty" },
+        { address=0X200B1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Slot 3: Eggs Dead Qty" },
+        { address=0X200B9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Slot 4: Egg Dead Qty" },
+        { address=0X200C1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Slot 5: Egg Dead Qty" },
+        { address=0X200C9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Slot 6: Egg Dead Qty" },
+        { address=0X200D1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Slot 7: Egg Dead Qty" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAA6E, type="u16be", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Card" },
+        { address=0X1FFD0, type="u8", condition="bit_true", bit=3, mask=0X08, action="AMMO_STATE", no_log=true, no_survey=false, desc="infinite gas gun ammo cheat" },
+        { address=0X20B6C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Key =02 increased" },
+        { address=0X2271C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Stunner Ammo" },
+        { address=0X2271E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Tranquilizer Ammo" },
+        { address=0X22720, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Gas Gun Ammo" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1645E, type="u32be", condition="eq", value=0XC070, action="JUMPING", no_log=false, no_survey=false, desc="Node Jumper" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1FFA0, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Door Opened on helicopter" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X200A4, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Slot 1: Egg Death Timer [16-bit hex]" },
+        { address=0X200AC, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slot 2: Egg Death Timer [16-bit hex]" },
+        { address=0X200B4, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slot 3: Egg Death Timer [16-bit hex]" },
+        { address=0X200BC, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slot 4: Egg Death Timer [16-bit hex]" },
+        { address=0X200C4, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slot 5: Egg Death Timer [16-bit hex]" },
+        { address=0X200CC, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slot 6: Egg Death Timer [16-bit hex]" },
+        { address=0X200D4, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slot 7: Egg Death Timer [16-bit hex]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy4way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Zapper</text>
+			<color>${white}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Zapper</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 OBE 10480</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 GJL 10100</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 RAQ 3910</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 JVC 2870</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 ELP 1830</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 JIM 1770</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 JMH 1640</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 DAN 1590</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 APH 1410</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 BIL 1200</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "The Sims 3",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-sims-3",
+    file = "the-sims-3.zip",
+    hashes = {
+      { hash = "916b25280020184ce7d4dac002f22234", label = "Sims 3, The (USA) (En,Fr,Es) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1DFB28, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attractive" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CC806, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 1] Painting Skill Level" },
+        { address=0X1CC807, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 1] Logic Skill Level" },
+        { address=0X1CC808, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 1] Athletics Skill Level" },
+        { address=0X1CC809, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 1] Charisma Skill Level" },
+        { address=0X1CC80A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 1] Cooking Skill Level" },
+        { address=0X1CC80B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 1] Handiness Skill Level" },
+        { address=0X1CC80C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 1] Fishing Skill Level" },
+        { address=0X1CD006, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 2] Painting Skill Level" },
+        { address=0X1CD007, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 2] Logic Skill Level" },
+        { address=0X1CD008, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 2] Athletics Skill Level" },
+        { address=0X1CD009, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 2] Charisma Skill Level" },
+        { address=0X1CD00A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 2] Cooking Skill Level" },
+        { address=0X1CD00B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 2] Handiness Skill Level" },
+        { address=0X1CD00C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Sim 2] Fishing Skill Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X177D7C, type="u16le", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lifetime Wish Fulfilled" },
+        { address=0X1DFB24, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="-Sim 1- Lifetime Happiness increased" },
+        { address=0X1DFB24, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="-Sim 1- Lifetime Happiness decreased" },
+        { address=0X1DFB28, type="u16le", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="Mid Life Crisis" },
+        { address=0X1E0800, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Sim 2] Lifetime Happiness increased" },
+        { address=0X1E0800, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Sim 2] Lifetime Happiness decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X244340, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sim 2 -Stats- Painting: Money Earned from Painting increased" },
+      },
+    },
+  },
+}

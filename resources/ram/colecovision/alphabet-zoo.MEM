@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Alphabet Zoo",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Miscellaneous, Ludo-Educatif"
+  },
+
+  rom = {
+    name = "alphabet-zoo",
+    file = "alphabet-zoo.zip",
+    hashes = {
+      { hash = "d2b2efd04ef3e2596bfca82262f98664", label = "Alphabet Zoo (USA).col" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0064, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Settings" },
+      },
+    },
+  },
+}

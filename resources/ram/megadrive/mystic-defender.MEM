@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Mystic Defender",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "mystic-defender",
+    file = "mystic-defender.zip",
+    hashes = {
+      { hash = "2a3742ce7a8e5d86bdc52b9d47a82788", label = "Mystic Defender (USA, Europe).md" },
+      { hash = "780baa7dd2f030f0b1c64897b5d4cc10", label = "Mystic Defender (USA, Europe) (Rev A).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF626, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF62A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifes increased" },
+        { address=0XF62A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifes decreased" },
+      },
+    },
+  },
+}

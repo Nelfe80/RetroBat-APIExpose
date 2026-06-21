@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "No More Heroes",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "no-more-heroes",
+    file = "no-more-heroes.zip",
+    hashes = {
+      { hash = "4aeb38327b5cee7b08dd7a84eade30c5", label = "No More Heroes (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X611B5C, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X611B5C, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X611B5D, type="u8", condition="eq", value=0X0, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X611B5D, type="u8", condition="eq", value=0X1, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUE?" },
+        { address=0X611B6F, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X12F0737E, type="u8", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="Memory of Demon" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12F0174C, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit BE] MISSION 05 - NUMBER OF MINES CLEARED (BEST)" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 03: Garbage Collection" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 01: Coconut Collector" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 02: Lawn Mowing" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 06: Grafitti Cleaning" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0XB, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 08: Scorpion Extermination" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0XD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 04: Gas Stand" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0XE, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 05: Mine Sweeping" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0X18, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 07: Meow Meow" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0X1B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assassination Gig 01: Pizza Butt" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0X1E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assassination Gig 02: Snake Hall" },
+        { address=0X12F04DB0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Ongoing Side Job/Assassination Gig (Don't use this, I think this is basically tellin" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X611B48, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Pure White Giant Glastonbury - Lives increased" },
+        { address=0X611B48, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Pure White Giant Glastonbury - Lives decreased" },
+        { address=0X111F2860, type="u32be", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Assassination Gig 07: Death Match 100" },
+        { address=0X12F061E8, type="u32be", condition="eq", value=0X2B6, action="LIVES_STATE", no_log=false, no_survey=false, desc="068 - SUCH IS LIFE" },
+      },
+      health = {
+        { address=0X12F05D00, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE Float] Max Health decreased" },
+        { address=0X12F05D00, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE Float] Max Health increased" },
+        { address=0X12F05D04, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE Float] Health decreased" },
+        { address=0X12F05D04, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE Float] Health increased" },
+        { address=0X12F073BC, type="u32be", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE Float] Damage Taken in ranking battle" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X611B38, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Pure White Giant Glastonbury - SCORE" },
+        { address=0X611B44, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Pure White Giant Glastonbury - HI-SCORE" },
+        { address=0X12F061E8, type="u32be", condition="eq", value=0X2AB, action="SCORE_STATE", no_log=false, no_survey=false, desc="081 - HIGH SCORE" },
+      },
+      collectibles = {
+        { address=0X12F016E4, type="u8", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X611B6B, type="u8", condition="eq", value=0X1, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss defeated" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X106E7418, type="u32be", condition="eq", value=0X4, action="JUMPING", no_log=false, no_survey=false, desc="Mission 09: Bike Jump" },
+        { address=0X111F2860, type="u32be", condition="eq", value=0X4, action="JUMPING", no_log=false, no_survey=false, desc="Mission 09: Bike Jump" },
+        { address=0X12F016D4, type="u32be", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[32-bit BE] MISSION 09 - JUMPED YARDS (BEST)" },
+        { address=0X12F04DB0, type="u32be", condition="eq", value=0X4, action="JUMPING", no_log=false, no_survey=false, desc="Mission 09: Bike Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X0, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Santa Destroy" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X35, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Santa Destroy: Parking Garage" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0XD, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Stadium" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X41, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Stadium" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X3F, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Stadium" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X4D, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Stadium (save room)" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0XE, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Stadium: Field" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Santa Destroy High School" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X2, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Santa Destroy High School" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X3, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Santa Destroy High School" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X4, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Santa Destroy High School" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X4C, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Santa Destroy High School (save room)" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X6, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Stadium" },
+        { address=0X12F004AC, type="u32be", condition="eq", value=0X16, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Santa Destroy Highway" },
+        { address=0X12F061C4, type="u32be", condition="eq", value=0X1F9, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="006 - SANTA DESTROY" },
+        { address=0X12F061E8, type="u32be", condition="eq", value=0X2A7, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="064 - DESTROYMAN" },
+        { address=0X12F061E8, type="u32be", condition="eq", value=0X2A1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="075 - SANTA DESTROY" },
+      },
+    },
+  },
+}

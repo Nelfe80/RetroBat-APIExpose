@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Congo Bongo",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "congo-bongo",
+    file = "congo-bongo.zip",
+    hashes = {
+      { hash = "43e1e931df97b5adc0b04e09add0f076", label = "Congo Bongo (1983)(Sega)(JP)[BLOAD'CAS:',R].cas" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X2FAB, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24-bit BE]" },
+      },
+    },
+  },
+}

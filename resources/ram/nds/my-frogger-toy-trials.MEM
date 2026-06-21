@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "My Frogger: Toy Trials",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "my-frogger-toy-trials",
+    file = "my-frogger-toy-trials.zip",
+    hashes = {
+      { hash = "f87c7dd01f058033d1edc675f5b1118b", label = "My Frogger - Toy Trials (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XDD678, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+  },
+}

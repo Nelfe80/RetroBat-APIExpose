@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tekken 5 [Subset - Tekken Lord]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "tekken-5-subset-tekken-lord",
+    file = "tekken-5-subset-tekken-lord.zip",
+    hashes = {
+      { hash = "8b3054cc6704d49d6495ea2ddda67d66", label = "Tekken 5 [Subset - Tekken Lord]" },
+    }
+  },
+
+  events = {
+  },
+}

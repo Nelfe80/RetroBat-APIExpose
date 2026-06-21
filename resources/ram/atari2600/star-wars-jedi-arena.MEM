@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Star Wars: Jedi Arena",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "star-wars-jedi-arena",
+    file = "star-wars-jedi-arena.zip",
+    hashes = {
+      { hash = "c9f6e521a49a2d15dac56b6ddb3fb4c7", label = "Star Wars - Jedi Arena (USA).a26" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X0009, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="The score on the left" },
+        { address=0X000A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="The score on the right" },
+      },
+    },
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Aretha",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "aretha",
+    file = "aretha.zip",
+    hashes = {
+      { hash = "92ba221cfcfecb2234e89f22284ed8f7", label = "Aretha (Japan) (En) (v1.0) (Dynamic-Designs).sfc" },
+      { hash = "ddf4920ae09530da94eae230fdffd3c4", label = "Aretha (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0A6F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ariel Level" },
+        { address=0X0A93, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ariel Next (Exp needed to next level)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0A70, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ariel current HP (16 bit) decreased" },
+        { address=0X0A70, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ariel current HP (16 bit) increased" },
+        { address=0X0A72, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ariel max HP (16 bit) decreased" },
+        { address=0X0A72, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ariel max HP (16 bit) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0A89, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ariel equipment slot 1 (weapon)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0A8D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ariel equipment slot 3 (shield)" },
+      },
+    },
+  },
+}

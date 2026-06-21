@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Pitfall II: The Lost Caverns",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "pitfall-ii-the-lost-caverns",
+    file = "pitfall-ii-the-lost-caverns.zip",
+    hashes = {
+      { hash = "38ae610eb6266d4db8bc6d3dcb8fcd4a", label = "Pitfall II - The Lost Caverns (Japan) (Rev 1).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo active (0 = no, 1 = yes)" },
+        { address=0X0000, type="u8", condition="bit_true", bit=5, mask=0X20, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over (0 = no, 1 = yes)" },
+        { address=0X0000, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-game/demo (0 = no, 1 = yes)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0102, type="u8", condition="eq", value=0X0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death animation" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0102, type="u8", condition="eq", value=0X03, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X0102, type="u8", condition="eq", value=0X05, action="SWIMMING", no_log=false, no_survey=false, desc="Swimming" },
+      },
+    },
+  },
+}

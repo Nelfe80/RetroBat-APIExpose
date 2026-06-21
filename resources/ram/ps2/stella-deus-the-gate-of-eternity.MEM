@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Stella Deus: The Gate of Eternity",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "stella-deus-the-gate-of-eternity",
+    file = "stella-deus-the-gate-of-eternity.zip",
+    hashes = {
+      { hash = "fd50a80959ea0d8c719b30e36b76fc1f", label = "Stella Deus - The Gate of Eternity (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Jurassic: The Hunted",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "jurassic-the-hunted",
+    file = "jurassic-the-hunted.zip",
+    hashes = {
+      { hash = "1b087caf57dce11d435770e966da2835", label = "Jurassic - The Hunted (USA)" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0X7EAEF4, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dinosaurs killed with stationary weapons (Code: Whiskey-Tango-Foxtrot) [32 bits]" },
+        { address=0X7EAF58, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dinosaurs killed with stationary weapons (Far From Shore, Far From Home) [32 bits]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7EAF04, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Exploding mushrooms destroyed (Code: Whiskey-Tango-Foxtrot) [32 bits]" },
+        { address=0X7EAF68, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Exploding mushrooms destroyed (Far From Shore, Far From Home) [32 bits]" },
+      },
+    },
+  },
+}

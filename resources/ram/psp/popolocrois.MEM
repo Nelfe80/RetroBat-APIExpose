@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "PoPoLoCrois",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "popolocrois",
+    file = "popolocrois.zip",
+    hashes = {
+      { hash = "8b5e4b1b8f65887929a3356971039da4", label = "PoPoLoCrois (Europe).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB42AE2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0xb42ae2 - Wicky, Horned Penguin, Mini Demon, Samurai Robot, Hatamoto Robot, Devil bat, Vampire" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB42AE1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0xb42ae1 - Living Dead, Orc, Orc Warlord, Steamed Power, Steamed King, Overheat, Ninja Robot, Sh" },
+      },
+      health = {
+        { address=0XA07F1C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP (32bit) decreased" },
+        { address=0XA07F1C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP (32bit) increased" },
+        { address=0XA0808C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 Current HP (32bit) decreased" },
+        { address=0XA0808C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 Current HP (32bit) increased" },
+        { address=0XA081FC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 Current HP (32bit) decreased" },
+        { address=0XA081FC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 Current HP (32bit) increased" },
+        { address=0XA0836C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 Current HP (32bit) decreased" },
+        { address=0XA0836C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 Current HP (32bit) increased" },
+        { address=0XB42ADD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0xb42add - Turtle Camel, Shell Camel, Negative Energy, Ectoplasm, Bad Kitty, Doll, Gargoyle, Gia" },
+        { address=0XB42ADD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0xb42add - Turtle Camel, Shell Camel, Negative Energy, Ectoplasm, Bad Kitty, Doll, Gargoyle, Gia" },
+        { address=0XB43018, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pietoro's Current HP decreased" },
+        { address=0XB43018, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pietoro's Current HP increased" },
+        { address=0XB431F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Narcia's Current HP decreased" },
+        { address=0XB431F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Narcia's Current HP increased" },
+        { address=0XB433D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kai's Current HP decreased" },
+        { address=0XB433D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kai's Current HP increased" },
+        { address=0XB435AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="White Knight's Current HP decreased" },
+        { address=0XB435AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="White Knight's Current HP increased" },
+        { address=0XB43D1C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kimendoji's Current HP (16bit) decreased" },
+        { address=0XB43D1C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kimendoji's Current HP (16bit) increased" },
+        { address=0XB43EF8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gabo's Current HP decreased" },
+        { address=0XB43EF8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gabo's Current HP increased" },
+        { address=0XB440D4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gon's Current HP (16bit) decreased" },
+        { address=0XB440D4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gon's Current HP (16bit) increased" },
+        { address=0XB442B0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Don's Current HP (16bit) decreased" },
+        { address=0XB442B0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Don's Current HP (16bit) increased" },
+        { address=0XB4448C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Esper 1 HP (16bit) decreased" },
+        { address=0XB4448C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Esper 1 HP (16bit) increased" },
+        { address=0XB44668, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Esper 2 HP (16bit) decreased" },
+        { address=0XB44668, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Esper 2 HP (16bit) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XB665D0, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Start of Treasure Chest Local Memory Blob" },
+        { address=0XB6666B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="End of Treasure Chest Local Memory Blob" },
+        { address=0XB66A30, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Beginning of treasure chest flags" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB42AD6, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="0xb42ad6 - Acornholio, Ammonite, Ammowar, Gorgon, Skewered Rocks, Bombie, Lionman, Condor" },
+        { address=0XB42AD9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0xb42ad9 - Assassin Chef, Gold Golem, Mr. Pepper, Evil Castanet, Maracas, Death Trumpet, Foul Dr" },
+        { address=0XB42F84, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Toy Ring increased" },
+        { address=0XB42F85, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Glass Ring increased" },
+        { address=0XB42FF0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+  },
+}

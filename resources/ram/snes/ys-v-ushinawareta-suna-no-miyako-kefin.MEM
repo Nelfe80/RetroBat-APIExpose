@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Ys V: Ushinawareta Suna no Miyako Kefin",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ys-v-ushinawareta-suna-no-miyako-kefin",
+    file = "ys-v-ushinawareta-suna-no-miyako-kefin.zip",
+    hashes = {
+      { hash = "b27591ad95c4904e584c5b2523de4b0d", label = "Ys V - Ushinawareta Suna no Miyako Kefin (Japan) (En) (Aeon Genesis) (1.0).sfc" },
+      { hash = "f05e59ae38aed40de271e7aa8e392fe8", label = "Ys V - Kefin, Lost Kingdom of Sand (Japan) (En) (MSU-1).sfc" },
+      { hash = "f630c6e0f11fd53d112f3dd004ea7184", label = "Ys V - Ushinawareta Suna no Miyako Kefin (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X058C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Physical level" },
+        { address=0X059C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magic Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0418, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit 0 - Silver Coin (Ramzen Gorge) increased" },
+        { address=0X0418, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 0 - Silver Coin (Ramzen Gorge) decreased" },
+      },
+      health = {
+        { address=0X0387, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP bar setting decreased" },
+        { address=0X0387, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP bar setting increased" },
+        { address=0X0471, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max HP decreased" },
+        { address=0X0471, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max HP increased" },
+        { address=0X0475, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="energy store, max value is 64 decreased" },
+        { address=0X0475, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="energy store, max value is 64 increased" },
+        { address=0X064C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Adol's current HP decreased" },
+        { address=0X064C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Adol's current HP increased" },
+        { address=0X0654, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 current HP decreased" },
+        { address=0X0654, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 current HP increased" },
+        { address=0X0656, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 max HP decreased" },
+        { address=0X0656, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 max HP increased" },
+        { address=0X0666, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="used for Nygfinicus right hand's HP decreased" },
+        { address=0X0666, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="used for Nygfinicus right hand's HP increased" },
+        { address=0X0668, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="used for Nygfinicus left hand's max HP decreased" },
+        { address=0X0668, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="used for Nygfinicus left hand's max HP increased" },
+        { address=0X1857, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="somehow related to doing damage, was changing as monsters were attacked" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X048C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="equipped weapon" },
+        { address=0X0493, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="First weapon available to equip" },
+        { address=0X0494, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Second weapon available to equip" },
+        { address=0X0495, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Third weapon available to equip" },
+        { address=0X0496, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fourth weapon available to equip" },
+        { address=0X0497, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fifth weapon available to equip" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X020F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="____XX Gold increased" },
+        { address=0X040D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - magic ring (Rock Wall area) increased" },
+        { address=0X047C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold in Adol's possession increased" },
+        { address=0X048F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="equipped ring increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X040B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit 6 - beat Fire Beast Boss" },
+        { address=0X041D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit 1 - agree to look for the boss" },
+        { address=0X066A, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss_1/5/6/7's HP" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X048E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="equipped shield" },
+        { address=0X049D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="First slot of available shields to equip" },
+        { address=0X049E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Second slot of available shields to equip" },
+        { address=0X049F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Third slot of available shields to equip" },
+        { address=0X04A0, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Fourth slot of available shields to equip" },
+        { address=0X04A1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Fifth slot of available shields to equip" },
+        { address=0X06B1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="postion x, y below of Adol's shield" },
+      },
+      player = {
+        { address=0X06DE, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X041E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="bit 0 - SE switch flipped" },
+        { address=0X12400, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="determines nature of each block of textures, if properly modified you can do OOB or walk above t" },
+      },
+    },
+  },
+}

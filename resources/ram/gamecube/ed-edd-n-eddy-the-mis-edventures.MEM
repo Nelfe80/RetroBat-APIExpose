@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Ed, Edd n Eddy: The Mis-Edventures",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "ed-edd-n-eddy-the-mis-edventures",
+    file = "ed-edd-n-eddy-the-mis-edventures.zip",
+    hashes = {
+      { hash = "09be56dcfe7a43b9ff185f0a57b74026", label = "Ed, Edd n Eddy - The Mis-Edventures (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X12F1EE7, type="u8", condition="eq", value=0X0C, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Main Menu / Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12F1EF9, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ed Marks the Spot - Underground" },
+        { address=0X12F1EF9, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ed Marks the Spot - Underground (Near sandbox)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X12F1503, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ed Boys' Health decreased" },
+        { address=0X12F1503, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ed Boys' Health increased" },
+        { address=0X12F1553, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="Unlimited Damage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X12F1EF6, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X12F1EF9, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rebel Robot Ranch - Final Boss Area" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12F1EFA, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Ed on Arrival - Generator Door" },
+      },
+    },
+  },
+}

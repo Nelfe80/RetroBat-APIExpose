@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "The Lost World: Jurassic Park",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-lost-world-jurassic-park",
+    file = "the-lost-world-jurassic-park.zip",
+    hashes = {
+      { hash = "42db88df74ef4ea07ef0c575960a0934", label = "Lost World, The - Jurassic Park (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2EEF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 -> 1 -> 2 -> 3 - Level Select Code Entered" },
+        { address=0X3D044, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select Catagory" },
+        { address=0X3D048, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select Selection" },
+        { address=0X5CCF4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-bit - Compy Level ID" },
+        { address=0X5D2A8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ff - Compy level complete" },
+        { address=0X61D04, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-bit - Human Prey Level ID" },
+        { address=0X622B8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ff - Human Prey level complete" },
+        { address=0X637BC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-bit - Raptor Level ID" },
+        { address=0X63D70, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ff - Raptor level complete" },
+        { address=0X64550, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-bit - Hunter Level ID" },
+        { address=0X66200, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-bit - T-Rex Level ID" },
+        { address=0X6623C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-bit - T-Rex Level ID" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6237F, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Human Prey - Flare Ammo" },
+        { address=0X64BD0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Hunter - Flamethrower ammo" },
+        { address=0X64BD1, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Hunter - Explosive Ammo" },
+        { address=0X64BD2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Hunter - Poison Ammo" },
+        { address=0X64BD4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Hunter - Machine Gun Ammo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X64BD3, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Hunter - Time Grenade Ammo" },
+      },
+    },
+  },
+}

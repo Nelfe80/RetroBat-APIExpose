@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Kid Klown in Crazy Chase",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "kid-klown-in-crazy-chase",
+    file = "kid-klown-in-crazy-chase.zip",
+    hashes = {
+      { hash = "572fd9201f8c000abd16c4c84d9ddf98", label = "Kid Klown in Crazy Chase (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1CA86, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits roll?" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0535, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="milli seconds spent in stage" },
+        { address=0X0536, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="seconds spent in stage" },
+        { address=0X0537, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Minutes spent in stage" },
+        { address=0X0570, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0F34, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0F34, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0568, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+      },
+    },
+  },
+}

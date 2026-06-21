@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Steal Princess",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "steal-princess",
+    file = "steal-princess.zip",
+    hashes = {
+      { hash = "1607140fc42c51db76773e2dc8796411", label = "Steal Princess (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19E790, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Palace 1" },
+        { address=0X19E850, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Palace 25" },
+        { address=0X19EA45, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Palace EX1 map unlocked" },
+        { address=0X19EA46, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Palace EX2 map unlocked" },
+        { address=0X19EA47, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Palace EX3 map unlocked" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19E330, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished stage 1-1" },
+        { address=0X19E338, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished stage 1-2" },
+        { address=0X19ED06, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Custom map 1 Clears" },
+      },
+      stage = {
+        { address=0X268884, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gems got stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2E303C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X2E303C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X2E309C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health 3 decreased" },
+        { address=0X2E309C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health 3 increased" },
+        { address=0X2E6BFC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health1 (indirect) decreased" },
+        { address=0X2E6BFC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health1 (indirect) increased" },
+        { address=0X2E923D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health (indirect) decreased" },
+        { address=0X2E923D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health (indirect) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X19EA4D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(12Byte) Treasure start" },
+        { address=0X19EA4E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald 5000G" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X19EC22, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit1 - Defeated Boss 1" },
+        { address=0X19EC23, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit2 - Defeated Boss 4?" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X19EBAC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objects start" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X26884A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time got current stage?" },
+      },
+    },
+  },
+}

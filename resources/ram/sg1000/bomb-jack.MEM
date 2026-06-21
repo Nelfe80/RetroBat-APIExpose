@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Bomb Jack",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "bomb-jack",
+    file = "bomb-jack.zip",
+    hashes = {
+      { hash = "0bf5b6959fc1b58d8e37f9647f47a0b3", label = "Bomb Jack (Japan, Australia) (Ja).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause status" },
+      },
+      events = {
+        { address=0X0011, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Enemy combo while under 'P' power-up; resets to 0x00 when next 'P' power-up is collected" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0057, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round selected via Round Select; disappears after starting the game" },
+        { address=0X0060, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total number of Bombs remaining in the current Round; starts at 0x18" },
+        { address=0X0064, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+        { address=0X0065, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit BCD] Round displayed on the screen; differs from current Round value at 0x64 after Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0061, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Remaining lives increased" },
+        { address=0X0061, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Remaining lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X005F, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Progress towards 'P' power-up spawn" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0054, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-Bit BCD] High Score" },
+        { address=0X005B, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-Bit BCD] Score of current player" },
+      },
+      collectibles = {
+        { address=0X005E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total number of Fire Bombs collected in the current Round (Max: 0x17) increased" },
+      },
+    },
+  },
+}

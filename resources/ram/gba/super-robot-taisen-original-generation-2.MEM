@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Super Robot Taisen: Original Generation 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Tactical Role-Playing"
+  },
+
+  rom = {
+    name = "super-robot-taisen-original-generation-2",
+    file = "super-robot-taisen-original-generation-2.zip",
+    hashes = {
+      { hash = "d6f114b4d88f348d85d12f35a544e5f3", label = "Super Robot Taisen - Original Generation 2 (USA) (Pt) (v1.0) (Pinguimbozo,Nenhum).gba" },
+      { hash = "f3d168d87d3e2ae25dbec012471cd9b5", label = "Super Robot Taisen - Original Generation 2 (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9C34, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Scrolling Text for Opening and Ending-Credits, always 0000 otherwise." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X228B1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Before Level Change" },
+        { address=0X228B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="After Level Change" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X20466, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sixth Weapon Slot of Gespenst MkII R. Becomes 7F with Graviton Cannon equipped." },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9B4A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0000 on Title Screen, 0001 during Episode, 0002 during a Battle and Intermission. increased" },
+        { address=0X21CA8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring ID increased" },
+        { address=0X22908, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit Money Address increased" },
+      },
+    },
+  },
+}

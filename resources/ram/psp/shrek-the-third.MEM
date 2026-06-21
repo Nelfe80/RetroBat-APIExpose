@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Shrek the Third",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shrek-the-third",
+    file = "shrek-the-third.zip",
+    hashes = {
+      { hash = "04132af72b147db4f12d344c37b664f1", label = "DreamWorks Shrek the Third (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF93DC, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XBF93DC, type="u8", condition="eq", value=0X05, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XC2BAE4, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0XC2BAE4, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBF93DC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gift Shop/Scene Select" },
+        { address=0XBF93DC, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options" },
+        { address=0XBF93DC, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Multiplayer" },
+        { address=0XBF93DC, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Results" },
+        { address=0XBF93DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu Background [8bit]" },
+        { address=0XC2BB12, type="u8", condition="eq", value=0X7269736F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Prison Castle Attack" },
+        { address=0XC2BB12, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID [ASCII]" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x0 Poor" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x5 Respectable" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x10 Excellent" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x25 Remarkable" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x50 Incredible" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x75 Stunning" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x100 Amazing" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x150 Tremendous" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x200 Monstrous" },
+        { address=0XC2C32C, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="x300 Kingly" },
+        { address=0XC2C32C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Combat Style Level (Current) [8bit]" },
+        { address=0XC2DDB0, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level is Played (changes when level is loaded in and started and not on Loading screen)" },
+        { address=0XCD10AB, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Perfect" },
+        { address=0XCD10AB, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tourist" },
+        { address=0XCD10AB, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Finisher" },
+        { address=0XCD10AB, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sports Fan" },
+        { address=0XCD10AB, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tremendous" },
+        { address=0XCD10F8, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Academy Grounds" },
+        { address=0XCD1122, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Commentary: Academy Grounds" },
+        { address=0XCD1B5B, type="u32be", condition="eq", value=0X74657273, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lancelot's Castle Attack" },
+        { address=0XCD1B5B, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID [32bit BE ASCII]" },
+        { address=0XCD1BCC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+        { address=0XCD2450, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes, Playing Level" },
+        { address=0XCD2452, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="No, Playing Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCD1121, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="Bonus Damage (Increases 20%)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XCD1108, type="u8", condition="eq", value=0X02, action="SWIMMING", no_log=true, no_survey=false, desc="Swim Trunks" },
+        { address=0XCD1120, type="u8", condition="bit_true", bit=1, mask=0X02, action="SWIMMING", no_log=true, no_survey=false, desc="Costume (Shrek): Swim Trunks" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCD10AD, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Perfect" },
+        { address=0XCD10AD, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tourist" },
+        { address=0XCD10AD, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Finisher" },
+        { address=0XCD10AD, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The King" },
+        { address=0XCD10AD, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rescuer" },
+        { address=0XCD10F9, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Prison Cell Block" },
+        { address=0XCD1122, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Commentary: Prison Cell Block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCD1088, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Levels Unlocked in Scene Select Counter [8bit]" },
+        { address=0XCD23C8, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Deaths in Level Counter [32bit]" },
+        { address=0XCD24E0, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Completion Fade Out Timer (32bit Float)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "The Scorpion King: Sword of Osiris",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-scorpion-king-sword-of-osiris",
+    file = "the-scorpion-king-sword-of-osiris.zip",
+    hashes = {
+      { hash = "8620aeb89f00dd3e3c2a500ba75ce2de", label = "Scorpion King, The - Sword of Osiris (USA).gba" },
+      { hash = "bf8fac941521947c92ba860d570927c4", label = "Scorpion King, The - Sword of Osiris (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00BE, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="True" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credit Screen" },
+        { address=0X0228, type="u32le", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0230, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0290, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X02AC, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X02E0, type="u32le", condition="eq", value=0X15, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="True" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X0224, type="u16le", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Menu" },
+        { address=0X0224, type="u16le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage 1 - The Intro" },
+        { address=0X0224, type="u16le", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage 2 - The Desert" },
+        { address=0X0224, type="u16le", condition="eq", value=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage 3 - The Crypt" },
+        { address=0X0224, type="u16le", condition="eq", value=0X0C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage 4 - The Aqueduct" },
+        { address=0X0224, type="u16le", condition="eq", value=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage 5 - The Oasis" },
+        { address=0X0224, type="u16le", condition="eq", value=0X14, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage 6 - The Mountain" },
+        { address=0X0224, type="u16le", condition="eq", value=0X19, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage 7 - The Night" },
+        { address=0X0224, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID" },
+      },
+      stage = {
+        { address=0X0465, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Inside the Scorpion Statue on Stage 2" },
+        { address=0X0465, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Inside the Scorpion Statue on Stage 4" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00AC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X00AC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0288, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0288, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X00B0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X00B0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0144, type="u32le", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X0144, type="u32le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Duel Wield" },
+        { address=0X014C, type="u32le", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X014C, type="u32le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Duel Wield" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0030, type="u16le", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Intro Boss" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="When final boss is defeated." },
+      },
+    },
+  },
+}

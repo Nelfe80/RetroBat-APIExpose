@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Dragon Ball: Advanced Adventure",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "dragon-ball-advanced-adventure",
+    file = "dragon-ball-advanced-adventure.zip",
+    hashes = {
+      { hash = "cb14df09ea41694532a9327510bb28c1", label = "Dragon Ball - Advanced Adventure (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3120, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Deals with whether most of the HUD is visible, part of title screen protection" },
+        { address=0X31E90, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen, Menu, One-On-One, Options, etc." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X31E44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (10=Chow's Castle)" },
+        { address=0X31F34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (Goku)" },
+        { address=0X31F35, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (Krillin)" },
+      },
+      stage = {
+        { address=0X89B6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Select stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3FB3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life (during game) increased" },
+        { address=0X3FB3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life (during game) decreased" },
+        { address=0X3FC3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life (but only fight with boss) increased" },
+        { address=0X3FC3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life (but only fight with boss) decreased" },
+        { address=0X4174, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss life Beat'em up mode 16-bit (Dead=ffxx) increased" },
+        { address=0X4174, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss life Beat'em up mode 16-bit (Dead=ffxx) decreased" },
+        { address=0X31A56, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy life in 1VS1 16-bit (Dead=ffxx) increased" },
+        { address=0X31A56, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy life in 1VS1 16-bit (Dead=ffxx) decreased" },
+        { address=0X31F36, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (New game=02, Max=63 [99]) increased" },
+        { address=0X31F36, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (New game=02, Max=63 [99]) decreased" },
+      },
+      health = {
+        { address=0X28646, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X28646, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X28648, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X28648, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X2864A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy decreased" },
+        { address=0X2864A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy increased" },
+        { address=0X31986, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Goku's Health when Fighting 1v1 decreased" },
+        { address=0X31986, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Goku's Health when Fighting 1v1 increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X28660, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points (Hex) (x10)" },
+      },
+      collectibles = {
+        { address=0X3FBD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Energy (during game) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3FCD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Energy (but only fight with boss)" },
+      },
+    },
+  },
+}

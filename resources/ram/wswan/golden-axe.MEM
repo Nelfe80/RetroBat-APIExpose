@@ -1,0 +1,111 @@
+return {
+  game = {
+    title = "Golden Axe",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "golden-axe",
+    file = "golden-axe.zip",
+    hashes = {
+      { hash = "55c9cc830000f0aaf721eac69d1703cc", label = "Golden Axe (Japan).wsc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X041A, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="0000 = Game Over" },
+        { address=0XC058, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC188, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage / Duel:" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCEA0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives increased" },
+        { address=0XCEA0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives decreased" },
+        { address=0XCF75, type="u24le", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder" },
+        { address=0XCF75, type="u24le", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder Jr." },
+        { address=0XCF75, type="u24le", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Bringer" },
+        { address=0XCF95, type="u24le", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder" },
+        { address=0XCF95, type="u24le", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder Jr." },
+        { address=0XCF95, type="u24le", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Bringer" },
+        { address=0XCFB5, type="u24le", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder" },
+        { address=0XCFB5, type="u24le", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder Jr." },
+        { address=0XCFB5, type="u24le", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Bringer" },
+        { address=0XCFD5, type="u24le", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder" },
+        { address=0XCFD5, type="u24le", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder Jr." },
+        { address=0XCFD5, type="u24le", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Bringer" },
+        { address=0XCFF5, type="u24le", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder" },
+        { address=0XCFF5, type="u24le", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder Jr." },
+        { address=0XCFF5, type="u24le", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Bringer" },
+        { address=0XD015, type="u24le", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder" },
+        { address=0XD015, type="u24le", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Adder Jr." },
+        { address=0XD015, type="u24le", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Bringer" },
+      },
+      health = {
+        { address=0XCE97, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Player Health decreased" },
+        { address=0XCE97, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Player Health increased" },
+        { address=0XCF77, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Health decreased" },
+        { address=0XCF77, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Health increased" },
+        { address=0XCF97, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 Health decreased" },
+        { address=0XCF97, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 Health increased" },
+        { address=0XCFB7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 Health decreased" },
+        { address=0XCFB7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 Health increased" },
+        { address=0XCFD7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 Health decreased" },
+        { address=0XCFD7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 Health increased" },
+        { address=0XCFF7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 Health decreased" },
+        { address=0XCFF7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 Health increased" },
+        { address=0XD017, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 Health decreased" },
+        { address=0XD017, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 Health increased" },
+        { address=0XD708, type="u16le", condition="eq", value=0X12, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0XD708, type="u16le", condition="eq", value=0X13, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Falling with no HP" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCF75, type="u24le", condition="eq", value=0X0C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Heninger" },
+        { address=0XCF75, type="u24le", condition="eq", value=0X12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Longmoan" },
+        { address=0XCF95, type="u24le", condition="eq", value=0X0C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Heninger" },
+        { address=0XCF95, type="u24le", condition="eq", value=0X12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Longmoan" },
+        { address=0XCFB5, type="u24le", condition="eq", value=0X0C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Heninger" },
+        { address=0XCFB5, type="u24le", condition="eq", value=0X12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Longmoan" },
+        { address=0XCFD5, type="u24le", condition="eq", value=0X0C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Heninger" },
+        { address=0XCFD5, type="u24le", condition="eq", value=0X12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Longmoan" },
+        { address=0XCFF5, type="u24le", condition="eq", value=0X0C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Heninger" },
+        { address=0XCFF5, type="u24le", condition="eq", value=0X12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Longmoan" },
+        { address=0XD015, type="u24le", condition="eq", value=0X0C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Heninger" },
+        { address=0XD015, type="u24le", condition="eq", value=0X12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Longmoan" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCF75, type="u24le", condition="eq", value=0X19, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Purple Shield Skeleton" },
+        { address=0XCF95, type="u24le", condition="eq", value=0X19, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Purple Shield Skeleton" },
+        { address=0XCFB5, type="u24le", condition="eq", value=0X19, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Purple Shield Skeleton" },
+        { address=0XCFD5, type="u24le", condition="eq", value=0X19, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Purple Shield Skeleton" },
+        { address=0XCFF5, type="u24le", condition="eq", value=0X19, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Purple Shield Skeleton" },
+        { address=0XD015, type="u24le", condition="eq", value=0X19, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Purple Shield Skeleton" },
+      },
+      player = {
+        { address=0XD708, type="u16le", condition="eq", value=0X05, action="JUMPING", no_log=true, no_survey=false, desc="Jumping" },
+        { address=0XD708, type="u16le", condition="eq", value=0X07, action="JUMPING", no_log=true, no_survey=false, desc="Jump Attacking" },
+        { address=0XD708, type="u16le", condition="eq", value=0X08, action="JUMPING", no_log=true, no_survey=false, desc="High Jump Attacking" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC106, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Character Info Block Identificator [Offser = 20]" },
+        { address=0XC186, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint for Last Stage" },
+        { address=0XCE54, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Character Info Block Identificator [Offser = 20]" },
+        { address=0XE60E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Animation Address Block Identificator [Offser = 3a]" },
+      },
+    },
+  },
+}

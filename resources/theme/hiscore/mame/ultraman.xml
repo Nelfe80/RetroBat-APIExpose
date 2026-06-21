@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 C-,A 103320</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 IIDA 100000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 DONE 100000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ARAS 100000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 IDET 100000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FUJI 100000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 MURA 100000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HAYA 100000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 ARAS 100000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 IDET 100000</text>
+		</text>
+	</view>
+</theme>

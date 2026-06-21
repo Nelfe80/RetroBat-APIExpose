@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE hi2txt SYSTEM "hi2txt.dtd">
+<hi2txt>
+  <!--
+    tested with:
+      mame 0.219 and related hiscore.dat
+      mame 0.153 and hiscore.dat 2014-04-23
+    history:
+      2020-04-29 split table into 4, one per mode, for easier reading
+    source: GreatStone
+  //-->
+  
+  <structure file=".hi">
+    <check>
+      <!-- optional: if defined and hiscore.dat provided, it allows to select the good structure versus the provided file //-->
+      <definition>0:20fa20:310:00:30</definition>
+      <!-- optional: if defined, it allows to select the good structure versus the provided file
+                     useful if multiple structures are defined but hiscore.dat not provided //-->
+      <size>784</size>
+    </check>
+    <loop count="7">
+      <elt size="3" type="raw"  id="T_UNKNOWN"/>
+      <elt size="1" type="raw"  id="T_UNKNOWN2"/>
+      <elt size="4" type="int"  id="T_SCORE"/>
+      <elt size="7" type="text" id="T_SCORE ALT"/>
+      <elt size="1" type="raw"  id="T_EMPTY"/>
+      <elt size="3" type="text" id="T_NAME"/>
+      <elt size="1" type="raw"  id="T_EMPTY2"/>
+      <elt size="1" type="int"  id="T_CHARACTER1"/>
+      <elt size="1" type="int"  id="T_CHARACTER2"/>
+      <elt size="1" type="int"  id="T_CHARACTER3"/>
+      <elt size="3" type="raw"  id="T_EMPTY3"/>
+      <elt size="2" type="text" id="T_STAGE"/>
+    </loop>
+    <loop count="7">
+      <elt size="3" type="raw"  id="N_UNKNOWN"/>
+      <elt size="1" type="raw"  id="N_UNKNOWN2"/>
+      <elt size="4" type="int"  id="N_SCORE"/>
+      <elt size="7" type="text" id="N_SCORE ALT"/>
+      <elt size="1" type="raw"  id="N_EMPTY"/>
+      <elt size="3" type="text" id="N_NAME"/>
+      <elt size="1" type="raw"  id="N_EMPTY2"/>
+      <elt size="1" type="int"  id="N_CHARACTER1"/>
+      <elt size="1" type="int"  id="N_CHARACTER2"/>
+      <elt size="1" type="int"  id="N_CHARACTER3"/>
+      <elt size="3" type="raw"  id="N_EMPTY3"/>
+      <elt size="2" type="text" id="N_STAGE"/>
+    </loop>
+    <loop count="7">
+      <elt size="3" type="raw"  id="A_UNKNOWN"/>
+      <elt size="1" type="raw"  id="A_UNKNOWN2"/>
+      <elt size="4" type="int"  id="A_SCORE"/>
+      <elt size="7" type="text" id="A_SCORE ALT"/>
+      <elt size="1" type="raw"  id="A_EMPTY"/>
+      <elt size="3" type="text" id="A_NAME"/>
+      <elt size="1" type="raw"  id="A_EMPTY2"/>
+      <elt size="1" type="int"  id="A_CHARACTER1"/>
+      <elt size="1" type="int"  id="A_CHARACTER2"/>
+      <elt size="1" type="int"  id="A_CHARACTER3"/>
+      <elt size="3" type="raw"  id="A_EMPTY3"/>
+      <elt size="2" type="text" id="A_STAGE"/>
+    </loop>
+    <loop count="7">
+      <elt size="3" type="raw"  id="S_UNKNOWN"/>
+      <elt size="1" type="raw"  id="S_UNKNOWN2"/>
+      <elt size="4" type="int"  id="S_SCORE"/>
+      <elt size="7" type="text" id="S_SCORE ALT"/>
+      <elt size="1" type="raw"  id="S_EMPTY"/>
+      <elt size="3" type="text" id="S_NAME"/>
+      <elt size="1" type="raw"  id="S_EMPTY2"/>
+      <elt size="1" type="int"  id="S_CHARACTER1"/>
+      <elt size="1" type="int"  id="S_CHARACTER2"/>
+      <elt size="1" type="int"  id="S_CHARACTER3"/>
+      <elt size="3" type="raw"  id="S_EMPTY3"/>
+      <elt size="2" type="text" id="S_STAGE"/>
+    </loop>
+  </structure>
+  
+  <output>
+    <table id="TRAINING" lines-max="5">
+      <column id="RANK"       src="index"        format="+1"/>
+      <column id="SCORE"      src="T_SCORE"/>
+      <column id="SCORE ALT"  src="T_SCORE ALT"  format="trim" display="debug"/>
+      <column id="NAME"       src="T_NAME"       format="trim"/>
+      <column id="STAGE"      src="T_STAGE"      format="trim"/>
+      <column id="CHARACTER1" src="T_CHARACTER1" format="character"/>
+      <column id="CHARACTER2" src="T_CHARACTER2" format="character"/>
+      <column id="CHARACTER3" src="T_CHARACTER3" format="character"/>
+      <column id="UNKNOWN"    src="T_UNKNOWN"    format="0x" display="debug"/>
+      <column id="UNKNOWN2"   src="T_UNKNOWN2"   format="0x" display="debug"/>
+      <column id="UNKNOWN3"   src="T_UNKNOWN3"   format="0x" display="debug"/>
+      <column id="EMPTY"      src="T_EMPTY"      format="0x" display="debug"/>
+      <column id="EMPTY2"     src="T_EMPTY2"     format="0x" display="debug"/>
+      <column id="EMPTY3"     src="T_EMPTY3"     format="0x" display="debug"/>
+    </table>
+
+    <table id="NORMAL" lines-max="5">
+      <column id="RANK"       src="index"        format="+1"/>
+      <column id="SCORE"      src="N_SCORE"/>
+      <column id="SCORE ALT"  src="N_SCORE ALT"  format="trim" display="debug"/>
+      <column id="NAME"       src="N_NAME"       format="trim"/>
+      <column id="STAGE"      src="N_STAGE"      format="trim"/>
+      <column id="CHARACTER1" src="N_CHARACTER1" format="character"/>
+      <column id="CHARACTER2" src="N_CHARACTER2" format="character"/>
+      <column id="CHARACTER3" src="N_CHARACTER3" format="character"/>
+      <column id="UNKNOWN"    src="N_UNKNOWN"    format="0x" display="debug"/>
+      <column id="UNKNOWN2"   src="N_UNKNOWN2"   format="0x" display="debug"/>
+      <column id="UNKNOWN3"   src="N_UNKNOWN3"   format="0x" display="debug"/>
+      <column id="EMPTY"      src="N_EMPTY"      format="0x" display="debug"/>
+      <column id="EMPTY2"     src="N_EMPTY2"     format="0x" display="debug"/>
+      <column id="EMPTY3"     src="N_EMPTY3"     format="0x" display="debug"/>
+    </table>
+
+    <table id="ADVANCE" lines-max="5">
+      <column id="RANK"       src="index"        format="+1"/>
+      <column id="SCORE"      src="A_SCORE"/>
+      <column id="SCORE ALT"  src="A_SCORE ALT"  format="trim" display="debug"/>
+      <column id="NAME"       src="A_NAME"       format="trim"/>
+      <column id="STAGE"      src="A_STAGE"      format="trim"/>
+      <column id="CHARACTER1" src="A_CHARACTER1" format="character"/>
+      <column id="CHARACTER2" src="A_CHARACTER2" format="character"/>
+      <column id="CHARACTER3" src="A_CHARACTER3" format="character"/>
+      <column id="UNKNOWN"    src="A_UNKNOWN"    format="0x" display="debug"/>
+      <column id="UNKNOWN2"   src="A_UNKNOWN2"   format="0x" display="debug"/>
+      <column id="UNKNOWN3"   src="A_UNKNOWN3"   format="0x" display="debug"/>
+      <column id="EMPTY"      src="A_EMPTY"      format="0x" display="debug"/>
+      <column id="EMPTY2"     src="A_EMPTY2"     format="0x" display="debug"/>
+      <column id="EMPTY3"     src="A_EMPTY3"     format="0x" display="debug"/>
+    </table>
+
+    <table id="SPECIAL" lines-max="5">
+      <column id="RANK"       src="index"        format="+1"/>
+      <column id="SCORE"      src="S_SCORE"/>
+      <column id="SCORE ALT"  src="S_SCORE ALT"  format="trim" display="debug"/>
+      <column id="NAME"       src="S_NAME"       format="trim"/>
+      <column id="STAGE"      src="S_STAGE"      format="trim"/>
+      <column id="CHARACTER1" src="S_CHARACTER1" format="character"/>
+      <column id="CHARACTER2" src="S_CHARACTER2" format="character"/>
+      <column id="CHARACTER3" src="S_CHARACTER3" format="character"/>
+      <column id="UNKNOWN"    src="S_UNKNOWN"    format="0x" display="debug"/>
+      <column id="UNKNOWN2"   src="S_UNKNOWN2"   format="0x" display="debug"/>
+      <column id="UNKNOWN3"   src="S_UNKNOWN3"   format="0x" display="debug"/>
+      <column id="EMPTY"      src="S_EMPTY"      format="0x" display="debug"/>
+      <column id="EMPTY2"     src="S_EMPTY2"     format="0x" display="debug"/>
+      <column id="EMPTY3"     src="S_EMPTY3"     format="0x" display="debug"/>
+    </table>
+  </output>
+  
+  <format id="trim">
+    <trim direction="left"> </trim>
+  </format>
+
+  <format id="character">
+    <case src="144" dst="D.D - Flying Killer (A)"/>
+    <case src="145" dst="D.D - Flying Killer (B)"/>
+    <case src="146" dst="D.D - Flying Killer (C)"/>
+    <case src="147" dst="D.D - Flying Killer (Start)"/>
+    <case src="148" dst="Shorty - Carry Carry (A)"/>
+    <case src="149" dst="Shorty - Carry Carry (B)"/>
+    <case src="150" dst="Shorty - Carry Carry (C)"/>
+    <case src="151" dst="Shorty - Carry Carry (Start)"/>
+    <case src="152" dst="Jyuji - Sangerea 5280 (A)"/>
+    <case src="153" dst="Jyuji - Sangerea 5280 (B)"/>
+    <case src="154" dst="Jyuji - Sangerea 5280 (C)"/>
+    <case src="155" dst="Jyuji - Sangerea 5280 (Start)"/>
+    <case src="156" dst="Maria - Clitter IV (A)"/>
+    <case src="157" dst="Maria - Clitter IV (B)"/>
+    <case src="158" dst="Maria - Clitter IV (C)"/>
+    <case src="159" dst="Maria - Clitter IV (Start)"/>
+    <case src="160" dst="Golden - Razer Back (A)"/>
+    <case src="161" dst="Golden - Razer Back (B)"/>
+    <case src="162" dst="Golden - Razer Back (C)"/>
+    <case src="163" dst="Golden - Razer Back (Start)"/>
+    <case src="164" dst="Strawman - Beyond 8570 (A)"/>
+    <case src="165" dst="Strawman - Beyond 8570 (B)"/>
+    <case src="166" dst="Strawman - Beyond 8570 (C)"/>
+    <case src="167" dst="Strawman - Beyond 8570 (Start)"/>
+    <case src="168" dst="Birthday - Mad Romero (A)"/>
+    <case src="169" dst="Birthday - Mad Romero (B)"/>
+    <case src="170" dst="Birthday - Mad Romero (C)"/>
+    <case src="171" dst="Birthday - Mad Romero (Start)"/>
+    <case src="172" dst="Tag-T - Grizzly Vse (A)"/>
+    <case src="173" dst="Tag-T - Grizzly Vse (B)"/>
+    <case src="174" dst="Tag-T - Grizzly Vse (C)"/>
+    <case src="175" dst="Tag-T - Grizzly Vse (Start)"/>
+    <case src="176" dst="Adam - V-Twin Bogivman (A)"/>
+    <case src="177" dst="Adam - V-Twin Bogivman (B)"/>
+    <case src="178" dst="Adam - V-Twin Bogivman (C)"/>
+    <case src="179" dst="Adam - V-Twin Bogivman (Start)"/>
+    <case src="180" dst="B. Wayne - Silversword (A)"/>
+    <case src="181" dst="B. Wayne - Silversword (B)"/>
+    <case src="182" dst="B. Wayne - Silversword (C)"/>
+    <case src="183" dst="B. Wayne - Silversword (Start)"/>
+    <case src="184" dst="J. Wayne - Grasshoper (A)"/>
+    <case src="185" dst="J. Wayne - Grasshoper (B)"/>
+    <case src="186" dst="J. Wayne - Grasshoper (C)"/>
+    <case src="187" dst="J. Wayne - Grasshoper (Start)"/>
+    <case src="188" dst="B. Wayne - Flying Baron (A)"/>
+    <case src="189" dst="B. Wayne - Flying Baron (B)"/>
+    <case src="190" dst="B. Wayne - Flying Baron (C)"/>
+    <case src="191" dst="B. Wayne - Flying Baron (Start)"/>
+    <case src="192" dst="J. Wayne - Wild Snail (A)"/>
+    <case src="193" dst="J. Wayne - Wild Snail (B)"/>
+    <case src="194" dst="J. Wayne - Wild Snail (C)"/>
+    <case src="195" dst="J. Wayne - Wild Snail (Start)"/>
+    <case src="196" dst="Gain - Valhallyzer (A)"/>
+    <case src="197" dst="Gain - Valhallyzer (B)"/>
+    <case src="198" dst="Gain - Valhallyzer (C)"/>
+    <case src="199" dst="Gain - Valhallyzer (Start)"/>
+    <case src="200" dst="Chitta - Gun-Dalf (A)"/>
+    <case src="201" dst="Chitta - Gun-Dalf (B)"/>
+    <case src="202" dst="Chitta - Gun-Dalf (C)"/>
+    <case src="203" dst="Chitta - Gun-Dalf (Start)"/>
+    <case src="204" dst="Miyamoto - Miyamoto (A)"/>
+    <case src="205" dst="Miyamoto - Miyamoto (B)"/>
+    <case src="206" dst="Miyamoto - Miyamoto (C)"/>
+    <case src="207" dst="Miyamoto - Miyamoto (Start)"/>
+    <case src="208" dst="Bornnam - Golgodian (A)"/>
+    <case src="209" dst="Bornnam - Golgodian (B)"/>
+    <case src="210" dst="Bornnam - Golgodian (C)"/>
+    <case src="211" dst="Bornnam - Golgodian (Start)"/>
+    <case src="212" dst="Carpet - Magic Carpet (A)"/>
+    <case src="213" dst="Carpet - Magic Carpet (B)"/>
+    <case src="214" dst="Carpet - Magic Carpet (C)"/>
+    <case src="215" dst="Carpet - Magic Carpet (Start)"/>
+  </format>
+</hi2txt>
+

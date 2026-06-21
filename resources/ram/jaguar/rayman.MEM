@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Rayman",
+    system = "jaguar",
+    system_name = "Atari Jaguar",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "rayman",
+    file = "rayman.zip",
+    hashes = {
+      { hash = "c0ebfa0c65145bc59ca3bad632d85a39", label = "Rayman (World).j64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6C2B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Dream Forest levels unlocked" },
+        { address=0X6C31, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Band Land levels unlocked" },
+        { address=0X6C37, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Blue Mountains levels unlocked" },
+        { address=0X6C3B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Picture City levels unlocked" },
+        { address=0X6C43, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Caves of Skops levels unlocked" },
+      },
+      zone = {
+        { address=0X6CAE, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World current level belongs to can shift here on specific screens" },
+        { address=0X6CAF, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World current level belongs to" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6C60, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (BCD) increased" },
+        { address=0X6C60, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (BCD) decreased" },
+        { address=0X6C79, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Demo/Leaving level flag increased" },
+        { address=0X6C79, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Demo/Leaving level flag decreased" },
+        { address=0X6D42, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Breakball lives increased" },
+        { address=0X6D42, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Breakball lives decreased" },
+      },
+      health = {
+        { address=0X6C62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Upper4] Health decreased" },
+        { address=0X6C62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Upper4] Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6DD7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+  },
+}

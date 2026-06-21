@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "El Tigre: The Adventures of Manny Rivera",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "el-tigre-the-adventures-of-manny-rivera",
+    file = "el-tigre-the-adventures-of-manny-rivera.zip",
+    hashes = {
+      { hash = "666daaf7472a0ec95d37d7d04eb60aad", label = "Nickelodeon El Tigre - The Adventures of Manny Rivera (USA)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XC6C574, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="32-Bit - HEX - Death Counter" },
+      },
+    },
+  },
+}

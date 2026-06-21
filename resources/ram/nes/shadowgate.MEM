@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Shadowgate",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "shadowgate",
+    file = "shadowgate.zip",
+    hashes = {
+      { hash = "2d838f82d9225fa2ec6fc856183db74d", label = "Shadowgate (France).nes" },
+      { hash = "71b7941ace29af073e74dea8945658b1", label = "Shadowgate (Sweden).nes" },
+      { hash = "7f809c8bb850d8dbb17f876344978713", label = "Shadowgate (Europe).nes" },
+      { hash = "95a9917bf732ea61a10d74f190651878", label = "Shadowgate (USA).nes" },
+      { hash = "3bb3ae8978cad86310f5f877fb0274a2", label = "Shadowgate (Germany).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0442, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Bit 3 - Demon Statue Lowered" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0440, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 1 - Werewolf Dead" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X00AF, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item being pointed at" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0438, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Doors Opened Bit String increased" },
+        { address=0X0439, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Doors Opened Bit String increased" },
+        { address=0X0441, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 4 - Pot of Gold Taken increased" },
+        { address=0X045A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 0 - Gold Coin 2 Taken increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X04EB, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Bit 0 - Shield Panel Down" },
+        { address=0X04FA, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Status" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0426, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 4 - Main Hall Double Doors Unlocked" },
+        { address=0X0427, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 0 - Banquet Room - Top-Right Door Unlocked" },
+        { address=0X043B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 0 - Epor Room - Hidden Door Opened" },
+        { address=0X043F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 0 - Banquet Room - Top-Right Door Opened" },
+      },
+    },
+  },
+}

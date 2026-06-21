@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "King's Field",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kings-field",
+    file = "kings-field.zip",
+    hashes = {
+      { hash = "54efd85dda05c355545492ef7b69d51a", label = "King's Field (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X12004, type="u32le", condition="eq", value=0X0FFFF001, action="DEMO_MODE", no_log=false, no_survey=false, desc="OPEN.EXE (Game Demo/Menu)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA0788, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6CA6C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Tree Life increased" },
+        { address=0X6CA6C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tree Life decreased" },
+        { address=0X6D1BC, type="u16le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X6DF84, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Red Scorpion Life increased" },
+        { address=0X6DF84, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Red Scorpion Life decreased" },
+      },
+      health = {
+        { address=0X6D1BC, type="u16le", condition="eq", value=0X5A, action="HIT", no_log=false, no_survey=false, desc="Initial Value (no damage taken)" },
+        { address=0X6D1BC, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="object 47 current hp" },
+        { address=0XA0790, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0XA0790, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0XA0792, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0XA0792, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XA07E4, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Slot" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X652CF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Coin increased" },
+        { address=0X652D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Light Ring increased" },
+        { address=0X652DB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Twin Dragon Ring increased" },
+        { address=0X652DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Cross increased" },
+        { address=0XA07AC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6C634, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss HP" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X652C2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Small Shield" },
+        { address=0X652C3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Knight Shield" },
+        { address=0X652C4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Tower Shield" },
+        { address=0XA0812, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Slot" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9DDB6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bitflag - When door to fountain opens" },
+      },
+    },
+  },
+}

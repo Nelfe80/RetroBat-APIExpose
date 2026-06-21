@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Mille Miglia",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "mille-miglia",
+    file = "mille-miglia.zip",
+    hashes = {
+      { hash = "3a35c29651f165e31a301eb132afa2e1", label = "Mille Miglia (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X63AE9, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X63AE9, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0X63AE9, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Exit" },
+        { address=0X1DE384, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Racing" },
+        { address=0X1DE384, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X5E9DC, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Brescia" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 - Vicenza" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 - Ravenna" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 - Ancona" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 - Pescara" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 - Roma" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 - Monte Fiascone" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8 - Siena" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 - Bologna" },
+        { address=0X5E9DC, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 10 - Piacenza" },
+        { address=0X5E9DC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage ID" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Brescia" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 - Vicenza" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 - Ravenna" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 - Ancona" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 - Pescara" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 - Roma" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 - Monte Fiascone" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8 - Siena" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 - Bologna" },
+        { address=0X1DE1D8, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 10 - Piacenza" },
+        { address=0X1DE1D8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage IDs" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9" },
+        { address=0X1F5E68, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 10" },
+        { address=0X1F5E68, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade - Stage Selection" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1F5FDC, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Cup Race" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X54A58, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-Bit-A] Ingame timer [never stop]" },
+        { address=0X63EBC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-Bit-A] Total Race Time" },
+        { address=0X1DE2A8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Out - Milliseconds" },
+        { address=0X1DE2AC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Out - Seconds" },
+        { address=0X1DE2B0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Out - Minutes" },
+        { address=0X1F4F90, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Lap Time - Minutes" },
+        { address=0X1F4F94, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Lap Time - Minutes" },
+        { address=0X1F4F98, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Lap Time - Milliseconds" },
+        { address=0X1F6028, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X1F6028, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Start Game - Select Game" },
+        { address=0X1F7098, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Out - Milliseconds" },
+      },
+    },
+  },
+}

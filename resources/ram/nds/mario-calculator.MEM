@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mario Calculator",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mario-calculator",
+    file = "mario-calculator.zip",
+    hashes = {
+      { hash = "88f5aa28c7651767625844636c5a1190", label = "Mario Calculator (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+  },
+}

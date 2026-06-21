@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 YOSHI    20000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 K.KODAMA 18000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 KOBAYASI 16000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4  MORITA  15000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 Y.NAKA   14000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 MASAKO.K 8240</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ☠✄☂ 29400</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ⚾√⌈ 28100</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 09♥ 8400</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 [snowman][shoe][crossed-swords] 5700</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 ⌈AA 1800</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 NYH 700</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 JKS 600</text>
+		</text>
+	</view>
+</theme>

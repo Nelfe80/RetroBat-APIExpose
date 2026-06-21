@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="control3" extra="true">
+			<text>joy8way</text>
+			<color>${green}</color>
+		</text>
+		<text name="control4" extra="true">
+			<text>joy8way</text>
+			<color>${violet}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="p3button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p3button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p3button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="p4button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p4button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p4button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

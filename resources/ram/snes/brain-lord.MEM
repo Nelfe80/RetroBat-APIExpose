@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Brain Lord",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "brain-lord",
+    file = "brain-lord.zip",
+    hashes = {
+      { hash = "290ffe44a6d10ac30cea203c026daf31", label = "Brain Lord (USA) (Pt) (v1.0) (CBT).sfc" },
+      { hash = "bda740a4574c4c0bdb955d5c57ddb3df", label = "Brain Lord (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

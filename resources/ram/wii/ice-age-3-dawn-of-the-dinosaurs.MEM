@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Ice Age 3: Dawn of the Dinosaurs",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ice-age-3-dawn-of-the-dinosaurs",
+    file = "ice-age-3-dawn-of-the-dinosaurs.zip",
+    hashes = {
+      { hash = "1b45b24533e7f2dbaed24abb1f9cfd6e", label = "Ice Age 3 - Dawn of the Dinosaurs (Europe) (En,Fr,De,Es,Nl,Sv)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X53A060, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grave Danger" },
+        { address=0X53A060, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skeleton" },
+        { address=0X53A061, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Noisy Nightlife" },
+        { address=0X53A061, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unexpected" },
+        { address=0X53A061, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flight" },
+        { address=0X53A061, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Revenge" },
+        { address=0X53A061, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tar Pit" },
+        { address=0X53A062, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Egg Roll" },
+        { address=0X53A062, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Run Sid" },
+        { address=0X53A062, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scratte" },
+        { address=0X53A062, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Buck Rescue" },
+        { address=0X53A062, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flower" },
+        { address=0X53A062, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Root" },
+        { address=0X53A062, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle" },
+        { address=0X53A063, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sid's Early Start" },
+        { address=0X53A063, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Pursuit" },
+        { address=0X53A063, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Baby Proofing" },
+        { address=0X53A063, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lonesome Sloth" },
+        { address=0X53A063, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Egg Roll Challenge 1" },
+        { address=0X53A063, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Egg Roll Challenge 2" },
+        { address=0X53A067, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Saving Sid" },
+        { address=0X791BF4, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Replay" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X53A1D8, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="Noisy Nightlife - 3" },
+        { address=0X53A1D9, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Noisy Nightlife - 2" },
+        { address=0X53A1DA, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Noisy Nightlife - 1" },
+      },
+      health = {
+        { address=0X53A1E2, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Extender 1 [Buck]" },
+        { address=0X53A1E2, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Extender 2 [Buck]" },
+        { address=0X53A1E3, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Extender 2 [Sid]" },
+        { address=0X53A1E3, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Extender 1 [Sid]" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X53A1E2, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Big Weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X53A1E3, type="u8", condition="bit_true", bit=4, mask=0X10, action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo Extender" },
+      },
+    },
+  },
+}

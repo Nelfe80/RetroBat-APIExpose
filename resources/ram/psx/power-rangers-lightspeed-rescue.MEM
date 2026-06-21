@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Power Rangers: Lightspeed Rescue",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "power-rangers-lightspeed-rescue",
+    file = "power-rangers-lightspeed-rescue.zip",
+    hashes = {
+      { hash = "a12c010ace95765aaa3b66d69a4c37f8", label = "Saban's Power Rangers - Lightspeed Rescue (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB39CC, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[Infinite Continues Cheat Code Activated]" },
+        { address=0XB39D0, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[Continues Cheat Menu Toggle]" },
+        { address=0XBFACC, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Minimum Value (0 credits)" },
+        { address=0XBFACC, type="u8", condition="eq", value=0X05, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Maximum Value (5 credits) (Cheat OFF)" },
+        { address=0XBFACC, type="u8", condition="eq", value=0XFF, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Maximum Value (255 credits) (Cheat ON)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA1044, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amount of Enemies (Levels 1, 2, 5 and 6)" },
+        { address=0XA1060, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amount of Enemies (Level 3 and 4)" },
+        { address=0XB397C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Level Skip Menu Toggle]" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 (Megazord battle)" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 (Megazord battle)" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 (Megazord battle)" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7" },
+        { address=0XBFAC0, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 (Megazord battle)" },
+        { address=0XBFAC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Current Level]" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 (Megazord battle)" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 (Megazord battle)" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 (Megazord battle)" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7" },
+        { address=0XBFAC4, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 (Megazord battle)" },
+        { address=0XBFAC4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Current Level- Alternative Address]" },
+      },
+      stage = {
+        { address=0XB3978, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Level Skip Code Activated]" },
+        { address=0X16A9B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Amount of Hostages (Level 4 First Sector)" },
+        { address=0X16A9C8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Amount of Hostages (Level 4 Second Sector)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB3940, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Infinite Lives Cheat Code Activated] increased" },
+        { address=0XB3940, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Infinite Lives Cheat Code Activated] decreased" },
+        { address=0XB3944, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Infinite Lives Cheat Code Menu Toggle] increased" },
+        { address=0XB3944, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Infinite Lives Cheat Code Menu Toggle] decreased" },
+        { address=0XC02F9, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Blue" },
+        { address=0XC02F9, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Orange" },
+        { address=0XC02F9, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Green" },
+        { address=0XC02F9, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Red" },
+        { address=0XC02F9, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="Purple" },
+      },
+      health = {
+        { address=0XB395C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Infinite Health Cheat Code Activated] decreased" },
+        { address=0XB395C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Infinite Health Cheat Code Activated] increased" },
+        { address=0XB3960, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Infinite Health Cheat Code Menu Toggle] decreased" },
+        { address=0XB3960, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Infinite Health Cheat Code Menu Toggle] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB3A2C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[High Scores]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Shadow Hearts: Covenant [Subset - First Place Lottery Wins]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shadow-hearts-covenant-subset-first-place-lottery-wins",
+    file = "shadow-hearts-covenant-subset-first-place-lottery-wins.zip",
+    hashes = {
+      { hash = "651e4dff3ca59d4d399611ddad68f620", label = "Shadow Hearts - Covenant (USA)  (Disc 1) [Subset - First Place Lotto]" },
+      { hash = "d7cf60e2c797b90f86448f71529580cb", label = "Shadow Hearts - Covenant (USA)  (Disc 2) [Subset - First Place Lotto]" },
+    }
+  },
+
+  events = {
+  },
+}

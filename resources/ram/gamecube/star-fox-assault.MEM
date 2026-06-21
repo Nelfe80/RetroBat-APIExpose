@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Star Fox: Assault",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "star-fox-assault",
+    file = "star-fox-assault.zip",
+    hashes = {
+      { hash = "4e50ec9b91906f1b25d611b2b64e31d8", label = "Star Fox - Assault (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2A2CA9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] game paused" },
+      },
+      events = {
+        { address=0X2A2D35, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8bit] Current combos" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X2A2CA1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Mission stage status" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2A2B75, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives left (the heart icon) increased" },
+        { address=0X2A2B75, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives left (the heart icon) decreased" },
+      },
+      health = {
+        { address=0X2A2B7C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit BE] Ship Health decreased" },
+        { address=0X2A2B7C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit BE] Ship Health increased" },
+        { address=0XD8307E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bitBE] Fortuna cruiser 1 HP 2 decreased" },
+        { address=0XD8307E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bitBE] Fortuna cruiser 1 HP 2 increased" },
+        { address=0XD83C7E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bitBE] Fortuna cruiser 1 HP decreased" },
+        { address=0XD83C7E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bitBE] Fortuna cruiser 1 HP increased" },
+        { address=0XD85C7E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bitBE] Fortuna cruiser 2 HP? decreased" },
+        { address=0XD85C7E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bitBE] Fortuna cruiser 2 HP? increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2A2B68, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16bit BE] Current Weapon ammunition" },
+        { address=0X2A2B6A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Type of weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X29E570, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Survival Mode High Score" },
+        { address=0X29E574, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 1 score" },
+        { address=0X29E578, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 2 score" },
+        { address=0X29E57C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 3 score" },
+        { address=0X29E580, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 4 score" },
+        { address=0X29E584, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 5 score" },
+        { address=0X29E588, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 6 score" },
+        { address=0X29E58C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 7 score" },
+        { address=0X29E590, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 8 score" },
+        { address=0X29E594, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 9 score" },
+        { address=0X29E598, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Mission 10 score" },
+        { address=0X2A2B60, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Points to something." },
+      },
+      collectibles = {
+        { address=0X29E558, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Gold Medals increased" },
+        { address=0X29E559, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Gold Medals save 1 increased" },
+        { address=0X29E70D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Gold Medals save 2 increased" },
+      },
+    },
+  },
+}

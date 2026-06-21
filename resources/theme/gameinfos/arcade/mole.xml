@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>only_buttons</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Attack 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Attack 2</text>
+			<color>${red}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>Attack 3</text>
+			<color>${red}</color>
+		</text>
+		<text name="button4" extra="true">
+			<text>Attack 4</text>
+			<color>${red}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Attack 5</text>
+			<color>${red}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Attack 6</text>
+			<color>${red}</color>
+		</text>
+		<text name="button7" extra="true">
+			<text>Attack 7</text>
+			<color>${red}</color>
+		</text>
+		<text name="button8" extra="true">
+			<text>Attack 8</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Attack 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Attack 2</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button3" extra="true">
+			<text>Attack 3</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button4" extra="true">
+			<text>Attack 4</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button5" extra="true">
+			<text>Attack 5</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Attack 6</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button7" extra="true">
+			<text>Attack 7</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button8" extra="true">
+			<text>Attack 8</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${red}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 YACHIYO          5000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 YACHIYO          5000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 YACHIYO          5000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 YACHIYO          5000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 YACHIYO          5000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

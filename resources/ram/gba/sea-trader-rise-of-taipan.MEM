@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sea Trader: Rise of Taipan",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "sea-trader-rise-of-taipan",
+    file = "sea-trader-rise-of-taipan.zip",
+    hashes = {
+      { hash = "ac807e619878b8219240d908bd7d5ed6", label = "Sea Trader - Rise of Taipan (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

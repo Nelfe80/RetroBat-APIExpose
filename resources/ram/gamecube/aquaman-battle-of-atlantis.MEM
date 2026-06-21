@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Aquaman: Battle of Atlantis",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "aquaman-battle-of-atlantis",
+    file = "aquaman-battle-of-atlantis.zip",
+    hashes = {
+      { hash = "58d7d3b18138fe8d84aa23e2b7824bd2", label = "Aquaman - Battle for Atlantis (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2FE6D0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Next Level ID [32-Bit BE]" },
+        { address=0X2FEAC8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mid-Level Cutscene (01) [32-Bit BE]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2FEAA0, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Palace/Armory Health [32-Bit BE] decreased" },
+        { address=0X2FEAA0, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Palace/Armory Health [32-Bit BE] increased" },
+        { address=0X2FEB10, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (Static Mirror) [Float BE] decreased" },
+        { address=0X2FEB10, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (Static Mirror) [Float BE] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X20A9B4, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Current Objective Count [32-Bit BE]" },
+        { address=0X2FED64, type="u32be", condition="eq", value=0X11, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mission 17: Broken" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2FEAB8, type="u32be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level Fadeout Timer [32-Bit BE]" },
+      },
+    },
+  },
+}

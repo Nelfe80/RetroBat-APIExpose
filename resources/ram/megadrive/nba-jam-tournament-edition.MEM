@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "NBA Jam: Tournament Edition",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports, Basketball"
+  },
+
+  rom = {
+    name = "nba-jam-tournament-edition",
+    file = "nba-jam-tournament-edition.zip",
+    hashes = {
+      { hash = "edeb01f0aa8aed3868db1179670db22f", label = "NBA Jam - Tournament Edition (World).md" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X2156, type="u16be", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[16 Bit] [Options] Special Features - Powerup Icons" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X213E, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] [Options] Timer Speed" },
+        { address=0X2150, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] [Options] Special Features - Shot Clock" },
+        { address=0X2152, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] [Options] Special Features - Overtime" },
+      },
+    },
+  },
+}

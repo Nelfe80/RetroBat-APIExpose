@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 JNV♂!ZRX 12200</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 NORIBOZ♀ 11700</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 SUMI.    10300</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 TOMY!    8900</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MIWARIN♀ 7400</text>
+		</text>
+	</view>
+</theme>

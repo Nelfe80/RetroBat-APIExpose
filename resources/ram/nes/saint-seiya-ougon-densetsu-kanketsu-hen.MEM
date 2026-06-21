@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Saint Seiya: Ougon Densetsu Kanketsu Hen",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "saint-seiya-ougon-densetsu-kanketsu-hen",
+    file = "saint-seiya-ougon-densetsu-kanketsu-hen.zip",
+    hashes = {
+      { hash = "2c85dedefc8dd7b49b80774de9793506", label = "Saint Seiya - Ougon Densetsu Kanketsu Hen (Japan).nes" },
+      { hash = "f2ead54c1ad2618d83a96d8390e25f7f", label = "Saint Seiya - Ougon Densetsu Kanketsu Hen (Japan) (En) (Aishsha,Djinn) (1.01).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0059, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Seiya's Life increased" },
+        { address=0X0059, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Seiya's Life decreased" },
+        { address=0X005B, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Shun's Life increased" },
+        { address=0X005B, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Shun's Life decreased" },
+        { address=0X005D, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Hyoga's Life increased" },
+        { address=0X005D, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Hyoga's Life decreased" },
+        { address=0X005F, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Shiryu's Life increased" },
+        { address=0X005F, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Shiryu's Life decreased" },
+        { address=0X0061, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Ikki's Life increased" },
+        { address=0X0061, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Ikki's Life decreased" },
+        { address=0X05CE, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Life during boss battle increased" },
+        { address=0X05CE, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Life during boss battle decreased" },
+        { address=0X05F1, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Boss Life increased" },
+        { address=0X05F1, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BCD] Boss Life decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X05AA, type="u16le", condition="eq", value=0X9999, action="SCORE_STATE", no_log=false, no_survey=false, desc="Maximum" },
+        { address=0X05AA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] SevenSense Points" },
+      },
+      collectibles = {
+        { address=0X05BC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BCD] Cosmo during boss battle increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X05E0, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16-bit BCD] Boss Cosmo" },
+        { address=0X05F1, type="u16le", condition="eq", value=0X0000, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated" },
+      },
+    },
+  },
+}

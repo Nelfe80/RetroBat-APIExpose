@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "The Three Stooges",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-three-stooges",
+    file = "the-three-stooges.zip",
+    hashes = {
+      { hash = "c88a679db40a606f93edb697c9422cc2", label = "Three Stooges, The (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round number in boxing minigame:" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0089, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Stooges health (Decreases with the mouse trap): decreased" },
+        { address=0X0089, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Stooges health (Decreases with the mouse trap): increased" },
+        { address=0X0092, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Quantity of crackers eaten and health in waiters minigame (5) decreased" },
+        { address=0X0092, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Quantity of crackers eaten and health in waiters minigame (5) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X000E, type="u8", condition="eq", value=0X9C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Finding the money" },
+        { address=0X000E, type="u8", condition="eq", value=0X94, action="MONEY_STATE", no_log=false, no_survey=false, desc="Returning the money to the bank and getting the reward" },
+        { address=0X000E, type="u8", condition="eq", value=0X095, action="MONEY_STATE", no_log=false, no_survey=false, desc="Finding the money" },
+        { address=0X000E, type="u8", condition="eq", value=0X0AC, action="MONEY_STATE", no_log=false, no_survey=false, desc="Seeing how many money you got" },
+        { address=0X007E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Money earned increased" },
+      },
+    },
+  },
+}

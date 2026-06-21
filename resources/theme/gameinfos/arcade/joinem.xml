@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>unknown</text>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 JMB 43200</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ACE 34500</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 SOS 24700</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 TNT 24000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 EIR 18400</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 CFO 17400</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 KNN 10100</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 ZCK 10000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 CPU 9800</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 ETC 9200</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

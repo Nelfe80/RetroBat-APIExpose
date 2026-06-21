@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Ghostbusters",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "ghostbusters",
+    file = "ghostbusters.zip",
+    hashes = {
+      { hash = "734c4ff66aa541b202c2b2c51cab4bbb", label = "Ghostbusters (USA).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0056, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PK Energy (Ones) decreased" },
+        { address=0X0056, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PK Energy (Ones) increased" },
+        { address=0X0057, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PK Energy (Tens) decreased" },
+        { address=0X0057, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PK Energy (Tens) increased" },
+        { address=0X0058, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PK Energy (Hundreds) decreased" },
+        { address=0X0058, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PK Energy (Hundreds) increased" },
+        { address=0X0059, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PK Energy (Thousands) decreased" },
+        { address=0X0059, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PK Energy (Thousands) increased" },
+        { address=0X00DD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Stairway Health decreased" },
+        { address=0X00DD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Stairway Health increased" },
+        { address=0X054F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gozer Battle Player Health decreased" },
+        { address=0X054F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gozer Battle Player Health increased" },
+        { address=0X065C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gozer Health decreased" },
+        { address=0X065C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gozer Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X005A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (Ones) increased" },
+        { address=0X005B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (Tens) increased" },
+        { address=0X005C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (Hundreds) increased" },
+        { address=0X005D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (One Thousands) increased" },
+        { address=0X005E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (Ten Thousands) increased" },
+        { address=0X005F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (Hundred Thousands) increased" },
+        { address=0X0060, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (Millions) increased" },
+        { address=0X00F4, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00E4, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 1" },
+        { address=0X00E5, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 2" },
+        { address=0X00E6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 3" },
+        { address=0X00E8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door ghost on stairway" },
+        { address=0X00E9, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 6" },
+        { address=0X00EB, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 8" },
+        { address=0X00EC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 9" },
+        { address=0X00ED, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 10" },
+        { address=0X00EE, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 11" },
+        { address=0X00EF, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 12" },
+        { address=0X00F0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 13" },
+        { address=0X00F1, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 14" },
+        { address=0X00F2, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 15" },
+        { address=0X00F6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 19" },
+        { address=0X00F7, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 20" },
+        { address=0X00F8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 21" },
+        { address=0X00F9, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Staircase door 22" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00C3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Remaining in Capture Stage" },
+        { address=0X00C4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Remaining in Capture Stage" },
+        { address=0X00C5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Remaining in Capture Stage" },
+        { address=0X00C6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Remaining in Capture Stage" },
+      },
+    },
+  },
+}

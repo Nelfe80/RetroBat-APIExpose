@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "NCW: Natsume Championship Wrestling",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "ncw-natsume-championship-wrestling",
+    file = "ncw-natsume-championship-wrestling.zip",
+    hashes = {
+      { hash = "2067f76b1ac029c6a6c59b0beafb2b80", label = "Natsume Championship Wrestling (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1004, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Hex] Menu Selection & Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X106A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Hex] Difficulty level" },
+        { address=0X155B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Hex] opponent health bar level" },
+        { address=0X171B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Hex] Player 1 bar level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X155A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent health within bar decreased" },
+        { address=0X155A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent health within bar increased" },
+        { address=0X171A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 health decreased" },
+        { address=0X171A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1738, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="pin counter speed increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X106C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Hex] Time Settings" },
+        { address=0X1800, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Hex] Seconds left on clock" },
+        { address=0X1801, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Hex] Minutes left on clock" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "FIFA 2004",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "fifa-2004",
+    file = "fifa-2004.zip",
+    hashes = {
+      { hash = "f9e6bfc9404be783b149259ffd9c5da0", label = "FIFA Soccer 2004 (USA, Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

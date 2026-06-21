@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Harvest Moon: A Wonderful Life",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Life Simulation, Role-Playing, Sandbox"
+  },
+
+  rom = {
+    name = "harvest-moon-a-wonderful-life",
+    file = "harvest-moon-a-wonderful-life.zip",
+    hashes = {
+      { hash = "ea86895552fe7101969b1a6dc508ae6c", label = "Harvest Moon - A Wonderful Life (USA)" },
+      { hash = "c598ff0b2ffaf51353609cae27ae8d7e", label = "Harvest Moon - A Wonderful Life (Europe)" },
+      { hash = "40f00a29d84aa66dfd059687605113de", label = "Harvest Moon - A Wonderful Life (Germany)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1070ACE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{GER} Ranching Level" },
+        { address=0X1070AD2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{GER} Agriculture Level" },
+        { address=0X1070AD6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{GER} Cooking Level" },
+        { address=0X1071A2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EUR} Ranching Level" },
+        { address=0X1071A32, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EUR} Agriculture Level" },
+        { address=0X1071A36, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EUR} Cooking Level" },
+        { address=0X108590E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PROUD} Ranching Level" },
+        { address=0X1085912, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PROUD} Agriculture Level" },
+        { address=0X1085916, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PROUD} Cooking Level" },
+        { address=0X1085A2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ranching Level" },
+        { address=0X1085A32, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Agriculture Level" },
+        { address=0X1085A36, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cooking Level" },
+        { address=0X1086014, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Murrey Hunger Level [32bit BE]" },
+        { address=0X15B848E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{JP rev1} Ranching Level" },
+        { address=0X15B8492, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{JP rev1} Agriculture Level" },
+        { address=0X15B8496, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{JP rev1} Cooking Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X105907C, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{GER} Tartan - Ingredient 1 [32bit BE]" },
+        { address=0X1059080, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{GER} Tartan - Ingredient 2 [32bit BE]" },
+        { address=0X1059FDC, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{EUR} Tartan - Ingredient 1 [32bit BE]" },
+        { address=0X1059FE0, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{EUR} Tartan - Ingredient 2 [32bit BE]" },
+        { address=0X106DEBC, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{PROUD} Tartan - Ingredient 1 [32bit BE]" },
+        { address=0X106DEC0, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{PROUD} Tartan - Ingredient 2 [32bit BE]" },
+        { address=0X106DFDC, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tartan - Ingredient 1 [32bit BE]" },
+        { address=0X106DFE0, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tartan - Ingredient 2 [32bit BE]" },
+        { address=0X10711CC, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{GER} Van's Diet Tracker [32bit BE]" },
+        { address=0X108612C, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Van's Diet tracker [32bit BE]" },
+        { address=0X109E1D4, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Map ID - Livestock Animal 1 [32bit BE] increased" },
+        { address=0X109E1D4, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Map ID - Livestock Animal 1 [32bit BE] decreased" },
+        { address=0X15A0A3C, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{JP rev1} Tartan - Ingredient 1 [32bit BE]" },
+        { address=0X15A0A40, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{JP rev1} Tartan - Ingredient 2 [32bit BE]" },
+        { address=0X15B8B8C, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{JP rev1} Van's Diet Tracker [32bit BE]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1070938, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{GER} Gold / Money [32bit BE] increased" },
+        { address=0X1071898, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{EUR} Gold / Money [32bit BE] increased" },
+        { address=0X1085778, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{PROUD} Gold / Money [32bit BE] increased" },
+        { address=0X1085898, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold / Money [32bit BE] increased" },
+        { address=0X1086118, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money donated to Murrey [32bit BE] increased" },
+        { address=0X15B82F8, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{JP rev1} Gold / Money [32bit BE] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1072014, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="{EUR} Murrey Hunger Level [32bit BE]" },
+        { address=0X107212C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{EUR} Van's Diet Tracker [32bit BE]" },
+      },
+    },
+  },
+}

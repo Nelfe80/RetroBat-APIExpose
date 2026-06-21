@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "LEGO Star Wars: The Video Game",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "lego-star-wars-the-video-game",
+    file = "lego-star-wars-the-video-game.zip",
+    hashes = {
+      { hash = "caa2d80d5c14a76d1f482f7589281c22", label = "LEGO Star Wars - The Video Game (USA, Europe) (En,Fr,De,Es,It,Nl,Da).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6F5C, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Federation Ship" },
+        { address=0X6F5C, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Naboo Forest," },
+        { address=0X6F5C, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Naboo City" },
+        { address=0X6F5C, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tatooine" },
+        { address=0X6F5C, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Return to Naboo Forest" },
+        { address=0X6F5C, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Return to Tatooine" },
+      },
+      stage = {
+        { address=0X6F5C, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Genosian Droid Factory" },
+        { address=0X6F5C, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Genosian Factory Rescue" },
+      },
+    },
+  },
+}

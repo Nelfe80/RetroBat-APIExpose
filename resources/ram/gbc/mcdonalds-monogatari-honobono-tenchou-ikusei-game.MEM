@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "McDonald's Monogatari: Honobono Tenchou Ikusei Game",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "mcdonalds-monogatari-honobono-tenchou-ikusei-game",
+    file = "mcdonalds-monogatari-honobono-tenchou-ikusei-game.zip",
+    hashes = {
+      { hash = "e6009a3556e22fa2f42134999759d366", label = "McDonald's Monogatari - Honobono Tenchou Ikusei Game (Japan).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCB99, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Employee 1 / Softdrinks - Promotional Level" },
+        { address=0XCBA7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Employee 2 / Delivery - Promotional Level" },
+        { address=0XCBB5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Employee 3 / Cash Register - Promotional Level" },
+        { address=0XCBC3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Employee 4 / Burgers - Promotional Level" },
+        { address=0XCBD1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Employee 5 / French Fries - Promotional Level" },
+      },
+    },
+  },
+}

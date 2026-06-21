@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Smuggler's Run",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "smugglers-run",
+    file = "smugglers-run.zip",
+    hashes = {
+      { hash = "6b7dd7e5eb5d97af30d9fd043e3cfb85", label = "Smuggler's Run (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2C453C, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not in Demo" },
+        { address=0X2C453C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Viewing Demo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X28AD2C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 1 - Score" },
+        { address=0X28AD30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 1 - Final Score" },
+        { address=0X28AD40, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 2 - Final Score" },
+        { address=0X28AD50, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 3 - Final Score" },
+        { address=0X28AD60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 4 - Final Score" },
+        { address=0X28AD70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 5 - Final Score" },
+        { address=0X28AD80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 6 - Final Score" },
+        { address=0X28AD90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 7 - Final Score" },
+        { address=0X28ADA0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 8 - Final Score" },
+        { address=0X28ADB0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 9 - Final Score" },
+        { address=0X28ADC0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 10 - Final Score" },
+        { address=0X28ADD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 11 - Final Score" },
+        { address=0X28ADE0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 12 - Final Score" },
+        { address=0X28ADF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 13 - Final Score" },
+        { address=0X28AE00, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 14 - Final Score" },
+        { address=0X28AE10, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 15 - Final Score" },
+        { address=0X28AE20, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 16 - Final Score" },
+        { address=0X28AE30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 17 - Final Score" },
+        { address=0X28AE40, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 18 - Final Score" },
+        { address=0X28AE50, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 19 - Final Score" },
+        { address=0X28AE60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 20 - Final Score" },
+        { address=0X28AE70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 21 - Final Score" },
+        { address=0X28AE80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 22 - Final Score" },
+        { address=0X28AE90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 23 - Final Score" },
+        { address=0X28AEA0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 24 - Final Score" },
+        { address=0X28AEB0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 25 - Final Score" },
+        { address=0X28AEC0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 26 - Final Score" },
+        { address=0X28AED0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 27 - Final Score" },
+        { address=0X28AEE0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 28 - Final Score" },
+        { address=0X28AEF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 29 - Final Score" },
+        { address=0X28AF00, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 30 - Final Score" },
+        { address=0X28AF10, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 31 - Final Score" },
+        { address=0X28AF20, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 32 - Final Score" },
+        { address=0X28AF30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 33 - Final Score" },
+        { address=0X28AF40, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 34 - Final Score" },
+        { address=0X28AF4C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission Summary - Score" },
+        { address=0X28AF50, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission Summary - Final Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X285F68, type="u16le", condition="eq", value=0X7263, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Race (cr)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X28AD28, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mission 1 - Time Left" },
+        { address=0X28AF48, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Mission Summary - Time Left" },
+      },
+    },
+  },
+}

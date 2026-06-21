@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Dragon Slayer",
+    system = "scv",
+    system_name = "Super Cassette Vision",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "dragon-slayer",
+    file = "dragon-slayer.zip",
+    hashes = {
+      { hash = "9c688c8f43b142a84b90181d717df6d2", label = "Dragon Slayer (Japan) (En).bin" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XFF09, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (16-bit) decreased" },
+        { address=0XFF09, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (16-bit) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XFF0F, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (16-bit) increased" },
+      },
+    },
+  },
+}

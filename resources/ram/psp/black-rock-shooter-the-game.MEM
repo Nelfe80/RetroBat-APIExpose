@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Black Rock Shooter: The Game",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "black-rock-shooter-the-game",
+    file = "black-rock-shooter-the-game.zip",
+    hashes = {
+      { hash = "40d6d9d6ebda178354446eddfee1c778", label = "Black Rock Shooter - The Game (Europe) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1E26AA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-ID" },
+        { address=0X1E27060, type="u8", condition="eq", value=0X0A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 San Francisco Active;" },
+        { address=0X1E27060, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 Complete" },
+      },
+      stage = {
+        { address=0X1E26E16, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X1E26E17, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1E26E87, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Guard" },
+      },
+      health = {
+        { address=0XD2C4F6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Check HP Mii decreased" },
+        { address=0XD2C4F6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Check HP Mii increased" },
+        { address=0X14B53FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="BRS HP decreased" },
+        { address=0X14B53FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="BRS HP increased" },
+        { address=0X1BE117E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Check HP Mii decreased" },
+        { address=0X1BE117E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Check HP Mii increased" },
+        { address=0X1E2763C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X1E2763C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1E26E87, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Hunt" },
+        { address=0X1E27614, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Equipped Suit" },
+      },
+      weapon = {
+        { address=0X1E27610, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1E060B4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=In-game, becomes 0x00 when accessing the map, pause-menu, or loading a save-file in-game. D" },
+      },
+    },
+  },
+}

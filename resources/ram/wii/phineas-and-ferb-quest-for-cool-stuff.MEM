@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Phineas and Ferb: Quest for Cool Stuff",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "phineas-and-ferb-quest-for-cool-stuff",
+    file = "phineas-and-ferb-quest-for-cool-stuff.zip",
+    hashes = {
+      { hash = "2bd4591467fe0f522075bdd867dbc724", label = "Disney Phineas and Ferb - Quest for Cool Stuff (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X14C39C4, type="u32be", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Playing/Credits" },
+        { address=0X14CE6AC, type="u32be", condition="eq", value=0X4DA22741, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X1508FC1, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Before Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X428952, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[33 Bytes ASCII] (Unstable, gets cleared when exiting the Wii Menu)" },
+        { address=0X15243E0, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Playing a Level" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1508CD4, type="u32be", condition="eq", value=0X3330346B, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Hunt" },
+        { address=0X1508CD4, type="u32be", condition="eq", value=0XE09C00C3, action="TREASURE", no_log=false, no_survey=false, desc="The Treasure Room" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAF7D3F, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Golden Coin Amulet" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1508CD4, type="u32be", condition="eq", value=0X7EF89560, action="SWIMMING", no_log=false, no_survey=false, desc="Swimming in the Deep" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1504248, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-Bit BE]" },
+      },
+    },
+  },
+}

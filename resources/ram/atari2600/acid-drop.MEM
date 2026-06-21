@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Acid Drop",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "acid-drop",
+    file = "acid-drop.zip",
+    hashes = {
+      { hash = "17ee23e5da931be82f733917adcb6386", label = "Acid Drop (Europe).a26" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0011, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level : value 01 up to 30 / 30 is maximum level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0004, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [0000xx]" },
+        { address=0X0005, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [00xx00]" },
+        { address=0X0006, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [0000xx]" },
+        { address=0X007A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="02 = logo, ab = credits, 1a = level selection, f1 = game is running, 43 = final score" },
+      },
+    },
+  },
+}

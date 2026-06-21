@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Nightshade | Kunoichi",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "nightshade-kunoichi",
+    file = "nightshade-kunoichi.zip",
+    hashes = {
+      { hash = "dbb306d8c5ae11f8ae1cde3b6f136a2d", label = "Nightshade (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X492FD0, type="u8", condition="eq", value=0X1, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X19FD76C, type="u8", condition="eq", value=0X3, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X19FD76D, type="u8", condition="eq", value=0X4, action="GAME_OVER", no_log=false, no_survey=false, desc="Quit (Game Over)" },
+        { address=0X19FD76D, type="u8", condition="eq", value=0X5, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit (Pause)" },
+      },
+      events = {
+        { address=0X4930FC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19FD2C6, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 Complete" },
+        { address=0X19FD2C6, type="u8", condition="eq", value=0X13, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 13 Complete" },
+        { address=0X19FD2CA, type="u8", condition="eq", value=0X88, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Unlock Joe Musashi" },
+        { address=0X19FD2D0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[156 bytes] Stage Clear Data" },
+        { address=0X19FD2D1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 Clear Minutes" },
+        { address=0X19FD2D2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 Clear Seconds" },
+        { address=0X19FD2D3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 Clear Centiseconds" },
+        { address=0X19FD2D4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 Clear Total" },
+        { address=0X19FD2DA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 Clear Rank" },
+        { address=0X19FD76D, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+      stage = {
+        { address=0X492FD0, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X493188, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Selection" },
+        { address=0X19FD2AA, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Unlocked" },
+        { address=0X19FD2AA, type="u8", condition="eq", value=0X13, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 13 Unlocked" },
+        { address=0X19FD2AA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Progress" },
+        { address=0X19FD36C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[156 bytes] Beginner Stage Records" },
+        { address=0X19FD408, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[156 bytes] Easy Stage Records" },
+        { address=0X19FD4A4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[156 bytes] Normal Stage Records" },
+        { address=0X19FD4A5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Best Minutes - Normal" },
+        { address=0X19FD4A6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Best Seconds - Normal" },
+        { address=0X19FD4A7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Best Centiseconds - Normal" },
+        { address=0X19FD4AE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Best Rank - Normal" },
+        { address=0X19FD540, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[156 bytes] Hard Stage Records" },
+        { address=0X19FD766, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X19FD76C, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Intro" },
+        { address=0X19FD76C, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X19FD76C, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Other" },
+        { address=0X19FD76C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage State" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4930E0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0X4930E0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+        { address=0X4930E4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X4930E4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X19FD7AC, type="u32le", condition="eq", value=0X0, action="HIT", no_log=false, no_survey=false, desc="No Damage" },
+        { address=0X19FD814, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Current Damage Taken" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X19FD4A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage 1 Hi-Score - Normal" },
+        { address=0X19FD4AD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage 1 Hi-Score Character - Normal" },
+        { address=0X19FD7A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combat Performance - Tate Score" },
+        { address=0X19FD7B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Nakatomi Supplies - Items Score" },
+        { address=0X19FD7D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combat Performance - Max Combo Score" },
+        { address=0X19FD7E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combat Performance - Kills Score" },
+        { address=0X19FD7E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combat Performance - Damage Score" },
+        { address=0X19FD7EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="vs. (Boss) - Tate Score" },
+        { address=0X19FD7F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Nakatomi Supplies - Scrolls Score" },
+        { address=0X19FD7F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Score" },
+      },
+      collectibles = {
+        { address=0X19FD2B7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[11-bytes] Coins increased" },
+        { address=0X19FD2C1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="~b6 = Last Coin (Stage 12 - Hard) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X19FD7E8, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="vs. (Boss) - Tactical Success" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X492FD0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mode" },
+        { address=0X19FD4AC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage 1 Best Time Character - Normal" },
+      },
+    },
+  },
+}

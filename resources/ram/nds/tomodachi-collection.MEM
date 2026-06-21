@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "Tomodachi Collection",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "tomodachi-collection",
+    file = "tomodachi-collection.zip",
+    hashes = {
+      { hash = "369e839793cf8bd5211fc916d957fa70", label = "Tomodachi Collection (Japan) (En) (v0.8) (jjjewel).nds" },
+      { hash = "8b5692269f005fb96a79eabebb91ff32", label = "Tomodachi Collection (Japan) (Rev 1).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X123789, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Upper4] Mii 1 - Level up items gifted (Global)" },
+        { address=0X12378A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Lower4] Mii 1 - Level up items gifted (Global)" },
+        { address=0X37B0E5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Upper4] Level up items gifted to current Mii (Apartment)" },
+        { address=0X37B0E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Lower4] Level up items gifted to current Mii (Apartment)" },
+      },
+      stage = {
+        { address=0X12369F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Mii 1 - Satasfaction Level (Global)" },
+        { address=0X1239AF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Mii 2 - Satasfaction Level (Global)" },
+        { address=0X123FCF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Mii 4 - Satasfaction Level (Global)" },
+        { address=0X1242DF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Mii 5 - Satasfaction Level (Global)" },
+        { address=0X310DEF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Current Mii's Satasfaction Level (Apartment) (Outside room)" },
+        { address=0X37AFFB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Current Mii's Satasfaction Level (Apartment) (Inside Room)" },
+        { address=0X37DD8C, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dropping back to the ground" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X136C0A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8bit) Medieval Interior" },
+      },
+      health = {
+        { address=0X136AF5, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Not logged in the Food Album yet" },
+        { address=0X136AF5, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[8bit] Current amount of Energy Drink (Global)" },
+        { address=0X32A244, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Current amount of Energy Drink (Food Shop) decreased" },
+        { address=0X32A244, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Current amount of Energy Drink (Food Shop) increased" },
+        { address=0X33F810, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Current amount of Energy Drink (Apartment) decreased" },
+        { address=0X33F810, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Current amount of Energy Drink (Apartment) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1367E6, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="(16bit) Suit (Gray)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X310D6C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Mii 1 - Popularity Points (Ranking Board)" },
+        { address=0X310D70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Mii 1 - Popular Guy Points (Ranking Board)" },
+      },
+      collectibles = {
+        { address=0X1234AC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Current amount of Money (Global) increased" },
+        { address=0X136BCD, type="u8", condition="eq", value=0XFF, action="MONEY_STATE", no_log=false, no_survey=false, desc="Not logged in the Asset Album yet" },
+        { address=0X136BD6, type="u8", condition="eq", value=0XFF, action="MONEY_STATE", no_log=false, no_survey=false, desc="Not logged in the Asset Album yet" },
+        { address=0X136BD7, type="u8", condition="eq", value=0XFF, action="MONEY_STATE", no_log=false, no_survey=false, desc="Not logged in the Asset Album yet" },
+        { address=0X32A144, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Current amount of Money (Food Shop) increased" },
+        { address=0X32A178, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Current amount of Money (Pawn Shop) increased" },
+        { address=0X32A6C8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Current amount of Money (Apparel Shop) increased" },
+        { address=0X32A860, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Current amount of Money (Interior Shop) increased" },
+        { address=0X341688, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Current amount of Money (Apartment) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X136BCF, type="u8", condition="eq", value=0XFF, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not logged in the Asset Album yet" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X123450, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Timer for data saving (Starts at 0)" },
+      },
+    },
+  },
+}

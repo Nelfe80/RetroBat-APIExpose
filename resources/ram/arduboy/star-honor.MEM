@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Star Honor",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "star-honor",
+    file = "star-honor.zip",
+    hashes = {
+      { hash = "463a980cf9eae9b9d67467a97c0bbf31", label = "Star Honor (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01D0, type="u8", condition="eq", value=0X18, action="GAME_OVER", no_log=false, no_survey=false, desc="'Game Over'" },
+        { address=0X01D6, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="'Title'," },
+        { address=0X01D6, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="'Title Loop'," },
+        { address=0X01D6, type="u8", condition="eq", value=0X6, action="GAME_OVER", no_log=false, no_survey=false, desc="'Game Over'," },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X01D0, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Intro'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Combat Choice'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Combat Calculations'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Status Screen'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Run Away'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Neutral Planet'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Positive Planet'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X15, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Success'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X16, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Ran Away'," },
+        { address=0X01D0, type="u8", condition="eq", value=0X17, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Result:," },
+        { address=0X01D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SequenceStage = {" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X01D0, type="u8", condition="eq", value=0X9, action="HIT", no_log=false, no_survey=false, desc="'Print Damage'," },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X088A, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="'Weapons'," },
+        { address=0X091B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons" },
+        { address=0X0926, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons Max" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X088A, type="u8", condition="eq", value=0X3, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="'Shields'," },
+        { address=0X091F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shields" },
+        { address=0X0928, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shields Max" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X01D6, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="GameState = {" },
+        { address=0X08EB, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="EncounterSelection = {" },
+      },
+    },
+  },
+}

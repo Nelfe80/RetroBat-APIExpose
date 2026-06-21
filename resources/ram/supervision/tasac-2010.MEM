@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Tasac 2010",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "tasac-2010",
+    file = "tasac-2010.zip",
+    hashes = {
+      { hash = "e0ed04b139740452995d962827759a7f", label = "Tasac 2010 (USA, Europe).sv" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Speed level." },
+        { address=0X00A6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power level." },
+      },
+      stage = {
+        { address=0X0E57, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0E5D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives. increased" },
+        { address=0X0E5D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives. decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0EBB, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Countdown to the results screen after defeating a boss. Value switches to 6F while the results s" },
+      },
+    },
+  },
+}

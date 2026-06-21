@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Aqua Teen Hunger Force: Zombie Ninja Pro-Am",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Racing, Sports"
+  },
+
+  rom = {
+    name = "aqua-teen-hunger-force-zombie-ninja-pro-am",
+    file = "aqua-teen-hunger-force-zombie-ninja-pro-am.zip",
+    hashes = {
+      { hash = "6788976be80331946eb448243fe069d5", label = "Aqua Teen Hunger Force - Zombie Ninja Pro-Am (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

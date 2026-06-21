@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Dual Orb II",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dual-orb-ii",
+    file = "dual-orb-ii.zip",
+    hashes = {
+      { hash = "12db4be2ef5bf95008c7b4241ad576a3", label = "Dual Orb (Japan) (En) (v1.7) (TransCorp).sfc" },
+      { hash = "eb42510c01054711bcf04346aba7ed2f", label = "Dual Orb II (Japan).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X3DDA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy A HP decreased" },
+        { address=0X3DDA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy A HP increased" },
+        { address=0X3DDC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy A max HP decreased" },
+        { address=0X3DDC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy A max HP increased" },
+        { address=0X3EA2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy B HP decreased" },
+        { address=0X3EA2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy B HP increased" },
+        { address=0X3EA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy B Max HP decreased" },
+        { address=0X3EA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy B Max HP increased" },
+        { address=0X3F6A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy C HP decreased" },
+        { address=0X3F6A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy C HP increased" },
+        { address=0X3F6C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy C Max HP decreased" },
+        { address=0X3F6C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy C Max HP increased" },
+        { address=0X4A8E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(1st Char) Aleth HP decreased" },
+        { address=0X4A8E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(1st Char) Aleth HP increased" },
+        { address=0X4A8F, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(1st Char) Aleth HP decreased" },
+        { address=0X4A8F, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(1st Char) Aleth HP increased" },
+        { address=0X4A90, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(1st Char) Aleth Max HP decreased" },
+        { address=0X4A90, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(1st Char) Aleth Max HP increased" },
+        { address=0X4A91, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(1st Char) Aleth Max HP decreased" },
+        { address=0X4A91, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(1st Char) Aleth Max HP increased" },
+        { address=0X4B56, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(2nd Char) HP decreased" },
+        { address=0X4B56, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(2nd Char) HP increased" },
+        { address=0X4B58, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(2nd Char) Max HP decreased" },
+        { address=0X4B58, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(2nd Char) Max HP increased" },
+        { address=0X4C1E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(3rd Char) HP decreased" },
+        { address=0X4C1E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(3rd Char) HP increased" },
+        { address=0X4C20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(3rd Char) Max HP decreased" },
+        { address=0X4C20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(3rd Char) Max HP increased" },
+        { address=0X4CE6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(4th Char) HP decreased" },
+        { address=0X4CE6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(4th Char) HP increased" },
+        { address=0X4CE8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(4th Char) Max HP decreased" },
+        { address=0X4CE8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(4th Char) Max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X46C5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasures bitflags" },
+        { address=0X46C7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46C8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46C9, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46CB, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags:" },
+        { address=0X46CC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags:" },
+        { address=0X46CD, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46CE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D1, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D6, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D9, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46DA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46DC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags:" },
+        { address=0X46DD, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasures bitflags" },
+        { address=0X46DE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46DF, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags:" },
+        { address=0X46E0, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46E1, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasures bitflags" },
+        { address=0X46E2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+        { address=0X46E3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure bitflags" },
+      },
+      weapon = {
+        { address=0X4AE6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon" },
+        { address=0X4AF6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon IDs" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4746, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (G) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X46CF, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="treasure bitflags" },
+        { address=0X46D0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="treasure bitflags" },
+      },
+    },
+  },
+}

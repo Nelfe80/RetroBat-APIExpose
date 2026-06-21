@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Cyberia",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle, Shooter"
+  },
+
+  rom = {
+    name = "cyberia",
+    file = "cyberia.zip",
+    hashes = {
+      { hash = "6aa41afd268e19fc93e11f48a6b8beb4", label = "Cyberia (USA) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1416BE, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off" },
+        { address=0X1416BE, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="On" },
+        { address=0X14476D, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pad Speed 1" },
+        { address=0X14476D, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="2" },
+        { address=0X14476D, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="3" },
+        { address=0X14476D, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="4" },
+        { address=0X14476D, type="u8", condition="eq", value=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Volume 0" },
+        { address=0X14476D, type="u8", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="1" },
+        { address=0X14476D, type="u8", condition="eq", value=0X06, action="PAUSE_ON", no_log=false, no_survey=false, desc="2" },
+        { address=0X14476D, type="u8", condition="eq", value=0X07, action="PAUSE_ON", no_log=false, no_survey=false, desc="3" },
+        { address=0X14476D, type="u8", condition="eq", value=0X08, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X14476D, type="u8", condition="eq", value=0X09, action="PAUSE_ON", no_log=false, no_survey=false, desc="Load" },
+        { address=0X14476D, type="u8", condition="eq", value=0X0A, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0X14476D, type="u8", condition="eq", value=0X0B, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X15D31A, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X15D31E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shields" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X14479A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Game Timer Seconds [8-bit BCD]" },
+        { address=0X14479B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Game Timer Minutes[8-bit BCD]" },
+      },
+    },
+  },
+}

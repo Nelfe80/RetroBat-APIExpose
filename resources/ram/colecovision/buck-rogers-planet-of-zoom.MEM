@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Buck Rogers: Planet of Zoom",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "buck-rogers-planet-of-zoom",
+    file = "buck-rogers-planet-of-zoom.zip",
+    hashes = {
+      { hash = "d032d6e0a34d427f7885e88d308f8d92", label = "Buck Rogers - Planet of Zoom (USA, Europe).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0104, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0100, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skill Level" },
+        { address=0X0105, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0104, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Remaining increased" },
+        { address=0X0104, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Remaining decreased" },
+      },
+    },
+  },
+}

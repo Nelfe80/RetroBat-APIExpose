@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Indiana Jones and the Last Crusade",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "indiana-jones-and-the-last-crusade",
+    file = "indiana-jones-and-the-last-crusade.zip",
+    hashes = {
+      { hash = "e9ab5fa1ce2ddd441fa793ce7cb6f173", label = "Indiana Jones and the Last Crusade (1989)(US Gold)(v3)[codes].dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00FE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="test for level ID" },
+        { address=0X0108, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="test for level ID" },
+        { address=0X02C7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="test for level ID" },
+        { address=0X6501, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="bit0 or 1 = Make Cross disappear at 1st level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X02B8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) Total Lives increased" },
+        { address=0X02B8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) Total Lives decreased" },
+      },
+      health = {
+        { address=0X02B7, type="u8", condition="eq", value=0X2F, action="HEALTH_STATE", no_log=true, no_survey=false, desc="maxed" },
+        { address=0X02B7, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="(8 bit) Energy Bar" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X00F0, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="(8 bit) 1 = Jumping, 2 = Falling 3 = Climbing [Animation]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Al Unser Jr.'s Road to the Top",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "al-unser-jr-s-road-to-the-top",
+    file = "al-unser-jr-s-road-to-the-top.zip",
+    hashes = {
+      { hash = "48b9b7110373b958128b41daeebf45fb", label = "Al Unser Jr.'s Road to the Top (USA).sfc" },
+      { hash = "f086b3c1c0b2dde6963d254f4cdf7ef2", label = "Al Unser Jr.'s Road to the Top (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0564, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X1B0D, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Enabled" },
+        { address=0X1B0D, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Disabled" },
+        { address=0X1BD0, type="u8", condition="eq", value=0X3B, action="PAUSE_ON", no_log=false, no_survey=false, desc="Currently Racing" },
+        { address=0X1BD0, type="u8", condition="eq", value=0X9F, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1905, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Two Pines Circuit" },
+        { address=0X1905, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Super Kart Rally" },
+        { address=0X1905, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kart Klassic" },
+        { address=0X1905, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kodiak Run" },
+        { address=0X1905, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kootenay Loop" },
+        { address=0X1905, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Huskies Gorge" },
+        { address=0X1905, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Eagle Motorplex" },
+        { address=0X1905, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dakota GP" },
+        { address=0X1905, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="R.E. Nationals" },
+        { address=0X1905, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Delta Speedway" },
+        { address=0X1905, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cage GP 300" },
+        { address=0X1905, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Vahalla 150" },
+        { address=0X1905, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pikes Peak" },
+        { address=0X1905, type="u8", condition="eq", value=0X0D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unser Showdown" },
+        { address=0X1905, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Track Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0888, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results Screen - Race Time F" },
+        { address=0X088A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results Screen - Race Time E" },
+        { address=0X088C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results Screen - Race Time B" },
+        { address=0X088E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results Screen - Race Time A" },
+        { address=0X0890, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results Screen - Race Time C" },
+        { address=0X0892, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results Screen - Race Time D" },
+        { address=0X0A38, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Snowmobile Airtime Animation A" },
+        { address=0X1B58, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Lap Time" },
+        { address=0X1B80, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Lead/Lag Time" },
+      },
+    },
+  },
+}

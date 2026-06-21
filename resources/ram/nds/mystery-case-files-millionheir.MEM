@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Mystery Case Files: MillionHeir",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "mystery-case-files-millionheir",
+    file = "mystery-case-files-millionheir.zip",
+    hashes = {
+      { hash = "6dd263547a80aeed2c0b62afbae7bd58", label = "Mystery Case Files - MillionHeir (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X11BEB0, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object Found Cutscene (Screen Not Movable)" },
+        { address=0X1F647C, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Open" },
+        { address=0X1F647C, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Closed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11BEB0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 BIT] Screen Interactive" },
+      },
+    },
+  },
+}

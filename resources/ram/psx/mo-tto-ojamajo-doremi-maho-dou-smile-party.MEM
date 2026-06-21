@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Mo-tto! Ojamajo Doremi: Maho-dou Smile Party",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "mo-tto-ojamajo-doremi-maho-dou-smile-party",
+    file = "mo-tto-ojamajo-doremi-maho-dou-smile-party.zip",
+    hashes = {
+      { hash = "17947d1ed1558f507ebbf66eb02ebf01", label = "Kids Station - Motto! Oja Majo DoReMi - Maho-dou Smile Party (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3C2B0, type="u16le", condition="eq", value=0X40, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X654BC, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Doremi Harukaze" },
+        { address=0X654BC, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Hazuki Fujiwara" },
+        { address=0X654BC, type="u16le", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Aiko Senoo" },
+        { address=0X654BC, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Onpu Segawa" },
+        { address=0X654BC, type="u16le", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Momoko Asuka" },
+        { address=0X654BC, type="u16le", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not Loaded" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X3CCFC, type="u16le", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Witch" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X654C0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Title Screen - Demo Counters" },
+      },
+    },
+  },
+}

@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Elevator Action",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Platform, Shooter, Stealth"
+  },
+
+  rom = {
+    name = "elevator-action",
+    file = "elevator-action.zip",
+    hashes = {
+      { hash = "23c751fe6bb8bd4f8c0cd9b0d39adecd", label = "Elevator Action (Japan).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0044, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="In Gameplay (Includes Demo!!!)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X002E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X002F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X002F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0008, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score (Hundred Thousands and Ten Thousands) [8-bit BCD]" },
+        { address=0X0009, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score (Thousands and Hundreds) [8-bit BCD]" },
+        { address=0X000A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score (Hundred Thousands and Ten Thousands) [8-bit BCD]" },
+        { address=0X000B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score (Tens and Ones) [8-bit BCD]" },
+        { address=0X000C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score (Thousands and Hundreds) [8-bit BCD]" },
+        { address=0X000D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score (Hundred Thousands and Ten Thousands) [8-bit BCD]" },
+      },
+    },
+  },
+}

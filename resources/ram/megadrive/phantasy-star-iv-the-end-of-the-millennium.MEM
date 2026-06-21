@@ -1,0 +1,143 @@
+return {
+  game = {
+    title = "Phantasy Star IV: The End of the Millennium",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "phantasy-star-iv-the-end-of-the-millennium",
+    file = "phantasy-star-iv-the-end-of-the-millennium.zip",
+    hashes = {
+      { hash = "19731c22e7f7b26e47f5d709afdf5059", label = "Phantasy Star IV (USA) (Pt).md" },
+      { hash = "436d74341ce1885c5151d49da4b202f3", label = "Phantasy Star IV (USA) (Es) (v1.1) (Sayans Traductions).md" },
+      { hash = "58646828bbe100f37df663ccdc3ace0e", label = "Phantasy Star IV (Europe).md" },
+      { hash = "84cbd0ff47f3c8e9d21d2c2fc39185fa", label = "Phantasy Star IV (USA).md" },
+      { hash = "8e9a282ed591e115b23fb4dacb953970", label = "Phantasy Star IV (USA) (Ru) (v1.1) (bybyc9lc9l).md" },
+      { hash = "a98b963b51368db77b12cf7ea6547b71", label = "Phantasy Star IV (USA) (Fr) (Terminus).md" },
+      { hash = "d6cae47e928e55d52217dd80904e3ca9", label = "Phantasy Star IV (USA) (Lv99 Fix) (v1.0) (Sixfortyfive).md" },
+      { hash = "b7580d424fa09efe54a15aacbcd0e114", label = "Phantasy Star IV (USA) (Enemy Restoration)) (v1.0) (sourkraut) (Bug Fixes) (v1.5) (Iory1990).md" },
+      { hash = "ac58425a75a17a8d4db5d27e86dda207", label = "Phantasy Star IV (USA) (Enemy Restoration) (v1.0) (sourkraut).md" },
+      { hash = "6dd68b9decdb6fbbbc8d1c78ac044efd", label = "Phantasy Star IV (USA) (Bugfix) (v1.5) (Iory1990).md" },
+      { hash = "f4c9ca25980c3055508058b9b615f761", label = "Phantasy Star IV - Purist (v8.5) (GhaleonUnlimited).md" },
+      { hash = "140a311c7e62c003a6c559f9c5cf8fb1", label = "Phantasy Star IV - Purist (English Names) (v8.5) (GhaleonUnlimited).md" },
+      { hash = "fb78e5fb68d21e38e5f11fd318db793c", label = "Phantasy Star IV (USA) (Genesis Mini).md" },
+      { hash = "6c7b046ca2be8b319f66232feb682cbb", label = "Phantasy Star IV (USA) (Fr) (v3.0) (bge).md" },
+      { hash = "9cf7f6a0ca8cf5a42427529d12f18b8c", label = "Phantasy Star IV (USA) (Fr) (v3.0 + Music Fix) (bge).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEC20, type="u8", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Map title card" },
+        { address=0XEC28, type="u24be", condition="eq", value=0X11, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Piata Academy. Title menu." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF508, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaz level" },
+        { address=0XF588, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alys level" },
+        { address=0XF608, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hahn level" },
+        { address=0XF688, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rune level" },
+        { address=0XF708, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gryz level" },
+        { address=0XF788, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rika level" },
+        { address=0XF808, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Demi level" },
+        { address=0XF888, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wren level" },
+        { address=0XF908, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raja level" },
+        { address=0XF988, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kyra level" },
+      },
+      zone = {
+        { address=0XF401, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Space ship and place world" },
+      },
+      stage = {
+        { address=0X41D9, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active and playing out this round." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X41F6, type="u8", condition="eq", value=0X1A, action="LIVES_STATE", no_log=false, no_survey=false, desc="LifeDeletr" },
+        { address=0XEC28, type="u24be", condition="eq", value=0X99, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier's Temple, outside." },
+        { address=0XEC28, type="u24be", condition="eq", value=0X9A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier's Temple, inside." },
+        { address=0XF10D, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alys Death 1" },
+        { address=0XF10D, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alys Death 2" },
+        { address=0XF10E, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Stain in Life job complete" },
+        { address=0XF116, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Silver Soldier job complete" },
+        { address=0XF117, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Silver Soldier: Daughter spoken to." },
+        { address=0XF517, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (non-android)" },
+        { address=0XF517, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (android)" },
+        { address=0XF697, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (non-android)" },
+        { address=0XF697, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (android)" },
+        { address=0XF797, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (non-android)" },
+        { address=0XF797, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (android)" },
+        { address=0XF897, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (non-android)" },
+        { address=0XF897, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (android)" },
+      },
+      health = {
+        { address=0X420E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP decreased" },
+        { address=0X420E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP increased" },
+        { address=0X4210, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] 1st enemy - max HP decreased" },
+        { address=0X4210, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] 1st enemy - max HP increased" },
+        { address=0X428E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] 2nd enemy - current HP decreased" },
+        { address=0X428E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] 2nd enemy - current HP increased" },
+        { address=0X4290, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] 2nd enemy - max HP decreased" },
+        { address=0X4290, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] 2nd enemy - max HP increased" },
+        { address=0X430E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] 3rd enemy - current HP decreased" },
+        { address=0X430E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] 3rd enemy - current HP increased" },
+        { address=0X4310, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] 3rd enemy - max HP decreased" },
+        { address=0X4310, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] 3rd enemy - max HP increased" },
+        { address=0XF50E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Chaz - current HP decreased" },
+        { address=0XF50E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Chaz - current HP increased" },
+        { address=0XF510, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Chaz - max HP decreased" },
+        { address=0XF510, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Chaz - max HP increased" },
+        { address=0XF58E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Alys - current HP decreased" },
+        { address=0XF58E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Alys - current HP increased" },
+        { address=0XF590, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Alys - max HP decreased" },
+        { address=0XF590, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Alys - max HP increased" },
+        { address=0XF60E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Hahn - current HP decreased" },
+        { address=0XF60E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Hahn - current HP increased" },
+        { address=0XF610, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Hahn - max HP decreased" },
+        { address=0XF610, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Hahn - max HP increased" },
+        { address=0XF68E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 3 Current HP decreased" },
+        { address=0XF68E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 3 Current HP increased" },
+        { address=0XF78E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 2 Current HP decreased" },
+        { address=0XF78E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 2 Current HP increased" },
+        { address=0XF88E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char 4 Current HP decreased" },
+        { address=0XF88E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char 4 Current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XEC28, type="u24be", condition="eq", value=0XC4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Plant, 1." },
+        { address=0XEC28, type="u24be", condition="eq", value=0XC6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Plant, 3, Burst Roc room." },
+        { address=0XEC28, type="u24be", condition="eq", value=0XC7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Plant, 4." },
+        { address=0XF12F, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Plant: Burst Roc parts." },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE44F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Beat boss final and end ?" },
+        { address=0XEC28, type="u24be", condition="eq", value=0X17, action="BOSS_HIT", no_log=false, no_survey=false, desc="Academy basement boss room" },
+        { address=0XEE4F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Type Monster and boss" },
+        { address=0XF10F, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="ChaosSorcr boss engaged." },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4146, type="u16be", condition="eq", value=0X466, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Powshield" },
+        { address=0X4146, type="u16be", condition="eq", value=0X488, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Mahlay Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF112, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Trees destroyed?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEC20, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Window type open" },
+      },
+    },
+  },
+}

@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Tactics Ogre: Let Us Cling Together",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "tactics-ogre-let-us-cling-together",
+    file = "tactics-ogre-let-us-cling-together.zip",
+    hashes = {
+      { hash = "6144d2c0f27233d9ddc9038c0b48674f", label = "Tactics Ogre - Let Us Cling Together (Japan) (En) (v1.2) (Aeon Genesis).sfc" },
+      { hash = "e60fef5d311e06ab16a127f1c7718958", label = "Tactics Ogre - Let Us Cling Together (Japan) (Rev 2) (NP).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X056C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Supposedly the background id" },
+        { address=0X17FE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Exp-Level of Denim in battle" },
+        { address=0XB338, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hero level in menu" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1826, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Denim's Hp on battle decreased" },
+        { address=0X1826, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Denim's Hp on battle increased" },
+        { address=0X184E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero max hp in battle decreased" },
+        { address=0X184E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero max hp in battle increased" },
+        { address=0XB37E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16 bit- Hero hp in menu decreased" },
+        { address=0XB37E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16 bit- Hero hp in menu increased" },
+        { address=0XB380, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="No. 2 Hp in menu decreased" },
+        { address=0XB380, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="No. 2 Hp in menu increased" },
+        { address=0XB382, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="No. 3 Hp in menu decreased" },
+        { address=0XB382, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="No. 3 Hp in menu increased" },
+        { address=0XB3C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16-bit Hero max hp in menu decreased" },
+        { address=0XB3C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16-bit Hero max hp in menu increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X7E1ACE, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Second Screen Item 1" },
+        { address=0X7E1ACF, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Second Screen Item 2" },
+        { address=0X7E1AF6, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Second Screen Item 3" },
+        { address=0X7E1AF7, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Second Screen Item 4" },
+        { address=0X7E1E87, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="In-Battle Stats Menu Buffer - Second Screen Item 1" },
+        { address=0X7E1E88, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="In-Battle Stats Menu Buffer - Second Screen Item 2" },
+        { address=0X7E1E89, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="In-Battle Stats Menu Buffer - Second Screen Item 3" },
+        { address=0X7E1E8A, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="In-Battle Stats Menu Buffer - Second Screen Item 4" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBD87, type="u8", condition="eq", value=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="of Gold 09 = of Thunder l 0a = of Dark l 0b = of Sea l 0c = of Black l 0d = of Twin l 0e = of Fi" },
+      },
+    },
+  },
+}

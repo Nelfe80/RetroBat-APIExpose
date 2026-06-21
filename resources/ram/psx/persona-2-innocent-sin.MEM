@@ -1,0 +1,135 @@
+return {
+  game = {
+    title = "Persona 2: Innocent Sin",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "persona-2-innocent-sin",
+    file = "persona-2-innocent-sin.zip",
+    hashes = {
+      { hash = "1052168c5462df4ead8c7040bc9f5ff9", label = "Persona 2 - Tsumi ~ Innocent Sin (Japan) (En) (v1.0a) (Gemini)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7CAE8, type="u8", condition="eq", value=0X06, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X7F912, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonic Rumors Flag" },
+        { address=0X7F913, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stymphalides 3rd Rumor" },
+        { address=0X7F913, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Kanaloa 1st Rumor" },
+        { address=0X7F914, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonic Rumors Flag" },
+        { address=0X7F918, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Alice Room - Abandoned Factory" },
+        { address=0X7F919, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Waste Facility - Abandoned Factory" },
+        { address=0X7F9DB, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Japanese Blade No Alignment" },
+        { address=0X7F9DB, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Japanese Blade Water" },
+        { address=0X7F9DC, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Japanese Blade Wind" },
+        { address=0X7F9DC, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Japanese Blade Earth" },
+        { address=0X7F9DC, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Japanese Blade Supreme" },
+        { address=0X7F9DC, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guns No Alignment" },
+        { address=0X7F9DC, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guns Fire" },
+        { address=0X7F9DC, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guns Water" },
+        { address=0X7F9DC, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guns Wind" },
+        { address=0X7F9DD, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guns Earth" },
+        { address=0X7F9DD, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guitar Case No Alignment" },
+        { address=0X7F9DD, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guitar Case Fire" },
+        { address=0X7F9DD, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guitar Case Water" },
+        { address=0X7F9DD, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guitar Case Wind" },
+        { address=0X7F9DE, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Guitar Case Supreme" },
+        { address=0X7F9DE, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Gloves No Alignment" },
+        { address=0X7F9DE, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Gloves Fire" },
+        { address=0X7F9DE, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Gloves Water" },
+        { address=0X7F9DE, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Gloves Earth" },
+        { address=0X7F9DF, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Gloves Supreme" },
+        { address=0X7F9DF, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Flower No Alignment" },
+        { address=0X7F9DF, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Flower Fire" },
+        { address=0X7F9DF, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Flower Wind" },
+        { address=0X7F9DF, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Flower Earth" },
+        { address=0X7F9DF, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Legendary Flower Supreme" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X7CAE8, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X801F1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Persona Slot 1 - Current Level" },
+        { address=0X80491, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Persona Level - Slot 9" },
+        { address=0X17D905, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Turned On" },
+        { address=0X17D905, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Turned Off (casting a fusion spell)" },
+        { address=0X17D905, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle Background" },
+      },
+      zone = {
+        { address=0X7F7DE, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tarot Cards (16-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7F7CE, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Tarot Cards (16-bit)" },
+        { address=0X7F990, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Divination Active - Purgatory" },
+        { address=0X7F990, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Divination Active - Moon" },
+        { address=0X7F990, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Divination Active - Ego" },
+        { address=0X10174C, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Finished (Only when you die or win a battle)" },
+      },
+      health = {
+        { address=0X110BFC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tatsuya HP 1 decreased" },
+        { address=0X110BFC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tatsuya HP 1 increased" },
+        { address=0X110C50, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Michelle HP 1 decreased" },
+        { address=0X110C50, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Michelle HP 1 increased" },
+        { address=0X110CA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ginko HP 1 decreased" },
+        { address=0X110CA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ginko HP 1 increased" },
+        { address=0X110CF8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maya HP 1 decreased" },
+        { address=0X110CF8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maya HP 1 increased" },
+        { address=0X110D4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yukki/Jun HP 1 decreased" },
+        { address=0X110D4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yukki/Jun HP 1 increased" },
+        { address=0X110DA0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP (16-bit) decreased" },
+        { address=0X110DA0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP (16-bit) increased" },
+        { address=0X110DF4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP (16-bit) decreased" },
+        { address=0X110DF4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP (16-bit) increased" },
+        { address=0X1492B2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tatsuya HP 2 decreased" },
+        { address=0X1492B2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tatsuya HP 2 increased" },
+        { address=0X149362, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Michelle HP 2 decreased" },
+        { address=0X149362, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Michelle HP 2 increased" },
+        { address=0X149412, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ginko HP 2 decreased" },
+        { address=0X149412, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ginko HP 2 increased" },
+        { address=0X1494C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maya HP 2 decreased" },
+        { address=0X1494C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maya HP 2 increased" },
+        { address=0X149572, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yukki/Jun HP 2 decreased" },
+        { address=0X149572, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yukki/Jun HP 2 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X7F971, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ramen Shop Weapons (1st Rumor)" },
+        { address=0X7F987, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Time Castle Weapons" },
+        { address=0X7F987, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tony Shop Weapons" },
+        { address=0X7F987, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Clair de Lune Weapons" },
+        { address=0X7F987, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Jolly Roger Weapons" },
+        { address=0X7F989, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Clair de Lune Amazing Weapons" },
+        { address=0X7F989, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ramen Shiraishi Special Weapons" },
+        { address=0X7F98E, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Time Castle Legendary Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X7F428, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X7CB41, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle ID (8-bit)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X7F979, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Jumping Old Man" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7CB64, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Related to Philemon Temple?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Slave Zero",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "slave-zero",
+    file = "slave-zero.zip",
+    hashes = {
+      { hash = "8138f5e5bc0f9a537f280351619b8b27", label = "Slave Zero (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X86EAE4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Cells 1 decreased" },
+        { address=0X86EAE4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Cells 1 increased" },
+        { address=0X876D44, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Cells 2 decreased" },
+        { address=0X876D44, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Cells 2 increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X86EAE0, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="(16bit) Gun Ammo 1" },
+        { address=0X876D40, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="(16bit) Gun ammo 2" },
+      },
+    },
+  },
+}

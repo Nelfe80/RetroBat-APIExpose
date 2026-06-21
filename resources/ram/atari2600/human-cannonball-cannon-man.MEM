@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Human Cannonball | Cannon Man",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "human-cannonball-cannon-man",
+    file = "human-cannonball-cannon-man.zip",
+    hashes = {
+      { hash = "7972e5101fa548b952d852db24ad6060", label = "Human Cannonball ~ Cannon Man (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon White Version 2 [Subset - Challenge Mode]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-white-version-2-subset-challenge-mode",
+    file = "pokemon-white-version-2-subset-challenge-mode.zip",
+    hashes = {
+      { hash = "98041b23fbea01bed90e960fce246011", label = "Pokemon - White Version 2 [Subset - Challenge Mode].nds" },
+    }
+  },
+
+  events = {
+  },
+}

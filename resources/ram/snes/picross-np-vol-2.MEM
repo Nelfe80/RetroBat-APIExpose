@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Picross NP Vol. 2",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picross-np-vol-2",
+    file = "picross-np-vol-2.zip",
+    hashes = {
+      { hash = "38de95c1e45b718fa97a8648b0c60993", label = "Picross NP Vol. 2 (Japan) (Rev 1) (NP).sfc" },
+      { hash = "7ccd3d8fc102f5898f60e85d3a58344c", label = "Picross NP Vol. 2 (Japan) (NP).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1EF6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background music" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X202B9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Beginner A time" },
+      },
+    },
+  },
+}

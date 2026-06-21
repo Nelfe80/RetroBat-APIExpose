@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Who Wants to Be a Millionaire",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "who-wants-to-be-a-millionaire",
+    file = "who-wants-to-be-a-millionaire.zip",
+    hashes = {
+      { hash = "c2d1e564ad14d0301761fdd3b5546583", label = "Who Wants to Be a Millionaire (Europe)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X99E80, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Audience Answer Highlighted" },
+        { address=0X99E84, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit 0 = 50/50 Lifeline increased" },
+        { address=0X99E84, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 0 = 50/50 Lifeline decreased" },
+        { address=0X99E88, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit 0 = Phone A Friend Lifeline increased" },
+        { address=0X99E88, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 0 = Phone A Friend Lifeline decreased" },
+        { address=0X99E8C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit 0 = Ask the Audience Lifeline increased" },
+        { address=0X99E8C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 0 = Ask the Audience Lifeline decreased" },
+      },
+    },
+  },
+}

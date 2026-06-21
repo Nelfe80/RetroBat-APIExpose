@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Army Men: Air Combat",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Strategy, Shoot'em Up, Shooter, Avion"
+  },
+
+  rom = {
+    name = "army-men-air-combat",
+    file = "army-men-air-combat.zip",
+    hashes = {
+      { hash = "755df7f57edf87706d4c80ff15883312", label = "Army Men - Air Combat (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB254F, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Plastic Pandemonium" },
+        { address=0XB254F, type="u8", condition="eq", value=0X0C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demolition Time" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X5FB4D1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Mission 2 Health 400= Max decreased" },
+        { address=0X5FB4D1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Mission 2 Health 400= Max increased" },
+        { address=0X5FE8D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Mission 1 Health 400= Max decreased" },
+        { address=0X5FE8D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Mission 1 Health 400= Max increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB254F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Selected Mission" },
+      },
+    },
+  },
+}

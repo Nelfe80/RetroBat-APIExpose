@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Mortal Kombat Trilogy",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-trilogy",
+    file = "mortal-kombat-trilogy.zip",
+    hashes = {
+      { hash = "c440c81cf74068eafeabb2745f32ea6f", label = "Mortal Kombat Trilogy (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[1 byte] Attract-mode indicator candidate" },
+      },
+      events = {
+        { address=0X180073, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Base address for combo pointers" },
+        { address=0X1843CC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[1 byte] Options - combos P1" },
+        { address=0X1843CE, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[1 byte] Options - combos P2" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X183EDA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[1 byte] 1P rounds won" },
+        { address=0X184052, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[1 byte] 2P rounds won" },
+        { address=0X1841F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[1 byte] 1P total rounds won" },
+        { address=0X1841F2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[1 byte] 2P total rounds won" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X183AFC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] 2P health, display value decreased" },
+        { address=0X183AFC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] 2P health, display value increased" },
+        { address=0X183B14, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] 1P health, display value decreased" },
+        { address=0X183B14, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] 1P health, display value increased" },
+        { address=0X183ED4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] 1P health, actual value decreased" },
+        { address=0X183ED4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] 1P health, actual value increased" },
+        { address=0X18404C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] 2P health, actual value decreased" },
+        { address=0X18404C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] 2P health, actual value increased" },
+        { address=0X1843D2, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[1 byte] Secret options - normal boss damage" },
+        { address=0X1843D6, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[1 byte] Secret options - low damage" },
+        { address=0X1843D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] Secret options - health recovery decreased" },
+        { address=0X1843D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] Secret options - health recovery increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1843C8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[1 byte] Options - timer" },
+        { address=0X18525F, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[1 byte] 2P combo counter, candidate C" },
+        { address=0X1852DA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[1 byte] Timer, tens digit" },
+        { address=0X1852DE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[1 byte] Timer, ones digit" },
+        { address=0X18579F, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[1 byte] 1P combo counter, candidate B" },
+        { address=0X1862FF, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[1 byte] 2P combo counter, candidate B" },
+        { address=0X18659F, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[1 byte] 1P combo counter" },
+        { address=0X18683F, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[1 byte] 1P combo counter, candidate C" },
+        { address=0X1872BF, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[1 byte] 2P combo counter" },
+        { address=0X1877FF, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[1 byte] 2P combo counter, candidate A" },
+      },
+    },
+  },
+}

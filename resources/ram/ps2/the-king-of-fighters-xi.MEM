@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "The King of Fighters XI",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-king-of-fighters-xi",
+    file = "the-king-of-fighters-xi.zip",
+    hashes = {
+      { hash = "4d4bad72445cd91ecd5041c2063fdfc5", label = "King of Fighters XI, The (USA, Canada)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8A9510, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CPU Decreased Health" },
+        { address=0X8A9510, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Power Gauge Recovery" },
+        { address=0X8A9510, type="u8", condition="eq", value=0X04, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Skill Gauge Max" },
+        { address=0X8A95E8, type="u16le", condition="eq", value=0X0201, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X8A95E8, type="u16le", condition="eq", value=0X0304, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X8A95E8, type="u16le", condition="eq", value=0X0305, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Service" },
+        { address=0X8A95E8, type="u16le", condition="eq", value=0X0306, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X8A95E9, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8B6DB1, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-4 (default)" },
+        { address=0X8B6DB1, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-8" },
+        { address=0X8B6DB1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings [Battle] - CPU-Level" },
+        { address=0X8B6DB4, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 rounds (default)" },
+        { address=0X8B6DB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings [Battle] - Single Round [8 bits]" },
+        { address=0X8B6DB5, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4 (default)" },
+        { address=0X8B6DB5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings [Battle] - Defense Level 1P [8 bits]" },
+        { address=0X8B6DB6, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4 (default)" },
+        { address=0X8B6DB6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings [Battle] - Defense Level 2P [8 bits]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8B6DB2, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Settings [Battle] - Play Time [8 bits]" },
+      },
+    },
+  },
+}

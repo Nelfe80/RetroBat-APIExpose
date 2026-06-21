@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pilot ni Narou! 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Flight Simulator"
+  },
+
+  rom = {
+    name = "pilot-ni-narou-2",
+    file = "pilot-ni-narou-2.zip",
+    hashes = {
+      { hash = "e119d2274e74cbb389a134b965e635f7", label = "Pilot ni Narou! 2 (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

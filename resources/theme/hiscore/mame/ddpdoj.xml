@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 Y. 7752841</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 YDX 7296714</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 WTN 7280945</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 NAI 7193547</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 NAL 44683</text>
+		</text>
+	</view>
+</theme>

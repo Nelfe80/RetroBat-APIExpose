@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Tak and the Power of Juju",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "tak-and-the-power-of-juju",
+    file = "tak-and-the-power-of-juju.zip",
+    hashes = {
+      { hash = "182fea4da66f533105a189fe1a1c8ec9", label = "Tak and the Power of Juju (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X327D20, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1 if paused, 0 otherwise" },
+        { address=0X327D50, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1 if paused, 0 otherwise" },
+        { address=0X332CE0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="1 if demo is playing, 0 otherwise" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1234073, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 after you have discovered the burial ground" },
+      },
+    },
+  },
+}

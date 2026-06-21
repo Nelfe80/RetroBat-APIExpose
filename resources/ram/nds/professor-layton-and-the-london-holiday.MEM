@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Professor Layton and the London Holiday",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "professor-layton-and-the-london-holiday",
+    file = "professor-layton-and-the-london-holiday.zip",
+    hashes = {
+      { hash = "1dc7d130e52bc6eb7819a689325ef4a7", label = "Level5 Premium - Silver (Japan) (Demo) (Promo).nds" },
+      { hash = "71b60de258ccec9ffb2863cc90d069ad", label = "Layton Kyouju to Akuma no Hako (Japan).nds" },
+      { hash = "b2c859d9d4cfe2f1649f62f2f40c46cd", label = "Level5 Premium - Gold (Japan) (Demo) (Promo).nds" },
+    }
+  },
+
+  events = {
+  },
+}

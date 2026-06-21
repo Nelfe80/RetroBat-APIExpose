@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Tetris Party Deluxe",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tetris-party-deluxe",
+    file = "tetris-party-deluxe.zip",
+    hashes = {
+      { hash = "68e1ddb2eae003c29233851c545e0ea2", label = "Tetris Party Deluxe (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X273326, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU Level" },
+      },
+    },
+  },
+}

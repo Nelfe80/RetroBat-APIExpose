@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Transformers: Autobots",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing, Shooter"
+  },
+
+  rom = {
+    name = "transformers-autobots",
+    file = "transformers-autobots.zip",
+    hashes = {
+      { hash = "7fe1492f8e268aaf4dece668c4a4d323", label = "Transformers - Autobots (United Kingdom).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XADC04, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0XADC04, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2" },
+        { address=0XADC04, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0XADC04, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4" },
+        { address=0XADC04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 Bit) Wanted Level" },
+        { address=0X173154, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-Bit) Level/Rank Number" },
+        { address=0X173185, type="u8", condition="eq", value=0X1, action="LEVEL_CURRENTLY_IN_A_CHALLENGE_MISSION", no_log=false, no_survey=false, desc="Currently in a Challenge Mission" },
+        { address=0X173185, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-Bit) Challenge Level Select" },
+        { address=0X173187, type="u8", condition="eq", value=0X1, action="LEVEL_PLAYER_ENTERED_A_MISSION_THROUGH_THE_LEVEL_SELECT_ON_THE", no_log=false, no_survey=false, desc="Player entered a mission through the Level Select on the menu" },
+        { address=0X173187, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-Bit) Level Select Check" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X173118, type="u8", condition="eq", value=0X1E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Truck" },
+        { address=0X1732DE, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Truck" },
+      },
+      health = {
+        { address=0X16DB84, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 Bit) HP Meter decreased" },
+        { address=0X16DB84, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 Bit) HP Meter increased" },
+        { address=0X16DB88, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 Bit) Energy Meter decreased" },
+        { address=0X16DB88, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 Bit) Energy Meter increased" },
+        { address=0X16ED74, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-Bit) Optimus Prime HP decreased" },
+        { address=0X16ED74, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-Bit) Optimus Prime HP increased" },
+        { address=0X270830, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 Bit) Utility Car HP decreased" },
+        { address=0X270830, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 Bit) Utility Car HP increased" },
+        { address=0X2B08C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 Bit) Sports Car HP decreased" },
+        { address=0X2B08C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 Bit) Sports Car HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17324C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-Bit) Swing Batter, Swing High Score" },
+        { address=0X173254, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-Bit) Trash the Place High Score" },
+        { address=0X17326C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-Bit) Vandalism High Score" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X173180, type="u8", condition="eq", value=0X0D, action="JUMPING", no_log=false, no_survey=false, desc="In Through the Back Door / Jump the Floes" },
+        { address=0X173241, type="u8", condition="eq", value=0X5, action="JUMPING", no_log=false, no_survey=false, desc="Jump the Floes" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X171638, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(32-Bit) Object Being Held?" },
+        { address=0X173168, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="(32-Bit) Statistics Vehicles Destroyed" },
+        { address=0X17316C, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="(32-Bit) Statistics Robots Destroyed" },
+        { address=0X173170, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="(32-Bit) Statistics Objects Destroyed" },
+        { address=0X173180, type="u8", condition="eq", value=0X13, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Narrow Escape / Roadblock" },
+        { address=0X173180, type="u8", condition="eq", value=0X1E, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object Toss" },
+        { address=0X173230, type="u8", condition="eq", value=0X11, action="DOOR_OPENED", no_log=false, no_survey=false, desc="In Through the Back Door Unlocked" },
+        { address=0X173242, type="u8", condition="eq", value=0X3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Road Block" },
+        { address=0X173243, type="u8", condition="eq", value=0X6, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object Toss" },
+        { address=0X1F8490, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(8 Bit) Object Pathfinding" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X173164, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32-Bit) Statistics Death Counter" },
+        { address=0X173180, type="u8", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bad Reception / Time Trial" },
+        { address=0X173180, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-Bit) Mission ID" },
+        { address=0X173241, type="u8", condition="eq", value=0X0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X173241, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-Bit) [Bitflag] Challenge Missions 9-16" },
+      },
+    },
+  },
+}

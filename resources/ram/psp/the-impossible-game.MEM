@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Impossible Game",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-impossible-game",
+    file = "the-impossible-game.zip",
+    hashes = {
+      { hash = "83c5da8ffe82a0e9fc4efaf3a1c84381", label = "Impossible Game, The (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

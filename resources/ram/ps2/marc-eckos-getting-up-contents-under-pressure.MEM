@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Marc Ecko's Getting Up: Contents Under Pressure",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "marc-eckos-getting-up-contents-under-pressure",
+    file = "marc-eckos-getting-up-contents-under-pressure.zip",
+    hashes = {
+      { hash = "712f00c88f1721e0c62afc3f3028abb9", label = "Marc Ecko's Getting Up - Contents Under Pressure (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Route 66",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "route-66",
+    file = "route-66.zip",
+    hashes = {
+      { hash = "9b9baac2e4e067e7e556393ade1cda56", label = "Route 66 (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X18DFB40, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level - Text (32bit)" },
+        { address=0X1F6FA48, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level - Loaded (32bit)" },
+      },
+    },
+  },
+}

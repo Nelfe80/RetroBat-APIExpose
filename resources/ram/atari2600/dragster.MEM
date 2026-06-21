@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Dragster",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "dragster",
+    file = "dragster.zip",
+    hashes = {
+      { hash = "77057d9d14b99e465ea9e29783af0ae3", label = "Dragster (USA).a26" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X0030, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="rapidly counts down from 1e to 0 then goes back to 1e only when switching between game 1 and 2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0010, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="10th place seconds counter" },
+        { address=0X0012, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="seconds counter" },
+        { address=0X0014, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="countdown timer for race counts down from -2 then -10 and loop until it hits 0 and starts the ra" },
+        { address=0X0016, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="1/10 seconds counter" },
+        { address=0X0033, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer player 1" },
+        { address=0X0034, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer player 2" },
+        { address=0X0035, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="player 1 milliseconds counter" },
+        { address=0X0036, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="player 2 milliseconds counter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "Earthworm Jim",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "earthworm-jim",
+    file = "earthworm-jim.zip",
+    hashes = {
+      { hash = "c25af3925fd6973af62bdd6d0c5f61ca", label = "Earthworm Jim (USA).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01FF, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8bit] Continues" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X01D6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X01D6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+        { address=0X1F01, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Western" },
+        { address=0X1F01, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] New Junk City Lives Bits increased" },
+        { address=0X1F01, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] New Junk City Lives Bits decreased" },
+        { address=0X1F03, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Second" },
+        { address=0X1F03, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Helicopter Lives Bits increased" },
+        { address=0X1F03, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Helicopter Lives Bits decreased" },
+        { address=0X1F07, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="First" },
+        { address=0X1F07, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Pod Race Lives Bits increased" },
+        { address=0X1F07, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Pod Race Lives Bits decreased" },
+        { address=0X1F09, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="North" },
+        { address=0X1F09, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] What the Heck Lives Bits increased" },
+        { address=0X1F09, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] What the Heck Lives Bits decreased" },
+        { address=0X1F0D, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Third" },
+        { address=0X1F0D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Helicopter Lives Bits increased" },
+        { address=0X1F0D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Helicopter Lives Bits decreased" },
+        { address=0X1F0E, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Second" },
+        { address=0X1F0E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Pod Race Lives Bits increased" },
+        { address=0X1F0E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Pod Race Lives Bits decreased" },
+        { address=0X1F13, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Central" },
+        { address=0X1F13, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] What the Heck Lives Bits increased" },
+        { address=0X1F13, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] What the Heck Lives Bits decreased" },
+        { address=0X1F23, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Only" },
+        { address=0X1F23, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Buttville Lives Bits increased" },
+        { address=0X1F23, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Buttville Lives Bits decreased" },
+        { address=0X1F24, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Eastern" },
+        { address=0X1F24, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Down the Tubes Lives Bits increased" },
+        { address=0X1F24, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Down the Tubes Lives Bits decreased" },
+        { address=0X1F32, type="u8", condition="eq", value=0X3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Eastern" },
+        { address=0X1F32, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] New Junk City Lives Bits increased" },
+        { address=0X1F32, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] New Junk City Lives Bits decreased" },
+      },
+      health = {
+        { address=0X0146, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8bit] Bubble Ship Damage" },
+        { address=0X01D7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health decreased" },
+        { address=0X01D7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0193, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Ammo" },
+        { address=0X0194, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Ammo x255" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X01F3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1932, type="u8", condition="eq", value=0X12, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken" },
+        { address=0X193A, type="u8", condition="eq", value=0X12, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken" },
+      },
+    },
+  },
+}

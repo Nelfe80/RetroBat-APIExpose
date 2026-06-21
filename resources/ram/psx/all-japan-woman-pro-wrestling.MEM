@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "All Japan Woman Pro Wrestling",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "all-japan-woman-pro-wrestling",
+    file = "all-japan-woman-pro-wrestling.zip",
+    hashes = {
+      { hash = "bad2d852d10b39e91cece67d265f4976", label = "Zen Nihon Joshi Pro Wrestling - Joou Densetsu - Yume no Taikousen (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X870B0, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+        { address=0X870B0, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3E5D6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="WWWA Ranking Match: Stamina Level" },
+        { address=0X3E5D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="WWWA Ranking Match: Bump Level" },
+        { address=0X3E5D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="WWWA Ranking Match: Resist Level" },
+        { address=0X3E5D9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="WWWA Ranking Match: Techincal Level" },
+        { address=0X3E5DA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="WWWA Ranking Match: Finish Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1FAF12, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White" },
+        { address=0X1FAF12, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Yellow" },
+        { address=0X1FAF12, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Red" },
+        { address=0X1FAF12, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Wrestler 2 Head Health" },
+        { address=0X1FAF14, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White" },
+        { address=0X1FAF14, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Yellow" },
+        { address=0X1FAF14, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Red" },
+        { address=0X1FAF14, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Wrestler 2 Torso Health" },
+        { address=0X1FAF16, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White" },
+        { address=0X1FAF16, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Yellow" },
+        { address=0X1FAF16, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Red" },
+        { address=0X1FAF16, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Wrestler 2 Leg Health" },
+        { address=0X1FBD3A, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White" },
+        { address=0X1FBD3A, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Yellow" },
+        { address=0X1FBD3A, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Red" },
+        { address=0X1FBD3A, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Wrestler 1 Head Health" },
+        { address=0X1FBD3C, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White" },
+        { address=0X1FBD3C, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Yellow" },
+        { address=0X1FBD3C, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Red" },
+        { address=0X1FBD3C, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Wrestler 1 Torso Health" },
+        { address=0X1FBD3E, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="White" },
+        { address=0X1FBD3E, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Yellow" },
+        { address=0X1FBD3E, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Red" },
+        { address=0X1FBD3E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Wrestler 1 Leg Health" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X870CC, type="u16le", condition="eq", value=0X011B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Out" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4725C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Options: Time" },
+        { address=0X870D4, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Match Timer" },
+      },
+    },
+  },
+}

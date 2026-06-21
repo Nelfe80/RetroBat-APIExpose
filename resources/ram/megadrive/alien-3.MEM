@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Alien 3",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform, Action"
+  },
+
+  rom = {
+    name = "alien-3",
+    file = "alien-3.zip",
+    hashes = {
+      { hash = "3189dec0eadd9a36b142ad12fbfe6cf8", label = "Alien 3 (USA, Europe) (Rev A) (Ru).md" },
+      { hash = "793b92cd4a66921db6ca4f582a690db5", label = "Alien 3 (USA, Europe) (Rev A).md" },
+      { hash = "f9e32be60028206b3716f64f2ba0ab00", label = "Alien 3 (USA, Europe).md" },
+    }
+  },
+
+  events = {
+  },
+}

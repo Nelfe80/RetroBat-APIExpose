@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "4 Elements",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "4-elements",
+    file = "4-elements.zip",
+    hashes = {
+      { hash = "552356cc91dc696fc24974eb082a607b", label = "4 Elements (DSIware) (Europe, Australia) (En,Fr,De).nds" },
+      { hash = "f04768a5af8ec26a3ac3e0d621793eab", label = "4 Elements (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE5CEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+  },
+}

@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "C: The Contra Adventure",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "c-the-contra-adventure",
+    file = "c-the-contra-adventure.zip",
+    hashes = {
+      { hash = "030f00c1d413bf8354da01a30629b101", label = "C - The Contra Adventure (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEFCE2, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0XEFCFE, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode (Off) = 00" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8F350, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Cleared Screen = 00; Gameplay = 01" },
+        { address=0X90162, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Cleared Screen = 0d; Gameplay = 08 or 0c" },
+        { address=0XDD91C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select/FMV Cheat = b4ee" },
+        { address=0XEC111, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Cleared Screen = 05; Gameplay = 0b" },
+        { address=0XECF0A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="sfx of Stage Completed = 40" },
+        { address=0X1FFE90, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select = 01ac" },
+      },
+      stage = {
+        { address=0X8F168, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progress 2D?" },
+        { address=0XB706C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage section?" },
+        { address=0XB71DC, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Section??" },
+        { address=0X1A3C34, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8F128, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Infinite Lives" },
+        { address=0XEB518, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XEB518, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XCC6C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP 2D decreased" },
+        { address=0XCC6C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP 2D increased" },
+        { address=0XEC5D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP 3D decreased" },
+        { address=0XEC5D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP 3D increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X8F2D4, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Machinegun" },
+        { address=0X8F2D4, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flamethrower" },
+        { address=0X8F2D4, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spread Gun" },
+        { address=0X8F2D4, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade Launcher" },
+        { address=0X8F2D4, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser" },
+        { address=0X8F2D4, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Homing Missiles" },
+        { address=0XCC6BF, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Machinegun" },
+        { address=0XCC6BF, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flamethrower" },
+        { address=0XCC6BF, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spread Gun" },
+        { address=0XCC6BF, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade Launcher" },
+        { address=0XCC6BF, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser" },
+        { address=0XCC6BF, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Homing Missiles" },
+        { address=0XEFA5C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon slot" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8F090, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP Bar" },
+        { address=0XA26F0, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss 1 (Live = ff, Dead = 00)" },
+        { address=0XA26F2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Killed Flag = 01" },
+        { address=0XBF05A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 Killed Flag = 01" },
+        { address=0XC2E4A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 HP3?" },
+        { address=0XC42CA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 HP4?" },
+        { address=0XC4BC2, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Train HP" },
+        { address=0XC71C2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 Killed Flag = 01 (2nd)" },
+        { address=0XC90F2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 HP5?" },
+        { address=0XCA2E2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 HP?" },
+        { address=0XCABDA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 HP2?" },
+        { address=0XCAD22, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 HP6?" },
+      },
+    },
+  },
+}

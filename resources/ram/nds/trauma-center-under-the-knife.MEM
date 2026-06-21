@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Trauma Center: Under the Knife",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation, Visual Novel"
+  },
+
+  rom = {
+    name = "trauma-center-under-the-knife",
+    file = "trauma-center-under-the-knife.zip",
+    hashes = {
+      { hash = "9fdce55a596c460adb0b9174948b0235", label = "Trauma Center - Under the Knife (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X17D95C, type="u8", condition="eq", value=0X9, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life or Death" },
+        { address=0X17D95C, type="u8", condition="eq", value=0XF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Just Let Me Die" },
+        { address=0X17D95C, type="u8", condition="eq", value=0X3B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Awaits All" },
+      },
+      health = {
+        { address=0X1E6F98, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Patient Health? decreased" },
+        { address=0X1E6F98, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Patient Health? increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17D9E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 bit] Score" },
+        { address=0X1E614C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-bit - Operation Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1DE118, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Glass Piece Damage Timer" },
+      },
+    },
+  },
+}

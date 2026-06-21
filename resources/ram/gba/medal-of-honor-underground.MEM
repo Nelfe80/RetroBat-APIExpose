@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Medal of Honor: Underground",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Shooter, 1ere Personne"
+  },
+
+  rom = {
+    name = "medal-of-honor-underground",
+    file = "medal-of-honor-underground.zip",
+    hashes = {
+      { hash = "d15113e7b1843edfd258ad5f5051b418", label = "Medal of Honor - Underground (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5968, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level ID" },
+        { address=0X5AF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Result Screen - Enemies Eliminated (current level)" },
+        { address=0X5AF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Result Screen - Number of Hits (current level)" },
+        { address=0X5B00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Result Screen - Rating (current level)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2667, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X2667, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5E96, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Petrol Bomb Ammo" },
+      },
+    },
+  },
+}

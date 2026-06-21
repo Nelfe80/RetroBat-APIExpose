@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Jojo no Kimyou na Bouken: Phantom Blood",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Fighting"
+  },
+
+  rom = {
+    name = "jojo-no-kimyou-na-bouken-phantom-blood",
+    file = "jojo-no-kimyou-na-bouken-phantom-blood.zip",
+    hashes = {
+      { hash = "305258b91129f8dbf9eae87136a1f1a1", label = "Jojo no Kimyou na Bouken - Phantom Blood (Japan)" },
+      { hash = "9ae312d48fb15762141c6a554a217b90", label = "Jojo no Kimyou na Bouken - Phantom Blood (SLPS-25686) [35A6E6D5]" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X31D483, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8bit] Current BEAT! Count (Combos)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X244504, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] total amount of health decreased" },
+        { address=0X244504, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] total amount of health increased" },
+        { address=0X244508, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] current health left decreased" },
+        { address=0X244508, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] current health left increased" },
+        { address=0X249540, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Enemy 1 HP decreased" },
+        { address=0X249540, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Enemy 1 HP increased" },
+        { address=0X249544, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Enemy 1 HP decreased" },
+        { address=0X249544, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Enemy 1 HP increased" },
+        { address=0X249548, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Enemy 1 HP decreased" },
+        { address=0X249548, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Enemy 1 HP increased" },
+        { address=0X24E500, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Enemy 2 health decreased" },
+        { address=0X24E500, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Enemy 2 health increased" },
+        { address=0X24E504, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Enemy 2 health decreased" },
+        { address=0X24E504, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Enemy 2 health increased" },
+        { address=0X24E508, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Enemy 2 health decreased" },
+        { address=0X24E508, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Enemy 2 health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X244500, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[float] health regen timer" },
+      },
+    },
+  },
+}

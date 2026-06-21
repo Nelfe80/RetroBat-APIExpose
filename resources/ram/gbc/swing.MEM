@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Swing",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "swing",
+    file = "swing.zip",
+    hashes = {
+      { hash = "c53d2f538f6a5f421c87f935a42aa912", label = "Swing (Germany).gbc" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0XDC61, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block 1 Type" },
+        { address=0XDC62, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block 2 type" },
+        { address=0XDC63, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block 3 type" },
+      },
+    },
+  },
+}

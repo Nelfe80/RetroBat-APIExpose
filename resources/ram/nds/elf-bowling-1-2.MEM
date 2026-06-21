@@ -1,0 +1,34 @@
+return {
+  game = {
+    title = "Elf Bowling 1 & 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "elf-bowling-1-2",
+    file = "elf-bowling-1-2.zip",
+    hashes = {
+      { hash = "e725f80e85088afab9ff2dddaf3ec30b", label = "Elf Bowling 1 & 2 (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1CBAE8, type="u32le", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CBAE8, type="u32le", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score Calcuated & Elves Hit Cleared" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1CB4EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Elf Bowling 1 - Displayed Final Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Motoko-chan no Wonder Kitchen",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Party"
+  },
+
+  rom = {
+    name = "motoko-chan-no-wonder-kitchen",
+    file = "motoko-chan-no-wonder-kitchen.zip",
+    hashes = {
+      { hash = "ae83f7bb3966cc887fa210aebb5422b0", label = "Motoko-chan no Wonder Kitchen (Japan).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "Zelda II: The Adventure of Link",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform, Role-Playing"
+  },
+
+  rom = {
+    name = "zelda-ii-the-adventure-of-link",
+    file = "zelda-ii-the-adventure-of-link.zip",
+    hashes = {
+      { hash = "000cbbf155e03c0523fab879aee9b679", label = "Zelda II - The Adventure of Link (USA) (Zh) (wiiiii).nes" },
+      { hash = "1397dbd4f3b651353fc9f95522d349cc", label = "Zelda II - The Adventure of Link (USA) (Es) (v1.0) (jackic).nes" },
+      { hash = "20de5fbc067da27fb56242aae1515a0b", label = "Zelda II - The Adventure of Link (USA) (Du) (v1.1) (Ok Impala!).nes" },
+      { hash = "445bebcac5e5538767656fc3cf92a281", label = "Zelda II - The Adventure of Link (USA) (Tl) (v1.0) (Zynk Oxhyde).nes" },
+      { hash = "5df477ffb9fcf57d8fc8b84d599d3aa0", label = "Zelda II - The Adventure of Link (USA) (Fr) (v1.0) (Generation IX).nes" },
+      { hash = "79efcc636d33f9af534fe81ae5143e18", label = "Zelda II - The Adventures of Link (USA) (Eo) (v1.0) (eokakto).nes" },
+      { hash = "88c0493fb1146834836c0ff4f3e06e45", label = "Zelda II - The Adventure of Link (USA).nes" },
+      { hash = "96afde1deb2f1484c7fdc8fe8aa59aa3", label = "Zelda II - The Adventure of Link (USA) (Tu) (knighTeen87).nes" },
+      { hash = "aa86b61c8dbcec521e93cab48cd25386", label = "Zelda II - The Adventure of Link (USA) (Ro) (v1.0) (gorgyrip).nes" },
+      { hash = "b59c67d97b6041346b0160cb0a97a39d", label = "Zelda II - The Adventure of Link (USA) (De) (v1.01) (Ice Man).nes" },
+      { hash = "f240370ce4f22e3b6df1732c44317cd2", label = "Zelda II - The Adventure of Link (USA) (La) (abw).nes" },
+      { hash = "f94648a5e2f0b33a542659d9365338b1", label = "Zelda II - The Adventure of Link (USA) (No) (v1.0) (Just4Fun).nes" },
+      { hash = "8e381e740c91dd183fb6ec866b6b0ce7", label = "Zelda II - The Adventure of Link (Flash Removal) (v1.0) (Zenkerdus).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0027, type="u8", condition="bit_true", bit=5, mask=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/file load" },
+        { address=0X076E, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/File Select" },
+        { address=0X079F, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues used on file" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0706, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Regular overworld" },
+        { address=0X076E, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld and some caves" },
+        { address=0X0777, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Attack level" },
+        { address=0X0778, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magic level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0561, type="u8", condition="eq", value=0X1A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Magic Container in Death Mountain room" },
+        { address=0X0619, type="u8", condition="bit_true", bit=2, mask=0X04, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up in swamp north of Saria (room 0x33)" },
+        { address=0X061C, type="u8", condition="bit_true", bit=1, mask=0X02, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up in west of Graveyard (room 0x39)" },
+        { address=0X062D, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Magic Container in Death Mountain (room 0x1a)" },
+        { address=0X0659, type="u8", condition="bit_true", bit=1, mask=0X02, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up in swamp north of ruined Kasuto (room 0x33)" },
+        { address=0X065C, type="u8", condition="bit_true", bit=1, mask=0X02, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up west of Maze Island bridge (room 0x39)" },
+        { address=0X06BB, type="u8", condition="bit_true", bit=4, mask=0X10, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up in Three-Eye Rock Palace (room 0x36)" },
+        { address=0X06D4, type="u8", condition="bit_true", bit=0, mask=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up in Great Palace (room 0x29)" },
+        { address=0X0700, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives possessed increased" },
+        { address=0X0700, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives possessed decreased" },
+        { address=0X0706, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Mountain and Maze Island" },
+        { address=0X0779, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life level increased" },
+        { address=0X0779, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life level decreased" },
+        { address=0X077D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Have Life spell increased" },
+        { address=0X077D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Have Life spell decreased" },
+        { address=0X742A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="File 1 death count" },
+        { address=0X745C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="File 2 death count" },
+        { address=0X748E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="File 3 death count" },
+      },
+      health = {
+        { address=0X00C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 health decreased" },
+        { address=0X00C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 health increased" },
+        { address=0X00C7, type="u8", condition="eq", value=0XC0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Thunderbird max" },
+        { address=0X00C7, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Enemy 1 health" },
+        { address=0X0774, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="empty" },
+        { address=0X0774, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=false, no_survey=false, desc="8 full containers" },
+        { address=0X0774, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Current health" },
+        { address=0X0784, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Total Health Containers decreased" },
+        { address=0X0784, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Total Health Containers increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X00AF, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Enemy 6's current-item-ID OR something else(AI?)" },
+        { address=0X048E, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Enemy 6's item-ID in the future" },
+        { address=0X05DF, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="count of easy monster killed for item drop" },
+        { address=0X05E0, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="count of hard monster killed for item drop" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X076F, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X077B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Have Shield spell" },
+      },
+      player = {
+        { address=0X0561, type="u8", condition="eq", value=0X25, action="JUMPING", no_log=false, no_survey=false, desc="Jump spell room, missing child room" },
+        { address=0X076F, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0X077C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Have Jump spell" },
+      },
+    },
+  },
+}

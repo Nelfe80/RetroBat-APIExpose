@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Hebereke",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "hebereke",
+    file = "hebereke.zip",
+    hashes = {
+      { hash = "47f483766aa1284228791f4443552241", label = "U-four-ia - The Saga - Hebereke (Japan) (En) (v1.0) (BMF54123).nes" },
+      { hash = "a65e9c06d97fc082fd6f0db5f7939be9", label = "Hebereke (Japan).nes" },
+      { hash = "db90dd8c79c6709dd29c9892ba3afc5e", label = "Ufouria - The Saga (Europe).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X04E6, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="Water of Life" },
+      },
+      health = {
+        { address=0X04E3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Reserve Tank decreased" },
+        { address=0X04E3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Reserve Tank increased" },
+        { address=0X04E5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X04E5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X0CE5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player hp decreased" },
+        { address=0X0CE5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player hp increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X04E0, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Freeon-Leeon Secret Weapon" },
+        { address=0X04E7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="bit1 = Bop Louie Secret Weapon" },
+        { address=0X1CE0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="b2 got shade's secret weapon b4 got suction cups b7 got red key" },
+        { address=0X1CE7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="b0 got insight | b1 got Louie's Secret weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X002C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Upper-4 = Player Max HP(during buddy fight); increased" },
+        { address=0X002D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Upper-4 = Enemy Max HP(during buddy fight); increased" },
+        { address=0X04E6, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Blue Ring" },
+        { address=0X04E6, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Green Ring" },
+        { address=0X04E6, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Red Ring" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X040F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mini-Boss HP" },
+        { address=0X04E4, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mini-Boss-2 Defeated" },
+        { address=0X04E4, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mini-Boss-4 Defeated" },
+        { address=0X04E4, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mini-Boss-5 Defeated" },
+        { address=0X04E4, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mini-Boss-6 Defeated" },
+        { address=0X04E4, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mini-Boss-7 Defeated" },
+        { address=0X04E4, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mini-Boss-3 Defeated" },
+        { address=0X04EB, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Final Boss Started" },
+        { address=0X102C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="buddy boss fight?" },
+        { address=0X102D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="buddy boss fight?" },
+        { address=0X1C0F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="big head boss HP" },
+        { address=0X1CE4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="b1 big head boss 2 beaten b6 big head boss 3 beaten" },
+      },
+    },
+  },
+}

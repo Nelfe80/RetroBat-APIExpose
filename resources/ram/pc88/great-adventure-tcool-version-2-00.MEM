@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Great Adventure TcOOL Version 2.00",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "great-adventure-tcool-version-2-00",
+    file = "great-adventure-tcool-version-2-00.zip",
+    hashes = {
+      { hash = "edef0564006bb5bd66f789a7b6c27138", label = "Adventure Tsukuuru mkII (Disk A).d88" },
+    }
+  },
+
+  events = {
+  },
+}

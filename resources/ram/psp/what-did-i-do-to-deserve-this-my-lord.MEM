@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "What Did I Do to Deserve This, My Lord!?",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "what-did-i-do-to-deserve-this-my-lord",
+    file = "what-did-i-do-to-deserve-this-my-lord.zip",
+    hashes = {
+      { hash = "a5cb550f56686c515b5ac8c444fc117f", label = "Holy Invasion of Privacy, Badman! What Did I Do to Deserve This (Europe, Australia) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9C74B0, type="u16le", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9C74B0, type="u16le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Intro" },
+        { address=0X9C74B0, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Prep Phase" },
+        { address=0X9C74B0, type="u16le", condition="eq", value=0X0B, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X9D4F48, type="u32le", condition="eq", value=0XF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X9D5038, type="u32le", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X9D50D8, type="u32le", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X9D5128, type="u32le", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X9D5128, type="u32le", condition="eq", value=0X14, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XA03F6C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slime Level" },
+        { address=0XA03F74, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Omnom Level" },
+        { address=0XA03F7C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lizardman Level" },
+        { address=0XA03F84, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spirit Level" },
+        { address=0XA03F8C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lilith Level" },
+        { address=0XA03F94, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dragon Level" },
+      },
+      stage = {
+        { address=0X9C74B0, type="u16le", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Results" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9E1D04, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Final Results: Army Died" },
+        { address=0X9E6B8E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Almanac - 059 - Undeadly" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X9E6F3C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Almanac - 076 - Treasure Chest" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9E1D34, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Final Score Story Mode" },
+        { address=0X9E5EC8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Story Mode High Score [32bit]" },
+        { address=0X9E5F88, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Challenge 1 High Score" },
+        { address=0X9E5F90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Challenge 2 High Score" },
+        { address=0X9E5F98, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Challenge 3 High Score" },
+        { address=0XA037F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Next Stage Dig Power" },
+        { address=0XA03F70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Slime Upgrade Points" },
+        { address=0XA03F78, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Omnom Upgrade Points" },
+        { address=0XA03F80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lizardman Upgrade Points" },
+        { address=0XA03F88, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Spirit Upgrade Points" },
+        { address=0XA03F90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lilith Upgrade Points" },
+        { address=0XA03F98, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dragon Upgrade Points" },
+      },
+    },
+  },
+}

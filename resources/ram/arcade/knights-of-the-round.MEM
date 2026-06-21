@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Knights of the Round",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "knights-of-the-round",
+    file = "knights-of-the-round.zip",
+    hashes = {
+      { hash = "2061bac208c7bdd2665fbf4b7067e468", label = "knights.7z <Knights of the Round (911127 etc)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAC9B, type="u8", condition="bit_true", bit=2, mask=0X04, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="game active" },
+        { address=0XAC9B, type="u8", condition="bit_true", bit=3, mask=0X08, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE7DA, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="00:XX" },
+        { address=0XE7DA, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining (bcd)" },
+        { address=0XE7DB, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="XX:00" },
+        { address=0XE7DB, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining (bcd)" },
+      },
+    },
+  },
+}

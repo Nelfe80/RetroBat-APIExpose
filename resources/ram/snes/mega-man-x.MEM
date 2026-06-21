@@ -1,0 +1,124 @@
+return {
+  game = {
+    title = "Mega Man X",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "mega-man-x",
+    file = "mega-man-x.zip",
+    hashes = {
+      { hash = "19bf3ac320754ae21b586ce112b19ec5", label = "Rockman X (Japan) (Rev 1).sfc" },
+      { hash = "1d9d56cdf7a1b6654f69063fd7aefe50", label = "Mega Man X (USA) (Fr).sfc" },
+      { hash = "1e11a6c21b7885512f83844470c87ddf", label = "Mega Man X (USA) (Fr) (BessaB) (0.1).sfc" },
+      { hash = "7899d1a6d3ddcd99e6cbd7b223392d18", label = "Mega Man X (USA) (Pt) (BRgames).sfc" },
+      { hash = "797fd8e6eab44ea597aed9f44d4e1669", label = "Mega Man X (USA) (Rev 1) (MSU-1) (Krzysztof Slowikowski) (Guitar Playthrough) (v16-2020-07-07) (Audio Fix) (Qwertymodo).sfc" },
+      { hash = "7abdac1eb51baebd9996e45a0c05a232", label = "Mega Man X (USA) (Rev 1) (MSU-1) (Krzysztof Slowikowski) (Guitar Playthrough) (v16-2020-07-07).sfc" },
+      { hash = "82870d3fd437ae8280a7c6c23874b737", label = "Mega Man X (USA) (MSU-1) (Savaged Regime - YM2612 Style) (Relikk) (v2.0) (DarkShock) (v2015-03-06).sfc" },
+      { hash = "df1cc0c8c8c4b61e3b834cc03366611c", label = "Mega Man X (USA) (Rev 1).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00C9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x20 when paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00B3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Screen's level of brightness when fading" },
+        { address=0X0C03, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Buster charged level: 0=none, 1=Max, 2=Med, 3=Low" },
+      },
+      stage = {
+        { address=0X1F7A, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Highway Intro" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Octopus" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chameleon" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Armadillo" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mammoth" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Eagle" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mandrill" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kuwanger" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Penguin" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sigma 1" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sigma 2" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sigma 3" },
+        { address=0X1F7A, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sigma 4" },
+        { address=0X1F7A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0BAA, type="u8", condition="eq", value=0X0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1F80, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1F80, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0BCF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Megaman - Current Health decreased" },
+        { address=0X0BCF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Megaman - Current Health increased" },
+        { address=0X0E8F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 01 - HP decreased" },
+        { address=0X0E8F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 01 - HP increased" },
+        { address=0X0E9E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Flame Mammoth Throb Health? decreased" },
+        { address=0X0E9E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Flame Mammoth Throb Health? increased" },
+        { address=0X0ECF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 02 - HP decreased" },
+        { address=0X0ECF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 02 - HP increased" },
+        { address=0X0F0F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 03 - HP decreased" },
+        { address=0X0F0F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 03 - HP increased" },
+        { address=0X0F4F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 04 - HP decreased" },
+        { address=0X0F4F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 04 - HP increased" },
+        { address=0X1F9A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health (Max) decreased" },
+        { address=0X1F9A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health (Max) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1229, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Several other weapons impact" },
+        { address=0X1269, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Several other weapons impact" },
+        { address=0X12A9, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Several other weapons impact" },
+        { address=0X1F88, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Homing.T (Weapon); b6=Launch Octopus Defeated (can use exit)" },
+        { address=0X1F8A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="C.Sting (Weapon)" },
+        { address=0X1F8E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fire.W (Weapon)" },
+        { address=0X1F90, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Storm.T (Weapon)" },
+        { address=0X1F92, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="E.Spark (Weapon)" },
+        { address=0X1F94, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="B.Cutter (Weapon)" },
+        { address=0X1F96, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="S.Ice (Weapon)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0E72, type="u8", condition="eq", value=0X0C, action="AMMO_STATE", no_log=false, no_survey=false, desc="Flame Mammoth" },
+        { address=0X1F99, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Btflags for Upgrades (low nibble=gear, high nibble=E. Tank): b0=Head, b1=Arm, b2=Body, b3=Legs;" },
+        { address=0X1F9C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Bitflags for heart tanks: b0=penguin, b1=armadillo, b2=eagle, b3=chameleon, b4=mammoth, b5=kuwan" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0E68, type="u8", condition="eq", value=0XFF, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss explosion" },
+        { address=0X0EA8, type="u8", condition="eq", value=0XFF, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss explosion" },
+        { address=0XFFFD, type="u8", condition="eq", value=0X2E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Preparation" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0BDB, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Current Weapon: 00=X Buster, 02=Homing Torpedo, 04=Chameleon Sting, 06=Rolling Shield, 08=Fire W" },
+        { address=0X0C13, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+        { address=0X1232, type="u16le", condition="eq", value=0X09, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rolling Shield" },
+        { address=0X1232, type="u16le", condition="eq", value=0X12, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="R. Shield Charged" },
+        { address=0X1F8C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="R.Shield (Weapon)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0BAA, type="u8", condition="eq", value=0X1C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Transition" },
+        { address=0X1F81, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1F7E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="b7=Hadouken power up; b0-b6=Counter (up to 5)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Jazz Jackrabbit",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jazz-jackrabbit",
+    file = "jazz-jackrabbit.zip",
+    hashes = {
+      { hash = "693bbcab772317e7e295a2b52dca175d", label = "Jazz Jackrabbit (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4500, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="500 credits cheat file 1" },
+        { address=0X4501, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1000 credits cheat file 1" },
+        { address=0X4502, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5000 credits cheat file 1" },
+        { address=0X4520, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="500 credits cheat file 2" },
+        { address=0X4521, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1000 credits cheat file 2" },
+        { address=0X4522, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5000 credits cheat file 2" },
+        { address=0X4540, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="500 credits cheat file 3" },
+        { address=0X4541, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1000 credits cheat file 3" },
+        { address=0X4542, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5000 credits cheat file 3" },
+        { address=0X58F0, type="u16le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Space Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3F0C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level" },
+        { address=0X59BD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level select cheat entered" },
+      },
+      stage = {
+        { address=0XF558, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage selected in level select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3EF8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives remaining increased" },
+        { address=0X3EF8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives remaining decreased" },
+      },
+      health = {
+        { address=0X2566, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Currnet Health decreased" },
+        { address=0X2566, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Currnet Health increased" },
+        { address=0X3EFC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Visual health bar decreased" },
+        { address=0X3EFC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Visual health bar increased" },
+        { address=0X58F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Infinite health cheat entered decreased" },
+        { address=0X58F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Infinite health cheat entered increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X3F00, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Curretnly selected weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X34DC, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Carrot Grenade ammo" },
+        { address=0X351A, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Machine Gun Ammo" },
+        { address=0X3532, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ricochet Gun Ammo" },
+        { address=0X354A, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Flamethrower Ammo" },
+        { address=0X3562, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Rocket Launcher Ammo" },
+        { address=0X357A, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Big Gun Ammo" },
+        { address=0X3F04, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo of currnetly selected weapon" },
+      },
+    },
+  },
+}

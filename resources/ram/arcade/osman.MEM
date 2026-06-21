@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Osman",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "osman",
+    file = "osman.zip",
+    hashes = {
+      { hash = "76a12a6c4965f2b6b8869159d7a01471", label = "candance.7z <Cannon Dancer (Japan)>" },
+      { hash = "eff99cfe6876008c6a6e080e4a382be1", label = "osman.7z <Osman (World)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0019, type="u8", condition="bit_true", bit=1, mask=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue." },
+        { address=0X0019, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Sound." },
+        { address=0X003B, type="u8", condition="eq", value=0X19, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Slaver, credits." },
+        { address=0X404F, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract." },
+        { address=0X404F, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing." },
+      },
+      events = {
+        { address=0X272B, type="u8", condition="eq", value=0X1C, action="COMBO_HIT", no_log=false, no_survey=false, desc="Stand final combo attack." },
+        { address=0X272F, type="u8", condition="eq", value=0X00, action="COMBO_HIT", no_log=false, no_survey=false, desc="Kick 1/Not attacking/Air kick 1." },
+        { address=0X272F, type="u8", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Kick 2/Air kick 2." },
+        { address=0X272F, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Swipe 1/Air kick 3." },
+        { address=0X272F, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Swipe 2." },
+        { address=0X272F, type="u8", condition="eq", value=0X04, action="COMBO_HIT", no_log=false, no_survey=false, desc="Forward punch." },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X40F4, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1." },
+        { address=0X40F4, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="6." },
+        { address=0X40F4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X272B, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death." },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X40DD, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Tianon." },
+        { address=0X40DD, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Willf." },
+        { address=0X40DD, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Cannons." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0018, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Screen Rotation." },
+        { address=0X0019, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Extend." },
+      },
+    },
+  },
+}

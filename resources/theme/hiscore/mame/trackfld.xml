@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 AAA 43130</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 AXV 38220</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 ABC 34610</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 AAA 32860</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 XVT 29780</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 AAA 27430</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 LMN 25260</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 AAP 23370</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 BCD 23350</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 IJK 22770</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 EFG 21060</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 AAC 10420</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13  YW 10340</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 WVU 9700</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 XPM 5600</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 DEF 5400</text>
+		</text>
+	</view>
+</theme>

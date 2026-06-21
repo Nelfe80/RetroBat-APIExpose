@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Cannon Fodder",
+    system = "jaguar",
+    system_name = "Atari Jaguar",
+    genre = "Shooter, Strategy"
+  },
+
+  rom = {
+    name = "cannon-fodder",
+    file = "cannon-fodder.zip",
+    hashes = {
+      { hash = "4aa320637ffc598d7d9db44085a88df2", label = "Cannon Fodder (World).j64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X191DAC, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16-bit BE] Snake group bazooka rounds possessed" },
+        { address=0X191DAE, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16-bit BE] Eagle group bazooka rounds possessed" },
+        { address=0X191DB0, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16-bit BE] Panther group bazooka rounds possessed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1905CC, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BE] 1st soldier ID" },
+        { address=0X1905CE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st soldier rank" },
+        { address=0X1905D6, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BE] 1st slot soldier kills" },
+        { address=0X1905D8, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BE] 2nd soldier ID" },
+        { address=0X1905DA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd soldier rank" },
+        { address=0X1905E2, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BE] 2nd slot soldier kills" },
+        { address=0X1905E4, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BE] 3rd soldier ID" },
+        { address=0X1905E6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd soldier rank" },
+        { address=0X1905EE, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BE] 3rd slot soldier kills" },
+        { address=0X1905F0, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BE] 4th soldier ID" },
+        { address=0X1905F2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="4th soldier rank" },
+        { address=0X1905FA, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16-bit BE] 4th slot soldier kills" },
+      },
+    },
+  },
+}

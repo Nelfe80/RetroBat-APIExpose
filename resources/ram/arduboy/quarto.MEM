@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Quarto!",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "quarto",
+    file = "quarto.zip",
+    hashes = {
+      { hash = "6a2ab0ba8d2ecb2921d0a41e79d37202", label = "Quarto! (World) (v0.10) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0187, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current CPU Level {cpuLevel}" },
+        { address=0X0188, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Level Unlocked (default=3) {maxLevel}" },
+        { address=0X01D0, type="u16le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="light round tall filled" },
+        { address=0X01D0, type="u16le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="light round tall hole" },
+        { address=0X01D0, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="light round short filled" },
+        { address=0X01D0, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="light round short hole" },
+        { address=0X01D0, type="u16le", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="dark round tall filled" },
+        { address=0X01D0, type="u16le", condition="eq", value=0X0D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="dark round tall hole" },
+        { address=0X01D0, type="u16le", condition="eq", value=0X0E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="dark round short filled" },
+        { address=0X01D0, type="u16le", condition="eq", value=0X0F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="dark round short hole" },
+      },
+    },
+  },
+}

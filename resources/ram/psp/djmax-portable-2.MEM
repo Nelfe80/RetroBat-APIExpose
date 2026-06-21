@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "DJMax Portable 2",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "djmax-portable-2",
+    file = "djmax-portable-2.zip",
+    hashes = {
+      { hash = "8ef42596d6f18b52edc1705e6552e79d", label = "DJ Max Emotional Sense P 2 - Sound Miracle (Korea) (En,Ja,Ko).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X97570B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X975714, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player Gold increased" },
+      },
+    },
+  },
+}

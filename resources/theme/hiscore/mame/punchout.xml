@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 NOA 88700</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 QCB 87700</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 DIC 86700</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 BBS 85700</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 DBY 84700</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 MCE 83700</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 QBQ 82700</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 BBC 81700</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 DTB 80700</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 BIC 79700</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 SBM 78700</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 CQU 77700</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 MBE 76700</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 ABB 75700</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 CBC 74700</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 LCS 73700</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 BQX 72700</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 KEA 71700</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 AAD 70700</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 OFA 69700</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 AAA 68700</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 DBO 67700</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 YDB 66700</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 PGI 65700</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 NNL 64700</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 OQF 63700</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 BVC 62700</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 RAA 61700</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 EQA 60700</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 OGY 59700</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 PIZ 58700</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 GIH 57700</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 HHG 56700</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 HPG 55700</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 QIH 54700</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 IFX 53700</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 MMQ 52700</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 BZN 51700</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 ASJ 50700</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 XMW 49700</text>
+		</text>
+	</view>
+</theme>

@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Railway",
+    system = "megaduck",
+    system_name = "Mega Duck",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "railway",
+    file = "railway.zip",
+    hashes = {
+      { hash = "c217738067267475f86eec9bc19f462b", label = "Railway (World).bin" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC32F, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC32E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+      },
+      stage = {
+        { address=0XC32D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC3BA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0XC3F1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Item - Time" },
+      },
+    },
+  },
+}

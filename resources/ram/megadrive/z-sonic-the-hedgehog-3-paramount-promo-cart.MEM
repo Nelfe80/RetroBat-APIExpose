@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "~Z~ Sonic the Hedgehog 3: Paramount Promo Cart",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-sonic-the-hedgehog-3-paramount-promo-cart",
+    file = "z-sonic-the-hedgehog-3-paramount-promo-cart.zip",
+    hashes = {
+      { hash = "2886958811c81211174184d6fa874797", label = "Sonic The Hedgehog 3 (USA) (Movie Promo).md" },
+    }
+  },
+
+  events = {
+  },
+}

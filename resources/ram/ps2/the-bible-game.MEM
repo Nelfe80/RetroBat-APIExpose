@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Bible Game",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-bible-game",
+    file = "the-bible-game.zip",
+    hashes = {
+      { hash = "328b1db0b5295f91c7fafb8abd4581bf", label = "Bible Game, The (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

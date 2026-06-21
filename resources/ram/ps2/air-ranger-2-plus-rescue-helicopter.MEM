@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Air Ranger 2 Plus: Rescue Helicopter",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Flight Simulator"
+  },
+
+  rom = {
+    name = "air-ranger-2-plus-rescue-helicopter",
+    file = "air-ranger-2-plus-rescue-helicopter.zip",
+    hashes = {
+      { hash = "75bbb63e865d009dfd73ac87c0e18966", label = "Air Ranger 2 Plus - Rescue Helicopter (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

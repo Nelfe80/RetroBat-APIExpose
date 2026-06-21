@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Rockman 2: Dr. Wily no Nazo",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rockman-2-dr-wily-no-nazo",
+    file = "rockman-2-dr-wily-no-nazo.zip",
+    hashes = {
+      { hash = "d351a9e4780b8d261599ce5eccc80145", label = "Rockman 2 - Dr. Wily no Nazo (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X55B5C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Mode Indicator/Demo Mode Check" },
+        { address=0XDAC6C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag (0x00 - not paused, 0x01 - paused)" },
+        { address=0XDDA3C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Save File Number/Pause Menu Option (0x00-0x07)" },
+        { address=0XDDCC8, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Exit To Menu Check" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XDAC24, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5C6C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Select Unlock Flag (0x00 - not unlocked, all other values - unlocked) increased" },
+        { address=0X5C6C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Select Unlock Flag (0x00 - not unlocked, all other values - unlocked) decreased" },
+        { address=0XDA579, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mega Man's Death Flag/Robot Master Death Flag" },
+        { address=0XDDA80, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Selected Option For Lives Count (Main Game, Boss Attack) increased" },
+        { address=0XDDA80, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Selected Option For Lives Count (Main Game, Boss Attack) decreased" },
+        { address=0XDDE08, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max Lives Count (Main Game, Boss Attack) increased" },
+        { address=0XDDE08, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max Lives Count (Main Game, Boss Attack) decreased" },
+        { address=0X2002E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Count increased" },
+        { address=0X2002E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Count decreased" },
+      },
+      health = {
+        { address=0X5D090, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mega Man's HP (0x00-0x1c) decreased" },
+        { address=0X5D090, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mega Man's HP (0x00-0x1c) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2002E4, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Special Weapon Shot Count (0x00-0x03)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2002D4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Atomic Fire (0x00-0x1c)" },
+        { address=0X2002D5, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Air Shooter (0x00-0x1c)" },
+        { address=0X2002D7, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Bubble Lead (0x00-0x1c)" },
+        { address=0X2002D8, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Quick Boomerang (0x00-0x1c)" },
+        { address=0X2002DA, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Metal Blade (0x00-0x1c)" },
+        { address=0X2002DB, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Crash Bomb (0x00-0x1c)" },
+        { address=0X2002DC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Item 1 (0x00-0x1c)" },
+        { address=0X2002DD, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Item 2 (0x00-0x1c)" },
+        { address=0X2002DE, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Item 3 (0x00-0x1c)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5C6BC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Attack Unlock Flag (0x00 - not unlocked, all other values - unlocked)" },
+        { address=0X5CDF0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Intro Easter Egg Flag" },
+        { address=0X5D091, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP (0x00-0x1c)" },
+        { address=0X2002EB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss ID; also works for teleporter refights" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X200283, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Mega Man's Invincibility Timer" },
+        { address=0X2002D6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Weapon Ammo - Leaf Shield (0x00-0x1c)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X55DF0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Boss Attack Timer - Minutes (0x00-0x3b)" },
+        { address=0X55DF8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Boss Attack Timer - Seconds (0x00-0x3b)" },
+        { address=0XDB1B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Equipped Weapon" },
+        { address=0X2002D2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stages Beaten & Weapons Obtained Bitflags" },
+        { address=0X2002D9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Weapon Ammo - Time Stopper (0x00-0x1c)" },
+      },
+    },
+  },
+}

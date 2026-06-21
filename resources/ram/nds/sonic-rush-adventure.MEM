@@ -1,0 +1,124 @@
+return {
+  game = {
+    title = "Sonic Rush Adventure",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "sonic-rush-adventure",
+    file = "sonic-rush-adventure.zip",
+    hashes = {
+      { hash = "0e2af67715835703fa53a657e3030931", label = "Sonic Rush Adventure (USA) (En,Ja,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X289B24, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Submarine combo" },
+        { address=0X2A8424, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hovercraft combo" },
+        { address=0X2BDBE4, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Waterbike combo" },
+        { address=0X2BE4C4, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Boat combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X13947C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1338E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1338E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X289B1A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="submarine health decreased" },
+        { address=0X289B1A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="submarine health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X134CE3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chaos Emeralds" },
+        { address=0X1394DA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chaos/Sol Emeralds test" },
+        { address=0X18E210, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald collected" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1344B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Plant Kingdom act 1 score" },
+        { address=0X1344B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Plant Kingdom act 2 score" },
+        { address=0X1344B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Plant Kingdom vs boss score" },
+        { address=0X1344BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Machine Labyrinth act 1 score" },
+        { address=0X1344C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Machine Labyrinth act 2 score" },
+        { address=0X1344C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Machine Labyrinth vs boss score" },
+        { address=0X1344C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Coral Cave act 1 score" },
+        { address=0X1344CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Coral Cave act 2 score" },
+        { address=0X1344D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Coral Cave vs boss score" },
+        { address=0X1344D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Haunted Ship act 1 score" },
+        { address=0X1344D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Haunted Ship act 2 score" },
+        { address=0X1344DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Haunted Ship vs boss score" },
+        { address=0X1344E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Blizzard Peaks act 1 score" },
+        { address=0X1344E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Blizzard Peaks act 2 score" },
+        { address=0X1344E8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Blizzard Peaks vs boss score" },
+        { address=0X1344EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Sky Babylon act 1 score" },
+        { address=0X1344F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Sky Babylon act 2 score" },
+        { address=0X1344F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Sky Babylon vs boss score" },
+        { address=0X1344F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Pirates Island act 1 score" },
+        { address=0X1344FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Pirates Island act 2 score" },
+        { address=0X134500, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Pirates Island vs boss score" },
+        { address=0X134504, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Big Swell score" },
+        { address=0X134508, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bit) Deep Core score" },
+        { address=0X13450C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 1 score" },
+        { address=0X134510, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 2 score" },
+        { address=0X134514, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 3 score" },
+        { address=0X134518, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 4 score" },
+        { address=0X13451C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 5 score" },
+        { address=0X134520, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 6 score" },
+        { address=0X134524, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 7 score" },
+        { address=0X134528, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 8 score" },
+        { address=0X13452C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 9 score" },
+        { address=0X134530, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 10 score" },
+        { address=0X134534, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 11 score" },
+        { address=0X134538, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 12 score" },
+        { address=0X13453C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 13 score" },
+        { address=0X134540, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 14 score" },
+        { address=0X134544, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 15 score" },
+        { address=0X134548, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bits)Hidden Island 16 score" },
+      },
+      collectibles = {
+        { address=0X134608, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32bit)Total Rings increased" },
+        { address=0X134617, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Gold material increased" },
+        { address=0X18E67E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+        { address=0X18F6BE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+        { address=0X19013E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+        { address=0X19259E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+        { address=0X19517E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+        { address=0X1953DE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X177C1C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final boss character switch" },
+        { address=0X18E354, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) Plant Kingdom boss health" },
+        { address=0X18E35C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit)Big swell boss health/Tutorial text" },
+        { address=0X18E360, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) Sky Babylon boss health" },
+        { address=0X18E36C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) Blizzard Peaks boss health" },
+        { address=0X18E374, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) Haunted Ship boss health" },
+        { address=0X18E378, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) Machine Labyrinth boss health" },
+        { address=0X18E398, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) Coral Cave boss health" },
+        { address=0X18F472, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) Pirate island boss Whisker health" },
+        { address=0X18F842, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Deep Core boss health" },
+        { address=0X1900D2, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit)Pirate island boss Johnny health" },
+        { address=0X194FA8, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit)Pirate island boss Johnny health alt" },
+        { address=0X194FAC, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) Pirate island boss Whisker health alt" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1395CC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="mission reset blocker test" },
+      },
+    },
+  },
+}

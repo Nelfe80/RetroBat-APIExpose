@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Super Black Bass",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "super-black-bass",
+    file = "super-black-bass.zip",
+    hashes = {
+      { hash = "595c027ee3c75b1cae6ddc5d78484855", label = "Super Black Bass (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1B00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number displayed when drawing total weight at the end of a round. 1 byte = 1 digit" },
+        { address=0X1BD4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round number for Lake 3" },
+        { address=0X1DBE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Type of fish caught (on weighing screen, after catching). Doesn't get cleared until you catch so" },
+      },
+      stage = {
+        { address=0X0CCE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="On the lake overview screen before the stage starts, this address is the number in the bottom ri" },
+        { address=0X1770, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X1770, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2" },
+        { address=0X1770, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5 (not a typo!)" },
+        { address=0X1770, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3 (also post-stage 5, probably because it loops back to sage 3 if you didn't win)" },
+        { address=0X1770, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3b (lake 3, round 2)" },
+        { address=0X1770, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3c (lake 3, round 3)" },
+        { address=0X1770, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage id" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X16D2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The fishing point the current fish was caught in, not currently using it but may switch to it la" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00D8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Used for the fish caught screen, it's the number displayed on screen when weighing the fish (inc" },
+      },
+    },
+  },
+}

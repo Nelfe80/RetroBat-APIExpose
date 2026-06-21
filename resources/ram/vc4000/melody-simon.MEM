@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Melody: Simon",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "melody-simon",
+    file = "melody-simon.zip",
+    hashes = {
+      { hash = "4defcd82f76080b9b59ef71d80811777", label = "Melody - Simon (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

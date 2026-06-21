@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Garfield: Caught in the Act",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "garfield-caught-in-the-act",
+    file = "garfield-caught-in-the-act.zip",
+    hashes = {
+      { hash = "b8591488ca46b51c1d39b6869fa23006", label = "Garfield - Caught in the Act (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCFA6, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Remaining" },
+        { address=0XEE1E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="bit2 = Paused" },
+        { address=0XEE28, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCF28, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Clear when remote control touched; causes all onscreen action to pause as next address cau" },
+        { address=0XEE22, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-ID - More accurate, includes missing screens from 0xa52a" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB7C6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Last boss 'health', starts at 00, dies at 07." },
+        { address=0XCF9E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives, 01 is last life increased" },
+        { address=0XCF9E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives, 01 is last life decreased" },
+      },
+      health = {
+        { address=0XCF2A, type="u16be", condition="eq", value=0X004F, action="HIT", no_log=false, no_survey=false, desc="Damage Timer;" },
+        { address=0XCF2C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="0x02 or bit1 = Invulnerability from Damage(or cheat);" },
+        { address=0XCF70, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0XCF70, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCFA0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo Count" },
+        { address=0XEE38, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Pause and button-input indicator; counts how many times a button was pressed during Pause, reset" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA52A, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Level ID. Starts at 17, goes to 0a thru 16 at final boss." },
+        { address=0XAB0E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Dog Boss Health" },
+        { address=0XABAE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0XAE62, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Number of Caskets Open - 3 is boss defeat" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCF2A, type="u16be", condition="eq", value=0X0176, action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Coffee Timer;" },
+        { address=0XCF2A, type="u16be", condition="eq", value=0X0456, action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Cheat Code Timer;" },
+        { address=0XCF2A, type="u16be", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="16-bit timer for Invincibility, higher if Coffee or Cheat are in effect;" },
+      },
+    },
+  },
+}

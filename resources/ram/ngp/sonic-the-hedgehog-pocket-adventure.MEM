@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Sonic the Hedgehog: Pocket Adventure",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sonic-the-hedgehog-pocket-adventure",
+    file = "sonic-the-hedgehog-pocket-adventure.zip",
+    hashes = {
+      { hash = "6123e8a783b146bdcdc6a9fa95abb0bd", label = "Sonic The Hedgehog - Pocket Adventure (World) (En,Ja).ngc" },
+      { hash = "b8a899ae2b0f1dfa0db5417de745a51e", label = "Sonic The Hedgehog - Pocket Adventure (World).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0D3E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="ff = demo" },
+        { address=0X27B0, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="ColonD: Continues?" },
+        { address=0X2913, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00A6, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level has started" },
+        { address=0X27B6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level completed" },
+        { address=0X27D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ColonD: Zone?" },
+        { address=0X27D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level number" },
+        { address=0X28E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level" },
+        { address=0X2A62, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone" },
+      },
+      stage = {
+        { address=0X2910, type="u8", condition="eq", value=0X15, action="STAGE_SELECT", no_log=false, no_survey=false, desc="hit by mines in special stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1024, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ColonD: This 8-bit value and the other two 8-bit values after this one seem to control screen br" },
+        { address=0X27AF, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X27AF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2911, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="bit 7 = got a chaos emerald!" },
+        { address=0X2A64, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chaos emerald" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X27A8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings collected increased" },
+        { address=0X27AE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="ColonD: If this doesn't equal 0, then your dead. It equals 1 if you die from falling off the lev" },
+        { address=0X27D3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="ColonD: Level State?: 00 before a level, 01 during a level, 02 when ring falls or capsule is hit" },
+        { address=0X28EC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bonus rings increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2792, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="ColonD: Chaotic Space Boss Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2910, type="u8", condition="eq", value=0X4, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="recovering from mine hit(invincibility frames)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Discworld",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "discworld",
+    file = "discworld.zip",
+    hashes = {
+      { hash = "3fe99cc2844ac08cb646f86bd46336dd", label = "Terry Pratchett's Discworld (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X56748, type="u32le", condition="eq", value=0X359E, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="the Ending Credits" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X56748, type="u32le", condition="eq", value=0X0BC4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="at Edge of the World" },
+      },
+      stage = {
+        { address=0X13615C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act (8-bit range 1-4)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X135D68, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Event Flag (bit 0 - 0 = Unvisited by Death, 1 = Visited by Death)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5663C, type="u24le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cursor Over Object (16-bit)" },
+        { address=0X56675, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Event Flag (bit 0 - 0 = cursor over rincewind/luggage, 1 = cursor over any other object)" },
+        { address=0X56748, type="u32le", condition="eq", value=0X01C3, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="in the Basement of the Broken Drum" },
+        { address=0X56748, type="u32le", condition="eq", value=0X14ED, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Outside the Broken Drum" },
+        { address=0X56748, type="u32le", condition="eq", value=0X31B6, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Inside the Broken Drum" },
+        { address=0X56824, type="u8", condition="eq", value=0X25, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum - Barman" },
+        { address=0X56824, type="u8", condition="eq", value=0X26, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum - Braggart" },
+        { address=0X56824, type="u8", condition="eq", value=0X27, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum - Drunk A" },
+        { address=0X56824, type="u8", condition="eq", value=0X28, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum - Drunk B" },
+        { address=0X56824, type="u8", condition="eq", value=0X29, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum - Hublander A" },
+        { address=0X56824, type="u8", condition="eq", value=0X2A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum - Hublander B" },
+        { address=0X56824, type="u8", condition="eq", value=0X2B, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum - Little Guy" },
+        { address=0X56824, type="u8", condition="eq", value=0X2C, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum - Scared Guy" },
+        { address=0X56824, type="u8", condition="eq", value=0X15, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum Basement - Elderwine Barrel" },
+        { address=0X56824, type="u8", condition="eq", value=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum Basement - Mouse" },
+        { address=0X56824, type="u8", condition="eq", value=0X11, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Drum Basement - Boogeyman" },
+        { address=0X13608C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Event Flag (8-bit - 0x0 = Boogey man stuck behing door, 0x90 = Door unscrewed, Boogey can leave)" },
+        { address=0X1362D4, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Event Flag (bit 0 - 0 = Boogey man in inn, 1 = Boogey man in broken drum)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X56824, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Rincewind is talking to (8-bit)" },
+      },
+    },
+  },
+}

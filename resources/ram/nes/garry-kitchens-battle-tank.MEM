@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Garry Kitchen's Battle Tank",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Vehicle Simulation"
+  },
+
+  rom = {
+    name = "garry-kitchens-battle-tank",
+    file = "garry-kitchens-battle-tank.zip",
+    hashes = {
+      { hash = "b8d3640437779169bb1b5346397791db", label = "Garry Kitchen's Battletank (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0726, type="u8", condition="eq", value=0X23, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen;" },
+        { address=0X0726, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over;" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0576, type="u8", condition="eq", value=0X30, action="HIT", no_log=false, no_survey=false, desc="Damage critical;" },
+      },
+    },
+  },
+}

@@ -1,0 +1,18 @@
+return {
+  game = {
+    title = "Final Fantasy Chronicles: Final Fantasy IV [Subset - Rare Drops]",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "final-fantasy-chronicles-final-fantasy-iv-subset-rare-drops",
+    file = "final-fantasy-chronicles-final-fantasy-iv-subset-rare-drops.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Golf Magazine: 36 Great Holes Starring Fred Couples",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "golf-magazine-36-great-holes-starring-fred-couples",
+    file = "golf-magazine-36-great-holes-starring-fred-couples.zip",
+    hashes = {
+      { hash = "b90a2a1eec015911aa445f9c41d7bc32", label = "Golf Magazine Presents - 36 Great Holes Starring Fred Couples (Japan, USA) (En).32x" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Gals Panic SS",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "gals-panic-ss",
+    file = "gals-panic-ss.zip",
+    hashes = {
+      { hash = "b054c9dac8bce10fbcf0fbb5d8545c5b", label = "Gals Panic SS (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X146BEE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1467D4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1467D4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X183C98, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Remaining" },
+      },
+    },
+  },
+}

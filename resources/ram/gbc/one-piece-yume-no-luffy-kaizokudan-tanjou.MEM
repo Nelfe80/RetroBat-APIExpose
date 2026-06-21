@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "One Piece: Yume no Luffy Kaizokudan Tanjou!",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "one-piece-yume-no-luffy-kaizokudan-tanjou",
+    file = "one-piece-yume-no-luffy-kaizokudan-tanjou.zip",
+    hashes = {
+      { hash = "66762a46b77660aca6b9c61016a00b60", label = "From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Japan) (En) (v11) (Parmentation).gbc" },
+      { hash = "da5586315ca857071d557a8fde26c108", label = "From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "5f43dc79250321f235a1ddc422a2d58d", label = "From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Japan) (Rev 1) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC5EB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="--- Bit1 | Ghost Ship's Demon - Luffy wants to find the Ghost Ship" },
+        { address=0XC5EC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="--- Bit2 | Ghost Ship's Demon - Obtained 5x BestMeat from Land of the Sinking Sun" },
+        { address=0XC5ED, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="--- Bit6 | Ghost Ship's Demon - Visited Land of the Sinking Sun" },
+        { address=0XC5EE, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="--- Bit0 | Ghost Ship's Demon - Visited Blooming Meadows" },
+        { address=0XC610, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="--- Bit0 | Stray Pirate - Defeated the Demon Bird" },
+        { address=0XC6C7, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="--- Episode 4 - Ghost Ship's Demon [8bit]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC5CD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit1 | Alvida's Invitation - Nami navigated around the Whirl Pool" },
+        { address=0XCC33, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle - Opponents - Level" },
+        { address=0XCCCD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle - Party - Level" },
+        { address=0XCCD3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle - Opponents - Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC57C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="--- LifeMdcn [8bit] increased" },
+        { address=0XC57C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- LifeMdcn [8bit] decreased" },
+        { address=0XC5D3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Bit0 | Tough Soldier - Obtained 2x FullHeal from the Storage" },
+        { address=0XC5DE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Bit0 | Morgan Again! - Obtained 2x HealMdcn from Soldier at Gate" },
+        { address=0XC63B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Bit1 | Squid Dead End - Arrived in the Territory" },
+        { address=0XC63D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Bit5 | Squid Dead End - Revisit Territory" },
+        { address=0XC640, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Bit0 | Squid Dead End - Defeated a Squid Brother again" },
+        { address=0XC66A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Bit2 | Baratie's Crack - Brought ingredients to Zeff" },
+        { address=0XC673, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="--- Bit0 | Emerald Treasure - Obtained 3x LifeMdcn from second Rock increased" },
+        { address=0XC673, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Bit0 | Emerald Treasure - Obtained 3x LifeMdcn from second Rock decreased" },
+        { address=0XC6C2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Episode 2 - Tough Soldier [8bit]" },
+        { address=0XC6C9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Episode 4 - Squid Dead End [8bit]" },
+      },
+      health = {
+        { address=0XCCED, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Party - Max HP [12 Bytes; 16bit each] decreased" },
+        { address=0XCCED, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Party - Max HP [12 Bytes; 16bit each] increased" },
+        { address=0XCCF9, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Opponents - Max HP [20 Bytes; 16bit each] decreased" },
+        { address=0XCCF9, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Opponents - Max HP [20 Bytes; 16bit each] increased" },
+        { address=0XCD2D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Party - Current HP [12 Bytes; 16bit each] decreased" },
+        { address=0XCD2D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Party - Current HP [12 Bytes; 16bit each] increased" },
+        { address=0XCD39, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Opponents - Current HP [20 Bytes; 16bit each] decreased" },
+        { address=0XCD39, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Opponents - Current HP [20 Bytes; 16bit each] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC614, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="--- Bit0 | Eerie Island - Defeated the Pirates and got the Treasure" },
+        { address=0XC617, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="--- Bit0 | Eerie Island - Treasure Reminder on the Beach" },
+        { address=0XC641, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="--- Bit0 | Rare Animal - Checked Gaimon's Treasure" },
+        { address=0XC677, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="--- Bit1 | 3 Ghost Warriors - Want to visit Emerald Island" },
+        { address=0XC678, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="--- Bit3 | 3 Ghost Warriors - Entered Beach of Emerald Island" },
+        { address=0XC6E2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="--- Episode 12 - Emerald Treasure [8bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC659, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="--- Bit1 | Sea Gold - Visited the island where Luffy met Yosaku and Johnny increased" },
+        { address=0XC65A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="--- Bit0 | Sea Gold - Obtained 1x STMFruit from the Sky increased" },
+        { address=0XC6DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="--- Episode 10 - Sea Gold (without Yosaku) [8bit] increased" },
+        { address=0XC6DD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="--- Episode 10 - Sea Gold (with Yosaku) [8bit] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC5F0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="--- Bit0 | Ghost Ship's Demon - Luffy wants to see a real Ghost next time" },
+      },
+    },
+  },
+}

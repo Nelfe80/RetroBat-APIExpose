@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>double_joystick_4way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire</text>
+			<color>${brown}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 BLAZER  30000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 GROBDA  25000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 LEOPARD 22000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 PANTHER 18000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 LYNX    15000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

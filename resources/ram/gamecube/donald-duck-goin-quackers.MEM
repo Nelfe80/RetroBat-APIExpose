@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Donald Duck: Goin' Quackers",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "donald-duck-goin-quackers",
+    file = "donald-duck-goin-quackers.zip",
+    hashes = {
+      { hash = "facb1fd592f3978e05c67e52434233f3", label = "Disney's Donald Duck - Goin' Quackers (USA) (En,Fr)" },
+      { hash = "61b78fc9764f760a5a4fcd5cde2900f6", label = "Disney's Donald Duck - Quack Attack (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X765074, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-Bit BE] Lives increased" },
+        { address=0X765074, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-Bit BE] Lives decreased" },
+      },
+    },
+  },
+}

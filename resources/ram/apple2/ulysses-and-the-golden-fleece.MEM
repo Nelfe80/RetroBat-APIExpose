@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Ulysses and the Golden Fleece",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ulysses-and-the-golden-fleece",
+    file = "ulysses-and-the-golden-fleece.zip",
+    hashes = {
+      { hash = "d837732de99cf814e160d93672f1c559", label = "Ulysses and the Golden Fleece side A.woz" },
+      { hash = "391cc09141418de2a6c929fa907babe9", label = "Ulysses and the Golden Fleece side B.woz" },
+      { hash = "49256e89c1badaf8c523015cb1c39375", label = "Hi-Res Adventure 4 - Ulysses and the Golden Fleece (1981)(On-Line Systems)(Side A).do" },
+      { hash = "3fb477266fdced934332c803a78105b4", label = "Hi-Res Adventure 4 - Ulysses and the Golden Fleece (1981)(On-Line Systems)(Side B)[unk filesys].do" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X897A, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X897A, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="(Value used just before game over is triggered)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0079, type="u8", condition="eq", value=0X0B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pluto turns you to stone" },
+        { address=0X0079, type="u8", condition="eq", value=0X2A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sirens lure ship into rocks" },
+        { address=0X0079, type="u8", condition="eq", value=0X45, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Crew cannabalism" },
+        { address=0X0079, type="u8", condition="eq", value=0X66, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cyclops eats you" },
+        { address=0X0079, type="u8", condition="eq", value=0X69, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Falling into canyon" },
+        { address=0X0079, type="u8", condition="eq", value=0X73, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Attempting to kill a guard" },
+        { address=0X0079, type="u8", condition="eq", value=0X7D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hurricane destroys ship" },
+        { address=0X0079, type="u8", condition="eq", value=0X8E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Failing to bow to king" },
+        { address=0X0079, type="u8", condition="eq", value=0XBB, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Neptune smashes ship" },
+        { address=0X0079, type="u8", condition="eq", value=0XCA, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Skeletons kill you" },
+        { address=0X0079, type="u8", condition="eq", value=0XDA, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Failing to use trunk against cyclops correctly" },
+        { address=0X0079, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dragon roasts you" },
+        { address=0X0083, type="u8", condition="eq", value=0X1C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Passageway dead-end" },
+        { address=0X0083, type="u8", condition="eq", value=0X34, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Passageway dead-end" },
+        { address=0X0083, type="u8", condition="eq", value=0X46, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Passageway dead-end" },
+        { address=0X0083, type="u8", condition="eq", value=0XE4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Passageway dead-end" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0083, type="u8", condition="eq", value=0XD8, action="MONEY_STATE", no_log=false, no_survey=false, desc="Alley (gold coin)" },
+        { address=0X0B0A, type="u8", condition="eq", value=0XFD, action="MONEY_STATE", no_log=false, no_survey=false, desc="Used/consumed (bribed guard)" },
+        { address=0X0B0A, type="u8", condition="eq", value=0XFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X8912, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8-bit Boolean] Received Gold and Silver from King for Quest (0 = no, 1 = yes) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8924, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8-bit Boolean] Destroyed Band of Skeletons (0 = no, 1 = yes)" },
+      },
+    },
+  },
+}

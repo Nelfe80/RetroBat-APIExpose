@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Naruto: Clash of Ninja",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "naruto-clash-of-ninja",
+    file = "naruto-clash-of-ninja.zip",
+    hashes = {
+      { hash = "dd585efef511615d0ae8753a2a5050f0", label = "Naruto - Clash of Ninja (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X189200, type="u16be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="0x01 = Fight Lee at end of Story Mode (no continues) [16bit BE]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1883C2, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Match Option - Number of Rounds [16bit BE]" },
+      },
+      stage = {
+        { address=0X18918C, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage Location [32bit BE]" },
+        { address=0X189192, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Story Mode / One Player Mode - Current Stage [16bit BE]" },
+        { address=0X1897E0, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage Location [32bit BE]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X188E1C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 1st Place - Name [32bit BE]" },
+        { address=0X188E24, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 1st Place - Score [32bit BE]" },
+        { address=0X188E34, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 1st Place - Character [16bit BE]" },
+        { address=0X188E40, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 2nd Place - Score [32bit BE]" },
+        { address=0X188E5C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 3rd Place - Score [32bit BE]" },
+        { address=0X188E78, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 4th Place - Score [32bit BE]" },
+        { address=0X188E94, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 5th Place - Score [32bit BE]" },
+        { address=0X188EB0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 6th Place - Score [32bit BE]" },
+        { address=0X188ECC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 7th Place - Score [32bit BE]" },
+        { address=0X188EE8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 8th Place - Score [32bit BE]" },
+        { address=0X188F04, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 9th Place - Score [32bit BE]" },
+        { address=0X188F20, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking - 10th Place - Score [32bit BE]" },
+        { address=0X189214, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="One Player Mode - Score [32bit BE]" },
+      },
+      collectibles = {
+        { address=0X189078, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Times Played as Sharingan Kakashi [16-bit BE] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X188BEC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 1st Place - Name [32bit BE]" },
+        { address=0X188BF8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 1st Place - Time [32bit BE]" },
+        { address=0X188C08, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 2nd Place - Name [32bit BE]" },
+        { address=0X188C14, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 2nd Place - Time [32bit BE]" },
+        { address=0X188C30, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 3rd Place - Time [32bit BE]" },
+        { address=0X188C4C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 4th Place - Time [32bit BE]" },
+        { address=0X188C68, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 5th Place - Time [32bit BE]" },
+        { address=0X188C84, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 6th Place - Time [32bit BE]" },
+        { address=0X188CA0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 7th Place - Time [32bit BE]" },
+        { address=0X188CBC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 8th Place - Time [32bit BE]" },
+        { address=0X188CD8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 9th Place - Time [32bit BE]" },
+        { address=0X188CF4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Ranking - 10th Place - Time [32bit BE]" },
+        { address=0X188F58, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Sasuke [16-bit BE]" },
+        { address=0X188F7C, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Haku [16-bit BE]" },
+        { address=0X188FA0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Kakashi [16-bit BE]" },
+        { address=0X188FC4, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Lee [16-bit BE]" },
+        { address=0X188FE8, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Iruka [16-bit BE]" },
+        { address=0X18900C, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Zabuza [16-bit BE]" },
+        { address=0X189030, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Sakura [16-bit BE]" },
+        { address=0X189054, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Naruto [16-bit BE]" },
+        { address=0X18909C, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played as Nine-Tails Naruto [16-bit BE]" },
+      },
+    },
+  },
+}

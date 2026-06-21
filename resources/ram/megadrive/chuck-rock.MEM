@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Chuck Rock",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "chuck-rock",
+    file = "chuck-rock.zip",
+    hashes = {
+      { hash = "efd1546c7f4c8c76f36d6b3eeb9f5331", label = "Chuck Rock (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X05BA, type="u8", condition="eq", value=0X07, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End game credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X05BA, type="u8", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage clear screen" },
+      },
+      stage = {
+        { address=0X05BA, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X05BA, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X06D4, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1EC3, type="u8", condition="eq", value=0X0000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1EC4, type="u8", condition="eq", value=0X0000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1EC9, type="u8", condition="eq", value=0XFF00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+    },
+  },
+}

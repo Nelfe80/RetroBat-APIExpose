@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 333 4702650</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 BBB 4525820</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 222 1591740</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 444 1199370</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 CAV 1000000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 CAV 900000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 111 881740</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 CAV 800000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 CAV 700000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 CAV 600000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 CAV 2000000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 CAV 1800000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 CAV 1600000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 CAV 1400000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 CAV 1200000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 CAV 1000000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 CAV 800000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 CAV 600000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 CAV 400000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 CAV 200000</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 CAV 3000000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 CAV 2700000</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 CAV 2400000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 CAV 2100000</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 CAV 1800000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 CAV 1500000</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 CAV 1200000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 CAV 900000</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 CAV 600000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 CAV 300000</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 CAV 4000000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 CAV 3600000</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 CAV 3200000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 CAV 2800000</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 CAV 2400000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 CAV 2000000</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 CAV 1600000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 CAV 1200000</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 CAV 800000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 CAV 400000</text>
+		</text>
+	</view>
+</theme>

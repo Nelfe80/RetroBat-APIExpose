@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Spectral Tower",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "spectral-tower",
+    file = "spectral-tower.zip",
+    hashes = {
+      { hash = "3f9039c8970b08c0da84e7f35b9cec76", label = "Spectral Tower (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0A24, type="u8", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Sequence" },
+        { address=0X19293A, type="u8", condition="eq", value=0X22, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon" },
+        { address=0X19293A, type="u8", condition="eq", value=0X23, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon King" },
+        { address=0X19293A, type="u8", condition="eq", value=0X29, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Warrior" },
+        { address=0X19327A, type="u8", condition="eq", value=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Buster" },
+        { address=0X19327A, type="u8", condition="eq", value=0X58, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Prince" },
+        { address=0X19327A, type="u8", condition="eq", value=0X62, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Armour" },
+        { address=0X19327A, type="u8", condition="eq", value=0X64, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon's Son" },
+        { address=0X1932AC, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Type Effectiveness" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA35BC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XA35C8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XA35D4, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XA35E0, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XC0ED2, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1932AE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Weapon Level" },
+        { address=0X1932B0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Food Level" },
+        { address=0X1932B2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Search Level" },
+        { address=0X1932B4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Curse Level" },
+        { address=0X1932B6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Disease Level" },
+      },
+      zone = {
+        { address=0X19340C, type="u8", condition="eq", value=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map Selection" },
+        { address=0X193430, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X193430, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="On world map?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC0A24, type="u8", condition="eq", value=0X0D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X19327A, type="u8", condition="eq", value=0X69, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Invincible Soldier" },
+      },
+      health = {
+        { address=0X192940, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X192940, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X19329C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X19329C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+        { address=0X1932A0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Max HP decreased" },
+        { address=0X1932A0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X19293A, type="u8", condition="eq", value=0X39, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest" },
+        { address=0X19293A, type="u8", condition="eq", value=0X3A, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest (Skull)" },
+        { address=0X19293A, type="u8", condition="eq", value=0X3B, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest" },
+      },
+      weapon = {
+        { address=0X19327A, type="u8", condition="eq", value=0X36, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Merchant" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X19293A, type="u8", condition="eq", value=0X27, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Dragon" },
+        { address=0X19293A, type="u8", condition="eq", value=0X2B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Wild Coin" },
+        { address=0X19293A, type="u8", condition="eq", value=0X2C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Poor Coin" },
+        { address=0X19293A, type="u8", condition="eq", value=0X2D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Cursed Coin" },
+        { address=0X19293A, type="u8", condition="eq", value=0X2E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Sick Coin" },
+        { address=0X19293A, type="u8", condition="eq", value=0X2F, action="MONEY_STATE", no_log=false, no_survey=false, desc="King Coin" },
+      },
+    },
+  },
+}

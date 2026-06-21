@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Maya the Bee & Her Friends",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "maya-the-bee-her-friends",
+    file = "maya-the-bee-her-friends.zip",
+    hashes = {
+      { hash = "184f5d0fbb190ae2d7242e0a7ec4a407", label = "Maya the Bee & Her Friends (Europe) (En,Fr,De) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XFC9A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XFC9A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDC95, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16-bit Time seconds" },
+        { address=0XDC97, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time minutes" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Pocahontas",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "pocahontas",
+    file = "pocahontas.zip",
+    hashes = {
+      { hash = "966cc6df20d8c5d42f690f28bbcc8caa", label = "Pocahontas (USA, Europe) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC11F, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue screen" },
+        { address=0XC11F, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0XC11F, type="u8", condition="eq", value=0X03, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Transition to next level" },
+        { address=0XC11F, type="u8", condition="eq", value=0X04, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In level" },
+        { address=0XC33F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[Binary] Game Paused" },
+        { address=0XD9DE, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[Binary] Game Over/Continue Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC34C, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Colors of the Wind' bonus" },
+        { address=0XC34C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC350, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XC350, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD9D8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Stage 15 Timer (Seconds)" },
+      },
+    },
+  },
+}

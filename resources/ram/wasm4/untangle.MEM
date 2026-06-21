@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Untangle",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "untangle",
+    file = "untangle.zip",
+    hashes = {
+      { hash = "bf657a4954ce7ca7b7164e5fb250de67", label = "Untangle (World) (v0.1.1) (Mota Link).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X446C, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Level Select" },
+        { address=0X4470, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Completed" },
+        { address=0X4470, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X449F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level ID" },
+      },
+    },
+  },
+}

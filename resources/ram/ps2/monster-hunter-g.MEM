@@ -1,0 +1,111 @@
+return {
+  game = {
+    title = "Monster Hunter G",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "monster-hunter-g",
+    file = "monster-hunter-g.zip",
+    hashes = {
+      { hash = "52c9595d023cde1a88a4bcd86d20e052", label = "Monster Hunter G (Japan) (En) (Remix v13) (Amaillo)" },
+      { hash = "394b5233a11123a7c822e4f228755cd7", label = "Monster Hunter G (Japan)" },
+      { hash = "565ade0e68991e0910763145a18b80a9", label = "Monster Hunter G (Japan) (En) (Remix v13) (Amaillo) (MHGPlus) (vFinal QuestFix2) (Yuzucchi)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X32CE90, type="u8", condition="eq", value=0XB7, action="DEMO_MODE", no_log=false, no_survey=false, desc="No. 14 Mega Demondrug" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X340F42, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Large Monster Health decreased" },
+        { address=0X340F42, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Large Monster Health increased" },
+        { address=0X34D752, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Health decreased" },
+        { address=0X34D752, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X32C256, type="u16le", condition="eq", value=0X1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Green Pants" },
+        { address=0X32C256, type="u16le", condition="eq", value=0XC9, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="^Lucky Metal Boots" },
+        { address=0X32C95C, type="u16le", condition="eq", value=0X0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X32C95C, type="u16le", condition="eq", value=0X1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Book of Combos 1" },
+        { address=0X32C95C, type="u16le", condition="eq", value=0X100, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rubbery Hide+" },
+        { address=0X32C95C, type="u16le", condition="eq", value=0X200, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ballista S" },
+        { address=0X32C95C, type="u16le", condition="eq", value=0X207, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powderstone" },
+        { address=0X32C95E, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[16bit] Item Box Item 1 Quantity" },
+      },
+      weapon = {
+        { address=0X34D7AF, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blademaster" },
+        { address=0X34D7AF, type="u8", condition="eq", value=0X7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gunner" },
+        { address=0X34D7B0, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16bit] Weapon Equipped" },
+        { address=0X34DCCE, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16bit] Weapon Sharpness" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X32C22C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] HR Points" },
+      },
+      collectibles = {
+        { address=0X32CF22, type="u16le", condition="eq", value=0X81, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF2C, type="u16le", condition="eq", value=0X7A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF30, type="u16le", condition="eq", value=0X7A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF36, type="u16le", condition="eq", value=0X7F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF3C, type="u16le", condition="eq", value=0X8B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF3E, type="u16le", condition="eq", value=0X87, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF42, type="u16le", condition="eq", value=0X87, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF48, type="u16le", condition="eq", value=0X7D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF4A, type="u16le", condition="eq", value=0X86, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF4C, type="u16le", condition="eq", value=0X81, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF54, type="u16le", condition="eq", value=0X7F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF56, type="u16le", condition="eq", value=0X7B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF58, type="u16le", condition="eq", value=0X7B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF5E, type="u16le", condition="eq", value=0X88, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF62, type="u16le", condition="eq", value=0XB1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF6A, type="u16le", condition="eq", value=0X81, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF6C, type="u16le", condition="eq", value=0X7A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF6E, type="u16le", condition="eq", value=0X7D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF72, type="u16le", condition="eq", value=0X7F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF74, type="u16le", condition="eq", value=0X81, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF76, type="u16le", condition="eq", value=0X8B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF78, type="u16le", condition="eq", value=0X7F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF7A, type="u16le", condition="eq", value=0X87, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF7C, type="u16le", condition="eq", value=0X86, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF7E, type="u16le", condition="eq", value=0X87, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF80, type="u16le", condition="eq", value=0X81, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X32CF82, type="u16le", condition="eq", value=0X7F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X32CE24, type="u8", condition="eq", value=0XB6, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Kut-Ku Sword and Shield" },
+        { address=0X32CE25, type="u8", condition="eq", value=0XB3, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rathalos Sword and Shield" },
+        { address=0X32CE26, type="u8", condition="eq", value=0XB0, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Gypceros Sword and Shield" },
+        { address=0X32CE26, type="u8", condition="eq", value=0XB5, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Plesioth Sword and Shield" },
+        { address=0X32CE27, type="u8", condition="eq", value=0XB2, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Khezu Sword and Shield" },
+        { address=0X32CE28, type="u8", condition="eq", value=0XB4, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Cephadrome Sword and Shield" },
+        { address=0X32CE29, type="u8", condition="eq", value=0XB1, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Monoblos Sword and Shield" },
+        { address=0X32CE2A, type="u8", condition="eq", value=0XB3, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Gravios Sword and Shield" },
+        { address=0X32D018, type="u32le", condition="eq", value=0X4E24, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Training - Kut-Ku - Sword and Shield" },
+        { address=0X32D018, type="u32le", condition="eq", value=0X4E29, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Training - Rathalos - Sword and Shield" },
+        { address=0X32D018, type="u32le", condition="eq", value=0X4E2E, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Training - Gypeceros - Sword and Shield" },
+        { address=0X32D018, type="u32le", condition="eq", value=0X4E33, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Training - Plesioth - Sword and Shield" },
+        { address=0X32D018, type="u32le", condition="eq", value=0X4E38, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Training - Khezu - Sword and Shield" },
+        { address=0X32D018, type="u32le", condition="eq", value=0X4E42, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Training - Cephadrome - Sword and Shield" },
+        { address=0X32D018, type="u32le", condition="eq", value=0X4E47, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Training - Monoblos - Sword and Shield" },
+        { address=0X32D018, type="u32le", condition="eq", value=0X4E51, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Training - Gravios - Sword and Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X32CE0C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Town Quests - 1 Star" },
+      },
+    },
+  },
+}

@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Pengo",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pengo",
+    file = "pengo.zip",
+    hashes = {
+      { hash = "ff90daea12936ee9f90eeeef2ba60e48", label = "Pengo (World) (Pitfall Jones).uze" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0ED5, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0ED5, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0ED5, type="u8", condition="eq", value=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Leaderboard after Game Over" },
+        { address=0X0EFF, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0F00, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0ED5, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Round Complete" },
+        { address=0X0EE1, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Initial" },
+        { address=0X0EE1, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max" },
+        { address=0X0EE1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Current Level" },
+        { address=0X0EE2, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Initial" },
+        { address=0X0EE2, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max" },
+        { address=0X0EE2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0EFF, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="Initial" },
+        { address=0X0EFF, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives increased" },
+        { address=0X0EFF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives decreased" },
+        { address=0X0F00, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="Initial" },
+        { address=0X0F00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives increased" },
+        { address=0X0F00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X000F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1st Leaderboard Score" },
+        { address=0X0015, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2nd Leaderboard Score" },
+        { address=0X001B, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="3rd Leaderboard Score" },
+        { address=0X0021, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="4th Leaderboard Score" },
+        { address=0X0027, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="5th Leaderboard Score" },
+        { address=0X0ED8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score" },
+        { address=0X0EDA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Score" },
+        { address=0X0EF3, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0EED, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Active" },
+        { address=0X0EED, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Glowing" },
+        { address=0X0EED, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Triggered" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0EF5, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Bonus" },
+      },
+    },
+  },
+}

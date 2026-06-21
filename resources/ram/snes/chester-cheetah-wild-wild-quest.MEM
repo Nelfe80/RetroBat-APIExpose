@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Chester Cheetah: Wild Wild Quest",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "chester-cheetah-wild-wild-quest",
+    file = "chester-cheetah-wild-wild-quest.zip",
+    hashes = {
+      { hash = "e6f8389a1b055406d69812d4e901178b", label = "Chester Cheetah - Wild Wild Quest (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

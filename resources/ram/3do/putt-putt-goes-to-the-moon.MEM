@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Putt-Putt Goes to the Moon",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Adventure, Education"
+  },
+
+  rom = {
+    name = "putt-putt-goes-to-the-moon",
+    file = "putt-putt-goes-to-the-moon.zip",
+    hashes = {
+      { hash = "43def02afa11f26ffea31c45307020be", label = "Putt-Putt Goes to the Moon (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X51FE3, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Start (Pause button) / Y" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X13C868, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="What round of simon says you are on" },
+        { address=0X13C86C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="How many buttons pushed in Simon says this round" },
+        { address=0X13C898, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Startng fuel on current level in Bear Stormin" },
+        { address=0X13C8A0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level on Bear Stormin" },
+        { address=0X13C8B0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max level on Bear Stormin" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X13C88C, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives left in Bear Stormin increased" },
+        { address=0X13C88C, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives left in Bear Stormin decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X13C878, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Alien tag score" },
+        { address=0X13C8A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current score on Bear Stormin" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X5554D, type="u8", condition="eq", value=0X3F, action="JUMPING", no_log=false, no_survey=false, desc="cow jumped over the moon" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X13C848, type="u8", condition="eq", value=0X26, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Trash can" },
+        { address=0X13C848, type="u8", condition="eq", value=0X2C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Basket" },
+        { address=0X13C848, type="u8", condition="eq", value=0X6D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sun" },
+        { address=0X13C848, type="u8", condition="eq", value=0X6E, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mercury" },
+        { address=0X13C848, type="u8", condition="eq", value=0X6F, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Venus" },
+        { address=0X13C848, type="u8", condition="eq", value=0X70, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Earth" },
+        { address=0X13C848, type="u8", condition="eq", value=0X71, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mars" },
+        { address=0X13C848, type="u8", condition="eq", value=0X72, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Jupiter" },
+        { address=0X13C848, type="u8", condition="eq", value=0X73, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Saturn" },
+        { address=0X13C848, type="u8", condition="eq", value=0X74, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Uranus" },
+        { address=0X13C848, type="u8", condition="eq", value=0X75, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Neptune" },
+        { address=0X13C848, type="u8", condition="eq", value=0X76, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pluto" },
+      },
+    },
+  },
+}

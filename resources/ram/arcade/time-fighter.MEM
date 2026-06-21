@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Time Fighter",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "time-fighter",
+    file = "time-fighter.zip",
+    hashes = {
+      { hash = "5dc8f188bb548d5f0eb2d6d23d4ede8b", label = "timefgtr.7z <>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X055F, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

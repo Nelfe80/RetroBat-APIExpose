@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Shin Megami Tensei",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shin-megami-tensei",
+    file = "shin-megami-tensei.zip",
+    hashes = {
+      { hash = "662d3b4f27ada028dd4a853fc58cc745", label = "Shin Megami Tensei (Japan) (Es).sfc" },
+      { hash = "7590a77f8f6661bb8877d3acdb33c944", label = "Shin Megami Tensei (Japan) (En) (v1.00) (Aeon Genesis) (Bug Fix) (v1.0) (Orden).sfc" },
+      { hash = "7770b441b184245f3a2243cf08503282", label = "Shin Megami Tensei (Japan) (En) (v1.0) (AutomapEnhance).sfc" },
+      { hash = "9055814b1782cadd538c78ae773826b8", label = "Shin Megami Tensei (Japan).sfc" },
+      { hash = "e0450bd7cae39aed72cb8535fc39048c", label = "Shin Megami Tensei (Japan) (En) (Aeon Genesis) (1.0).sfc" },
+      { hash = "f3f2c71227399931fbcb09e1b4e27f46", label = "Shin Megami Tensei (Japan) (En) (v1.0) (AGTP) (Automap+) (Bug Fix) (v1.0) (Orden).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X07C1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit1 - 1st demon attack at Kichijoji Mall" },
+        { address=0X07C8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit0 - Retrieving a demon at Kongokai [or mag]" },
+        { address=0X07C9, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit1 - Chaos Hero fuse with a demon" },
+        { address=0X07DD, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="1st demon progr. upgrade at Lab" },
+        { address=0X1184, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(8 bit) 1st Demon Name" },
+        { address=0X11E4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(8 bit) 2nd Demon Name" },
+        { address=0X1244, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(8 bit) 3rd Demon Modifier" },
+        { address=0X12A4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(8 bit) 4th Demon Modifier" },
+        { address=0X1304, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(8 bit) 5th Demon Modifier" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X07DF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="bit7 - Event with nuclear bomb at American" },
+        { address=0X100A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Hero level" },
+        { address=0X106A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Heroine level" },
+        { address=0X10CA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Law level" },
+        { address=0X112A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Chaos level" },
+      },
+      zone = {
+        { address=0X0404, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="3D exploring buildings" },
+        { address=0X0404, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="ff = 2D world map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X07D1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit3 - Help the Law Hero's girlfriend move on to the afterlife [side quest at Ropongi] increased" },
+        { address=0X07D1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit3 - Help the Law Hero's girlfriend move on to the afterlife [side quest at Ropongi] decreased" },
+      },
+      health = {
+        { address=0X102E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Hero current HP decreased" },
+        { address=0X102E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Hero current HP increased" },
+        { address=0X1030, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Hero max HP decreased" },
+        { address=0X1030, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Hero max HP increased" },
+        { address=0X162E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st enemy - Current HP decreased" },
+        { address=0X162E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st enemy - Current HP increased" },
+        { address=0X1630, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st enemy - MAX HP decreased" },
+        { address=0X1630, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st enemy - MAX HP increased" },
+        { address=0X168E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 2nd enemy - Current HP decreased" },
+        { address=0X168E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 2nd enemy - Current HP increased" },
+        { address=0X16EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 3rd enemy - Current HP decreased" },
+        { address=0X16EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 3rd enemy - Current HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3400, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(8 bit) Treasure Chests" },
+        { address=0X3401, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(8 bit) Treasure Chests" },
+      },
+      weapon = {
+        { address=0X1042, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) hero - weapon slot" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1B7D, type="u8", condition="eq", value=0X4, action="MONEY_STATE", no_log=false, no_survey=false, desc="active [if you change it, it hide the text temporary]" },
+      },
+    },
+  },
+}

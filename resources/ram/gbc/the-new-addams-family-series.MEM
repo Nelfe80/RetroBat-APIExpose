@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The New Addams Family Series",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "the-new-addams-family-series",
+    file = "the-new-addams-family-series.zip",
+    hashes = {
+      { hash = "2d2a8314f789d490bf83ed3c44538fe3", label = "New Addams Family Series, The (Europe) (En,Fr,De,Es,It,Pt).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

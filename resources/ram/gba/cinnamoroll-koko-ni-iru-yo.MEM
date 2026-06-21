@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Cinnamoroll: Koko ni Iru yo",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "cinnamoroll-koko-ni-iru-yo",
+    file = "cinnamoroll-koko-ni-iru-yo.zip",
+    hashes = {
+      { hash = "978953379422ea0eef46ed02253fe77a", label = "Cinnamoroll - Koko ni Iru yo (Japan).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X07F4, type="u16le", condition="eq", value=0X5630, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X3986C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Viewing demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X39914, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Character selection 'Clear' display" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X39778, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Puzzle animation timer" },
+        { address=0X397CC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

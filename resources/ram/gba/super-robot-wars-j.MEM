@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Super Robot Wars J",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "super-robot-wars-j",
+    file = "super-robot-wars-j.zip",
+    hashes = {
+      { hash = "6caff32286c768d3bf9f7986d535ef7b", label = "Super Robot Taisen J (Japan) (En) (Aerie).gba" },
+      { hash = "ef32f93816b6dbcf788f08faf1e71450", label = "Super Robot Taisen J (Japan).gba" },
+      { hash = "c2d2a66cda98ea45e6e0873ce5e964d1", label = "Super Robot Taisen J (Japan) (Zh) (v1.0) (starteams).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X311D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Katia Level" },
+        { address=0X311F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Festenia Level" },
+        { address=0X31217, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Melua Level" },
+      },
+      stage = {
+        { address=0X31776, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Episode ID, Puzzle-Robo stages come afterwards" },
+        { address=0X3177E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Puzzle Robo Stages, zero-lead" },
+        { address=0X317F3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting at this Address, each subsequent address becomes 01(bit0) when Puzzle Robo Stage is ava" },
+        { address=0X31825, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Puzzle Robo Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X31755, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Genichiro is Dead" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X31750, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit Money increased" },
+      },
+    },
+  },
+}

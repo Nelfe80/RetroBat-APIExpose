@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Famicom Mini Vol. 16: Dig Dug",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "famicom-mini-vol-16-dig-dug",
+    file = "famicom-mini-vol-16-dig-dug.zip",
+    hashes = {
+      { hash = "10ea584b14960348548e8528202968f1", label = "Famicom Mini 16 - Dig Dug (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

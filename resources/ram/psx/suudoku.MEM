@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Suudoku",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Board Game, Puzzle"
+  },
+
+  rom = {
+    name = "suudoku",
+    file = "suudoku.zip",
+    hashes = {
+      { hash = "7048d7c70f31123f14dc1fe245a19852", label = "SuperLite 1500 Series - Suudoku (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X83198, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This determines what stage in story mode you are in" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X82E70, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="This is for the timer in a sudoku game. goes up at 1 Second intervals." },
+      },
+    },
+  },
+}

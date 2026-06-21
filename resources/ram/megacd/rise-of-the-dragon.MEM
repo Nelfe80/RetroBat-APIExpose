@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Rise of the Dragon",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "rise-of-the-dragon",
+    file = "rise-of-the-dragon.zip",
+    hashes = {
+      { hash = "367a921f8d55f1a4693389a33bd1fcac", label = "Rise of the Dragon (USA) (Rerelease) (RE)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEC1F, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="0xff = Game Over?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEC78, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="0x01 - Rock of Life in inventory increased" },
+        { address=0XEC78, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x01 - Rock of Life in inventory decreased" },
+        { address=0XED62, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x01 - Watch Chen die" },
+        { address=0XED6E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x01 - Watch Chen die" },
+        { address=0XED88, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x01 - Watch Chen die" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XED50, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="0x01 - Get a claim check for your weapon" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XED8C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="0x01 - Blow up Chen's door lock" },
+      },
+    },
+  },
+}

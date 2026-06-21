@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "The Itsudemo Puzzle: Massugu Soroete Straws",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "the-itsudemo-puzzle-massugu-soroete-straws",
+    file = "the-itsudemo-puzzle-massugu-soroete-straws.zip",
+    hashes = {
+      { hash = "d9a3d6ae2ec335fe8cf8008539ac14e7", label = "Simple 2960 Tomodachi Series Vol. 3 - The Itsudemo Puzzle - Massugu Soroete Straws (Japan).gba" },
+      { hash = "02865e1b0b3882eefc065957e52f4c04", label = "Simple 2960 Tomodachi Series Vol. 3 - The Itsudemo Puzzle - Massugu Soroete Straws (Japan) (En) (v1.0) (AnotherBlob).gba" },
+    }
+  },
+
+  events = {
+  },
+}

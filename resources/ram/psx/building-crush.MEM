@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Building Crush!",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "building-crush",
+    file = "building-crush.zip",
+    hashes = {
+      { hash = "d97e33ea15c69e6aa9e739cbb24305ba", label = "Building Crush! (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FFE4C, type="u32le", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Watching demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6EBD8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 rounds won" },
+        { address=0X6EBDA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 rounds won" },
+      },
+      stage = {
+        { address=0X6EAA4, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Taeko" },
+        { address=0X6EAA4, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yoshio" },
+        { address=0X6EAA4, type="u16le", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ryouko" },
+        { address=0X6EAA4, type="u16le", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kenji" },
+        { address=0X6EAA4, type="u16le", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sanae" },
+        { address=0X6EAA4, type="u16le", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bakudan-kun" },
+        { address=0X6EAA4, type="u16le", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bakudan-chan" },
+        { address=0X6EAA4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6EB74, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X6EB78, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Player 2" },
+        { address=0XA50D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Record - High score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8A1B4, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Current blocks destroyed in chain" },
+        { address=0XA50C4, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Record - Maximum blocks destroyed in chain" },
+        { address=0XA50C8, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Record - Total blocks destroyed" },
+      },
+    },
+  },
+}

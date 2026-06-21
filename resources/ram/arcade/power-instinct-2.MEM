@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Power Instinct 2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "power-instinct-2",
+    file = "power-instinct-2.zip",
+    hashes = {
+      { hash = "383cc84f4c8a6ae0f24494b0c60dc64d", label = "pwrinst2j.7z <Gouketsuji Ichizoku 2 (Japan, ver. 94/04/08)>" },
+      { hash = "ef85a049d9f4cb0e23a26a95c1e284f3", label = "pwrinst2.7z <Power Instinct 2 (USA, ver. 94/04/08)>" },
+    }
+  },
+
+  events = {
+  },
+}

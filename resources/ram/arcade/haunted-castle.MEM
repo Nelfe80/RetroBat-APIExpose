@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Haunted Castle",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "haunted-castle",
+    file = "haunted-castle.zip",
+    hashes = {
+      { hash = "3ddedc5f069dff75065f9ef75e5b8f54", label = "hcastle.7z <Haunted Castle (ver. M)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X14C4, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of Credits you have" },
+        { address=0X6502, type="u8", condition="eq", value=0X51, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X6502, type="u8", condition="eq", value=0X63, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Dracula Arised (Title)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1B16, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This tells what stage you are on" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X040E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="'Lives'. Why only 1 life Konami increased" },
+        { address=0X040E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="'Lives'. Why only 1 life Konami decreased" },
+      },
+      health = {
+        { address=0X040C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of Energy bars on screen in hex decreased" },
+        { address=0X040C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of Energy bars on screen in hex increased" },
+        { address=0X040D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Total health value in decimal decreased" },
+        { address=0X040D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Total health value in decimal increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0C10, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Whip" },
+        { address=0X0C10, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mace" },
+        { address=0X0C10, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X1A99, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X1A99, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0X1A99, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Torch" },
+        { address=0X1A99, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Boomerang" },
+        { address=0X1A99, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cross" },
+        { address=0X1A99, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Clock" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1512, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Point score for 10 thoudsands and 100 thousands place" },
+        { address=0X1513, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score hundres and thousands place" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6502, type="u8", condition="eq", value=0X55, action="BOSS_HIT", no_log=false, no_survey=false, desc="The Revived Devil (Boss)" },
+        { address=0X6502, type="u8", condition="eq", value=0X5C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dracula's Room (Final Boss 1)" },
+        { address=0X6502, type="u8", condition="eq", value=0X5D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Battle (Final Boss 2)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X040A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Death Counter" },
+        { address=0X1A99, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sub-Weapons" },
+        { address=0X6502, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8-Bits] Music ID" },
+      },
+    },
+  },
+}

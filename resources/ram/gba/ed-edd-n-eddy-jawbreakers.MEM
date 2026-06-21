@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Ed, Edd n Eddy: Jawbreakers!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ed-edd-n-eddy-jawbreakers",
+    file = "ed-edd-n-eddy-jawbreakers.zip",
+    hashes = {
+      { hash = "9e3c1af23ea83cc4852c632525bea1c5", label = "Ed, Edd n Eddy - Jawbreakers! (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1070, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title / In-game reset." },
+        { address=0X7D8C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game over / continue screen." },
+        { address=0X89F8, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen reset." },
+        { address=0X9A94, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen. Use for resets." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X7CCE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="from ground level" },
+        { address=0X7CE5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared screen." },
+        { address=0X9A5D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Screen/Level ID" },
+        { address=0X9A93, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cheat Level Select" },
+        { address=0X9AF8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="'Cleared' screen." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9A5C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X9A5C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X7D7D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rolfs health decreased" },
+        { address=0X7D7D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rolfs health increased" },
+        { address=0XA4CE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rolfs health decreased" },
+        { address=0XA4CE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rolfs health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9A5A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins value. increased" },
+        { address=0XA3FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ed death animation (during Sara boss battle) increased" },
+        { address=0XA404, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Eddy death animation (During Kevin boss battle) increased" },
+        { address=0XA4E5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="DD death animation (during Rolf boss battle) increased" },
+        { address=0XA52C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="DD death animation (during Sara boss battle) increased" },
+        { address=0XA65C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Eddy death animation (during Sara boss battle) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X9A91, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheat Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XAB11, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="checkpoint flag level 1 street" },
+      },
+    },
+  },
+}

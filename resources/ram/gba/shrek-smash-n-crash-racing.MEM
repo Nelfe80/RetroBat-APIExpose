@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Shrek: Smash n' Crash Racing",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "shrek-smash-n-crash-racing",
+    file = "shrek-smash-n-crash-racing.zip",
+    hashes = {
+      { hash = "b7bd37b2b39b8aaad6f297423db2d2a2", label = "Shrek - Smash n' Crash Racing (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "NAM-1975",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "nam-1975",
+    file = "nam-1975.zip",
+    hashes = {
+      { hash = "bd7fd18a24c392d25d712a3ae6ed98a2", label = "Nam-1975 (Japan) (En,Ja)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X109E, type="u8", condition="eq", value=0X0, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="False - Continue Screen" },
+        { address=0X119E, type="u8", condition="eq", value=0X0, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="False - Continue Screen" },
+        { address=0X1359, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="False" },
+        { address=0X1359, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="True" },
+        { address=0X69B6, type="u8", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Main Title Screen" },
+        { address=0X69B6, type="u8", condition="eq", value=0X0F, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End Credits (d0x0e)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X109E, type="u8", condition="eq", value=0X8, action="LIVES_STATE", no_log=false, no_survey=false, desc="True" },
+        { address=0X109E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Upper 4] Player 1 Has Lives Remaining increased" },
+        { address=0X109E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Upper 4] Player 1 Has Lives Remaining decreased" },
+        { address=0X119E, type="u8", condition="eq", value=0X8, action="LIVES_STATE", no_log=false, no_survey=false, desc="True" },
+        { address=0X119E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Upper 4] Player 2 Has Lives Remaining increased" },
+        { address=0X119E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Upper 4] Player 2 Has Lives Remaining decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X10E6, type="u8", condition="eq", value=0X83, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Grenades" },
+        { address=0X10E6, type="u8", condition="eq", value=0XC0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile" },
+        { address=0X10E6, type="u8", condition="eq", value=0XC1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Balcan" },
+        { address=0X10E6, type="u8", condition="eq", value=0XC2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flamethrower" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1008, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE BCD] Player 1 Current Score" },
+        { address=0X100C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 2 Current Score" },
+      },
+      collectibles = {
+        { address=0X10E7, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player 1 Quantity of Special Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0015, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pre-City Sub-Boss (M2)" },
+        { address=0X0015, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pre-Plane Sub-Boss (M3)" },
+        { address=0X0015, type="u8", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pre-Airport Sub-Boss (M4)" },
+        { address=0X0015, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pre-Factory Sub-Boss (M5)" },
+        { address=0X43AD, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X43AD, type="u8", condition="eq", value=0X7F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full Health" },
+        { address=0X44AD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 1 Boss Health (1/2)" },
+        { address=0X46AD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 1 Boss Health (2/2)" },
+      },
+    },
+  },
+}

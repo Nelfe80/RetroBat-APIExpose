@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Santa Claus Saves the Earth",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "santa-claus-saves-the-earth",
+    file = "santa-claus-saves-the-earth.zip",
+    hashes = {
+      { hash = "fbd187500572b8af52c505f4f8a4bd9b", label = "Santa Claus Saves the Earth (Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X09B4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0DD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level value" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X375CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Nilam Health decreased" },
+        { address=0X375CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Nilam Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X175A, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Snowball ammo" },
+        { address=0X175C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Cannonball Ammo" },
+        { address=0X175E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Tomato ammo" },
+      },
+    },
+  },
+}

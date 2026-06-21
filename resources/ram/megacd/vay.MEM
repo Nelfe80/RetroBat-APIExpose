@@ -1,0 +1,124 @@
+return {
+  game = {
+    title = "Vay",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "vay",
+    file = "vay.zip",
+    hashes = {
+      { hash = "6b77f65a5a6a31c376623b629995312e", label = "Vay (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE655, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="bit 0 - get permission to continue to use the dragon" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF0CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sandor's level" },
+        { address=0XF0CE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="PJ's level" },
+        { address=0XF0D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lynx's level" },
+        { address=0XF0D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pottle's level" },
+        { address=0XF0D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kinsey's level" },
+        { address=0XF0D6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rachel's level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE647, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 0 - talk to soldier in Jeffle" },
+        { address=0XE6F3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit 0 - Lifestone (Firelake) increased" },
+        { address=0XE6F3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 0 - Lifestone (Firelake) decreased" },
+      },
+      health = {
+        { address=0XEFEE, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sandor's current HP decreased" },
+        { address=0XEFEE, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sandor's current HP increased" },
+        { address=0XEFF2, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PJ's current HP decreased" },
+        { address=0XEFF2, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PJ's current HP increased" },
+        { address=0XEFF6, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lynx's current HP decreased" },
+        { address=0XEFF6, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lynx's current HP increased" },
+        { address=0XEFFA, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pottle's current HP decreased" },
+        { address=0XEFFA, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pottle's current HP increased" },
+        { address=0XEFFE, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kinsey's current HP decreased" },
+        { address=0XEFFE, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kinsey's current HP increased" },
+        { address=0XF002, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rachel's current HP decreased" },
+        { address=0XF002, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rachel's current HP increased" },
+        { address=0XF006, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sandor's max HP decreased" },
+        { address=0XF006, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sandor's max HP increased" },
+        { address=0XF00A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PJ's max HP decreased" },
+        { address=0XF00A, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PJ's max HP increased" },
+        { address=0XF00E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lynx's max HP decreased" },
+        { address=0XF00E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lynx's max HP increased" },
+        { address=0XF012, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pottle's max HP decreased" },
+        { address=0XF012, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pottle's max HP increased" },
+        { address=0XF016, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kinsey's max HP decreased" },
+        { address=0XF016, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kinsey's max HP increased" },
+        { address=0XF01A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rachel's Max HP decreased" },
+        { address=0XF01A, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rachel's Max HP increased" },
+        { address=0XF6EA, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Slot 1 decreased" },
+        { address=0XF6EA, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Slot 1 increased" },
+        { address=0XF6EC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Slot 2 decreased" },
+        { address=0XF6EC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Slot 2 increased" },
+        { address=0XF6EE, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Slot 3 decreased" },
+        { address=0XF6EE, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Slot 3 increased" },
+        { address=0XF6F0, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Slot 4 decreased" },
+        { address=0XF6F0, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Slot 4 increased" },
+        { address=0XF6F2, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Slot 5 decreased" },
+        { address=0XF6F2, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Slot 5 increased" },
+        { address=0XF6F4, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Slot 6 decreased" },
+        { address=0XF6F4, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Slot 6 increased" },
+        { address=0XF6F6, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Slot 7 decreased" },
+        { address=0XF6F6, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Slot 7 increased" },
+        { address=0XF6F8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Slot 8 decreased" },
+        { address=0XF6F8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Slot 8 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XF0ED, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sandor's Equipped weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE698, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Power Ring (Shadhook) increased" },
+        { address=0XE6E2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Gold Vortex (Vaygess) increased" },
+        { address=0XE6F2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Lava Ring (Firelake) increased" },
+        { address=0XE6FD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 9999 Gold (Toth) increased" },
+        { address=0XE700, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 10000 Gold (Toth) increased" },
+        { address=0XE720, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 12000 Gold (Exeter) increased" },
+        { address=0XE722, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 10000 Gold (Hectare) increased" },
+        { address=0XE724, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 20000 Gold (Hectare) increased" },
+        { address=0XE725, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 15000 Gold (Hectare) increased" },
+        { address=0XE727, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 100 Gold (Hectare) increased" },
+        { address=0XE729, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Lava Ring (Dunton) increased" },
+        { address=0XE740, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Lava Ring (Danek Castle) increased" },
+        { address=0XE745, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Dragon Ring (Danek Castle) increased" },
+        { address=0XEFE8, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Gold in possession increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XE66D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Leather Shield (Jeffle)" },
+        { address=0XE68E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Bronze Shield (Windspur)" },
+        { address=0XE6A7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Thor's Shield (Raxaal)" },
+        { address=0XE6B7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Iron Shield (Danek Base)" },
+        { address=0XE6C1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Knight Shield (Layre)" },
+        { address=0XE6C9, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Silver Shield (Icetower)" },
+        { address=0XE6FF, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Rune Shield (Toth)" },
+        { address=0XE721, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Knight Shield (Exeter)" },
+        { address=0XE728, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Tin Shield (Dunton)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XE646, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 0 - listened at the door" },
+      },
+    },
+  },
+}

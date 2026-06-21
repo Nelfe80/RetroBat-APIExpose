@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lucky Star: Ryouou Gakuen Outousai Portable",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lucky-star-ryouou-gakuen-outousai-portable",
+    file = "lucky-star-ryouou-gakuen-outousai-portable.zip",
+    hashes = {
+      { hash = "1c64b533480a2920d337b49ca3c9f56f", label = "Lucky Star - Ryouou Gakuen Outousai Portable (Japan).iso" },
+    }
+  },
+
+  events = {
+  },
+}

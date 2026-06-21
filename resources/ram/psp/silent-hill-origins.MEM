@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Silent Hill: Origins",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "silent-hill-origins",
+    file = "silent-hill-origins.zip",
+    hashes = {
+      { hash = "e7184e15be52c236f74915f69418e1d9", label = "Silent Hill Origins (USA) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9EE188, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Status?" },
+        { address=0X9EF414, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles Toggle" },
+        { address=0X9F07C8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (Bit0)" },
+        { address=0XA048A4, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit to Main Menu?" },
+        { address=0XA048A4, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XA05074, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XA05074, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit to Main Menu?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9EF41C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Brightness Level" },
+        { address=0X9FDA18, type="u32le", condition="eq", value=0X6B726144, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Otherworld" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X19EA3DC, type="u8", condition="eq", value=0X4250, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0XA84EC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Total Health Drinks in the Inventory decreased" },
+        { address=0XA84EC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Total Health Drinks in the Inventory increased" },
+        { address=0X19EA3DC, type="u8", condition="eq", value=0X5000, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max HP" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XD8AD18, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Total enemies killed using melee weapons (Float)" },
+        { address=0XD8AD4C, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="% of enemies killed with melee weapons (Float)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XDF4434, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sun Totem - Object 4" },
+        { address=0XE08AD8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sun Totem - Object 3" },
+        { address=0XE3004C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Totems F2 - Unlocking the door (Bit0)" },
+        { address=0XE30064, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sun Totem - Object 2" },
+        { address=0XE31648, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Totems F1 - Unlocking the door (Bit0)" },
+        { address=0XE31660, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sun Totem - Object Placed (8-bit)" },
+        { address=0XE31664, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moon Totem - Object Placed (8-bit)" },
+      },
+    },
+  },
+}

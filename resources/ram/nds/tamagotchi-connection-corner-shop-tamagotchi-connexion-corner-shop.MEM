@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tamagotchi Connection: Corner Shop | Tamagotchi Connexion: Corner Shop",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Simulation, party, virtual pet"
+  },
+
+  rom = {
+    name = "tamagotchi-connection-corner-shop-tamagotchi-connexion-corner-shop",
+    file = "tamagotchi-connection-corner-shop-tamagotchi-connexion-corner-shop.zip",
+    hashes = {
+      { hash = "edf380c21e06fbcc9457da4ff1bb4490", label = "Tamagotchi Connexion - Corner Shop (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

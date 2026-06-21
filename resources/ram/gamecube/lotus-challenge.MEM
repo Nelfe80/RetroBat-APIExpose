@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lotus Challenge",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "lotus-challenge",
+    file = "lotus-challenge.zip",
+    hashes = {
+      { hash = "1b7eca7b645be2c8b6b9f527de0d4deb", label = "Lotus Challenge (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

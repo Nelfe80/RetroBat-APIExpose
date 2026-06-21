@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Dragon Ball Z 2: Super Battle",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "dragon-ball-z-2-super-battle",
+    file = "dragon-ball-z-2-super-battle.zip",
+    hashes = {
+      { hash = "e8d35aa4568a00a9f3b8b03984b1ba38", label = "dbz2.7z <Dragonball Z 2 - Super Battle>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X62A2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo value" },
+        { address=0X7840, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X78EE, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Progression check that stickies on continue?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6261, type="u16le", condition="eq", value=0X9E02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Explosion" },
+        { address=0X77C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds won by opponent" },
+      },
+      stage = {
+        { address=0X78C6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage id" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X62A8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Actual Player Life increased" },
+        { address=0X62A8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Actual Player Life decreased" },
+        { address=0X62D6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Life GRAPHICAL increased" },
+        { address=0X62D6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Life GRAPHICAL decreased" },
+        { address=0X64A8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy life increased" },
+        { address=0X64A8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy life decreased" },
+        { address=0X64D0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Equal to the number at right top when P2 is active (lives or wins of some sort) - used to determ" },
+        { address=0X64D0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Equal to the number at right top when P2 is active (lives or wins of some sort) - used to determ" },
+        { address=0X78C8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Wins (Can be used as progression but does not change the actual progression) - NVM - sets" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X62CE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16bit XXX 000" },
+        { address=0X62D0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16bits" },
+        { address=0X62D1, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16bits 000 X00" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X752C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Match timer" },
+      },
+    },
+  },
+}

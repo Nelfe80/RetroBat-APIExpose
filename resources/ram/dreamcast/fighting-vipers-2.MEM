@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Fighting Vipers 2",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "fighting-vipers-2",
+    file = "fighting-vipers-2.zip",
+    hashes = {
+      { hash = "8481db972e859526e471194a82d48860", label = "Fighting Vipers 2 (Europe) (En,Ja,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1BD704, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+        { address=0X1BD704, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0X1BD709, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+        { address=0X1BD709, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0X1BD70A, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+        { address=0X1BD70A, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0X1BD70B, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+        { address=0X1BD70B, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0XFD3CD4, type="u8", condition="eq", value=0X80, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X14, action="NEW_LEVEL", no_log=false, no_survey=false, desc="20" },
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X19, action="NEW_LEVEL", no_log=false, no_survey=false, desc="25" },
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X1E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="30" },
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X23, action="NEW_LEVEL", no_log=false, no_survey=false, desc="35" },
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X28, action="NEW_LEVEL", no_log=false, no_survey=false, desc="40" },
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X2D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="45" },
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="50" },
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X37, action="NEW_LEVEL", no_log=false, no_survey=false, desc="55" },
+        { address=0X15E7F6, type="u32le", condition="eq", value=0X3C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60" },
+        { address=0X15E7F6, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="round time in options" },
+        { address=0X15E7F7, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="timer on" },
+        { address=0X15E7F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="round time in options" },
+      },
+      stage = {
+        { address=0X1E6354, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage (fight) use for arcade and survival" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X15E7FA, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="energy max p1 in options" },
+        { address=0X15E7FC, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="energy max p2 in options" },
+        { address=0X169346, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 1 health decreased" },
+        { address=0X169346, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 1 health increased" },
+        { address=0X171C8A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 2 health decreased" },
+        { address=0X171C8A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 2 health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X5A, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="90" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X5F, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="95" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X64, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="100" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X69, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="105" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X6E, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="110" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X73, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="115" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X78, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="120" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X7D, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="125" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X82, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="130" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X87, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="135" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X8C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="140" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X91, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="145" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X96, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="150" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0X9B, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="155" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0XA0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="160" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0XA5, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="165" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0XAA, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="170" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0XAF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="175" },
+        { address=0X15E7F8, type="u16le", condition="eq", value=0XB4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="180" },
+        { address=0X15E7F8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="survival time in options" },
+        { address=0X1E634C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="player 1 rounds won counter" },
+      },
+    },
+  },
+}

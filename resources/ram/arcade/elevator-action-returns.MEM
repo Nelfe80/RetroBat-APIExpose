@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "Elevator Action Returns",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "elevator-action-returns",
+    file = "elevator-action-returns.zip",
+    hashes = {
+      { hash = "3180d6cdfd39a897d6aabc818887a000", label = "elvactr.7z <Elevator Action Returns (Ver 2.2O 1995/02/20)>" },
+      { hash = "4fcdb11d546a7d1b41f12c6da7aab9af", label = "elvactrj.7z <Elevator Action Returns (Ver 2.2J 1995/02/20)>" },
+      { hash = "98ff592c4894fbaa0519683021935bc8", label = "elvact2u.7z <Elevator Action II (Ver 2.2A 1995/02/20)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0090, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="current credits" },
+        { address=0X01FB, type="u8", condition="bit_true", bit=5, mask=0X20, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue mode" },
+        { address=0X0308, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="goes from 0x00 to 0x01 at first game start but does not reset on game over" },
+        { address=0X07AD, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="at demo screen (intro, demo play)" },
+        { address=0X07AD, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits in machine, playing or selecting char" },
+        { address=0X07AD, type="u8", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="out of lives, continue? flashing on screen" },
+        { address=0X77BE, type="u16le", condition="eq", value=0X0000, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="'Continue?' countdown, before selecting a char" },
+        { address=0X77C4, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits used" },
+        { address=0X780C, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="JAD THE TAFF" },
+        { address=0X780C, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="KART BRADFIELD" },
+        { address=0X9C18, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="caution flash animation. 0xffff normally. set to 0x0012 after 0x009c16 hits zero, then counts do" },
+      },
+      events = {
+        { address=0X9BAC, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="weird combo of x and y coordinates along with 0x009bae (16-bit). behaves super strangely but goo" },
+        { address=0X9BAE, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="weird combo of x and y coordinates along with 0x009bac (16-bit). behaves super strangely but goo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X780C, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="EDIE BURRET" },
+        { address=0X800E, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="EDIE max HP" },
+        { address=0X8010, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="current bombs count (less accurate - death indicator?)" },
+        { address=0XA60A, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="0 lives remaining" },
+        { address=0XA60A, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 life remaining" },
+        { address=0XA60A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="on-screen lives display increased" },
+        { address=0XA60A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="on-screen lives display decreased" },
+        { address=0XB73C, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="EDIE" },
+      },
+      health = {
+        { address=0X800E, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=true, no_survey=false, desc="KART max HP" },
+        { address=0X800E, type="u8", condition="eq", value=0X38, action="HEALTH_STATE", no_log=true, no_survey=false, desc="JAD max HP" },
+        { address=0X800E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="current HP" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X781C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="highest record digit for score value. multiply by 65536 in decimal, 0x10000 in hex to add to sco" },
+        { address=0X781E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="lowest digits for score. add to 0x00781c after multiplying that value by 0x10000 or 65536 to get" },
+      },
+      collectibles = {
+        { address=0X8012, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="current special weapon ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X01FA, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1: normal (default)" },
+        { address=0X01FA, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1: hard" },
+        { address=0X01FA, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="game style" },
+        { address=0X0208, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="violence mode" },
+        { address=0X0209, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1: player stock 4" },
+        { address=0X0209, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="free play" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1EFC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="goes from 0x0000 to 0xffff when starting a new game (going to char select). various values at ot" },
+        { address=0X1AE06, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="rest time counter in a normal level" },
+      },
+    },
+  },
+}

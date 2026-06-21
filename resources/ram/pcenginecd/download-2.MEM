@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Download 2",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "download-2",
+    file = "download-2.zip",
+    hashes = {
+      { hash = "9eb8f91f467550acdbf77e9f5ad20115", label = "Down Load 2 (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0059, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X00FC, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X00FC, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X00FC, type="u8", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X00FC, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X00FC, type="u8", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X00FC, type="u8", condition="eq", value=0X9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X00FC, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0X00FC, type="u8", condition="eq", value=0X11, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8" },
+        { address=0X00FC, type="u8", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9" },
+        { address=0X00FC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (unstable during cutscenes)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0059, type="u8", condition="eq", value=0X9, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X0059, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0059, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X005A, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Blaster" },
+        { address=0X005A, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Laser" },
+        { address=0X005A, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Ball" },
+        { address=0X005A, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Melee" },
+        { address=0X0228, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Swap" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X005D, type="u8", condition="eq", value=0X8, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="New shield" },
+        { address=0X005D, type="u8", condition="eq", value=0XA, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Maxed shield" },
+      },
+    },
+  },
+}

@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Carol Vorderman's Sudoku",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "carol-vordermans-sudoku",
+    file = "carol-vordermans-sudoku.zip",
+    hashes = {
+      { hash = "f56777d4f84c60dcc4b5fbf70c59e9e1", label = "Carol Vorderman's Sudoku (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2A6992, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1st Dan" },
+        { address=0X2A6992, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2nd Dan" },
+        { address=0X2A6992, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3rd Dan" },
+        { address=0X2A6992, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4th Dan" },
+        { address=0X2A6992, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Graduated. Wow!" },
+        { address=0X2A6992, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Challenge Carol - Current Challenge Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2A6F77, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives - 3 Strikes increased" },
+        { address=0X2A6F77, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives - 3 Strikes decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2A6F5C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Current Points For Level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2A69B8, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Rules" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2A69A2, type="u16le", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Beat The Clock" },
+        { address=0X2A69A2, type="u16le", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra Time" },
+        { address=0X2A69A2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16bit] Game Mode" },
+        { address=0X2A6F60, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bit] Current Puzzle Timer" },
+      },
+    },
+  },
+}

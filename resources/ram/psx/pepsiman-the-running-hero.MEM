@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Pepsiman: The Running Hero",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "pepsiman-the-running-hero",
+    file = "pepsiman-the-running-hero.zip",
+    hashes = {
+      { hash = "e2dfc0f35f3684145e539964995c72c7", label = "Pepsiman (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X95760, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="04=ingame 28=black screen 3c=game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X95830, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XE0588, type="u8", condition="eq", value=0XF65C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 1 and level 2 level 3 and probably level 4 eeeeeeeeeeeeeeeeeeehhhh" },
+      },
+      stage = {
+        { address=0X96A58, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1-1 Pepsi Record" },
+        { address=0X96A5C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1-2 Pepsi Record" },
+        { address=0X96A60, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2-1 Pepsi Record" },
+        { address=0X96A64, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2-2 Pepsi Record" },
+        { address=0X96A68, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3-1 Pepsi Record" },
+        { address=0X96A6C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3-2 Pepsi Record" },
+        { address=0X96A70, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4-1 Pepsi Record" },
+        { address=0X96A74, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4-2 Pepsi Record" },
+        { address=0X9EB7E, type="u8", condition="eq", value=0X36, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ded in chase stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X95770, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X95770, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X958A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X958A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X9EB7E, type="u8", condition="eq", value=0X35, action="HIT", no_log=false, no_survey=false, desc="damage in chase stages" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X9EF40, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="invincibility timer" },
+      },
+      player = {
+        { address=0X9EB7E, type="u8", condition="eq", value=0X34, action="JUMPING", no_log=false, no_survey=false, desc="jump in chase stages" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9EA78, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="32bit chase sequence object distance" },
+        { address=0XD86B8, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current Checkpoint" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X958EA, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Pause timer" },
+        { address=0X95988, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="16bit time remaining" },
+      },
+    },
+  },
+}

@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "007: Everything or Nothing",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing, Shooter"
+  },
+
+  rom = {
+    name = "007-everything-or-nothing",
+    file = "007-everything-or-nothing.zip",
+    hashes = {
+      { hash = "b63b2244edc2385ae1eab9c8ee448c6f", label = "007 - Everything or Nothing (USA, Europe) (En,Fr,De).gba" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X21EC4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+      },
+      collectibles = {
+        { address=0X4040, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Handle" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2245C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Mission Timer (Seconds)" },
+      },
+    },
+  },
+}

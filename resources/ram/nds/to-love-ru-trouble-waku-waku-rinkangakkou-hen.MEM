@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "To Love-Ru Trouble: Waku Waku! Rinkangakkou-Hen",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "to-love-ru-trouble-waku-waku-rinkangakkou-hen",
+    file = "to-love-ru-trouble-waku-waku-rinkangakkou-hen.zip",
+    hashes = {
+      { hash = "370d48ac0dc6d07857ff635a8310249d", label = "To Love-Ru - Trouble - Waku Waku! Rinkan Gakkou Hen (Japan).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X106924, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X30814C, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2A - Level Unlocked" },
+        { address=0X308150, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3A - Figurine Sprite - Level Unlocked" },
+        { address=0X308154, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4A - Level Unlocked" },
+        { address=0X308154, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 4A Finished" },
+        { address=0X30CD9C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear / Time Up" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X106870, type="u8", condition="eq", value=0X04, action="SWIMMING", no_log=true, no_survey=false, desc="Swim Uniform" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X30CD9C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Mini Game State" },
+      },
+    },
+  },
+}

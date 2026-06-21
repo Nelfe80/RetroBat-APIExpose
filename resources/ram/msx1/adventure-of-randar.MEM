@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Adventure of Randar",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "adventure-of-randar",
+    file = "adventure-of-randar.zip",
+    hashes = {
+      { hash = "c87b75029bec477a114354177346bcbd", label = "Adventure of Randar (Japan) (Clean).dsk" },
+      { hash = "0164108447e64616dac9b082256dd941", label = "Adventure of Randar (Japan) (En) (v2003) (Sargon).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

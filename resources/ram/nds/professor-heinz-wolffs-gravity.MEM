@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Professor Heinz Wolff's Gravity",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "professor-heinz-wolffs-gravity",
+    file = "professor-heinz-wolffs-gravity.zip",
+    hashes = {
+      { hash = "2a678dc15c033a3ab57c279e5071beb8", label = "Professor Heinz Wolff's Gravity (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

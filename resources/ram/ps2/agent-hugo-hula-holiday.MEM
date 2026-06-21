@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Agent Hugo: Hula Holiday",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "agent-hugo-hula-holiday",
+    file = "agent-hugo-hula-holiday.zip",
+    hashes = {
+      { hash = "fbbe7c50e9fa573ef03e230e2403bb18", label = "Agent Hugo - Hula Holiday (Europe) (En,Fr,De,Es,It,Nl,Pt)" },
+      { hash = "3fe32e17e425a674c1d791a276a1b586", label = "Agent Hugo - Hula Holiday (Scandinavia) (En,Sv,No,Da,Fi)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X41781C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 1" },
+        { address=0X417820, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 1" },
+        { address=0X417824, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 2" },
+        { address=0X417828, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 2" },
+        { address=0X41782C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 3" },
+        { address=0X417830, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 3" },
+        { address=0X417834, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 4" },
+        { address=0X417838, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 4" },
+        { address=0X41783C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 5" },
+        { address=0X417840, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 5" },
+        { address=0X417844, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 6" },
+        { address=0X417848, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 6" },
+        { address=0X41784C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 7" },
+        { address=0X417850, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 7" },
+        { address=0X417854, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 8" },
+        { address=0X417858, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 8" },
+        { address=0X41785C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 9" },
+        { address=0X417860, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 9" },
+        { address=0X417864, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 10" },
+        { address=0X417868, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 10" },
+        { address=0X41786C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 11" },
+        { address=0X417870, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 11" },
+        { address=0X417874, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 12" },
+        { address=0X417878, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 12" },
+        { address=0X41787C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 13" },
+        { address=0X417880, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 13" },
+        { address=0X417884, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 14" },
+        { address=0X417888, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 14" },
+        { address=0X41788C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 15" },
+        { address=0X417890, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 15" },
+        { address=0X417894, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 16" },
+        { address=0X417898, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 16" },
+        { address=0X41789C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock flag - Level 17" },
+        { address=0X4178A0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Completion % Level 17" },
+      },
+    },
+  },
+}

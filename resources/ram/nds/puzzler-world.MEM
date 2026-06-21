@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Puzzler World",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzler-world",
+    file = "puzzler-world.zip",
+    hashes = {
+      { hash = "9905ac581d6589859666908d8a82ca13", label = "Puzzler World (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA6AA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB82B1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ascii timer" },
+        { address=0XEC408, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Timer" },
+        { address=0X24902F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="ascii timer" },
+      },
+    },
+  },
+}

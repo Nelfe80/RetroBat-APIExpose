@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Midnight Club II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "midnight-club-ii",
+    file = "midnight-club-ii.zip",
+    hashes = {
+      { hash = "d484c6d7d908c26b675e373b438e7a4d", label = "Midnight Club II (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X42CCE0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Float] howhardcanitbe cheat difficulty level (some rounding issues observed, recommend using sl" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5B4C5C, type="u8", condition="eq", value=0X1F, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Party (Hector 2)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5A9F24, type="u8", condition="eq", value=0X0A, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time results" },
+        { address=0X5A9F2C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float] Race timer in seconds" },
+        { address=0X5B4C5C, type="u8", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Takeoff Time (Steven 1)" },
+        { address=0X5B4C5C, type="u8", condition="eq", value=0X2B, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Hangtime (Tokyo Circuit 5)" },
+        { address=0X5B4C5C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Active race - dynamic" },
+        { address=0X5B4C95, type="u8", condition="bit_true", bit=3, mask=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Hangtime" },
+      },
+    },
+  },
+}

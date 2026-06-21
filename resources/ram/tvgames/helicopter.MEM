@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Helicopter",
+    system = "tvgames",
+    system_name = "Elektor TV Games Computer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "helicopter",
+    file = "helicopter.zip",
+    hashes = {
+      { hash = "d59524e3efae862b9a42196e30da6c4f", label = "Helicopter (Europe) (ESS-010-3).tvc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Push-Over",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "push-over",
+    file = "push-over.zip",
+    hashes = {
+      { hash = "a2eaa3a65d1a82ad837274980c105278", label = "Push-Over (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0341, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="screen (0=menu, 1=game, 5=final lvl, 6-9=demo, a=cutscene)" },
+        { address=0X10EA, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(8 bit) Current level (value >63 are demo levels)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0325, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Displayed level (tens)" },
+        { address=0X0326, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Displayed level (ones)" },
+        { address=0X10F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level done" },
+        { address=0X10FA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ending state" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X10F2, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X110A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer" },
+      },
+    },
+  },
+}

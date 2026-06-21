@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Meitantei Conan: Kako Kara no Zensoukyoku Pureryuudo",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Visual Novel"
+  },
+
+  rom = {
+    name = "meitantei-conan-kako-kara-no-zensoukyoku-pureryuudo",
+    file = "meitantei-conan-kako-kara-no-zensoukyoku-pureryuudo.zip",
+    hashes = {
+      { hash = "1373549373261ea3fbbe2840b6c146a0", label = "Meitantei Conan - Kako Kara no Zensou Kyoku (Japan).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X36D955, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+  },
+}

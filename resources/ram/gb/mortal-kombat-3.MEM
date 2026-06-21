@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Mortal Kombat 3",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-3",
+    file = "mortal-kombat-3.zip",
+    hashes = {
+      { hash = "c19d61e31d6aebc12abf80d628a7bd09", label = "Mortal Kombat 3 (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC60F, type="u8", condition="eq", value=0X84, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XD1DE, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not Demo" },
+        { address=0XD1DE, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XD4DB, type="u8", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Default in game" },
+        { address=0XD4DB, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC0A5, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 1" },
+        { address=0XC0A5, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 2" },
+        { address=0XC0A5, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 3" },
+        { address=0XC0A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+        { address=0XC0A6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Rounds Won" },
+        { address=0XC0A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 Rounds Won" },
+        { address=0XD4DF, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Bell Tower" },
+        { address=0XD4DF, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Temple" },
+        { address=0XD4DF, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Bridge" },
+        { address=0XD4DF, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Pit" },
+        { address=0XD4DF, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Subway" },
+        { address=0XD4DF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Battleground" },
+      },
+      stage = {
+        { address=0XE5D9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="BGM (Stage 1? - Initially 4e)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCD14, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max Health" },
+        { address=0XCD14, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Min Health but not necessarily defeated" },
+        { address=0XCD14, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player 1 Health" },
+        { address=0XCD54, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max Health" },
+        { address=0XCD54, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Min Health but not necessarily defeated" },
+        { address=0XCD54, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player 2 Health" },
+        { address=0XE0D6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health - Starts 3F - Ends 0 decreased" },
+        { address=0XE0D6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health - Starts 3F - Ends 0 increased" },
+        { address=0XE0D7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> P2 Health - Starts at 3F - Ends 00 decreased" },
+        { address=0XE0D7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> P2 Health - Starts at 3F - Ends 00 increased" },
+        { address=0XED54, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health - Starts at FF - Ends 00 decreased" },
+        { address=0XED54, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health - Starts at FF - Ends 00 increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD502, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocking Disabled" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC0DE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Remaining - Fifteenths of a Second" },
+        { address=0XC0DF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining - Seconds" },
+        { address=0XC0E0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining - Tens Seconds" },
+      },
+    },
+  },
+}

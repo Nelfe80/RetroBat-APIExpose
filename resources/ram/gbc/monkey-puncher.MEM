@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Monkey Puncher",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "monkey-puncher",
+    file = "monkey-puncher.zip",
+    hashes = {
+      { hash = "65da43aef4c10cfd8feee70e842a46ae", label = "Monkey Puncher (Europe) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC0A0, type="u8", condition="eq", value=0XB2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="cutscene saru after qualif round" },
+        { address=0XC0A4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="b0 = game clear ?" },
+      },
+      zone = {
+        { address=0XC0A3, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="b0 = cutscene i can invite you to the dark world" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD43B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="match : opponent hp decreased" },
+        { address=0XD43B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="match : opponent hp increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC0A5, type="u8", condition="eq", value=0XB5, action="MONEY_STATE", no_log=false, no_survey=false, desc="obtained gold key from princess" },
+        { address=0XCF57, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="sell screen : amount of money earned if selling increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XC4C2, type="u8", condition="eq", value=0XB1, action="JUMPING", no_log=true, no_survey=false, desc="continously" },
+        { address=0XC4C2, type="u8", condition="eq", value=0XB2, action="JUMPING", no_log=true, no_survey=false, desc="double jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC24A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time." },
+      },
+    },
+  },
+}

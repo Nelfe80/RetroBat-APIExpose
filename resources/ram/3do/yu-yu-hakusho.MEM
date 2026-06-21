@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Yu Yu Hakusho",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "yu-yu-hakusho",
+    file = "yu-yu-hakusho.zip",
+    hashes = {
+      { hash = "9a14a399c139faccfe4a356d5384d0a0", label = "Yu Yu Hakusho (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XF7F3C, type="u8", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sensui (2nd battle)" },
+        { address=0XF7F3C, type="u8", condition="eq", value=0X0F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ending" },
+        { address=0XF7F3C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE - PROGRESS" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD1CB8, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XD1CBC, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0XD14D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yusuke Story mode health decreased" },
+        { address=0XD14D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yusuke Story mode health increased" },
+        { address=0XD14D4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kuwabara Story mode health decreased" },
+        { address=0XD14D4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kuwabara Story mode health increased" },
+        { address=0XD14D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hiei Story mode health decreased" },
+        { address=0XD14D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hiei Story mode health increased" },
+        { address=0XD14DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kurama Story mode health decreased" },
+        { address=0XD14DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kurama Story mode health increased" },
+        { address=0XD1CB8, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="1P health" },
+        { address=0XD1CBC, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="2P health" },
+        { address=0XD1CC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P health on screen decreased" },
+        { address=0XD1CC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P health on screen increased" },
+        { address=0XD1CCC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P health on screen decreased" },
+        { address=0XD1CCC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P health on screen increased" },
+      },
+    },
+  },
+}

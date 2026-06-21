@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "ATV: Quad Power Racing",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "atv-quad-power-racing",
+    file = "atv-quad-power-racing.zip",
+    hashes = {
+      { hash = "06ae9bc5a49c1f5edac5f5dbdd30882d", label = "ATV - Quad Power Racing (Europe) (En,Fr,De,Es,It) (Rev 1).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8417, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="02=Paused" },
+        { address=0X942E, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Ingame" },
+        { address=0X942E, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8374, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap 1 Time" },
+        { address=0X8378, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap 2 Time" },
+        { address=0X837C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap 3 Time" },
+        { address=0X8380, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap 4 Time" },
+        { address=0X8384, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap 5 Time" },
+        { address=0X83EC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Finish Timer" },
+      },
+    },
+  },
+}

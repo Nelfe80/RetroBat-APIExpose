@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Anastasia",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "anastasia",
+    file = "anastasia.zip",
+    hashes = {
+      { hash = "976a954a6c946fe7da48e333d3919943", label = "Anastasia (Europe) (En,Fr,De,Nl)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X429EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Movie Timer - 59bc" },
+        { address=0X4CA68, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Castle of Shikigami III [Subset - All Dramatic Combinations]",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "castle-of-shikigami-iii-subset-all-dramatic-combinations",
+    file = "castle-of-shikigami-iii-subset-all-dramatic-combinations.zip",
+    hashes = {
+      { hash = "79d7d0c065b9261e470093d8f5e69af8", label = "Castle of Shikigami III [Subset - All Dramatic Combinations]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X486FE8, type="u32be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE]P2 number of continues" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X486FD8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]P1 Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Raiden Densetsu: Raiden Trad",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "raiden-densetsu-raiden-trad",
+    file = "raiden-densetsu-raiden-trad.zip",
+    hashes = {
+      { hash = "af6b6c2e4870a46e61b90bd6d662e7fa", label = "Raiden Trad (Japan, USA) (En).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC026, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC11A, type="u16le", condition="eq", value=0X0121, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed" },
+        { address=0XC11A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Scrolling" },
+        { address=0XC1C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XC468, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete Screen" },
+        { address=0XE9E6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nuclear Missiles" },
+        { address=0XFFEA, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Special Stage Clear = 0bda; Game Over = 0b32" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE9A2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XE9A2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XE9E2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Vulcan Weapon [MAX 08]" },
+        { address=0XE9E4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Weapon [MAX 08]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC0B6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+        { address=0XC0E4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Multiplier [65535 = 01]" },
+        { address=0XC0E6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC11A, type="u16le", condition="eq", value=0X0024, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1 Boss" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE92E, type="u16be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss timer" },
+      },
+    },
+  },
+}

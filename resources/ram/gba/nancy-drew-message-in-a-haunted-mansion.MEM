@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Nancy Drew: Message in a Haunted Mansion",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "nancy-drew-message-in-a-haunted-mansion",
+    file = "nancy-drew-message-in-a-haunted-mansion.zip",
+    hashes = {
+      { hash = "f977a030aa9f5fa4c6013ae472f68b91", label = "Nancy Drew - Message in a Haunted Mansion (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0030, type="u16le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[16bit] Game overs" },
+        { address=0X2AC8, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[8bit] Game over/send the player to the main menu screen flag" },
+        { address=0X7EA4, type="u32be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[32 bit BE] piano puzzle, continued in 0x007ea5" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1D87, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Asked Abby about where Charlie lives increased" },
+        { address=0X1D87, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Asked Abby about where Charlie lives decreased" },
+        { address=0X1DA5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Asked Louis about 'Ladies Protection Society'" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1DFF, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[8bit] Talked to Hannah about map to the hidden treasure" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1D58, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Ask Charlie about what happened to the gold increased" },
+        { address=0X1EB7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 0x00 during loading screens, 0x06 at the title screen and later (also 0x02 sometimes?) in" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1DD9, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit[ Attic trap door opened" },
+        { address=0X1E41, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Trap door rope broke" },
+        { address=0X1E81, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] trapdoor key in inventory" },
+        { address=0X2820, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] item available in inventory, after picking up it switches to next shown item ID" },
+      },
+    },
+  },
+}

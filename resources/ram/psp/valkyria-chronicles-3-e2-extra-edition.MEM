@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Valkyria Chronicles 3 E2: Extra Edition",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "valkyria-chronicles-3-e2-extra-edition",
+    file = "valkyria-chronicles-3-e2-extra-edition.zip",
+    hashes = {
+      { hash = "cf5cd29a71863e4164596409b8611c93", label = "Senjou no Valkyria 3 - Extra Edition (Japan) (En) (v1.0.1) (akorov)" },
+      { hash = "55a46ae6c1d4cd9bef5cb3e40d323cd0", label = "Senjou no Valkyria 3 - Extra Edition (Japan) (En) (v1.0.2) (akorov)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD352B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Durablity train level" },
+        { address=0XD352B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Accuracy train level" },
+        { address=0XD352B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Evasion train level" },
+        { address=0XD352BC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="vsPersonelle train level" },
+        { address=0XD352C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="vsArmor train level" },
+        { address=0XD352C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Defense train level" },
+        { address=0XD352C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Resilience train level" },
+        { address=0XD38A75, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Story Mission 1 Vasel War-Round One turns [8 bits]" },
+        { address=0XD38A76, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="S" },
+        { address=0XD38A76, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="A" },
+        { address=0XD38A76, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="B" },
+        { address=0XD38A76, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="C" },
+        { address=0XD38A76, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Story Mission 1 Vasel War-Round One rank [8 bits]" },
+        { address=0XD38A7D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Story Mission 2 Vasel War-Round Two turns taken [8 bits]" },
+        { address=0XD38A7E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="S" },
+        { address=0XD38A7E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="A" },
+        { address=0XD38A7E, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="B" },
+        { address=0XD38A7E, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="C" },
+        { address=0XD38A7E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Story Mission 2 Vasel War-Round Two rank [8 bits]" },
+      },
+      zone = {
+        { address=0XD32210, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD3F948, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Tank Seal Gallian Brave Soldiers" },
+        { address=0XD40385, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Diehl-1" },
+        { address=0XD40387, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Diehl-2" },
+        { address=0XD4194B, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Soldier Amulet" },
+      },
+      health = {
+        { address=0XD41946, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="1 Health Talisman" },
+        { address=0X1077EA0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP - Kurt decreased" },
+        { address=0X1077EA0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP - Kurt increased" },
+        { address=0X1077FA0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP - Reila decreased" },
+        { address=0X1077FA0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP - Reila increased" },
+        { address=0X10780A0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP - Imca decreased" },
+        { address=0X10780A0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP - Imca increased" },
+        { address=0X10781A0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP - Alois decreased" },
+        { address=0X10781A0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP - Alois increased" },
+        { address=0X10782A0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP - Liam decreased" },
+        { address=0X10782A0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP - Liam increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XD3250A, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon - Kurt" },
+        { address=0XD32514, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Kurt equiped Weapon [16 bits]" },
+        { address=0XD41656, type="u16le", condition="eq", value=0X0011, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Develop Weapon A" },
+        { address=0XD41660, type="u16le", condition="eq", value=0X002C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Develop Weapon B" },
+        { address=0XD41672, type="u16le", condition="eq", value=0X0055, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Develop Weapon C" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10780DE, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="(Imca) ammo left" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD32210, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Mission ID" },
+      },
+    },
+  },
+}

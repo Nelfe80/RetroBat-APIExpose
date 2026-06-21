@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Dick Tracy",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "dick-tracy",
+    file = "dick-tracy.zip",
+    hashes = {
+      { hash = "ab5f50d0e31a07e19739453bb9a2d328", label = "Dick Tracy (USA).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC198, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage value" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCF5A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0XCF5A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+      },
+    },
+  },
+}

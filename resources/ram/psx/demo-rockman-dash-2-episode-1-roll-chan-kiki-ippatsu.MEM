@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "~Demo~ Rockman Dash 2: Episode 1 - Roll-chan Kiki Ippatsu!",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "demo-rockman-dash-2-episode-1-roll-chan-kiki-ippatsu",
+    file = "demo-rockman-dash-2-episode-1-roll-chan-kiki-ippatsu.zip",
+    hashes = {
+      { hash = "7481ec493119e18c1ece30132d00aef7", label = "Rockman Dash 2 - Episode 1 - 'Roll-chan Kiki Ippatsu!' no Maki (Japan) (Demo)" },
+      { hash = "891f6bea637a101dee0daf81f62958fa", label = "Rockman Dash 2 - Episode 1 - 'Roll-chan Kiki Ippatsu!' no Maki (Japan) (Demo) (En) (Hilltop)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6CB78, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X6CB78, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X86A1A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Treasure [Single Bit] increased" },
+        { address=0X86A1A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Treasure [Single Bit] decreased" },
+      },
+      health = {
+        { address=0X7FADC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X7FADC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X7FADE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maximum health. decreased" },
+        { address=0X7FADE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maximum health. increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X86A18, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure [Single Bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X7FBD8, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Current Ammo" },
+        { address=0X7FBDC, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Remaining Ammo Reserve" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6DDC4, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses HP" },
+        { address=0XD35BC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Display Active" },
+        { address=0XD35CA, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP Display" },
+      },
+    },
+  },
+}

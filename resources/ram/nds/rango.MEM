@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Rango",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "rango",
+    file = "rango.zip",
+    hashes = {
+      { hash = "2ad11dbe0ecccf60ce1a97c16cfde4f0", label = "Rango (USA) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1A145C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[Upper4] Number of Peashooter Damage upgrades purchased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Super Bomberman: Panic Bomber W",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "super-bomberman-panic-bomber-w",
+    file = "super-bomberman-panic-bomber-w.zip",
+    hashes = {
+      { hash = "cc9c8195b55b94e075c771ca1628cbc8", label = "Super Bomberman - Panic Bomber W (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01FD, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo (bf value)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X062F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Speed level (?)" },
+        { address=0X0A2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Bomb level number (Single Player and 2P Battle Mode)" },
+        { address=0X0B10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Difficulty first digit" },
+        { address=0X0B12, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Difficulty second digit" },
+        { address=0X0B14, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Difficulty third digit" },
+        { address=0X0B16, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Difficulty fourth digit" },
+        { address=0X0B18, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Difficulty firfth digit" },
+        { address=0X0B9A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle mode 1P level select [4-bit]" },
+        { address=0X0BF2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Bomb level number (4P battle mode)" },
+        { address=0X0C18, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Bomb level number (P3 Battle Mode)" },
+      },
+      stage = {
+        { address=0X20000, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game-P1-Stage Grid [512-bytes]" },
+        { address=0X20220, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game-P2 Stage Grid [512-bytes]" },
+        { address=0X20440, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game-P3 Stage Grid [512-bytes]" },
+        { address=0X20660, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game-P4-Stage Grid [512-Bytes]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X002E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer of the enemy entrance" },
+        { address=0X2168C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ready battle timer" },
+      },
+    },
+  },
+}

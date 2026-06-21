@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Strike Force Hydra",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "strike-force-hydra",
+    file = "strike-force-hydra.zip",
+    hashes = {
+      { hash = "c0d22ee74ae19ded121ff3f80e9ac5b3", label = "Strike Force Hydra (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

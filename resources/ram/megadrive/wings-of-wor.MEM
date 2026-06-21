@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Wings of Wor",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "wings-of-wor",
+    file = "wings-of-wor.zip",
+    hashes = {
+      { hash = "911ef3d3909b19609f76f0d70a017d85", label = "Wings of Wor (USA).md" },
+      { hash = "fa0609181242f4b5fd59598273f138ec", label = "Gynoug (Europe).md" },
+      { hash = "fa49fa5c1eec5bfae59fb87f310c0852", label = "Gynoug (Japan).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8006, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0003 = title screen?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD6C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Orb level 0 - 4" },
+        { address=0XD6C3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blue Orb level 0 - 4" },
+        { address=0XD74A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+      stage = {
+        { address=0XCCF0, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select countdown" },
+        { address=0XCD8D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 - level select active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC9CC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player died" },
+        { address=0XD6CC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Amount of Life increased" },
+        { address=0XD6CC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amount of Life decreased" },
+        { address=0XFE08, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Amount of Life (Preselection from the Option Menu) increased" },
+        { address=0XFE08, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amount of Life (Preselection from the Option Menu) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD6BC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score in BCD" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X804E, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Stage Boss defeated (control lose)" },
+        { address=0XC242, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mini Boss HP" },
+        { address=0XC252, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+  },
+}

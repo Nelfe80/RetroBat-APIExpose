@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "B.L.U.E.: Legend of Water",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "b-l-u-e-legend-of-water",
+    file = "b-l-u-e-legend-of-water.zip",
+    hashes = {
+      { hash = "06fc1b24d320f7efff289b434306695d", label = "B. L. U. E. - Legend of Water (Japan)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XBBC0A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="!Dead [bitflag]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10201, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold medal [8bit] increased" },
+        { address=0XAC014, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="!Game paused (during text sections) [bitflag] increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XBBD74, type="u16le", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="!Swimming speed [16bit]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X101A2, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bitflags (doors?) [8bit]" },
+        { address=0XDEC20, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="!Ch.1 ruin light pillar puzzle - upper blocks state [32bit]" },
+        { address=0XDEC70, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="!Ch.1 ruin light pillar puzzle - mid blocks state [32bit]" },
+        { address=0XDECC0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="!Ch.1 ruin light pillar puzzle - lower blocks state [32bit]" },
+      },
+    },
+  },
+}

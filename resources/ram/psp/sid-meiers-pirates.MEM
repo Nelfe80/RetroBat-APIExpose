@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Sid Meier's Pirates!",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sid-meiers-pirates",
+    file = "sid-meiers-pirates.zip",
+    hashes = {
+      { hash = "4d83c37a6c7f739cd220dd043b8e2ba1", label = "Sid Meier's Pirates! (USA) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XA38F08, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Personal gold (signed) increased" },
+      },
+    },
+  },
+}

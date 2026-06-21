@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Metroid Prime Pinball",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "metroid-prime-pinball",
+    file = "metroid-prime-pinball.zip",
+    hashes = {
+      { hash = "caed5f7e93886fa445c03975edc19298", label = "Metroid Prime Pinball (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3D40D0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+      events = {
+        { address=0X3D434C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Tallon Overworld Loop Combo Artifact" },
+        { address=0X3D4350, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Pirate Frigate Loop Combo Artifact" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA7590, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tallon Overworld Unlocked (it's always unlocked)" },
+        { address=0X3D4050, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Phason Multiball Ready/Awarded, any Adventure level" },
+        { address=0X3D437C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tallon Overworld - Beetles" },
+        { address=0X3D4380, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tallon Overworld - War Wasps" },
+        { address=0X3D4394, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tallon Overworld - Triclops Defeated" },
+        { address=0X3D43AC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pirate Frigate - Parasite Purge Level Completed" },
+        { address=0X3D43B0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pirate Frigate - Space Pirate Panic Level Completed" },
+        { address=0X3D43B4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pirate Frigate - Metroid Mania Level Completed" },
+        { address=0X3D43B8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tallon - Metroid Mania Level Completed" },
+        { address=0X3D43BC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pirate Frigate - Shriekbat Shootout Level Completed" },
+        { address=0X3D43C0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tallon - Triclops Level Completed" },
+        { address=0X3D43C4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tallon - Burrower Bash Level Complete" },
+        { address=0X3D43C8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tallon - Beetle Blaster Level Completed" },
+        { address=0X3D43D4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Phason Mines Difficulty Level Completed" },
+        { address=0X3D43DC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Phendrana Drifts Difficulty Level Completed" },
+        { address=0X3D43E4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Impact Crater Difficulty Level Completed;" },
+        { address=0X3D43EC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Artifact Temple Difficulty Level Completed" },
+        { address=0X3D43F0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pirate Frigate Difficulty Level Completed" },
+        { address=0X3D43F4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tallon Overworld Difficulty Level Completed" },
+      },
+      stage = {
+        { address=0X3D45D4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level Active/Inactive" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3D42EC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Post-death Bounty Calculation" },
+      },
+      health = {
+        { address=0X3D8CB0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Combat Samus HP decreased" },
+        { address=0X3D8CB0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Combat Samus HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3BB9B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bit) Score" },
+        { address=0X3BB9B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-bit Hurry-Up Score Countdown" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3D427C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current-Loop Artifacts Collected - Always Missing Boss Artifacts" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3D43CC, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Pirate Frigate - Wall Jump Level Completed" },
+        { address=0X3D43D0, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Tallon - Wall Jump Level Completed" },
+      },
+    },
+  },
+}

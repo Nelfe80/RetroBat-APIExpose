@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Toy Story 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "toy-story-3",
+    file = "toy-story-3.zip",
+    hashes = {
+      { hash = "79ab10baa5cdd617b1d842bb46ced51f", label = "Disney-Pixar Toy Story 3 (USA) (En,Fr,Es)" },
+      { hash = "7de39db7e7e498b7361ca7926fa2b37a", label = "Disney-Pixar Toy Story 3 (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+  },
+}

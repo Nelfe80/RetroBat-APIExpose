@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Shrek: Ogres & Dronkeys",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "shrek-ogres-dronkeys",
+    file = "shrek-ogres-dronkeys.zip",
+    hashes = {
+      { hash = "d63e16d2f192f2ddbbdd07255c8c109f", label = "Shrek - Ogres & Dronkeys (United Kingdom).nds" },
+      { hash = "b6454c6ecd6d6632d8987385a275f9e9", label = "Shrek - Oger und Dresel (Germany).nds" },
+      { hash = "fce8b35a6b84f157a165e3b0b4353985", label = "Shrek - Ogres & Dronkeys (Netherlands).nds" },
+      { hash = "70fa0b78341df60109c66283549d8f41", label = "Shrek - Ogres & Dronkeys (USA).nds" },
+      { hash = "dbbe9d2e6896fc66aacb97a83a3c756e", label = "Shrek - Ogres et Dranons (France).nds" },
+      { hash = "627d1755f07e1730f15c6fa23125f892", label = "Shrek - Ogritos y Drasnos (Spain).nds" },
+      { hash = "ce40ff78fb073bc6446bb6ffdef9a67d", label = "Shrek - Orchetti e Ciuchini (Italy).nds" },
+    }
+  },
+
+  events = {
+  },
+}

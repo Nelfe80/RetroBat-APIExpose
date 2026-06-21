@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "The Legend of Zelda: Ocarina of Time 3D",
+    system = "3ds",
+    system_name = "Nintendo 3DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-legend-of-zelda-ocarina-of-time-3d",
+    file = "the-legend-of-zelda-ocarina-of-time-3d.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X77C69EB, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Inventory" },
+      },
+    },
+  },
+}

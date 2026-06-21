@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Small Soldiers",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "small-soldiers",
+    file = "small-soldiers.zip",
+    hashes = {
+      { hash = "26d64e5d348647db734d1792dc6bac48", label = "Small Soldiers (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X393C4, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X3AF30, type="u24le", condition="eq", value=0X565702, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits video" },
+        { address=0X1FFE79, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[128-bit] ASCII Title of video currently played" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X393CA, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dimensional Temple" },
+        { address=0X393CA, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Creepy Caverns" },
+        { address=0X393CA, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spirit Bog" },
+        { address=0X393CA, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hall of Patriots" },
+        { address=0X393CA, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nuclear Mine" },
+        { address=0X393CA, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Garrison Prime" },
+        { address=0X393CA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2P level" },
+        { address=0X393DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level summary - kill count" },
+        { address=0X393E1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level summary - secrets count" },
+        { address=0X393E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level summary - secrets total" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X393CE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Summary screen lives increased" },
+        { address=0X393CE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Summary screen lives decreased" },
+      },
+      health = {
+        { address=0XA14B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP for P1 decreased" },
+        { address=0XA14B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP for P1 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X393D9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Boolean] Cheat - all weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X393DA, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[Boolean] Cheat - infinite ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X38E2F, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility flag" },
+        { address=0X393D8, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[Boolean] Cheat - invincibility" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9C240, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level Timer" },
+      },
+    },
+  },
+}

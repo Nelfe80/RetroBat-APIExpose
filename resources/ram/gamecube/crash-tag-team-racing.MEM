@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Crash Tag Team Racing",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "crash-tag-team-racing",
+    file = "crash-tag-team-racing.zip",
+    hashes = {
+      { hash = "ca1b6422a5824aefedcea215bbb4085c", label = "Crash Tag Team Racing (USA)" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0X41B558, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 2" },
+        { address=0X41B558, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 3" },
+        { address=0X41B560, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 2" },
+        { address=0X41B560, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 3" },
+        { address=0X41B568, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 2" },
+        { address=0X41B568, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 3" },
+        { address=0X41B570, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 2" },
+        { address=0X41B570, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 3" },
+        { address=0X41B578, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 2" },
+        { address=0X41B578, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 3" },
+        { address=0X41B580, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 2" },
+        { address=0X41B580, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 3" },
+        { address=0X41B588, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 2" },
+        { address=0X41B588, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 3" },
+        { address=0X41B590, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 2" },
+        { address=0X41B590, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tier 3" },
+      },
+    },
+  },
+}

@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 4: Kuroda Mirei",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-4-kuroda-mirei",
+    file = "private-idol-disc-vol-4-kuroda-mirei.zip",
+    hashes = {
+      { hash = "1c6c7c8205a80b2e2e6b1315635dd1de", label = "Private Idol Disc Vol. 4 - Mirei Kuroda (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X132B7A, type="u8", condition="eq", value=0X8, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12D261, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Congrats screen" },
+        { address=0X12D261, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz level" },
+        { address=0X133B01, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz - Number of correct answers in level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X108DE8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Demo/attract time out" },
+      },
+    },
+  },
+}

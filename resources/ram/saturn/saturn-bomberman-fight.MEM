@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Saturn Bomberman Fight!!",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "saturn-bomberman-fight",
+    file = "saturn-bomberman-fight.zip",
+    hashes = {
+      { hash = "2eab66e389cb02d4a0ddc78283bba1dc", label = "Saturn Bomberman Fight!! (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X13F0C9, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Continue ? Countdown" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X14A8C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Battle Mode Config Nb of Rounds" },
+        { address=0X15FF45, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Number of P1 Round Won" },
+      },
+      stage = {
+        { address=0X1601C3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X15FF50, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Health decreased" },
+        { address=0X15FF50, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P1 Health increased" },
+        { address=0X160000, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P2 Health decreased" },
+        { address=0X160000, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P2 Health increased" },
+        { address=0X1600B0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P3 Health decreased" },
+        { address=0X1600B0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P3 Health increased" },
+        { address=0X160160, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P4 Health decreased" },
+        { address=0X160160, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P4 Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X15FF36, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8 Bit] P1 Power-up" },
+      },
+    },
+  },
+}

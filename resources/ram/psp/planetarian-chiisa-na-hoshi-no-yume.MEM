@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Planetarian: Chiisa na Hoshi no Yume",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "planetarian-chiisa-na-hoshi-no-yume",
+    file = "planetarian-chiisa-na-hoshi-no-yume.zip",
+    hashes = {
+      { hash = "aa23457f19030458e78633f4e02f35b9", label = "Planetarian - Chiisa na Hoshi no Yume (Japan) (v1.00 or v2.00) (En) (v1.0) (ShinjiGR).iso [legacy]" },
+      { hash = "501e884a2accaf29b471cbc042e713b3", label = "Planetarian - Chiisana Hoshi no Yume (Japan) (v2.00) (Touhoku-Chihou Taiheiyou-Oki Jishin Hisaichi Charity Ban).iso" },
+      { hash = "951ca50d673abd38ba7b61e0284aa7dc", label = "Planetarian - Chiisa na Hoshi no Yume (Japan) (v1.00 or v2.00) (En) (v1.0) (ShinjiGR).iso" },
+      { hash = "a962a5b8552fcf15ce8912c2b96c2992", label = "Planetarian - Chiisana Hoshi no Yume (Japan) (v1.02).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X856ACC, type="u8", condition="eq", value=0X09, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Song of Circling Stars (only in music player, not credits - instead it's 0x00 there)" },
+        { address=0X858FAC, type="u8", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X858FAC, type="u8", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Start from title" },
+        { address=0X858FAC, type="u8", condition="eq", value=0X16, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Load from title" },
+        { address=0X858FAC, type="u8", condition="eq", value=0X19, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Options from title" },
+        { address=0X858FAC, type="u8", condition="eq", value=0X3C, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Opening, Credits, certain cutscenes or panning scenes" },
+        { address=0X88E4EA, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits start flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X88E3A5, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reverie sprite + background" },
+      },
+    },
+  },
+}

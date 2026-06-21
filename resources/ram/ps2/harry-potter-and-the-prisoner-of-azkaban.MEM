@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Harry Potter and the Prisoner of Azkaban",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "harry-potter-and-the-prisoner-of-azkaban",
+    file = "harry-potter-and-the-prisoner-of-azkaban.zip",
+    hashes = {
+      { hash = "3f5de550d4cfb3c2c50cfdf617cb6348", label = "Harry Potter and the Prisoner of Azkaban (USA)" },
+      { hash = "4deb44bf51aa89576d041ab248655433", label = "Harry Potter and the Prisoner of Azkaban (USA) (60FPS)" },
+      { hash = "8186de02d119a44cb8a2076fccfd23a6", label = "Harry Potter i Wiezien Azkabanu (Poland)" },
+      { hash = "769a4275c4169ef916a9c37ef58634b6", label = "Harry Potter i Wiezien Azkabanu (Poland) (50FPS)" },
+      { hash = "67da7d3e3f26a27d591a874da998214c", label = "Harry Potter and the Prisoner of Azkaban (Europe) (En,Sv,No,Da)" },
+      { hash = "f40125710d6bac911d000d3ce1a068e0", label = "Harry Potter and the Prisoner of Azkaban (Asia)" },
+      { hash = "f47cfd53c69ef08c25f342c7db9cfc2f", label = "Harry Potter and the Prisoner of Azkaban (Europe) (En,Fr,De,Es,It,Nl,Pt)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X55E2E0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 bit] Level Duel" },
+        { address=0X56B210, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 bit] Level gryffindor mini game" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X47C86C, type="u16le", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="10 House Points" },
+        { address=0X47C86C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="House points (found by thegotoguyy)" },
+      },
+    },
+  },
+}

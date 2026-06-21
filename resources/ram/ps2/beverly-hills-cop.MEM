@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Beverly Hills Cop",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "beverly-hills-cop",
+    file = "beverly-hills-cop.zip",
+    hashes = {
+      { hash = "4abee94842fe82389ecfe5c76631f830", label = "Beverly Hills Cop (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi)" },
+    }
+  },
+
+  events = {
+  },
+}

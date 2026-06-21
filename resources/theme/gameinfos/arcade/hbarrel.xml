@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>rotary_joystick</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Shoot</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Grenade</text>
+			<color>${brown}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Shoot</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Grenade</text>
+			<color>${brown}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${orange}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${orange}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

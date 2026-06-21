@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "King's Quest II: Romancing the Throne",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kings-quest-ii-romancing-the-throne",
+    file = "kings-quest-ii-romancing-the-throne.zip",
+    hashes = {
+      { hash = "0fe0171c101d92659530af44be9df553", label = "King's Quest 2 (1985) (Sierra OnLine) (The Blade) (Disk 3).nib" },
+      { hash = "239f0238141ba3ecb100d015d543ac1f", label = "King's Quest 2 (1985) (Sierra OnLine) (The Blade) (Disk 1 - Side B).nib" },
+      { hash = "46ca9ce71dd984496684fc671fb18af1", label = "King's Quest 2 - Disk 2 - Back.nib" },
+      { hash = "51fecf807b7369288714fa67492d0209", label = "King's Quest 2 - Disk 1 - Front.nib" },
+      { hash = "654f982ff24269dedf646052ec469f94", label = "King's Quest 2 - Disk 1 - Back.nib" },
+      { hash = "74571c7ecfa0f2f6686a8ff70029b595", label = "King's Quest 2 - Disk 2 - Front.nib" },
+      { hash = "9998017630a30d635dff03bbd5515925", label = "King's Quest 2 - Disk 3 - Front.nib" },
+      { hash = "d8549ae7a488ab18289a02c13461d24b", label = "King's Quest 2 (1985) (Sierra OnLine) (The Blade) (Disk 1 - Side A).nib" },
+      { hash = "da01ed6b55920013f63e2d79fbb15660", label = "King's Quest 2 (1985) (Sierra OnLine) (The Blade) (Disk 2 - Side B).nib" },
+      { hash = "e077d01f89c5d87fdf1f85890f579ed4", label = "King's Quest 2 (1985) (Sierra OnLine) (The Blade) (Disk 2 - Side A).nib" },
+      { hash = "0717faca504daa539e6b2771e256d3ed", label = "King's Quest II disk 1A.woz" },
+      { hash = "56443afd0f1fd3bef2d7b1765d4c3b01", label = "King's Quest II disk 1B.woz" },
+      { hash = "313fb09806ab5696be6ebfa710688d6b", label = "King's Quest II disk 2A.woz" },
+      { hash = "8e7ae73692d8fed3260f1b609d941049", label = "King's Quest II disk 2B.woz" },
+      { hash = "30c74c11694ae9797931bcc3e54aa310", label = "King's Quest II disk 3A.woz" },
+    }
+  },
+
+  events = {
+  },
+}

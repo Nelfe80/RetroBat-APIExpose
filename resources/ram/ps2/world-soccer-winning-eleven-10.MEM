@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "World Soccer Winning Eleven 10",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "world-soccer-winning-eleven-10",
+    file = "world-soccer-winning-eleven-10.zip",
+    hashes = {
+      { hash = "3290481de00fdaa58440684c3f3d58ac", label = "World Soccer Winning Eleven 10 (Japan)" },
+      { hash = "a32a4ddb3ec90aa8b25f2339aea7629a", label = "World Soccer Winning Eleven 10 (Korea)" },
+      { hash = "a57e9dfcd72c74a93462981f666e72ff", label = "World Soccer Winning Eleven 10 (Japan) (En) (v5.0) (Fernando fk)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5CDA1E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal left team" },
+        { address=0XC80544, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal left team" },
+        { address=0XC8054C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal left team" },
+        { address=0XC8E678, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal left team" },
+        { address=0XC8E67A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal left team" },
+      },
+    },
+  },
+}

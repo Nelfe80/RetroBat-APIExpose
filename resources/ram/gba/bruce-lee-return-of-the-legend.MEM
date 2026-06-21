@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Bruce Lee: Return of the Legend",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "bruce-lee-return-of-the-legend",
+    file = "bruce-lee-return-of-the-legend.zip",
+    hashes = {
+      { hash = "73d90562373b2b0882354986aabdd61f", label = "Bruce Lee - Return of the Legend (USA).gba" },
+      { hash = "bd34635cf119a77c121bbf005b3ddfbe", label = "Bruce Lee - Return of the Legend (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X139F0, type="u16le", condition="eq", value=0X0012, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max Health" },
+        { address=0X139F0, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X11818, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Durability" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10F48, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X802C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current Level - Timer" },
+      },
+    },
+  },
+}

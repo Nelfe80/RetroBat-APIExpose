@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Game & Watch: Helmet",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "game-watch-helmet",
+    file = "game-watch-helmet.zip",
+    hashes = {
+      { hash = "e501bf3d9f768bfbefcd14d0be76b7f4", label = "Game & Watch - Helmet (USA, Europe)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X13E56C, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 Bit] Lives/Misses increased" },
+        { address=0X13E56C, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] Lives/Misses decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X13D3D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Starting Score" },
+        { address=0X13D498, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Starting Score Diplay" },
+        { address=0X13E574, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Score" },
+      },
+    },
+  },
+}

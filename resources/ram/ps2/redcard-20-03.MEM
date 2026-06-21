@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "RedCard 20-03",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "redcard-20-03",
+    file = "redcard-20-03.zip",
+    hashes = {
+      { hash = "764bf5ffba490a3763207d0315048eec", label = "RedCard 20-03 (USA) (En,Fr,De,Es,It)" },
+      { hash = "e67847498a67144400f1bc7a9a92bbd9", label = "RedCard (Europe) (En,Fr,De,It,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3D8C14, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal Difference" },
+      },
+      zone = {
+        { address=0X859408, type="u8", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Class" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3E77D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Home Score: 1st Half" },
+        { address=0X3E77DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Home Score: 2nd Half" },
+        { address=0X3E77EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Away Score: 1st Half" },
+        { address=0X3E77F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Away Score: 2nd Half" },
+      },
+    },
+  },
+}

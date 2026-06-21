@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Silent Hill 4: The Room",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "silent-hill-4-the-room",
+    file = "silent-hill-4-the-room.zip",
+    hashes = {
+      { hash = "f5369ee15ecc3ea96451fbffa958186a", label = "Silent Hill 4 - The Room (USA) (En,Ja)" },
+      { hash = "ea3ae8cecbd30bfb256f7da089553a06", label = "Silent Hill 4 - The Room (USA) (Ru)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X45AF24, type="u32le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="0x01 - Game Over" },
+        { address=0X45AF44, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues used" },
+        { address=0X1ED0528, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Ending Stats - Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1ED03E8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear screen background" },
+      },
+      zone = {
+        { address=0X5D14CA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Hospital World - Revolver Bullets" },
+        { address=0X5D14CB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Silver Bullet - Subway World 2 Stairs" },
+        { address=0X5D14CC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Hospital World - Holy Candle" },
+        { address=0X5D14D0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Hospital World - Saint Medallion" },
+        { address=0X5D14DC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Aluminium Bat in Building World" },
+        { address=0X5D14DD, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Driver in Building World 2" },
+        { address=0X5D14E1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - 3-Iron in Building World 2" },
+        { address=0X5D14E3, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Hospital World - 4-Iron" },
+        { address=0X5D14E5, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - 5-Iron golf club in Building World" },
+        { address=0X5D14E7, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - 6-Iron golf club in Forest World" },
+        { address=0X5D14E9, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - 7-Iron in Building World 2" },
+        { address=0X5D14EB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - 8-Iron in Building World 2" },
+        { address=0X5D14F1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Sand Wedge in Building World 2" },
+        { address=0X5D14F7, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Spade in Building World" },
+        { address=0X5D14F8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Rusty Axe in Building World" },
+        { address=0X5D14FD, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Chainsaw in Forest World" },
+        { address=0X5D1541, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Chaos Placard in Building World" },
+        { address=0X5D1543, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Nurse Outfit (Apt World 2)" },
+        { address=0X5D1549, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - SMG in Apt. World" },
+        { address=0X5D154B, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Item Availability - Riding Crop in Subway World 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5D14CD, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item Availability - Sword of Obedience in Building World (use top button in elevator)" },
+      },
+      health = {
+        { address=0X45A548, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Actual Health decreased" },
+        { address=0X45A548, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Actual Health increased" },
+        { address=0X45A74C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="0 = no damage?" },
+        { address=0X45A988, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Eileen Current Health decreased" },
+        { address=0X45A988, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Eileen Current Health increased" },
+        { address=0X45A9AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Eileen Max Health decreased" },
+        { address=0X45A9AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Eileen Max Health increased" },
+        { address=0X624390, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Max Health? decreased" },
+        { address=0X624390, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Max Health? increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X45A568, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon" },
+        { address=0X45A76C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon charge" },
+        { address=0X45A794, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon" },
+        { address=0X626507, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Eileen - Weapon equipped" },
+        { address=0X79AE95, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon" },
+        { address=0X1EBC750, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="bit0 - One-Weapon Mode Active" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5D1034, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 1 Ammo or Qty" },
+        { address=0X5D103C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 2 Ammo or Qty" },
+        { address=0X5D1044, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 3 Ammo or Qty" },
+        { address=0X5D104C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 4 Ammo or Qty" },
+        { address=0X5D1054, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 5 Ammo or Qty" },
+        { address=0X5D105C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 6 Ammo or Qty" },
+        { address=0X5D1064, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 7 Ammo or Qty" },
+        { address=0X5D106C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 8 Ammo or Qty" },
+        { address=0X5D1074, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 9 Ammo or Qty" },
+        { address=0X5D107C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slot 10 Ammo or Qty" },
+      },
+    },
+  },
+}

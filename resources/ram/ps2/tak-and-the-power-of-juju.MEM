@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Tak and the Power of Juju",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "tak-and-the-power-of-juju",
+    file = "tak-and-the-power-of-juju.zip",
+    hashes = {
+      { hash = "d0a9dc7e127f3de54faeadafbf119658", label = "Tak and the Power of Juju (USA)" },
+      { hash = "d04236f229b3db1302301448510d9663", label = "Tak and the Power of Juju (USA) (v1.0) (60fps) (Souzooka)" },
+    }
+  },
+
+  events = {
+  },
+}

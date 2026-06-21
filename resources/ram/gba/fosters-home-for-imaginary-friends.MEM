@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Foster's Home for Imaginary Friends",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "fosters-home-for-imaginary-friends",
+    file = "fosters-home-for-imaginary-friends.zip",
+    hashes = {
+      { hash = "1207a415c9acfbd206e5580f34e73ba2", label = "Foster's Home for Imaginary Friends (USA).gba" },
+      { hash = "784e266e768506888dd0f656fd7cf715", label = "Foster's Home for Imaginary Friends (Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8E7C, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X8E84, type="u16le", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8EF8, type="u16le", condition="eq", value=0X1B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Terrence and RED Boss Arena" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8EF8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

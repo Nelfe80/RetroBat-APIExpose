@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Metamorphic Force",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "metamorphic-force",
+    file = "metamorphic-force.zip",
+    hashes = {
+      { hash = "4a7bc7c27a1683215d3bd06accd0e98a", label = "metamrphj.7z <Metamorphic Force (ver JAA)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2630, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Final Credit" },
+        { address=0X2A6F, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode or Menus" },
+        { address=0X2E56, type="u8", condition="eq", value=0XFFFF, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0110, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Medium (Default)" },
+        { address=0X0110, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dip Switch - Difficulty Level" },
+      },
+      stage = {
+        { address=0X2A2D, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X2A2D, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X2A2D, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Stage 1" },
+        { address=0X2A2D, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X2A2D, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X2A2D, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Stage 2" },
+        { address=0X2A2D, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X2A2D, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage" },
+        { address=0X2A2D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0111, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Credit 2 Lives (Default)" },
+        { address=0X0111, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dip Switch - Player's Life increased" },
+        { address=0X0111, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dip Switch - Player's Life decreased" },
+        { address=0X2A30, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X2A30, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alive" },
+        { address=0X3201, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 life (or none)" },
+        { address=0X3201, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0X3201, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player One Lives increased" },
+        { address=0X3201, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player One Lives decreased" },
+        { address=0X3204, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X3211, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 life (or none)" },
+        { address=0X3211, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0X3211, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Two Lives increased" },
+        { address=0X3211, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Two Lives decreased" },
+        { address=0X3214, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X2618, type="u8", condition="eq", value=0X9494, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X2618, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Dip Switch Setting - Continuous Energy" },
+        { address=0X3204, type="u8", condition="eq", value=0X5F, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max Health (JP Version)" },
+        { address=0X3204, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player One Health" },
+        { address=0X3214, type="u8", condition="eq", value=0X5F, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max Health (JP Version)" },
+        { address=0X3214, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Two Health" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2A50, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Alive" },
+        { address=0X2A50, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Dead" },
+        { address=0X403A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health" },
+      },
+    },
+  },
+}

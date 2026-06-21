@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Club Penguin: Elite Penguin Force",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "club-penguin-elite-penguin-force",
+    file = "club-penguin-elite-penguin-force.zip",
+    hashes = {
+      { hash = "7aa8d39c4e43169376dfe4f84a0b3694", label = "Club Penguin - Elite Penguin Force (Europe).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19C844, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X20A5C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dance Challenge Mini-Game Current Round Number [8bit]" },
+        { address=0X20A5C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dance Challenge Mini-Game - Total Number of Rounds [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2B4B74, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ice Fishing - Number of Lives [8bit] increased" },
+        { address=0X2B4B74, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ice Fishing - Number of Lives [8bit] decreased" },
+      },
+      health = {
+        { address=0X233834, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Snow Trekker - Health GUI [32bit] decreased" },
+        { address=0X233834, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Snow Trekker - Health GUI [32bit] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2B4B80, type="u8", condition="eq", value=0X09, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Appears" },
+        { address=0X2B4B80, type="u8", condition="eq", value=0X0A, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Loading" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2BAD14, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cart Surfer Score Static Address" },
+        { address=0X2BB778, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Snowboarding Score (When in Game) [32bit]" },
+        { address=0X2BB77C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Snowboarding (While in mini-game) - Score Earned on trick combo [32bit] added addr to 0x2bb778" },
+      },
+      collectibles = {
+        { address=0X19C848, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Earned Coins from Game Gui [8bit] increased" },
+        { address=0X233830, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Snow Trekker - Number of Earned Coins GUI [32bit] increased" },
+        { address=0X289790, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Coins [32bit] increased" },
+        { address=0X2B4B68, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins Earned Ice Fishing Minigame [8bit] increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Catrap",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "catrap",
+    file = "catrap.zip",
+    hashes = {
+      { hash = "5a75fe8de54e4cbd09cae23f050f6965", label = "Catrap (USA).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD4F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[796-bits] level flags(00 is unbeaten, 01 is beaten)" },
+        { address=0XD55B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="counts how many levels the player has beaten" },
+        { address=0XFF96, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level clear check - when the last enemy has been defeated, this starts counting down to 0" },
+      },
+      stage = {
+        { address=0XFFA3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9C01, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Edit mode tile, used to detect if player has entered Edit mode and reset achievements accordingl" },
+        { address=0XFFA4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="When stage is cleared by defeating all enemies, bit switches to 01. When stage is cleared with s" },
+      },
+    },
+  },
+}

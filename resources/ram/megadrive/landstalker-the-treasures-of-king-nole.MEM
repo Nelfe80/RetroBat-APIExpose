@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Landstalker: The Treasures of King Nole",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "landstalker-the-treasures-of-king-nole",
+    file = "landstalker-the-treasures-of-king-nole.zip",
+    hashes = {
+      { hash = "04ae2b65f3a11a7504339e60735beed8", label = "Landstalker (USA).md" },
+      { hash = "0bee733207842672479cc0f2775290ba", label = "Landstalker - Le Tresor du Roi Nole (France).md" },
+      { hash = "2569e90fae793cd4b826075e5010e17b", label = "Landstalker (USA) (Controls Patch) (v1.0) (MIJET).md" },
+      { hash = "2b6ee5677a6233fd98f0b90b51684991", label = "Landstalker - Die Schatze von Konig Nolo (Germany).md" },
+      { hash = "2cad7a202eaf98c27248d99680ca38b5", label = "Landstalker - Le Tresor du Roi Nole (France) (Improvement) (v1.0) (Arunotaku).md" },
+      { hash = "38b00b29431634e2348579687855410b", label = "Landstalker - The Treasures of King Nole (Europe) (Es) (v1.0 Expanded) (Paspallas).md" },
+      { hash = "3a4a21f894f011b3f57bf636a3386f53", label = "Landstalker - Koutei no Zaihou (Japan) (Ko) (Cyjzero) (Rev 1).md" },
+      { hash = "4feae5987b0c552b84620f3d48bd8c4b", label = "Landstalker - The Treasures of King Nole (Europe) (Mega Drive Mini).md" },
+      { hash = "62d468dbb3f1c4a864c65c64b8dfcbe4", label = "Landstalker (USA) (Alternate Controls Patch) (v1.0) (MagicianLord).md" },
+      { hash = "6397f7029f90f59881bdc4174eafb52f", label = "Landstalker - The Treasures of King Nole (Europe).md" },
+      { hash = "6937a9617fa421be00cbd6407775da6a", label = "Landstalker (USA) (It) (v1.0) (Gufino2).md" },
+      { hash = "890171e3d0671b0ac49470e592f0ea99", label = "Landstalker - Die Schatze von Konig Nolo (Germany) (Mega Drive Mini).md" },
+      { hash = "8efeb8e3f5eef7f4e76f96e430de65be", label = "Landstalker - The Treasures of King Nole (Europe) (Es) (v1.0) (Paspallas).md" },
+      { hash = "a8e797ebaae6dc09020074b03b57ed75", label = "Landstalker - Le Tresor du Roi Nole (France) (Mega Drive Mini).md" },
+      { hash = "d9a7922681a126653dc16a0d907d7f32", label = "Landstalker - Koutei no Zaihou (Japan).md" },
+      { hash = "dbaa50ee8b061b573c33337e18329ecd", label = "Landstalker (USA) (Genesis Mini).md" },
+      { hash = "dcc153ec3ca6b4e84f987782038c82c0", label = "Landstalker - Koutei no Zaihou (Japan) (Mega Drive Mini).md" },
+      { hash = "ff2dec1b3e41e5012a2fbe0cf0eaa9e0", label = "Landstalker (USA) (1993-07-13) (Sega Channel).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFFFE, type="u8", condition="eq", value=0XC6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Climax logo/title" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X102C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life stock shop? increased" },
+        { address=0X102C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life stock shop? decreased" },
+        { address=0X547E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life stock increased" },
+        { address=0X547E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life stock decreased" },
+        { address=0X547F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life stock - 3 is default. 3=4 increased" },
+        { address=0X547F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life stock - 3 is default. 3=4 decreased" },
+      },
+      health = {
+        { address=0X102A, type="u16be", condition="eq", value=0X1C00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="drugstore" },
+        { address=0X102A, type="u16be", condition="eq", value=0X1610, action="HEALTH_STATE", no_log=false, no_survey=false, desc="verla boat" },
+        { address=0X102A, type="u16be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="1400=variety shp" },
+        { address=0X543E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (16-Bit) decreased" },
+        { address=0X543E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (16-Bit) increased" },
+        { address=0X553F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gola's health decreased" },
+        { address=0X553F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gola's health increased" },
+        { address=0X55BF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="King Nole's health decreased" },
+        { address=0X55BF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="King Nole's health increased" },
+        { address=0X563F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Zak's health decreased" },
+        { address=0X563F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Zak's health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0F9A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="strange counter related to taking hits, getting gold, getting chests increased" },
+        { address=0X120E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="gold = 00 00 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X10CB, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 7 - Final Boss Defeated" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1143, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+      },
+      player = {
+        { address=0X1004, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Man in Mercator jumps off the balcony" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1018, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="talked to guards blocking Mercator castle's entrance" },
+        { address=0X5430, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="type of object standing on" },
+      },
+    },
+  },
+}

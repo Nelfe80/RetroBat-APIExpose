@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Alice in Wonderland",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "alice-in-wonderland",
+    file = "alice-in-wonderland.zip",
+    hashes = {
+      { hash = "5a3ea75ad9b6e16f2c42d4be3a22d7e8", label = "Alice in Wonderland side A.woz" },
+      { hash = "e9d4e672fe899153035a1abd4047e3bf", label = "Alice in Wonderland side B.woz" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0080, type="u16le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="16Bit When Pause it have a different address depending of what option you are selecting" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00FF, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time" },
+      },
+    },
+  },
+}

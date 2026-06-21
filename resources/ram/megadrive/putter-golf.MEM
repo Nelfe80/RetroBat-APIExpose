@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Putter Golf",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "putter-golf",
+    file = "putter-golf.zip",
+    hashes = {
+      { hash = "2fed39c0cc048a5ecd2a91495975b002", label = "Putter Golf (Japan) (SegaNet).md" },
+    }
+  },
+
+  events = {
+  },
+}

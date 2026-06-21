@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "David Crane's The Rescue of Princess Blobette",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "david-cranes-the-rescue-of-princess-blobette",
+    file = "david-cranes-the-rescue-of-princess-blobette.zip",
+    hashes = {
+      { hash = "81f7dee7546e630de075a3397349efb8", label = "David Crane's The Rescue of Princess Blobette (USA).gb" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XC1E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XC1E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+  },
+}

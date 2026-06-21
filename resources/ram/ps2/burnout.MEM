@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Burnout",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "burnout",
+    file = "burnout.zip",
+    hashes = {
+      { hash = "3a66d06ceddac2fb4085eb495515915a", label = "Burnout (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X379140, type="u32le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dolby Sorround" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2F0550, type="u16le", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+      },
+    },
+  },
+}

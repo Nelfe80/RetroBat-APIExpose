@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Space Channel 5",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "space-channel-5",
+    file = "space-channel-5.zip",
+    hashes = {
+      { hash = "c4bf8962f85ba1b74409a4c0c5cb3db2", label = "Space Channel 5 (Europe) (En,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18AE50, type="u32le", condition="eq", value=0X00040019, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XAF7349, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Normal gameplay" },
+        { address=0XAF7349, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Cheat active" },
+        { address=0XAF9A09, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Normal gameplay" },
+        { address=0XAF9A09, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Cheat active" },
+        { address=0XAFFFE8, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E730B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Background Video [Lower4]" },
+      },
+      stage = {
+        { address=0XFB859, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Earthling 10 - Ground Crew" },
+        { address=0XFB864, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Earthling 10 - Ground Crew" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFB859, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Earthling 08 - Jodie Bundt" },
+        { address=0XFB864, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Earthling 08 - Jodie Bundt" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFB861, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 78 - Blank TV" },
+        { address=0XFB861, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 77 - Giant Evila" },
+        { address=0XFB861, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 76 - Evila" },
+        { address=0XFB861, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 75 - Morolian Monroe!" },
+        { address=0XFB861, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 74 - Morolina" },
+        { address=0XFB861, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 73 - Coco Tapioca" },
+        { address=0XFB86C, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 78 - Blank TV" },
+        { address=0XFB86C, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 77 - Giant Evila" },
+        { address=0XFB86C, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 76 - Evila" },
+        { address=0XFB86C, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 75 - Morolian Monroe!" },
+        { address=0XFB86C, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 74 - Morolina" },
+        { address=0XFB86C, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 73 - Coco Tapioca" },
+      },
+    },
+  },
+}

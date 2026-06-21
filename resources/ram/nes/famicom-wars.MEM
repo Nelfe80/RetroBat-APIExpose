@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Famicom Wars",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "famicom-wars",
+    file = "famicom-wars.zip",
+    hashes = {
+      { hash = "35e5b82125cb1af4ea5418cc2df97947", label = "Famicom Wars (Japan) (Virtual Console).nes" },
+      { hash = "407d5988b91b6b8b39de4bd4e3175e13", label = "Famicom Wars (Japan) (Fr) (v1.0) (FlashPV).nes" },
+      { hash = "7843d4e38f562a648e64ad18ea019e7d", label = "Famicom Wars (Japan) (En) (v1.01) (Stardust Crusaders).nes" },
+      { hash = "922f4f86c8719d1ceb9b7773600348ac", label = "Famicom Wars (Japan).nes" },
+      { hash = "b6dd58376b5aa4ebf1f6962dde2b0b82", label = "Famicom Wars (Japan) (En) (v1.0) (Stardust Crusaders).nes" },
+      { hash = "e7f58d6401832810bf7317e250cf4298", label = "Famicom Wars (Japan) (En) (v1.0) (Spinner8 and Friends).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X7405, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Unit 1 Life increased" },
+        { address=0X7405, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unit 1 Life decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X607C, type="u8", condition="eq", value=0X07, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Island" },
+        { address=0X6085, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Neutral" },
+        { address=0X6085, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Red Star" },
+        { address=0X6085, type="u8", condition="eq", value=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Blue Moon" },
+        { address=0X6096, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[8 Bit] Treasure Island Victory record (in days)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X60AA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] Gold increased" },
+        { address=0X7407, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Unit 1 ammo" },
+      },
+    },
+  },
+}

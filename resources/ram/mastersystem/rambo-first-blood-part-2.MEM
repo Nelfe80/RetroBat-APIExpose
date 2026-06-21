@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Rambo: First Blood Part 2",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "rambo-first-blood-part-2",
+    file = "rambo-first-blood-part-2.zip",
+    hashes = {
+      { hash = "3f6c5515a2e39826fbf816780298701c", label = "Secret Command (Europe).sms" },
+      { hash = "7a080a155ad6a806da88aa1d3576d78c", label = "Rambo - First Blood Part II (USA).sms" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X011F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life count: increased" },
+        { address=0X011F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life count: decreased" },
+        { address=0X0120, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 life points: starts at 3 when 2nd player spawn on 1st or 2nd round increased" },
+        { address=0X0120, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 life points: starts at 3 when 2nd player spawn on 1st or 2nd round decreased" },
+        { address=0X0122, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8-Bit Flags] Player 2 life state: same as player 1 increased" },
+        { address=0X0122, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-Bit Flags] Player 2 life state: same as player 1 decreased" },
+        { address=0X0221, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Final boss central head life: increased" },
+        { address=0X0221, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Final boss central head life: decreased" },
+        { address=0X0400, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8-Bit Flags] Player life flags: Binary flags for the different state of the player increased" },
+        { address=0X0400, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-Bit Flags] Player life flags: Binary flags for the different state of the player decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0417, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8-Bit Flags] Power up state: Binary flags for all the different power up" },
+      },
+    },
+  },
+}

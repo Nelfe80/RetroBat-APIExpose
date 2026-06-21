@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "2048",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "2048",
+    file = "2048.zip",
+    hashes = {
+      { hash = "f1582d662a6b80fb6acfc78b87ca889c", label = "2048 (World) (Peter Hellberg).wasm" },
+    }
+  },
+
+  events = {
+  },
+}

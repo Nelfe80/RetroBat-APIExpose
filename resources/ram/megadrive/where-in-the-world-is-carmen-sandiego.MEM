@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Where in the World is Carmen Sandiego?",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Adventure, Ludo-Educatif"
+  },
+
+  rom = {
+    name = "where-in-the-world-is-carmen-sandiego",
+    file = "where-in-the-world-is-carmen-sandiego.zip",
+    hashes = {
+      { hash = "73b10dc65ef1e21e9aaf2b34d74dc7b2", label = "Where in the World Is Carmen Sandiego (USA, Europe) (En,Fr,De,Es,It).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD0EE, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0XE95C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XE95C, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="No demo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF402, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Carmen Sandiego" },
+        { address=0XF402, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fast Eddie B" },
+      },
+    },
+  },
+}

@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "DeJig: Tin Toy",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "dejig-tin-toy",
+    file = "dejig-tin-toy.zip",
+    hashes = {
+      { hash = "3ce75a6ce82eab3c26f856a978be7896", label = "DeJig - Tin Toy (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0002, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="30 - In game, Level select" },
+        { address=0X10CFBF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0c - Level Select" },
+        { address=0X10D85C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Bit Value 17-20" },
+        { address=0X10D85E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Bit Value 1-8" },
+        { address=0X10D85F, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Bit Value 9-16" },
+      },
+    },
+  },
+}

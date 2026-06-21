@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Rush Hour",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "rush-hour",
+    file = "rush-hour.zip",
+    hashes = {
+      { hash = "ce8bf34b57967273f7accdb072b0e0cb", label = "Rush Hour (USA)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XCF744, type="u8", condition="eq", value=0X06, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="best times" },
+        { address=0XCF744, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="game mode selection" },
+      },
+    },
+  },
+}

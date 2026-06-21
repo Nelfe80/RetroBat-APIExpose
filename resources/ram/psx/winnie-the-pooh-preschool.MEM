@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Winnie the Pooh: Preschool",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "winnie-the-pooh-preschool",
+    file = "winnie-the-pooh-preschool.zip",
+    hashes = {
+      { hash = "d2f60b2f5e05729d5a00e6ee295b97ca", label = "Disney's Winnie the Pooh - Preschool (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9D4E1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Selected Level in Kanga's Alphabet Soup" },
+        { address=0X9D4FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level in Kanga's Alphabet Soup" },
+        { address=0X9D504, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last selected Level in Piglet's Picture" },
+        { address=0X9D514, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level in Piglet's Picture" },
+        { address=0X9D515, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Picture in Level 1 of Piglet's Paintings" },
+        { address=0X9D55B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level in Pooh's Dream" },
+        { address=0X9D562, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last selected Level in Tigger's Popcorn Calliope" },
+        { address=0XC48DC, type="u8", condition="eq", value=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="First Half completed" },
+        { address=0XC48DC, type="u8", condition="eq", value=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0XC48DC, type="u8", condition="eq", value=0X3A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Almost Completed" },
+        { address=0XC48DC, type="u8", condition="eq", value=0X39, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Almost Completed" },
+        { address=0XC48DC, type="u8", condition="eq", value=0X3F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Almost Complete" },
+        { address=0XCD228, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD228, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 1 of Pooh's Dream" },
+        { address=0XCD229, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD229, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 2 of Pooh's Dream" },
+        { address=0XCD22A, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD22A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 3 of Pooh's Dream" },
+        { address=0XCD22B, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD22B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 1 of Kanga's Alphabet Soup" },
+        { address=0XCD22C, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD22C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 2 of Kanga's Alphabet Soup" },
+        { address=0XCD22D, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD22D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 3 of Kanga's Alphabet Soup" },
+        { address=0XCD22E, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD22E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 1 of Rabbit's Canning Encounter" },
+        { address=0XCD22F, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD22F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 2 of Rabbit's Canning Encounter" },
+        { address=0XCD230, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD230, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 3 of Rabbit's Canning Encounter" },
+        { address=0XCD231, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD231, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 1 of Tigger's Popcorn Calliope" },
+        { address=0XCD232, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD232, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 2 of Tigger's Popcorn Calliope" },
+        { address=0XCD233, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD233, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 3 of Tigger's Popcorn Calliope" },
+        { address=0XCD234, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD234, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 1 of Piglet's Picture" },
+        { address=0XCD235, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD235, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 2 of Piglet's Picture" },
+        { address=0XCD236, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD236, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 3 of Piglet's Picture" },
+        { address=0XCD237, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD237, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 1 of Owl's Family Tree" },
+        { address=0XCD238, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD238, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 2 of Owl's Family Tree" },
+        { address=0XCD239, type="u8", condition="eq", value=0X64, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0XCD239, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress in Level 3 of Owl's Family Tree" },
+        { address=0XCD280, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level in Tigger's Popcorn Calliope" },
+        { address=0X1E1EF0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level in Owl's Family Tree" },
+      },
+      stage = {
+        { address=0XC48DC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Progress in Current Stage of whatever Mini Game youre in" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9D476, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Mini-Game" },
+        { address=0X9D518, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Last Selected Level in Rabbit's Canning Encounter" },
+        { address=0X9D52C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Current Level in Rabbit's Canning Encounter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "LMA Manager 2001",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Construction and Management Simulation, Sports"
+  },
+
+  rom = {
+    name = "lma-manager-2001",
+    file = "lma-manager-2001.zip",
+    hashes = {
+      { hash = "184bc9b7b4a5bc8658ab84e6e43d7b7f", label = "LMA Manager 2001 (Europe)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X156942, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Match: Home Score" },
+        { address=0X159512, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Match: Away Score" },
+        { address=0X1D09D8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[160 bytes] [Array] English Premiership Top Scorer Table [16-bit each]" },
+        { address=0X1D0A78, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[160 bytes] [Array] English Division 1 Top Scorer Table [16-bit each]" },
+        { address=0X1D0B18, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[160 bytes] [Array] English Division 2 Top Scorer Table [16-bit each]" },
+        { address=0X1D0BB8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[160 bytes] [Array] English Division 3 Top Scorer Table [16-bit each]" },
+      },
+    },
+  },
+}

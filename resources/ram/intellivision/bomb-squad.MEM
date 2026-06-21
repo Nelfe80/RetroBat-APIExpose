@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bomb Squad",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "bomb-squad",
+    file = "bomb-squad.zip",
+    hashes = {
+      { hash = "8d0d0bb758718e663886a890d1412fd5", label = "Bomb Squad (USA, Europe).int" },
+    }
+  },
+
+  events = {
+  },
+}

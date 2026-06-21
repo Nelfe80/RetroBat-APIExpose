@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Final Fantasy Fables: Chocobo's Dungeon",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "final-fantasy-fables-chocobos-dungeon",
+    file = "final-fantasy-fables-chocobos-dungeon.zip",
+    hashes = {
+      { hash = "70349ce7deff2e9edb0d5b9a99a69c2b", label = "Final Fantasy Fables - Chocobo's Dungeon (USA)" },
+      { hash = "4040f5c0c53134dcec8744b30be59bee", label = "Final Fantasy Fables - Chocobo's Dungeon (Europe) (En,Fr)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB46BFC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Chocobo Level" },
+        { address=0XB46C4C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Natural" },
+        { address=0XB46CD8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Knight" },
+        { address=0XB46D64, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Dragoon" },
+        { address=0XB46DF0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Dark Knight" },
+        { address=0XB46E7C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Ninja" },
+        { address=0XB46F08, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Thief" },
+        { address=0XB46F94, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Scholar" },
+        { address=0XB47020, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Black Mage" },
+        { address=0XB470AC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - White Mage" },
+        { address=0XB47138, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Job Level - Dancer" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XB46C00, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bit BE] Max HP decreased" },
+        { address=0XB46C00, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bit BE] Max HP increased" },
+        { address=0XB46C04, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bit BE] Current HP decreased" },
+        { address=0XB46C04, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bit BE] Current HP increased" },
+      },
+    },
+  },
+}

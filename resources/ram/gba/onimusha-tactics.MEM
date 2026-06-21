@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Onimusha Tactics",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "onimusha-tactics",
+    file = "onimusha-tactics.zip",
+    hashes = {
+      { hash = "1e0b41fbb6f338dc44932625446df20c", label = "Onimusha Tactics (Europe).gba" },
+      { hash = "7c8e479f4c4e46f406b1da5e786358c0", label = "Onimusha Tactics (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X556C, type="u8", condition="eq", value=0XFE, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X556C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Unlock Stage Nodes on World Map" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X829C, type="u16le", condition="eq", value=0X86, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword of Morpheus" },
+      },
+    },
+  },
+}

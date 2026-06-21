@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Brain Age 2: More Training in Minutes a Day!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "brain-age-2-more-training-in-minutes-a-day",
+    file = "brain-age-2-more-training-in-minutes-a-day.zip",
+    hashes = {
+      { hash = "efa089f4843c0304da28626d4f8e087d", label = "Brain Age 2 - More Training in Minutes a Day! (USA) (En,Fr,Es).nds" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X11363D, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Training Block Count Available" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11363D, type="u8", condition="bit_true", bit=1, mask=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Training Clock Spin Available" },
+      },
+    },
+  },
+}

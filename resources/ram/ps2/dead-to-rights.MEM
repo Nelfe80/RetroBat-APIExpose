@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Dead to Rights",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "dead-to-rights",
+    file = "dead-to-rights.zip",
+    hashes = {
+      { hash = "147d78a5751c487ee079eb17841e3e9f", label = "Dead to Rights (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X42DC08, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused (01)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X24EF64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bit 0 - Lazy-Ass Mode (Level Select)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X24F0CC, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Bit 0 - Your Skills Are Extra-Ordinary Mode (Double Melee Damage)" },
+        { address=0X24F0F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bit 0 - Super Cop Mode (Infinite Health) decreased" },
+        { address=0X24F0F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bit 0 - Super Cop Mode (Infinite Health) increased" },
+        { address=0X24F138, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bit 0 - Up Close and Personal Mode (Infinite Human Shield Health) decreased" },
+        { address=0X24F138, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bit 0 - Up Close and Personal Mode (Infinite Human Shield Health) increased" },
+        { address=0X42B244, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hildy Dancing Health (Float) decreased" },
+        { address=0X42B244, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hildy Dancing Health (Float) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X42D97C, type="u16le", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="No Weapon" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc=".45 Automatic Pistol" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="SPAS-12 Shotgun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="MP5-A5 Submachine Gun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M4 Carbine Assault Rifle" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="L96A1 Sniper Rifle" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="PSG 1 Sniper Rifle" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="MARK 3-A2 Automatic Shotgun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M92 Silenced Pistol" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M79 Grenade Launcher" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M629 .44 Magnum Revolver" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X0B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M60 Machine Gun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M210 Double Barrel Shotgun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X0D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M11 Silenced Submachine Gun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X0E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="AKM Assault Rifle" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=false, no_survey=false, desc=".50 Automatic Pistol" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M202A1 Rocket Launcher" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X11, action="WEAPON_STATE", no_log=false, no_survey=false, desc="GunCon" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade Launcher" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X13, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fire Extinguisher" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X14, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Gun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X15, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Gun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X16, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spear Gun" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X17, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tazer" },
+        { address=0X42D97C, type="u16le", condition="eq", value=0X18, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shadow" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X24EED4, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Bit 0 - Boomstick Mode (Infinite Shotgun Ammo)" },
+        { address=0X24EF1C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Bit 0 - Bang Bang Mode (Handguns only with infinite ammo)" },
+        { address=0X24EF88, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Bit 0 - 10,000 Bullets Mode (Infinite Ammo)" },
+      },
+    },
+  },
+}

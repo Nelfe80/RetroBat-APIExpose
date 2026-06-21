@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Gunstar Super Heroes",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle-Game, Action, Shooter, Run and Gun"
+  },
+
+  rom = {
+    name = "gunstar-super-heroes",
+    file = "gunstar-super-heroes.zip",
+    hashes = {
+      { hash = "5a3db0c384d089bda397e395df4270f8", label = "Gunstar Future Heroes (Europe) (En,Ja,Fr,De,Es,It).gba" },
+      { hash = "a5b75829debc9262b08076a94c8473eb", label = "Gunstar Super Heroes (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X2CB71, type="u8", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Earth" },
+        { address=0X2CB71, type="u8", condition="eq", value=0X1, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Moon 1" },
+        { address=0X2CB71, type="u8", condition="eq", value=0X2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Moon 2" },
+        { address=0X2CB71, type="u8", condition="eq", value=0X3, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Moon 3" },
+        { address=0X2CB71, type="u8", condition="eq", value=0X4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Moon 4" },
+        { address=0X2CB71, type="u8", condition="eq", value=0X5, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Moon 5" },
+        { address=0X2CB71, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World:" },
+      },
+    },
+  },
+}

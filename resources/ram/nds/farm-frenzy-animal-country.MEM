@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Farm Frenzy: Animal Country",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Construction and Management Simulation, Strategy"
+  },
+
+  rom = {
+    name = "farm-frenzy-animal-country",
+    file = "farm-frenzy-animal-country.zip",
+    hashes = {
+      { hash = "d6ba7cad25ea6f74a726a7ac2d9befef", label = "Farm Frenzy - Animal Country (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X959E9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Touch the ground to water it and make the grass grow." },
+        { address=0X959F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Profile 2 - Levels Data ordered by Level ID" },
+        { address=0X95A98, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Profile 3 - Levels Data ordered by Level ID" },
+        { address=0X95D70, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level [32bit]" },
+        { address=0X95D7C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level State [32bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X95950, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Profile 1 - Levels Data ordered by Level ID increased" },
+        { address=0X95DB0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Previous Money [32bit] increased" },
+        { address=0X95DB4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Money [32bit] increased" },
+        { address=0X95E5C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Medal Time - Gold Medal [32bit] increased" },
+      },
+    },
+  },
+}

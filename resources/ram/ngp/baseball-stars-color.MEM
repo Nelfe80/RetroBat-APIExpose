@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Baseball Stars Color",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "baseball-stars-color",
+    file = "baseball-stars-color.zip",
+    hashes = {
+      { hash = "6f9f680b659369448f01508501c5a709", label = "Baseball Stars Color - Pocket Sports Series (World) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+  },
+}

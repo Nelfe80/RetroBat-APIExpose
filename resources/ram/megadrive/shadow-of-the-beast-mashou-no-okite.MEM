@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Shadow of the Beast: Mashou no Okite",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "shadow-of-the-beast-mashou-no-okite",
+    file = "shadow-of-the-beast-mashou-no-okite.zip",
+    hashes = {
+      { hash = "9cd4a754fcb6793d7470a6fa63903025", label = "Shadow of the Beast - Mashou no Okite (Japan).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1ACC, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title, But.. also Jetpack Stage while playing?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1ACC, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death," },
+      },
+      health = {
+        { address=0X1A57, type="u8", condition="eq", value=0XB0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Picked up one or more of certain full health potions [Tree SW, Tree NE, Castle NE, Castle SW]" },
+        { address=0X1A57, type="u8", condition="eq", value=0XB1, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Picked up one or more of certain full health potions [Tree E]" },
+        { address=0X1A57, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full Health Potion Acquisition:" },
+        { address=0X1AC0, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Inactive," },
+        { address=0X1AC0, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Active" },
+        { address=0X1AC0, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="CHEAT: Infinite Energy:" },
+        { address=0X1AC1, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="No," },
+        { address=0X1AC1, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Yes" },
+        { address=0X1AC1, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="CHEAT: Infinite Energy Possible:" },
+      },
+    },
+  },
+}

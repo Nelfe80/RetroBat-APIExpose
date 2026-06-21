@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Tom and Jerry in Mouse Attacks",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tom-and-jerry-in-mouse-attacks",
+    file = "tom-and-jerry-in-mouse-attacks.zip",
+    hashes = {
+      { hash = "7a826122ccc3818dce9a8e8db6d77edb", label = "Tom and Jerry in - Mouse Attacks! (USA).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC03E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC064, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC048, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives left - Editable increased" },
+        { address=0XC048, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives left - Editable decreased" },
+        { address=0XC09B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives left - 2 increased" },
+        { address=0XC09B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives left - 2 decreased" },
+        { address=0XC1B1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Jerry health increased" },
+        { address=0XC1B1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Jerry health decreased" },
+      },
+      health = {
+        { address=0X10302, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pie Panic Health decreased" },
+        { address=0X10302, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pie Panic Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC030, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Item 1 ammo" },
+        { address=0XC031, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Item 2 ammo" },
+        { address=0XC032, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Item 3 ammo" },
+        { address=0XC033, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Item 4 ammo" },
+        { address=0XC0A5, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Equiped item ammo" },
+        { address=0X102BD, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Pie Panic Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC1E1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 and Boss 3 health - Eggs game eggs transported - Boss 1 trap status" },
+        { address=0XC1E2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 health bar - Eggs game Eggs dropped" },
+        { address=0XC4F1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final boss health bar" },
+        { address=0XD0F0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 cat shown" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC1D3, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility timer" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1027E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Minutes digit in Block Puzzle minigame" },
+        { address=0X1027F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Seconds two digit in Block Puzzle minigame" },
+        { address=0X10280, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Seconds one digit in Block Puzzle minigame" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X10281, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Block puzzle timer millisecond" },
+      },
+    },
+  },
+}

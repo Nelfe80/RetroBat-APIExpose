@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Magic Knight Rayearth",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "magic-knight-rayearth",
+    file = "magic-knight-rayearth.zip",
+    hashes = {
+      { hash = "023c3cdce1602147c6ff5e8c7a4aaa49", label = "Magic Knight Rayearth (USA)" },
+      { hash = "6c07aa3005541db2fcae66db2110a104", label = "Magic Knight Rayearth (USA) (Undub) (v1.0) (Rep_Plus_^-^)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1BFC4B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hikaru Escudo Weapon level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1BFC82, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit4 - End Alcione's battle Tree of Life increased" },
+        { address=0X1BFC82, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit4 - End Alcione's battle Tree of Life decreased" },
+        { address=0X1BFC83, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit7 - Starts Alcione's battle Tree of Life increased" },
+        { address=0X1BFC83, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit7 - Starts Alcione's battle Tree of Life decreased" },
+        { address=0X1BFCE9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit0 - Heart Jewel Tree of Life increased" },
+        { address=0X1BFCE9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit0 - Heart Jewel Tree of Life decreased" },
+        { address=0X1BFCEB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit0 - Magic Jewel Tree of Life at Lairy increased" },
+        { address=0X1BFCEB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit0 - Magic Jewel Tree of Life at Lairy decreased" },
+        { address=0X1BFCF8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit6 - Health potion Tempting Cave increased" },
+        { address=0X1BFCF8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit6 - Health potion Tempting Cave decreased" },
+      },
+      health = {
+        { address=0X1BFC4A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hikaru's Max HP decreased" },
+        { address=0X1BFC4A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hikaru's Max HP increased" },
+        { address=0X1BFC4D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hikaru's HP decreased" },
+        { address=0X1BFC4D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hikaru's HP increased" },
+        { address=0X1BFC54, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Umi's Max HP decreased" },
+        { address=0X1BFC54, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Umi's Max HP increased" },
+        { address=0X1BFC57, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Umi's HP decreased" },
+        { address=0X1BFC57, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Umi's HP increased" },
+        { address=0X1BFC5E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fuu's Max HP decreased" },
+        { address=0X1BFC5E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fuu's Max HP increased" },
+        { address=0X1BFC61, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fuu's HP decreased" },
+        { address=0X1BFC61, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fuu's HP increased" },
+        { address=0X1BFCDF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bit6 - Health Potion Waterfall secret decreased" },
+        { address=0X1BFCDF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bit6 - Health Potion Waterfall secret increased" },
+        { address=0X1BFCFB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bit0 - Heaven's Labyrinth Health potion decreased" },
+        { address=0X1BFCFB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bit0 - Heaven's Labyrinth Health potion increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1BFC93, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Bit0 - Emerald fight start (Zagat palace map)" },
+      },
+      weapon = {
+        { address=0X1BFC70, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bit0 - Got new weapons from Precia" },
+        { address=0X1BFC80, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bit2 - Umi weapons lv2" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1A48C6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16Bit) Money (gems) increased" },
+        { address=0X1A48D4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16Bit) Displayed Money (gems) increased" },
+        { address=0X1BFC3E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Magic Recovery Ring increased" },
+        { address=0X1BFC68, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16Bit) Actual money value (isnt shown in count) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1BFC85, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit4 - 2nd Caldina boss fight start" },
+        { address=0X1BFC86, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit4 - Ended Turtle boss fight" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1BFC74, type="u8", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="Bit4 - Learned how to swim" },
+      },
+    },
+  },
+}

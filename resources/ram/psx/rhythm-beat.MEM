@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Rhythm Beat",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "rhythm-beat",
+    file = "rhythm-beat.zip",
+    hashes = {
+      { hash = "41f8433edca83f0aa7107639cb519577", label = "Rhythm Beat (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9F4B8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Level ID=9 if you beat without using a continue" },
+        { address=0XBE7A4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUES" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9EED4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total Kills in arcade? (all opponents) (14 if you never die)" },
+      },
+    },
+  },
+}

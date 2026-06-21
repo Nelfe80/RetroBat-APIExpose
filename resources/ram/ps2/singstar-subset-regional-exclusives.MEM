@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "SingStar [Subset - Regional Exclusives]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "singstar-subset-regional-exclusives",
+    file = "singstar-subset-regional-exclusives.zip",
+    hashes = {
+      { hash = "a22a09a013e0a24e9543d3431d8bdcbd", label = "SingStar (France)" },
+      { hash = "d35d5cfbfa5388a8d4f2db6c318c8c81", label = "SingStar (Germany)" },
+      { hash = "006882a1de31d29e3c6f9c18c1f8d5d5", label = "SingStar (Italy)" },
+      { hash = "df04a8c1668ff3c2c67646cbddaa53ff", label = "SingStar (Spain)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2A1708, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[ITALY] Is Game Paused" },
+        { address=0X2A22F8, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[SPAIN] Is Game Paused" },
+        { address=0X2A28F0, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[GERMANY] Is Game Paused" },
+        { address=0X2A29F0, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[FRANCE] Is Game Paused" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X36CB10, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[ITALY] Score screen detector" },
+        { address=0X36D750, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[SPAIN] Score screen detector" },
+        { address=0X36DE90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[FRANCE] Score screen detector" },
+        { address=0X36DFD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[GERMANY] Score screen detector" },
+      },
+    },
+  },
+}

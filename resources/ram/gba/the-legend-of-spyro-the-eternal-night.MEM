@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "The Legend of Spyro: The Eternal Night",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-legend-of-spyro-the-eternal-night",
+    file = "the-legend-of-spyro-the-eternal-night.zip",
+    hashes = {
+      { hash = "fe87f3053a6579e3bcb3fef3332aabfa", label = "Legend of Spyro, The - The Eternal Night (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4650, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause flag - 0=Paused, else 1 (basically just pauses sprite animations)" },
+        { address=0X5460, type="u8", condition="eq", value=0X0A, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+      },
+      events = {
+        { address=0X4820, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current combo count" },
+        { address=0X4830, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo - First hit ID" },
+        { address=0X4831, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo - Second hit ID" },
+        { address=0X4835, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo - Sixth hit ID ... etc...." },
+        { address=0X4F26, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Best combo in training area (max=63) (99), 23 combo(17 hex) unlocks final gate(legendary dragons" },
+        { address=0X4F5D, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Abilities(only in Menu) - bit0=Hover, bit1=WallClimb, bit2=SlideAttack, bit3,4,5=AdditionalMelee" },
+        { address=0X4F61, type="u8", condition="bit_true", bit=6, mask=0X40, action="COMBO_HIT", no_log=false, no_survey=false, desc="(10combo)" },
+        { address=0X4F61, type="u8", condition="bit_true", bit=7, mask=0X80, action="COMBO_HIT", no_log=false, no_survey=false, desc="AdditionalAirComboAttack" },
+        { address=0XA36B, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(All save slots) Latest saved file data for Best Combo in training area after saving game" },
+        { address=0X138C8, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Training Dummy Combo (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4F6C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32bit Amount of Spirit spent in Fire's current level" },
+        { address=0X4F70, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32bit Amount of Spirit spent in Earth's current level" },
+        { address=0X4F74, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32bit Amount of Spirit spent in Ice's current level" },
+        { address=0X4F78, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32bit Amount of Spirit spent in Lightning's current level" },
+        { address=0X4F7C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire Breath Level - 0=Locked, 1=UnlockedLvl1, 2=2, 3=3(max)" },
+        { address=0X4F7D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Earth Breath Level - 0=Locked, 1=UnlockedLvl1, 2=2, 3=3(max)" },
+        { address=0X4F7E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice Breath Level - 0=Locked, 1=UnlockedLvl1, 2=2, 3=3(max)" },
+        { address=0X4F7F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lightning Breath Level - 0=Locked, 1=UnlockedLvl1, 2=2, 3=3(max)" },
+      },
+      zone = {
+        { address=0X4F39, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Available areas from World Map" },
+        { address=0X667A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Save Slot 1 Areas available from World Map" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4F5E, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="ElementalMeleeDamage(15combo), bit1=PiercingClaws" },
+        { address=0X4F62, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="ElementalMeleeDamage(15combo), bit1=PiercingClaws, bit2=RagingFury, bit3,4=IncreasedMeleeDamage," },
+        { address=0X4F64, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Abilities - Health Upgrade - Each bit is one upgrade decreased" },
+        { address=0X4F64, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Abilities - Health Upgrade - Each bit is one upgrade increased" },
+        { address=0X4F66, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Abilities - bit0,1,2,3,=EnergyUpgrades decreased" },
+        { address=0X4F66, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Abilities - bit0,1,2,3,=EnergyUpgrades increased" },
+        { address=0X4F80, type="u24be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spyro Current Health (24-bit BE) decreased" },
+        { address=0X4F80, type="u24be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spyro Current Health (24-bit BE) increased" },
+        { address=0X4F84, type="u24be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spyro Max Health (24-bit BE) decreased" },
+        { address=0X4F84, type="u24be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spyro Max Health (24-bit BE) increased" },
+        { address=0X4F88, type="u24be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spyro Current Green Energy (24-bit BE) decreased" },
+        { address=0X4F88, type="u24be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spyro Current Green Energy (24-bit BE) increased" },
+        { address=0X4F8C, type="u24be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spyro Max Green Energy (24-bit BE) decreased" },
+        { address=0X4F8C, type="u24be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spyro Max Green Energy (24-bit BE) increased" },
+        { address=0X5460, type="u8", condition="eq", value=0X15, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health and Safety screen" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4F11, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="BeatNagaBoss" },
+        { address=0X5468, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Naga Boss Room" },
+        { address=0X13582, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="(dynamic) Fire Avatar Boss Health - Max=dc, Dead=0" },
+        { address=0X1394E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(dynamic num2) Fire Avatar Boss Health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X4F5C, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Double Jump" },
+        { address=0X4F5C, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="Wall Jump" },
+        { address=0X4F60, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Double Jump" },
+        { address=0X4F60, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="Wall Jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4828, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="16bit Combo meter and timer (max=578) - FFFF when in training area" },
+      },
+    },
+  },
+}

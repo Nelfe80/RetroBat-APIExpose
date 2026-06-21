@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "God of War II [Subset - Bonus]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "god-of-war-ii-subset-bonus",
+    file = "god-of-war-ii-subset-bonus.zip",
+    hashes = {
+      { hash = "b04e16539b4dd4c1b722bf9ab84f7838", label = "God of War II [Subset - Bonus]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2D8EF4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] flipping this pauses the game, but not on a pause screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X333CB4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Euryale death" },
+        { address=0X36B0C8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32bit] total deaths" },
+      },
+      health = {
+        { address=0X2D86A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="infinite health decreased" },
+        { address=0X2D86A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="infinite health increased" },
+        { address=0XDA74F8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Euryale health decreased" },
+        { address=0XDA74F8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Euryale health increased" },
+        { address=0X1B4BF38, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] colossus health float decreased" },
+        { address=0X1B4BF38, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] colossus health float increased" },
+      },
+    },
+  },
+}

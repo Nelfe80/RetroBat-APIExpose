@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Rayman",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rayman",
+    file = "rayman.zip",
+    hashes = {
+      { hash = "4392c6d819e6ebde2aaa8d0a365a5e94", label = "Rayman (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

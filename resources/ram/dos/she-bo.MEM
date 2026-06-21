@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "She Bo",
+    system = "dos",
+    system_name = "DOS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "she-bo",
+    file = "she-bo.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X19152, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives? increased" },
+        { address=0X19152, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives? decreased" },
+      },
+    },
+  },
+}

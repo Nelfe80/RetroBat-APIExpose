@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Chiki Chiki Boys",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "chiki-chiki-boys",
+    file = "chiki-chiki-boys.zip",
+    hashes = {
+      { hash = "b89406ff3537d74f77a4f7e5e71b25b7", label = "Chiki Chiki Boys (USA, Europe).md" },
+      { hash = "e91cc2771c7801e8669117a0c2e06e40", label = "Chiki Chiki Boys (Japan, Korea) (Ja).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC088, type="u8", condition="eq", value=0X13, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Clown Theme," },
+        { address=0XC088, type="u8", condition="eq", value=0X15, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Theme," },
+        { address=0XC088, type="u8", condition="eq", value=0X16, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen," },
+        { address=0XC088, type="u8", condition="eq", value=0X1B, action="GAME_OVER", no_log=false, no_survey=false, desc="Final Game Over Theme," },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC088, type="u8", condition="eq", value=0X1D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Chime," },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC088, type="u8", condition="eq", value=0X17, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Screen," },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC088, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Regular Boss Theme," },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XAF4E, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Standard Shield," },
+        { address=0XAF4E, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Power Shield," },
+        { address=0XAF4E, type="u8", condition="eq", value=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ace Shield," },
+        { address=0XAF4E, type="u8", condition="eq", value=0X03, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Super Shield" },
+      },
+    },
+  },
+}

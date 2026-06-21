@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Shox | Shox: Rally Reinvented",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "shox-shox-rally-reinvented",
+    file = "shox-shox-rally-reinvented.zip",
+    hashes = {
+      { hash = "58d6622daf5cb9ebdb43160417a3c4cf", label = "Shox (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

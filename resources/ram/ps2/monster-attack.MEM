@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Monster Attack",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "monster-attack",
+    file = "monster-attack.zip",
+    hashes = {
+      { hash = "90f91d09ba1ce7108b49d5a962582239", label = "Monster Attack (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X21A61E, type="u16le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x0001 - Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X26089E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="15. Grounded - 0x01 - Beat on Easy" },
+        { address=0X26089F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="15. Grounded - 0x01 - Beat on Normal" },
+        { address=0X2608A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="15. Grounded - 0x01 - Beat on Hard" },
+        { address=0X2608A1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="15. Grounded - 0x01 - Beat on Chaos" },
+        { address=0X2608A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="15. Grounded - 0x01 - Beat on Inferno" },
+      },
+      stage = {
+        { address=0X260850, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage Number" },
+        { address=0X9CDD00, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select for Versus Mode" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X26080C, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player 1 - Weapon ID Slot 1" },
+        { address=0X260810, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player 1 - Weapon ID Slot 2" },
+        { address=0X260820, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player 2 - Weapon ID Slot 1" },
+        { address=0X260824, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player 2 - Weapon ID Slot 2" },
+        { address=0X260B0E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B0F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B10, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B11, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B12, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B13, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B14, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B15, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B16, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B17, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B18, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B19, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B1A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B1B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B1C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B1D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B1E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B1F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B20, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B21, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+        { address=0X260B22, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X260876, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="7. Blockade - 0x01 - Beat on Easy" },
+        { address=0X260877, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="7. Blockade - 0x01 - Beat on Normal" },
+        { address=0X260878, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="7. Blockade - 0x01 - Beat on Hard" },
+        { address=0X260879, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="7. Blockade - 0x01 - Beat on Chaos" },
+        { address=0X26087A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="7. Blockade - 0x01 - Beat on Inferno" },
+      },
+    },
+  },
+}

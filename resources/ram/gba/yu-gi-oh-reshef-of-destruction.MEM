@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Reshef of Destruction",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-reshef-of-destruction",
+    file = "yu-gi-oh-reshef-of-destruction.zip",
+    hashes = {
+      { hash = "4f71a4e021f4b9319c9d4443dd710666", label = "Yu-Gi-Oh! - Reshef of Destruction (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "c06decdf51468503434dcb5e7bbdcca5", label = "Yu-Gi-Oh! - Reshef of Destruction (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X29C20, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Duelist Level] [16 - Bits]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2C4D5, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Slifer (7)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X29D10, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Money/Domino Gained in a Duel] [64 - Bits] increased" },
+        { address=0X29DD0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Money/Domino] [64 - Bits] increased" },
+      },
+    },
+  },
+}

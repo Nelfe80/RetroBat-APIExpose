@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "World Championship Cards",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "world-championship-cards",
+    file = "world-championship-cards.zip",
+    hashes = {
+      { hash = "d1f9214809d8d98c0a2aac76febf5580", label = "World Championship Cards (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5B6240, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="- 01 if Demo mode" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X602720, type="u32le", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door" },
+        { address=0X765354, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="- Current Door bought" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5B6234, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="- Quick Play>Game Type:" },
+      },
+    },
+  },
+}

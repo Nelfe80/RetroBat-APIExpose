@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Oha Suta Dance Dance Revolution",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "oha-suta-dance-dance-revolution",
+    file = "oha-suta-dance-dance-revolution.zip",
+    hashes = {
+      { hash = "1b077a97e0899d1e6e1bae7ed2de68db", label = "Oha-Studio Dance Dance Revolution (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD3E00, type="u8", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="GAME OVER" },
+        { address=0XD3E00, type="u8", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XD3E00, type="u8", condition="eq", value=0X1D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XD3E00, type="u8", condition="eq", value=0X1E, action="DEMO_MODE", no_log=false, no_survey=false, desc="Tutorial Demo" },
+        { address=0XEA4DB, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo/Title Screen" },
+      },
+      events = {
+        { address=0XD3EA8, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P1 Max Combo" },
+        { address=0XD4808, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16 Bit] Current Combo" },
+        { address=0XDA044, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P2 Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD3E0A, type="u16le", condition="eq", value=0XFFFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Done" },
+        { address=0XEE308, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Super Easy (Default)" },
+        { address=0XEE308, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Options - Game level" },
+        { address=0XEE31D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Option - Graphics - Background Dim" },
+      },
+      stage = {
+        { address=0XD3E08, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1st Stage" },
+        { address=0XD3E08, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Current Stage" },
+        { address=0XEE30A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Options - Easy stages" },
+        { address=0XEE30B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Options - Normal stages" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD3E3C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Total Score (graphic)" },
+        { address=0XD3E40, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 'Current' Score" },
+        { address=0XD3E44, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Total Score" },
+        { address=0XD9FD8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Total Score (Graphic)" },
+        { address=0XD9FDC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 'Current' Score" },
+        { address=0XD9FE0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Total Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Star Wars: Battlefront - Elite Squadron",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "star-wars-battlefront-elite-squadron",
+    file = "star-wars-battlefront-elite-squadron.zip",
+    hashes = {
+      { hash = "373de3d0aa17e09106eaf4ac962cdefc", label = "Star Wars Battlefront - Elite Squadron (USA) (En,Fr,De,Es,It) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XDCD010, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Data (1= Tutorial complete Padawan)" },
+        { address=0XDCD014, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Data (1=Tutorial Complete Knight)" },
+        { address=0XDCD018, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Data (1=Tutorial Complete Master)" },
+      },
+    },
+  },
+}

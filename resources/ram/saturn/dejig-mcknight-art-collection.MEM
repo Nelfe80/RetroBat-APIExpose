@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "DeJig: McKnight - Art Collection",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "dejig-mcknight-art-collection",
+    file = "dejig-mcknight-art-collection.zip",
+    hashes = {
+      { hash = "d8ad98ff399147de3e62ffff20a2bb13", label = "DeJig - McKnight - Art Collection (Japan)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1BF76A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="This is for the movie timer" },
+      },
+    },
+  },
+}

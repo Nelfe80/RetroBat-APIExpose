@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Transport Tycoon",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Construction and Management Simulation"
+  },
+
+  rom = {
+    name = "transport-tycoon",
+    file = "transport-tycoon.zip",
+    hashes = {
+      { hash = "571db288496c9b45b51a3b1652ca055c", label = "Transport Tycoon (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1191C7, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not in demo / tutorial" },
+        { address=0X1191C7, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="In demo / tutorial" },
+        { address=0X11937C, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Theme" },
+        { address=0X11937E, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause buffer" },
+        { address=0X11937E, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Loading / paused (this value stays present after pausing and never changes back)" },
+        { address=0X11937F, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not paused" },
+        { address=0X11937F, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused / loading (activates when newspapers pop up as well)" },
+        { address=0X119418, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="In demo / tutorial" },
+        { address=0X119418, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not in demo / tutorial" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X11937C, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Little Red Diesel" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1AFD1C, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X1AFD1D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] In some way related to money increased" },
+        { address=0X1AFD26, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Below £1k" },
+        { address=0X1AFD26, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="£1k-£?" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X11CB62, type="u8", condition="eq", value=0XB0, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Select" },
+        { address=0X11CB62, type="u8", condition="eq", value=0XB1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="L3" },
+        { address=0X11CB62, type="u8", condition="eq", value=0XB2, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="R3" },
+        { address=0X11CB62, type="u8", condition="eq", value=0XB3, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Start" },
+        { address=0X11CB62, type="u8", condition="eq", value=0XB4, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Up" },
+        { address=0X11CB62, type="u8", condition="eq", value=0XB5, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Right" },
+        { address=0X11CB62, type="u8", condition="eq", value=0XB6, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Down" },
+        { address=0X11CB62, type="u8", condition="eq", value=0XB7, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Left" },
+        { address=0X11CB63, type="u8", condition="eq", value=0XB0, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="L2" },
+        { address=0X11CB63, type="u8", condition="eq", value=0XB1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="R2" },
+        { address=0X11CB63, type="u8", condition="eq", value=0XB2, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="L1" },
+        { address=0X11CB63, type="u8", condition="eq", value=0XB3, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="R1" },
+        { address=0X11CB63, type="u8", condition="eq", value=0XB4, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Triangle" },
+        { address=0X11CB63, type="u8", condition="eq", value=0XB5, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Circle" },
+        { address=0X11CB63, type="u8", condition="eq", value=0XB6, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Cross" },
+        { address=0X11CB63, type="u8", condition="eq", value=0XB7, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Square" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X119436, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Competitor start time" },
+        { address=0X1B51CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Time passed in months" },
+      },
+    },
+  },
+}

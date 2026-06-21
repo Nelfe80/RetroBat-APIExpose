@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! The Duelists of the Roses",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-the-duelists-of-the-roses",
+    file = "yu-gi-oh-the-duelists-of-the-roses.zip",
+    hashes = {
+      { hash = "39241ef7858506e56e4a8253a25fe10f", label = "Yu-Gi-Oh! The Duelists of the Roses (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X299ED8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Move To, Overworld Location" },
+        { address=0X338F8C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Card Data - Ground Attacker Bugroth [32 bits]" },
+        { address=0X33A240, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Card Data - Zone Eater [32 bits]" },
+        { address=0X33BC60, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Card Data - Darkworld Thorns [32 bits]" },
+      },
+      zone = {
+        { address=0X33C62C, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Card Data - Toon World [32 bits]" },
+      },
+      stage = {
+        { address=0X299ED7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Overworld Location" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X332038, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Luminous Soldier [32 bits]" },
+        { address=0X33224C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Black Luster Soldier [32 bits]" },
+        { address=0X3352FC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Card Data - That Which Feeds on Life [32 bits] increased" },
+        { address=0X3352FC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - That Which Feeds on Life [32 bits] decreased" },
+        { address=0X3367C4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Card Data - Hourglass of Life [32 bits] increased" },
+        { address=0X3367C4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Hourglass of Life [32 bits] decreased" },
+        { address=0X336BEC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Card Data - Winged Egg of New Life [32 bits] increased" },
+        { address=0X336BEC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Winged Egg of New Life [32 bits] decreased" },
+        { address=0X3377CC, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Insect Soldiers of the Sky [32 bits]" },
+        { address=0X338788, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Cyber Soldier of Darkworld [32 bits]" },
+        { address=0X33899C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Cyber Soldier [32 bits]" },
+        { address=0X338BB0, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Cannon Soldier [32 bits]" },
+        { address=0X3390BC, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Giant Mech-Soldier [32 bits]" },
+        { address=0X339498, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Kinetic Soldier [32 bits]" },
+        { address=0X33A9F8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Penguin Soldier [32 bits]" },
+        { address=0X33B1B0, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Giant Soldier of Stone [32 bits]" },
+        { address=0X33BBC8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Card Data - Bean Soldier [32 bits]" },
+      },
+      health = {
+        { address=0X33D7B0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card Data - Dark Energy [32 bits] decreased" },
+        { address=0X33D7B0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card Data - Dark Energy [32 bits] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X33626C, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Card Data - Man-Eating Treasure Chest [32 bits]" },
+        { address=0X33DB40, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Card Data - Dragon Treasure [32 bits]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X331E70, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Data - Great Mammoth of Goldfine [32 bits]" },
+        { address=0X3378FC, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Data - Mammoth Graveyard [32 bits]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X32FFDC, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - One-Eyed Shield Dragon [32 bits]" },
+        { address=0X332FF4, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Millennium Shield [32 bits]" },
+        { address=0X33D258, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Shield & Sword [32 bits]" },
+        { address=0X33D2A4, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Yellow Luster Shield [32 bits]" },
+        { address=0X33DBD8, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Cyber Shield [32 bits]" },
+        { address=0X33EE40, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Curse of Millennium Shield [32 bits]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X331588, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Card Data - Aqua Madoor [32 bits]" },
+        { address=0X3359D0, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Card Data - Versago the Destroyer [32 bits]" },
+        { address=0X338A34, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Card Data - Blocker [32 bits]" },
+        { address=0X33B410, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Card Data - Destroyer Golem [32 bits]" },
+        { address=0X33EA64, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Card Data - Block Attack [32 bits]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3181E3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Counter" },
+      },
+    },
+  },
+}

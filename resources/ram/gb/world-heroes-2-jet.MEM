@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "World Heroes 2 JET",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "world-heroes-2-jet",
+    file = "world-heroes-2-jet.zip",
+    hashes = {
+      { hash = "8272e012f5c953450a3e2efd88d41aeb", label = "World Heroes 2 Jet (USA, Europe) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC63A, type="u8", condition="eq", value=0X09, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tournament Cleared" },
+        { address=0XC6C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Music" },
+        { address=0XC7E9, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 wins" },
+        { address=0XC7E9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Win Counter" },
+      },
+      stage = {
+        { address=0XC63A, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage" },
+        { address=0XC63A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC096, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0XC096, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0XC097, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health Graphical Bar decreased" },
+        { address=0XC097, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health Graphical Bar increased" },
+        { address=0XC196, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0XC196, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0XC197, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health Graphical Bar decreased" },
+        { address=0XC197, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health Graphical Bar increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC680, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="unlimited" },
+        { address=0XC680, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time" },
+      },
+    },
+  },
+}

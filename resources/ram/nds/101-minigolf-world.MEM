@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "101 MiniGolf World",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "101-minigolf-world",
+    file = "101-minigolf-world.zip",
+    hashes = {
+      { hash = "2a40edea9a842ede6307af7f7d2b6265", label = "101 MiniGolf World (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0XFFE00C, type="u32be", condition="eq", value=0X4B584945, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="101 MiniGolf World" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X14735C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[432 bytes] Profile 1 - Island High Scores Table" },
+        { address=0X14750C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[432 bytes] Profile 2 - Island High Scores Table" },
+        { address=0X1476BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[432 bytes] Profile 3 - Island High Scores Table" },
+        { address=0X14786C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[432 bytes] Profile 4 - Island High Scores Table" },
+        { address=0X1497A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[432 bytes] Par Score Table" },
+      },
+    },
+  },
+}

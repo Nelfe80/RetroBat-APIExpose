@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Blaster",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "blaster",
+    file = "blaster.zip",
+    hashes = {
+      { hash = "1e0ad2ec7e8c3cc595a9ec2e3762b117", label = "blaster.7z <Blaster>" },
+    }
+  },
+
+  events = {
+  },
+}

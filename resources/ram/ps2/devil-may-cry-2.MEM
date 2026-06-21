@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Devil May Cry 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "devil-may-cry-2",
+    file = "devil-may-cry-2.zip",
+    hashes = {
+      { hash = "0269081f15d31e880409aded878f7a3c", label = "Devil May Cry 2 (China) (Disc 2)" },
+      { hash = "088d5402d30de3a15a737a5cbea16e16", label = "Devil May Cry 2 (Japan) (Disc 2) (Lucia)" },
+      { hash = "0bcfdf07fdd4313cbd50f9ec380269d4", label = "Devil May Cry 2 (USA) (Disc 1)" },
+      { hash = "64d2a885c68110ed824b5cfafaefbc65", label = "Devil May Cry 2 (Japan) (Disc 1) (Dante)" },
+      { hash = "660942a41fe3646b85e817003a42601c", label = "Devil May Cry 2 (Disc 2) (Korea)" },
+      { hash = "70ca992a908691baa0544d7d7bbbc923", label = "Devil May Cry 2 (USA) (Disc 2)" },
+      { hash = "befee52bb8041f635b042cda3b2be969", label = "Devil May Cry 2 (Disc 1) (Korea)" },
+      { hash = "cf75ef011e7db2aa1c4a6ba21f5e0b5f", label = "Devil May Cry 2 (Europe) (En,Fr,De,Es,It) (Disc 1)" },
+      { hash = "d20fc476f9374949570469750f2fd4b4", label = "Devil May Cry 2 (China) (Disc 1)" },
+      { hash = "f735a548bc885ca75029d4ea175b1dfe", label = "Devil May Cry 2 (Europe) (En,Fr,De,Es,It) (Disc 2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X570C09, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonochorus" },
+        { address=0X5A8B89, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonochorus" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X570B31, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lucia (2nd Diesel)," },
+        { address=0X570B31, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dante (Diesel)," },
+        { address=0X570B31, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lucia (1st Diesel)," },
+        { address=0X570B3C, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Must Die" },
+        { address=0X570C0D, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="the Despair Embodied" },
+        { address=0X570C48, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lucia (1st Diesel)" },
+        { address=0X570D34, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X570D4E, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dante (Diesel), // also used to tell game if Dante campaign complete" },
+        { address=0X570D4F, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lucia (1st Diesel), // also used to tell game if Lucia campaign complete" },
+        { address=0X570D4F, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lucia (2nd Diesel)," },
+        { address=0X5A8B8D, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="the Despair Embodied" },
+      },
+      health = {
+        { address=0X9F0D00, type="u32le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Orangguerra (both) Health," },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9C0D0A, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health [16-bits]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X56FCA9, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="*US, JP*" },
+      },
+    },
+  },
+}

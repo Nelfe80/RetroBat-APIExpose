@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Comix Zone",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Beat 'em Up"
+  },
+
+  rom = {
+    name = "comix-zone",
+    file = "comix-zone.zip",
+    hashes = {
+      { hash = "38aff5287c05dba4c5bbd269a268bf22", label = "Comix Zone (USA) (Es) (v0.90) (Kale).md" },
+      { hash = "393ac681c66051906cb15fdf12861caf", label = "Comix Zone (USA) (Pt) (2010) (joanad Nenhum).md" },
+      { hash = "5cc88fa866c76cb24c50ec7019daee7e", label = "Comix Zone (USA) (Sega Smash Pack 2).md" },
+      { hash = "7078e8018ded17f3ce4c70cc8bf74afc", label = "Comix Zone (USA).md" },
+      { hash = "7f121ad5e332cb76e861fd0dfefcc0d8", label = "Comix Zone (USA) (Es).md" },
+      { hash = "90a9a99f853eb1853be2b725dab758c9", label = "Comix Zone (Europe) (En,Fr,De,Es).md" },
+      { hash = "afefa6517e8ee35f2a5b5b42964f4295", label = "Comix Zone (USA) (Ru).md" },
+      { hash = "b09f105210f67e01bddaa9c371151f03", label = "Comix Zone (USA) (Ru) (Shedevr & Pirates).md" },
+      { hash = "d92ccdfd14118af824b98997ab639bb7", label = "Comix Zone (Japan) (En,Ja).md" },
+      { hash = "f75ac0929ebdff0c208fe717cc482097", label = "Comix Zone (USA) (Ru) (NewGame).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF07, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0XBF50, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Number of dialogue boxes at screen [Chat, panel title, etc.]" },
+        { address=0XBFD7, type="u24be", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="Pause/Unpause FF/0-244" },
+        { address=0XC190, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 = Demo mode active" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XBEE0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting stage [Using level select]" },
+        { address=0XBF1E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+        { address=0XBFD0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting Stage?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XBF04, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Current Health decreased" },
+        { address=0XBF04, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Current Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X82F8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Some Y- Axis final boss" },
+        { address=0XBF3A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Number of elements at screen [Enemies, Boxes, Boss, etc]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XBEE1, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="0b = Invincibility cheat" },
+      },
+    },
+  },
+}

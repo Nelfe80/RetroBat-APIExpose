@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Spider-Man: Web of Shadows",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "spider-man-web-of-shadows",
+    file = "spider-man-web-of-shadows.zip",
+    hashes = {
+      { hash = "04d42edb4ee6bf6353c46e603aef2118", label = "Spider-Man - Web of Shadows (Europe) (En,Fr,De).nds" },
+      { hash = "201632255b763351846aa0a277e1b467", label = "Spider-Man - Web of Shadows (Europe) (Es,It).nds" },
+      { hash = "6e2cd89c5a40e4eb6e981ed2cda847e0", label = "Spider-Man - Web of Shadows (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X296230, type="u8", condition="eq", value=0X2C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie's Apartment" },
+        { address=0X2AA408, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="First Symbiote Boss health in Eddie's Apartment (32-bit)" },
+      },
+      health = {
+        { address=0X140028, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Mini Game Active - 10a decreased" },
+        { address=0X140028, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Mini Game Active - 10a increased" },
+        { address=0X296181, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spidey health spot 2(dynamic) decreased" },
+        { address=0X296181, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spidey health spot 2(dynamic) increased" },
+        { address=0X29627E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spider-Man Health Orbs decreased" },
+        { address=0X29627E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spider-Man Health Orbs increased" },
+        { address=0X2962B5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spider-Man Health Bar decreased" },
+        { address=0X2962B5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spider-Man Health Bar increased" },
+        { address=0X2A1EDC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Purple symbiote health spot 3(dynamic) decreased" },
+        { address=0X2A1EDC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Purple symbiote health spot 3(dynamic) increased" },
+        { address=0X2A7E7C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Super Symbiote(Pier) Health decreased" },
+        { address=0X2A7E7C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Super Symbiote(Pier) Health increased" },
+        { address=0X2A7E98, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Super Symbiote Health(Fat Purple One In Residental Area) decreased" },
+        { address=0X2A7E98, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Super Symbiote Health(Fat Purple One In Residental Area) increased" },
+        { address=0X2AA734, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Red symbiote health sewers decreased" },
+        { address=0X2AA734, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Red symbiote health sewers increased" },
+        { address=0X2AB01C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Green Symbiote Health spot 2 (dynamic) decreased" },
+        { address=0X2AB01C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Green Symbiote Health spot 2 (dynamic) increased" },
+        { address=0X2ADA90, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Venom Health decreased" },
+        { address=0X2ADA90, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Venom Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X296283, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Black Suit Active - 1" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X296241, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Health upgrade total string 2 bits 0-7 increased" },
+        { address=0X296242, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Health upgrade string 3 - Bit0-6 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X296230, type="u8", condition="eq", value=0X38, action="BOSS_HIT", no_log=false, no_survey=false, desc="Red Symbiote Boss Area" },
+        { address=0X296230, type="u8", condition="eq", value=0X3B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Green Symbiote Boss Area" },
+        { address=0X296230, type="u8", condition="eq", value=0X24, action="BOSS_HIT", no_log=false, no_survey=false, desc="Left half of above room(blue symbiote boss)" },
+        { address=0X296230, type="u8", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="Venom Boss Battle Area" },
+        { address=0X296230, type="u8", condition="eq", value=0X15, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fight 1 before boss" },
+        { address=0X296230, type="u8", condition="eq", value=0X17, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fight 2 before boss" },
+        { address=0X296230, type="u8", condition="eq", value=0X18, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Fight Before Boss" },
+        { address=0X296230, type="u8", condition="eq", value=0X19, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Batlle" },
+        { address=0X2A585C, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Green Symbiote Boss in Sewers Health 32-bit" },
+        { address=0X2A6510, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health" },
+        { address=0X2A7EFC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Purple Symbiote boss health spot 2 (dynamic)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X13FD2C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="_of times gone through a door" },
+        { address=0X2AAD00, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Health Mini-Game Timer p2" },
+        { address=0X2AE25D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="First encounter symbiote human health" },
+        { address=0X2B9770, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Health Mini-game Timer" },
+      },
+    },
+  },
+}

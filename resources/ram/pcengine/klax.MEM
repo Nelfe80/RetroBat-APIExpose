@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Klax",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Puzzle-Game, Strategy"
+  },
+
+  rom = {
+    name = "klax",
+    file = "klax.zip",
+    hashes = {
+      { hash = "8becf757a68f72a01428d4359165e463", label = "Klax (USA).pce" },
+    }
+  },
+
+  events = {
+  },
+}

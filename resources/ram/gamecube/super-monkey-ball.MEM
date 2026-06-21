@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Super Monkey Ball",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "super-monkey-ball",
+    file = "super-monkey-ball.zip",
+    hashes = {
+      { hash = "bccf85b9da906c62bdd35042bacad952", label = "Super Monkey Ball (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1EEC73, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause screen selection" },
+        { address=0X1F3A83, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Used Continues Quantity" },
+        { address=0X2F1C0D, type="u8", condition="bit_true", bit=3, mask=0X08, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Unlimited continues" },
+        { address=0X2F1EE3, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused [bit3]" },
+        { address=0X2F2228, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Bananas collected on the credits" },
+        { address=0X166ECF6, type="u16be", condition="eq", value=0XFFFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1F3A5B, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="goal!" },
+        { address=0X1F3A5B, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="time over!" },
+        { address=0X1F3A5B, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="fall out!" },
+        { address=0X1F3A5B, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="time stopped" },
+        { address=0X1F3A5B, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="replay" },
+        { address=0X1F3A5B, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completed stage" },
+        { address=0X1F3A65, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Blue (Green Goal Advanced 6 and Expert 46)" },
+        { address=0X1F3A65, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Green (Blue Goal Advanced 6 and Expert 46, Red Goal Expert 2)" },
+        { address=0X1F3A65, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Red" },
+        { address=0X1F3A7C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Remaining bananas on level" },
+        { address=0X2F1BF5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Billiards COM Level" },
+        { address=0X2F1BFC, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5" },
+        { address=0X2F1BFC, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="10" },
+        { address=0X2F1BFC, type="u8", condition="eq", value=0X0F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="15" },
+        { address=0X2F1BFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Target Rounds" },
+        { address=0X12AED47, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Target current round" },
+        { address=0X12B8DA7, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X205E62, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Main Game - Remaining lives increased" },
+        { address=0X205E62, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Main Game - Remaining lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X205EDC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Main Game - Score" },
+        { address=0X250B90, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Floor score address?" },
+        { address=0X28D92C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Practice Mode Best Score Display on Master [32-bit BE]" },
+        { address=0X28DAA4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Practice Mode Best Score Display [32-bit BE]" },
+        { address=0X2F1CAC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Practice Mode Best Score [32-bit BE]" },
+        { address=0X2F1F80, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Total Score up to last floor" },
+        { address=0X2F1FBC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Current Play Points" },
+        { address=0X129DA29, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Billiards score" },
+        { address=0X129DA2F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Billiards COM score" },
+        { address=0X12B7D68, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Race Score [16-Bit BE]" },
+        { address=0X12B7D6A, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Race COM2 Score [16-Bit BE]" },
+        { address=0X12B7D6C, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Race COM3 Score [16-Bit BE]" },
+        { address=0X12B7D6E, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Race COM4 Score [16-Bit BE]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1EED97, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Monkey Race Selection" },
+      },
+    },
+  },
+}

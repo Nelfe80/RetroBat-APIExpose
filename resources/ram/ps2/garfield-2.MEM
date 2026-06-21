@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Garfield 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "garfield-2",
+    file = "garfield-2.zip",
+    hashes = {
+      { hash = "6f26c6bd1b6c79108cfeaf369848c001", label = "Garfield 2 (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Spider-Man 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "spider-man-2",
+    file = "spider-man-2.zip",
+    hashes = {
+      { hash = "7914ea9bed5d6936cec9b1c240247bda", label = "Spider-Man 2 (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8F28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spider's Collected in 3D Hub Worlds" },
+        { address=0X14544, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag/Skills Menu" },
+        { address=0X14594, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 16 (Puma's Base) Alarm Text 'You've Been Detected'" },
+        { address=0X14598, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 16 (Puma's Base) - Alarm" },
+        { address=0X145A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number Of Enemies Defeated On Current Level" },
+        { address=0X145C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pictures Taken On Current Level" },
+        { address=0X14664, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of pizzas left on level 1" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9F04, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X9F04, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X9F20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spider-Man Health decreased" },
+        { address=0X9F20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spider-Man Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X16B70, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health(Shared)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1464C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Level 11 Number Of Bombs Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4540, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level 18 (Doc Ock Chase) Timer" },
+        { address=0X9E80, type="u24le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XA1DC, type="u24le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Mission Objective in Pause Menu" },
+        { address=0XD410, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level 11 (Construction Site) Timer" },
+        { address=0X14550, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level 1 On Screen Timer Miliseconds" },
+        { address=0X14551, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level 1 On Screen Timer (Minutes/Fives)" },
+        { address=0X14644, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level 8 (Times Square) Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Up N Down",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "up-n-down",
+    file = "up-n-down.zip",
+    hashes = {
+      { hash = "90e261510765deecaeac8283aa88d815", label = "Up 'n Down (USA).col" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X014A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Difficulty Level" },
+        { address=0X014C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Round Sec" },
+        { address=0X0280, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Round (display)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X014B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Life Counter P1 increased" },
+        { address=0X014B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Life Counter P1 decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0140, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24 Bit] Score P1 BCD" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X014D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Current Round Min timer" },
+      },
+    },
+  },
+}

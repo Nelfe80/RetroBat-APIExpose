@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Door Door",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "door-door",
+    file = "door-door.zip",
+    hashes = {
+      { hash = "21d67a1e6ce5d2ca3244e2d07ffc04b9", label = "Door Door {V1 mode}.cmt" },
+      { hash = "2d6208af8fb0f9f1e00e9769dbf95a71", label = "Door Door {V1 mode}.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X600D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Acts as a demo flag, but only on the disk version, so ignore" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4110, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X405A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (stays at 1 after the last death) increased" },
+        { address=0X405A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (stays at 1 after the last death) decreased" },
+        { address=0X52E3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="In menu AFTER DEATH: 0x0a, game start: 5" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4174, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (16-bit, hundreds)" },
+      },
+      collectibles = {
+        { address=0X52DF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0x00: demo; 0x20: in game or on fresh load (refreshes when entering game/demo) increased" },
+      },
+    },
+  },
+}

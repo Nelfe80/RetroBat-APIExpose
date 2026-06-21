@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Zoop",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "zoop",
+    file = "zoop.zip",
+    hashes = {
+      { hash = "0b7a524e5470eca3ed29b75e427a7cf4", label = "Zoop (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2D22, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Being cleared" },
+        { address=0X37C5, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of shapes left to clear" },
+        { address=0X4059, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X37C7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage + 1" },
+        { address=0X407D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting Stage + 1" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2F04, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="//Array of 16 byte arrays tracking blocks behavior, including the color of each block, their sta" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X37C1, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score multiplied by 100" },
+      },
+    },
+  },
+}

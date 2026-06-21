@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "J.J. Squawkers",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "j-j-squawkers",
+    file = "j-j-squawkers.zip",
+    hashes = {
+      { hash = "33ea0b2a54cc395a47bad9e05dbc0976", label = "jjsquawk.7z <J. J. Squawkers>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0042, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X55CA, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Story scene during Attract Mode, Final scene during credits" },
+        { address=0X55CA, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Normal title screen, Stage 1" },
+        { address=0X55CA, type="u8", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Awesome title screen, Ending" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X55CA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X14B1, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X561C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives increased" },
+        { address=0X561C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives decreased" },
+        { address=0X561D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X561D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+      },
+      health = {
+        { address=0X5724, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health decreased" },
+        { address=0X5724, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health increased" },
+        { address=0X5725, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X5725, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X152C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P2 Weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5614, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score * 65536" },
+        { address=0X5616, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score * 1" },
+        { address=0X5618, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score * 65536" },
+        { address=0X561A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score * 1" },
+        { address=0X561E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score * 65536" },
+        { address=0X5620, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score * 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X14B1, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="P1 State" },
+        { address=0X14BE, type="u16le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="P1 'Disappear' (Shell Invincibility) Timer" },
+        { address=0X153E, type="u16le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="P2 'Disappear' (Shell Invincibility) Timer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X14B8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Weapon Timer" },
+        { address=0X1538, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 Weapon Timer" },
+      },
+    },
+  },
+}

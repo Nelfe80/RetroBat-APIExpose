@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Alien Hominid",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "alien-hominid",
+    file = "alien-hominid.zip",
+    hashes = {
+      { hash = "183ef83a4d51a22852cbd2c4a8ccb280", label = "Alien Hominid (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

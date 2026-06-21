@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Rayman 3",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "rayman-3",
+    file = "rayman-3.zip",
+    hashes = {
+      { hash = "14d8dddf41901b02db25a04ab587664b", label = "Rayman 3 (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X47F54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X47FF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last level exited" },
+        { address=0X47FF5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Latest Level completed" },
+      },
+      zone = {
+        { address=0X47F56, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Forgotten Forests" },
+        { address=0X47F56, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Haunted Dreams" },
+        { address=0X47F56, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Magmacosm" },
+        { address=0X47F56, type="u8", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pirate Hideout" },
+        { address=0X47F56, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X47FF6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Amount of Lives increased" },
+        { address=0X47FF6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amount of Lives decreased" },
+      },
+      health = {
+        { address=0X3BC2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman HP - Den of Rocky decreased" },
+        { address=0X3BC2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman HP - Den of Rocky increased" },
+        { address=0X3BCA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman Hp - Scalemans Keep decreased" },
+        { address=0X3BCA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman Hp - Scalemans Keep increased" },
+        { address=0X3BDA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman HP - Magma Mayhem decreased" },
+        { address=0X3BDA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman HP - Magma Mayhem increased" },
+        { address=0X3BE6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman Hp - Heart of the Ancients decreased" },
+        { address=0X3BE6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman Hp - Heart of the Ancients increased" },
+        { address=0X3BF6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman HP - Garish Gears decreased" },
+        { address=0X3BF6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman HP - Garish Gears increased" },
+        { address=0X3C42, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman HP - Jano's Nest decreased" },
+        { address=0X3C42, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman HP - Jano's Nest increased" },
+        { address=0X3C4E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman HP - Magma Mayhem 2 decreased" },
+        { address=0X3C4E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman HP - Magma Mayhem 2 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X429C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Rocky's Den - Hits on Boss" },
+        { address=0X437C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Scaleman's Keep - Hits on Boss" },
+        { address=0X47C0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Heart of the Ancients (Part 1) - Hits on Boss" },
+        { address=0X47EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Garish Gears - Hits on Boss" },
+        { address=0X483C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Heart of the Ancients (Part 2) - Hits on Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X47FED, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Unbroken Cages" },
+        { address=0X47FEE, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Unbroken Cages" },
+        { address=0X47FEF, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Unbroken Cages" },
+        { address=0X47FF0, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Unbroken Cages" },
+        { address=0X47FF1, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Unbroken Cages" },
+        { address=0X47FF2, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Unbroken Cages" },
+        { address=0X47FF3, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Unbroken Cages" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X572C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Magma Mayhem - Time in stage" },
+      },
+    },
+  },
+}

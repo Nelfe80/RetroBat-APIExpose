@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Monopoly",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "monopoly",
+    file = "monopoly.zip",
+    hashes = {
+      { hash = "c9b52f5fbd52c36076506c33ebf526cd", label = "Monopoly (USA).sfc" },
+      { hash = "f478e1eddc87352ed35205d6cfe017ce", label = "Monopoly (USA) (Rev 1).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0827, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title options menu initial selection =0d" },
+        { address=0X0A14, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo =01" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X08C2, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 Money 16bit increased" },
+        { address=0X08C4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 2 Money 16bit increased" },
+        { address=0X08C6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P3 Money increased" },
+        { address=0X08C8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P4 Money increased" },
+        { address=0X08CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P5 Money increased" },
+        { address=0X08CC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P6 Money increased" },
+        { address=0X08CE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P7 Money increased" },
+        { address=0X08D0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P8 Money increased" },
+        { address=0X0955, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player get money increased" },
+        { address=0X0982, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Winner money at the end increased" },
+      },
+    },
+  },
+}

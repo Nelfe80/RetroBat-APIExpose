@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Road Rash: Jailbreak",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Racing"
+  },
+
+  rom = {
+    name = "road-rash-jailbreak",
+    file = "road-rash-jailbreak.zip",
+    hashes = {
+      { hash = "dbdd64df89083681f6b985a5cc3d72d6", label = "Road Rash - Jailbreak (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XD4A78, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XD4A78, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XD4A7C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bike health decreased" },
+        { address=0XD4A7C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bike health increased" },
+        { address=0XD4A84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health for player in side car of bike 1 decreased" },
+        { address=0XD4A84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health for player in side car of bike 1 increased" },
+        { address=0XD4AD0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health P2 decreased" },
+        { address=0XD4AD0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health P2 increased" },
+        { address=0XD4AD4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bike 2 health decreased" },
+        { address=0XD4AD4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bike 2 health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XD4A74, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+        { address=0XD5786, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+        { address=0XD81E4, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Chain (0 - no, 1 - yes)," },
+        { address=0XD81E4, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bat (0 - no, 1 - yes)," },
+        { address=0XD81E4, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Billy Club (0 - no, 1 - yes)," },
+        { address=0XD81E4, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Stick (0 - no, 1 - yes)," },
+        { address=0XD81E4, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nun-Chuck (0 - no, 1 - yes)," },
+        { address=0XD81E4, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Crowbar (0 - no, 1 - yes)," },
+        { address=0XD81E4, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cattle Prod (0 - no, 1 - yes)," },
+        { address=0XD81E4, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Taser (0 - no, 1 - yes)," },
+        { address=0XD81E5, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spray (0 - no, 1 - yes)" },
+        { address=0XD81E8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Superweapon charges:" },
+        { address=0XD81E9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Superweapon charges:" },
+        { address=0XD81EA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Superweapon charges:" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD9C40, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Checkpoint 1 time" },
+      },
+    },
+  },
+}

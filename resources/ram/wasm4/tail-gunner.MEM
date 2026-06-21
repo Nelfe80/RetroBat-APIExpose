@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Tail Gunner",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tail-gunner",
+    file = "tail-gunner.zip",
+    hashes = {
+      { hash = "fae4b6a3540ea3c992f8be54190f659c", label = "Tail Gunner (World) (Dial0).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X50CC, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game State (0 = Title, 1 = Game, 2 = Dead)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4890, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 1 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X48A8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 2 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X48C0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 3 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X48D8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 4 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X48F0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 5 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X4908, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 6 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X4920, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 7 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X4938, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 8 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X4950, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 9 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X4968, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 10 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X4980, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 11 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X4998, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 12 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X49B0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 13 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X49C8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 14 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X49E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 15 Alive (0.0 = Dead, 1.0 = Alive)" },
+        { address=0X49F8, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Float] Enemy 16 Alive (0.0 = Dead, 1.0 = Alive)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X50B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X50B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Sword Master",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "sword-master",
+    file = "sword-master.zip",
+    hashes = {
+      { hash = "acbd5bc743b5220cde52060a89f17e49", label = "Sword Master (Europe).nes" },
+      { hash = "c4e63defa2fddadf54e1f3ae82f07faf", label = "Sword Master (Japan).nes" },
+      { hash = "d1a2eb1c5f6cb93773360474b4492d75", label = "Sword Master (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06D4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="HP MAX / Level Exp" },
+        { address=0X06D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL" },
+      },
+      stage = {
+        { address=0X06A3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0112, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="f0=boss death" },
+      },
+      health = {
+        { address=0X042F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X042F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+        { address=0X054F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X054F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+      },
+    },
+  },
+}

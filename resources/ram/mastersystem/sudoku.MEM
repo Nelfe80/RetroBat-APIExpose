@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Sudoku (Tectoy)",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sudoku",
+    file = "sudoku.zip",
+    hashes = {
+      { hash = "1ef2a7240551c4666b47a72e4fc6c473", label = "Sudoku (Brazil) (Mega Drive 4).sms" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X033B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This tells what level you are playing" },
+      },
+    },
+  },
+}

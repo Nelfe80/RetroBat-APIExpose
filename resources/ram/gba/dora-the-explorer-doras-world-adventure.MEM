@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Dora the Explorer: Dora's World Adventure",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "dora-the-explorer-doras-world-adventure",
+    file = "dora-the-explorer-doras-world-adventure.zip",
+    hashes = {
+      { hash = "81df4456e398f87e893c522810cc8cda", label = "Dora the Explorer - Dora's World Adventure! (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3428, type="u16le", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2EC8, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X2EC8, type="u16le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X2EC8, type="u16le", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X2EC8, type="u16le", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Goofy's Hysterical History Tour",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "goofys-hysterical-history-tour",
+    file = "goofys-hysterical-history-tour.zip",
+    hashes = {
+      { hash = "426471b87024c7b1e688fa8474390624", label = "Goofy's Hysterical History Tour (USA).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0018, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level id" },
+      },
+    },
+  },
+}

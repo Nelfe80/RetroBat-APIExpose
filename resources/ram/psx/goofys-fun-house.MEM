@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Goofy's Fun House",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure, Sports"
+  },
+
+  rom = {
+    name = "goofys-fun-house",
+    file = "goofys-fun-house.zip",
+    hashes = {
+      { hash = "44aa4cd1760699c931772f7cc1010ce4", label = "Disney's Goofy's Fun House (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9BC90, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Playing mole level 16-bit" },
+        { address=0XA39DC, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Win" },
+        { address=0XA39DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ski mini-game: Win Level 8-bit" },
+        { address=0X1EB78C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finish Level Car 8-bit" },
+        { address=0X1ECB18, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground - golf mini-game 8-bit" },
+        { address=0X1ECB38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background golf min-game 8-bit" },
+        { address=0X1F27CC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ski mini-game: playing level 16-bit" },
+        { address=0X1F8587, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="touch yellow car on ground" },
+        { address=0X1F85A7, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="touch red car on ground" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9E410, type="u8", condition="eq", value=0X3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Birdie" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1F71B0, type="u8", condition="eq", value=0X1, action="JUMPING", no_log=true, no_survey=false, desc="jump on skate" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9DCB8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object fish when fishing 8-bit" },
+        { address=0X1F3FE0, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Above sofa" },
+        { address=0X1F67A4, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="switch on" },
+        { address=0X1F67A4, type="u8", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="switch off" },
+        { address=0X1F7354, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Harry Door - Opened" },
+        { address=0X1F7354, type="u8", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Harry Door - Closed" },
+        { address=0X1F8614, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="switch on" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1EB784, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer when Finish Car level 16-bit" },
+        { address=0X1F5C1B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Map: TV Room 8-bit" },
+        { address=0X1F8BC0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Map: Goofy's Room 8-bit" },
+      },
+    },
+  },
+}

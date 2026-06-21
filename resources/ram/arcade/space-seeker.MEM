@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "spaceskr",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "space-seeker",
+    file = "space-seeker.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X81F1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC461, type="u64be", condition="change", action="SCORE_STATE", min=50, max=100, no_log=false, no_survey=false, desc="Score delta 50-100: Score delta 50-100" },
+        { address=0XC461, type="u64be", condition="change", action="SCORE_STATE", color="orange", min=100, max=300, no_log=false, no_survey=false, desc="Score delta 100-300: Score delta 100-300" },
+        { address=0XC461, type="u64be", condition="change", action="SCORE_STATE", color="cyan", min=310, max=500, no_log=false, no_survey=false, desc="Score delta 310-500: Score delta 310-500" },
+        { address=0XC461, type="u64be", condition="change", action="SCORE_STATE", color="green", min=510, max=1000, no_log=false, no_survey=false, desc="Score delta 510-1000: Score delta 510-1000" },
+        { address=0XC461, type="u64be", condition="change", action="SCORE_STATE", color="blue", min=1100, max=10000, no_log=false, no_survey=false, desc="Score delta 1100-10000: Score delta 1100-10000" },
+      },
+    },
+  },
+}

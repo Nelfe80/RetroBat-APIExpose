@@ -1,0 +1,114 @@
+return {
+  game = {
+    title = "Ghost in the Shell",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "ghost-in-the-shell",
+    file = "ghost-in-the-shell.zip",
+    hashes = {
+      { hash = "6e8c702a44def62bc1d0ea35f04dc731", label = "Ghost in the Shell (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X125DBC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] pause menu text" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X14020, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8Bit] Level ID" },
+        { address=0X140B8, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missions cleared/unlocked [16bit]" },
+        { address=0X140D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level? [mirror]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X117CD0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8Bit] Training energy decreased" },
+        { address=0X117CD0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8Bit] Training energy increased" },
+        { address=0X11F390, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8Bit] Mission 2 health decreased" },
+        { address=0X11F390, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8Bit] Mission 2 health increased" },
+        { address=0X11FD4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8Bit] Mission 5 health decreased" },
+        { address=0X11FD4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8Bit] Mission 5 health increased" },
+        { address=0X120258, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8Bit] Mission 1 health decreased" },
+        { address=0X120258, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8Bit] Mission 1 health increased" },
+        { address=0X1204A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Mission 8 Health decreased" },
+        { address=0X1204A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Mission 8 Health increased" },
+        { address=0X120C30, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8Bit] Mission 3 health decreased" },
+        { address=0X120C30, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8Bit] Mission 3 health increased" },
+        { address=0X1227A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] mission 4 health decreased" },
+        { address=0X1227A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] mission 4 health increased" },
+        { address=0X122F84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Mission 11 health decreased" },
+        { address=0X122F84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Mission 11 health increased" },
+        { address=0X1249D4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Mission 9 Health decreased" },
+        { address=0X1249D4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Mission 9 Health increased" },
+        { address=0X125084, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Mission 10 health decreased" },
+        { address=0X125084, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Mission 10 health increased" },
+        { address=0X125D04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8Bit] Mission 7 health decreased" },
+        { address=0X125D04, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8Bit] Mission 7 health increased" },
+        { address=0X1276E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8Bit] Mission 6 energy decreased" },
+        { address=0X1276E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8Bit] Mission 6 energy increased" },
+        { address=0X12BD50, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Mission 12 health decreased" },
+        { address=0X12BD50, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Mission 12 health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1402C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 1 Score - Mission Mode" },
+        { address=0X14038, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 2 Score - Mission Mode" },
+        { address=0X14044, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 3 Score - Mission Mode" },
+        { address=0X14050, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 4 Score - Mission Mode" },
+        { address=0X1405C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 5 Score - Mission Mode" },
+        { address=0X14068, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 1 Score - Training Mode" },
+        { address=0X14074, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 2 Score - Training Mode" },
+        { address=0X14080, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 3 Score - Training Mode" },
+        { address=0X1408C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 4 Score - Training Mode" },
+        { address=0X14098, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] Rank 5 Score - Training Mode" },
+        { address=0X117CCC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32Bit] Training Mode current score" },
+        { address=0X120254, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32Bit] Mission 1 score" },
+        { address=0X12BD4C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32Bit] Mission 12 current score" },
+      },
+      collectibles = {
+        { address=0X140C4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 4 appears to flip when clearing first mission increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X12309C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16Bit] Mission 11 boss hp" },
+        { address=0X12467C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Mission 9 targets left for boss" },
+        { address=0X12519C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16bit] Mission 10 boss health" },
+        { address=0X1277FC, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16Bit] Boss HP mission 6" },
+        { address=0X12BE68, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16bit] final boss phase 2 health" },
+        { address=0X1544E7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8Bit] Boss HP Stage 2" },
+        { address=0X1550BE, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16bit] Mision 8 Boss HP" },
+        { address=0X1561DA, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16Bit] Boss Health Stage 1(?)" },
+        { address=0X1561DB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8Bit] Boss Health Stage 1(?)" },
+        { address=0X15829F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8Bit] Boss HP mission 5" },
+        { address=0X15E90B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8Bit] Mission 4 Boss HP" },
+        { address=0X1612B7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Mission 7 Boss HP" },
+        { address=0X161C53, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8Bit] Boss HP level 3" },
+        { address=0X166E13, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8Bit] Final Boss Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X14030, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-Bits] Rank 1 Destroyed - Mission Mode" },
+        { address=0X1403C, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-Bits] Rank 2 Destroyed - Mission Mode" },
+        { address=0X14048, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-Bits] Rank 3 Destroyed - Mission Mode" },
+        { address=0X14054, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-Bits] Rank 4 Destroyed - Mission Mode" },
+        { address=0X14060, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-Bits] Rank 5 Destroyed - Mission Mode" },
+        { address=0X117CD8, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8bit] training targets destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1400C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="potential death counter" },
+      },
+    },
+  },
+}

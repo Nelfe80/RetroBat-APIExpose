@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Shattered Lands: Towers of Perdition",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shattered-lands-towers-of-perdition",
+    file = "shattered-lands-towers-of-perdition.zip",
+    hashes = {
+      { hash = "f3c23d302106643bc61836c01366d392", label = "Shattered Lands - Towers of Perdition (World) (v1.4).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0114, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X012B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cure Spell Level" },
+        { address=0X012C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Nuke Spell Level" },
+        { address=0X012D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire Spell Level" },
+        { address=0X012E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aqua Spell Level" },
+        { address=0X012F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rock Spell Level" },
+        { address=0X0130, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aero Spell Level" },
+        { address=0X0131, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dark Spell Level" },
+        { address=0X0132, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Holy Spell Level" },
+        { address=0X0134, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b0,1 - Sword Level," },
+        { address=0X032C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 2) Fire Spell Level" },
+        { address=0X032D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 2) Aqua Spell Level" },
+        { address=0X032E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 2) Rock Spell Level" },
+        { address=0X032F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 2) Aero Spell Level" },
+        { address=0X034B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 3) Fire Spell Level" },
+        { address=0X034C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 3) Aqua Spell Level" },
+        { address=0X034D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 3) Rock Spell Level" },
+        { address=0X034E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 3) Aero Spell Level" },
+        { address=0X036A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 4) Fire Spell Level" },
+        { address=0X036B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 4) Aqua Spell Level" },
+        { address=0X036C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 4) Rock Spell Level" },
+        { address=0X036D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 4) Aero Spell Level" },
+        { address=0X0389, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 5) Fire Spell Level" },
+        { address=0X038A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 5) Aqua Spell Level" },
+        { address=0X038B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 5) Rock Spell Level" },
+        { address=0X038C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 1) Aero Spell Level" },
+        { address=0X03A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 6) Fire Spell Level" },
+        { address=0X03A9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 6) Aqua Spell Level" },
+        { address=0X03AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 6) Rock Spell Level" },
+        { address=0X03AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (Slot 6) Aero Spell Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0111, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X0111, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X02F9, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 1) HP decreased" },
+        { address=0X02F9, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 1) HP increased" },
+        { address=0X02FB, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 1) Max HP decreased" },
+        { address=0X02FB, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 1) Max HP increased" },
+        { address=0X0318, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 2) HP decreased" },
+        { address=0X0318, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 2) HP increased" },
+        { address=0X031A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 2) Max HP decreased" },
+        { address=0X031A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 2) Max HP increased" },
+        { address=0X0337, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 3) HP decreased" },
+        { address=0X0337, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 3) HP increased" },
+        { address=0X0339, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 3) Max HP decreased" },
+        { address=0X0339, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 3) Max HP increased" },
+        { address=0X0356, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 4) HP decreased" },
+        { address=0X0356, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 4) HP increased" },
+        { address=0X0358, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 4) Max HP decreased" },
+        { address=0X0358, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 4) Max HP increased" },
+        { address=0X0375, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 5) HP decreased" },
+        { address=0X0375, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 5) HP increased" },
+        { address=0X0377, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 5) Max HP decreased" },
+        { address=0X0377, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 5) Max HP increased" },
+        { address=0X0394, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 6) HP decreased" },
+        { address=0X0394, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 6) HP increased" },
+        { address=0X0396, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster (Slot 6) Max HP decreased" },
+        { address=0X0396, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster (Slot 6) Max HP increased" },
+        { address=0X03B3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP (In Battle) decreased" },
+        { address=0X03B3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP (In Battle) increased" },
+        { address=0X03B5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP (In Battle) decreased" },
+        { address=0X03B5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP (In Battle) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X011B, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0133, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="b0 - Tower 2 Boss Fought," },
+      },
+    },
+  },
+}

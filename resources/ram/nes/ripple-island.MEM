@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Ripple Island",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "ripple-island",
+    file = "ripple-island.zip",
+    hashes = {
+      { hash = "868070b46a63bce8722cd475e68b1fd0", label = "Ripple Island (Japan) (En) (v1.0) (Supper).nes" },
+      { hash = "f7464b2be4b9e49f425279bed15f2345", label = "Ripple Island (Japan).nes" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X0082, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Hidden Treasure" },
+        { address=0X009C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Hidden Treasure Check" },
+      },
+    },
+  },
+}

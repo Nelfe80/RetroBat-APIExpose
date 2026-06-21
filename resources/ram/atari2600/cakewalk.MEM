@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Cakewalk",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "cakewalk",
+    file = "cakewalk.zip",
+    hashes = {
+      { hash = "7f6533386644c7d6358f871666c86e79", label = "Cakewalk (USA).a26" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X003C, type="u8", condition="eq", value=0X6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finish X Level" },
+        { address=0X003C, type="u8", condition="eq", value=0X4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete X Level" },
+      },
+    },
+  },
+}

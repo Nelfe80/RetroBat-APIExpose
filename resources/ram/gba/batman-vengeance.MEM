@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Batman: Vengeance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Beat 'em Up, Platform"
+  },
+
+  rom = {
+    name = "batman-vengeance",
+    file = "batman-vengeance.zip",
+    hashes = {
+      { hash = "06a6d7cd07281747cfe0300700a960fd", label = "Batman - Vengeance (USA) (En,Fr,Es).gba" },
+      { hash = "fffe680eff483b4d4366964eb7a150d8", label = "Batman - Vengeance (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0024, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health potions (0x00 to 0x09) decreased" },
+        { address=0X0024, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health potions (0x00 to 0x09) increased" },
+        { address=0X0028, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health bar (not editable) decreased" },
+        { address=0X0028, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health bar (not editable) increased" },
+      },
+    },
+  },
+}

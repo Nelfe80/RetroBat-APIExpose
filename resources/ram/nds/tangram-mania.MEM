@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Tangram Mania",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tangram-mania",
+    file = "tangram-mania.zip",
+    hashes = {
+      { hash = "1ba35c9d6b49123b42ae9a89e22c7c99", label = "Tangram Mania (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3FEA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal Game Current Level" },
+        { address=0X3FEAC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Normal Puzzle Sublevel (0x00 until you solve a puzzle)" },
+        { address=0X17CE7C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Sub-Level -1" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3FEB0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Attack Current Level" },
+        { address=0X3FEB4, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current Time Attack Sublevel (0x00 until you solve a puzzle)" },
+        { address=0X17CE94, type="u32le", condition="eq", value=0X2A30, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Start" },
+        { address=0X17CE94, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Time Attack Time Left" },
+        { address=0X17CE98, type="u32le", condition="eq", value=0X04B0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Girl Sad" },
+        { address=0X17CE98, type="u32le", condition="eq", value=0X0E10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Girl Mad" },
+        { address=0X17CE98, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit AFK Timer" },
+      },
+    },
+  },
+}

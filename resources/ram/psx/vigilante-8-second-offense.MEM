@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Vigilante 8: Second Offense",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "vigilante-8-second-offense",
+    file = "vigilante-8-second-offense.zip",
+    hashes = {
+      { hash = "2738837cd104f949168f7e13c7c76fd1", label = "Vigilante 8 - 2nd Offense (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6A56D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="<8-bit> demo =1" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6B418, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="<8-bit> level 0=arizona meteor 1=utah winter games 2=louisiana bayou 3=florida launch site 4=pen" },
+        { address=0X6B460, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="<8-bit> 1=completed all objectiveson current level" },
+        { address=0X6B9E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<8-bit> shiela quest (bits per level)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X6B470, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="<8-bit> damage setting" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6B9FC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<bits> flying all star trio quest FF=all objectives met" },
+        { address=0X860A7, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="---related to objectives" },
+        { address=0XC5D00, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="---50 = player destroyed" },
+      },
+    },
+  },
+}

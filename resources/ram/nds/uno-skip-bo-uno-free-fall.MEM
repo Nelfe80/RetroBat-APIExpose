@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Uno + Skip-Bo + Uno Free Fall",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Strategy, party, cards, Compilation"
+  },
+
+  rom = {
+    name = "uno-skip-bo-uno-free-fall",
+    file = "uno-skip-bo-uno-free-fall.zip",
+    hashes = {
+      { hash = "b601afb75dd1afcb68d90062d2e283d6", label = "3 Game Pack! - Uno & Skip-Bo & Uno Free Fall (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X140ABC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Profile - UNO - Rounds Won [16bit]" },
+        { address=0X140ABE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Profile - UNO - Rounds Played [16bit]" },
+        { address=0X140AC8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Profile - SKIP-BO - Rounds Won [16bit]" },
+        { address=0X140ACA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Profile - SKIP-BO - Rounds Played [16bit]" },
+      },
+    },
+  },
+}

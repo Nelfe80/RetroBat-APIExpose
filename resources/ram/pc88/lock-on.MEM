@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Lock On",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lock-on",
+    file = "lock-on.zip",
+    hashes = {
+      { hash = "eb90117ac001a9518e79a8df2d903e5e", label = "Lock On.d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA4B3, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level [MBF32 LE]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA4D3, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money [MBF32 LE] increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "I Kill Zombies",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "i-kill-zombies",
+    file = "i-kill-zombies.zip",
+    hashes = {
+      { hash = "64ad2ef0971ebcd3d2d4dc5dfac360dd", label = "I Kill Zombies (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

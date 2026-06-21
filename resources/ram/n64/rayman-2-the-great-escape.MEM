@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Rayman 2: The Great Escape",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "rayman-2-the-great-escape",
+    file = "rayman-2-the-great-escape.zip",
+    hashes = {
+      { hash = "5dbbfd5ace8222fa8fe51be113453c13", label = "Rayman 2 - The Great Escape (Europe) (En,Fr,De,Es,It).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE6911, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X231270, type="u8", condition="eq", value=0X74, action="PAUSE_ON", no_log=false, no_survey=false, desc="Gameplay" },
+        { address=0X231270, type="u8", condition="eq", value=0X68, action="PAUSE_ON", no_log=false, no_survey=false, desc="Cutscene" },
+        { address=0X231270, type="u8", condition="eq", value=0XBC, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X2249F8, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Cage on the Top of the World" },
+        { address=0X2249F8, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Cage on the Top of the World" },
+      },
+      stage = {
+        { address=0X74C873, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Show Timer (Globox won)" },
+        { address=0X74CF02, type="u16be", condition="eq", value=0XC262, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting Point" },
+        { address=0X74CF02, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Globox Son X Axis (Bonus Stage) 16bits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X21A288, type="u16be", condition="eq", value=0X4428, action="LIVES_STATE", no_log=false, no_survey=false, desc="Elixir of Life" },
+        { address=0X224A13, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="Elixir of Life" },
+      },
+      health = {
+        { address=0XEF5C7, type="u8", condition="eq", value=0X42, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Appeared" },
+        { address=0XEF5C7, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Rayman Health Bar" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5F01BF, type="u8", condition="eq", value=0X01, action="AMMO_STATE", no_log=true, no_survey=false, desc="Unlocked" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X780970, type="u8", condition="eq", value=0X38, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X780970, type="u8", condition="eq", value=0X18, action="JUMPING", no_log=false, no_survey=false, desc="Falling from a Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2249F1, type="u8", condition="bit_true", bit=1, mask=0X02, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Cage containing a Super Yellow Lum in the Fairy Glade underwater" },
+        { address=0X2249F1, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Cage in the Fairy Glade" },
+        { address=0X2249F1, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Cage in the Fairy Glade" },
+        { address=0X2249F1, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Cage in the Fairy Glade" },
+        { address=0X2249F1, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Cage containing a Super Yellow Lum in the Fairy Glade in Area 3 behind a blockade" },
+        { address=0X2249F1, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Cage containing 3 Yellow Lums in the Fairy Glade in Area 5, guarded by a sleeping pirate" },
+        { address=0X2249F1, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Final cage in the Fairy Glade" },
+        { address=0X2249FF, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Canopy, Globox switch (?)" },
+        { address=0X77AB93, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch pressed" },
+        { address=0X77B44B, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch pressed" },
+        { address=0X780970, type="u8", condition="eq", value=0XB8, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Static" },
+      },
+    },
+  },
+}

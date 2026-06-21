@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Metroid Fusion [Subset - Japanese Content]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "metroid-fusion-subset-japanese-content",
+    file = "metroid-fusion-subset-japanese-content.zip",
+    hashes = {
+      { hash = "e535a6ec2eb86d183453037289527a63", label = "Metroid Fusion (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

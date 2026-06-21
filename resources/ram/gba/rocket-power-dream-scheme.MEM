@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Rocket Power: Dream Scheme",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "rocket-power-dream-scheme",
+    file = "rocket-power-dream-scheme.zip",
+    hashes = {
+      { hash = "b14194832a55a7197916edb0bb92bea3", label = "Rocket Power - Dream Scheme (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X12E70, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Star Goal" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X12F58, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] - HP decreased" },
+        { address=0X12F58, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] - HP increased" },
+        { address=0X16110, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Lars Rodriguez HP - Mad Town Skate Park decreased" },
+        { address=0X16110, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Lars Rodriguez HP - Mad Town Skate Park increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X164FE, type="u16le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[16bit] - Invincibility Frames" },
+      },
+    },
+  },
+}

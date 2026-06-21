@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "fixeight",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "fixeight",
+    file = "fixeight.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X100671, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+        { address=0X102691, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: have shield" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1006AB, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: fire power" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1003FC, type="u32be", condition="change", action="SCORE_STATE", min=1, max=50, no_log=false, no_survey=false, desc="Score delta 1-50: Score delta 1-50" },
+        { address=0X1003FC, type="u32be", condition="change", action="SCORE_STATE", min=51, max=100, no_log=false, no_survey=false, desc="Score delta 51-100: Score delta 51-100" },
+        { address=0X1003FC, type="u32be", condition="change", action="SCORE_STATE", min=101, max=500, no_log=false, no_survey=false, desc="Score delta 101-500: Score delta 101-500" },
+        { address=0X1003FC, type="u32be", condition="change", action="SCORE_STATE", min=600, max=2000, no_log=false, no_survey=false, desc="Score delta 600-2000: Score delta 600-2000" },
+        { address=0X1003FC, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=2000, max=10000, no_log=false, no_survey=false, desc="Score delta 2000-10000: Score delta 2000-10000" },
+      },
+      collectibles = {
+        { address=0X100327, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

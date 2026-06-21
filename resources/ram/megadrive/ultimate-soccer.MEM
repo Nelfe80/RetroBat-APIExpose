@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Ultimate Soccer",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "ultimate-soccer",
+    file = "ultimate-soccer.zip",
+    hashes = {
+      { hash = "3426fc8802e1a385dc227b9dde59cbe4", label = "Ultimate Soccer (Europe) (En,Fr,De,Es,It).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFFFF, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10EA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1P Goals" },
+        { address=0X10EC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="2P/CPU Goals" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "I Spy Spooky Mansion",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "i-spy-spooky-mansion",
+    file = "i-spy-spooky-mansion.zip",
+    hashes = {
+      { hash = "76a8e88c7bdff134f6bf55fd75aaaca9", label = "I Spy Spooky Mansion (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Moonmist",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "moonmist",
+    file = "moonmist.zip",
+    hashes = {
+      { hash = "26eff41a35e24a8303db7b84158b3566", label = "Moonmist (1986)(Infocom)[CPM].dsk" },
+    }
+  },
+
+  events = {
+  },
+}

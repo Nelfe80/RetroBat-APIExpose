@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Pyros",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "pyros",
+    file = "pyros.zip",
+    hashes = {
+      { hash = "0d624fd28ba472ad7b880ba06754bf7a", label = "wardner.7z <Wardner (World)>" },
+      { hash = "1d63b8b1830873f8b0966686e7cf86e7", label = "wardnerj.7z <Wardner no Mori (Japan)>" },
+      { hash = "cc5146af83f4c690307ba8ba9ba9dc10", label = "pyros.7z <Pyros (US)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X20FD, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of Credits in the machine" },
+      },
+    },
+  },
+}

@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "South Park Rally",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Fighting, Racing, Driving"
+  },
+
+  rom = {
+    name = "south-park-rally",
+    file = "south-park-rally.zip",
+    hashes = {
+      { hash = "1c494719032ff99382b167c43fb11762", label = "South Park Rally (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X86304, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="screen (2=logos,4=title song, 6=menus, 7=game)" },
+        { address=0X86C90, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="paused=1" },
+        { address=0X86C9C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="1=Demo" },
+        { address=0X8D65A, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits" },
+        { address=0XF1334, type="u32be", condition="eq", value=0X2805D402, action="PAUSE_ON", no_log=false, no_survey=false, desc="pause menu" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X88A25, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="HUD elements: 0=all, 1=racers hidden, 2=objective hidden, 3=all hidden" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X86370, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer [counts to 8]" },
+      },
+    },
+  },
+}

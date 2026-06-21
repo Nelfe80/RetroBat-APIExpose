@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Animal Crossing: Wild World",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Miscellaneous"
+  },
+
+  rom = {
+    name = "animal-crossing-wild-world",
+    file = "animal-crossing-wild-world.zip",
+    hashes = {
+      { hash = "19bfd960234b03f0113f7dc13cf7af10", label = "Animal Crossing - Wild World (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "1b5e5107fff8d1190222570cf10853a3", label = "Animal Crossing - Wild World (Europe) (En,Fr,De,Es,It) (Wii U Virtual Console).nds" },
+      { hash = "7a549f2183942e0ada15a2e61e6a4bcc", label = "Animal Crossing - Wild World (Europe) (Singleplayer Nookington's) (v1.1.1) (SporyTike).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1C773C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Type of Item dropped on Ground [16bit]" },
+        { address=0X1C7740, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Item ID dropped on Ground [16bit]" },
+        { address=0X1DC566, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Merry-Go-Round" },
+        { address=0X1DCC18, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 - Item ID of Inventory Background [16bit]" },
+      },
+      zone = {
+        { address=0X1CF970, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Character ID in World [32bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1DEE8F, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="(P2) [Bit 0] Damage insurance." },
+        { address=0X1E111B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="(P3) [Bit 0] Damage insurance." },
+        { address=0X1E33A7, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="(P4) [Bit 0] Damage insurance." },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1D2124, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Money shown in Pop-up [32bit] increased" },
+        { address=0X1DC544, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 - Money in Inventory [32bit] increased" },
+        { address=0X1DC564, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="--- Bit0 | Hammock" },
+        { address=0X1DC5B7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="--- Bit0 | Armor Suit increased" },
+        { address=0X1DCC03, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(P1) [Bit 0] Damage insurance. increased" },
+        { address=0X1DCC03, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="(P1) [Bit 0] Damage insurance. empty" },
+        { address=0X1DCC05, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bit 0] Gold Slingshot increased" },
+        { address=0X1DE7D0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(P2) Money increased" },
+        { address=0X1E0A5C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(P3) Money increased" },
+        { address=0X1E2CE8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(P4) Money increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1C6DE2, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Current Interaction Object [16bit]" },
+        { address=0X38ABC4, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Player animation/action while outdoors." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1DC558, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="--- Bit0 | Kiddie Bureau" },
+      },
+    },
+  },
+}

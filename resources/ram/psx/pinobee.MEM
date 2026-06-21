@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Pinobee",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "pinobee",
+    file = "pinobee.zip",
+    hashes = {
+      { hash = "1dd0d2360d7a5815084ccb869c5dd58e", label = "Pinobee (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC996C, type="u16le", condition="eq", value=0X0000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XC996C, type="u16le", condition="eq", value=0X2A8, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Diary/Option select(New game/Continue)" },
+        { address=0XD41CA, type="u8", condition="eq", value=0X0D, action="PAUSE_ON", no_log=false, no_survey=false, desc="Playing" },
+        { address=0XD41CA, type="u8", condition="eq", value=0X0E, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1E68A1, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E68CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level proggresion?" },
+      },
+      stage = {
+        { address=0X1E689A, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Select Stage" },
+        { address=0X1E68CA, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage select" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1E6E6C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Flower Energy decreased" },
+        { address=0X1E6E6C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Flower Energy increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1E9D8A, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1: Switch not pressed" },
+      },
+    },
+  },
+}

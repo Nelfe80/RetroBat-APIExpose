@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Alf: The First Adventure",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "alf-the-first-adventure",
+    file = "alf-the-first-adventure.zip",
+    hashes = {
+      { hash = "73f514f8d70eafa2097f5ac8659168c0", label = "Alf v3.2.woz" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (0-based)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00D7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Pound count (lives remaining) increased" },
+        { address=0X00D7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pound count (lives remaining) decreased" },
+      },
+    },
+  },
+}

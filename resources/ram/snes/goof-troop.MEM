@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Goof Troop",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "goof-troop",
+    file = "goof-troop.zip",
+    hashes = {
+      { hash = "29e2ee08c6b7c1a89a720d7291f76e58", label = "Goof Troop (France).sfc" },
+      { hash = "615470bfbf276e58d45c7139a6452afd", label = "Goof Troop (USA) (Pt).sfc" },
+      { hash = "66688d31555ecfeab50d810bbdc85d0b", label = "Goof Troop (Europe).sfc" },
+      { hash = "bb6a1198e291c8ae58e9581a4296ed4d", label = "Goof Troop (USA).sfc" },
+      { hash = "da639310670e49e75ca3c9610f14dfbd", label = "Goof Troop (USA) (Pt) (G-Monkey) (1.0).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00AB, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+        { address=0X00CC, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="mode (4=player select, 6=map, 8=in level, 10=password)" },
+      },
+      stage = {
+        { address=0X00B6, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1; 0x01 = 2; 0x02 = 3; 0x03 = 4; 0x04 = 5" },
+        { address=0X00B6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage:" },
+        { address=0X00B7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current room in stage" },
+        { address=0X1FF11, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Status" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0100, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death animation" },
+        { address=0X0157, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="vidas / lives player 1 increased" },
+        { address=0X0157, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="vidas / lives player 1 decreased" },
+        { address=0X01D7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives increased" },
+        { address=0X01D7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives decreased" },
+      },
+      health = {
+        { address=0X026C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Blue Skelleton HP / Green Centipede 0x28 to 0x00, 8 hits (crash if chng) decreased" },
+        { address=0X026C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Blue Skelleton HP / Green Centipede 0x28 to 0x00, 8 hits (crash if chng) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0142, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Empty; 0x02 = Hookshot; 0x04 = Candle; 0x06 = Silver Key; 0x08 = Gold Key; 0x0a = Shovel; 0x0c =" },
+        { address=0X0143, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Empty; 0x02 = Hookshot; 0x04 = Candle; 0x06 = Silver Key; 0x08 = Gold Key; 0x0a = Shovel; 0x0c =" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X00F8, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Start" },
+        { address=0X00F8, type="u8", condition="eq", value=0X07, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X021C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Second Boss HP 0x30 to 0x00" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1144, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Open bits (Stg1, Stg2, Stg4, Stg5)" },
+        { address=0X1145, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Bits (Stg3, Stg4, Stg5 Last Door)" },
+      },
+    },
+  },
+}

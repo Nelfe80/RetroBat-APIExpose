@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dangun Feveron",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "dangun-feveron",
+    file = "dangun-feveron.zip",
+    hashes = {
+      { hash = "3c253b5326dcad0dfc09a0bb60686108", label = "dfeveron.zip" },
+    }
+  },
+
+  events = {
+  },
+}

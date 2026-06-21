@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire Bomb</text>
+			<color>${lime}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Mega Beam</text>
+			<color>${red}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>Ion Shot</text>
+			<color>${lime}</color>
+		</text>
+		<text name="button4" extra="true">
+			<text>Laser Shot</text>
+			<color>${red}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Missile Shot</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Atomic Bomb</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire Bomb</text>
+			<color>${lime}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Mega Beam</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button3" extra="true">
+			<text>Ion Shot</text>
+			<color>${lime}</color>
+		</text>
+		<text name="p2button4" extra="true">
+			<text>Laser Shot</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button5" extra="true">
+			<text>Missile Shot</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Atomic Bomb</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 A74 102940</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 9YB 84520</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 ,.0 78380</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 T.T 1000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 T.T 900</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 T.T 800</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 T.T 700</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 T.T 600</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 T.T 500</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 T.T 400</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

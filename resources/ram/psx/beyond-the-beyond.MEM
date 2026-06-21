@@ -1,0 +1,127 @@
+return {
+  game = {
+    title = "Beyond the Beyond",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "beyond-the-beyond",
+    file = "beyond-the-beyond.zip",
+    hashes = {
+      { hash = "5b503401ec72f919ad4539f10195d2b6", label = "Beyond the Beyond (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10363D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Demon's Blade" },
+        { address=0X103648, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Demon's Axe" },
+        { address=0X10366B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Demon's Fist" },
+        { address=0X10369E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Demon's Leather" },
+        { address=0X1036B4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Demon's Gauntlet" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1149C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Finn - Level" },
+        { address=0X1149F2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Finn - Experience Needed to Next Level" },
+        { address=0X114A50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Annie - Level" },
+        { address=0X114A7A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Annie - Experience Needed to Next Level" },
+        { address=0X114AD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Percy - Level" },
+        { address=0X114B02, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Percy - Experience Needed to Next Level" },
+        { address=0X114B60, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Samson - Level" },
+        { address=0X114B8A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Samson - Experience Needed to Next Level" },
+        { address=0X114BE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Edward - Level" },
+        { address=0X114C12, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Edward - Experience Needed to Next Level" },
+        { address=0X114C70, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tont - Level" },
+        { address=0X114C9A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tont - Experience Needed to Next Level" },
+        { address=0X114CF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Domino - Level" },
+        { address=0X114D22, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Domino - Experience Needed to Next Level" },
+        { address=0X114D80, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lorele - Level" },
+        { address=0X114DAA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lorele - Experience Needed to Next Level" },
+      },
+      zone = {
+        { address=0X10360A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - World Map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1035BA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0X1035BA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflags] Treasure decreased" },
+        { address=0X1035C8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0X1035C8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflags] Treasure decreased" },
+        { address=0X103601, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Source of Life increased" },
+        { address=0X103601, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Source of Life decreased" },
+        { address=0X1036BC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Death Hood" },
+        { address=0X1036FE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Vase of Life increased" },
+        { address=0X1036FE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Vase of Life decreased" },
+      },
+      health = {
+        { address=0X114FAC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Enemy 1 decreased" },
+        { address=0X114FAC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Enemy 1 increased" },
+        { address=0X115034, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Enemy 2 decreased" },
+        { address=0X115034, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Enemy 2 increased" },
+        { address=0X1150BC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Enemy 3 decreased" },
+        { address=0X1150BC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Enemy 3 increased" },
+        { address=0X115144, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Enemy 4 decreased" },
+        { address=0X115144, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Enemy 4 increased" },
+        { address=0X1151CC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Enemy 5 decreased" },
+        { address=0X1151CC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Enemy 5 increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X10354A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X1035BC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X1035BD, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X1035BF, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X1035C0, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X1035C2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflag] Treasure" },
+        { address=0X1035C4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X1035C7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X1035C9, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X1035CA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+        { address=0X103700, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Magic Emerald" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF9B0C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold received from battle increased" },
+        { address=0X103597, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0X1035B8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0X1035BB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0X1035BE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0X1035CB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0X1035CC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0X1036D1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Tempest Ring increased" },
+        { address=0X1036D2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Ring of Defense increased" },
+        { address=0X1036D3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Ring of Power increased" },
+        { address=0X1036D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Ring of Revenge increased" },
+        { address=0X1036D5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Fire Ring increased" },
+        { address=0X1036D6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Ice Ring increased" },
+        { address=0X1036D7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Seraphic Ring increased" },
+        { address=0X1036D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Ring of Death increased" },
+        { address=0X1036D9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Helium Ring increased" },
+        { address=0X1036F6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Gold Key increased" },
+        { address=0X103884, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X103651, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Shield Rod" },
+        { address=0X1036A4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Light Shield" },
+        { address=0X1036A5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Wood Shield" },
+        { address=0X1036A6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Steel Shield" },
+        { address=0X1036A7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Spike Shield" },
+        { address=0X1036A8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Heavy Shield" },
+        { address=0X1036A9, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Battle Shield" },
+        { address=0X1036AA, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Mithril Shield" },
+        { address=0X1036AB, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Chaos Shield" },
+        { address=0X1036AC, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Storage Trunk Quantity - Mystic Shield" },
+      },
+    },
+  },
+}

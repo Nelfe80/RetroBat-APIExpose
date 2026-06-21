@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Puzzle de Harvest Moon",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-de-harvest-moon",
+    file = "puzzle-de-harvest-moon.zip",
+    hashes = {
+      { hash = "15b7c5d72a7805cd9b2d1a58e0442850", label = "Puzzle de Harvest Moon (USA).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X69F90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Survival - Total Score [32bit]" },
+        { address=0X6A0E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Normal - 4:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A0F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Normal - 6:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A110, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Normal - 8:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A160, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - 2 vs. 2 - 4:00 [48 Bytes; 16 Bytes each]" },
+        { address=0X6A190, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - 2 vs. 2 - 6:00 [48 Bytes; 16 Bytes each]" },
+        { address=0X6A1C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - 2 vs. 2 - 8:00 [48 Bytes; 16 Bytes each]" },
+        { address=0X6A260, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Quota - 4:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A278, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Quota - 6:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A290, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Quota - 8:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A2E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Survival - 4:00 [36 Bytes; 12 Bytes each]" },
+        { address=0X6A304, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Survival - 6:00 [36 Bytes; 12 Bytes each]" },
+        { address=0X6A328, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Survival - 8:00 [36 Bytes; 12 Bytes each]" },
+        { address=0X6A360, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Multiplayer - Normal - 4:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A378, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Normal - 6:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A390, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Singleplayer - Normal - 8:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A3E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Multiplayer - 2 vs. 2 - 4:00 [48 Bytes; 16 Bytes each]" },
+        { address=0X6A410, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Multiplayer - 2 vs. 2 - 6:00 [48 Bytes; 16 Bytes each]" },
+        { address=0X6A440, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Multiplayer - 2 vs. 2 - 8:00 [48 Bytes; 16 Bytes each]" },
+        { address=0X6A4E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Multiplayer - Quota - 4:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A4F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Multiplayer - Quota - 6:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6A510, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Multiplayer - Quota - 8:00 [24 Bytes; 8 Bytes each]" },
+        { address=0X6F73C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 - Score [32bit]" },
+        { address=0X6F744, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 - Score [32bit]" },
+        { address=0X6F74C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 3 - Score [32bit]" },
+        { address=0X6F754, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 4 - Score [32bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X69F7C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Match Settings - Time [32bit]" },
+        { address=0X6F970, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Time left [16bit]" },
+      },
+    },
+  },
+}

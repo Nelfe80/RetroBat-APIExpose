@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Garfield and his Nine Lives",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "garfield-and-his-nine-lives",
+    file = "garfield-and-his-nine-lives.zip",
+    hashes = {
+      { hash = "5969f2b6f8f15afedcdb695fd3554133", label = "Garfield and His Nine Lives (Europe) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "d8d8a330e5471faef5b527b18aa24ad2", label = "Garfield and His Nine Lives (USA) (En,Fr,Es).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7DAC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="OUTDATED level codenote" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9E50, type="u8", condition="eq", value=0X8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Obedience Class" },
+        { address=0X9E50, type="u8", condition="eq", value=0X9, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dr. Dupes and the Odie Clones" },
+        { address=0X103AC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X103AC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X3CEA2, type="u8", condition="eq", value=0X8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Obedience Class" },
+        { address=0X3CEA2, type="u8", condition="eq", value=0X9, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dr. Dupes and the Odie Clones" },
+      },
+      health = {
+        { address=0X8551, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X8551, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0XFF5C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fridge HP and Cat HP decreased" },
+        { address=0XFF5C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fridge HP and Cat HP increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9E50, type="u8", condition="eq", value=0X3, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss fight 1" },
+        { address=0X9E50, type="u8", condition="eq", value=0X7, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss fight 2" },
+        { address=0X9E50, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last Boss Fight" },
+        { address=0X34E81, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="dog boss health???" },
+        { address=0X3CEA2, type="u8", condition="eq", value=0X3, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss fight 1" },
+        { address=0X3CEA2, type="u8", condition="eq", value=0X7, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss fight 2" },
+        { address=0X3CEA2, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last Boss Fight" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFD70, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Smash Object" },
+      },
+    },
+  },
+}

@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Shantae",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "shantae",
+    file = "shantae.zip",
+    hashes = {
+      { hash = "028c4262dbb49f4fc462a6eb3e514d72", label = "Shantae (USA).gbc" },
+      { hash = "4a278dd6cf21a5e50c41c01e76ea1106", label = "Shantae (USA) (Ru).gbc" },
+      { hash = "6745241780ab88a7b035331a3ef1cedd", label = "Shantae (USA) (GBC Palettes) (v1.0) (Drenn).gbc" },
+      { hash = "f96e6e8748f92aef50eae527056aeecd", label = "Shantae (USA) (GBC Palettes) (v1.1) (Drenn).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC28B, type="u8", condition="eq", value=0X52, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0XC28B, type="u8", condition="eq", value=0X4A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC00C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy gecko level" },
+        { address=0XC00F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Parlor Dance goal to beat" },
+        { address=0XC28A, type="u8", condition="eq", value=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="fully loaded" },
+        { address=0XC28A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="00 = level loading" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCA75, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Exit Candies" },
+        { address=0XCA7F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0XCA7F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+      health = {
+        { address=0XCA80, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0XCA80, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+        { address=0XCA82, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max health decreased" },
+        { address=0XCA82, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XCB39, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Morph Weapons Collected" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC28B, type="u8", condition="eq", value=0X48, action="BOSS_HIT", no_log=false, no_survey=false, desc="Beat Boss" },
+        { address=0XC9D2, type="u16le", condition="eq", value=0X000, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss fight" },
+        { address=0XCB40, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated phase 1 of first boss?" },
+      },
+    },
+  },
+}

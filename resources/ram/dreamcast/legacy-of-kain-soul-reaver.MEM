@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Legacy of Kain: Soul Reaver",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "legacy-of-kain-soul-reaver",
+    file = "legacy-of-kain-soul-reaver.zip",
+    hashes = {
+      { hash = "697c901349025432fce1a79067f3246b", label = "Legacy of Kain - Soul Reaver (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X15A5E1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Raziel's HP decreased" },
+        { address=0X15A5E1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Raziel's HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X15A5E0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="A timer that counts milliseconds up/down to one second/0, triggering passive HP healing/drain in" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1CA470, type="u8", condition="bit_true", bit=4, mask=0X10, action="SWIMMING", no_log=false, no_survey=false, desc="Swimming" },
+      },
+    },
+  },
+}

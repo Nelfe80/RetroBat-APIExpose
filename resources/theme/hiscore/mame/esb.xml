@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 OBI 285353</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 WAN 170936</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 HAN 154650</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 MLH 140212</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 GJR 127645</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 NLA 113710</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 ROB 100175</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 DAR 88614</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 JED 75800</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 DES 62436</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11     50612</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 HRR 49870</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 AIO 45225</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 LVW 40715</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 LEE 39312</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 YR  35025</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17  AM 32190</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 A A 27515</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 VRR 22282</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 EAG 19852</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 LLO 15056</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 LSL 12375</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 ATI 9082</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 RON 8780</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25  N  5490</text>
+		</text>
+	</view>
+</theme>

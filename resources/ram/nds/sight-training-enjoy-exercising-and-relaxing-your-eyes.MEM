@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Sight Training: Enjoy Exercising and Relaxing Your Eyes",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sight-training-enjoy-exercising-and-relaxing-your-eyes",
+    file = "sight-training-enjoy-exercising-and-relaxing-your-eyes.zip",
+    hashes = {
+      { hash = "fe5f67b3c962cc18dc0ab40412905eb5", label = "Sight Training - Enjoy Exercising and Relaxing Your Eyes (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "285a590476ba98b9bcbde529aa9c8bfe", label = "Flash Focus - Vision Training in Minutes a Day (USA) (En,Fr,Es).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X137734, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Training Most Recent Score" },
+        { address=0X137778, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Record Challenge Most Recent Score" },
+        { address=0X1DE6EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Display" },
+      },
+    },
+  },
+}

@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Dragon Slayer: The Legend of Heroes",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-slayer-the-legend-of-heroes",
+    file = "dragon-slayer-the-legend-of-heroes.zip",
+    hashes = {
+      { hash = "1154e293ff16c1bc4f2a52027760a639", label = "Dragon Slayer - The Legend of Heroes (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2A106, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="bit 0 - meet with resistance and get told you need to be level 8" },
+        { address=0X2A303, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Logan's level" },
+        { address=0X2A343, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ethan's level" },
+        { address=0X2A383, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Markus/Sonia's Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2A304, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Logan's current HP decreased" },
+        { address=0X2A304, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Logan's current HP increased" },
+        { address=0X2A306, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Logan's max HP decreased" },
+        { address=0X2A306, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Logan's max HP increased" },
+        { address=0X2A344, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ethan's current HP decreased" },
+        { address=0X2A344, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ethan's current HP increased" },
+        { address=0X2A346, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ethan's max HP decreased" },
+        { address=0X2A346, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ethan's max HP increased" },
+        { address=0X2A384, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Markus/Sonia's current HP decreased" },
+        { address=0X2A384, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Markus/Sonia's current HP increased" },
+        { address=0X2A386, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Markus/Sonia's max HP decreased" },
+        { address=0X2A386, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Markus/Sonia's max HP increased" },
+        { address=0X2A3C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Giles' currrent HP decreased" },
+        { address=0X2A3C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Giles' currrent HP increased" },
+        { address=0X2A3C6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Giles's max HP decreased" },
+        { address=0X2A3C6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Giles's max HP increased" },
+        { address=0X2A404, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 current HP decreased" },
+        { address=0X2A404, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 current HP increased" },
+        { address=0X2A444, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 current HP decreased" },
+        { address=0X2A444, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 current HP increased" },
+        { address=0X2A484, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 current HP decreased" },
+        { address=0X2A484, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 current HP increased" },
+        { address=0X2A4C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 current HP decreased" },
+        { address=0X2A4C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2A319, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Logan's equipped weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X00BE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Gold or EP increased" },
+        { address=0X2A08C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (Actual) increased" },
+        { address=0X2A10A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - spend the night and get gold stolen increased" },
+        { address=0X2A10A, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="bit 0 - spend the night and get gold stolen empty" },
+        { address=0X2A13A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - speak to Colin while you have gold card increased" },
+        { address=0X2A13A, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="bit 0 - speak to Colin while you have gold card empty" },
+        { address=0X2A13F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Colin gives you back the gold card increased" },
+        { address=0X2A141, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Gold Sword (Wolfjaw) increased" },
+        { address=0X2A142, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - use gold card increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2A115, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 0 - defeated granit guarding door" },
+        { address=0X2A118, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 0 - check locked door in Wyn Tower" },
+        { address=0X2A154, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 0 - door opened" },
+      },
+    },
+  },
+}

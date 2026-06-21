@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Lewis and Clark Stayed Home",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lewis-and-clark-stayed-home",
+    file = "lewis-and-clark-stayed-home.zip",
+    hashes = {
+      { hash = "138579ed7d1afb07a614c01d55894ac2", label = "MECC-A279 Lewis and Clark Stayed Home v1.0 (4am crack) side A.dsk" },
+      { hash = "3e1705a88dceef8ac6c9db893ca38f2d", label = "MECC-A279 Lewis and Clark Stayed Home v1.0 (4am crack) side B.dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X52EB, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0A3F, type="u32be", condition="eq", value=0X4163636F, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score card is being displayed onscreen" },
+        { address=0X52ED, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="River mapped miles points" },
+        { address=0X52EF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Land mapped blocks points" },
+        { address=0X52F1, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Landmarks mapped points" },
+        { address=0X52F3, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Villages interviewed points" },
+        { address=0X52F5, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Villages traded with points" },
+        { address=0X52F7, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Species of Plants found points" },
+        { address=0X52F9, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Species of animals found points" },
+        { address=0X52FB, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Completed goal points" },
+        { address=0X52FD, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Days late points lost" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X52E4, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Land Mapped Blocks" },
+      },
+    },
+  },
+}

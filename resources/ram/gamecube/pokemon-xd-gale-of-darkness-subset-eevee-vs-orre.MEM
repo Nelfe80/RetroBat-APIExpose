@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Pokémon XD: Gale of Darkness [Subset - Eevee vs. Orre]",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-xd-gale-of-darkness-subset-eevee-vs-orre",
+    file = "pokemon-xd-gale-of-darkness-subset-eevee-vs-orre.zip",
+    hashes = {
+      { hash = "373559eda564e2722508afc1f4de1643", label = "Pokemon XD - Gale of Darkness (Europe) (En,Fr,De,Es,It) [Subset - Eevee]" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X46EFAB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EU} Quick Battle - Challenge Level" },
+        { address=0X4DC719, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EU} P1 PKMN Slot 1 - Level" },
+        { address=0X4DCA19, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EU} P1 PKMN Slot 2 - Level" },
+        { address=0X4E3609, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EU} P2 PKMN Slot 1 - Level" },
+        { address=0X4E3908, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EU} P2 PKMN Slot 2 - Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4DC70C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 1 - Current HP decreased" },
+        { address=0X4DC70C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 1 - Current HP increased" },
+        { address=0X4DCA0C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 2 - Current HP decreased" },
+        { address=0X4DCA0C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 2 - Current HP increased" },
+        { address=0X4DCD0C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 3 - Current HP decreased" },
+        { address=0X4DCD0C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 3 - Current HP increased" },
+        { address=0X4DD00C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 4 - Current HP decreased" },
+        { address=0X4DD00C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 4 - Current HP increased" },
+        { address=0X4DD30C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 5 - Current HP decreased" },
+        { address=0X4DD30C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 5 - Current HP increased" },
+        { address=0X4DD36C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 5 - Current HP decreased" },
+        { address=0X4DD36C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 5 - Current HP increased" },
+        { address=0X4DD60C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 6 - Current HP decreased" },
+        { address=0X4DD60C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P1 PKMN Slot 6 - Current HP increased" },
+        { address=0X4E35FC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 1 - Current HP decreased" },
+        { address=0X4E35FC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 1 - Current HP increased" },
+        { address=0X4E38FC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 2 - Current HP decreased" },
+        { address=0X4E38FC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 2 - Current HP increased" },
+        { address=0X4E3BFC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 3 - Current HP decreased" },
+        { address=0X4E3BFC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 3 - Current HP increased" },
+        { address=0X4E3EFC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 4 - Current HP decreased" },
+        { address=0X4E3EFC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 4 - Current HP increased" },
+        { address=0X4E41FC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 5 - Current HP decreased" },
+        { address=0X4E41FC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 5 - Current HP increased" },
+        { address=0X4E44FC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 6 - Current HP decreased" },
+        { address=0X4E44FC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] {EU} P2 PKMN Slot 6 - Current HP increased" },
+      },
+    },
+  },
+}

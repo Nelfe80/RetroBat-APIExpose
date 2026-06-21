@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Side Pocket",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "side-pocket",
+    file = "side-pocket.zip",
+    hashes = {
+      { hash = "10e339039df1185206e2b8a236af9248", label = "Side Pocket (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X002D, type="u8", condition="eq", value=0X3A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 balls inside of special hole" },
+        { address=0X002D, type="u8", condition="eq", value=0X4E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 balls inside" },
+        { address=0X002D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ball in the zone or star target? amount" },
+        { address=0X002E, type="u8", condition="eq", value=0XE5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 balls inside of special hole" },
+        { address=0X002E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ball in the zone or star target? amount" },
+      },
+      stage = {
+        { address=0X14CF, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ending" },
+        { address=0X14CF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (City)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X109A, type="u8", condition="eq", value=0X37, action="SCORE_STATE", no_log=false, no_survey=false, desc="5500 (6balls game)" },
+        { address=0X109A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pocketed in Row value points" },
+      },
+    },
+  },
+}

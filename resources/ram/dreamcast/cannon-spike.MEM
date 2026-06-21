@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Cannon Spike",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "cannon-spike",
+    file = "cannon-spike.zip",
+    hashes = {
+      { hash = "687a2d974858b262d13ac7f3ac4d3c75", label = "Cannon Spike (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAA31E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01=Paused" },
+        { address=0X9F2DA0, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of Credits Left" },
+        { address=0XB85FD8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01=Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9DB5E0, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Occupied Town" },
+        { address=0X9DB5E0, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Perished Town" },
+        { address=0X9DB5E0, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Unholy Dwelling" },
+        { address=0X9DB5E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XAD644C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XAB493C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Health decreased" },
+        { address=0XAB493C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Health increased" },
+        { address=0XAB49D0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 Current Health decreased" },
+        { address=0XAB49D0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 Current Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XAB494C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score" },
+        { address=0XAB49E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAB49A4, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Player 1 Combo Counter" },
+        { address=0XAB4A38, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Player 2 Combo Counter" },
+      },
+    },
+  },
+}

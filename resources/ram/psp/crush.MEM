@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Crush",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "crush",
+    file = "crush.zip",
+    hashes = {
+      { hash = "b62737bdce3af86bf0c8f37ce72a6b35", label = "Crush (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X968F88, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+        { address=0X968F88, type="u32le", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X97288C, type="u16le", condition="eq", value=0X0007, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In level" },
+        { address=0X97288C, type="u16le", condition="eq", value=0X0003, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Transition screen" },
+        { address=0X97288C, type="u16le", condition="eq", value=0X0004, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In menu" },
+        { address=0X97288C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level Address" },
+        { address=0X9DB8E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Memory Piece For Current Level" },
+        { address=0X9DB8E5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Trophy For Current Level" },
+        { address=0XEE59A8, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="in level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X97287E, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Timer" },
+        { address=0X9B293C, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Address" },
+        { address=0XAE2E36, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Three Colours Block Time" },
+        { address=0XAE76BA, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Merry-Go-Round Time" },
+        { address=0XAE76C6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(Trophy Mode) Merry-Go-Round Time" },
+        { address=0XAE771A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slinkin' Around Time" },
+        { address=0XAE7726, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(Trophy Mode) Slinkin' Around Time" },
+        { address=0XAE777A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Broken Zones Time" },
+        { address=0XAE7786, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(Trophy Mode) Broken Zones Time" },
+        { address=0XAE77DA, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lock, Block & Barrel Time" },
+        { address=0XAE77E6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(Trophy Mode) Lock, Block & Barrel Time" },
+      },
+    },
+  },
+}

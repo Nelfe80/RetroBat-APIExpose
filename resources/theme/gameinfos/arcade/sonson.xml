@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy4way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy4way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ULMV 149830</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ULKT 71040</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 VTKA 46030</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ?999 2070</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 !♪♆[double-music-note] 1010</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

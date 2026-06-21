@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Mega Man Battle Network 6: Cybeast Falzar",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "mega-man-battle-network-6-cybeast-falzar",
+    file = "mega-man-battle-network-6-cybeast-falzar.zip",
+    hashes = {
+      { hash = "1e8c774ba210d1c55113531c7360c737", label = "Megaman - Battle Network 6 - Cybeast Falzar (USA).gba" },
+      { hash = "56d29cad9e26f1d7465f803ed1d1426b", label = "Megaman - Battle Network 6 - Cybeast Falzar (Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X12480, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X12480, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Normal Gameplay/Battles" },
+        { address=0X12480, type="u8", condition="eq", value=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Capcom" },
+        { address=0X12480, type="u8", condition="eq", value=0X14, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X12480, type="u8", condition="eq", value=0X28, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Inside a Menu" },
+        { address=0X12480, type="u8", condition="eq", value=0X2C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Shop" },
+        { address=0X1351B, type="u8", condition="eq", value=0X6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In Game" },
+        { address=0X42AB0, type="u16le", condition="eq", value=0X1A, action="DEMO_MODE", no_log=false, no_survey=false, desc="DemonEye" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8270, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Ground Man My Record] [16-Bits]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA063, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="195 - LifeSync" },
+        { address=0XA076, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="LifeSrd" },
+      },
+      health = {
+        { address=0XB1A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[HP Memory Quantity] [8-Bits] decreased" },
+        { address=0XB1A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[HP Memory Quantity] [8-Bits] increased" },
+        { address=0XC80C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Mega Man HP Out of Battle] [16-Bits] decreased" },
+        { address=0XC80C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Mega Man HP Out of Battle] [16-Bits] increased" },
+        { address=0XC80E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Mega Man Max HP Out of Battle] [16-Bits] decreased" },
+        { address=0XC80E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Mega Man Max HP Out of Battle] [16-Bits] increased" },
+        { address=0X42AAC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Main Enemy HP] [16-Bits] decreased" },
+        { address=0X42AAC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Main Enemy HP] [16-Bits] increased" },
+        { address=0X42AAE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Main Enemy Max HP] [16-Bits] decreased" },
+        { address=0X42AAE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Main Enemy Max HP] [16-Bits] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X19CD0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Bugfrags earned in Soul Weapon] [8-Bits]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9D77, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Souls defeated in Central Area 3 during Soul Weapon] [Bitflags] increased" },
+        { address=0X9D78, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Souls defeated in Central Area 3 during Soul Weapon] [Bitflags] increased" },
+        { address=0X9D7F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Souls defeated in SeaSide Area 3 during Soul Weapon] [Bitflags] increased" },
+        { address=0X9D80, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Souls defeated in SeaSide Area 3 during Soul Weapon] [Bitflags] increased" },
+        { address=0X9D81, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Souls defeated in Underground 1 during Soul Weapon] [Bitflags] increased" },
+        { address=0X9D82, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Souls defeated in Underground 1 during Soul Weapon] [Bitflags] increased" },
+        { address=0X9D83, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Souls defeated in Underground 1 during Soul Weapon] [Bitflags] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X42AB0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Main Enemy ID] [16-Bits]" },
+      },
+    },
+  },
+}

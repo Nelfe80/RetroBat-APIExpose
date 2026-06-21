@@ -1,0 +1,114 @@
+return {
+  game = {
+    title = "Trap Gunner",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "trap-gunner",
+    file = "trap-gunner.zip",
+    hashes = {
+      { hash = "25d1f48b3010f133d32c89c9c7b2e534", label = "Trap Gunner (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1093CC, type="u8", condition="eq", value=0X09, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="VS Mode or Story Mode Credits" },
+        { address=0X1093DA, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration [0/1]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X109488, type="u8", condition="eq", value=0X13, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Time Screen" },
+      },
+      stage = {
+        { address=0X1093CC, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X1093CC, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X1093CC, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X1093CC, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X1093CC, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X1093CC, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X1093CC, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0X1093CC, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8" },
+        { address=0X1093CC, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9" },
+        { address=0X1093CC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (Story Mode)" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8" },
+        { address=0X1093E8, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9" },
+        { address=0X1093E8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Most Recent Stage Chosen from Stage Select (Story Mode)" },
+        { address=0X124B13, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Extra Stages Unlocked" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X124EAC, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="On (Default)" },
+        { address=0X124EAC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Versus Options - Life Gauge increased" },
+        { address=0X124EAC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Versus Options - Life Gauge decreased" },
+      },
+      health = {
+        { address=0X12583A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health 1P decreased" },
+        { address=0X12583A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health 1P increased" },
+        { address=0X125856, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Detonator" },
+        { address=0X125856, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0X125856, type="u8", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="Mine" },
+        { address=0X125856, type="u8", condition="eq", value=0X03, action="HIT", no_log=false, no_survey=false, desc="Gas" },
+        { address=0X125856, type="u8", condition="eq", value=0X04, action="HIT", no_log=false, no_survey=false, desc="PitFall" },
+        { address=0X125856, type="u8", condition="eq", value=0X05, action="HIT", no_log=false, no_survey=false, desc="ForcePanel" },
+        { address=0X125856, type="u8", condition="eq", value=0X06, action="HIT", no_log=false, no_survey=false, desc="Shooting (bullets)" },
+        { address=0X125856, type="u8", condition="eq", value=0X07, action="HIT", no_log=false, no_survey=false, desc="Shooting (knockdown)" },
+        { address=0X125856, type="u8", condition="eq", value=0X08, action="HIT", no_log=false, no_survey=false, desc="Punch (Grapple)" },
+        { address=0X125856, type="u8", condition="eq", value=0X09, action="HIT", no_log=false, no_survey=false, desc="Unit" },
+        { address=0X125856, type="u8", condition="eq", value=0X0A, action="HIT", no_log=false, no_survey=false, desc="SparkBit" },
+        { address=0X125856, type="u8", condition="eq", value=0X0B, action="HIT", no_log=false, no_survey=false, desc="Missile" },
+        { address=0X125856, type="u8", condition="eq", value=0X0C, action="HIT", no_log=false, no_survey=false, desc="Laser" },
+        { address=0X125856, type="u8", condition="eq", value=0X0D, action="HIT", no_log=false, no_survey=false, desc="ExplosiveBox" },
+        { address=0X125856, type="u8", condition="eq", value=0X0E, action="HIT", no_log=false, no_survey=false, desc="Falling" },
+        { address=0X125856, type="u8", condition="eq", value=0X0F, action="HIT", no_log=false, no_survey=false, desc="Life Judgment" },
+        { address=0X126242, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health 2P decreased" },
+        { address=0X126242, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health 2P increased" },
+        { address=0X12625E, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Detonator" },
+        { address=0X12625E, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0X12625E, type="u8", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="Mine" },
+        { address=0X12625E, type="u8", condition="eq", value=0X03, action="HIT", no_log=false, no_survey=false, desc="Gas" },
+        { address=0X12625E, type="u8", condition="eq", value=0X04, action="HIT", no_log=false, no_survey=false, desc="PitFall" },
+        { address=0X12625E, type="u8", condition="eq", value=0X05, action="HIT", no_log=false, no_survey=false, desc="ForcePanel" },
+        { address=0X12625E, type="u8", condition="eq", value=0X06, action="HIT", no_log=false, no_survey=false, desc="Shooting (bullets)" },
+        { address=0X12625E, type="u8", condition="eq", value=0X07, action="HIT", no_log=false, no_survey=false, desc="Shooting (knockdown)" },
+        { address=0X12625E, type="u8", condition="eq", value=0X08, action="HIT", no_log=false, no_survey=false, desc="Punch (Grapple)" },
+        { address=0X12625E, type="u8", condition="eq", value=0X09, action="HIT", no_log=false, no_survey=false, desc="Unit" },
+        { address=0X12625E, type="u8", condition="eq", value=0X0A, action="HIT", no_log=false, no_survey=false, desc="SparkBit" },
+        { address=0X12625E, type="u8", condition="eq", value=0X0B, action="HIT", no_log=false, no_survey=false, desc="Missile" },
+        { address=0X12625E, type="u8", condition="eq", value=0X0C, action="HIT", no_log=false, no_survey=false, desc="Laser" },
+        { address=0X12625E, type="u8", condition="eq", value=0X0D, action="HIT", no_log=false, no_survey=false, desc="ExplosiveBox" },
+        { address=0X12625E, type="u8", condition="eq", value=0X0E, action="HIT", no_log=false, no_survey=false, desc="Falling" },
+        { address=0X12625E, type="u8", condition="eq", value=0X0F, action="HIT", no_log=false, no_survey=false, desc="Life Judgment" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1093C8, type="u8", condition="eq", value=0X34, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring" },
+        { address=0X12587C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="1P Unit Ammo [Quantity]" },
+        { address=0X12587D, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="1P Regular Weapon's Ammo [Quantity]" },
+        { address=0X126284, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="2P Unit Ammo [Quantity]" },
+        { address=0X126285, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="2P Regular Weapon's Ammo [Quantity]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1093C8, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Map" },
+        { address=0X109488, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Screen" },
+        { address=0X124EA7, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Versus Options - Time Limit" },
+      },
+    },
+  },
+}

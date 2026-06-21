@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Fisher-Price: I Can Remember",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Education, Puzzle"
+  },
+
+  rom = {
+    name = "fisher-price-i-can-remember",
+    file = "fisher-price-i-can-remember.zip",
+    hashes = {
+      { hash = "cda9b5267e3241ddeeac4458e62fc945", label = "Fisher-Price - I Can Remember (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0432, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0432, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X0432, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X0433, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of rounds remaining" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0020, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 current round score" },
+        { address=0X0022, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 all rounds score" },
+        { address=0X0024, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2/Computer current round score" },
+        { address=0X0026, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2/Computer all rounds score" },
+      },
+    },
+  },
+}

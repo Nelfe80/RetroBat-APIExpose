@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Puzzle Uo Poko",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-uo-poko",
+    file = "puzzle-uo-poko.zip",
+    hashes = {
+      { hash = "df6c9cf116bf3709501bbc19829de43c", label = "uopoko.7z <Puzzle Uo Poko (International, ver. 98/02/06)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0194, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X2270, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Dipswitches - Continue Mode" },
+        { address=0X2274, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Dipswitches - Demo Sound" },
+        { address=0X2280, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Dipswitches - Continue Play" },
+        { address=0X2307, type="u8", condition="eq", value=0X2D, action="GAME_OVER", no_log=false, no_survey=false, desc="highest before game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0222, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of balls cleared in the current part of the chain" },
+        { address=0X0224, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of balls cleared in the whole chain" },
+        { address=0X230A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level completion in seconds" },
+      },
+      stage = {
+        { address=0X0202, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+        { address=0X020A, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Total seconds played in all stages" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0218, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score overflow" },
+        { address=0X021A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+      collectibles = {
+        { address=0X2276, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dipswitches - Coin Slot 1 - Number of Coins increased" },
+        { address=0X2278, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dipswitches - Coin Slot 1 - Number of Credits increased" },
+        { address=0X227A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dipswitches - Coin Slot 2 - Number of Coins increased" },
+        { address=0X227C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dipswitches - Coin Slot 2 - Number of Credits increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2272, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dipswitches - Screen Mode" },
+        { address=0X227E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dipswitches - Difficulty" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2307, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current floor height" },
+      },
+    },
+  },
+}

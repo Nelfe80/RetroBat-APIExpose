@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Cash Quiz",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "cash-quiz",
+    file = "cash-quiz.zip",
+    hashes = {
+      { hash = "51bdbe28d1e760093e03fa0cdec15293", label = "cashquiz.7z <>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X08EE, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+  },
+}

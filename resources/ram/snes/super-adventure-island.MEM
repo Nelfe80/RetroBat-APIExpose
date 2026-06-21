@@ -1,0 +1,132 @@
+return {
+  game = {
+    title = "Super Adventure Island",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "super-adventure-island",
+    file = "super-adventure-island.zip",
+    hashes = {
+      { hash = "206e6c5c05ac1a83dde21400325a4a7d", label = "Super Adventure Island (USA).sfc" },
+      { hash = "947f2b011533f99fe33fd2acffd35875", label = "Super Adventure Island (Europe).sfc" },
+      { hash = "ba0e1fda3b6a6bdfe788fa85f5a13b8c", label = "Super Adventure Island (USA) (MSU-1) (Kurrono,PepilloPEV) (1.2).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0BF2, type="u8", condition="eq", value=0X14, action="GAME_PLAYING", no_log=false, no_survey=false, desc="level complete" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0BF2, type="u8", condition="eq", value=0X14, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X0CE5, type="u8", condition="eq", value=0X00, action="LEVEL_ROUND_1_NO_CHEAT_USED", no_log=false, no_survey=false, desc="Round 1 (no cheat used)" },
+        { address=0X0CE5, type="u8", condition="eq", value=0X01, action="LEVEL_ROUND_2", no_log=false, no_survey=false, desc="Round 2" },
+        { address=0X0CE5, type="u8", condition="eq", value=0X02, action="LEVEL_ROUND_3", no_log=false, no_survey=false, desc="Round 3" },
+        { address=0X0CE5, type="u8", condition="eq", value=0X03, action="LEVEL_ROUND_4", no_log=false, no_survey=false, desc="Round 4" },
+        { address=0X0CE5, type="u8", condition="eq", value=0X04, action="LEVEL_ROUND_5", no_log=false, no_survey=false, desc="Round 5" },
+        { address=0X0F42, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completed/enter bonus stage" },
+        { address=0X0F42, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level state" },
+      },
+      stage = {
+        { address=0X0C9D, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Round 1 bonus stage max" },
+        { address=0X0C9D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of bonus stage stars/moons collected" },
+        { address=0X0F42, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X030D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X030D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0BF2, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="died" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0D75, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="hammer" },
+        { address=0X0D75, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="boomerang" },
+        { address=0X0D7C, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="no weapon" },
+        { address=0X0D7C, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="max" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0C93, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] [BCD] Score" },
+        { address=0X0C94, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score - thousands place" },
+        { address=0X0C95, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score - hundred thousands place" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0BFF, type="u8", condition="eq", value=0X23, action="JUMPING", no_log=false, no_survey=false, desc="Jumping into lake cutscene" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0BFF, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Falling into Round 1 cutscene" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1-1" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1-1 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1-2" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1-2 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1 bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1-2 after bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1-3" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1-3 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X09, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 1 boss" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X0A, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2-1" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X0B, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2-1 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X0C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2-2" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X0D, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2-2 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X0E, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2 bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X0F, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2-2 after bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X10, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Eaten by whale cutscene" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X11, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2-3" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X12, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2-3 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X13, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 2 boss" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X14, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3-1" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X15, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3 bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X16, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3-1 after bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X17, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3-1 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X18, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3-2" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X19, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3-2 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X1A, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3-3" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X1B, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3-3 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X1C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 3 boss" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X1D, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4-1" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X1E, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4-1 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X1F, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4-2" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X20, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4 bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X21, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4-2 after bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X22, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4-2 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X24, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4-3" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X25, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4-3 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X26, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 4 boss" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X27, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5-1" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X28, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5-1 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X29, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5-2" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X2A, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5-2 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X2B, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5-3" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X2C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5-3 past checkpoint" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X2D, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5 bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X2E, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5-3 after bonus stage" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X2F, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5 boss 1" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X30, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5 boss transforms cutscene" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X31, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Round 5 boss 2" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X32, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Ending" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X33, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X0BFF, type="u8", condition="eq", value=0X34, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Intro screen" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0BF2, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Game state" },
+        { address=0X0D6B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer to begin stage" },
+      },
+    },
+  },
+}

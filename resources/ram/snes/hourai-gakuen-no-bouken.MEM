@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Hourai Gakuen no Bouken!",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "hourai-gakuen-no-bouken",
+    file = "hourai-gakuen-no-bouken.zip",
+    hashes = {
+      { hash = "586159e9055691aa8de3757f408350fd", label = "Hourai Gakuen no Bouken! - Tenkousei Scramble (Japan).sfc" },
+      { hash = "c15ce67b3cc15fbc7c5c4fcb9533af7d", label = "Hourai Gakuen no Bouken! - Tenkousei Scramble (Japan) (En) (v1.0) (AGTP).sfc" },
+      { hash = "309254eb4baf8a5333c8d25e51f5de34", label = "Hourai Gakuen no Bouken! - Tenkousei Scramble (Japan) (En) (Bugfix) (v1.0) (AGTP, advancedpillow).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X09FC, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max level for all friend levels ('Best Friend')" },
+        { address=0X09FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Daichi Friend Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1913, type="u8", condition="eq", value=0X12, action="HIT", no_log=false, no_survey=false, desc="Mininimum amount required to use Special. Ticks up at different amounts depending on how quickly" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2BB0, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Jungle | Smoke Signal" },
+        { address=0X2BB3, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Hospital | Stamina Drink" },
+        { address=0X2BB4, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Committee Central | 50G" },
+        { address=0X2BB4, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Committee Central | Eye Mask" },
+        { address=0X2BB4, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Committee Central | Student Cap" },
+        { address=0X2BB4, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Boys' Dorm | Tennis Racket" },
+        { address=0X2BB5, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Boy's Dorm | Student Cap" },
+        { address=0X2BB5, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Mamejima | Cardboard House" },
+        { address=0X2BB5, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Mamejima | Mirror" },
+        { address=0X2BB5, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Mamejima | Leather Shoes" },
+        { address=0X2BB6, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Mamejima | Eye Mask" },
+        { address=0X2BB6, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mamejima | Sailor Suit" },
+        { address=0X2BB6, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Mamejima | Houraimin A" },
+        { address=0X2BB6, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Mamejima | Kung Fu Shoes" },
+        { address=0X2BCF, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Hourai High | Confetti" },
+        { address=0X2BCF, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Hourai High | Perfume" },
+        { address=0X2BCF, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Hourai High | Houraimin A" },
+        { address=0X2BCF, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Hourai High | Firecracker" },
+        { address=0X2BCF, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Hourai High | Cherry Blossom" },
+        { address=0X2BCF, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Jungle | Stamina Drink" },
+        { address=0X2BD0, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Jungle | Relaxing CD" },
+        { address=0X2BD0, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Jungle | Iron Fan" },
+        { address=0X2BD0, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Jungle Cave | Blowdart" },
+        { address=0X2BD0, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Jungle Cave | Cardboard House" },
+        { address=0X2C02, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Magnifying Glass" },
+        { address=0X2C02, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Iron Fan" },
+        { address=0X2C03, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Nurse Hat" },
+        { address=0X2C03, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Fan Letter" },
+        { address=0X2C03, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Toe Shoes" },
+        { address=0X2C03, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Magnet Necklace" },
+        { address=0X2C03, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Special Medicine" },
+        { address=0X2C03, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Eye Mask" },
+        { address=0X2C04, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Leotard" },
+        { address=0X2C04, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Ponytail" },
+        { address=0X2C04, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Cardboard House" },
+        { address=0X2C04, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Braid" },
+        { address=0X2C05, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Kung Fu Shoes" },
+        { address=0X2C05, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Pendant" },
+        { address=0X2C05, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Pendant" },
+        { address=0X2C05, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Girls' Dorm | Pendant" },
+        { address=0X2C0A, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Sewers | Cardboard House" },
+        { address=0X2C0A, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Sewers | Question List" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2BD0, type="u8", condition="bit_true", bit=1, mask=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Jungle Cave | Hammock" },
+        { address=0X2C02, type="u8", condition="bit_true", bit=1, mask=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Girls' Dorm | Hammock" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1478, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block" },
+        { address=0X2BD7, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Discovered front door locked at Committee Central" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0986, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] First Club Joined" },
+      },
+    },
+  },
+}

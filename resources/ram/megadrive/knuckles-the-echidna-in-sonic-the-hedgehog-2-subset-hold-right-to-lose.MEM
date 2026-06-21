@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Knuckles the Echidna in Sonic the Hedgehog 2 [Subset - Hold Right To Lose]",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "knuckles-the-echidna-in-sonic-the-hedgehog-2-subset-hold-right-to-lose",
+    file = "knuckles-the-echidna-in-sonic-the-hedgehog-2-subset-hold-right-to-lose.zip",
+    hashes = {
+      { hash = "acd815533702bf51c8dab00e627aa2ee", label = "Sonic & Knuckles + Sonic the Hedgehog 2 (World) [Subset - Hold Right To Lose].md" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0XF7A6, type="u8", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated" },
+      },
+    },
+  },
+}

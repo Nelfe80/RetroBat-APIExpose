@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Chase H.Q.",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "chase-h-q",
+    file = "chase-h-q.zip",
+    hashes = {
+      { hash = "c72556c76d431b545dd56bdcc536a89f", label = "Chase H.Q. (USA).gg" },
+    }
+  },
+
+  events = {
+  },
+}

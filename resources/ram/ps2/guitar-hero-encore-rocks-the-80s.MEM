@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Guitar Hero Encore: Rocks the '80s",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "guitar-hero-encore-rocks-the-80s",
+    file = "guitar-hero-encore-rocks-the-80s.zip",
+    hashes = {
+      { hash = "2dc698809fa19eb2f8910af37d3d796a", label = "Guitar Hero Encore - Rocks the 80s (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X470CE0, type="u32le", condition="eq", value=0X00A9DDF0, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Replay" },
+        { address=0X470CE0, type="u32le", condition="eq", value=0X00AA0050, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X470CE0, type="u32le", condition="eq", value=0X00AA1020, action="PAUSE_ON", no_log=false, no_survey=false, desc="In Practice Mode (Paused)" },
+        { address=0X589654, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[32 Bit] Demo Active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA9B404, type="u32le", condition="eq", value=0X0054DF7D, action="LIVES_STATE", no_log=false, no_survey=false, desc="Skid Row - 18 and Life" },
+        { address=0XA9B404, type="u32le", condition="eq", value=0X0054E05B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Kennedys - Police Truck" },
+        { address=0XA9B404, type="u32le", condition="eq", value=0X0054E089, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Money - Shakin'" },
+      },
+      health = {
+        { address=0XA9B404, type="u32le", condition="eq", value=0X0054DFB2, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Quiet Riot - (Bang Your Head) Metal Health" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA9B404, type="u32le", condition="eq", value=0X0054DF87, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Poison - Nothin' But a Good Time" },
+        { address=0XA9B404, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Song ID" },
+      },
+    },
+  },
+}

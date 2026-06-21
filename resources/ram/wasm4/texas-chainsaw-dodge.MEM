@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Texas Chainsaw Dodge",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "texas-chainsaw-dodge",
+    file = "texas-chainsaw-dodge.zip",
+    hashes = {
+      { hash = "45794ae3d567aead175d2c53392459a2", label = "Texas Chainsaw Dodge (World) (Scott Breen).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X46B0, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Gamestate. 00=Title. 01=Ingame, 02=Dead" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4680, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Number of ticks alive; /10 for score" },
+        { address=0X46B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore; actual" },
+      },
+    },
+  },
+}

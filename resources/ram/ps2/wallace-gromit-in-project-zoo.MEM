@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Wallace & Gromit in Project Zoo",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "wallace-gromit-in-project-zoo",
+    file = "wallace-gromit-in-project-zoo.zip",
+    hashes = {
+      { hash = "efb3bb86dbcd372a1c0d69126f634653", label = "Wallace & Gromit in Project Zoo (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5882A8, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[Boolean] Subtitles enabled" },
+        { address=0X86A040, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[Boolean] Pause menu active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0001, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fix ground floor generator to start lift" },
+        { address=0X862C90, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Boolean] Level is being replayed (show replay marker)" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0XFFFFFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main menu" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle House" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000001, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Drill-o-Matic fight" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000002, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mines" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000003, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Copter chase" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000004, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volcano" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000005, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Warehouse" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000006, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boiler fight" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000007, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice House" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000008, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Submersible fight" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X00000009, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Diamond-o-Matic subarea" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X0000000A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Diamond-o-Matic" },
+        { address=0X952FB0, type="u32le", condition="eq", value=0X0000000B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Feathers McGraw fight" },
+        { address=0X952FB0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level ID" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0000, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Open the door to the second section" },
+        { address=0X0000, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the clockwork Penguins" },
+        { address=0X0000, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the mining machine" },
+        { address=0X0001, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Fix first floor generator to open blast doors" },
+        { address=0X0002, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy giant spikeball" },
+        { address=0X0002, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Feathers' giant boiler" },
+      },
+    },
+  },
+}

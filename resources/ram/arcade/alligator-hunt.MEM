@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "aligator",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "alligator-hunt",
+    file = "alligator-hunt.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XFE8027, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: energy" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFE1C6E, type="u56be", condition="change", action="SCORE_STATE", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Score delta 100-100" },
+        { address=0XFE1C6E, type="u56be", condition="change", action="SCORE_STATE", color="orange", min=200, max=300, no_log=false, no_survey=false, desc="Score delta 200-300: Score delta 200-300" },
+        { address=0XFE1C6E, type="u56be", condition="change", action="SCORE_STATE", color="cyan", min=400, max=600, no_log=false, no_survey=false, desc="Score delta 400-600: Score delta 400-600" },
+        { address=0XFE1C6E, type="u56be", condition="change", action="SCORE_STATE", color="green", min=700, max=2000, no_log=false, no_survey=false, desc="Score delta 700-2000: Score delta 700-2000" },
+        { address=0XFE1C6E, type="u56be", condition="change", action="SCORE_STATE", color="blue", min=2000, max=10000, no_log=false, no_survey=false, desc="Score delta 2000-10000: Score delta 2000-10000" },
+      },
+    },
+  },
+}

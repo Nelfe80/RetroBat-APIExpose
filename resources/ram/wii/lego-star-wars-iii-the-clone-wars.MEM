@@ -1,0 +1,133 @@
+return {
+  game = {
+    title = "LEGO Star Wars III: The Clone Wars",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "lego-star-wars-iii-the-clone-wars",
+    file = "lego-star-wars-iii-the-clone-wars.zip",
+    hashes = {
+      { hash = "bbb48136433c9e43f2b9be097c1a9c5d", label = "LEGO Star Wars III - The Clone Wars (Europe, Australia) (En,Fr,De,Es,It,Da) (Rev 1)" },
+      { hash = "85a76f302796611f47d6a1774f5f207a", label = "LEGO Star Wars III - The Clone Wars (USA) (En,Fr,Es) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8C817B, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="playing" },
+        { address=0X8C817B, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="menu open" },
+        { address=0X8C817B, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="submenu open" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8CEF5F, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="in level" },
+        { address=0X8CEF5F, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X9302FC, type="u32be", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 studs" },
+        { address=0X9302FC, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 studs" },
+        { address=0X9302FC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Current Studs in Level" },
+        { address=0X93116F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 minikits" },
+        { address=0X93116F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 minkits" },
+        { address=0X93116F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 minikits" },
+        { address=0X93116F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="minikits in current level" },
+        { address=0X931173, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 minikits" },
+        { address=0X931173, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 minkits" },
+        { address=0X931173, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 minikits" },
+        { address=0X931173, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="minikits in current level" },
+        { address=0X931177, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 minikits" },
+        { address=0X931177, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 minkits" },
+        { address=0X931177, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 minikits" },
+        { address=0X931177, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="minikits in current level" },
+        { address=0X103FB42, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X103FB56, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X103FB6A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X103FB7E, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X103FBA6, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X103FBBA, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X103FBE2, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level complete" },
+        { address=0X103FC2C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="complete" },
+        { address=0X103FC32, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="story mode complete" },
+      },
+      stage = {
+        { address=0X103FC2C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostage Crisis True Jedi" },
+        { address=0X103FC2F, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0 minikits collected" },
+        { address=0X103FC2F, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 minikits collected" },
+        { address=0X103FC2F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostage Crisis minikits" },
+        { address=0X103FC31, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="opening cutscene watched" },
+        { address=0X103FC31, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all minikits collected" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCD3D47, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Moon of Antar" },
+        { address=0XCD3D4B, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Moon of Antar" },
+        { address=0X104527B, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="locked" },
+        { address=0X104527B, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="unlocked" },
+      },
+      health = {
+        { address=0X10452A1, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0X10452A1, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="unlocked" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1045395, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="locked" },
+        { address=0X1045395, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="unlocked" },
+      },
+      weapon = {
+        { address=0X103FBDC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Factory True Jedi" },
+        { address=0X103FBDF, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="0 minikits collected" },
+        { address=0X103FBDF, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="1 minikits collected" },
+        { address=0X103FBE1, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="opening cutscene watched" },
+        { address=0X103FBE1, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="all minikits collected" },
+        { address=0X1045221, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="locked" },
+        { address=0X1045221, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0X179DF00, type="u16be", condition="eq", value=0X008D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Heavy Weapons Clone Trooper" },
+        { address=0X10297212, type="u16be", condition="eq", value=0X008D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Heavy Weapons Clone Trooper" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCD3D4E, type="u8", condition="bit_true", bit=2, mask=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x2" },
+        { address=0XCD3D4E, type="u8", condition="bit_true", bit=6, mask=0X40, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x8" },
+        { address=0XCD3D4F, type="u8", condition="bit_true", bit=1, mask=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x6" },
+        { address=0XCD3D4F, type="u8", condition="bit_true", bit=2, mask=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x10" },
+      },
+      collectibles = {
+        { address=0X103FAF2, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="story mode complete" },
+        { address=0X104013A, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="0 gold bricks" },
+        { address=0X104013A, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 gold bricks" },
+        { address=0X10452E3, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="locked" },
+        { address=0X10452E3, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="unlocked" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCD3D4D, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X103FB28, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="not complete" },
+        { address=0X103FB28, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="complete" },
+        { address=0X103FB2B, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="0 minikits collected" },
+        { address=0X103FB2B, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="1 minikits collected" },
+        { address=0X103FB2D, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="opening cutscene watched" },
+        { address=0X103FB2D, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="all minikits collected" },
+        { address=0X103FB2E, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="story mode complete" },
+        { address=0X10452E5, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="locked" },
+        { address=0X10452E5, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="unlocked" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9380BC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Timer in current level, including hub world" },
+        { address=0XF7C3D0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Timer in current level" },
+      },
+    },
+  },
+}

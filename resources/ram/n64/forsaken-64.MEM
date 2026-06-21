@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Forsaken 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "forsaken-64",
+    file = "forsaken-64.zip",
+    hashes = {
+      { hash = "5cdee5503a57d14533c66b35a5848899", label = "Forsaken 64 (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X22096, type="u8", condition="eq", value=0X2, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X22096, type="u8", condition="eq", value=0X7, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X3F6A8, type="u8", condition="eq", value=0XF0, action="GAME_OVER", no_log=false, no_survey=false, desc="'Game over'" },
+        { address=0X12E0B7, type="u8", condition="eq", value=0X0, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Resume" },
+        { address=0X12E0B7, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Abort" },
+        { address=0X12E0B7, type="u8", condition="eq", value=0X2, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0X12E0B7, type="u8", condition="eq", value=0X3, action="PAUSE_ON", no_log=false, no_survey=false, desc="Options" },
+        { address=0X12E0B7, type="u8", condition="eq", value=0X4, action="PAUSE_ON", no_log=false, no_survey=false, desc="Mission Brief" },
+        { address=0X137564, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X137564, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Else" },
+        { address=0X145959, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X145959, type="u8", condition="eq", value=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X220AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Difficulty 0-5" },
+        { address=0X8ED6D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cheat: Level Select" },
+        { address=0X14E620, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Orbital level 0-4" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3F6A8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player lives in Battle Mode increased" },
+        { address=0X3F6A8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player lives in Battle Mode decreased" },
+        { address=0X4013C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Options - Lives increased" },
+        { address=0X4013C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Options - Lives decreased" },
+        { address=0X4013F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Single Player Mode Lives remaining increased" },
+        { address=0X4013F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Single Player Mode Lives remaining decreased" },
+        { address=0X8ED6F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Cheat: Infinite Lives increased" },
+        { address=0X8ED6F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cheat: Infinite Lives decreased" },
+      },
+      health = {
+        { address=0X8ED61, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cheat: Infinite Weapon Energy decreased" },
+        { address=0X8ED61, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cheat: Infinite Weapon Energy increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X14E5EB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Primary Weapon power remaining" },
+        { address=0X14E601, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="MUG" },
+        { address=0X14E601, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Solaris" },
+        { address=0X14E601, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Scatter" },
+        { address=0X14E601, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Titan" },
+        { address=0X14E601, type="u8", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gravgon" },
+        { address=0X14E601, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="MFRL" },
+        { address=0X14E601, type="u8", condition="eq", value=0X7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Purge Mine" },
+        { address=0X14E601, type="u8", condition="eq", value=0X9, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pine Mine" },
+        { address=0X14E601, type="u8", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Quantum" },
+        { address=0X14E602, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pulsar" },
+        { address=0X14E602, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Transpulse" },
+        { address=0X14E602, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Trojax" },
+        { address=0X14E602, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Beamlaser" },
+        { address=0X14E602, type="u8", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Suss-gun" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE35A4, type="u8", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X14E5FF, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Chaos Shield is active" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X233B4, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Game state is in a level" },
+        { address=0X14E5FC, type="u16be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Chaos Shield time remaining" },
+      },
+    },
+  },
+}

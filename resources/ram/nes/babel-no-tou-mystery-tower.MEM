@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Babel no Tou | Mystery Tower",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "babel-no-tou-mystery-tower",
+    file = "babel-no-tou-mystery-tower.zip",
+    hashes = {
+      { hash = "8c8f77e2931dacd577642031772d20fa", label = "Babel no Tou (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X001F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X00A5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag for finish level" },
+      },
+    },
+  },
+}

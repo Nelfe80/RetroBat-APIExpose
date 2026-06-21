@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Cyber Spin",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cyber-spin",
+    file = "cyber-spin.zip",
+    hashes = {
+      { hash = "0bfec6b10c50b44ba80b5420d24cc75f", label = "Cyber Spin (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0066, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X006C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best Time m-sec" },
+        { address=0X006D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best Time sec" },
+        { address=0X006E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best Time min" },
+        { address=0X00B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time m-sec" },
+        { address=0X00B5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time sec" },
+        { address=0X00B6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time min" },
+        { address=0X00B7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Course Time m-sec" },
+        { address=0X00B8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Course Time sec" },
+        { address=0X00B9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Course Time min" },
+        { address=0X1506, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Course Time XX-00-00" },
+        { address=0X1507, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Course Time 00-XX-00" },
+        { address=0X1508, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Course Time 00-00-XX" },
+      },
+    },
+  },
+}

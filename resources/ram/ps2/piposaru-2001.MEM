@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Piposaru 2001",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "piposaru-2001",
+    file = "piposaru-2001.zip",
+    hashes = {
+      { hash = "05d78be8c58753a3256fa37629052d93", label = "Piposaru 2001 (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Cutscene" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Cutscene" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X12, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Enter Stage" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X13, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Summary" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X14, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Intro" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X15, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Active" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X1B, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Clear! Screen" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X1E, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Clear Stage" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X21, action="GAME_OVER", no_log=false, no_survey=false, desc="Ending Cutscene" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X22, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X96FAA0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Hono Bono Land Lv 1 - Cleared" },
+        { address=0X96FB28, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Hono Bono Land Lv 2 - Cleared" },
+        { address=0X96FBB0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Hono Bono Land Lv 3 - Cleared" },
+        { address=0X96FC38, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Hono Bono Land Lv 4 - Cleared" },
+        { address=0X96FCC0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Hono Bono Land Lv 5 - Cleared" },
+        { address=0X96FD48, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Hono Bono Land Specter - Cleared" },
+        { address=0X96FFF0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Picha Picha Land Lv 1 - Cleared" },
+        { address=0X970078, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Picha Picha Land Lv 2 - Cleared" },
+        { address=0X970100, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Picha Picha Land Lv 3 - Cleared" },
+        { address=0X970188, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Picha Picha Land Lv 4 - Cleared" },
+        { address=0X970210, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Picha Picha Land Lv 5 - Cleared" },
+        { address=0X970298, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Picha Picha Land Specter - Cleared" },
+        { address=0X970540, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Ati Ati Land Lv 1 - Cleared" },
+        { address=0X9705C8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Ati Ati Land Lv 2 - Cleared" },
+        { address=0X970650, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Ati Ati Land Lv 3 - Cleared" },
+        { address=0X9706D8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Ati Ati Land Lv 4 - Cleared" },
+        { address=0X970760, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Ati Ati Land Lv 5 - Cleared" },
+        { address=0X9707E8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Ati Ati Land Specter - Cleared" },
+        { address=0X970A90, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Doki Doki Land Lv 1 - Cleared" },
+        { address=0X970B18, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Doki Doki Land Lv 2 - Cleared" },
+        { address=0X970BA0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Doki Doki Land Lv 3 - Cleared" },
+        { address=0X970C28, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Doki Doki Land Lv 4 - Cleared" },
+        { address=0X970CB0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Doki Doki Land Lv 5 - Cleared" },
+        { address=0X970D38, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Doki Doki Land Specter - Cleared" },
+        { address=0X970FE0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Tsuru Tsuru Land Lv 1 - Cleared" },
+        { address=0X971068, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Tsuru Tsuru Land Lv 2 - Cleared" },
+        { address=0X9710F0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Tsuru Tsuru Land Lv 3 - Cleared" },
+        { address=0X971178, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Tsuru Tsuru Land Lv 4 - Cleared" },
+        { address=0X971200, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Tsuru Tsuru Land Lv 5 - Cleared" },
+        { address=0X971288, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Tsuru Tsuru Land Specter - Cleared" },
+        { address=0X971530, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Piko Piko Land Lv 1 - Cleared" },
+        { address=0X9715B8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Piko Piko Land Lv 2 - Cleared" },
+        { address=0X971640, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Piko Piko Land Lv 3 - Cleared" },
+        { address=0X9716C8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Piko Piko Land Lv 4 - Cleared" },
+        { address=0X971750, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Piko Piko Land Specter - Cleared" },
+        { address=0X9720A0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Expert - Hono Bono Land Lv 1 - Cleared" },
+        { address=0X972128, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Expert - Hono Bono Land Lv 2 - Cleared" },
+        { address=0X9721B0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Expert - Hono Bono Land Lv 3 - Cleared" },
+        { address=0X972238, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Expert - Hono Bono Land Lv 4 - Cleared" },
+        { address=0X9722C0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Expert - Hono Bono Land Lv 5 - Cleared" },
+        { address=0X972348, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit/bool] Expert - Hono Bono Land Specter - Cleared" },
+        { address=0X97519C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear - Transfer" },
+        { address=0X9751A0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear - Max Transfer" },
+      },
+      zone = {
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X09, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+        { address=0X96E9FC, type="u16le", condition="eq", value=0X0A, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map Status" },
+      },
+      stage = {
+        { address=0X96F2F4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+        { address=0X972000, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage ID" },
+        { address=0X974600, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Expert Map - Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X96F9F4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X96F9F4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X975194, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Clear - Time" },
+        { address=0X975198, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Clear - Max Time" },
+      },
+    },
+  },
+}

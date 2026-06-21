@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Vigilante 8",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "vigilante-8",
+    file = "vigilante-8.zip",
+    hashes = {
+      { hash = "cb5348c1b469d698eccddce99a16d384", label = "Vigilante 8 (USA) (Rumble Version).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC8EB, type="u8", condition="eq", value=0X07, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits" },
+        { address=0XCAAD, type="u8", condition="eq", value=0XD8, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused and after pause" },
+        { address=0XCADA, type="u8", condition="eq", value=0X09, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XCADA, type="u8", condition="eq", value=0X0D, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Options/Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC8D2, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Valley Farms" },
+        { address=0XC8D2, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Oil Fields" },
+        { address=0XC8D2, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ski Resort" },
+        { address=0XC8D2, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hoover Dam" },
+        { address=0XC8D2, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Casino City" },
+        { address=0XC8D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Map ID" },
+        { address=0XC8E2, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="easy" },
+        { address=0XC8E2, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="medium" },
+        { address=0XC8E2, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="hard" },
+        { address=0XC8E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - difficulty level (system - bank 0)" },
+        { address=0XC8EB, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="difficulty level selection" },
+        { address=0XCADA, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Choose Level" },
+        { address=0XE8E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - difficulty level (ECHO memory)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC8D3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Options - Lives # copy increased" },
+        { address=0XC8D3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Options - Lives # copy decreased" },
+        { address=0XC8EB, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="lives" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="2" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="3" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="4" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="5" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="6" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X07, action="LIVES_STATE", no_log=false, no_survey=false, desc="7" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="8" },
+        { address=0XC8F6, type="u8", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="9" },
+        { address=0XC8F6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Options - Lives # increased" },
+        { address=0XC8F6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Options - Lives # decreased" },
+        { address=0XC8F8, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0XC8F8, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0XC8F8, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="2..." },
+        { address=0XC8F8, type="u8", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="9" },
+        { address=0XC8F8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Arcade/time attack mode - Slot #1 - lives increased" },
+        { address=0XC8F8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Arcade/time attack mode - Slot #1 - lives decreased" },
+        { address=0XC8FA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Arcade mode - Slot #2 - lives increased" },
+        { address=0XC8FA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Arcade mode - Slot #2 - lives decreased" },
+        { address=0XC8FC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Arcade mode - Slot #3 - lives increased" },
+        { address=0XC8FC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Arcade mode - Slot #3 - lives decreased" },
+        { address=0XE8D3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Options - Lives # copy (ECHO ram) increased" },
+        { address=0XE8D3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Options - Lives # copy (ECHO ram) decreased" },
+        { address=0XE8F6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Options - Lives # (ECHO ram) increased" },
+        { address=0XE8F6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Options - Lives # (ECHO ram) decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC8D4, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="SEL" },
+        { address=0XC8D4, type="u8", condition="eq", value=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="UP" },
+        { address=0XC8EB, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="next weapon" },
+        { address=0XE8D4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Options - Next weapon (ECHO ram)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC8F1, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time Attack - game time" },
+        { address=0XC921, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Game mode selected" },
+      },
+    },
+  },
+}

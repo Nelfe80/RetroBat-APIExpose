@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Taz-Mania",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "taz-mania",
+    file = "taz-mania.zip",
+    hashes = {
+      { hash = "659550d4c9588ff594a927eb173877d2", label = "Taz-Mania (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD038, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUES" },
+        { address=0XE065, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over or MAP = 00" },
+        { address=0XFEE3, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="PRESS START from DEMO MODE" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD020, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Number, Verbatim" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD452, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="DEATH" },
+        { address=0XD454, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIVES increased" },
+        { address=0XD454, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIVES decreased" },
+      },
+      health = {
+        { address=0XD452, type="u8", condition="eq", value=0X0C, action="HEALTH_STATE", no_log=true, no_survey=false, desc="FULL" },
+        { address=0XD452, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=true, no_survey=false, desc="OTHER" },
+        { address=0XD452, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="HEALTH" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD44E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score BCD x10,000" },
+        { address=0XD450, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score BCD 1,000s" },
+      },
+    },
+  },
+}

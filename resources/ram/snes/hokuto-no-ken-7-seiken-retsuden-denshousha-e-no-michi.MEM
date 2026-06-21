@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Hokuto no Ken 7: Seiken Retsuden Denshousha e no Michi",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "hokuto-no-ken-7-seiken-retsuden-denshousha-e-no-michi",
+    file = "hokuto-no-ken-7-seiken-retsuden-denshousha-e-no-michi.zip",
+    hashes = {
+      { hash = "d027ed8073eb9dff3b51747a738c1cb8", label = "Hokuto no Ken 7 - Seiken Retsuden Denshousha e no Michi (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X13A2, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Super Easy" },
+        { address=0X13A2, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X13A2, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X13A2, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X13A2, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Super Hard" },
+        { address=0X13A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level (Difficulty):" },
+      },
+      stage = {
+        { address=0X11C0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage select?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0129, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (Player 1) decreased" },
+        { address=0X0129, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (Player 1) increased" },
+        { address=0X02BC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (Player 2) decreased" },
+        { address=0X02BC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (Player 2) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0022, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score? [32-bits]" },
+      },
+    },
+  },
+}

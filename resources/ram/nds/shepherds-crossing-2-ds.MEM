@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Shepherd's Crossing 2 DS",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "shepherds-crossing-2-ds",
+    file = "shepherds-crossing-2-ds.zip",
+    hashes = {
+      { hash = "2ff05bf3e5f6d46ae61b2031db4eb8ed", label = "Shepherd's Crossing 2 DS (USA).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1AF625, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="--- Livestock increased" },
+        { address=0X1AF625, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Livestock decreased" },
+      },
+    },
+  },
+}

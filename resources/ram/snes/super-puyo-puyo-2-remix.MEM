@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Super Puyo Puyo 2 Remix",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "super-puyo-puyo-2-remix",
+    file = "super-puyo-puyo-2-remix.zip",
+    hashes = {
+      { hash = "0dc4efac96b9e965009e9c613913c6f8", label = "Super Puyo Puyo Tsuu Remix (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1160, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="01=continue used 80=title screen 00=on Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0183, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Vs. Com Level setting" },
+        { address=0X030C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="4player p1 level" },
+        { address=0X030D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="4player p2 level" },
+        { address=0X030E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="4player p3 level" },
+        { address=0X030F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="4player p4 level" },
+        { address=0X0310, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Single Player round [00=1]" },
+        { address=0X0754, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="10c0=no clear since last garbage drop" },
+        { address=0X1859, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Amount of one color cleared at once [hex]" },
+      },
+      stage = {
+        { address=0X0306, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01=stage select used [Rally mode]" },
+        { address=0X0317, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tower mode tier [level] Practice mode diff" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X01A7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Margin time setting" },
+        { address=0X0749, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chain counter [hex]" },
+        { address=0X0798, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round time" },
+        { address=0X1165, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Over timer" },
+        { address=0X121C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round time [seconds]" },
+        { address=0X121D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round time [minutes]" },
+      },
+    },
+  },
+}

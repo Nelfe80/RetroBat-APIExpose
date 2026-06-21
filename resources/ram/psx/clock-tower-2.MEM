@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Clock Tower 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "clock-tower-2",
+    file = "clock-tower-2.zip",
+    hashes = {
+      { hash = "936cf3838128c1837cafa66a2a78b1d7", label = "Clock Tower (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7F464, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X959F5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Jennifer Ending A (8-bit) Cleared [Ending List]" },
+        { address=0X959F6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Jennifer Ending B (8-bit) Cleared [Ending List]" },
+        { address=0X959F7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Jennifer Ending C (8-bit) Cleared [Ending List]" },
+        { address=0X959F8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Jennifer Ending D (8-bit) Cleared [Ending List]" },
+        { address=0X959F9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Jennifer Ending E (8-bit) Cleared [Ending List]" },
+        { address=0X959FA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Helen Ending A (8-bit) Cleared [Ending List]" },
+        { address=0X959FB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Helen Ending B (8-bit) Cleared [Ending List]" },
+        { address=0X959FC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Helen Ending C (8-bit) Cleared [Ending List]" },
+        { address=0X959FD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Helen Ending D (8-bit) Cleared [Ending List]" },
+        { address=0X959FE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Helen Ending E (8-bit) Cleared [Ending List]" },
+      },
+      stage = {
+        { address=0X9588E, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Samuel Barton (Prologue)" },
+        { address=0X9588E, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jennifer (Scenario 1)" },
+        { address=0X9588E, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Helen (Scenario 1)" },
+        { address=0X9588E, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nolan (Scenario 2)" },
+        { address=0X9588E, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Helen (Scenario 2)" },
+        { address=0X9588E, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gotts (Scenario 2)" },
+        { address=0X9588E, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jennifer (Scenario 3)" },
+        { address=0X9588E, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Helen Scenario 3)" },
+        { address=0X9588E, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Intermissions" },
+        { address=0X9588E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current 'Stage' (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X958FD, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Called (phone will now be dead)" },
+        { address=0X9590B, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Found dead in 2nd floor bathroom stall" },
+        { address=0X9590B, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Found dead in Barton's office" },
+        { address=0X95939, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Found dead in 2nd floor bathroom stall" },
+        { address=0X95939, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Found dead in Barton's office" },
+        { address=0X95997, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Event (8-bit) Gotts at Rick's after Rick's death" },
+        { address=0X95A9F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Jennifer saved = 1? default/dead = 0?" },
+        { address=0X95B14, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="White" },
+        { address=0X95B14, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Yellow - One escape" },
+        { address=0X95B14, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Red - Two escapes (Instant death if trying to escape after this)" },
+        { address=0X95B14, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead End" },
+        { address=0X95B14, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stress/Life (8-bit) As expressed by cursor color increased" },
+        { address=0X95B14, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stress/Life (8-bit) As expressed by cursor color decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X958FC, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="The fax tone rings - sets 0x0958fb to 02" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X95928, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Helen - scissorman jumps out of lockers in fax room" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9580C, type="u8", condition="eq", value=0X13, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Fountain broken pathway" },
+        { address=0X958E6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Event (8-bit) Scenario 1: Jennifer - University - Front Entrance Door" },
+        { address=0X95921, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Interacted without pliers; Helen mentions the wire holding the door closed." },
+        { address=0X95921, type="u8", condition="eq", value=0X03, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Helen uses Storage Key to unlock the door and escape" },
+        { address=0X95937, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="No knocking on the door" },
+        { address=0X95937, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Knocking at the door" },
+        { address=0X959A1, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Event (8-bit) Gotts - Rick's Mansion - Laundry door" },
+        { address=0X959AE, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Vase broken on floor" },
+        { address=0X959C4, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Event (8-bit) Jennifer uses oil on door - Barrow's Mansion - Hall" },
+        { address=0X959C7, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Event (8-bit) Jennifer discovers the hidden switch - Barrow's Mansion - Kitchen Storeroom" },
+        { address=0X95A65, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Helen uses library key (must be found too for door to open)" },
+        { address=0XA71FA, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Elevator Doors (16-bit) Left Door" },
+        { address=0XA72EA, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Elevator doors turning when hiding inside elevator and Scissorman is approaching...? Right door" },
+        { address=0X199B20, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Base value for left elevator door (affects value used in 0x0a71f8)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9580C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Room ID (8-bit)" },
+        { address=0X958FE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Encounter (8-bit) Jennifer gets spooked by Scissorman from the lockers in the fax room 2nd floor" },
+        { address=0X95906, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Encounter (8-bit) Scenario 1: Jennifer - University - Computer room" },
+        { address=0X95930, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Encounter (8-bit) Scenario 1: Helen - University - Computer room" },
+        { address=0X9594E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Encounter (8-bit) Scenario 2: Nolan - Rick's Mansion - Kitchen" },
+        { address=0X9594F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Encounter (8-bit) Scenario 2: Nolan - Rick's Mansion" },
+        { address=0X95993, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Encounter (8-bit) Rick's Mansion - Gotts" },
+        { address=0X9599B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Encounter (8-bit) Scenario 2: Gotts - Rick's Mansion - Kitchen" },
+        { address=0X9599C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Encounter (8-bit) Scenario 2: Gotts - Rick's Mansion" },
+      },
+    },
+  },
+}

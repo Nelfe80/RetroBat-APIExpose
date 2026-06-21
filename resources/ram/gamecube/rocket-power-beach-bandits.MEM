@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Rocket Power: Beach Bandits",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Adventure, Sports, Strategy"
+  },
+
+  rom = {
+    name = "rocket-power-beach-bandits",
+    file = "rocket-power-beach-bandits.zip",
+    hashes = {
+      { hash = "b706aabb15d5f26b1d9cf25aadf798d8", label = "Nickelodeon Rocket Power - Beach Bandits (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1291B58, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Health is frozen at full and you can't take damage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1321154, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Score displayed value (GeneralIPC object)" },
+        { address=0X1321158, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Score true value (GeneralIPC object)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X13211C0, type="u32be", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="On ground/falling after walk off ledge" },
+        { address=0X13211C0, type="u32be", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X12915F8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Player death timer" },
+      },
+    },
+  },
+}

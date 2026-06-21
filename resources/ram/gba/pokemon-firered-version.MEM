@@ -1,0 +1,114 @@
+return {
+  game = {
+    title = "Pokémon FireRed Version",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "pokemon-firered-version",
+    file = "pokemon-firered-version.zip",
+    hashes = {
+      { hash = "21c75cf6ea782231121270606bdd2e76", label = "Pokemon - FireRed Version (USA) (Eo) (v0.93) (Kaifi).gba" },
+      { hash = "3135915853aa557889dbb36afb7d08f3", label = "Pokemon - FireRed Version (USA) (Moemon-Revival Project) (v2.6.0) (Magikarp-tan).gba" },
+      { hash = "4fcc165aab4b781c75afb68d4290aa8c", label = "Pokemon - FireRed Version (USA) (Vanilla Moemon) (Unknown).gba" },
+      { hash = "5c5c04fcc3640ef7f8e545d9bdcd2404", label = "Pokemon - FireRed Version (USA) (Moemon Gen 3) (v2.0).gba" },
+      { hash = "69ea9b894e5fae7684129f59c01b94ab", label = "Pokemon - FireRed Version (USA) (Moemon-Revival Project).gba" },
+      { hash = "8cd2a5aaee48b501748de1c8f7b420ed", label = "Pokemon - FireRed Version (USA) (Moemon-Revival Project) (v2.6.2).gba" },
+      { hash = "9ed8f007c7548716f81ddd0700a6bce7", label = "Pokemon - FireRed Version (USA) (Cosmetic) (Magikarp-tan).gba" },
+      { hash = "cfbecda514aee8b964e5e5603e60b925", label = "Pokemon - FireRed Version (USA) (Moemon-Revival Project) (v2.6.0).gba" },
+      { hash = "e26ee0d44e809351c8ce2d73c7400cdd", label = "Pokemon - FireRed Version (USA, Europe).gba" },
+      { hash = "e7e95ab0d167ea062a74c2accb299002", label = "Pokemon - FireRed (USA) (QoL Enhancement).gba" },
+      { hash = "51901a6e40661b3914aa333c802e24e8", label = "Pokemon - FireRed Version (USA, Europe) (Rev 1).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0F9C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Player Movement (=01)" },
+        { address=0X312C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="possible slots credits x000 graphics" },
+        { address=0X313C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="possible slots credits 0x00 graphics" },
+        { address=0X314C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="possible slots credits 00x0 graphics" },
+        { address=0X315C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="possible slots credits 000x graphics" },
+        { address=0X7307, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="(Bit7) Pause Music Flag" },
+        { address=0X8F0C, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="TM45 Attract" },
+        { address=0X28B72, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="possible total credits 00x0" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8F5F, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hidden Safari Zone" },
+        { address=0X2BC66, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy Pokemon level" },
+        { address=0X2C29C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 2 Level (JP)" },
+        { address=0X2C2D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 1 Level" },
+        { address=0X2C33C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2nd Pokemon Level" },
+        { address=0X2C3A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 3 Level" },
+        { address=0X2C404, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 4 Level" },
+        { address=0X2C468, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 5 Level" },
+        { address=0X2C4CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 6 Level" },
+      },
+      stage = {
+        { address=0X2B3F2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active Pokemon Level" },
+        { address=0X2BB6E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active Pokemon Level (JP)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2BBC4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Current HP (JP) decreased" },
+        { address=0X2BBC4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Current HP (JP) increased" },
+        { address=0X2BBC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Max HP decreased" },
+        { address=0X2BBC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Max HP increased" },
+        { address=0X2BC0C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Active Pokemon Current HP decreased" },
+        { address=0X2BC0C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Active Pokemon Current HP increased" },
+        { address=0X2BC64, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Current HP decreased" },
+        { address=0X2BC64, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Current HP increased" },
+        { address=0X2BC68, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Max HP decreased" },
+        { address=0X2BC68, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Max HP increased" },
+        { address=0X2C2DA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pokemon 1 Current HP decreased" },
+        { address=0X2C2DA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pokemon 1 Current HP increased" },
+        { address=0X2C2DC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pokemon 1 Max HP decreased" },
+        { address=0X2C2DC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pokemon 1 Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8F11, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Teeth" },
+        { address=0X8F28, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Case" },
+        { address=0X8F2D, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gift 10 Coins" },
+        { address=0X8F2D, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gift 20 Coins" },
+        { address=0X8F2E, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gift 20 Coins" },
+        { address=0X8F3F, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Amulet Coin" },
+        { address=0X8F63, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 10 Coins" },
+        { address=0X8F63, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 10 Coins" },
+        { address=0X8F63, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 20 Coins" },
+        { address=0X8F63, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 10 Coins" },
+        { address=0X8F63, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 10 Coins" },
+        { address=0X8F64, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 20 Coins" },
+        { address=0X8F64, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 10 Coins" },
+        { address=0X8F64, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 10 Coins" },
+        { address=0X8F64, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 10 Coins" },
+        { address=0X8F64, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 40 Coins" },
+        { address=0X8F64, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hidden 100 Coins" },
+        { address=0X29CD0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money When on Trainer Card x00000 increased" },
+        { address=0X29CD1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money When on Trainer Card 0x0000 increased" },
+        { address=0X29CD2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money When on Trainer Card 00x000 increased" },
+        { address=0X29CD3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money When on Trainer Card 000x00 increased" },
+        { address=0X29CD4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money When on Trainer Card 0000x0 increased" },
+        { address=0X29CD5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money When on Trainer Card 00000x increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X8F9D, type="u8", condition="bit_true", bit=2, mask=0X04, action="SWIMMING", no_log=true, no_survey=false, desc="Swimmer (Cerulean City Gym)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8EEB, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rocket (Blocking Poster)" },
+        { address=0X2BE87, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Pokeball Shakes if broken out" },
+      },
+    },
+  },
+}

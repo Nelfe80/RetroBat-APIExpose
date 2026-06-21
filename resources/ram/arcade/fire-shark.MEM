@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "fireshrk",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "fire-shark",
+    file = "fire-shark.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0XC1EBD, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: fire power" },
+        { address=0XC16E7, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: fire power" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC1E82, type="u32be", condition="change", action="SCORE_STATE", color="orange", min=50, max=200, no_log=false, no_survey=false, desc="Score delta 50-200: Score delta 50-200" },
+        { address=0XC1E82, type="u32be", condition="change", action="SCORE_STATE", color="cyan", min=210, max=500, no_log=false, no_survey=false, desc="Score delta 210-500: Score delta 210-500" },
+        { address=0XC1E82, type="u32be", condition="change", action="SCORE_STATE", color="green", min=510, max=1000, no_log=false, no_survey=false, desc="Score delta 510-1000: Score delta 510-1000" },
+        { address=0XC1E82, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=1100, max=10000, no_log=false, no_survey=false, desc="Score delta 1100-10000: Score delta 1100-10000" },
+      },
+    },
+  },
+}

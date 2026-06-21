@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Graffiti Kingdom",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "graffiti-kingdom",
+    file = "graffiti-kingdom.zip",
+    hashes = {
+      { hash = "7a8912afe7fd934b2cb22109f534fc8f", label = "Graffiti Kingdom (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

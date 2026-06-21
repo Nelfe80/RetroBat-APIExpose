@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Pokémon Mystery Dungeon: Explorers of Darkness",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-mystery-dungeon-explorers-of-darkness",
+    file = "pokemon-mystery-dungeon-explorers-of-darkness.zip",
+    hashes = {
+      { hash = "01a16e344dadada5671968014a1ea748", label = "Pokemon Mystery Dungeon - Explorers of Darkness (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "242622d88770371ca8f87acf329d913d", label = "Pokemon Mystery Dungeon - Explorers of Darkness (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1AE1E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1AE1E6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lead PkM HP decreased" },
+        { address=0X1AE1E6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lead PkM HP increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Winnie the Pooh in the Hundred Acre Wood",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "winnie-the-pooh-in-the-hundred-acre-wood",
+    file = "winnie-the-pooh-in-the-hundred-acre-wood.zip",
+    hashes = {
+      { hash = "48d5a95911742c869ce8a93086f87072", label = "Winnie the Pooh in the Hundred Acre Wood disk 1.woz" },
+      { hash = "eac803c863cd1fc78f21b666b30f618d", label = "Winnie the Pooh in the Hundred Acre Wood disk 2.woz" },
+    }
+  },
+
+  events = {
+  },
+}

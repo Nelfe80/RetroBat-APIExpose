@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Looney Tunes: Back in Action",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "looney-tunes-back-in-action",
+    file = "looney-tunes-back-in-action.zip",
+    hashes = {
+      { hash = "b4f76523a63b4f7ed5b6aa39c1cc1c52", label = "Looney Tunes - Back in Action (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X3097EC, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

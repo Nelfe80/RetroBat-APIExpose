@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "International Track & Field",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "international-track-field",
+    file = "international-track-field.zip",
+    hashes = {
+      { hash = "0bcecd82140ed50052318ed73b13f2ce", label = "International Track & Field (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB1AB4, type="u8", condition="bit_true", bit=6, mask=0X40, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="1 = Not on Title Screen (Options, name entry, in event, ect)" },
+        { address=0X1018D0, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Event Select/Title Screen" },
+        { address=0X1018D0, type="u16le", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Disqualified/Continue?" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1024C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1P: Current Points for Session" },
+        { address=0X1098DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points in Current/Last Event" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XB1B94, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="(Float) 1P Power: Long Jump" },
+        { address=0XB1BB4, type="u32le", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Foul" },
+        { address=0XB1E80, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="(Float) Current Result for Long Jump, Javelin, Triple Jump" },
+        { address=0X1018FC, type="u32le", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Long Jump" },
+        { address=0X1018FC, type="u32le", condition="eq", value=0X05, action="JUMPING", no_log=true, no_survey=false, desc="High Jump" },
+        { address=0X1018FC, type="u32le", condition="eq", value=0X07, action="JUMPING", no_log=true, no_survey=false, desc="Triple Jump" },
+        { address=0X101904, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=true, no_survey=false, desc="Long Jump" },
+        { address=0X101904, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=true, no_survey=false, desc="High Jump" },
+        { address=0X101904, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="Triple Jump" },
+        { address=0X104C1C, type="u32le", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Yes" },
+        { address=0X105924, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[Float] WR for Long Jump (in Meters)" },
+        { address=0X10592C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[Float] Qualifying Distance for Long Jump (in Meters)" },
+        { address=0X105A14, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[Float] WR for High Jump (in Meters)" },
+        { address=0X105A1C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[Float] Qualifying Height for High Jump (in Meters)" },
+        { address=0X105A8C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[Float] WR for Triple Jump (in Meters)" },
+        { address=0X105A94, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[Float] Qualifying Distance for Triple Jump (in Meters)" },
+        { address=0X105B0C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[Float] Qualifying Height for Pole Jump (in Meters)" },
+        { address=0X105BEC, type="u16le", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="Square" },
+        { address=0X105BEC, type="u16le", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=true, no_survey=false, desc="X" },
+        { address=0X105BEC, type="u16le", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=true, no_survey=false, desc="O" },
+        { address=0X105BEC, type="u16le", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=true, no_survey=false, desc="Triangle" },
+        { address=0X105BEC, type="u16le", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="R1" },
+        { address=0X105BEC, type="u16le", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=true, no_survey=false, desc="L1" },
+        { address=0X105BEC, type="u16le", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=true, no_survey=false, desc="R2" },
+        { address=0X105BEC, type="u16le", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=true, no_survey=false, desc="L2" },
+        { address=0X105BEE, type="u16le", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="Square" },
+        { address=0X105BEE, type="u16le", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=true, no_survey=false, desc="X" },
+        { address=0X105BEE, type="u16le", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=true, no_survey=false, desc="O" },
+        { address=0X105BEE, type="u16le", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=true, no_survey=false, desc="Triangle" },
+        { address=0X105BEE, type="u16le", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="R1" },
+        { address=0X105BEE, type="u16le", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=true, no_survey=false, desc="L1" },
+        { address=0X105BEE, type="u16le", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=true, no_survey=false, desc="R2" },
+        { address=0X105BEE, type="u16le", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=true, no_survey=false, desc="L2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1058F0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float] Qualifying Time for 100m Dash (in Seconds)" },
+        { address=0X1059A4, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float] Qualifying Time for 100m Free Stylist (in seconds)" },
+        { address=0X1059D8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float] WR Time for Hurdles (In Seconds)" },
+        { address=0X1059E0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float] Qualifying Time for Hurdles (in Seconds)" },
+      },
+    },
+  },
+}

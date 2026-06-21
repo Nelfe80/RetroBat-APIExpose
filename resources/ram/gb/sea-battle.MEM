@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Sea Battle",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "sea-battle",
+    file = "sea-battle.zip",
+    hashes = {
+      { hash = "b91125b6018a0a879e356a32129f5b73", label = "Bataille Navale (France) (En,Fr,De,Es).gb" },
+      { hash = "c62460c4fb6430cb4d2c6a3902b5442d", label = "Schiffe Versenken (Germany) (En,Fr,De,Es).gb" },
+      { hash = "efe060ea92c1815417d7fc12005d6afd", label = "Sea Battle (Europe) (En,Fr,De,Es).gb" },
+    }
+  },
+
+  events = {
+  },
+}

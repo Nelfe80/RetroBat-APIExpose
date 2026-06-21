@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Blood Omen: Legacy of Kain",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "blood-omen-legacy-of-kain",
+    file = "blood-omen-legacy-of-kain.zip",
+    hashes = {
+      { hash = "3dbd702934b12a2c6b842e4c7e060a67", label = "Blood Omen - Legacy of Kain (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

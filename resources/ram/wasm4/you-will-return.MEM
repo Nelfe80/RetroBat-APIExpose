@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "You Will Return",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "you-will-return",
+    file = "you-will-return.zip",
+    hashes = {
+      { hash = "4ce31f9e2abfeddb79132951567bbd27", label = "You Will Return (World) (Rev 1) (Sander in 't Veld).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD6E5, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Using the room select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD714, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of deaths" },
+      },
+    },
+  },
+}

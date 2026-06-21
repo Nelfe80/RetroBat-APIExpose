@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ardu-EZ Button",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ardu-ez-button",
+    file = "ardu-ez-button.zip",
+    hashes = {
+      { hash = "33bbab25de35f4f7bf51432fb7fe1ade", label = "Ardu-EZ Button (World) (Program) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+  },
+}

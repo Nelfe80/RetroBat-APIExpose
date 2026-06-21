@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 7: Asou Kaori",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-7-asou-kaori",
+    file = "private-idol-disc-vol-7-asou-kaori.zip",
+    hashes = {
+      { hash = "2954f17434e48c58072ef2e54b197137", label = "Private Idol Disc Vol. 7 - Kaori Asou (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X12C955, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X108DDE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Menu object for RP" },
+      },
+    },
+  },
+}

@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Who Wants to Be a Millionaire: 2nd Edition",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "who-wants-to-be-a-millionaire-2nd-edition",
+    file = "who-wants-to-be-a-millionaire-2nd-edition.zip",
+    hashes = {
+      { hash = "b5450f7d5c393aae4dac66a96d7b0448", label = "Who Wants to Be a Millionaire - 2nd Edition (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X50395, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title (startup)" },
+        { address=0X50395, type="u8", condition="eq", value=0X42, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1FFED0, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1FFED0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="50/50 Lifeline Available increased" },
+        { address=0X1FFED0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="50/50 Lifeline Available decreased" },
+        { address=0X1FFED1, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1FFED1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Phone a Friend Lifeline Available increased" },
+        { address=0X1FFED1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Phone a Friend Lifeline Available decreased" },
+        { address=0X1FFED2, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1FFED2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ask the Audience Lifeline Available increased" },
+        { address=0X1FFED2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ask the Audience Lifeline Available decreased" },
+      },
+    },
+  },
+}

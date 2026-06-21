@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lion and the King",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "lion-and-the-king",
+    file = "lion-and-the-king.zip",
+    hashes = {
+      { hash = "dbaf1d45f56a80725c44b69caf90c0b9", label = "Lion and the King (Europe) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+  },
+}

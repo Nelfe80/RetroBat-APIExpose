@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Metal Gear Solid: Integral",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure, Shooter, Stealth"
+  },
+
+  rom = {
+    name = "metal-gear-solid-integral",
+    file = "metal-gear-solid-integral.zip",
+    hashes = {
+      { hash = "5c7536dd77e4a4ec2c35f895ab261811", label = "Metal Gear Solid - Integral (Japan, Asia) (En,Ja) (Disc 2)" },
+      { hash = "9d140ac4b06b09241729ba48ee0e2988", label = "Metal Gear Solid - Integral (Japan, Asia) (En,Ja) (Disc 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAB928, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game paused" },
+        { address=0XAB990, type="u24le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Theater ID (16-Bit) (0xA242)" },
+        { address=0XB4E46, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X11708C, type="u16le", condition="eq", value=0X2A2F, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Theater" },
+        { address=0X11708C, type="u16le", condition="eq", value=0XB8BA, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB40A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rats Killed - Underground Passage" },
+        { address=0XB4E04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID Card Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB4DAE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0XB4DAE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0XB4DB0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max Life increased" },
+        { address=0XB4DB0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max Life decreased" },
+      },
+      health = {
+        { address=0XB4091, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Crane Damage" },
+        { address=0XB654E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ocelot/Mantis Health decreased" },
+        { address=0XB654E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ocelot/Mantis Health increased" },
+        { address=0XB6596, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Meryl Health (Mantis Fight) decreased" },
+        { address=0XB6596, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Meryl Health (Mantis Fight) increased" },
+        { address=0XB678E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Metal Gear REX Health decreased" },
+        { address=0XB678E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Metal Gear REX Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAB928, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon/Equipment Menu Open" },
+        { address=0XB4DB4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon" },
+        { address=0XBD561, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Last Weapon Equipped" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB40FD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 0 - Wearing Tuxedo/Meryl Wearing Sneaking Suit increased" },
+        { address=0XB4DBA, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Socom Ammo" },
+        { address=0XB4DBC, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="MP5SD/Famas Ammo" },
+        { address=0XB4DCC, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="PSG-1 Ammo" },
+        { address=0XB4DCE, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Socom Max Ammo" },
+        { address=0XBD552, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo in Current Gun" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB3CC9, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 3 - Walkway Door Blown Open" },
+        { address=0XB3F2F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 0 - Medical Room Bathroom Door Unlocked" },
+      },
+    },
+  },
+}

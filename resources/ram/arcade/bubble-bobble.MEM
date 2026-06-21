@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Bubble Bobble",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "bubble-bobble",
+    file = "bubble-bobble.zip",
+    hashes = {
+      { hash = "72a669a6a000928da3ab24c3a79e554c", label = "bublbobl.7z <Bubble Bobble (Japan, Ver 0.1)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3666, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X38D3, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Game active" },
+        { address=0X38D3, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo active" },
+        { address=0X3991, type="u8", condition="eq", value=0X00, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Between stages" },
+        { address=0X3991, type="u8", condition="eq", value=0X80, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3650, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of round to warp" },
+        { address=0X394B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round (base 0x00)" },
+        { address=0X4046, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of enemies spawned in round" },
+        { address=0X4047, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of enemies defeated by popping bubble in current round" },
+      },
+      stage = {
+        { address=0X39BB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of stages player 1 has fireballs" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X645, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+        { address=0X6C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: select head power" },
+        { address=0X1F21, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="DIP switches increased" },
+        { address=0X1F21, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="DIP switches decreased" },
+        { address=0X3643, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X38DE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Rounds cleared on current life increased" },
+        { address=0X38DE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rounds cleared on current life decreased" },
+        { address=0X3945, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X3945, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X3991, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player died" },
+        { address=0X474E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit0=All enemies die from Chack'n Heart" },
+      },
+      health = {
+        { address=0X38D2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power Up mode decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X38D2, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off" },
+        { address=0X38D2, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] P1: Score (value*10)" },
+        { address=0X3946, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] P2: Score (value*10)" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", color="orange", min=10, max=50, no_log=false, no_survey=false, desc="Score delta 10-50: Score delta 10-50" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", color="blue", min=60, max=100, no_log=false, no_survey=false, desc="Score delta 60-100: Score delta 60-100" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", color="cyan", min=150, max=350, no_log=false, no_survey=false, desc="Score delta 150-350: Score delta 150-350" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", min=400, max=600, no_log=false, no_survey=false, desc="Score delta 400-600: Score delta 400-600" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", color="orange", min=650, max=850, no_log=false, no_survey=false, desc="Score delta 650-850: Score delta 650-850" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", color="blue", min=900, max=1000, no_log=false, no_survey=false, desc="Score delta 900-1000: Score delta 900-1000" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", color="blue", min=2000, max=4000, no_log=false, no_survey=false, desc="Score delta 2000-4000: Score delta 2000-4000" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", color="yellow", min=5000, max=8000, no_log=false, no_survey=false, desc="Score delta 5000-8000: Score delta 5000-8000" },
+        { address=0X3941, type="u24le", condition="change", action="SCORE_STATE", color="white", min=9000, max=10000, no_log=false, no_survey=false, desc="Score delta 9000-10000: Score delta 9000-10000" },
+      },
+      collectibles = {
+        { address=0X366, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X39A4, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Bit0=Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1F20, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DIP switches" },
+      },
+    },
+  },
+}

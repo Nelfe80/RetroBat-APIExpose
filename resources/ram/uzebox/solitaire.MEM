@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Solitaire",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "solitaire",
+    file = "solitaire.zip",
+    hashes = {
+      { hash = "96d62386036c99f054e6e0506b2385c1", label = "Solitaire (World) (Final) (D3thAdd3r).uze" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0FFD, type="u8", condition="eq", value=0X0B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0FFD, type="u8", condition="eq", value=0X12, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores" },
+      },
+    },
+  },
+}

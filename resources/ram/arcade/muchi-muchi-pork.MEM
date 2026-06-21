@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Muchi Muchi Pork!",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "muchi-muchi-pork",
+    file = "muchi-muchi-pork.zip",
+    hashes = {
+      { hash = "7f83afd81a406f82fb91ebbb87b4b850", label = "mmpork.zip <Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C3345, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue countdown" },
+        { address=0X47F84A, type="u16le", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Yes, this also indicates demo mode" },
+        { address=0X482036, type="u8", condition="eq", value=0X0C, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue screen" },
+        { address=0X48F59A, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+        { address=0X48F59A, type="u8", condition="eq", value=0X12, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X4B75A6, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X510D2A, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+        { address=0X640F12, type="u8", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="3" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X48A12F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level select" },
+      },
+      stage = {
+        { address=0X5F732, type="u8", condition="eq", value=0X90, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X5F732, type="u8", condition="eq", value=0XCC, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X5F732, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Related to stage progress" },
+        { address=0X319753, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This seems to control the bomb spawn on Stage 5" },
+        { address=0X53EE26, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="First stage" },
+        { address=0X53EE26, type="u16le", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last stage" },
+        { address=0X53EE26, type="u16le", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 of second loop" },
+        { address=0X53EE26, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X47D2C0, type="u16le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="No, either not active or during the death sequence" },
+        { address=0X47F840, type="u16le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="No, either not active or during the death sequence" },
+        { address=0X48A166, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X48A166, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="2" },
+        { address=0X48A166, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 (Default)" },
+        { address=0X48A166, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="4" },
+        { address=0X48A166, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="5" },
+        { address=0X48A166, type="u8", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="multiply" },
+        { address=0X48A166, type="u8", condition="eq", value=0X07, action="LIVES_STATE", no_log=false, no_survey=false, desc="invincible" },
+        { address=0X48A166, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Initial lives increased" },
+        { address=0X48A166, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Initial lives decreased" },
+        { address=0X510D2A, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max obtainable" },
+        { address=0X510D2A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X510D2A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0X510F76, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives increased" },
+        { address=0X510F76, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives decreased" },
+        { address=0X514DE0, type="u8", condition="eq", value=0X00, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Picked" },
+        { address=0X514DE0, type="u8", condition="eq", value=0X03, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Not picked" },
+        { address=0X514DE0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up of Stage 3 status increased" },
+        { address=0X514DE0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1-Up of Stage 3 status decreased" },
+      },
+      health = {
+        { address=0X4B7CE0, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Enemy Health, this address is reused across different enemies" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X510D50, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score upper 8" },
+        { address=0X510D52, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score lower 8" },
+        { address=0X510F9C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score upper 8" },
+        { address=0X510F9E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score lower 8" },
+      },
+      collectibles = {
+        { address=0X53EDEA, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="freeplay" },
+        { address=0X53EDEA, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X53EDEA, type="u8", condition="eq", value=0X09, action="MONEY_STATE", no_log=false, no_survey=false, desc="9" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5F732, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final boss" },
+        { address=0X5F732, type="u8", condition="eq", value=0XB4, action="BOSS_HIT", no_log=false, no_survey=false, desc="During boss fights" },
+        { address=0X5F732, type="u8", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mini boss fights" },
+        { address=0X5F732, type="u8", condition="eq", value=0X9C, action="BOSS_HIT", no_log=false, no_survey=false, desc="after mini boss of stage 1" },
+        { address=0X5F732, type="u8", condition="eq", value=0XD8, action="BOSS_HIT", no_log=false, no_survey=false, desc="after mini boss of stage 2" },
+        { address=0X4B7CE0, type="u16le", condition="eq", value=0X12C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Third stage boss max health during phase 2 and phase 3" },
+      },
+    },
+  },
+}

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "The Lord of the Rings: The Return of the King",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-lord-of-the-rings-the-return-of-the-king",
+    file = "the-lord-of-the-rings-the-return-of-the-king.zip",
+    hashes = {
+      { hash = "6b75d64925583166f48792ff95abb05d", label = "Lord of the Rings, The - The Return of the King (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2AF66C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] all 4 buttons are pressed on pause menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2A6394, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Real Level ID" },
+        { address=0X30FBBC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit Float] Aragorn Level" },
+        { address=0X30FBF8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit Float] Legolas Level" },
+        { address=0X30FC34, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit float] Gimli Level" },
+        { address=0X30FC70, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32Bit Float] Gandalf Level float" },
+        { address=0X30FCAC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit Float] Sam Level" },
+        { address=0X30FCE8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit Float] Frodo level" },
+        { address=0X30FD24, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit Float] Pippin level" },
+        { address=0X30FD60, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit Float] Merry Level" },
+        { address=0X30FD9C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit float] Faramir level" },
+      },
+      stage = {
+        { address=0X31A584, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Level select (not actual level ID)" },
+      },
+    },
+  },
+}

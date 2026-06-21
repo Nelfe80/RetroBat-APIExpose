@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "One Piece: Unlimited Cruise 2 - Awakening of a Hero",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "one-piece-unlimited-cruise-2-awakening-of-a-hero",
+    file = "one-piece-unlimited-cruise-2-awakening-of-a-hero.zip",
+    hashes = {
+      { hash = "f0688c495f3165d459f67e700f8cfa89", label = "One Piece - Unlimited Cruise 2 - Awakening of a Hero (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

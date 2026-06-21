@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Match3",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "match3",
+    file = "match3.zip",
+    hashes = {
+      { hash = "433a0cbc5fe40e65b3ef2bdb91d0e1b7", label = "Match3 (World) (Ben Smith).wasm" },
+    }
+  },
+
+  events = {
+  },
+}

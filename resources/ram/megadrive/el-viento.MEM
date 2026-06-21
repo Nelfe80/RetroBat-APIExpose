@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "El Viento",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "el-viento",
+    file = "el-viento.zip",
+    hashes = {
+      { hash = "6ddf640c2c5f91f12487d813b6257114", label = "El.Viento (USA).md" },
+      { hash = "ca18abf6ccede48681f013db3c43f108", label = "El Viento (USA) (Enhancement) (v1.0) (Jon Najar).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAA96, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XD470, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-game" },
+        { address=0XD470, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+  },
+}

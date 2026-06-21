@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "Mottomo Abunai Deka",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "mottomo-abunai-deka",
+    file = "mottomo-abunai-deka.zip",
+    hashes = {
+      { hash = "70744d7bd03099e572c8ef50ef3369c0", label = "Mottomo Abunai Deka (Japan) (En) (v1.0) (Gil Galad).nes" },
+      { hash = "bf8547a4b1eea2a7a7e6f3d94140e163", label = "Mottomo Abunai Deka (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0004, type="u8", condition="bit_true", bit=7, mask=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="1 - main menu / title screen / demo mode on" },
+        { address=0X0004, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="0 - in-game / playing. stays at 0 through cutscenes and" },
+        { address=0X0676, type="u8", condition="eq", value=0X0F, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="end credits" },
+        { address=0X06EB, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0X06EC, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X05F6, type="u8", condition="eq", value=0X64, action="NEW_LEVEL", no_log=false, no_survey=false, desc="100 (starting value)" },
+        { address=0X05F6, type="u8", condition="eq", value=0X1C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="28" },
+        { address=0X05F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="road fighter level time" },
+      },
+      stage = {
+        { address=0X0676, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X0676, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="interstitial boat stage" },
+        { address=0X0676, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2" },
+        { address=0X0676, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3" },
+        { address=0X0676, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 4" },
+        { address=0X0676, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="shooting gallery" },
+        { address=0X0676, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5 (muscle man I)" },
+        { address=0X0676, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 6 (muscle man II, sewer)" },
+        { address=0X0676, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 7 (muscle man III endgame)" },
+        { address=0X0676, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 8" },
+        { address=0X0676, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="road fighter ripoff" },
+        { address=0X0676, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="honda shootout" },
+        { address=0X0676, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="final actual level" },
+        { address=0X0676, type="u8", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="final muscleman fight" },
+        { address=0X0676, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X06E1, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X06E2, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X06EB, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="game start" },
+        { address=0X06EB, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 left" },
+        { address=0X06EB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives remaining - taka increased" },
+        { address=0X06EB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives remaining - taka decreased" },
+        { address=0X06EC, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="game start" },
+        { address=0X06EC, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 left" },
+        { address=0X06EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives remaining - yuuji increased" },
+        { address=0X06EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives remaining - yuuji decreased" },
+      },
+      health = {
+        { address=0X06E1, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="1 bar" },
+        { address=0X06E1, type="u8", condition="eq", value=0X05, action="HEALTH_STATE", no_log=false, no_survey=false, desc="5 bars" },
+        { address=0X06E1, type="u8", condition="eq", value=0X0A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max" },
+        { address=0X06E1, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="current health (taka)" },
+        { address=0X06E2, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="1 bar" },
+        { address=0X06E2, type="u8", condition="eq", value=0X05, action="HEALTH_STATE", no_log=false, no_survey=false, desc="5 bars" },
+        { address=0X06E2, type="u8", condition="eq", value=0X0A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max" },
+        { address=0X06E2, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="current health (yuuji)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X05E5, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="pistol (default)" },
+        { address=0X05E5, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="machine gun" },
+        { address=0X05E5, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="grenade" },
+        { address=0X05E6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="equipped weapon (same as 0x05e5?)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X05F8, type="u8", condition="eq", value=0X00, action="AMMO_STATE", no_log=false, no_survey=false, desc="default (zero)" },
+        { address=0X05F8, type="u8", condition="eq", value=0X0A, action="AMMO_STATE", no_log=false, no_survey=false, desc="10" },
+        { address=0X05F9, type="u8", condition="eq", value=0X00, action="AMMO_STATE", no_log=false, no_survey=false, desc="default (zero)" },
+        { address=0X05F9, type="u8", condition="eq", value=0X0A, action="AMMO_STATE", no_log=false, no_survey=false, desc="10" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0676, type="u8", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="final final boss (maeo)" },
+      },
+    },
+  },
+}

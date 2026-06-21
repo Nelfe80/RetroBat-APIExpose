@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Nanashi no Geemu Me",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nanashi-no-geemu-me",
+    file = "nanashi-no-geemu-me.zip",
+    hashes = {
+      { hash = "624c5ab2b183060ffdaaf14db9321f63", label = "Nanashi no Geemu Me (Japan) (En) (v1.13) (Nagato).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X121980, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Might be corelated to dialogue?? Whatever the case may be, this value is 0x02 on the title scree" },
+        { address=0X12DF08, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X254134, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Return to title" },
+        { address=0X261ED0, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X11E8EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0x## value seems to change depending on if the player is in a cutscene or is in dialogue before" },
+      },
+      zone = {
+        { address=0X12DF08, type="u8", condition="eq", value=0X0E, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Akane's Mental World" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X12E0FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Might be the framerate??? Anyway, this always seems to be 0x01 during cutscenes and always 0x00" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF197C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="In the original game, this mem value was responsible for the Broken Mirror on Day 1. Its functio" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X254134, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+        { address=0X261ED0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

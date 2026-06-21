@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Power Rangers: Time Force",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "power-rangers-time-force",
+    file = "power-rangers-time-force.zip",
+    hashes = {
+      { hash = "21b6d4d9631896145f94b869de43f543", label = "Power Rangers - Time Force (USA, Europe).gba" },
+      { hash = "f29fe8cae0acb618d7c48fb5e292b367", label = "Power Rangers - Time Force (Germany).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8030, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2354, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ranger Red HP (Change Only When Change Of Character) decreased" },
+        { address=0X2354, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ranger Red HP (Change Only When Change Of Character) increased" },
+        { address=0X2360, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pink Ranger HP (Change Only When Change Of Character) decreased" },
+        { address=0X2360, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pink Ranger HP (Change Only When Change Of Character) increased" },
+        { address=0X236C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Blue Ranger HP (Change Only When Change Of Character) decreased" },
+        { address=0X236C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Blue Ranger HP (Change Only When Change Of Character) increased" },
+        { address=0X2378, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bits] Green Ranger HP (Change Only When Change Of Character) decreased" },
+        { address=0X2378, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bits] Green Ranger HP (Change Only When Change Of Character) increased" },
+        { address=0X2384, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yellow Ranger HP (Change Only When Change Of Character) decreased" },
+        { address=0X2384, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yellow Ranger HP (Change Only When Change Of Character) increased" },
+        { address=0XA25C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Actual HP Of The Ranger (16 Bits If The Controlled Ranger Is Green) decreased" },
+        { address=0XA25C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Actual HP Of The Ranger (16 Bits If The Controlled Ranger Is Green) increased" },
+      },
+    },
+  },
+}

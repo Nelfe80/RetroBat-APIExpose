@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "LEGO Pirates of the Caribbean: The Video Game",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lego-pirates-of-the-caribbean-the-video-game",
+    file = "lego-pirates-of-the-caribbean-the-video-game.zip",
+    hashes = {
+      { hash = "627ed6d450fc12451fbae8270823ec3d", label = "LEGO Pirates of the Caribbean - The Video Game (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0XA21371, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="story unlocked" },
+        { address=0XA21371, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="freeplay unlocked" },
+        { address=0XA21372, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="story true pirate" },
+        { address=0XA21372, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="freeplay true pirate" },
+        { address=0XA21372, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="story unlocked" },
+        { address=0XA21372, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="freeplay unlocked" },
+        { address=0XA21372, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="story true pirate" },
+        { address=0XA21373, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="freeplay true pirate" },
+        { address=0XA21373, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="story unlocked" },
+        { address=0XA21373, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="freeplay unlocked" },
+        { address=0XA21373, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="story true pirate" },
+        { address=0XA21373, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="freeplay true pirate" },
+        { address=0XA21385, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Bitflag] At World's End - Singapore - Minikits" },
+        { address=0XA21386, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Bitflag] At World's End - Escape the Dutchman - Minikits" },
+        { address=0XA21387, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Bitflag] At World's End - Shipwreck Cove - Minikits" },
+        { address=0XA21388, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Bitflag] At World's End - The Maelstrom - Minikits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA2134D, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Navy Soldier unlocked" },
+        { address=0XA2134D, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Navy Soldier purchased" },
+        { address=0XA2134E, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="E.I.T.C Soldier unlocked" },
+        { address=0XA2134E, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="E.I.T.C Soldier purchased" },
+        { address=0XA21350, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Spanish Soldier unlocked" },
+        { address=0XA21350, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Spanish Soldier purchased" },
+        { address=0XA21369, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story mode unlocked" },
+        { address=0XA21369, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay unlocked" },
+        { address=0XA21369, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story true pirate" },
+        { address=0XA2136A, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay true pirate" },
+        { address=0XA2136B, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story mode unlocked" },
+        { address=0XA2136B, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay unlocked" },
+        { address=0XA2136C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story true pirate" },
+        { address=0XA2136C, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay true pirate" },
+        { address=0XA2136D, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story unlocked" },
+        { address=0XA2136D, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay unlocked" },
+        { address=0XA2136D, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story true pirate" },
+        { address=0XA2136D, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay true pirate" },
+        { address=0XA2136F, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story unlocked" },
+        { address=0XA2136F, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay unlocked" },
+        { address=0XA2136F, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story true pirate" },
+        { address=0XA21370, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay true pirate" },
+        { address=0XA21370, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story unlocked" },
+        { address=0XA21370, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay unlocked" },
+        { address=0XA21370, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="story true pirate" },
+        { address=0XA21370, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="freeplay true pirate" },
+        { address=0XA21381, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflag] Dead Man's Chest - Isla de Pelegostos - Minikits" },
+        { address=0XA21382, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflag] Dead Man's Chest - Davy Jones' Key - Minikits" },
+        { address=0XA21383, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflag] Dead Man's Chest - Isla Cruces - Minikits" },
+        { address=0XA21384, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflag] Dead Man's Chest - The Kraken - Minikits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA21337, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hector Barbossa unlocked" },
+        { address=0XA21337, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hector Barbossa purchased" },
+        { address=0XA21337, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hector Barbossa (Privateer) unlocked" },
+        { address=0XA21337, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hector Barbossa (Privateer) purchased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XB57905, type="u8", condition="bit_true", bit=6, mask=0X40, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+      player = {
+        { address=0XB57904, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="monkey jump" },
+      },
+    },
+  },
+}

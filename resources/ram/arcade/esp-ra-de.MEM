@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "ESP Ra.De.",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "esp-ra-de",
+    file = "esp-ra-de.zip",
+    hashes = {
+      { hash = "0c8c4ab8dc2ba2c135e3b79b594398d7", label = "esprade.7z <ESP Ra.De. - A.D.2018 Tokyo (International, ver. 98/04/22)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X240A, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen before inserting credit" },
+        { address=0X240A, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen after inserting credit" },
+        { address=0X240A, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X240A, type="u8", condition="eq", value=0X07, action="GAME_OVER", no_log=false, no_survey=false, desc="Gameplay, Results, Ending (While playing with P1)" },
+        { address=0X240A, type="u8", condition="eq", value=0X08, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X25A6, type="u8", condition="eq", value=0X6, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X2566, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Houoh High School;" },
+        { address=0X2566, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shopping Mall at Night;" },
+        { address=0X2566, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bay Area;" },
+        { address=0X2566, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Wangan Subway Line;" },
+        { address=0X2566, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+        { address=0X25A6, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1;" },
+        { address=0X25A6, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2;" },
+        { address=0X25A6, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3;" },
+        { address=0X25A6, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4;" },
+        { address=0X25A6, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="5A;" },
+        { address=0X25A6, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="5B;" },
+        { address=0X25A6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[4-Bit] Stage Number" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X240A, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking" },
+      },
+    },
+  },
+}

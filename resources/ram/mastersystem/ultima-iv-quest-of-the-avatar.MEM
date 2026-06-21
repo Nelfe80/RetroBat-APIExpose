@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Ultima IV: Quest of the Avatar",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ultima-iv-quest-of-the-avatar",
+    file = "ultima-iv-quest-of-the-avatar.zip",
+    hashes = {
+      { hash = "c54c1a2559cec189f53e794177d002af", label = "Ultima IV - Quest of the Avatar (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0600, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X0957, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="empty party, value used on title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0600, type="u8", condition="eq", value=0X11, action="NEW_LEVEL", no_log=false, no_survey=false, desc="overworld" },
+        { address=0X075B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Avatar - Level" },
+        { address=0X0778, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 2nd char - Level" },
+        { address=0X0795, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="3rd char level" },
+        { address=0X07B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="4th char level" },
+        { address=0X07CF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="5th char level" },
+        { address=0X07EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="6th char level" },
+        { address=0X0809, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="7th char level" },
+        { address=0X0826, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8th char level" },
+        { address=0X0970, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dungeon level" },
+        { address=0X099F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="worldmap" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X07FE, type="u8", condition="eq", value=0X47, action="LOSE_LIFE", no_log=false, no_survey=false, desc="normal 50=poisoned 53=sleep 44=dead" },
+        { address=0X094B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Spell - Undead" },
+      },
+      health = {
+        { address=0X0751, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Current HP decreased" },
+        { address=0X0751, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Current HP increased" },
+        { address=0X0753, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Max HP decreased" },
+        { address=0X0753, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Max HP increased" },
+        { address=0X0770, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 2nd char - HP decreased" },
+        { address=0X0770, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 2nd char - HP increased" },
+        { address=0X07FF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 7th char HP 2/2 decreased" },
+        { address=0X07FF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 7th char HP 2/2 increased" },
+        { address=0X0800, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 7th char HP 1/2 decreased" },
+        { address=0X0800, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 7th char HP 1/2 increased" },
+        { address=0X0801, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 7th char HPX 2/2 decreased" },
+        { address=0X0801, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 7th char HPX 2/2 increased" },
+        { address=0X0802, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 7th char HPX 1/2 decreased" },
+        { address=0X0802, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 7th char HPX 1/2 increased" },
+        { address=0X093B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spell - Energy Field decreased" },
+        { address=0X093B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spell - Energy Field increased" },
+        { address=0X0961, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Ship HP decreased" },
+        { address=0X0961, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Ship HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0302, type="u8", condition="eq", value=0XEF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ready-weapon (choose char)" },
+        { address=0X0302, type="u8", condition="eq", value=0X17, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ready-weapon (choose weapon)" },
+        { address=0X075C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) weapon equiped" },
+        { address=0X080A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) 7th char weapon" },
+        { address=0X0827, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) 8th char weapon" },
+        { address=0X0920, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Staff" },
+        { address=0X0921, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Dagger" },
+        { address=0X0922, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Sling" },
+        { address=0X0923, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Mace" },
+        { address=0X0924, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Axe" },
+        { address=0X0925, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Sword" },
+        { address=0X0926, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Bow" },
+        { address=0X0927, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Crossbow" },
+        { address=0X0928, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Flame Oil" },
+        { address=0X0929, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Halberd" },
+        { address=0X092A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Magic Axe" },
+        { address=0X092B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Magic Swd" },
+        { address=0X092C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Magic Bow" },
+        { address=0X092D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8 bit) Weapon - Magic Wand" },
+        { address=0X092E, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="collected" },
+        { address=0X0954, type="u8", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="mystic weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0909, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16 bit) Gold increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0951, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Skull of Mondain was destroyed" },
+        { address=0X17F0, type="u8", condition="eq", value=0XC0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door" },
+      },
+    },
+  },
+}

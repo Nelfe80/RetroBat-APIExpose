@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Dr. Mario Express",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dr-mario-express",
+    file = "dr-mario-express.zip",
+    hashes = {
+      { hash = "cfe479031963a1be99838cbb01043c39", label = "Dr. Mario Express (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB8DB4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBFEC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Classic Mode - Current Level" },
+        { address=0XBFF0C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Highest Level Reached - Low [16bit]" },
+        { address=0XBFF0E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Highest Level Reached - Medium [16bit]" },
+        { address=0XBFF10, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Highest Level Reached - High [16bit]" },
+      },
+    },
+  },
+}

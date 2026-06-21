@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Trauma Center: Under the Knife 2 [Subset - XS-Ranks]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation, Visual Novel"
+  },
+
+  rom = {
+    name = "trauma-center-under-the-knife-2-subset-xs-ranks",
+    file = "trauma-center-under-the-knife-2-subset-xs-ranks.zip",
+    hashes = {
+      { hash = "a8ac9c0c779197ae3ee3413ecb5619f0", label = "Trauma Center - Under the Knife 2 [Subset - SX-Ranks].nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEE444, type="u8", condition="eq", value=0XC, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XEF020, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Easy Operation 1 Score" },
+        { address=0XEF188, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Easy Operation 4 Score" },
+        { address=0XEF194, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Normal Operation 4 Score" },
+        { address=0XEF1A0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Hard Operation 4 Score" },
+        { address=0X152D14, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 bit[ Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEF00C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Furthest Unlocked Operation" },
+      },
+    },
+  },
+}

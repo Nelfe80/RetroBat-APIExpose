@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "The Getaway: Black Monday",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-getaway-black-monday",
+    file = "the-getaway-black-monday.zip",
+    hashes = {
+      { hash = "b5f8bd6383346179fde2775d5aa045c8", label = "Getaway, The - Black Monday (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X4BDFBC, type="u16le", condition="eq", value=0X58F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Oi, Ladies!" },
+        { address=0X4BDFBC, type="u16le", condition="eq", value=0X1A3D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Free Roaming with Eddie" },
+        { address=0X53A9A8, type="u8", condition="eq", value=0X91, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chapter 7: The Jamaican - Use the helicopter to find the Yardie car." },
+        { address=0X53A9A8, type="u8", condition="eq", value=0X9E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chapter 12: The Wake of the Shoreditch Massacre - Find another way out of the gym and back to Ed" },
+        { address=0X53A9A8, type="u8", condition="eq", value=0XA2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chapter 14: Trespass as Eddie - Help Sam into the bulding" },
+        { address=0X5421EC, type="u8", condition="eq", value=0X4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X542208, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="pause or death menu" },
+        { address=0X5425F0, type="u16le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Oi, Ladies!" },
+        { address=0X54F3F8, type="u32le", condition="eq", value=0XFFFFFFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="when dead" },
+        { address=0X595B2C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 9" },
+        { address=0X595B2D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 10" },
+        { address=0X595B2E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 11" },
+        { address=0X595B30, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 13" },
+        { address=0X595B31, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 14" },
+        { address=0X595B33, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 16" },
+        { address=0X595B34, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 17" },
+        { address=0X595B35, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 18" },
+        { address=0X595B36, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 19" },
+        { address=0X595B38, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 21" },
+        { address=0X595B39, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 22" },
+        { address=0X595B3B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit1= Eddie Key 22 -2" },
+      },
+      health = {
+        { address=0X53B968, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Double Health" },
+        { address=0X54F3F8, type="u32le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="32bit - Health (100)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4C8328, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Float - Money Black Cab mode increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4BDF9C, type="u32le", condition="eq", value=0X14, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="in menu" },
+        { address=0X53B9B4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="32 bit - Some kind of menu state, some shares the same values but still usefull to block leaderb" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X53A9A8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="8bit Mission Briefing ID" },
+      },
+    },
+  },
+}

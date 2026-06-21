@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Ark of Time",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "ark-of-time",
+    file = "ark-of-time.zip",
+    hashes = {
+      { hash = "efa9c4ef5b06a87c412dc92f88c9b6b5", label = "Ark of Time (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XA7958, type="u16le", condition="eq", value=0XA, action="MONEY_STATE", no_log=false, no_survey=false, desc="mexican coin" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA7954, type="u16le", condition="eq", value=0X15, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Atlantis - Green Door" },
+        { address=0XA7954, type="u16le", condition="eq", value=0X18, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Atlantis - Blue door" },
+        { address=0XA7954, type="u16le", condition="eq", value=0X42, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Atlantis - Red Door" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X4, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="pot with dirty water" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X5, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="empty pot" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X6, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="pot with water" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X8, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tweezers" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X9, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Painter" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X11, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Professor Magnet" },
+        { address=0XA7958, type="u16le", condition="eq", value=0XD, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mug" },
+        { address=0XA7958, type="u16le", condition="eq", value=0XE, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mug with resin" },
+        { address=0XA7958, type="u16le", condition="eq", value=0XF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Mug" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X15, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cloth covered with resin" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X1B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="leaked bucket" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X1C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="fixed bucket" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X1F, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ashes Urn" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X29, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Stange object" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X3A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Library Window" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X3C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sacred Gem" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X48, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Jar with rat croquettes" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X56, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hieroglyphics" },
+        { address=0XA7958, type="u16le", condition="eq", value=0XC3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="fountain robinet" },
+        { address=0XA7958, type="u16le", condition="eq", value=0XC2, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="fountain working" },
+        { address=0XA7958, type="u16le", condition="eq", value=0XCF, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Gum Tree" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X6D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Handcuf key" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X1A1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Termites" },
+        { address=0XA7958, type="u16le", condition="eq", value=0X22C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Strange Door" },
+        { address=0XA795A, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="GAME : Interraction - Object B ID (16-bit)" },
+        { address=0XA7976, type="u16le", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="no object select to use" },
+        { address=0XA7976, type="u16le", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="an object is currently selected to use (on 0xa7958)" },
+      },
+    },
+  },
+}

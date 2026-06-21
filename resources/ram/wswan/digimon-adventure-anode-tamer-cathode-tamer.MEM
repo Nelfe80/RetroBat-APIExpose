@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Digimon Adventure: Anode Tamer & Cathode Tamer",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "digimon-adventure-anode-tamer-cathode-tamer",
+    file = "digimon-adventure-anode-tamer-cathode-tamer.zip",
+    hashes = {
+      { hash = "47b23a84817217cc5b9bbd85fe634174", label = "Digimon - Anode Tamer & Cathode Tamer - Veedramon Version (Hong Kong) (En).wsc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1367E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Main Map Zones ID] [8-Bits]" },
+        { address=0X14D53, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Total amount that has been executed *Attack* among all the Digimon of the level] [8-Bits]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X14D33, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Digimon HP] [8-Bits] decreased" },
+        { address=0X14D33, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Digimon HP] [8-Bits] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10A4E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Money] [8-Bits] [Part 1] increased" },
+        { address=0X10A4F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Money] [8-Bits] [Part 2] increased" },
+        { address=0X10A50, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Money] [8-Bits] [Part 3] increased" },
+      },
+    },
+  },
+}

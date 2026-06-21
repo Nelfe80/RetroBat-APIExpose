@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "The Granstream Saga",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-granstream-saga",
+    file = "the-granstream-saga.zip",
+    hashes = {
+      { hash = "094952da1e8821d525eca632e7ea2ea8", label = "Granstream Saga, The (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C9025, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(8-bit) [Demo Mode Check] If this is 0, then in demo mode" },
+        { address=0X1C9036, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="(8-bit) Starting Credits, Arcia Sacrificed 0x7a -> 0x01, Laramee Sacrificed 0x72 -> 01" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1C981C, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(16-bit) Main Character's HP. increased" },
+        { address=0X1C981C, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(16-bit) Main Character's HP. decreased" },
+      },
+      health = {
+        { address=0X94380, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Max health for Main character. decreased" },
+        { address=0X94380, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Max health for Main character. increased" },
+        { address=0XBADD4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) One of two values for the HP display. See also 0x0bae14. decreased" },
+        { address=0XBADD4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) One of two values for the HP display. See also 0x0bae14. increased" },
+        { address=0XBAE14, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) One of two values for the HP display. See also 0x0badd4. decreased" },
+        { address=0XBAE14, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) One of two values for the HP display. See also 0x0badd4. increased" },
+        { address=0XC0F04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) [Combat] Player HP decreased" },
+        { address=0XC0F04, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) [Combat] Player HP increased" },
+        { address=0XC110C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) Enemy Current HP decreased" },
+        { address=0XC110C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) Enemy Current HP increased" },
+        { address=0XC67E6, type="u8", condition="eq", value=0XB0, action="HIT", no_log=false, no_survey=false, desc="False if damageless/no magic, True if damaged at all/used magic" },
+        { address=0XC67E6, type="u8", condition="eq", value=0XB7, action="HIT", no_log=false, no_survey=false, desc="BIG DAMAGE?" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1C9119, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(8-bit) [Inventory] Fake Treasure, used in Scam the Scammer ach" },
+      },
+      weapon = {
+        { address=0X88494, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8-bit) Current Weapon Equipped" },
+        { address=0X1C9140, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8-bit) Inventory - Weapons - Daggers and Axes" },
+        { address=0X1C9141, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8-bit) Inventory - Weapons - Swords" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1C9112, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) Inventory - Gold Bars increased" },
+        { address=0X1C915C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16-bit) Gems (Money) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9E6D9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) Boss IDs:" },
+        { address=0X9E6DA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) Boss ID #2, see 0x09e6d9" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1C9144, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="(8-bit) Inventory - Shields" },
+      },
+      player = {
+        { address=0X1C9034, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Kilia Shrine, after jumping into hole" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1C9071, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="(8-bit) [Plot] Destroyed the Vangel 0x51 -> 0xd1" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9E3A8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32-bit) Encounter ID, used with mimic fights" },
+        { address=0XB897C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-bit) [Combat] Time spent with shield active (current)" },
+        { address=0X1C90FE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Spell Effect Flag:" },
+      },
+    },
+  },
+}

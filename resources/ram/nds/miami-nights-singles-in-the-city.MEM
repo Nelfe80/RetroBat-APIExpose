@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Miami Nights: Singles in the City",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "miami-nights-singles-in-the-city",
+    file = "miami-nights-singles-in-the-city.zip",
+    hashes = {
+      { hash = "ba229445c4d07cc987d1a762dab7ec5c", label = "Miami Nights - Singles in the City (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+  },
+}

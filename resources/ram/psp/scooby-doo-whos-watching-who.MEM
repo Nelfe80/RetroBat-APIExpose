@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Scooby-Doo! Who's Watching Who?",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "scooby-doo-whos-watching-who",
+    file = "scooby-doo-whos-watching-who.zip",
+    hashes = {
+      { hash = "0db9052c42616956d20d3e40696ea784", label = "Scooby-Doo! Who's Watching Who (Europe).iso" },
+    }
+  },
+
+  events = {
+  },
+}

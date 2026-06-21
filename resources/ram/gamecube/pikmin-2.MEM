@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Pikmin 2",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "pikmin-2",
+    file = "pikmin-2.zip",
+    hashes = {
+      { hash = "3876a058fdf7ee82565f9a4439237b1f", label = "Pikmin 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5152F8, type="u32be", condition="eq", value=0X8F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0X92F7C4, type="u32be", condition="eq", value=0XFFFFFFFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0X930770, type="u8", condition="bit_true", bit=6, mask=0X40, action="PAUSE_ON", no_log=false, no_survey=false, desc="Switched to Louie for the first time/How to Pause (Day 1)" },
+        { address=0X9FD8BC, type="u32be", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Spring" },
+        { address=0X9FD8BC, type="u32be", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Summer" },
+        { address=0X9FD8BC, type="u32be", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Autumn" },
+        { address=0X9FD8BC, type="u32be", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Winter" },
+        { address=0XB0B4E0, type="u32be", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+        { address=0XB0B4E0, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6B33B9, type="u8", condition="eq", value=0X1B, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="White Flower (Cleared)" },
+        { address=0X93076C, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="How to enter hole to next Sublevel" },
+      },
+      stage = {
+        { address=0X930423, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X930423, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Not New" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6B33B9, type="u8", condition="eq", value=0X3F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pink Flower (Cleared With 0 Deaths)" },
+        { address=0X930396, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X930396, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Not New" },
+        { address=0X9303E8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X9303E8, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Not New" },
+      },
+      health = {
+        { address=0X930411, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained" },
+        { address=0X930411, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Not New" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X5152F8, type="u32be", condition="eq", value=0X6F, action="TREASURE", no_log=false, no_survey=false, desc="Repaied the debt / Collected Every Treasure" },
+        { address=0X5152F8, type="u32be", condition="eq", value=0X70, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Collected" },
+        { address=0X92F7BC, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Gauge" },
+        { address=0X92F7BD, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Metal Suit Z" },
+        { address=0X9303FE, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X9303FE, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Not New" },
+        { address=0X93041B, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X93041B, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Not New" },
+        { address=0X93076C, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Found first treasure (Day 1)" },
+        { address=0XB0B678, type="u32be", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="No Scene in Progress" },
+        { address=0XB0B678, type="u32be", condition="eq", value=0X05, action="TREASURE", no_log=false, no_survey=false, desc="Scene in Progress" },
+        { address=0XB0B678, type="u32be", condition="eq", value=0X06, action="TREASURE", no_log=false, no_survey=false, desc="Scene Ended/Transitioning to Gameplay or next scene" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9303EA, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X9303EA, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Not New" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9303A6, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X9303A6, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Not New" },
+        { address=0X930417, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X930417, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not New" },
+        { address=0X930418, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X930418, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not New" },
+        { address=0X930419, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X930419, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not New" },
+        { address=0X93041A, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Obtained" },
+        { address=0X93041A, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not New" },
+        { address=0X93076D, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ultra-Spicy spray first use" },
+        { address=0X93076D, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ultra-Bitter spray first use" },
+        { address=0X93076D, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="How to call Pikmin out of Onion (Day 2)" },
+        { address=0X930770, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="How to Switch Captains (Day 1)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB0B4E0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bit BE] Time of Day is Paused (In a Cave)" },
+      },
+    },
+  },
+}

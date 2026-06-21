@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Fluidity",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "fluidity",
+    file = "fluidity.zip",
+    hashes = {
+      { hash = "ace246625ffa7b4789c053e841c40caf", label = "Fluidity (USA) (WiiWare).wad" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X4B7D24, type="u32be", condition="eq", value=0X74BA, action="JUMPING", no_log=true, no_survey=false, desc="Playroom 2(Long Jump)" },
+      },
+    },
+  },
+}

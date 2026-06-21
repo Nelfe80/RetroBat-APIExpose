@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Motocross Maniacs",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "motocross-maniacs",
+    file = "motocross-maniacs.zip",
+    hashes = {
+      { hash = "dca464649ea6a3969ac8ee834d431d44", label = "Motocross Maniacs (Europe).gb" },
+      { hash = "de1572d4d181b265e2cb7d517c0ba04a", label = "Motocross Maniacs (USA).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC006, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Gamestate [05=racing 06=Game Over 07=Race win]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC01B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="current level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC782, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Taken [Milisecond] [Dec]" },
+        { address=0XC783, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Taken [Dec]" },
+        { address=0XC784, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Taken [Dec]" },
+        { address=0XC881, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining [Seconds] [Dec]" },
+        { address=0XC882, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining [Minutes]" },
+      },
+    },
+  },
+}

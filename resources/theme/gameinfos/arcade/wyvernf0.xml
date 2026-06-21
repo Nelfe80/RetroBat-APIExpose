@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 +@  38450</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 AK- 32790</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 DVZ 31800</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 KYE 31300</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 R!H 30910</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 EW? 30300</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 !JV 30020</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 OUI 29190</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 =DT 28250</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 YCS 27530</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 .NR 26540</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 CQ  26040</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 JX! 25650</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14  OW 25040</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 XBN 24760</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 GMA 23930</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 V.L 22990</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 Q-K 22270</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 TFJ 21280</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 -IU 20780</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 BPX 20390</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 UGO 19780</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 PZF 19500</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 ?EY 18670</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 NTD 17730</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 ISC 17010</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 L=B 16020</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 SAM 15520</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 ZHP 15130</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 M?G 14520</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 HR= 14240</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 W Q 13410</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 FL. 12470</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 AK- 11750</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 DVZ 10760</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 KYE 10260</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 R!H 9870</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 EW? 9260</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 !JV 8980</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 OUI 8150</text>
+		</text>
+		<text name="hiscoreline41" extra="true">
+			<text>#41 =DT 7210</text>
+		</text>
+		<text name="hiscoreline42" extra="true">
+			<text>#42 YCS 6490</text>
+		</text>
+		<text name="hiscoreline43" extra="true">
+			<text>#43 .NR 5500</text>
+		</text>
+		<text name="hiscoreline44" extra="true">
+			<text>#44 CQ  5000</text>
+		</text>
+		<text name="hiscoreline45" extra="true">
+			<text>#45 JX! 4610</text>
+		</text>
+		<text name="hiscoreline46" extra="true">
+			<text>#46  OW 4000</text>
+		</text>
+		<text name="hiscoreline47" extra="true">
+			<text>#47 XBN 3720</text>
+		</text>
+		<text name="hiscoreline48" extra="true">
+			<text>#48 GMA 2890</text>
+		</text>
+		<text name="hiscoreline49" extra="true">
+			<text>#49 V.L 1950</text>
+		</text>
+		<text name="hiscoreline50" extra="true">
+			<text>#50 Q-K 1230</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

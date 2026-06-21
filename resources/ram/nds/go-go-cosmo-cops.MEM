@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Go! Go! Cosmo Cops!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "go-go-cosmo-cops",
+    file = "go-go-cosmo-cops.zip",
+    hashes = {
+      { hash = "9dbf6ec7e4fa228bca71f4fad7ceec79", label = "Go! Go! Cosmo Cops! (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X14CE04, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (32bit) decreased" },
+        { address=0X14CE04, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (32bit) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X14CE14, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emeralds (32bit)" },
+      },
+    },
+  },
+}

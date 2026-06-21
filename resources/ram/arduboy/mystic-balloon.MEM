@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Mystic Balloon",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mystic-balloon",
+    file = "mystic-balloon.zip",
+    hashes = {
+      { hash = "4f36f3dc5e0b111304b6969f1366bc65", label = "Mystic Balloon (World) (No QR Code).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01BA, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X01D9, type="u8", condition="eq", value=0X8, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+        { address=0X01D9, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X01D9, type="u8", condition="eq", value=0X9, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X017E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Items Collected In a Level" },
+        { address=0X01BA, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Transition" },
+        { address=0X01BC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Balloons Left When Exiting the Level" },
+        { address=0X0B44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0775, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Balloons (Hp) decreased" },
+        { address=0X0775, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Balloons (Hp) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01BE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+      collectibles = {
+        { address=0X01B8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins Acquired increased" },
+        { address=0X01B9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins Missing increased" },
+        { address=0X01BD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Coins Collected increased" },
+      },
+    },
+  },
+}

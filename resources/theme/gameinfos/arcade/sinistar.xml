@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>analog_stick</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire</text>
+			<color>${orange}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Sinibomb</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire</text>
+			<color>${orange}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Sinibomb</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${blue}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 CAB 12850</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 A = 5000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 -?  1050</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 !&lt;&gt; 750</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 019 600</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 ',. 450</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 000 0</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 000 0</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 000 0</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 000 0</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 000 0</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 000 0</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 000 0</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 000 0</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 000 0</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 000 0</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 000 0</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 000 0</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 000 0</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 000 0</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 000 0</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 000 0</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 000 0</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 000 0</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 000 0</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 000 0</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 000 0</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 000 0</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 000 0</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 000 0</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

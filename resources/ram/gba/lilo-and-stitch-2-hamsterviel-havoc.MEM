@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lilo and Stitch 2: Hamsterviel Havoc",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "lilo-and-stitch-2-hamsterviel-havoc",
+    file = "lilo-and-stitch-2-hamsterviel-havoc.zip",
+    hashes = {
+      { hash = "e309212adc8da5280235f8765649858e", label = "Lilo & Stitch 2 (Europe) (En,Fr,De,Es).gba" },
+    }
+  },
+
+  events = {
+  },
+}

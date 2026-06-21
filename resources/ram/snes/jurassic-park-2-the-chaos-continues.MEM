@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Jurassic Park 2: The Chaos Continues",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "jurassic-park-2-the-chaos-continues",
+    file = "jurassic-park-2-the-chaos-continues.zip",
+    hashes = {
+      { hash = "64d367e1406fc39281443da9cfd9f015", label = "Jurassic Park Part 2 - The Chaos Continues (USA) (En,Fr,De,It).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA9A0, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="1P/2P? 00 on title, 01 when 1P is selected, 02 when 2P" },
+        { address=0XA9A2, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="1P/2P? 00 on title, 01 when 1P is selected, 02 when 2P" },
+        { address=0XA9A6, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues (16-Bit)" },
+        { address=0XA9A7, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Cheat: Infinite continues (00 inactive, 03 active)" },
+        { address=0XA9EB, type="u16le", condition="eq", value=0X0004, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage complete" },
+        { address=0XA9EB, type="u16le", condition="eq", value=0XFFFE, action="GAME_OVER", no_log=false, no_survey=false, desc="Ending" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0008, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game-Dinosaur Stock Level (16-Bit)" },
+        { address=0XA9EB, type="u16le", condition="eq", value=0X0004, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage complete" },
+      },
+      stage = {
+        { address=0X0002, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage (00-05 are selected levels)(09, 06, 07, 08, 0a, 0b are 1st through 6th em mission)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA9EB, type="u16le", condition="eq", value=0X0001, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death health (unknown context, from previous note)" },
+        { address=0XA9EB, type="u16le", condition="eq", value=0X0002, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death timer (unknown context, from previous note)" },
+        { address=0XA9EB, type="u16le", condition="eq", value=0X0003, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death stock (unknown context, from previous note)" },
+        { address=0XB032, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+      health = {
+        { address=0XB032, type="u8", condition="eq", value=0X28, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0XB032, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Game-P1 Health (8-Bit)" },
+        { address=0XB03F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Second health address? Climbs through frames instead of skipping to 28 at start decreased" },
+        { address=0XB03F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Second health address? Climbs through frames instead of skipping to 28 at start increased" },
+        { address=0XB097, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health bar, 28 is starting value (40 in dec) skips to 28 instantly on start decreased" },
+        { address=0XB097, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health bar, 28 is starting value (40 in dec) skips to 28 instantly on start increased" },
+        { address=0XB0A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Second health address? Climbs through frames instead of skipping to 28 at start decreased" },
+        { address=0XB0A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Second health address? Climbs through frames instead of skipping to 28 at start increased" },
+        { address=0XB553, type="u8", condition="eq", value=0X28, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0XB553, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Game-Final Mission-Helecopter Health (8-Bit)" },
+        { address=0XFFDC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Equalling (On = 00, Off = 01, Auto = 02) decreased" },
+        { address=0XFFDC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Equalling (On = 00, Off = 01, Auto = 02) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XB040, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P1 weapon selected (00=Rifle, 01=Machine Gun, 02=Shotgun, 03=Stun Gun, 04=Tranq, 05=Gas Grenade)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA9B0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="P1 Machine Gun ammo" },
+        { address=0XA9B2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="P1 Shotgun ammo" },
+        { address=0XA9B6, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="P1 Tranquilizer ammo" },
+        { address=0XA9B8, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="P1 Gas Grenade ammo" },
+        { address=0XA9BA, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="P1 super gas grenade ammo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA9EB, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Game state" },
+      },
+    },
+  },
+}

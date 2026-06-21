@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Mortal Kombat II",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-ii",
+    file = "mortal-kombat-ii.zip",
+    hashes = {
+      { hash = "ce2927987765182b9c69f26f758656e9", label = "Mortal Kombat II (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD2C0, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="ff when pacifist game over" },
+        { address=0XDE12, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits in options" },
+        { address=0XDE13, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits ingame" },
+        { address=0XFFC8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 = demo" },
+        { address=0XFFC9, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="00 when credits roll and before game. ingame" },
+        { address=0XFFCA, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="02 when credits roll" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFFF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amount of rounds won" },
+        { address=0XFFF5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amount of rounds won by enemies" },
+        { address=0XFFF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level id - level 07 is secret level fighting jade" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDD20, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life bar P1 increased" },
+        { address=0XDD20, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life bar P1 decreased" },
+        { address=0XDD60, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life bar enemy increased" },
+        { address=0XDD60, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life bar enemy decreased" },
+        { address=0XFD20, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life bar P1 40 = full health 00 = death increased" },
+        { address=0XFD20, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life bar P1 40 = full health 00 = death decreased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDD7A, type="u16le", condition="eq", value=0X17, action="JUMPING", no_log=false, no_survey=false, desc="movingjumpkick, 0e=punch 14=uppercut," },
+        { address=0XDD7A, type="u16le", condition="eq", value=0X16, action="JUMPING", no_log=false, no_survey=false, desc="jumppunch, 18=movingjumppunch" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFFF1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="battle timer" },
+      },
+    },
+  },
+}

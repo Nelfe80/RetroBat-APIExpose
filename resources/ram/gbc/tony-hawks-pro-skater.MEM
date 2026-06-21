@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Tony Hawk's Pro Skater",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "tony-hawks-pro-skater",
+    file = "tony-hawks-pro-skater.zip",
+    hashes = {
+      { hash = "75be6e3561908e705d9e790b34eddb4d", label = "Tony Hawk's Pro Skater (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC1D9, type="u8", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+      events = {
+        { address=0XC52C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Number of Combo" },
+        { address=0XE35C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Grind Combo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC1E4, type="u8", condition="eq", value=0XB1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 on 1/Tournament - Street" },
+        { address=0XC1E4, type="u8", condition="eq", value=0X11, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 on 1/Tournament - Park" },
+        { address=0XC1E4, type="u8", condition="eq", value=0X71, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 on 1/Tournament - Downtown" },
+        { address=0XC1E4, type="u8", condition="eq", value=0XD1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 on 1/Tournament - Harbor" },
+        { address=0XC1E4, type="u8", condition="eq", value=0X31, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 on 1/Tournament - Skate Park" },
+        { address=0XC1E4, type="u8", condition="eq", value=0X91, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Half-Pipe - Burnside - Portland" },
+        { address=0XC1E4, type="u8", condition="eq", value=0X9D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Half-Pipe - Skatepark - Chicago" },
+        { address=0XC1E4, type="u8", condition="eq", value=0XA9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Half-Pipe - Downtown - Minneapolis" },
+        { address=0XC1E4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC014, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Trick Score" },
+        { address=0XC4D8, type="u16le", condition="eq", value=0X270F, action="SCORE_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0XC4D8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC589, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Race Result Time Seconds" },
+      },
+    },
+  },
+}

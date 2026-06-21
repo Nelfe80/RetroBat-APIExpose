@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Dungeons & Dragons Collection",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dungeons-dragons-collection",
+    file = "dungeons-dragons-collection.zip",
+    hashes = {
+      { hash = "3618f3f480bb57da26bfbeeb7e53bb6f", label = "Dungeons & Dragons Collection (Japan) (Disc 1) (Tower of Doom)" },
+      { hash = "7f0b418fd552bdb37040634183bffb86", label = "Dungeons & Dragons Collection (Japan) (Disc 2) (Shadow over Mystara)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1E08DD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Shadows Over Mystara] (P1) Level" },
+        { address=0X1E09D1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Tower of Doom] (P1) Level" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1E0780, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Tower of Doom] (P1) Equipped Weapon" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E0A03, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[Tower of Doom] (P1) Continue Countdown Timer" },
+        { address=0X1E0B03, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[Tower of Doom] (P2) Continue Countdown Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Mercenary: Compendium Edition",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Action, Flight Simulator, Puzzle"
+  },
+
+  rom = {
+    name = "mercenary-compendium-edition",
+    file = "mercenary-compendium-edition.zip",
+    hashes = {
+      { hash = "1f5905a036f3e8526cd5b1fc5be95857", label = "Mercenary (1987)(Novagen Software).dsk" },
+      { hash = "e30bdb02b87d490c3b67ef1b0a1c9b01", label = "Mercenary (1987)(Novagen Software)(fr).dsk" },
+      { hash = "0c880e174f0d07d74eca8d715b2850d2", label = "Mercenary (1987)(Novagen Software)(de).dsk" },
+      { hash = "df10ea24b5cce4cb546598ec08f4a175", label = "Mercenary-Saves.dsk" },
+    }
+  },
+
+  events = {
+  },
+}

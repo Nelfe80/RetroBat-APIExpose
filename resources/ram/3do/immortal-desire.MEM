@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Immortal Desire",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Visual Novel"
+  },
+
+  rom = {
+    name = "immortal-desire",
+    file = "immortal-desire.zip",
+    hashes = {
+      { hash = "ceef67751644f25514333eb3a642448b", label = "Immortal Desire (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

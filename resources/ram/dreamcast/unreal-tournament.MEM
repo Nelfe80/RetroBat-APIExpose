@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Unreal Tournament",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "unreal-tournament",
+    file = "unreal-tournament.zip",
+    hashes = {
+      { hash = "a53c0401d458901d6d47e3558af337a7", label = "Unreal Tournament (USA) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X747A68, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="deaths oblivion" },
+        { address=0X7C8828, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player deaths (practice)" },
+        { address=0X8E6C10, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="deaths oblivion" },
+        { address=0X8E6C18, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="deaths oblivion" },
+        { address=0XEC805C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="kills oblivion (total kills+deaths?)" },
+      },
+      health = {
+        { address=0X7C883C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP hud (practice) decreased" },
+        { address=0X7C883C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP hud (practice) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XBF1070, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="settings - autoweapon switch off" },
+        { address=0XBF1078, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="settings - autoweapon switch on" },
+      },
+    },
+  },
+}

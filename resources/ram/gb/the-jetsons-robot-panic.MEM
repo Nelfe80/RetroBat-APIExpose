@@ -1,0 +1,136 @@
+return {
+  game = {
+    title = "The Jetsons: Robot Panic",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-jetsons-robot-panic",
+    file = "the-jetsons-robot-panic.zip",
+    hashes = {
+      { hash = "70cd582d3b1f15cb251620203d8b00c9", label = "Jetsons, The - Robot Panic (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0233, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Start of pause subroutine" },
+        { address=0XC025, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause flag" },
+        { address=0XC02C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits" },
+        { address=0XC36A, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC40E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bitfield] Stage clear flags (final stage flag is in 0xc39c)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC325, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="number of lives increased" },
+        { address=0XC325, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="number of lives decreased" },
+      },
+      health = {
+        { address=0XC224, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: elroy health pill 1 decreased" },
+        { address=0XC224, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: elroy health pill 1 increased" },
+        { address=0XC225, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: elroy health potion 2 decreased" },
+        { address=0XC225, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: elroy health potion 2 increased" },
+        { address=0XC229, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: elroy health potion 1 decreased" },
+        { address=0XC229, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: elroy health potion 1 increased" },
+        { address=0XC231, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: judy health pill 1 decreased" },
+        { address=0XC231, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: judy health pill 1 increased" },
+        { address=0XC232, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: judy health potion 1 decreased" },
+        { address=0XC232, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: judy health potion 1 increased" },
+        { address=0XC235, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: judy health pill 2 decreased" },
+        { address=0XC235, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: judy health pill 2 increased" },
+        { address=0XC238, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: jane health pill 2 decreased" },
+        { address=0XC238, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: jane health pill 2 increased" },
+        { address=0XC23B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: jane health pill 1 decreased" },
+        { address=0XC23B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: jane health pill 1 increased" },
+        { address=0XC240, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: jane health pill 3 decreased" },
+        { address=0XC240, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: jane health pill 3 increased" },
+        { address=0XC241, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: jane health pill 4 decreased" },
+        { address=0XC241, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: jane health pill 4 increased" },
+        { address=0XC245, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george health pill 2 decreased" },
+        { address=0XC245, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george health pill 2 increased" },
+        { address=0XC24F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george health potion 1 decreased" },
+        { address=0XC24F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george health potion 1 increased" },
+        { address=0XC250, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george health pill 1 decreased" },
+        { address=0XC250, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george health pill 1 increased" },
+        { address=0XC254, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 2 decreased" },
+        { address=0XC254, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 2 increased" },
+        { address=0XC258, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 7 decreased" },
+        { address=0XC258, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 7 increased" },
+        { address=0XC25A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 6 decreased" },
+        { address=0XC25A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 6 increased" },
+        { address=0XC25B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 3 decreased" },
+        { address=0XC25B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 3 increased" },
+        { address=0XC25C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 2 decreased" },
+        { address=0XC25C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 2 increased" },
+        { address=0XC25F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 9 decreased" },
+        { address=0XC25F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 9 increased" },
+        { address=0XC264, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 8 decreased" },
+        { address=0XC264, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 8 increased" },
+        { address=0XC265, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 1 decreased" },
+        { address=0XC265, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 1 increased" },
+        { address=0XC266, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health potion 1 decreased" },
+        { address=0XC266, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health potion 1 increased" },
+        { address=0XC268, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 4 decreased" },
+        { address=0XC268, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 4 increased" },
+        { address=0XC269, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 5 decreased" },
+        { address=0XC269, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health pill 5 increased" },
+        { address=0XC26A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health potion 2 decreased" },
+        { address=0XC26A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health potion 2 increased" },
+        { address=0XC26C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="collection table entry: george 2 health potion 3 decreased" },
+        { address=0XC26C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="collection table entry: george 2 health potion 3 increased" },
+        { address=0XC324, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy, max 0x13 decreased" },
+        { address=0XC324, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy, max 0x13 increased" },
+        { address=0XC396, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health decreased" },
+        { address=0XC396, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health increased" },
+        { address=0XC397, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XC397, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XC39C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Final stage clear flag (set on dealing last damage to boss)" },
+        { address=0XD480, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health (internal) decreased" },
+        { address=0XD480, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health (internal) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC326, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE BCD] Score, max 999990" },
+      },
+      collectibles = {
+        { address=0XC11D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Screen entrance ID (set when entering doors and during other screen transitions, see note 0x740e" },
+        { address=0XC40F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current stage (including when hovering in stage select menu) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC435, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final boss health (does not decrement on final hit, will just freeze at last positive value)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2443, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Start of jump subroutine" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X740E, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[Rom Bank 7] Door info lookup table" },
+        { address=0X7CC3, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[Rom Bank 7] Start of enter door subroutine (includes checking if character is standing at door," },
+        { address=0XC32B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[Table] Pairs corresponding to map screens and doors. In the first byte of the pair, bit 0 will" },
+        { address=0XC38D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Last held object" },
+        { address=0XD4B6, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="box has unloaded" },
+        { address=0XD4B6, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="normal or bomb" },
+        { address=0XD4B6, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="piercing" },
+        { address=0XD4B7, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="box has exploded (not set if box goes offscreen and is unloaded)" },
+        { address=0XD4B7, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="box held" },
+        { address=0XD4B7, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="box in freefall" },
+        { address=0XD4B7, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="box sliding" },
+        { address=0XD4C6, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="yes" },
+      },
+    },
+  },
+}

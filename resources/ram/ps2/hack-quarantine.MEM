@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = ".hack//Quarantine",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hack-quarantine",
+    file = "hack-quarantine.zip",
+    hashes = {
+      { hash = "2c9fb4737e98a89b7dbd3253adff3ed2", label = "Dot Hack Part 4 - Quarantine (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X985F5A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Squilla Demon" },
+        { address=0X985F64, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Wander Demon" },
+        { address=0X98601D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Demon Wyvern" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X986AE6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kite's Level" },
+        { address=0XD1A1C8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Field Level" },
+      },
+      zone = {
+        { address=0X981A03, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Helba -> RE: The World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X985F4C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Crane" },
+        { address=0X985F6D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Glare" },
+        { address=0X985FB7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Black Death" },
+        { address=0X985FFA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Deadly Present" },
+        { address=0X985FFC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Head" },
+        { address=0X986000, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Living Dead" },
+        { address=0X986002, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Undead Voodoo" },
+        { address=0X986013, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Deadly Moth" },
+        { address=0X986030, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Implant" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X985EA1, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Treasure Boxes Opened" },
+        { address=0X985EA3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Gott's Treasure" },
+        { address=0X986ABE, type="u16le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Gott's Treasures Obtained" },
+        { address=0X9883A4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Item Completion Event - Treasure" },
+        { address=0X9883A5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Item Completion Event - Treasure" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9819E6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Rachel -> RE:B-day Money increased" },
+        { address=0X985FF6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Fake Money increased" },
+        { address=0X986AEC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (GP) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X98038D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Key Items -> Event Item -> Basin Shield" },
+        { address=0X985F61, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Shield Man" },
+        { address=0X985F62, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Shield Devil" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X985EA2, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ryu Book VI -> Breakables Broken" },
+        { address=0X986A92, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ryu Book VI -> Breakables Broken" },
+      },
+    },
+  },
+}

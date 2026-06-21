@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Megami Tensei Gaiden: Last Bible II",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "megami-tensei-gaiden-last-bible-ii",
+    file = "megami-tensei-gaiden-last-bible-ii.zip",
+    hashes = {
+      { hash = "5c426fda8368066cf7e30587876af631", label = "Megami Tensei Gaiden - Last Bible II (Japan) (En) (v1.0) (EsperKnight).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC494, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="total demons owned" },
+        { address=0XCBAB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Vida del Demonio(1) 2" },
+        { address=0XCCF5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Vida Demonio (2) 1" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9800, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="86 is a corner tile used in menus. used to prevent stat related achievements from popping up bef" },
+        { address=0XC538, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Hero - level" },
+        { address=0XC5A6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Girl level" },
+        { address=0XC614, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Guy level" },
+        { address=0XC682, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ganzu/larsa level" },
+        { address=0XC6F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="krau level" },
+        { address=0XC75E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="zodia level" },
+        { address=0XC7CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) beast 1 - level" },
+        { address=0XC83A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) beast 2 - level" },
+        { address=0XC8A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) beast 3 - level" },
+        { address=0XC916, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) beast 4 - level" },
+      },
+      zone = {
+        { address=0XC49F, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="00 - world map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC51B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="flag 0 - ugobach, flag 1 - golem, flag 2 - djinn, flag 4 - fighter, flag 5 - soldier, flag 6 - c" },
+        { address=0XD292, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dialogue ID (16 bit) - 00ac is egg cracking open. 00b5 is the enemy appearing from the egg. 0175" },
+        { address=0XD292, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dialogue ID (16 bit) - 00ac is egg cracking open. 00b5 is the enemy appearing from the egg. 0175" },
+      },
+      health = {
+        { address=0XC539, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Hero - HP decreased" },
+        { address=0XC539, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Hero - HP increased" },
+        { address=0XC7CD, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="current hp(beast 1)(16 bit) decreased" },
+        { address=0XC7CD, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="current hp(beast 1)(16 bit) increased" },
+        { address=0XC7D6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max HP(beast 1) decreased" },
+        { address=0XC7D6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max HP(beast 1) increased" },
+        { address=0XCB3D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 1st enemy HP decreased" },
+        { address=0XCB3D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 1st enemy HP increased" },
+        { address=0XCB3E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="when enemy HP hits 0, if this is greater than 1, it decreases by 1 decreased" },
+        { address=0XCB3E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="when enemy HP hits 0, if this is greater than 1, it decreases by 1 increased" },
+        { address=0XEB3D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 1st enemy HP (mirror) decreased" },
+        { address=0XEB3D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 1st enemy HP (mirror) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC49C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) money 1/3 increased" },
+        { address=0XC49D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) money 2/3 increased" },
+        { address=0XC49E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) money 3/3 increased" },
+        { address=0XC4B0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 being flipped is discovering the becquerel mining problem at the bottom of the mine. bit 5" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC4AF, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="when bit 4 is flipped, krau and zodia join for the first time. bit 1 being flipped is the soldie" },
+      },
+    },
+  },
+}

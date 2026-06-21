@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Kemono Patrol",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kemono-patrol",
+    file = "kemono-patrol.zip",
+    hashes = {
+      { hash = "bab2d1c54921bded4b03875bc90b2569", label = "Kemono Patrol (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0194, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0194, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X016D, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+        { address=0X017C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

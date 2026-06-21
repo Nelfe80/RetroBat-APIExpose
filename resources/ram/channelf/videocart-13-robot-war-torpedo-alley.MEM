@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-13: Robot War, Torpedo Alley",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "videocart-13-robot-war-torpedo-alley",
+    file = "videocart-13-robot-war-torpedo-alley.zip",
+    hashes = {
+      { hash = "3783b6ac359e21b99cfa17773aa811c6", label = "Robot War, Torpedo Alley (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

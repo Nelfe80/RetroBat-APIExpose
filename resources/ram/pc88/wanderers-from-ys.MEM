@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Wanderers from Ys",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "wanderers-from-ys",
+    file = "wanderers-from-ys.zip",
+    hashes = {
+      { hash = "28c2e77e4d80b869604d243527d3a9f5", label = "Ys III - Wanderers from Ys (Data disk 3 - Opening).d88" },
+      { hash = "9624e437532e6ea60f7a55f5aa0c04f3", label = "Ys III - Wanderers from Ys (Data disk 1).d88" },
+      { hash = "a3b7b1f53b7e075cc9ac05a0f5f04c25", label = "Ys III - Wanderers from Ys (Data disk 2).d88" },
+      { hash = "b8a8b191f89bf70e8539843321a69cf1", label = "Ys III - Wanderers from Ys (Scenario disk).d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X52A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Area (0: Redomont, 1: Tigrey, 2: Irubarnz, 3: Elderm, 4: Varestain, 5: final level?)" },
+        { address=0X53C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (max 12 = 0xc)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5381, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rank (0 = dead?, 1 = hard, 4 = normal, 8 = easy)" },
+      },
+      health = {
+        { address=0X53B7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X53B7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X53B8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X53B8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X53C3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Owned weapons" },
+        { address=0X53C4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X53BE, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (16-bit) increased" },
+        { address=0X53C9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Owned rings increased" },
+        { address=0X53CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Equipped ring increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X53DB, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bosses defeated (0: mine dude; 1: mine statue)" },
+        { address=0X53DC, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bosses defeated (0: Ligaty, 1: Gildias, 2: Galvaran, 3: Garland, 4: Garland again)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X53C7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Owned shields" },
+        { address=0X53C8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Equipped shield" },
+      },
+    },
+  },
+}

@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Mario Party 4",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "mario-party-4",
+    file = "mario-party-4.zip",
+    hashes = {
+      { hash = "1122a3eed3b4219dbaf6f711d5695532", label = "Mario Party 4 (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X168FD5, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Use for InTitle = 0" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X18FDF8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Mario Medley high score" },
+        { address=0X18FDFC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Domination high score" },
+        { address=0X18FE00, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Right Oar Left? high score" },
+        { address=0X18FE04, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Dungeon Duos high score" },
+        { address=0X18FE08, type="u32be", condition="eq", value=0X360, action="SCORE_STATE", no_log=false, no_survey=false, desc="0x168 = Oil Star" },
+        { address=0X18FE08, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Barrel Baron high score" },
+        { address=0X18FE0C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Mario Speedwagons high score" },
+        { address=0X18FE20, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Take a Breather high score" },
+        { address=0X18FE24, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Mushroom Medic high score" },
+        { address=0X18FE28, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Doors of Doom high score" },
+        { address=0X18FE30, type="u32be", condition="eq", value=0X55, action="SCORE_STATE", no_log=false, no_survey=false, desc="0x37 = Stomping Star" },
+        { address=0X18FE30, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit BE) Footloose highest score" },
+      },
+      collectibles = {
+        { address=0X18FC54, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16Bit BE) P1 Coins increased" },
+        { address=0X18FC57, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of coins earned in mini games increased" },
+        { address=0X18FC5B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Greatest number of coins during the game increased" },
+        { address=0X18FC85, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16Bit BE) P2 Coins increased" },
+        { address=0X18FCB5, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16Bit BE) P3 Coins increased" },
+        { address=0X18FCE5, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16Bit BE) P4 Coins increased" },
+        { address=0X18FDF3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit0 - Manta rings (4P) increased" },
+      },
+    },
+  },
+}

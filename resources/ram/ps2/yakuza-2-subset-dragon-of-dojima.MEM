@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Yakuza 2 [Subset - Dragon of Dojima]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Role-Playing, Sandbox"
+  },
+
+  rom = {
+    name = "yakuza-2-subset-dragon-of-dojima",
+    file = "yakuza-2-subset-dragon-of-dojima.zip",
+    hashes = {
+      { hash = "46aac39c1d3a45aaaa4fe16abc7f4bb7", label = "Yakuza 2 (USA) [Subset - Dragon of Dojima]" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XA697DC, type="u32le", condition="eq", value=0X102, action="LIVES_STATE", no_log=false, no_survey=false, desc="Night Life Dojo" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1A3A3C, type="u16le", condition="eq", value=0X103, action="MONEY_STATE", no_log=false, no_survey=false, desc="Champion's Ring" },
+        { address=0X1A3A40, type="u16le", condition="eq", value=0X103, action="MONEY_STATE", no_log=false, no_survey=false, desc="Champion's Ring" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA697DC, type="u32le", condition="eq", value=0X109, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="New Monitor Room" },
+      },
+    },
+  },
+}

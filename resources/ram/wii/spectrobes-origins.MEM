@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Spectrobes: Origins",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "spectrobes-origins",
+    file = "spectrobes-origins.zip",
+    hashes = {
+      { hash = "f4a5e2e97327a4ba9b0c91b54b39cdc9", label = "Spectrobes - Origins (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X12A17CA, type="u8", condition="bit_true", bit=0, mask=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo with your spectrobe tutorial in the Chamber of Ordeals" },
+        { address=0X12A2F80, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bits] Combo Strong Attack" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12A230F, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Kyptos checked for the first time" },
+        { address=0X12A2310, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bits BE] Quantity of Clear Kyptos in inventory" },
+        { address=0X12A2314, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bits BE] Quantity of Clear Kyptos excavated" },
+        { address=0X12A2927, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bits] Fossil Level" },
+        { address=0X12A2FDC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bits] Level" },
+        { address=0X12A9B24, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bits] Level" },
+        { address=0X12A9BE8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bits] Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X12A16ED, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Mineral circuit card used" },
+        { address=0X12A1741, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="After awakening the Ultimate lifeform Spectrobe and defeating Jado" },
+        { address=0X12A24F0, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 Bits] Life Mineral in Inventory increased" },
+        { address=0X12A24F0, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bits] Life Mineral in Inventory decreased" },
+        { address=0X12A24F4, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 Bits] Excavated Life Minerals increased" },
+        { address=0X12A24F4, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bits] Excavated Life Minerals decreased" },
+      },
+      health = {
+        { address=0X12A2FE0, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bits] Current HP decreased" },
+        { address=0X12A2FE0, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bits] Current HP increased" },
+        { address=0X12A2FE8, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bits] Bonus HP decreased" },
+        { address=0X12A2FE8, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bits] Bonus HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X12A1782, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Kamtoga gives you the Cosmokey (to unlock legendary weapons)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X12A171D, type="u8", condition="bit_true", bit=2, mask=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="NPC talking about Save points in the themple of Wyterra" },
+        { address=0X12A17BD, type="u8", condition="bit_true", bit=1, mask=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Save points tutorial" },
+        { address=0X12A1816, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bits] Tekka fossil score" },
+        { address=0X12A1980, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bits] Zeni Fossil Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X12A173E, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Cutscene and dialogue after defeating the giant Krawl (Galgore) in the Valley of Mist (Second Bo" },
+        { address=0X12A1769, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the cutscene and dialogue after defeating the first Krawl (Decaton) poisoning the river in" },
+        { address=0X12A1769, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the cutscene and dialogue after defeating the second Krawl (Decaton) poisoning the river i" },
+        { address=0X12A176A, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the cutscene and dialogue after defeating the third Krawl (Decaton) poisoning the river in" },
+        { address=0X12A176B, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the dialogue after defeating the big Krawl (Drilzon) inside the temple of Doldogo (sixth b" },
+        { address=0X12A177F, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the cutscene were you meet Kantoga, after defeating a Krawl with an ice shield (seventh bo" },
+        { address=0X12A1780, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the conversation after defeating the Centipede Krawl (eigth boss - small) in from of the t" },
+        { address=0X12A1781, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the conversation after defeating the Krawl (Gigardos) inside the temple of Kogoeria (ninet" },
+        { address=0X12A17A6, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the conversation after defeating the krawl (Savonek) attacking Neal in the Menahat ( tenth" },
+        { address=0X12A17A8, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Conversation after defeating the krawl (Zabatar) inside the big whale krawl in the dessert (elev" },
+        { address=0X12A17AE, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After cutscene after defeating the krawl (Grapatar) in the first floor of the tower in Slayso (1" },
+        { address=0X12A17B3, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="After defating the pink/purple krawl (Windorix) in the tower of Slayso, floor 500F (13th boss -" },
+        { address=0X12A17B4, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="After defating the light blue krawl (Thundorix) in the tower of Slayso, floor 800F (14th boss -" },
+        { address=0X12A17B4, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After the defeating the boss Krawl (Electrox) at the top of the tower of Slayso (15th boss - Big" },
+        { address=0X12A17B6, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After defeating the Krawl that kick Kamtoga down the ruins (16th boss - small)" },
+        { address=0X12A17BA, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After defeating the big Krawl (Gafing) at the end of the ruins in Bahmud (17th boss - big)" },
+        { address=0X12A17C2, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="After defeating the Krawl in the bridge (Wyterra) (First boss - small)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X12A222F, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Unlocked in the Equipment menu" },
+        { address=0X12A2233, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Unlocked in the Database" },
+        { address=0X12A223B, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Unlocked in the Equipment menu" },
+        { address=0X12A223F, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Unlocked in the Database" },
+        { address=0X12A2247, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Unlocked in the Equipment menu" },
+        { address=0X12A224B, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Unlocked in the Database" },
+      },
+      player = {
+        { address=0X12A16EC, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=true, no_survey=false, desc="Komainu (Jumpsuit) constellation card used" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12A1734, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="After defeating Krux and destroying the Krawlosphere" },
+        { address=0X12A173D, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="After the dialogue when you find your first fossil block" },
+        { address=0X12A1742, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="After Radese's dialogue about fossil blocs, turning your fossil block into a mistery pod" },
+        { address=0X12A17CA, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Spectrobe tutotial in the Chamber of Ordeals" },
+        { address=0X1352D7C, type="u32be", condition="eq", value=0X03, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroying the Krawlosphere" },
+      },
+    },
+  },
+}

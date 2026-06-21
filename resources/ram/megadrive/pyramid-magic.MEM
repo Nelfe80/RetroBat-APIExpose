@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Pyramid Magic",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "pyramid-magic",
+    file = "pyramid-magic.zip",
+    hashes = {
+      { hash = "3d8ade1cf3849e8d54da4f92e3de4edd", label = "Pyramid Magic (Japan) (SegaNet).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XE402, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Stage" },
+        { address=0XE430, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Stage Pass" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE427, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0XE427, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE404, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score Higher Numbers" },
+        { address=0XE406, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score Lower Numbers" },
+      },
+    },
+  },
+}

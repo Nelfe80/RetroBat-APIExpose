@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Freshly-Picked: Tingle's Rosy Rupeeland",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "freshly-picked-tingles-rosy-rupeeland",
+    file = "freshly-picked-tingles-rosy-rupeeland.zip",
+    hashes = {
+      { hash = "776b18885a3d5ba4410783719f83e46c", label = "Freshly-Picked - Tingle's Rosy Rupeeland (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X105658, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tower Level" },
+        { address=0X27B837, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Give your Ground Shell to Missy" },
+        { address=0X27B90C, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground Level 1 is opened" },
+        { address=0X27C4BD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bit0 - Sold Ground Shell to Chiko's Mum" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X246840, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Tingle Life ?? increased" },
+        { address=0X246840, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tingle Life ?? decreased" },
+        { address=0X27B7D8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 2 = Ingrendient Tips" },
+        { address=0X27B8BC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit0 - Death Bug Statue (Auros Ruins)" },
+        { address=0X27B918, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Brigde(Deku Forest)" },
+      },
+      health = {
+        { address=0X27B887, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mr. Energy" },
+        { address=0X315BA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Stalfos battle, Tingle HP decreased" },
+        { address=0X315BA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Stalfos battle, Tingle HP increased" },
+        { address=0X315BA8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Stalfos battle, Stalfos HP decreased" },
+        { address=0X315BA8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Stalfos battle, Stalfos HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X27B820, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Cape Treasure" },
+        { address=0X27B841, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Bit4 - Chest empty jar cape treasure" },
+        { address=0X27B874, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Secret Door on Cape Treasure(Pirate Symbol)" },
+        { address=0X27B8B9, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Star on Cape Treasure(MAP)" },
+        { address=0X27B90F, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Dog(Cape Treasure)" },
+        { address=0X27B910, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Bit2=Cape Treasure Brigde" },
+        { address=0X27B936, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Save Junglo" },
+        { address=0X27B936, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="'Monkey Brigde'" },
+        { address=0X27B936, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Deku tree door open" },
+        { address=0X27C4B6, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Puree" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X27B9A8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16bit) Points in Deku Forest Mini Game" },
+      },
+      collectibles = {
+        { address=0X1F3D74, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Shark Teeth 32-Bit [0228f28c] increased" },
+        { address=0X27B8A3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit2 - Pirate Hideaway B2 chest (Gold Shark Teeth) increased" },
+        { address=0X27B8B4, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mushroom Ring(Gooey Swamp)" },
+        { address=0X27BDA0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money offered increased" },
+        { address=0X2AF3E0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money invested in 1st Dialogue increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X27B849, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit0 - Hero's Shrine boss chest opened (when you lose and get kicked out)" },
+        { address=0X27B92F, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit3 - Defeated Oinker Boss" },
+        { address=0X27B950, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit2='Good work, matey! You're the saviour of the pirates!' After defeating Pirate Ship's Boss" },
+        { address=0X27B9C8, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16Bit) Bonus rupees collected in Mount Desma boss" },
+        { address=0X27BDB0, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(32Bit) Amount of rupees collected after boss" },
+        { address=0X304E94, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16Bit) Deku Boss Tingle HP" },
+        { address=0X34ADA0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Ballons Boss Fight" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X27B88D, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit3=Secret Door in Ship's Dugeon '55235'" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1EF33C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bomb Time Boss Battle" },
+      },
+    },
+  },
+}

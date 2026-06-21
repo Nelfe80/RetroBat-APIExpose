@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Happy Trails",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "happy-trails",
+    file = "happy-trails.zip",
+    hashes = {
+      { hash = "01348ced597a48a4ee87a5b3683616cb", label = "Happy Trails (USA, Europe).int" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X06AC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives increased" },
+        { address=0X06AC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives decreased" },
+      },
+    },
+  },
+}

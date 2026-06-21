@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Zoids Legacy",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "zoids-legacy",
+    file = "zoids-legacy.zip",
+    hashes = {
+      { hash = "220a6f1b9d8d63e7638248f24dbfa709", label = "Zoids - Legacy (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2F3E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="zeru level?" },
+        { address=0X2F428, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="juno level?" },
+        { address=0X30114, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="pulse level" },
+      },
+      stage = {
+        { address=0X36EAA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge Level 7 Stage 1" },
+        { address=0X36EAB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge Level 7 Stage 2" },
+        { address=0X36EAC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge Level 7 Stage 3" },
+        { address=0X36EAD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge Level 7 Stage 4" },
+        { address=0X36EAE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge Level 7 Stage 5" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X29976, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="saberlion weapon slot 1 upgrade" },
+        { address=0X29977, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="saberlion weapon slot 2 upgrade" },
+        { address=0X29978, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="saberlion weapon slot 3 upgrade" },
+        { address=0X29979, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="saberlion weapon slot 4 upgrade" },
+        { address=0X299E6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="gun tiger/juno zoid weapons 1 upgrade" },
+        { address=0X299E7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="gun tiger/juno zoid weapons 2 upgrade" },
+        { address=0X299E8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="gun tiger/juno zoid weapons 3 upgrade" },
+        { address=0X299E9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="gun tiger/juno zoid weapons 4 upgrade" },
+        { address=0X29AC6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mosasledge 1st weapon" },
+        { address=0X29B36, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="leo blaze weapon 1 slot" },
+        { address=0X29BA6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unenlagia weapon 1" },
+        { address=0X29C16, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="nightwise 1st weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X302E8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit money address, has a max limit somewhere around 8FFFFF increased" },
+        { address=0X302E9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money value 2 increased" },
+        { address=0X302EA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money value 3 increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X29A4A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Liger GEP upgrade" },
+        { address=0X29A50, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Lager Defense upgrade" },
+        { address=0X29A56, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield lager attack upgrade 1" },
+        { address=0X29A57, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield lager attack upgrade 2" },
+        { address=0X29A58, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield lager attack upgrade 3" },
+        { address=0X29A59, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield lager attack upgrade 4" },
+      },
+    },
+  },
+}

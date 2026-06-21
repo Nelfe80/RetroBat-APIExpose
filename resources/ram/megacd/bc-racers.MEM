@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "BC Racers",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "bc-racers",
+    file = "bc-racers.zip",
+    hashes = {
+      { hash = "6d14797a2108c284e27dfac0657b6692", label = "BC Racers (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

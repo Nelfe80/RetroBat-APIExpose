@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fat Princess: Fistful of Cake",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fat-princess-fistful-of-cake",
+    file = "fat-princess-fistful-of-cake.zip",
+    hashes = {
+      { hash = "bafb3ffd60aa6c830b6991e03fa6030a", label = "Fat Princess - Fistful of Cake (Europe, Australia) (En,Fr,De,Es,It,Nl,Pt,Ru).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "SingStar Party [Subset - Regional Exclusives]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "singstar-party-subset-regional-exclusives",
+    file = "singstar-party-subset-regional-exclusives.zip",
+    hashes = {
+      { hash = "e89286fa225fdddaa02d3c33ffecf176", label = "SingStar Party (Germany)" },
+      { hash = "c855b4dfaf85069ac3299b2e3387ab8a", label = "SingStar NRJ Music Tour (France)" },
+      { hash = "a0f3284aa058fddcf48122b5a39bcddc", label = "SingStar Party (Italy)" },
+      { hash = "d9637d758684715821f2ee2cf986e2a8", label = "SingStar Party (Spain)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2DCBCC, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[GERMANY] Is Game Paused" },
+        { address=0X2DE3CC, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[SPAIN] Is Game Paused" },
+        { address=0X2DE5CC, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[ITALY] Is Game Paused" },
+        { address=0X2DE5DC, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[FRANCE] Is Game Paused" },
+      },
+    },
+  },
+}

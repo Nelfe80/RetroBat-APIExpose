@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Penguin-kun Wars 2",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "penguin-kun-wars-2",
+    file = "penguin-kun-wars-2.zip",
+    hashes = {
+      { hash = "3db77573e81184156486fe743b828e58", label = "Penguin-kun Wars 2 (Japan).rom" },
+      { hash = "d4f8d8a7e052a0d6246ac2b5afdc729e", label = "Penguin-kun Wars 2 (Japan) (En) (v1.0) (Max Iwamoto,Tsunami).rom" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X71FA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mammal World Completed Status" },
+        { address=0X71FB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Insect World Completed Status" },
+        { address=0X71FC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Reptile World Completed Status" },
+        { address=0X71FD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sea World Completed Status" },
+        { address=0X71FE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Antartic World Completed Status" },
+      },
+      zone = {
+        { address=0X71F7, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3C9C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Session Time? [32-bits]" },
+        { address=0X3CA0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Session Time? [32-bits]" },
+        { address=0X71F8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Match Timer" },
+      },
+    },
+  },
+}

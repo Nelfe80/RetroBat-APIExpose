@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Midnight Club 3: DUB Edition Remix",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "midnight-club-3-dub-edition-remix",
+    file = "midnight-club-3-dub-edition-remix.zip",
+    hashes = {
+      { hash = "b5aba54785e3fb1752a2308423a997c8", label = "Midnight Club 3 - DUB Edition Remix (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X619ACC, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone" },
+        { address=0X80086D, type="u8", condition="eq", value=0X46, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class D Level 2 performance parts unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0X50, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class C Level 1 performance parts unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0X58, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class D Level 3 performance tires unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0X73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class C Level 2 performance parts unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0X87, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class B Level 1 performance parts unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0X8C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class C Level 3 performance tires unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0XA5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class B Level 2 performance parts unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0XB4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class B Level 3 performance tires unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0XB9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class A Level 1 performance parts unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0XC6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class A Level 2 performance parts unlocked" },
+        { address=0X80086D, type="u8", condition="eq", value=0XF0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Class A Level 3 performance tires unlocked" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X677389, type="u32be", condition="eq", value=0X6F705F73, action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Cop car" },
+        { address=0X6E08FD, type="u8", condition="eq", value=0X6F705F73, action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego cop car" },
+        { address=0X7D2310, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego" },
+        { address=0X7FDB86, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Tuners races won" },
+        { address=0X7FDB8D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego SUV/Trucks races won" },
+        { address=0X7FDB94, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Exotics races won" },
+        { address=0X7FDB9B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Luxury Sedan races won" },
+        { address=0X7FDBA2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Muscle Car races won" },
+        { address=0X7FDBA9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Chopper races won" },
+        { address=0X7FDBB0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Sport Bikes races won" },
+        { address=0X7FFE00, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego" },
+        { address=0X800844, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X800845, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X800846, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X800847, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X800848, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X800849, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X80084A, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X800884, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="on ramp under rollecoaster (8 on map)" },
+        { address=0X800884, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="on ramp to aircraft carrier (12 on map)" },
+        { address=0X800884, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="on aircraft carrier (2 on map)" },
+        { address=0X800884, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="in glass tunnel in east (9 on map)" },
+        { address=0X800884, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="on ramp in northeast (4 on map)" },
+        { address=0X800884, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="in small tunnel in northeast (3 on map)" },
+        { address=0X800884, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="in indoor fountain in center (6 on map)" },
+        { address=0X800884, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="northwest beach tunnel (1 on map)" },
+        { address=0X800885, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="on roof in northeast (7 on map)" },
+        { address=0X800885, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="on ramp south of baseball stadium in southeast (10 on map)" },
+        { address=0X800885, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="on a building complex in south (11 on map)" },
+        { address=0X800885, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="in mall in southeast (5 on map)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X800870, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Career mode money increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X800888, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="on building after jumping off ramp in park in west (2 on map)" },
+        { address=0X800888, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=true, no_survey=false, desc="on roof after freeway jump in south (8 on map)" },
+        { address=0X800889, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=true, no_survey=false, desc="on roof after freeway jump in northeast (7 on map)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7D615C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Race timer" },
+        { address=0X7FFE08, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race progression" },
+      },
+    },
+  },
+}

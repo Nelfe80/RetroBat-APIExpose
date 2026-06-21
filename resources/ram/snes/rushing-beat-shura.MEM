@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Rushing Beat Shura",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "rushing-beat-shura",
+    file = "rushing-beat-shura.zip",
+    hashes = {
+      { hash = "325a9d637c9f6e7211b2d413ee1fef3d", label = "Rushing Beat Shura (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0027, type="u8", condition="eq", value=0X12, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/ history of game" },
+        { address=0X0080, type="u8", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause game" },
+        { address=0X00F8, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X00DC, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="far from key card Sakura Stage" },
+        { address=0X00DC, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Far from key card Sakura Stage" },
+        { address=0X00F8, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 01" },
+        { address=0X00F8, type="u8", condition="eq", value=0X4D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00F1, type="u8", condition="eq", value=0XB3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="let jimmy die" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X00DC, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Desert Boss Room" },
+        { address=0X00DC, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Desert Boss Room" },
+        { address=0X00F1, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Bart on Beginning Stage" },
+        { address=0X00F1, type="u8", condition="eq", value=0X05, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Bart on Beginning Stage defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Mccoy on Beginning Stage" },
+        { address=0X00F1, type="u8", condition="eq", value=0X0B, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Mccoy on Beginning Stage defeated" },
+        { address=0X00F1, type="u8", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Bart on Hospital" },
+        { address=0X00F1, type="u8", condition="eq", value=0X11, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Bart on Hospital defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Mccoy on Sewers" },
+        { address=0X00F1, type="u8", condition="eq", value=0X17, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss McCoy on Sewers defeated" },
+        { address=0X00F1, type="u8", condition="eq", value=0X38, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Bart on Sewers" },
+        { address=0X00F1, type="u8", condition="eq", value=0X3B, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Bart on Sewers defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X41, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss ??? in Desert from Ship" },
+        { address=0X00F1, type="u8", condition="eq", value=0X44, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss ??? in Desert from Ship defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X47, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss ??? in Sakura defeat with Jimmy" },
+        { address=0X00F1, type="u8", condition="eq", value=0X4D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Hunter on the Cave" },
+        { address=0X00F1, type="u8", condition="eq", value=0X50, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Hunter on the Cave defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X59, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss M.Frame on Pirate Ship Blow Away" },
+        { address=0X00F1, type="u8", condition="eq", value=0X62, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss M.Frame on Pirate Ship" },
+        { address=0X00F1, type="u8", condition="eq", value=0X65, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss M.Frame on Pirate Ship defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X77, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Jony and Joe Elfin Slum fight" },
+        { address=0X00F1, type="u8", condition="eq", value=0X7A, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Jony and Joe Elfin Slum defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss scene after Burnet" },
+        { address=0X00F1, type="u8", condition="eq", value=0X89, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Yamaoka on Dojo" },
+        { address=0X00F1, type="u8", condition="eq", value=0X8C, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Yamaoka on Dojo defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X92, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Burnet 2º enconter on Bridge" },
+        { address=0X00F1, type="u8", condition="eq", value=0X95, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sub-Boss Calsonic in Desert from Airport" },
+        { address=0X00F1, type="u8", condition="eq", value=0X98, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Sub-Boss Calsonic in Desert from Airport defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0X9B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sub-Boss Calsonic in Desert from Ship" },
+        { address=0X00F1, type="u8", condition="eq", value=0X9E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sub-Boss Calsonic in Desert from Airport let go away" },
+        { address=0X00F1, type="u8", condition="eq", value=0XA1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sub-Boss Calsonic in Desert from Ship let go away" },
+        { address=0X00F1, type="u8", condition="eq", value=0XAA, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Yamaoka on Dojo if you broke a vase" },
+        { address=0X00F1, type="u8", condition="eq", value=0XAD, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Yamaoka on Dojo if you broke a vase defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0XB9, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Jony and Joe Elfin Slum kid" },
+        { address=0X00F1, type="u8", condition="eq", value=0XBC, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss M.Frames on Final Stage defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0XBF, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Kira and Onido" },
+        { address=0X00F1, type="u8", condition="eq", value=0XC2, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Kira and Onido defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0XCB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Helheim in Desert from Airport" },
+        { address=0X00F1, type="u8", condition="eq", value=0XCE, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Helheim in Desert from Airport defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0XD1, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Kulmbach on Final Stage defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0XD1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Velk" },
+        { address=0X00F1, type="u8", condition="eq", value=0XD4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Kulmbach on Final Stage" },
+        { address=0X00F1, type="u8", condition="eq", value=0XD7, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Final Boss Velk defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0XDA, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sub-Boss Calsonic in Desert from Airport 2º encounter" },
+        { address=0X00F1, type="u8", condition="eq", value=0XDD, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Sub-Boss Calsonic in Desert from Airport 2º encounter defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0XE3, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Burnet 1º enconter on Bridge" },
+        { address=0X00F1, type="u8", condition="eq", value=0XE6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Burnet 1º enconter on Bridge let go away" },
+        { address=0X00F1, type="u8", condition="eq", value=0XE9, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Burnet 1º enconter on Bridge defeat" },
+        { address=0X00F1, type="u8", condition="eq", value=0XEF, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss M.Frames on Final Stage" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X060A, type="u24le", condition="eq", value=0X0202, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00F1, type="u8", condition="eq", value=0X53, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Data Computer Destroyed in on Airport" },
+        { address=0X00F1, type="u8", condition="eq", value=0X56, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="If you do not destroy the Data Computer on Airport" },
+        { address=0X060A, type="u24le", condition="eq", value=0X18, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block" },
+      },
+    },
+  },
+}

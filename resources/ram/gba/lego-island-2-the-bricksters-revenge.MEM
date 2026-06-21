@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "LEGO Island 2: The Brickster's Revenge",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure, Construction and Management Simulation, Puzzle, Strategy"
+  },
+
+  rom = {
+    name = "lego-island-2-the-bricksters-revenge",
+    file = "lego-island-2-the-bricksters-revenge.zip",
+    hashes = {
+      { hash = "ef13adffd0dc94ed7e417c253e78244d", label = "LEGO Island 2 - The Brickster's Revenge (Europe) (En,Fr,De,Es,It,Nl,Sv,Da).gba" },
+    }
+  },
+
+  events = {
+  },
+}

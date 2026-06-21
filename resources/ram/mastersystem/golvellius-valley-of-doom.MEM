@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Golvellius: Valley of Doom",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "golvellius-valley-of-doom",
+    file = "golvellius-valley-of-doom.zip",
+    hashes = {
+      { hash = "2101295c258cb6b845bdb72be617691d", label = "Golvellius - Valley of Doom (USA, Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0100, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="New Game or Continue?" },
+        { address=0X0602, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused?" },
+        { address=0X065F, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X065F, type="u8", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Story Introduction / Credits" },
+        { address=0X065F, type="u8", condition="eq", value=0X05, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X080D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Unique Screen Coordintes (Overworld)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0802, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alive" },
+        { address=0X0802, type="u8", condition="eq", value=0X13, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X0803, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Possible Death Indicator?" },
+        { address=0X081A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifebar health increased" },
+        { address=0X081A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifebar health decreased" },
+      },
+      health = {
+        { address=0X0802, type="u8", condition="eq", value=0X09, action="HIT", no_log=false, no_survey=false, desc="Taken Damage" },
+        { address=0X0836, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health [8-bit BCD] decreased" },
+        { address=0X0836, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health [8-bit BCD] increased" },
+        { address=0X0839, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health.[BCD] decreased" },
+        { address=0X0839, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health.[BCD] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X083F, type="u24be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Gold [24-bit BE BCD] increased" },
+        { address=0X0842, type="u24be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Max Gold [24-bit BE BCD] increased" },
+        { address=0X0846, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="ring of invisibility (Even though this is used for breaking rocks?)" },
+        { address=0X084A, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring in Lake (Southern Island)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0175, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Current Health" },
+        { address=0X0195, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Second Boss Current Health" },
+        { address=0X065F, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle (Rolick)!" },
+        { address=0X065F, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle (Haidee)!" },
+        { address=0X065F, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle (Crawky)!" },
+        { address=0X065F, type="u8", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle (Bathular)!" },
+        { address=0X065F, type="u8", condition="eq", value=0X16, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle (Fosbus)!" },
+        { address=0X065F, type="u8", condition="eq", value=0X1B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle (Golvellius!)" },
+        { address=0X065F, type="u8", condition="eq", value=0X1C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle (Desba)!" },
+        { address=0X065F, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Victory!" },
+        { address=0X0845, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Desba in Valley" },
+        { address=0X0845, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rolick in Desert" },
+        { address=0X0845, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bachular in Grave" },
+        { address=0X0845, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fosbus in Swamp" },
+        { address=0X0845, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Warlic in Lake" },
+        { address=0X0845, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Crawky in Cursed Forest" },
+        { address=0X0845, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Haidee in Great Forest" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0849, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield" },
+        { address=0X0849, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Remedia Shield" },
+      },
+      player = {
+        { address=0X011B, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="0x01 = Ground movement, 0x00 = Jumping movement" },
+        { address=0X011E, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="0x00 = Ground movement, 0x07 = Jumping movement)" },
+        { address=0X1FE1, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jumping at 0xff, falling at 0x01, stationary at 0x2a." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X065F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Music ID" },
+      },
+    },
+  },
+}

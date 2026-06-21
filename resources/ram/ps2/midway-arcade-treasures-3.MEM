@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Midway Arcade Treasures 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "midway-arcade-treasures-3",
+    file = "midway-arcade-treasures-3.zip",
+    hashes = {
+      { hash = "f56b9f2a0df97548b5a4c47c5e9bbbe8", label = "Midway Arcade Treasures 3 (USA)" },
+      { hash = "f0c7e16ff8a80b7282561e72f65f412a", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+      { hash = "fbed27bb4465df918a05dfadd2d2e62d", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+      { hash = "7455b18e7043ab70d2385c1e14a2d0f7", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+      { hash = "740f0a17e44eb3cc79e72ee6750c3e8c", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+      { hash = "74d466c2ad23a2300e44a303bca6a440", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+      { hash = "242d857e6bef40da63d82ca8f6dcd770", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+      { hash = "e8ff9bba392906705b222800f1b525c6", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+      { hash = "cab3bf24db44677f3c9d49ed8ace540e", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+      { hash = "f719b1ee2dd802198333b014c9d5cfe9", label = "Midway Arcade Treasures 3 (SLUS-21094) [B843EAFB]" },
+    }
+  },
+
+  events = {
+  },
+}

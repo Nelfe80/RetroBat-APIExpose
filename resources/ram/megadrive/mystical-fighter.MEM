@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Mystical Fighter",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "mystical-fighter",
+    file = "mystical-fighter.zip",
+    hashes = {
+      { hash = "733ba7d7e9f0c81cd1cabcdcbd087a9e", label = "Mystical Fighter (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0E6, type="u16be", condition="eq", value=0X135, action="DEMO_MODE", no_log=false, no_survey=false, desc="fire demon (Stage 3, normal/hard)" },
+        { address=0XC0E6, type="u16be", condition="eq", value=0X144, action="DEMO_MODE", no_log=false, no_survey=false, desc="blue fire demon (Stage 6, hard)" },
+        { address=0XC0E6, type="u16be", condition="eq", value=0X172, action="DEMO_MODE", no_log=false, no_survey=false, desc="fire demon (stage 3, expert)" },
+        { address=0XC0E6, type="u16be", condition="eq", value=0X184, action="DEMO_MODE", no_log=false, no_survey=false, desc="blue fire demon (stage 6, expert)" },
+        { address=0XC0E6, type="u16be", condition="eq", value=0XE4, action="DEMO_MODE", no_log=false, no_survey=false, desc="fire demon (Stage 6, hard)" },
+        { address=0XC0E6, type="u16be", condition="eq", value=0X154, action="DEMO_MODE", no_log=false, no_survey=false, desc="Blue Fire Demon (Stage 3, Normal/hard)" },
+        { address=0XE92C, type="u16be", condition="eq", value=0XFC40, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo is playing" },
+        { address=0XEB24, type="u16be", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo 1" },
+        { address=0XEB24, type="u16be", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo 2" },
+        { address=0XEB24, type="u16be", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo 3" },
+        { address=0XEB26, type="u16be", condition="eq", value=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XE6F4, type="u16be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level" },
+        { address=0XEB5A, type="u16be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes, will advance to next level or section. Useful for testing purposes, as changing it to 1 mid" },
+        { address=0XEBAA, type="u16be", condition="eq", value=0X11, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="stage clear" },
+      },
+      stage = {
+        { address=0XEB26, type="u16be", condition="eq", value=0X100, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 6" },
+        { address=0XEB26, type="u16be", condition="eq", value=0X140, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stages 1, 3, 4, 5" },
+        { address=0XEB26, type="u16be", condition="eq", value=0X200, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE6F4, type="u16be", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="Number of Lives" },
+      },
+      health = {
+        { address=0XE538, type="u16be", condition="eq", value=0X70, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max health (all difficulties)" },
+        { address=0XE540, type="u16be", condition="eq", value=0X26, action="HIT", no_log=false, no_survey=false, desc="crouching/taking damage/throwingenemy facing left" },
+        { address=0XE540, type="u16be", condition="eq", value=0X27, action="HIT", no_log=false, no_survey=false, desc="crouching/taking damage/throwing enemy facing right" },
+        { address=0XE640, type="u16be", condition="eq", value=0X26, action="HIT", no_log=false, no_survey=false, desc="crouching/taking damage/throwingenemy facing left" },
+        { address=0XE640, type="u16be", condition="eq", value=0X27, action="HIT", no_log=false, no_survey=false, desc="crouching/taking damage/throwing enemy facing right" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XEBAA, type="u16be", condition="eq", value=0X0F, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss music" },
+        { address=0XEBAA, type="u16be", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="final boss" },
+        { address=0XEBAA, type="u16be", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="beat final boss" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XE540, type="u16be", condition="eq", value=0X0C, action="JUMPING", no_log=false, no_survey=false, desc="jumping straight facing left" },
+        { address=0XE540, type="u16be", condition="eq", value=0X0D, action="JUMPING", no_log=false, no_survey=false, desc="jumping straight facing right" },
+        { address=0XE640, type="u16be", condition="eq", value=0X0C, action="JUMPING", no_log=false, no_survey=false, desc="jumping straight facing left" },
+        { address=0XE640, type="u16be", condition="eq", value=0X0D, action="JUMPING", no_log=false, no_survey=false, desc="jumping straight facing right" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE700, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="16-bit" },
+        { address=0XE92C, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="16-bit" },
+      },
+    },
+  },
+}

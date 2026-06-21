@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Popful Mail",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "popful-mail",
+    file = "popful-mail.zip",
+    hashes = {
+      { hash = "cf24fa170286d8589397cada04ec71ad", label = "Popful Mail (Japan).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0490, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0490, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+  },
+}

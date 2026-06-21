@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Mary-Kate and Ashley: Crush Course",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Music"
+  },
+
+  rom = {
+    name = "mary-kate-and-ashley-crush-course",
+    file = "mary-kate-and-ashley-crush-course.zip",
+    hashes = {
+      { hash = "80aa26d71e1e79f7bf9299aa7597d50a", label = "Mary-Kate and Ashley - Crush Course (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X93563, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Previous level ID." },
+        { address=0XC97DC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Arcade) [32-Bit] End-of-round window progression for Ball Toss." },
+        { address=0XC9CAC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Arcade) [32-Bit] End-of-round window progression for Treasure Hunt." },
+        { address=0XCA18C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Arcade) [32-Bit] End-of-round window progression for Hoops." },
+        { address=0XCAB08, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Arcade) [32-Bit] Current round." },
+      },
+      zone = {
+        { address=0X93586, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mini Golf - The New World - Number of Swings" },
+        { address=0XAC014, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Freezing addresses in this memory block and messing with the values turns the game into a non-eu" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC97E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(Arcade) [32-Bit] Round score for Ball Toss." },
+        { address=0XCA190, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(Arcade) [32-Bit] Round score for Hoops." },
+        { address=0X17CAF8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(Arcade) [32-Bit] (@) Treasure Hunt total score." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC1784, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(Journalism) [8-Bit] Remaining objectives." },
+        { address=0XC1B78, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(Marine Biology) [32-Bit] Remaining objectives." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X91970, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time until demo mode starts." },
+        { address=0X91F00, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Minigame time remaining." },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Open Season",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "open-season",
+    file = "open-season.zip",
+    hashes = {
+      { hash = "2dee29eece91bc415fbe1853436bf7c9", label = "Open Season (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X61D1D0, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Overlay Check" },
+      },
+    },
+  },
+}

@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Hexa",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Mature"
+  },
+
+  rom = {
+    name = "hexa",
+    file = "hexa.zip",
+    hashes = {
+      { hash = "ea97aa85b07611982dc5ef19ee9bb356", label = "hexa.7z <Hexa>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X071B, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0720, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0709, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+        { address=0X070B, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

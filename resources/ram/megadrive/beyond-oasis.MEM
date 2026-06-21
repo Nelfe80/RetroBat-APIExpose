@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Beyond Oasis",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "beyond-oasis",
+    file = "beyond-oasis.zip",
+    hashes = {
+      { hash = "2d860cc07bc8a6bbdb0d73a09678c279", label = "Story of Thor, The (Spain).md" },
+      { hash = "5a79de198ed6b1ece2518574fe78d962", label = "Beyond Oasis (USA).md" },
+      { hash = "b18d41264fb9041c0cb0079ef756a757", label = "Beyond Oasis (USA) (Pt).md" },
+      { hash = "c6ab7550100019471896437ab2b94599", label = "Story of Thor, The (Europe) (Ru) (Shedevr).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19E8, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing/Demo" },
+        { address=0X1A1F, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing/Demo" },
+        { address=0X1CFE, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing/Demo" },
+      },
+    },
+  },
+}

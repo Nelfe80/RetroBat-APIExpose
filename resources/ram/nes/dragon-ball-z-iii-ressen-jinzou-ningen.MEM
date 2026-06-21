@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Dragon Ball Z III: Ressen Jinzou Ningen",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "dragon-ball-z-iii-ressen-jinzou-ningen",
+    file = "dragon-ball-z-iii-ressen-jinzou-ningen.zip",
+    hashes = {
+      { hash = "123b1b024332fa67dbdabc608f74b032", label = "Dragon Ball Z III - Ressen Jinzou Ningen (Japan) (Es) (v1.0A) (TransGen).nes" },
+      { hash = "897f47fd270dea2b444f4ceff6ec3e30", label = "Dragon Ball Z III - Ressen Jinzou Ningen (Japan).nes" },
+      { hash = "a4f8b0fb27f5f9b8bfb6d7d9c7c28b16", label = "Dragon Ball Z III - Ressen Jinzou Ningen (Japan) (En) (v1.0) (Twilight).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0319, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="piccolo level" },
+        { address=0X0331, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="vegeta level" },
+        { address=0X0349, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="total levels up for gohan? starts from 0 this value." },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0302, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="goku hp decreased" },
+        { address=0X0302, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="goku hp increased" },
+        { address=0X031A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="piccolo hp decreased" },
+        { address=0X031A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="piccolo hp increased" },
+        { address=0X0332, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="vegeta hp decreased" },
+        { address=0X0332, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="vegeta hp increased" },
+        { address=0X0362, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="krillin hp decreased" },
+        { address=0X0362, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="krillin hp increased" },
+        { address=0X037A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="yamcha hp decreased" },
+        { address=0X037A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="yamcha hp increased" },
+        { address=0X0392, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="tien hp decreased" },
+        { address=0X0392, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="tien hp increased" },
+        { address=0X03AA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="chiotzi hp decreased" },
+        { address=0X03AA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="chiotzi hp increased" },
+        { address=0X03C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="trucks hp decreased" },
+        { address=0X03C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="trucks hp increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X03D8, type="u8", condition="eq", value=0X17, action="BOSS_HIT", no_log=false, no_survey=false, desc="first boss eva" },
+      },
+    },
+  },
+}

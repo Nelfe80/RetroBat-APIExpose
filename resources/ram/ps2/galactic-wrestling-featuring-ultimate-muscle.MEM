@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Galactic Wrestling featuring Ultimate Muscle",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "galactic-wrestling-featuring-ultimate-muscle",
+    file = "galactic-wrestling-featuring-ultimate-muscle.zip",
+    hashes = {
+      { hash = "36a2454c070660446a28474ec62d4f96", label = "Galactic Wrestling featuring Ultimate Muscle - The Kinnikuman Legacy (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X41ED1C, type="u16le", condition="eq", value=0X21, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Character speaking on title" },
+        { address=0X41ED1C, type="u16le", condition="eq", value=0X22, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title video" },
+        { address=0X41ED1C, type="u16le", condition="eq", value=0X23, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X41ED1C, type="u16le", condition="eq", value=0X24, action="DEMO_MODE", no_log=false, no_survey=false, desc="Loading to DEMO" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2BC09C, type="u32le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 1" },
+        { address=0X2BC09C, type="u32le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 2" },
+        { address=0X2BC09C, type="u32le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 3" },
+        { address=0X2BC09C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+        { address=0X2BC0A0, type="u32le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X2BC0A0, type="u32le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds" },
+        { address=0X2BC0A0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Rounds" },
+        { address=0X2BC164, type="u16le", condition="eq", value=0X25, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tag Level 3 Special" },
+        { address=0X2BC164, type="u16le", condition="eq", value=0X45, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 3 Special" },
+        { address=0X2BC178, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Winner of Round 2 in Three-Point Match" },
+        { address=0X2BC190, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Winner of Round 3 in Three-Point Match" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2BDEC8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP decreased" },
+        { address=0X2BDEC8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP increased" },
+        { address=0X2BE9E0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP decreased" },
+        { address=0X2BE9E0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP increased" },
+        { address=0X2BF4F8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P3 HP decreased" },
+        { address=0X2BF4F8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P3 HP increased" },
+        { address=0X2C0010, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P4 HP decreased" },
+        { address=0X2C0010, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P4 HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2B2198, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Rogue Unlock increased" },
+        { address=0X2BC088, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stage increased" },
+        { address=0X425294, type="u16le", condition="eq", value=0X28, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rogue" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2BC084, type="u32le", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="30 Minutes" },
+        { address=0X2BC084, type="u32le", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="60 Minutes" },
+        { address=0X2BC084, type="u32le", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Unlimited" },
+        { address=0X2BC084, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Match Time Setting" },
+      },
+    },
+  },
+}

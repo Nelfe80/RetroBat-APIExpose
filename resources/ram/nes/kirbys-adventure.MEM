@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Kirby's Adventure",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "kirbys-adventure",
+    file = "kirbys-adventure.zip",
+    hashes = {
+      { hash = "09e21386297efe7e4bfd717b9c6a697d", label = "Kirby's Adventure (Europe).nes" },
+      { hash = "36ffa102acba11b5c57427d8ac5ad98e", label = "Kirby's Adventure (USA).nes" },
+      { hash = "4d22184ed99efec06bbec5cd7805cc56", label = "Hoshi no Kirby - Yume no Izumi no Monogatari (Japan).nes" },
+      { hash = "758744ec2d2fa3d1f2020586401f97e8", label = "Kirby's Adventure (USA) (Rev 1).nes" },
+      { hash = "868635e8bbcc61c73aaa4a56ddbe677c", label = "Kirby's Adventure (Germany).nes" },
+      { hash = "f397d53818b0697e6a80ee5cc30d2a23", label = "Kirby's Adventure (Canada) (Fr).nes" },
+      { hash = "fdf4bbe03b31ae0f5faf376ee0153079", label = "Kirby's Adventure (France).nes" },
+      { hash = "3607749a65ec3f8d3710fac0090ca1ca", label = "Kirby's Adventure (USA) (Rev 1) (Input Fix) (v1.0) (Controllerhead).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X62C9, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X62C9, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Waving" },
+        { address=0X62C9, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Sound Test" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0558, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Worlds" },
+      },
+      zone = {
+        { address=0X0558, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 - Vegetable Valley" },
+        { address=0X0558, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2 - Ice Cream Island" },
+        { address=0X0558, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 3 - Butter Building" },
+        { address=0X0558, type="u8", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 4 - Grape Garden" },
+        { address=0X0558, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 5 - Yogurt Yard" },
+        { address=0X0558, type="u8", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 6 - Orange Ocean" },
+        { address=0X0558, type="u8", condition="eq", value=0X06, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 7 - Rainbow Resort" },
+        { address=0X0558, type="u8", condition="eq", value=0X07, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 8 - Fountain of Dreams" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X05E0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Related to Power-Up Animations decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X05E0, type="u8", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="In Ball Form" },
+      },
+    },
+  },
+}

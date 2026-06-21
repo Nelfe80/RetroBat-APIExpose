@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Ghost Manor",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "ghost-manor",
+    file = "ghost-manor.zip",
+    hashes = {
+      { hash = "2bee7f226d506c217163bad4ab1768c0", label = "Ghost Manor (USA).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X003A, type="u16le", condition="eq", value=0X0101, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0002, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ending" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0002, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Died" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0004, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] [BCD] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X003A, type="u16le", condition="eq", value=0X0707, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Starting time" },
+        { address=0X003A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time remaining, decrements" },
+      },
+    },
+  },
+}

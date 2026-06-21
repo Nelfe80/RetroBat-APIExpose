@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Fatal Fury Special",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "fatal-fury-special",
+    file = "fatal-fury-special.zip",
+    hashes = {
+      { hash = "5fcd3e9663ea54cf9dd7883625f18956", label = "Fatal Fury Special (USA).sfc" },
+      { hash = "906a3da585415529b20bd0708fd91486", label = "Garou Densetsu Special (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FC45, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="P1 - Continues Used (Loops after 0x63 or 99)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1FC49, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds won" },
+        { address=0X1FC4D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds won" },
+        { address=0X1FCCB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game level" },
+      },
+      stage = {
+        { address=0X1F67B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1P Mode - Stage Level, 0F=Krauser" },
+        { address=0X1F6FB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Background" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1F761, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health decreased" },
+        { address=0X1F761, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health increased" },
+        { address=0X1F763, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health Bar decreased" },
+        { address=0X1F763, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health Bar increased" },
+        { address=0X1F9FD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health decreased" },
+        { address=0X1F9FD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health increased" },
+        { address=0X1F9FF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health Bar decreased" },
+        { address=0X1F9FF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health Bar increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1F979, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] P1 - Score x100 (resets with overflow)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1F71B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - Right direction held timer" },
+        { address=0X1F71D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - Left direction held timer" },
+        { address=0X1F71F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - Y Button held timer" },
+        { address=0X1F721, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - Down direction held timer" },
+        { address=0X1F727, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - B Button held timer" },
+        { address=0X1F729, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - Up direction held timer" },
+        { address=0X1F72F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - R Button held timer" },
+        { address=0X1F731, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - L Button held timer" },
+        { address=0X1F733, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - X Button held timer" },
+        { address=0X1F735, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[2 Byte] P1 - A Button held timer" },
+        { address=0X1FCBF, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Time" },
+        { address=0X1FCC1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X1FCC5, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="License Play Time ( Minutes )" },
+        { address=0X1FCC6, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="License Play Time ( Seconds ) in Hex" },
+      },
+    },
+  },
+}

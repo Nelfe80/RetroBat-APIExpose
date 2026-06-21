@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Kingdom Hearts: Birth by Sleep",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kingdom-hearts-birth-by-sleep",
+    file = "kingdom-hearts-birth-by-sleep.zip",
+    hashes = {
+      { hash = "56f2e7c9f46e7120cbe768a48cc89c29", label = "Kingdom Hearts - Birth by Sleep (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1F17A50, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Exp Gained in Current Level (32-bit)" },
+        { address=0X1F17A5C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terra - Current Level (16-bit)" },
+        { address=0X1F17A68, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terra - EXP to Next Level (32-bit)" },
+        { address=0X1F252E5, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Forest Clearing Discovered" },
+        { address=0X1F262FA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Inventory - Command 2 Level (16-bit)" },
+        { address=0X1F28824, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level [Editable] (16-bit)" },
+      },
+      zone = {
+        { address=0XB61CE0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1F252E5, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Audience Chamber Discovered" },
+      },
+      health = {
+        { address=0X1F17A6E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Terra - Current HP Stat (16-bit) decreased" },
+        { address=0X1F17A6E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Terra - Current HP Stat (16-bit) increased" },
+        { address=0X1F17A70, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Terra - Max HP Stat (16-bit) decreased" },
+        { address=0X1F17A70, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Terra - Max HP Stat (16-bit) increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Catan",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Board Game, Strategy"
+  },
+
+  rom = {
+    name = "catan",
+    file = "catan.zip",
+    hashes = {
+      { hash = "6c785c87933bf54063fbe2f7579d7172", label = "Catan (Europe) (En,De).nds" },
+    }
+  },
+
+  events = {
+  },
+}

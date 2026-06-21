@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Kazmania 2: Chaos in Kazmania",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "kazmania-2-chaos-in-kazmania",
+    file = "kazmania-2-chaos-in-kazmania.zip",
+    hashes = {
+      { hash = "1aec98ddb7149504cfcd381eb5880d14", label = "KazMania 2 - Chaos in KazMania (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

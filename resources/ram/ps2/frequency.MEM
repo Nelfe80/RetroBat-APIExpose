@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Frequency",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "frequency",
+    file = "frequency.zip",
+    hashes = {
+      { hash = "a451663267e1130e9a0cffc1a3a4ef97", label = "Frequency (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

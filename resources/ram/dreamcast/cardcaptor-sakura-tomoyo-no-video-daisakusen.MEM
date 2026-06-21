@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Cardcaptor Sakura: Tomoyo no Video Daisakusen",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "cardcaptor-sakura-tomoyo-no-video-daisakusen",
+    file = "cardcaptor-sakura-tomoyo-no-video-daisakusen.zip",
+    hashes = {
+      { hash = "a1e515c0273c374469ebea341f7afb1b", label = "Cardcaptor Sakura - Tomoyo no Video Daisakusen (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A572D, type="u8", condition="bit_true", bit=3, mask=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X2220AC, type="u8", condition="eq", value=0X0D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitle" },
+        { address=0X22980C, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10BB44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In-level flag" },
+        { address=0XE7D274, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Snack Hunter Kero-chan DX clear flag" },
+      },
+      stage = {
+        { address=0X1A572C, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Opening" },
+        { address=0X1A572C, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Ending" },
+        { address=0X1A572C, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 Opening" },
+        { address=0X1A572C, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 Ending" },
+        { address=0X1A572C, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 Opening" },
+        { address=0X1A572C, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 Ending" },
+        { address=0X1A572D, type="u8", condition="bit_true", bit=0, mask=0X01, action="STAGE_SELECT", no_log=false, no_survey=false, desc="Special Stage Opening" },
+        { address=0X1A572D, type="u8", condition="bit_true", bit=1, mask=0X02, action="STAGE_SELECT", no_log=false, no_survey=false, desc="Special Stage Ending" },
+        { address=0X1A572D, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X1A572D, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X1A572D, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X1A572D, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SP Stage" },
+        { address=0X221F84, type="u32le", condition="eq", value=0X08A00000, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Playing stage" },
+        { address=0X221F84, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Playing stage" },
+        { address=0X2220D4, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 beaten" },
+        { address=0X2220D4, type="u8", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 beaten" },
+        { address=0X2220D4, type="u8", condition="eq", value=0X22, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 beaten" },
+        { address=0X2220D4, type="u8", condition="eq", value=0X21, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal Stage 1 beaten" },
+        { address=0X222144, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X222150, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage X-2" },
+        { address=0X222150, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage X-1" },
+        { address=0X222150, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sub-stage" },
+        { address=0XE76DF0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Snack Hunter Kero-chan P2 stage" },
+        { address=0XE76DF1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Snack Hunter Kero-chan P1 stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE7D060, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Snack Hunter Kero-chan P1 score" },
+        { address=0XE7D064, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Snack Hunter Kero-chan P2 score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X223AC8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Stage 1-1 timer" },
+        { address=0X224164, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Stage 1-2 timer" },
+        { address=0X225D94, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Stage 2-1 timer" },
+        { address=0X226434, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Stage 2-2 timer" },
+        { address=0X2279F8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Stage 3-1 timer" },
+        { address=0X228094, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Stage 3-2 timer" },
+        { address=0X22CED4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] SP Stage-1 timer" },
+        { address=0X22D570, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] SP Stage-2 timer" },
+        { address=0XE7D06C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Snack Hunter Kero-chan clear time" },
+      },
+    },
+  },
+}

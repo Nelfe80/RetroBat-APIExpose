@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>top_fire_joystick</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Fire (Bomb)</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Fire (Bomb)</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${blue}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 KAJ 10000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 IHA 9000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 RAK 8000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ATS 7000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 UYA 6000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 NAG 5000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 ATA 4000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 EIR 3000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 OMR 2000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 IDA 1000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

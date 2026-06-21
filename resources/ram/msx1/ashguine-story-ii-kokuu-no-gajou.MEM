@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "AshGuine Story II: Kokuu no Gajou",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ashguine-story-ii-kokuu-no-gajou",
+    file = "ashguine-story-ii-kokuu-no-gajou.zip",
+    hashes = {
+      { hash = "3b191ba16e7c5def2f1e9febc1fb92e5", label = "AshGuine Story II - Kokuu no Gajou (Japan).rom" },
+      { hash = "801db5352c6b1ada7c74a681169a2804", label = "AshGuine Story II - Kokuu no Gajou (Japan) (En) (v1.0) (MSX Translations).rom" },
+      { hash = "dc3f1aba221492b5b2d9ead9b36e8a07", label = "AshGuine Story II - Kokuu no Gajou (Japan) (En) (v1.0 - AS MSX-Audio) (MSX Translations).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X20B6, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen / Ending" },
+        { address=0X20EB, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen / Ending" },
+        { address=0X20EC, type="u8", condition="eq", value=0XFF, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0023, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[24-bit BCD] Level" },
+      },
+      stage = {
+        { address=0X0000, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage number" },
+        { address=0X0004, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Uncollected" },
+        { address=0X0004, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Collected" },
+        { address=0X0004, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 - Collected M-Sphere" },
+        { address=0X0005, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Uncollected" },
+        { address=0X0005, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Collected" },
+        { address=0X0005, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 - Collected M-Sphere" },
+        { address=0X00E6, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Standing on plate" },
+        { address=0X00E6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 - standing on metal plate" },
+        { address=0X00EA, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X00EA, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Deactivated" },
+        { address=0X00EA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 - Deactivated first security terminal" },
+        { address=0X00EB, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X00EB, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Deactivated" },
+        { address=0X00EB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 - Deactivated second security terminal" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00F0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X00F0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0001, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sword powerup level decreased" },
+        { address=0X0003, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Control Sphere powerup level decreased" },
+        { address=0X0016, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0016, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X0019, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Boots powerup level decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0001, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0001, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X0001, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X0003, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Not active" },
+        { address=0X0003, type="u8", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0003, type="u8", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X0003, type="u8", condition="eq", value=0X1E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X0019, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0019, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X0019, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level 3" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X002D, type="u8", condition="eq", value=0XA5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss room" },
+        { address=0X002D, type="u8", condition="eq", value=0XA6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Outside boss room" },
+        { address=0X002D, type="u8", condition="eq", value=0XAA, action="BOSS_HIT", no_log=false, no_survey=false, desc="Outside miniboss room #1" },
+        { address=0X002D, type="u8", condition="eq", value=0XAB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #1" },
+        { address=0X002D, type="u8", condition="eq", value=0XAC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #2" },
+        { address=0X002D, type="u8", condition="eq", value=0XAF, action="BOSS_HIT", no_log=false, no_survey=false, desc="Room with warp to miniboss room #1" },
+        { address=0X002D, type="u8", condition="eq", value=0XB8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Outside miniboss room #1" },
+        { address=0X002D, type="u8", condition="eq", value=0XB9, action="BOSS_HIT", no_log=false, no_survey=false, desc="Outside miniboss room #2" },
+        { address=0X002D, type="u8", condition="eq", value=0XB0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #3" },
+        { address=0X002D, type="u8", condition="eq", value=0XB2, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #1" },
+        { address=0X0034, type="u8", condition="eq", value=0X9C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss antechamber" },
+        { address=0X0034, type="u8", condition="eq", value=0XAD, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss room" },
+        { address=0X0034, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #2" },
+        { address=0X0034, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #1" },
+        { address=0X0034, type="u8", condition="eq", value=0X69, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #1" },
+        { address=0X0034, type="u8", condition="eq", value=0X7A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #2" },
+        { address=0X0034, type="u8", condition="eq", value=0X9F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss room #3" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X003A, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Moving/attacking" },
+        { address=0X003A, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shielded" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X002D, type="u8", condition="eq", value=0XAA, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Inside hidden door" },
+        { address=0X002D, type="u8", condition="eq", value=0XB2, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Outside hidden door" },
+      },
+    },
+  },
+}

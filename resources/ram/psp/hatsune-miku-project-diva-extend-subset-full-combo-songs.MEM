@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Hatsune Miku: Project DIVA Extend [Subset - Full Combo Songs]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hatsune-miku-project-diva-extend-subset-full-combo-songs",
+    file = "hatsune-miku-project-diva-extend-subset-full-combo-songs.zip",
+    hashes = {
+      { hash = "2bf464fc0aa88745376adca507e48f5d", label = "Hatsune Miku - Project Diva Extend [Subset - Full Combo Songs].iso" },
+      { hash = "b64ad1968698eedfeb4c6695c4b1f2b9", label = "Hatsune Miku - Project Diva Extend [Subset - Full Combo Songs] (60FPS).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCC5FD0, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On Title/load screen" },
+        { address=0XD0B8D8, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Player Titles start" },
+        { address=0XD0B8E5, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Bit5 - Player titles end" },
+      },
+      events = {
+        { address=0XD01934, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Look this way baby, max combo (easy)" },
+        { address=0XD019CC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Look this way baby, max combo (Normal)" },
+        { address=0XD0549C, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Solitude's End Max combo (Hard)" },
+        { address=0XD0B8AA, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Help Item - Combo Guard amount" },
+        { address=0X11F38BC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Current Song Combo (Indirect address)" },
+        { address=0X11F38E0, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Combo Bonus (Indirect address)" },
+        { address=0X11F38EC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Max Song Combo (Indirect address)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD018A4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Look this way baby, clear standard (Easy)" },
+        { address=0XD018BC, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Miku Standar Clear" },
+        { address=0XD0193C, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Look this way baby, clear standard (Normal)" },
+        { address=0XD01954, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Miku, clear standard (Normal)" },
+        { address=0XD0540C, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Solitude's End Cleared with Standard (Hard)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X11F38AC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(32Bit) Song Life (Indirect address) increased" },
+        { address=0X11F38AC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(32Bit) Song Life (Indirect address) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD01930, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Look this way baby, max score (Easy)" },
+        { address=0XD019C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Look this way baby, max score (Normal)" },
+        { address=0X11F3860, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Finished song score, use for submit LB [d -> e] (Indirect address)" },
+        { address=0X11F38B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Current score (Indirect address)" },
+        { address=0X11F38F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Chance time score (Indirect address)" },
+      },
+      collectibles = {
+        { address=0XCC6058, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32Bit) Money / Diva Points increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD0B97A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Chance time flag (HP won't decrease)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Space Hulk: Vengeance of the Blood Angels",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter, Strategy"
+  },
+
+  rom = {
+    name = "space-hulk-vengeance-of-the-blood-angels",
+    file = "space-hulk-vengeance-of-the-blood-angels.zip",
+    hashes = {
+      { hash = "c4eecf0022493846957a18e9653f2bd1", label = "Space Hulk - Vengeance of the Blood Angels (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X9FCC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Escape Door Health decreased" },
+        { address=0X9FCC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Escape Door Health increased" },
+        { address=0XA2C2C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health decreased" },
+        { address=0XA2C2C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XA2C08, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Left Weapon Ammunition" },
+        { address=0XA2C0C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Right Weapon Ammunition" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA2BCD, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[8bit] freeze at 0 to be somewhat invincible" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1E2F0, type="u8", condition="eq", value=0X12, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Famous Missions: Sabathius - Blockade" },
+        { address=0XA02CC, type="u8", condition="eq", value=0XB4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="NW Door Sealed" },
+        { address=0XA02CF, type="u8", condition="eq", value=0XB7, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="NW Room Burned" },
+        { address=0XA02E8, type="u8", condition="eq", value=0XB4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="NE Door Sealed" },
+        { address=0XA02EB, type="u8", condition="eq", value=0XB7, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="NW Room Burned" },
+        { address=0XA0304, type="u8", condition="eq", value=0XB4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="SE Door Sealed" },
+        { address=0XA0307, type="u8", condition="eq", value=0XB7, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="NW Room Burned" },
+        { address=0XA0320, type="u8", condition="eq", value=0XB4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="SW Door Sealed" },
+        { address=0XA0323, type="u8", condition="eq", value=0XB7, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="NW Room Burned" },
+        { address=0XA0358, type="u8", condition="eq", value=0XB4, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Both Marines Exit With the Relic" },
+        { address=0XA2BF6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA2CAE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA2D66, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA2E1E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA2ED6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA2F8E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA3046, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA30FE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA31B6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+        { address=0XA326E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] b6=In Objective" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E2F0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Mission" },
+      },
+    },
+  },
+}

@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Crusader of Centy",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "crusader-of-centy",
+    file = "crusader-of-centy.zip",
+    hashes = {
+      { hash = "3e52fb2e8fc33f3a7d4942d3ff718465", label = "Soleil (France).md" },
+      { hash = "49e6bf1adf3dd64dbd984250f340cfee", label = "Soleil (Europe).md" },
+      { hash = "4ead1c30202dbc10ad3e327f69770570", label = "Crusader of Centy (USA).md" },
+      { hash = "6cbbb5d870ca386075a96bc727068ec2", label = "Soleil (Spain).md" },
+      { hash = "812c703ccc9271efdcd3ae199d080f2b", label = "megadriv/crusader.7z <Crusader of Centy (USA)>" },
+      { hash = "83cd070ca2c80be6bb57117a19ee203e", label = "Crusader of Centy (USA) (Pt).md" },
+      { hash = "c5cd8a2d316ec23b869122920e029c3b", label = "Crusader of Centy (USA) (Ru) (Shedevr).md" },
+      { hash = "c61bf2d959a4f6614554aa85945cb94c", label = "Soleil (Germany).md" },
+      { hash = "dca77479caf56ced86cee5a670782b74", label = "Crusader of Centy (USA) (Ru) (NewGame+Shedevr).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFDF1, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="8bit - scenes? 6a when credits roll" },
+        { address=0XFDF5, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="8bit - scenes? a9 when credits roll" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC812, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit - The current round in the cheetah race" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB644, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Final boss life increased" },
+        { address=0XB644, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Final boss life decreased" },
+        { address=0XC842, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="8bit - Octopus (2nd boss) life increased" },
+        { address=0XC842, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="8bit - Octopus (2nd boss) life decreased" },
+        { address=0XC882, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Wolf (1st boss) life increased" },
+        { address=0XC882, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wolf (1st boss) life decreased" },
+      },
+      health = {
+        { address=0XCE42, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Maldra's health decreased" },
+        { address=0XCE42, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Maldra's health increased" },
+        { address=0XFE60, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="8bit - Maximum health decreased" },
+        { address=0XFE60, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="8bit - Maximum health increased" },
+        { address=0XFE62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="8bit - Current health decreased" },
+        { address=0XFE62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="8bit - Current health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCE13, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="8bit - Time counter upon entering Rahlesia School, goes from 00 to 03 and then back down to 00 i" },
+        { address=0XFE66, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="16bit - malins (money) increased" },
+        { address=0XFE8A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money bag 1 (one by bite) increased" },
+        { address=0XFE8B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money bag 2 (one by bite) increased" },
+        { address=0XFE8C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money bag 3 (one by bite) increased" },
+        { address=0XFE8D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money bag 4 (one by bite) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC802, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="8bit - Roxie's (4th boss) health" },
+        { address=0XC8C2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="8bit - Fire/Ice monster (5th boss) health" },
+        { address=0XCC82, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Shuffler (3rd boss) health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCBD6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="8bit - In Black Night, denotes what has been hit/pressed, goes 4 and above only after starting t" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB0C4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8bit - time duration of sword throw energy building" },
+        { address=0XC000, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8bit - 'Pac-Man' boss fight apple collection counter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Minesweeper: Soukaitei",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "minesweeper-soukaitei",
+    file = "minesweeper-soukaitei.zip",
+    hashes = {
+      { hash = "a36b4c6c13d1dc9a98af66f963858ba9", label = "Minesweeper - Soukaitei (Japan).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCE2D, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x01 if inputting password, or game is paused due to win / loss" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCE2C, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Load level" },
+        { address=0XCE2C, type="u8", condition="eq", value=0X0B, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="7-Mission Clear" },
+        { address=0XCE69, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Remaining panels to clear" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCE73, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BCD] Score" },
+        { address=0XCE7B, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BCD] Number to which Hi-Score changes when level starts" },
+        { address=0XCE7F, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BCD] Score when level started" },
+        { address=0XCE87, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BCD] Hi-Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCE61, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time since last movement" },
+      },
+    },
+  },
+}

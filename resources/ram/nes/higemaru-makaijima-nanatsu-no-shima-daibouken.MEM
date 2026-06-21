@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Higemaru Makaijima: Nanatsu no Shima Daibouken",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "higemaru-makaijima-nanatsu-no-shima-daibouken",
+    file = "higemaru-makaijima-nanatsu-no-shima-daibouken.zip",
+    hashes = {
+      { hash = "a3db96268386cc0efa66cc6e974a8f90", label = "Higemaru - Makai-jima - Nanatsu no Shima Daibouken (Japan).nes" },
+      { hash = "62b53133ded135e50e91011fc7c11848", label = "Higemaru - Makai-jima - Nanatsu no Shima Daibouken (Japan) (En) (v1.0) (snark).nes" },
+      { hash = "7c54658aa3d5700445ef8d0f05ad0681", label = "Higemaru - Makai-jima - Nanatsu no Shima Daibouken (Japan) (Censor) (v1.0) (HangedMan).nes" },
+      { hash = "82ee6e9e93532680c98b167071c22e14", label = "Higemaru - Makai-jima - Nanatsu no Shima Daibouken (Japan) (En) (v1.0) (snark) (Censor) (v1.0) (HangedMan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X005C, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="New Game" },
+        { address=0X005C, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Pass Word" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0070, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="taking damage" },
+        { address=0X0481, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - X0000 decreased" },
+        { address=0X0481, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - X0000 increased" },
+        { address=0X0482, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - 0X000 decreased" },
+        { address=0X0482, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - 0X000 increased" },
+        { address=0X0483, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - 00X00 decreased" },
+        { address=0X0483, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - 00X00 increased" },
+        { address=0X0484, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - 000X0 decreased" },
+        { address=0X0484, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - 000X0 increased" },
+        { address=0X0485, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - 0000X decreased" },
+        { address=0X0485, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - 0000X increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0490, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Cook - Moribito (1F)" },
+        { address=0X0490, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Curse - Archbishop (03)" },
+        { address=0X0490, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mermaid - Kraken" },
+        { address=0X0490, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Hebi - Cyclops (1B)" },
+        { address=0X0490, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dokuro - Giant Zombie" },
+        { address=0X0490, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Ookami - Fire Kong" },
+        { address=0X0490, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="J.Knife - glacier monster" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X048C, type="u8", condition="bit_true", bit=7, mask=0X80, action="DOOR_OPENED", no_log=false, no_survey=false, desc="reached final door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0097, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Jump Animation Timer [8 bit]" },
+        { address=0X01D7, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo Counter [8 bit]" },
+      },
+    },
+  },
+}

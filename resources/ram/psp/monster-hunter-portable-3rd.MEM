@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Monster Hunter Portable 3rd",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "monster-hunter-portable-3rd",
+    file = "monster-hunter-portable-3rd.zip",
+    hashes = {
+      { hash = "8b9e9a82fe447607cf3c07d6852e21b1", label = "Monster Hunter Portable 3rd (TMO v5)" },
+      { hash = "f169d84a13732812d75a1d02dea3341c", label = "Monster Hunter Portable 3rd HD ver. (Japan) (En) (v5) (Team Maverick ONE)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1BA7A64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PSP} Stats - Polar Zone (1)" },
+        { address=0X1BA7A9D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PSP} Stats - Polar Zone (2)" },
+        { address=0X1BA7AD6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PSP} Stats - Polar Zone (3)" },
+        { address=0X1BA7B0F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PSP} Stats - Polar Zone (4)" },
+        { address=0X1FAE514, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PS3} Stats - Polar Zone (1)" },
+        { address=0X1FAE54D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PS3} Stats - Polar Zone (2)" },
+        { address=0X1FAE586, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PS3} Stats - Polar Zone (3)" },
+        { address=0X1FAE5BF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PS3} Stats - Polar Zone (4)" },
+      },
+    },
+  },
+}

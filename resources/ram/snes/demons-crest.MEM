@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Demon's Crest",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "demons-crest",
+    file = "demons-crest.zip",
+    hashes = {
+      { hash = "34c791f3e69b7fb8081eea0e8b8ad0b2", label = "Demon's Crest (USA) (MSU-1) (ArcadeTV,Conn,Relikk) (v2.0).sfc" },
+      { hash = "e990ae600a8326eda25489bdddffca55", label = "Demon's Crest (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0010, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="kd: (8-bit OBS) 0b while falling or flying. 01 when on ground, 6a when in pause menu." },
+        { address=0X1DD0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Dark Demon's HP" },
+        { address=0X1E51, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Fire," },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0300, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="kd (8-bit E) Color of background in hex; range: ~00-FF~." },
+        { address=0X0422, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Secret area //kd: Refers to level 3 minigame flag" },
+        { address=0X1068, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Staying in ground" },
+        { address=0X1E54, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Part 2," },
+        { address=0X1E54, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 UG Part 2," },
+        { address=0X1E55, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Part 2," },
+        { address=0X1E55, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 Part 2," },
+        { address=0X1E55, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 Secret Path," },
+        { address=0X1E55, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 UW Part 1," },
+        { address=0X1E55, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 Part 2, main path," },
+        { address=0X1E55, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6 OG Part 1," },
+        { address=0X1E55, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7," },
+      },
+      stage = {
+        { address=0X0000, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="kd: table of definitions: 'kd': kdecks, 'E' Editable value; changing a value from the memory ins" },
+        { address=0X1005, type="u16le", condition="eq", value=0X1A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="flying high; 10= dead; 1c= gets flying in a stage; 14= swimming" },
+        { address=0X1005, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action indicator: 02= standing/walking in ground; 04= in the air; 06= hovering; 08= standing in" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1062, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Life increased" },
+        { address=0X1062, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Life decreased" },
+        { address=0X106C, type="u8", condition="eq", value=0X0A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="shadow; 02= hold; 08= imp; 06= shock; 04= death" },
+      },
+      health = {
+        { address=0X106B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage indicator" },
+        { address=0X1386, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ovnunu Health decreased" },
+        { address=0X1386, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ovnunu Health increased" },
+        { address=0X1DD9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Phalanx 3's HP decreased" },
+        { address=0X1DD9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Phalanx 3's HP increased" },
+        { address=0X1E50, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health decreased" },
+        { address=0X1E50, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health increased" },
+        { address=0X1E54, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Somulo," },
+        { address=0X1E54, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Hippogrif," },
+        { address=0X1E54, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Belth," },
+        { address=0X1E54, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Scula," },
+        { address=0X1E54, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Holothurian," },
+        { address=0X1E55, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="head but Mini Game," },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1300, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="kd: (8-bit OBS) goes to 96 when a new object loads, goes to D2 then 00 when enemy is killed. OR" },
+        { address=0X1300, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="kd: (8-bit OBS) goes to 96 when a new object loads, goes to D2 then 00 when enemy is killed. OR" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0EA4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="12= title screen; 13, ff= cutscene; 20= boss" },
+        { address=0X1336, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="First boss'Gargoyle' Health" },
+        { address=0X1E54, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 5 Part 2, before boss," },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X103C, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="invincibility counter" },
+      },
+      player = {
+        { address=0X0014, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="kd: (8-bit OBS) 01 on ground, at jump 04 then 00 while ascending. Just before apex 0C, one frame" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1350, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="kd (OBS) 2nd object loader? Loads to 96 if first slot is full first slot being 0x1300" },
+        { address=0X13A0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="kd: 3rd object loader" },
+        { address=0X13F0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="kd: 4th object loader?" },
+        { address=0X1440, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="kd: 5th object loader" },
+        { address=0X1490, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="kd: 6th object loader ?" },
+        { address=0X1530, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="kd: 8th object loader" },
+        { address=0X1580, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="kd: 9th object loader?" },
+        { address=0X1CF0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="kd: no more 'object loaders' at this line, or whatever it is" },
+      },
+    },
+  },
+}

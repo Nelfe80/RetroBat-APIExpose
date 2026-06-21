@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pole Position",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "pole-position",
+    file = "pole-position.zip",
+    hashes = {
+      { hash = "20a828f38df6569b9b6e16d58d0c37c8", label = "Pole Position (USA).int" },
+    }
+  },
+
+  events = {
+  },
+}

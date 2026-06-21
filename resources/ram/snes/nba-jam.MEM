@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "NBA Jam",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "nba-jam",
+    file = "nba-jam.zip",
+    hashes = {
+      { hash = "6ee56e3fdfa9543ef7755a08897767ec", label = "NBA Jam (USA) (Rev 1).sfc" },
+      { hash = "808b6d01ca9c7e1938541f55eb71f73c", label = "NBA Jam (USA).sfc" },
+      { hash = "81dcfbbaa66f8bed4c0ab0e2b6d3e053", label = "NBA Jam (Europe) (Rev 1).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06F1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo 00" },
+        { address=0X165F, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="game over?" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0C3B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Shooting points worth" },
+        { address=0X0CA9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="current score" },
+        { address=0X0CB7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player score 10s digit" },
+        { address=0X0CB9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player score 1s digit" },
+        { address=0X0CBD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Computer/Player 2 score 10s digit" },
+        { address=0X0CBF, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Computer 2/Player 2 score 1s digit" },
+        { address=0X1C91, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="player 3 points" },
+        { address=0X1C99, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="total points for player 1?" },
+        { address=0X1C9B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="player 2 total points" },
+        { address=0X1C9D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="cpu 1 total points" },
+        { address=0X1C9F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="cpu 2 total points" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1CB9, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="player 1 blocks" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0CCB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X0CCD, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="24-second clock - X0" },
+        { address=0X0CCF, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="24-second clock - 0X" },
+        { address=0X0CD5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="4 = overtime? 2=halftime" },
+        { address=0X1CE5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Options - Timer Speed: 0=Very Slow, 1=Slow, 2=Normal, 3=Fast, 4=Very Fast" },
+      },
+    },
+  },
+}

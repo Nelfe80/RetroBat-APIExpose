@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Zunou Senkan Galg",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "zunou-senkan-galg",
+    file = "zunou-senkan-galg.zip",
+    hashes = {
+      { hash = "dad92a6e2f21b6df1d358419f9830758", label = "Zunou Senkan Galg (Japan) (En).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0072, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0072, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0X0072, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+    },
+  },
+}

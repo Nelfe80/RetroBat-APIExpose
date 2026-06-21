@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle - Echter Puzzlespass für Unterwegs: Pferdefreunde",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-echter-puzzlespass-fur-unterwegs-pferdefreunde",
+    file = "puzzle-echter-puzzlespass-fur-unterwegs-pferdefreunde.zip",
+    hashes = {
+      { hash = "712c47feb1b764d46a5bb4609c87ab53", label = "Pferdefreunde Puzzle - Echter Puzzlespass fuer Unterwegs (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

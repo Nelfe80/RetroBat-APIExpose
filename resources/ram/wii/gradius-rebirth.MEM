@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Gradius ReBirth",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "gradius-rebirth",
+    file = "gradius-rebirth.zip",
+    hashes = {
+      { hash = "fae8ebbd1836bafed74a69cdd19f197d", label = "Gradius ReBirth (USA) (v257) (WiiWare)" },
+      { hash = "d148c58597c9c4c321583753f156381a", label = "Gradius ReBirth (Europe) (v257) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

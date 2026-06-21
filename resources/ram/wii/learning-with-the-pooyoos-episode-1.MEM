@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Learning with the PooYoos: Episode 1",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "learning-with-the-pooyoos-episode-1",
+    file = "learning-with-the-pooyoos-episode-1.zip",
+    hashes = {
+      { hash = "757b698ae55883d6e39f2625d249a8f7", label = "Learning with the PooYoos - Episode 1 (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

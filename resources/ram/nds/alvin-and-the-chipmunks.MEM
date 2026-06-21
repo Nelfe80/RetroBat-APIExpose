@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Alvin and the Chipmunks",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music, Puzzle"
+  },
+
+  rom = {
+    name = "alvin-and-the-chipmunks",
+    file = "alvin-and-the-chipmunks.zip",
+    hashes = {
+      { hash = "464ede6ad6715cf6c1c9ee4464437af8", label = "Alvin and the Chipmunks (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0600, type="u8", condition="eq", value=0X84, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XC0600, type="u8", condition="eq", value=0XC0, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0XCE1A5, type="u32le", condition="eq", value=0X97F096F0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1659EE, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X1659EE, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Medium" },
+        { address=0X1659EE, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X1659EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] General Difficulty Level" },
+        { address=0X165A70, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165A7C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165A88, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165A94, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165AAC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165AB8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165AC4, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165AD0, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165ADC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165AE8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165AF4, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165AF8, type="u32le", condition="eq", value=0X0001D337, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B04, type="u16le", condition="eq", value=0X4ABA, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B18, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B24, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B30, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B3C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B54, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B60, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B6C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B78, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B84, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B90, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165B9C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165BA0, type="u32le", condition="eq", value=0X00014715, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165BAC, type="u16le", condition="eq", value=0XB80E, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165BC0, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165BCC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165BD8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165BE4, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165BFC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165C08, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165C14, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165C20, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165C2C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165C38, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165C44, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165C48, type="u32le", condition="eq", value=0X0001EC51, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X165C54, type="u32le", condition="eq", value=0X00011666, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X166100, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Scored During Song" },
+      },
+      collectibles = {
+        { address=0X166162, type="u8", condition="eq", value=0X3, action="MONEY_STATE", no_log=false, no_survey=false, desc="x3 (Flaming Gold)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X165410, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Uptime" },
+        { address=0X1666A0, type="u16le", condition="eq", value=0X0000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="0 Pads" },
+        { address=0X1666A0, type="u16le", condition="eq", value=0X0064, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="1 Pad" },
+        { address=0X1666A0, type="u16le", condition="eq", value=0X00C8, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="2 Pads" },
+        { address=0X1666A0, type="u16le", condition="eq", value=0X012C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="3 Pads" },
+        { address=0X1666A0, type="u16le", condition="eq", value=0X0190, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="4 Pads" },
+        { address=0X1666A0, type="u16le", condition="eq", value=0X01F4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="5 Pads" },
+        { address=0X1666A0, type="u16le", condition="eq", value=0X0258, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="6 Pads (Max)" },
+        { address=0X1666A0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Last Pads Tapped in Scatterpad Mini-game (Resets on Next Scatterpad Mini-game Encounter)" },
+      },
+    },
+  },
+}

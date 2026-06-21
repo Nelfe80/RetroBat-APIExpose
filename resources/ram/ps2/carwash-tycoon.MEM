@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Carwash Tycoon",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "carwash-tycoon",
+    file = "carwash-tycoon.zip",
+    hashes = {
+      { hash = "488f9438b98c132e31c18d0865773d2f", label = "Carwash Tycoon (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Operative: No One Lives Forever",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-operative-no-one-lives-forever",
+    file = "the-operative-no-one-lives-forever.zip",
+    hashes = {
+      { hash = "580ca17896813f2a8ff1fa777f5d885c", label = "Operative, The - No One Lives Forever (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

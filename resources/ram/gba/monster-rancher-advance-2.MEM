@@ -1,0 +1,109 @@
+return {
+  game = {
+    title = "Monster Rancher Advance 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "monster-rancher-advance-2",
+    file = "monster-rancher-advance-2.zip",
+    hashes = {
+      { hash = "c92823ec801e976852b67ac3f10723a7", label = "Monster Rancher Advance 2 (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1233C, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="New Game" },
+        { address=0X1233C, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1233C, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Link" },
+        { address=0X14A1A, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/NPC vs NPC" },
+        { address=0X29BD0, type="u16le", condition="eq", value=0X8408, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X29BD0, type="u16le", condition="eq", value=0X9D18, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAC12, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 9" },
+        { address=0XAC12, type="u16le", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAC51, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow (Rank C) - Entered but didn't win 1st place" },
+        { address=0XAC51, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow (Rank C) - Entered and won 1st place" },
+        { address=0XAC51, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow (Rank B) - Entered but didn't win 1st place" },
+        { address=0XAC51, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow (Rank B) - Entered and won 1st place" },
+        { address=0XAC51, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow (Rank A) - Entered but didn't win 1st place" },
+        { address=0XAC51, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow (Rank A) - Entered and won 1st place" },
+        { address=0XCF68, type="u24le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Book Entry 247/512 - Grandie [Bit0]" },
+        { address=0XD87C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Book Entry 330/512 - Shadie [Bit0]" },
+        { address=0XEC8C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item Quantity - DietWeed" },
+        { address=0XEDDE, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Monster - Life Stage increased" },
+        { address=0XEDDE, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Monster - Life Stage decreased" },
+        { address=0XEE4C, type="u24le", condition="eq", value=0X0F0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Grandie" },
+        { address=0XEE4C, type="u24le", condition="eq", value=0X0F11, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shadie" },
+        { address=0X149E0, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle Result - Life Percentage for Monster 1 increased" },
+        { address=0X149E0, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Result - Life Percentage for Monster 1 decreased" },
+        { address=0X149E2, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle Result - Life Percentage for Monster 2 increased" },
+        { address=0X149E2, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Result - Life Percentage for Monster 2 decreased" },
+        { address=0X15580, type="u8", condition="eq", value=0X0C, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Comparison" },
+      },
+      health = {
+        { address=0X95F4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ruins - Energy decreased" },
+        { address=0X95F4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ruins - Energy increased" },
+        { address=0XAC3D, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="New Energy Cup - Entered but didn't win 1st place" },
+        { address=0XAC3D, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=true, no_survey=false, desc="New Energy Cup - Entered and won 1st place" },
+        { address=0XEDE6, type="u16le", condition="eq", value=0X0000, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Really Energetic" },
+        { address=0XEDE6, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Current Monster's Energy" },
+        { address=0X14A2A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Monster 1 Max HP/LIF Stat decreased" },
+        { address=0X14A2A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Monster 1 Max HP/LIF Stat increased" },
+        { address=0X14A32, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Monster 1 Current HP decreased" },
+        { address=0X14A32, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Monster 1 Current HP increased" },
+        { address=0X14CFA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Monster 2 Max HP/LIF Stat decreased" },
+        { address=0X14CFA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Monster 2 Max HP/LIF Stat increased" },
+        { address=0X14D02, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - Monster 2 Current HP Stat decreased" },
+        { address=0X14D02, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - Monster 2 Current HP Stat increased" },
+        { address=0X15560, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Battle - Attack Damage" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XAC3D, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Cup - Entered but didn't win 1st place" },
+        { address=0XAC3D, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Cup - Entered and won 1st place" },
+        { address=0XAC41, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Emerald Cup - Entered but didn't win 1st place" },
+        { address=0XAC41, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Emerald Cup - Entered and won 1st place" },
+        { address=0XEC89, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Item Quantity - Emerald" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XEC87, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item Quantity - Gold Bar increased" },
+        { address=0XECA6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item Quantity - Gold Cup increased" },
+        { address=0XECCA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item Quantity - Gold Box increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC494, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Book Entry 148/512 - Blocken [Bit0]" },
+        { address=0XEE4C, type="u24le", condition="eq", value=0X0107, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocken" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15580, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Battle" },
+      },
+    },
+  },
+}

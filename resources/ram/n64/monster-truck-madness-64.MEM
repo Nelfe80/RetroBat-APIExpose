@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Monster Truck Madness 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "monster-truck-madness-64",
+    file = "monster-truck-madness-64.zip",
+    hashes = {
+      { hash = "514d61d3b3d5e6326869783eb2e84a00", label = "Monster Truck Madness 64 (USA).z64" },
+      { hash = "e3b408997d7db91f8219f168c6d57d26", label = "Monster Truck Madness 64 (Europe) (En,Fr,De,Es,It).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X11BC24, type="u32be", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X123552, type="u8", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Trap" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11BC28, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- [US]" },
+      },
+    },
+  },
+}

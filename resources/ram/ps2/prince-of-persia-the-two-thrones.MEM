@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Prince of Persia: The Two Thrones",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "prince-of-persia-the-two-thrones",
+    file = "prince-of-persia-the-two-thrones.zip",
+    hashes = {
+      { hash = "280f8d66dec3bbd2560e5085506496f9", label = "Prince of Persia - The Two Thrones (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA952B4, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="PLAYER : Sand Credits" },
+        { address=0XB2C778, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="ENGINE : Pause boolean" },
+      },
+    },
+  },
+}

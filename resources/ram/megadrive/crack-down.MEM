@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Crack Down",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "crack-down",
+    file = "crack-down.zip",
+    hashes = {
+      { hash = "f0a0a4e19e9f962afb304fbcadd8f101", label = "Crack Down (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE160, type="u16be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Num Credits" },
+        { address=0XE3E6, type="u16be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Num Starting Credits 0x00-06 (Default 4)" },
+        { address=0XE3F6, type="u16be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="If true, set starting credits to 99" },
+        { address=0XE464, type="u16be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused = 0x01" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XE01E, type="u16be", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="TickingDown, 0x2=Frozen, 0x1=DepletingEndLevel" },
+        { address=0XE1C4, type="u16be", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Not Yet Complete" },
+        { address=0XE1C4, type="u16be", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete by P1" },
+        { address=0XE1C4, type="u16be", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete by P2" },
+        { address=0XE1C4, type="u16be", condition="eq", value=0X3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete by P1 and P2" },
+        { address=0XE1C6, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Processed Stage Complete flags (See 0xe1c4)" },
+        { address=0XE218, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="When = 0x4, load next level (WRITABLE)" },
+        { address=0XE404, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Initial Seconds Per Level (Easy=210,Normal=180,Hard=150)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE050, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Number of Lives P1 increased" },
+        { address=0XE050, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Number of Lives P1 decreased" },
+        { address=0XE060, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Number of Lives P2 increased" },
+        { address=0XE060, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Number of Lives P2 decreased" },
+        { address=0XE1D0, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ticks til GameOver waiting for Press Start Button to add Credit after ingame death, or Respawn D" },
+        { address=0XE250, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives P1 increased" },
+        { address=0XE250, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives P1 decreased" },
+        { address=0XE402, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Initial Number of Lives (Easy=9,Normal=6,Hard=3) increased" },
+        { address=0XE402, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Initial Number of Lives (Easy=9,Normal=6,Hard=3) decreased" },
+      },
+      health = {
+        { address=0XE172, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Players Active 0x1=JustP1 0x2=JustP2 0x3=BothP1AndP2 decreased" },
+        { address=0XE172, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Players Active 0x1=JustP1 0x2=JustP2 0x3=BothP1AndP2 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XE1FE, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player 1 Selected Weapon 0x0=M.Gun, 0x01=Cannon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE052, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score P1 upper16" },
+        { address=0XE054, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score P1 lower16" },
+        { address=0XE062, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score P2 upper16" },
+        { address=0XE064, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score P2 lower16" },
+        { address=0XE254, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score, lower16" },
+        { address=0XE364, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[56 bytes] High Score Table (top 7)" },
+      },
+      collectibles = {
+        { address=0XE056, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current M.Gun Ammo P1" },
+        { address=0XE058, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current Cannon Ammo" },
+        { address=0XE05A, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current S.Bomb Ammo P1" },
+        { address=0XE216, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Has player fired MGun or Cannon this stage. Set to 01 if P1 has, 02 if P2 has, or 03 for both. I" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XE1C2, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Num Objectives Remaining" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE01E, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer state:" },
+      },
+    },
+  },
+}

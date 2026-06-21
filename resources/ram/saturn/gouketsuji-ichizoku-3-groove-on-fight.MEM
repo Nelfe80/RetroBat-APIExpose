@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Gouketsuji Ichizoku 3: Groove on Fight",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "gouketsuji-ichizoku-3-groove-on-fight",
+    file = "gouketsuji-ichizoku-3-groove-on-fight.zip",
+    hashes = {
+      { hash = "5118f171235b0219eb5fb29ea7b66878", label = "Gouketsuji Ichizoku 3 - Groove on Fight (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C91E6, type="u16le", condition="eq", value=0X0300, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X1C91F8, type="u16le", condition="eq", value=0X0000, action="DEMO_MODE", no_log=false, no_survey=false, desc="Navigating menus" },
+        { address=0X1C91F8, type="u16le", condition="eq", value=0XFF00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Watching the demo" },
+        { address=0X1C91F8, type="u16le", condition="eq", value=0XFF01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-game" },
+        { address=0X1CCE67, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1CCEB1, type="u8", condition="eq", value=0X09, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1E2B5D, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X1E2B5D, type="u8", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X1E2B5D, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X1E2B5D, type="u8", condition="eq", value=0X0C, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Scrolling credits" },
+        { address=0X1E2B5D, type="u8", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Ending" },
+      },
+      events = {
+        { address=0X1C8F28, type="u16le", condition="eq", value=0X0098, action="COMBO_HIT", no_log=false, no_survey=false, desc="Last Step of the Combo Technique" },
+        { address=0X1C9804, type="u16le", condition="eq", value=0X78, action="COMBO_HIT", no_log=false, no_survey=false, desc="Last Frame" },
+        { address=0X1D7F98, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P2 - Hit Combo" },
+        { address=0X1D7F99, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Hit Combo" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1C8F06, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Character 1 Health decreased" },
+        { address=0X1C8F06, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Character 1 Health increased" },
+        { address=0X1C8F08, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Character 1 Max Health decreased" },
+        { address=0X1C8F08, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Character 1 Max Health increased" },
+        { address=0X1C8F86, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Character 1 Health decreased" },
+        { address=0X1C8F86, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Character 1 Health increased" },
+        { address=0X1C8F88, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Character 1 Max Health decreased" },
+        { address=0X1C8F88, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Character 1 Max Health increased" },
+        { address=0X1C8FA9, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="P2 - Character 1 'Taking Damage'" },
+        { address=0X1C9006, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Character 2 Health decreased" },
+        { address=0X1C9006, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Character 2 Health increased" },
+        { address=0X1C9008, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Character 2 Max Health decreased" },
+        { address=0X1C9008, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Character 2 Max Health increased" },
+        { address=0X1C9086, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Character 2 Health decreased" },
+        { address=0X1C9086, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Character 2 Health increased" },
+        { address=0X1C9088, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Character 2 Max Health decreased" },
+        { address=0X1C9088, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Character 2 Max Health increased" },
+        { address=0X1C90A9, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="P2 - Character 2 'Taking Damage'" },
+        { address=0X1D7F69, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Special Bar Energy decreased" },
+        { address=0X1D7F69, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Special Bar Energy increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1C8F28, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="P1 - Character 1 Moves" },
+        { address=0X1CF086, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Settings: Time" },
+        { address=0X1D78FE, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Match Timer" },
+      },
+    },
+  },
+}

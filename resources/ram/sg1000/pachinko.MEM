@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pachinko",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "pachinko",
+    file = "pachinko.zip",
+    hashes = {
+      { hash = "37f5e516d9fbce05052204b67379a6da", label = "Pachinko (Japan).sg" },
+    }
+  },
+
+  events = {
+  },
+}

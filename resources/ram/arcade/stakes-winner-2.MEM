@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Stakes Winner 2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Horse Racing"
+  },
+
+  rom = {
+    name = "stakes-winner-2",
+    file = "stakes-winner-2.zip",
+    hashes = {
+      { hash = "ddfbfabd2d5b6b13f339bd97a1777b17", label = "stakwin2.7z <Stakes Winner 2>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0386, type="u8", condition="eq", value=0X1, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X0386, type="u8", condition="eq", value=0X4, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X8A92, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powerup" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2896, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer (Minutes)" },
+        { address=0X289A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer (FIRST digit in seconds)" },
+        { address=0X289C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer (SECOND digit in seconds)" },
+        { address=0X28A6, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer (Milliseconds)" },
+      },
+    },
+  },
+}

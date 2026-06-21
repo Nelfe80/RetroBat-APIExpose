@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Street Hoop",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "street-hoop",
+    file = "street-hoop.zip",
+    hashes = {
+      { hash = "0a70a4409ebac6fe7096e9c3799a56ee", label = "Dunk Dream ~ Street Slam ~ Street Hoop (Japan, USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A4F, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X1A4F, type="u8", condition="eq", value=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Half Time Demo" },
+        { address=0X1A4F, type="u8", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1A4F, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1A4F, type="u8", condition="eq", value=0X0D, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits/End Cutscene" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1A4B, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="First Stage" },
+        { address=0X1A4B, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage" },
+        { address=0X1A4B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1A4F, type="u8", condition="eq", value=0X07, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Board" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0A25, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Play Time" },
+        { address=0X1A4F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Game State" },
+      },
+    },
+  },
+}

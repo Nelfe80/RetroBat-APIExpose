@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Led Storm Rally 2011",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Driving"
+  },
+
+  rom = {
+    name = "led-storm-rally-2011",
+    file = "led-storm-rally-2011.zip",
+    hashes = {
+      { hash = "4ae7b96bde0e9aae7a1f98c7da8111e7", label = "leds2011.7z <Led Storm Rally 2011 (World)>" },
+      { hash = "f995af6611429193835171725be72fd5", label = "leds2011u.7z <Led Storm Rally 2011 (US)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X80E0, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode Detector" },
+        { address=0X87E2, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XC6A7, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Countdown" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X219BA, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 9/18 Finish Indicator" },
+      },
+      stage = {
+        { address=0X881E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Tracked For Progress Screen" },
+        { address=0X881F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Tracked For Leaderboards" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X882D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fuel Can Energy (the boost one) decreased" },
+        { address=0X882D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fuel Can Energy (the boost one) increased" },
+        { address=0X8847, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy decreased" },
+        { address=0X8847, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8836, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (upper 4 digits)" },
+        { address=0X8838, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (lower 4 digits)" },
+      },
+      collectibles = {
+        { address=0X87F7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Switch increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X87F4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DIP Switches" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8826, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Time Seconds" },
+        { address=0X8827, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Time Minutes" },
+        { address=0X8829, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Time Centiseconds" },
+      },
+    },
+  },
+}

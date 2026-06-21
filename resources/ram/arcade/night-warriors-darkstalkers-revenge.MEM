@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Night Warriors: Darkstalkers' Revenge",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "night-warriors-darkstalkers-revenge",
+    file = "night-warriors-darkstalkers-revenge.zip",
+    hashes = {
+      { hash = "8f90a6e435ce46037177617740ca644b", label = "vhuntj.7z <Vampire Hunter - darkstalkers' revenge (950316 Japan)>" },
+      { hash = "d96ff3c1a1cd640c7796d00c517c6cf7", label = "nwarr.7z <Night Warriors - darkstalkers' revenge (950316 Euro)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8000, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X8004, type="u8", condition="eq", value=0X08, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X8004, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      events = {
+        { address=0X84FE, type="u8", condition="eq", value=0X00, action="COMBO_HIT", no_log=false, no_survey=false, desc="No chain combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8008, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Start" },
+        { address=0X8236, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 round" },
+        { address=0X8236, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 rounds" },
+        { address=0X8236, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 rounds" },
+        { address=0X8236, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Max Rounds [8 bits]" },
+        { address=0X8A6F, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Starting" },
+        { address=0X8A6F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Running" },
+        { address=0X8A6F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round - Starting [8 bits]" },
+        { address=0X8E12, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X8E12, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Special Move" },
+        { address=0X8E12, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ES Finish" },
+        { address=0X8E12, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Time Out" },
+        { address=0X8E12, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Draw" },
+        { address=0X8E12, type="u8", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EX Special Finish" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X8262, type="u8", condition="eq", value=0X04, action="HIT", no_log=false, no_survey=false, desc="5 - Medium (default)" },
+        { address=0X838D, type="u8", condition="eq", value=0X0C, action="HIT", no_log=false, no_survey=false, desc="Damaged" },
+        { address=0X83CA, type="u16le", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X83CA, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 - HP [16 bits]" },
+        { address=0X888D, type="u8", condition="eq", value=0X0C, action="HIT", no_log=false, no_survey=false, desc="Damaged" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X838D, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Jumping" },
+        { address=0X888D, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X838D, type="u8", condition="eq", value=0X0A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Proximity Block" },
+        { address=0X888D, type="u8", condition="eq", value=0X0A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Proximity Block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8232, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Settings - Time Count Speed [8 bits]" },
+        { address=0X8E12, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round - Finishing Move Type [8 bits]" },
+      },
+    },
+  },
+}

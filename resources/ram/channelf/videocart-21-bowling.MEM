@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Videocart-21: Bowling",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "videocart-21-bowling",
+    file = "videocart-21-bowling.zip",
+    hashes = {
+      { hash = "25e231e7a464a32b4715bfb47af89240", label = "Bowling (USA).bin" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X0015, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] BCD Score" },
+      },
+    },
+  },
+}

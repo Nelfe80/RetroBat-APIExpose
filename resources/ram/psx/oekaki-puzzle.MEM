@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Oekaki Puzzle",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "oekaki-puzzle",
+    file = "oekaki-puzzle.zip",
+    hashes = {
+      { hash = "75ff44ef29d008a6855e1271322c51ab", label = "SuperLite 1500 Series - Oekaki Puzzle (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X80777, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage stage select." },
+        { address=0X80777, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This is for the to tell if you in the stage select mode." },
+      },
+    },
+  },
+}

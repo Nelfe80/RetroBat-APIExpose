@@ -1,0 +1,116 @@
+return {
+  game = {
+    title = "Godzilla: Save the Earth",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "godzilla-save-the-earth",
+    file = "godzilla-save-the-earth.zip",
+    hashes = {
+      { hash = "65cc09d9d2b2c2610e7d804cfdb7868c", label = "Godzilla - Save the Earth (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6A6C5C, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demolition challenge unlocked" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6A6BD0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Versus rounds" },
+        { address=0X6A6BD8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Versus round length" },
+        { address=0X6A6BE8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Free for all round length" },
+        { address=0X6A6BF8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Team Battle round length" },
+        { address=0X6A6C08, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Destruction round length" },
+        { address=0X6A6C18, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Team Destruction round length" },
+        { address=0X6A6C20, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival rounds" },
+        { address=0X6A6C28, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival round length" },
+        { address=0X6A6C6C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster Roundup challenge unlocked" },
+        { address=0X6AF8FC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival Rounds" },
+        { address=0X6C5D44, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 rounds won" },
+        { address=0X6C5D4C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 won most recent round" },
+        { address=0X6C5D54, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 rounds won" },
+        { address=0X6C5D5C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 won most recent round" },
+        { address=0X6C5D64, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P3 rounds won" },
+        { address=0X6C5D6C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P3 won most recent round" },
+        { address=0X6C5D74, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P4 rounds won" },
+        { address=0X6C5D7C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P4 won most recent round" },
+        { address=0X6C5D84, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total rounds completed" },
+      },
+      stage = {
+        { address=0X6A672C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ActionLevel?" },
+        { address=0X6A6C30, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action rounds" },
+        { address=0X6A6C38, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action round length" },
+        { address=0X6A6C40, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ActionLastLevel" },
+        { address=0X6B0754, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action mode round/Challenge monster bowling win flag" },
+        { address=0X6B0790, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action Mode round loss flag" },
+        { address=0X6C588C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action/Survival rounds" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X6C5C3C, type="u8", condition="bit_true", bit=4, mask=0X10, action="HIT", no_log=false, no_survey=false, desc="P1 4x damage" },
+        { address=0X6C5C3C, type="u8", condition="bit_true", bit=5, mask=0X20, action="HIT", no_log=false, no_survey=false, desc="P2 4x damage" },
+        { address=0X6C5C3C, type="u8", condition="bit_true", bit=6, mask=0X40, action="HIT", no_log=false, no_survey=false, desc="P3 4x damage" },
+        { address=0X6C5C3C, type="u8", condition="bit_true", bit=7, mask=0X80, action="HIT", no_log=false, no_survey=false, desc="P4 4x damage" },
+        { address=0X6C5C3D, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health regenerates" },
+        { address=0X6C5C3E, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Energy doesnt regenerate" },
+        { address=0X6C5C40, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 infinite energy" },
+        { address=0X6C5C40, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 infinite energy" },
+        { address=0X6C5C40, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="P3 infinite energy" },
+        { address=0X6C5C40, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="P4 infinite energy" },
+        { address=0X6E57DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 health [Float] decreased" },
+        { address=0X6E57DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 health [Float] increased" },
+        { address=0X6E57E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Energy [Float] decreased" },
+        { address=0X6E57E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Energy [Float] increased" },
+        { address=0X6F27DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 health [Float] decreased" },
+        { address=0X6F27DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 health [Float] increased" },
+        { address=0X6F27E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 energy [Float] decreased" },
+        { address=0X6F27E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 energy [Float] increased" },
+        { address=0X6FF7DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P3 health [Float] decreased" },
+        { address=0X6FF7DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P3 health [Float] increased" },
+        { address=0X6FF7E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P3 energy [Float] decreased" },
+        { address=0X6FF7E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P3 energy [Float] increased" },
+        { address=0X70C7DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P4 health [Float] decreased" },
+        { address=0X70C7DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P4 health [Float] increased" },
+        { address=0X70C7E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P4 energy [Float] decreased" },
+        { address=0X70C7E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P4 energy [Float] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6A6724, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+        { address=0X6A6728, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="ActionScore?" },
+        { address=0X6A67A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Anguirus Action High Score" },
+        { address=0X6A68C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Godzilla 2000 Action High Score" },
+        { address=0X6A6C48, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="ActionLastScore" },
+        { address=0X6B0730, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Demolition/destruction score" },
+        { address=0X6B0758, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Melee/Survival P1 current score" },
+        { address=0X6C5894, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Action mode score" },
+        { address=0X6C5D48, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Melee P1 score" },
+        { address=0X6C5D58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Melee P2 score" },
+        { address=0X6C5D68, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Melee P3 score" },
+        { address=0X6C5D78, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Melee P4 score" },
+      },
+      collectibles = {
+        { address=0X6A6788, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Boxing Ring increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6B0748, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Buildings destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6E584C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Rage timer" },
+        { address=0X6F284C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 Rage timer" },
+      },
+    },
+  },
+}

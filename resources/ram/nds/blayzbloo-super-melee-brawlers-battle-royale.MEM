@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "BlayzBloo: Super Melee Brawlers Battle Royale",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "blayzbloo-super-melee-brawlers-battle-royale",
+    file = "blayzbloo-super-melee-brawlers-battle-royale.zip",
+    hashes = {
+      { hash = "025ec2fe1511edcb7fd897ca7308a76a", label = "BlayzBloo - Super Melee Brawlers Battle Royale (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3875E4, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="main menu (Single-player, free battle, return to title)" },
+        { address=0X3875E4, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title ('Press Start')" },
+        { address=0X3875E4, type="u8", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title menu" },
+        { address=0X3876F8, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="start game" },
+        { address=0X3876F8, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="help" },
+        { address=0X3876F8, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="dsi menu" },
+        { address=0X38774C, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="return to title" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X387980, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="empty (test. possible boss Ragna?)" },
+        { address=0X387990, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="empty (test. possible boss Ragna?)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Garfield: The Search for Pooky",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "garfield-the-search-for-pooky",
+    file = "garfield-the-search-for-pooky.zip",
+    hashes = {
+      { hash = "85cc314417d8f96798248507629eaa8b", label = "Garfield - The Search for Pooky (Europe) (En,Fr,De,It).gba" },
+      { hash = "cd27477e70b529b736746185b882100e", label = "Garfield - The Search for Pooky (USA) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X168AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{In First Level}" },
+        { address=0X168AC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{In First Level}" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X168A9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="{In First Level} increased" },
+        { address=0X168A9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{In First Level} decreased" },
+      },
+    },
+  },
+}

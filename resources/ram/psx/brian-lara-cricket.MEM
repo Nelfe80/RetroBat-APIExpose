@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Brian Lara Cricket",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "brian-lara-cricket",
+    file = "brian-lara-cricket.zip",
+    hashes = {
+      { hash = "bc14b12ea4dbd1112d46151b0b1ccbec", label = "Brian Lara Cricket (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

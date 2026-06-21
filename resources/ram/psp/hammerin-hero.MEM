@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Hammerin' Hero",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hammerin-hero",
+    file = "hammerin-hero.zip",
+    hashes = {
+      { hash = "80785b10b7c3c555f5704ddd940d70c5", label = "Hammerin' Hero (USA).iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1C7B234, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="current lifes (Stage 1) increased" },
+        { address=0X1C7B234, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="current lifes (Stage 1) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XAF7EC4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="current score in game (on any stage)" },
+        { address=0XB04104, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score Apprentice Diff - stage 1" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1C7B23C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="timer in game (Stage 1)" },
+        { address=0X1C7B260, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="timer in game Milliseconds (Stage 1)" },
+      },
+    },
+  },
+}

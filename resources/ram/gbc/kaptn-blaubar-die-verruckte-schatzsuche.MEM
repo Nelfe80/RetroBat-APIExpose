@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Käpt'n Blaubär: Die verrückte Schatzsuche",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "kaptn-blaubar-die-verruckte-schatzsuche",
+    file = "kaptn-blaubar-die-verruckte-schatzsuche.zip",
+    hashes = {
+      { hash = "433d5df048561d0a276a56b210e25d9b", label = "Kaept'n Blaubaer - Die verrueckte Schatzsuche (Germany).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

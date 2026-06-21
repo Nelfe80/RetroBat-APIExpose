@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Brutal Unleashed: Above the Claw",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "brutal-unleashed-above-the-claw",
+    file = "brutal-unleashed-above-the-claw.zip",
+    hashes = {
+      { hash = "1738a479b0253bcb0bcfb7bf09c03add", label = "Brutal - Above the Claw (USA).32x" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X02FE, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="None Used" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X02FC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Single Round" },
+        { address=0X02FC, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First To 2 Rounds" },
+        { address=0X02FC, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Best Of 3 Rounds / First To 3 Rounds" },
+        { address=0X02FC, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First To 4 Rounds" },
+        { address=0X02FC, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Best Of 5 Rounds" },
+        { address=0X02FC, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Best Of 7 Rounds" },
+        { address=0X02FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - Number Of Rounds" },
+        { address=0X03E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Amount of Rounds won by Player" },
+        { address=0X045C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="BACKUP - [8bit] Amount of Rounds won by Player" },
+      },
+      stage = {
+        { address=0X0318, type="u8", condition="eq", value=0X15, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Fight" },
+        { address=0X0318, type="u8", condition="eq", value=0X16, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ending Cutscene" },
+        { address=0X0318, type="u8", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Fight" },
+        { address=0X0318, type="u8", condition="eq", value=0X0E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final tutorial and final cutscene" },
+        { address=0X0318, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Stage Progression" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X03B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Player HP decreased" },
+        { address=0X03B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Player HP increased" },
+        { address=0X0428, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Enemy HP decreased" },
+        { address=0X0428, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Enemy HP increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X02F7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Options" },
+      },
+    },
+  },
+}

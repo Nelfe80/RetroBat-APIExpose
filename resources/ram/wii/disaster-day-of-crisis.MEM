@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Disaster: Day of Crisis",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "disaster-day-of-crisis",
+    file = "disaster-day-of-crisis.zip",
+    hashes = {
+      { hash = "d5c642d77c9e98b84b195c8f4ba34c20", label = "Disaster - Day of Crisis (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5EB585, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused (either through pause menu or other popups which pause the game)" },
+      },
+      events = {
+        { address=0X5EAD98, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32-bit BE] Bullet HIT Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5EB590, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[64-bytes ASCII] Level identifier" },
+        { address=0X5EB610, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[64-bytes ASCII] Previous level identifer" },
+      },
+      stage = {
+        { address=0X6291E0, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[46-bytes array] of [16-bit] values indicating number of Staminas signs collected within a stage" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X616608, type="u32be", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Weapon ID" },
+        { address=0X616608, type="u32be", condition="eq", value=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8-bit] Is weapon owned (1=Yes/0=No)" },
+        { address=0X61662C, type="u32be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit BE] (+0x0) Handgun I - Weapon ID (is 1 in this case)" },
+        { address=0X616968, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[36-bytes] Pulse Firefighting Gun info (see 0x00616608) (NOT AN ACTUAL WEAPON)" },
+        { address=0X61698C, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[36-bytes] Hose info (see 0x00616608) (NOT AN ACTUAL WEAPON)" },
+        { address=0X616A64, type="u32be", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="NONE (Note: You can change weapon IDs on the fly via editing, but if you had nothing equipped yo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X62929C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] BP (Battle Points) (Logical value; not display)" },
+        { address=0X6292A4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] SP (Stamina Points) (Logical value; not display)" },
+      },
+      collectibles = {
+        { address=0X5EB5D0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[64-bytes ASCII] Next level identifier (null string when not loading) increased" },
+        { address=0X616520, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16-bit BE] Shotgun ammo count" },
+        { address=0X616522, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16-bit BE] Assault Rifle ammo count" },
+        { address=0X616528, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16-bit BE] Pulse/Spark Gun ammo count" },
+        { address=0X61652A, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[16-bit BE] Gatling Gun ammo count" },
+        { address=0X616608, type="u32be", condition="eq", value=0X1C, action="AMMO_STATE", no_log=true, no_survey=false, desc="[32-bit BE] Ammo in magazine" },
+        { address=0X616648, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32-bit BE] (+0x1C) Handgun I - Magazine Ammo" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Lux-Pain",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "lux-pain",
+    file = "lux-pain.zip",
+    hashes = {
+      { hash = "4d1b1aea2fd8802d413c282565f3b6ec", label = "Lux-Pain (Europe).nds" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X181964, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

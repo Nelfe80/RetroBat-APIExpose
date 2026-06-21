@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>paddle</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Accelerate</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>Brake</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Nitro</text>
+			<color>${red}</color>
+		</text>
+		<text name="button7" extra="true">
+			<text>Hi / Lo</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 TAK 450000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ESH 350000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 I.I 260000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 RGV 240000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 VFR 220000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 YZF 200000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 CBR 180000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Need for Speed: Underground",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "need-for-speed-underground",
+    file = "need-for-speed-underground.zip",
+    hashes = {
+      { hash = "89ae76893ff69a1fbb7a45b32d703723", label = "Need for Speed - Underground (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2BDA80, type="u32be", condition="eq", value=0XD7BA6011, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Go Underground" },
+        { address=0X323A59, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="#81 - Round And Round And Round We Go" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X323A26, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="#30 - Tournament - Dead Calm" },
+        { address=0X323A2C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="#36 - For the Ladies" },
+        { address=0X323A4C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="#68 - Dead of Night" },
+        { address=0X323A63, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="#91 - Tournament - Eddie's Posse, Part 1" },
+        { address=0X323A6D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="#101 - Eddie's Posse, Part 2" },
+        { address=0X323A77, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="#111 - Wrath of Eddie" },
+      },
+      health = {
+        { address=0X323A21, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="#25 - A Little Dirt Won't Hurt" },
+        { address=0X323A28, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="#32 - World of Hurt" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X31D298, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bit BE] Total Style Points" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X31D31F, type="u8", condition="eq", value=0X06, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Promises" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X323A0F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="#7 - TJ's Time Trial" },
+        { address=0X323A15, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="#13 - Time To Get Dirt-Y" },
+        { address=0X323A1D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="#21 - Gut Check Time" },
+        { address=0X323A23, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="#27 - Wrong Place, Right Time" },
+        { address=0X323A54, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="#76 - It's Klutch Time" },
+      },
+    },
+  },
+}

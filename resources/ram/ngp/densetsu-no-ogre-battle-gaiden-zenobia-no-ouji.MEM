@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Densetsu no Ogre Battle Gaiden: Zenobia no Ouji",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "densetsu-no-ogre-battle-gaiden-zenobia-no-ouji",
+    file = "densetsu-no-ogre-battle-gaiden-zenobia-no-ouji.zip",
+    hashes = {
+      { hash = "26d0557d8a465aa8f430d5e4d94c679a", label = "Densetsu no Ogre Battle Gaiden - Zenobia no Ouji (Japan).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000C, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="SNK logo / Title screen / New game" },
+        { address=0X21DB, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X21DB, type="u8", condition="eq", value=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0699, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game cleared" },
+        { address=0X0699, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game not cleared" },
+      },
+      zone = {
+        { address=0X1406, type="u8", condition="eq", value=0X16, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World" },
+        { address=0X146A, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Estrada's Manor" },
+        { address=0X146A, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Grossmark" },
+        { address=0X146A, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Cape Satz" },
+        { address=0X146A, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Lichtfrost" },
+        { address=0X146A, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Lothen District" },
+        { address=0X146A, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Lit Isles" },
+        { address=0X146A, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Nessa District" },
+        { address=0X146A, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Nordheim District" },
+        { address=0X146B, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Megaholten" },
+        { address=0X146B, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chagall Fen" },
+        { address=0X146B, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Lego Archipelago" },
+        { address=0X146B, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ahm Weald" },
+        { address=0X146B, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Loch Laika" },
+        { address=0X146B, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chrono Range" },
+        { address=0X146B, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ayn Peninsula" },
+        { address=0X146B, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Wynd Dunes" },
+        { address=0X146C, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Freyja Islss" },
+        { address=0X146C, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Free Battle Area 1" },
+        { address=0X146C, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Free Battle Area 2" },
+        { address=0X146C, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Free Battle Area 3" },
+      },
+      stage = {
+        { address=0X146E, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Estrada's Manor" },
+        { address=0X146E, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Grossmark" },
+        { address=0X146E, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cape Satz" },
+        { address=0X146E, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lichtfrost" },
+        { address=0X146E, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lothen District" },
+        { address=0X146E, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lit Islss" },
+        { address=0X146E, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nessa District" },
+        { address=0X146E, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nordheim District" },
+        { address=0X146F, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Megaholten" },
+        { address=0X146F, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chagall Fen" },
+        { address=0X146F, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lego Archipelago" },
+        { address=0X146F, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ahm Weald" },
+        { address=0X146F, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Loch Laika" },
+        { address=0X146F, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chrono Massif" },
+        { address=0X146F, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ayn Peninsula" },
+        { address=0X146F, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Wynd Dunes" },
+        { address=0X1470, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Freyja Isles" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X138E, type="u8", condition="eq", value=0X2D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Claws" },
+        { address=0X138E, type="u8", condition="eq", value=0X85, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Staff" },
+        { address=0X138E, type="u8", condition="eq", value=0X86, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Ring" },
+        { address=0X1406, type="u8", condition="eq", value=0X0D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1B2C, type="u32le", condition="eq", value=0X7FCF0A00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Do or Die" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X138E, type="u8", condition="eq", value=0X5D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Power" },
+        { address=0X138E, type="u8", condition="eq", value=0X5E, action="MONEY_STATE", no_log=false, no_survey=false, desc="ことだまの Ring" },
+        { address=0X138E, type="u8", condition="eq", value=0X60, action="MONEY_STATE", no_log=false, no_survey=false, desc="Thunder Ring" },
+        { address=0X138E, type="u8", condition="eq", value=0X62, action="MONEY_STATE", no_log=false, no_survey=false, desc="Lucifer's Ring" },
+        { address=0X138E, type="u8", condition="eq", value=0X63, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Protection" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X138E, type="u8", condition="eq", value=0X4A, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Bow" },
+        { address=0X138E, type="u8", condition="eq", value=0X7D, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Spike Shield" },
+        { address=0X138E, type="u8", condition="eq", value=0X7E, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Power Shield" },
+        { address=0X138E, type="u8", condition="eq", value=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ogre Shield" },
+        { address=0X138E, type="u8", condition="eq", value=0X81, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Heat Shield" },
+        { address=0X138E, type="u8", condition="eq", value=0X82, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Cold Shield" },
+        { address=0X138E, type="u8", condition="eq", value=0X83, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Thunder Beast Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X138E, type="u8", condition="eq", value=0X2C, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Sword" },
+      },
+    },
+  },
+}

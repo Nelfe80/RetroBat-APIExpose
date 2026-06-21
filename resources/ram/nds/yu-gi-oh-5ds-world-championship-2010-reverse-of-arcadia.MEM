@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! 5D's World Championship 2010: Reverse of Arcadia",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-5ds-world-championship-2010-reverse-of-arcadia",
+    file = "yu-gi-oh-5ds-world-championship-2010-reverse-of-arcadia.zip",
+    hashes = {
+      { hash = "71c4569cd6cd7af559045a0e0036853d", label = "Yu-Gi-Oh! 5D's - World Championship 2010 - Reverse of Arcadia (Europe) (En,Ja,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X285ABC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[CPU Life Points] [32-Bits] increased" },
+        { address=0X285ABC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[CPU Life Points] [32-Bits] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCBDA8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Wifi Points] [16-Bits]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCE395, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[Objects] [Bitflags]" },
+      },
+    },
+  },
+}

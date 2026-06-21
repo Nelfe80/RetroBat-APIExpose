@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Jaguar Bomber",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "jaguar-bomber",
+    file = "jaguar-bomber.zip",
+    hashes = {
+      { hash = "a896fc8bc1eba73a0689cb587c665e94", label = "Jaguar Bomber (USA, Europe).sv" },
+    }
+  },
+
+  events = {
+  },
+}

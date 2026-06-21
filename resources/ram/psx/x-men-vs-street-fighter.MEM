@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "X-Men vs. Street Fighter",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "x-men-vs-street-fighter",
+    file = "x-men-vs-street-fighter.zip",
+    hashes = {
+      { hash = "8475f8fe3090c8a3703d89ceb8e3ab57", label = "X-Men vs. Street Fighter (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

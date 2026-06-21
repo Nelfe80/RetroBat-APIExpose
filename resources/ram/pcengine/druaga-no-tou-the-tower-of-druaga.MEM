@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Druaga no Tou | The Tower of Druaga",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Role-Playing, Maze"
+  },
+
+  rom = {
+    name = "druaga-no-tou-the-tower-of-druaga",
+    file = "druaga-no-tou-the-tower-of-druaga.zip",
+    hashes = {
+      { hash = "8da3885d9c6674f33cf9bac28905d249", label = "Tower of Druaga, The (Japan) (En) (Procyon) (1.1).pce" },
+      { hash = "da7fa7e120ca1d6c0817bd557ec034d2", label = "pce/druaga.7z <The Tower of Druaga>" },
+      { hash = "df4fa7ddc1a4e8cc29dc67e700b2a55a", label = "Tower of Druaga, The (Japan).pce" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X008E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X008E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X008F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X008F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X18B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Allocated health decreased" },
+        { address=0X18B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Allocated health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1616, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="0xbe after collecting treasure chest 1st floor" },
+        { address=0X1C04, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="0x00 after collecting treasure chest 1st floor" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1892, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Equipped" },
+      },
+    },
+  },
+}

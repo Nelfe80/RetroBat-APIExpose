@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Super Robot Taisen Gaiden: Masou Kishin - The Lord of Elemental",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "super-robot-taisen-gaiden-masou-kishin-the-lord-of-elemental",
+    file = "super-robot-taisen-gaiden-masou-kishin-the-lord-of-elemental.zip",
+    hashes = {
+      { hash = "680ee04af6792c3891947b43b98eed46", label = "Super Robot Taisen Gaiden - Masoukishin - The Lord of Elemental (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1009, type="u16le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits 16-bits" },
+      },
+    },
+  },
+}

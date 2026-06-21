@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "IKD",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ikd",
+    file = "ikd.zip",
+    hashes = {
+      { hash = "eaa30a863b432584d7b3e58e1778d906", label = "IKD (World) (v1.0) (Dan Macdonald).uze" },
+    }
+  },
+
+  events = {
+  },
+}

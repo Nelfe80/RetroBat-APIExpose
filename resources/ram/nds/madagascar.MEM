@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Madagascar",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "madagascar",
+    file = "madagascar.zip",
+    hashes = {
+      { hash = "0f7b72bdf5e8bc40392ab36e5aa157fd", label = "Madagascar (Germany).nds" },
+      { hash = "1ba6a8d25562a1e0283560e183910dc9", label = "Madagascar (Spain).nds" },
+      { hash = "274ba15c9393d8af0a7eb362eb479d09", label = "Madagascar (France).nds" },
+      { hash = "41a6d8b5d3948a88146afa4396668584", label = "Madagascar (Italy).nds" },
+      { hash = "8140bd74c4f45f809094fd780f7c4911", label = "Madagascar (Japan).nds" },
+      { hash = "84d34c5a08eee3767b1d8403388c319c", label = "Madagascar (USA).nds" },
+      { hash = "b5597f81460b80c8ed26f8d7dda90105", label = "Madagascar (Netherlands).nds" },
+      { hash = "bc820c9d8798b99d326b6955307ee5ca", label = "Madagascar (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

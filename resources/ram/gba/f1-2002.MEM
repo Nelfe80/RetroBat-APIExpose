@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "F1 2002",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "f1-2002",
+    file = "f1-2002.zip",
+    hashes = {
+      { hash = "ab1c6c1e37df4c3dacf88a1ecbe59afd", label = "F1 2002 (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "c5e3a3d61b6c46d78bd66bd842fba8b8", label = "F1 2002 (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+  },
+}

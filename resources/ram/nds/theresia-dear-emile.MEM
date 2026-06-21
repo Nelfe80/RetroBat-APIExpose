@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Theresia: Dear Emile",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "theresia-dear-emile",
+    file = "theresia-dear-emile.zip",
+    hashes = {
+      { hash = "b97a87dc19f7c758229482705d5a2e45", label = "Theresia.. (USA).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X2F01F4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Life, Prologue Only increased" },
+        { address=0X2F01F4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Life, Prologue Only decreased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7447C, type="u8", condition="eq", value=0X4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="East Dog Door" },
+        { address=0X2CDF60, type="u32le", condition="eq", value=0X30313570, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Dog Door East Side" },
+        { address=0X2CDF60, type="u32le", condition="eq", value=0X30323070, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Large Door" },
+        { address=0X2CDF60, type="u32le", condition="eq", value=0X33313070, action="DOOR_OPENED", no_log=false, no_survey=false, desc="'Welcome to Chaos' Door" },
+        { address=0X2CDF60, type="u32le", condition="eq", value=0X34303070, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Dog Door" },
+        { address=0X2CDF60, type="u32le", condition="eq", value=0X36313070, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Exam Room Door" },
+        { address=0X2CDF60, type="u32le", condition="eq", value=0X37313070, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Boarded Door" },
+        { address=0X2CDF60, type="u32le", condition="eq", value=0X38313070, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switchboard" },
+        { address=0X2CDF60, type="u32le", condition="eq", value=0X39313070, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switchboard Activated" },
+        { address=0X2EE1BC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Elixir taken after 'Welcome to Chaos' door" },
+        { address=0X2EEC38, type="u8", condition="eq", value=0XB0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Body Disposal Room Lights Switch" },
+        { address=0X2EFB58, type="u8", condition="eq", value=0X4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="East dog door unlocked" },
+        { address=0X2EFB58, type="u8", condition="eq", value=0X5, action="DOOR_OPENED", no_log=false, no_survey=false, desc="East dog door gone through" },
+        { address=0X2EFB58, type="u8", condition="eq", value=0X6, action="DOOR_OPENED", no_log=false, no_survey=false, desc="West dog door unlocked" },
+        { address=0X2EFB58, type="u8", condition="eq", value=0X7, action="DOOR_OPENED", no_log=false, no_survey=false, desc="West dog door gone through" },
+        { address=0X2EFB58, type="u8", condition="eq", value=0X9, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Tried to open 'Welcome to Chaos' door" },
+        { address=0X2EFB58, type="u8", condition="eq", value=0XB, action="DOOR_OPENED", no_log=false, no_survey=false, desc="'Welcome to Chaos' door disarmed" },
+        { address=0X2EFB94, type="u16le", condition="eq", value=0X4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Dog Door" },
+        { address=0X2EFB94, type="u16le", condition="eq", value=0XD, action="DOOR_OPENED", no_log=false, no_survey=false, desc="'Welcome to Chaos' Door" },
+        { address=0X2EFB94, type="u16le", condition="eq", value=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Exam Room Door" },
+        { address=0X2EFB94, type="u16le", condition="eq", value=0X11, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Boarded Door`" },
+        { address=0X2EFB94, type="u16le", condition="eq", value=0X1FE, action="DOOR_OPENED", no_log=false, no_survey=false, desc="East Dog Door East Side" },
+      },
+    },
+  },
+}

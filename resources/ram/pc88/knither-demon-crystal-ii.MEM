@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Knither: Demon Crystal II",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "knither-demon-crystal-ii",
+    file = "knither-demon-crystal-ii.zip",
+    hashes = {
+      { hash = "01e64aaf482eabf2f0cedb6d5b6dc0e9", label = "Knither - Demon Crystal II.d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3397, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1=Completed level" },
+        { address=0X339B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Substages completed in current world" },
+      },
+      zone = {
+        { address=0X3392, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World (-1)" },
+      },
+      stage = {
+        { address=0X3399, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Substage" },
+        { address=0X339E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Collected special item in stage (Old Man, Lamp, etc)" },
+        { address=0X33A4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Sprite X (in level)" },
+        { address=0X33A5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Sprite Y (in level)" },
+        { address=0X33AA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Sprite X (overworld)" },
+        { address=0X33AB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Sprite Y (overworld)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3394, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (max 9) increased" },
+        { address=0X3394, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (max 9) decreased" },
+        { address=0X33E9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Potions of Life held increased" },
+        { address=0X33E9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Potions of Life held decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3460, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x100000 (BCD)" },
+        { address=0X3462, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x10 (BCD)" },
+        { address=0X3466, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score x100000 (BCD)" },
+        { address=0X3468, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score x10 (BCD)" },
+      },
+    },
+  },
+}

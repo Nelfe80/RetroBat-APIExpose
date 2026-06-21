@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Shin Megami Tensei: Devil Summoner",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-devil-summoner",
+    file = "shin-megami-tensei-devil-summoner.zip",
+    hashes = {
+      { hash = "5abaebf7872a31aa9dded393bce14f89", label = "Shin Megami Tensei - Devil Summoner (Japan) (Rev B)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X5006, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Hp value (Player) decreased" },
+        { address=0X5006, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Hp value (Player) increased" },
+        { address=0X5682, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Hp of enemy 1 decreased" },
+        { address=0X5682, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Hp of enemy 1 increased" },
+        { address=0X56C6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Hp of enemy 2 decreased" },
+        { address=0X56C6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Hp of enemy 2 increased" },
+        { address=0X570A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Hp of enemy 3 decreased" },
+        { address=0X570A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Hp of enemy 3 increased" },
+        { address=0X574E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Hp of enemy 4 decreased" },
+        { address=0X574E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Hp of enemy 4 increased" },
+      },
+    },
+  },
+}

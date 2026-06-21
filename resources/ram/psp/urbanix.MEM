@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Urbanix",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "urbanix",
+    file = "urbanix.zip",
+    hashes = {
+      { hash = "3c5f432a8da3770e4f6be889783914c0", label = "Urbanix (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Farm Frenzy 2",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "farm-frenzy-2",
+    file = "farm-frenzy-2.zip",
+    hashes = {
+      { hash = "8dbfdefebd257158d81ff2ff52047a9e", label = "Farm Frenzy 2 (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Hatris",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "hatris",
+    file = "hatris.zip",
+    hashes = {
+      { hash = "b9d3d91d8389cc510aa8fe9063228644", label = "Hatris (Japan, USA) (En).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFF94, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="not demo" },
+        { address=0XFF97, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="00 demo last played, also if music is not on" },
+        { address=0XFFC2, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="00 not paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFFBB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="number of hats left per level (bcd)" },
+      },
+      stage = {
+        { address=0XFFBC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 00..09" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFFB2, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="24 bit score (bcd)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "24: The Game",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Puzzle, Shooter"
+  },
+
+  rom = {
+    name = "24-the-game",
+    file = "24-the-game.zip",
+    hashes = {
+      { hash = "9639f9a5cebde2e6341f1d211e1f4829", label = "24 - The Game (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

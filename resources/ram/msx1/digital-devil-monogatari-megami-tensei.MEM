@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Digital Devil Monogatari: Megami Tensei",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "digital-devil-monogatari-megami-tensei",
+    file = "digital-devil-monogatari-megami-tensei.zip",
+    hashes = {
+      { hash = "1d24ba1350218f5be891784e34f1dc28", label = "msx/megamit.7z <Digital Devil Monogatari - Megami Tensei (Jpn)>" },
+      { hash = "5faaa5ab88e24224584577c4c43efc40", label = "Digital Devil Monogatari Megami Tensei (Japan).rom" },
+      { hash = "e557b29ad6cae416ec6c3126a0761aac", label = "Digital Devil Monogatari - Megami Tensei (Japan) (En) (v1.0) (Kaisaan)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1271, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health decreased" },
+        { address=0X1271, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X145B, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Uses left of selected weapon/item?" },
+        { address=0X145C, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Uses left of selected weapon/item?" },
+      },
+    },
+  },
+}

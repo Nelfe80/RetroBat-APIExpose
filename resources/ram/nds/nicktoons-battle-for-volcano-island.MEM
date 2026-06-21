@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Nicktoons: Battle for Volcano Island",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "nicktoons-battle-for-volcano-island",
+    file = "nicktoons-battle-for-volcano-island.zip",
+    hashes = {
+      { hash = "dc64d5555c14d6ed4080c6c37b5e10af", label = "SpongeBob and Friends - Battle for Volcano Island (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XABAB2, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not watching a demo/tutorial" },
+        { address=0XABAB2, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Watching a demo/tutorial" },
+        { address=0XBA6F4, type="u32le", condition="eq", value=0X020878B4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0XBA6F4, type="u32le", condition="eq", value=0X02089730, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue? screen" },
+        { address=0XCC778, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="No (minigame)" },
+        { address=0XCC778, type="u8", condition="eq", value=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="No (main game)" },
+        { address=0XCC778, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+      events = {
+        { address=0XBA74C, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Minigame final combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBA354, type="u16le", condition="eq", value=0X14, action="NEW_LEVEL", no_log=false, no_survey=false, desc="20/20" },
+        { address=0XBA354, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volcano Coins collected during the current level's Field Area" },
+        { address=0XBA368, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All 3 are collected" },
+        { address=0XBA368, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Crystals collected during the current level's Field Area" },
+        { address=0XBA430, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hasn't beat the boss yet" },
+        { address=0XBA430, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Beat the boss, on the results screen" },
+        { address=0XBA674, type="u32le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tropical Jungle" },
+        { address=0XBA674, type="u32le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sandbar" },
+        { address=0XBA674, type="u32le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Riverbank" },
+        { address=0XBA674, type="u32le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Vortex Volcano" },
+        { address=0XBA674, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels unlocked" },
+        { address=0XBA6F4, type="u32le", condition="eq", value=0X0207BED4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level results" },
+      },
+      stage = {
+        { address=0XBA358, type="u16le", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="20/20" },
+        { address=0XBA358, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Volcano Coins collected during the current level's Action Area" },
+        { address=0XBA3BC, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Walking on solid ground" },
+        { address=0XBA6A8, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Green Field" },
+        { address=0XBA6A8, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tropical Jungle" },
+        { address=0XBA6A8, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sandbar" },
+        { address=0XBA6A8, type="u16le", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Riverbank" },
+        { address=0XBA6A8, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Minigame stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBA430, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hasn't beat the boss yet, died during the level (goes back to 0x00 when transitioning screens)" },
+      },
+      health = {
+        { address=0XBA394, type="u32le", condition="eq", value=0X06, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max health" },
+        { address=0XBA394, type="u32le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Spongebob's health" },
+        { address=0XBA398, type="u32le", condition="eq", value=0X06, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max health" },
+        { address=0XBA398, type="u32le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Danny's health" },
+        { address=0XBA39C, type="u32le", condition="eq", value=0X06, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max health" },
+        { address=0XBA39C, type="u32le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Timmy's health" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBA744, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame final score" },
+      },
+    },
+  },
+}

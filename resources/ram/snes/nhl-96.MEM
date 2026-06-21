@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "NHL 96",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "nhl-96",
+    file = "nhl-96.zip",
+    hashes = {
+      { hash = "5558aa840d9f842b7a6c97b26c80c244", label = "NHL 96 (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

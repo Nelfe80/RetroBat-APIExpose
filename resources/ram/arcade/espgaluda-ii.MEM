@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Espgaluda II",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "espgaluda-ii",
+    file = "espgaluda-ii.zip",
+    hashes = {
+      { hash = "0c1d466451f9533e606ea06c41280790", label = "espgal2.zip <Espgaluda II (2005/11/14.MASTER VER.)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5EB56, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X37D70C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 score high places: value*65536" },
+        { address=0X37D70E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 score low places: 0-65535" },
+      },
+    },
+  },
+}

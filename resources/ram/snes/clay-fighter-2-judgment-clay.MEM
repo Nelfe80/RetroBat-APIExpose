@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Clay Fighter 2: Judgment Clay",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "clay-fighter-2-judgment-clay",
+    file = "clay-fighter-2-judgment-clay.zip",
+    hashes = {
+      { hash = "eb7d8986545e2e54f915e621f088ab31", label = "Clay Fighter 2 - Judgment Clay (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1FA0, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On" },
+        { address=0X1FA0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Foreground Layer Setting" },
+      },
+      stage = {
+        { address=0X1412, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Manual" },
+        { address=0X1412, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sequential" },
+        { address=0X1412, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Random" },
+        { address=0X1412, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tournament Mode Stage Select Mode" },
+        { address=0X1000E, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="character select" },
+        { address=0X1000E, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Under De Clay" },
+        { address=0X1000E, type="u8", condition="eq", value=0X4B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bungle Jungle" },
+        { address=0X1000E, type="u8", condition="eq", value=0X6D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Crib" },
+        { address=0X1000E, type="u8", condition="eq", value=0XA5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Oozeville" },
+        { address=0X1000E, type="u8", condition="eq", value=0XAD, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mt Mushmore" },
+        { address=0X1000E, type="u8", condition="eq", value=0XC8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mudville Gardens" },
+        { address=0X1000E, type="u8", condition="eq", value=0XD2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Camp Catastrophe" },
+        { address=0X1000E, type="u8", condition="eq", value=0XF4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Clay Keep" },
+        { address=0X1000E, type="u8", condition="eq", value=0XF5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Frosty's Workshop+" },
+        { address=0X1000E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Code" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X140A, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sudden Death" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1625, type="u32le", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jump (neutral), 09 = Jump (forward), 0A = Jump (backward)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0FC6, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Start (255)" },
+        { address=0X0FC6, type="u8", condition="eq", value=0XC0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time's up (192)" },
+        { address=0X0FC6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Fight timer" },
+        { address=0X1F9C, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="35 sec" },
+        { address=0X1F9C, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="45 sec" },
+        { address=0X1F9C, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="55 sec" },
+        { address=0X1F9C, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="65 sec" },
+        { address=0X1F9C, type="u8", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Infinite" },
+        { address=0X1F9C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Match Timer Setting" },
+      },
+    },
+  },
+}

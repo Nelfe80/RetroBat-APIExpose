@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Nicktoons Movin'",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "nicktoons-movin",
+    file = "nicktoons-movin.zip",
+    hashes = {
+      { hash = "f7a1d74a5f45e6ea2365876c16a3c00d", label = "Nicktoons Movin' (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

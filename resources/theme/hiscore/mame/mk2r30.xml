@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 CRL 3356790</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 MDP 3251200</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 GNP 3155600</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 BYL 3040930</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 BBB 2992200</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FEL 800000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 SAN 700000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HAI 600000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 SFT 500000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 BBD 400000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 WIT 300000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 HOU 200000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 TTT 100000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 RYU 90000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 TWG 80000</text>
+		</text>
+	</view>
+</theme>

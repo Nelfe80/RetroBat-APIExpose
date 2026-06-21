@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "EyeToy: Play 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "eyetoy-play-3",
+    file = "eyetoy-play-3.zip",
+    hashes = {
+      { hash = "78dc9e5ff36566f6a215a3b6fc1d08d0", label = "EyeToy - Play 3 (Europe, Australia) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi,El)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X301E50, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) day 1 score" },
+        { address=0X301E58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) day 2 score" },
+        { address=0X301E60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) day 3 score" },
+        { address=0X301E80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) total score" },
+      },
+    },
+  },
+}

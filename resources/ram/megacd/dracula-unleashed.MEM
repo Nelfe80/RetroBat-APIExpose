@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Dracula Unleashed",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "dracula-unleashed",
+    file = "dracula-unleashed.zip",
+    hashes = {
+      { hash = "1e5609b304f3b0b023caac37b2f995f0", label = "Dracula Unleashed (USA) (Disc 1)" },
+      { hash = "8309d2aed7f5bcac384ab5a5913cb5c0", label = "Dracula Unleashed (USA) (Disc 2)" },
+    }
+  },
+
+  events = {
+  },
+}

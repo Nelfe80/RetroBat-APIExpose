@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Hustle Chumy",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "hustle-chumy",
+    file = "hustle-chumy.zip",
+    hashes = {
+      { hash = "8be690d357a99abd26ebb5378e9c0153", label = "Hustle Chumy (Japan).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01E3, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X01A9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max amount of food on the level;" },
+      },
+      stage = {
+        { address=0X0106, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage-ID, verbatim, changes immediately when the current-level exit is taken" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0157, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives, verbatim, Game Over is 0xFF increased" },
+        { address=0X0157, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives, verbatim, Game Over is 0xFF decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0102, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Current Score x10 (hex)" },
+        { address=0X0104, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Highest Score x10 (hex)" },
+      },
+    },
+  },
+}

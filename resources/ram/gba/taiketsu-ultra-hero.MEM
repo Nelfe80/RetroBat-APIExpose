@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Taiketsu! Ultra Hero",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "taiketsu-ultra-hero",
+    file = "taiketsu-ultra-hero.zip",
+    hashes = {
+      { hash = "fab7a0ca0e546fc80d886f11390dd9ac", label = "Taiketsu! Ultra Hero (Japan).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X2E67, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage in VS mode" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4330, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P HP decreased" },
+        { address=0X4330, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P HP increased" },
+        { address=0X4518, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P HP decreased" },
+        { address=0X4518, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P HP increased" },
+      },
+    },
+  },
+}

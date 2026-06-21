@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Submarine + Racing",
+    system = "tvgames",
+    system_name = "Elektor TV Games Computer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "submarine-racing",
+    file = "submarine-racing.zip",
+    hashes = {
+      { hash = "fb8c205c7aa983c379068e9581364c2c", label = "Submarines & Racing (Europe) (ESS-011-E).tvc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0010, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Game" },
+        { address=0X0010, type="u8", condition="eq", value=0X40, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X17C3, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game" },
+        { address=0X17C3, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1758, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Submarine level progression flag 1" },
+        { address=0X1759, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Submarine level progression flag 2" },
+        { address=0X175A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Submarine level progression flag 3" },
+        { address=0X175B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Submarine level progression flag 4" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X175C, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE BCD] Submarine score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1757, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Submarine red layer active ship" },
+      },
+    },
+  },
+}

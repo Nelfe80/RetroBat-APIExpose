@@ -1,0 +1,107 @@
+return {
+  game = {
+    title = "Soulcalibur II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "soulcalibur-ii",
+    file = "soulcalibur-ii.zip",
+    hashes = {
+      { hash = "10a3f715122ec8d7c2a3b447d97d061a", label = "Soulcalibur II (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3FE729, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Raphael - Unlocked Flag" },
+        { address=0X3FE72C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Talim - Unlocked Flag" },
+        { address=0X3FE72F, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Yunsung - Unlocked Flag" },
+        { address=0X3FE731, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Cassandra - Unlocked Flag" },
+        { address=0X3FE734, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Mitsurugi" },
+        { address=0X3FE737, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Taki" },
+        { address=0X3FE73A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Voldo" },
+        { address=0X3FE73D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Nightmare" },
+        { address=0X3FE740, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Astaroth" },
+        { address=0X3FE743, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Ivy" },
+        { address=0X3FE746, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Kilik" },
+        { address=0X3FE748, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Xianghua" },
+        { address=0X3FE74B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Maxi" },
+        { address=0X3FE74D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Necrid" },
+        { address=0X3FE74F, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Weapon Demo - Heihachi" },
+        { address=0X3FE76E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Theater - Weapon Master Opening Unlocked Flag" },
+        { address=0X3FE76F, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Theater - Weapon Master Ending Unlocked Flag" },
+        { address=0X3FE770, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Theater - Opening (Home ver.) Unlocked Flag" },
+        { address=0X3FE771, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Theater - Opening (Arcade ver.) Unlocked Flag" },
+        { address=0X3FE772, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Theater - Ending (Arcade ver.) Unlocked Flag" },
+        { address=0X3FE7D8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Tail - Ivy - Unlocked Flag" },
+        { address=0X40FDE8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Character Change at Continue" },
+        { address=0X40FE28, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3F4C62, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+      },
+      stage = {
+        { address=0X40FDEC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Selection" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3FE764, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Extra Survival (Death Match) Unlocked Flag" },
+        { address=0X40FDDC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Gauge - 1P Game [32-bit Float] increased" },
+        { address=0X40FDDC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Gauge - 1P Game [32-bit Float] decreased" },
+      },
+      health = {
+        { address=0X3D449C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Health [Float] decreased" },
+        { address=0X3D449C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Health [Float] increased" },
+        { address=0X3E531C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2/CPU Health [Float] decreased" },
+        { address=0X3E531C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2/CPU Health [Float] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X3D2FDE, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Character Weapon Being Used" },
+        { address=0X3FE76D, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Gallery Unlocked Flag" },
+        { address=0X40D704, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Master" },
+        { address=0X44D290, type="u32le", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Master - Exp" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3FE775, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Locations: Money Pit Unlocked Flag increased" },
+        { address=0X44D474, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Weapon Master - Gold increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X3FE796, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Spiked Shield - Cassandra - Unlocked Flag" },
+        { address=0X3FE810, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Owl Shield - Sophitia - Unlocked Flag" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X40FDE0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Time - P1 Game" },
+        { address=0X40FDE4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Time - Vs Game" },
+        { address=0X44D2A4, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chapter 1 - Proving Grounds - Times Won [24-bit]" },
+        { address=0X44D2AC, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chapter 1 - Warrior's Trial Grounds - Times Won [24-bit]" },
+        { address=0X44D2E8, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chapter 6 - Castle of the Dead - Times Won [24-bit]" },
+        { address=0X44D2FC, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chpater 6 - Underground Juno - Times Won [24-bit]" },
+        { address=0X44D300, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chapter 7 - Underground Prison - Times Won [24-bit]" },
+        { address=0X44D308, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chapter 7 - Forbidden Grounds - Times Won [24-bit]" },
+        { address=0X44D338, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chapter 10 - Court of the Dead - Times Won [24-bit]" },
+        { address=0X44D374, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra Chapter 1 - Stage 1 - Times Won [24-bit]" },
+        { address=0X44D378, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra Chapter 1 - Stage 2 - Times Won [24-bit]" },
+        { address=0X44D37C, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra Chapter 1 - Stage 3 - Times Won [24-bit]" },
+        { address=0X44D380, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra Chapter 2 - Stage 1 - Times Won [24-bit]" },
+        { address=0X44D384, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra Chapter 2 - Stage 2 - Times Won [24-bit]" },
+        { address=0X44D388, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra Chapter 2 - Stage 3 - Times Won [24-bit]" },
+        { address=0X44D38C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Proving Grounds - Times Lost" },
+      },
+    },
+  },
+}

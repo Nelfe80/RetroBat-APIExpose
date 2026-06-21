@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Jet Set Willy",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jet-set-willy",
+    file = "jet-set-willy.zip",
+    hashes = {
+      { hash = "8c3a90526f545746f8b72d9552b0eb5a", label = "Jet Set Willy (1985)(Software Projects)[cr].dsk" },
+      { hash = "94f750a0449f41d6273c20649ce9bd08", label = "Jet Set Willy (UK) (1985).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4DAA, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screens" },
+        { address=0X4DAA, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="in-game / high score" },
+        { address=0X4DE6, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="game over screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4DE6, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="final life" },
+        { address=0X4DE6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life counter increased" },
+        { address=0X4DE6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life counter decreased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X4E1E, type="u8", condition="eq", value=0X3B, action="SWIMMING", no_log=false, no_survey=false, desc="Swimming Pool" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4E1E, type="u8", condition="eq", value=0X0A, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Front Door" },
+        { address=0X4E1E, type="u8", condition="eq", value=0X32, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Back Door" },
+      },
+    },
+  },
+}

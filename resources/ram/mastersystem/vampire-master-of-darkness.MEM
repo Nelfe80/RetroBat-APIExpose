@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Vampire: Master of Darkness",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "vampire-master-of-darkness",
+    file = "vampire-master-of-darkness.zip",
+    hashes = {
+      { hash = "8354932a7f20e84a808471b3724a56f8", label = "Master of Darkness (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1FB1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mode Select - Round Number" },
+        { address=0X1FB6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mode Select - Soud Id (clear)" },
+        { address=0X1FC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round id (0 based)" },
+        { address=0X1FF2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game part 00=Reset 01=Title 02=Mode Select 03=Cutscene 04=Stage Intro 05=Stage 06=Stage Clear Sc" },
+      },
+      stage = {
+        { address=0X1FB2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mode Select - Stage Number" },
+        { address=0X1FC1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage id (0 based)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0A3A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(hex 8-bit) Life increased" },
+        { address=0X0A3A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(hex 8-bit) Life decreased" },
+        { address=0X1FBA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit hex) Lives increased" },
+        { address=0X1FBA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit hex) Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1FB7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Primary weapon 00=Knife 01=Stake 02=Sabre 03=Axe" },
+        { address=0X1FB8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Secondary weapon 00=Pistol 01=Boomerang 02=Projectile 03=Bomb" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1FCA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Score 0000X00" },
+        { address=0X1FCB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Score 000X000" },
+        { address=0X1FCC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Score 00X0000" },
+        { address=0X1FCD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Score 0X00000" },
+        { address=0X1FCE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Score X000000" },
+        { address=0X1FDA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Hiscore 0000X00" },
+        { address=0X1FDB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Hiscore 000X000" },
+        { address=0X1FDC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Hiscore 00X0000" },
+        { address=0X1FDD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Hiscore 0X00000" },
+        { address=0X1FDE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(lower 4bit decimal) Hiscore X000000" },
+      },
+      collectibles = {
+        { address=0X06A0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(2 bytes) Stage progress (2nd byte advances while entering next room) increased" },
+        { address=0X1FB9, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="(8-bit hex) Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0B3A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(hex 8-bit) Boss health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0A3C, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="(hex 8-bit) Invincibility duration" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Harvest Moon: Hero of Leaf Valley",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "harvest-moon-hero-of-leaf-valley",
+    file = "harvest-moon-hero-of-leaf-valley.zip",
+    hashes = {
+      { hash = "d2d9ba3dc9b9acecf82710891690ef49", label = "Harvest Moon - Hero of Leaf Valley (Europe).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCBBC10, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+        { address=0XCBBC38, type="u8", condition="eq", value=0X4A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Loading Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCF8126, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ponta unlocks the path to Underground Lake" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XCD5B2C, type="u16le", condition="eq", value=0XC4, action="TREASURE", no_log=false, no_survey=false, desc="Sunken Treasure" },
+        { address=0XCD5B2C, type="u16le", condition="eq", value=0XC5, action="TREASURE", no_log=false, no_survey=false, desc="Pirate Treasure" },
+        { address=0XCD5B2C, type="u16le", condition="eq", value=0XC6, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest" },
+        { address=0XCD5C2C, type="u16le", condition="eq", value=0X1DA, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Map" },
+        { address=0XCF80E2, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Tale of the Secret Treasure Complete" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCD5B2C, type="u16le", condition="eq", value=0X5D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Breadfruit" },
+        { address=0XCD5B2C, type="u16le", condition="eq", value=0X78, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Mushroom" },
+        { address=0XCD5B2C, type="u16le", condition="eq", value=0X13C, action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammonite Fossil" },
+      },
+    },
+  },
+}

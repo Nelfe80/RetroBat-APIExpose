@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Robopon 2: Cross Version",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "robopon-2-cross-version",
+    file = "robopon-2-cross-version.zip",
+    hashes = {
+      { hash = "22a4e57b85f7413c1973d4bd5a19d5a3", label = "Robopon 2 - Cross Version (USA).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X5FF0, type="u24le", condition="eq", value=0X56, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Gaia" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5FF0, type="u24le", condition="eq", value=0X51, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold tower" },
+        { address=0X5FF0, type="u24le", condition="eq", value=0X54, action="MONEY_STATE", no_log=false, no_survey=false, desc="the Gold Tower (Past)" },
+      },
+    },
+  },
+}

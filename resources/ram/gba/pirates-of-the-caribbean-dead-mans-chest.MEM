@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Pirates of the Caribbean: Dead Man's Chest",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "pirates-of-the-caribbean-dead-mans-chest",
+    file = "pirates-of-the-caribbean-dead-mans-chest.zip",
+    hashes = {
+      { hash = "c13785f8c7f0342d4c96c294e600e338", label = "Pirates of the Caribbean - Dead Man's Chest (USA, Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X3C60, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8bit] Cheat Combo Input Value Slot 1" },
+        { address=0X3C64, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8bit] Cheat Combo Input Value Slot 2" },
+        { address=0X3C68, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8bit] Cheat Combo Input Value Slot 3" },
+        { address=0X3C6C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8bit] Cheat Combo Input Value Slot 4" },
+        { address=0X3C70, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8bit] Cheat Combo Input Value Slot 5" },
+        { address=0X49E5, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Bit 0 = Slide Kick Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X49E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sword level (6 = max)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X49B4, type="u8", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Garland" },
+        { address=0X49BA, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tome of the Dead" },
+        { address=0X49BB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 0 = Unlucky Dice of a Dead Man" },
+      },
+      health = {
+        { address=0X49DF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X49DF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X49B4, type="u8", condition="eq", value=0X4, action="MONEY_STATE", no_log=false, no_survey=false, desc="Drake's Gold Cane" },
+        { address=0X49B8, type="u8", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Anne Bonny" },
+        { address=0X49B9, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Calico Jack" },
+        { address=0X49B9, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin of Yacatecuhtli" },
+        { address=0X49BA, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Ahau Chamahez" },
+        { address=0X49BD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Might set to 0x03 on succesfully clearing a level but only the first time clearing it? increased" },
+        { address=0X49DB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Might set to X on succesfully clearing a level but only the first time clearing it? increased" },
+        { address=0X49E2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Changes when using 1,000 gold cheat increased" },
+        { address=0X4A2E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Cartridge Ram increased" },
+        { address=0X6E50, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money System Ram increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4994, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheat codes related? Changes on Invincibility" },
+      },
+      player = {
+        { address=0X49B9, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="Golden Icon of Kukucan - Double Jump Unlocked" },
+      },
+    },
+  },
+}

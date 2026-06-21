@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Tsugunai: Atonement",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Strategy"
+  },
+
+  rom = {
+    name = "tsugunai-atonement",
+    file = "tsugunai-atonement.zip",
+    hashes = {
+      { hash = "0632b25dc4e38b1e3a5944b3a8e3424d", label = "Tsugunai - Atonement (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X3212C9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 bit] Fruit of Life increased" },
+        { address=0X3212C9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 bit] Fruit of Life decreased" },
+        { address=0X3212CB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 bit] Ring of Life increased" },
+        { address=0X3212CB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 bit] Ring of Life decreased" },
+      },
+      health = {
+        { address=0X3247A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Max HP decreased" },
+        { address=0X3247A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Max HP increased" },
+        { address=0X3247AA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Current HP decreased" },
+        { address=0X3247AA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Current HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3212CC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] Ring of Magic increased" },
+        { address=0X3212CD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] Ring of Strength increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3615A0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Balrog Boss Max HP" },
+        { address=0X3615A2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Balrog Boss HP" },
+      },
+    },
+  },
+}

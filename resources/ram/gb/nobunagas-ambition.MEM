@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Nobunaga's Ambition",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "nobunagas-ambition",
+    file = "nobunagas-ambition.zip",
+    hashes = {
+      { hash = "7cc78ea5dbc099e8f89849a11a08c38e", label = "Nobunaga's Ambition (USA).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD787, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC004, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0XC004, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+  },
+}

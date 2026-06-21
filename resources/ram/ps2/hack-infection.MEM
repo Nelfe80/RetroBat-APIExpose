@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = ".hack//Infection",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hack-infection",
+    file = "hack-infection.zip",
+    hashes = {
+      { hash = "363c22fbec26f81a4babedc9d2c76ee6", label = "Dot Hack Part 1 - Infection (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA462DA, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Squilla Demon" },
+        { address=0XA462E4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Wander Demon" },
+        { address=0XA4639D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Demon Wyvern" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA3F668, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Field Level" },
+        { address=0XA46E66, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kite's Level" },
+      },
+      zone = {
+        { address=0XA42235, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[News] - 'The World' Tops 20 Million" },
+        { address=0XA42239, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[News] - 'The World' for Idiots" },
+        { address=0XA42266, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[News] - 'News of the World' to Operate Online" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA462CC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Crane" },
+        { address=0XA462ED, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Glare" },
+        { address=0XA46337, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Black Death" },
+        { address=0XA4637A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Deadly Present" },
+        { address=0XA4637C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Head" },
+        { address=0XA46380, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Living Dead" },
+        { address=0XA46382, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Undead Voodoo" },
+        { address=0XA46393, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Deadly Moth" },
+        { address=0XA463B0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Implant" },
+      },
+      health = {
+        { address=0X182A3C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kite Current HP decreased" },
+        { address=0X182A3C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kite Current HP increased" },
+        { address=0X182A3C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kite MAX HP decreased" },
+        { address=0X182A3C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kite MAX HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA46221, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Treasure Boxes Opened" },
+        { address=0XA46223, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Gott's Treasure" },
+        { address=0XA46E3E, type="u16le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Gott's Treasures Obtained" },
+      },
+      weapon = {
+        { address=0XA42238, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[News] - New Weapon in Online Retail" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA42246, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[News] - A New Silver Dollar Coin increased" },
+        { address=0XA46376, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Fake Money increased" },
+        { address=0XA46E6C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (GP) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA4070D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Key Items -> Event Item -> Basin Shield" },
+        { address=0XA462E1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Shield Man" },
+        { address=0XA462E2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Shield Devil" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA46222, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ryu Book VI -> Breakables Broken" },
+        { address=0XA46E12, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ryu Book VI -> Breakables Broken" },
+      },
+    },
+  },
+}

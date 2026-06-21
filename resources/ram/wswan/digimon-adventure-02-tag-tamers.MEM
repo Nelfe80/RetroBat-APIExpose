@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Digimon Adventure 02: Tag Tamers",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "digimon-adventure-02-tag-tamers",
+    file = "digimon-adventure-02-tag-tamers.zip",
+    hashes = {
+      { hash = "2cb264ba76b88452d7576992f2b90dbf", label = "Digimon Adventure 02 - Tag Tamers (Japan) (Rev 1).ws" },
+      { hash = "521dee8107ef14ffc0e0b3795207d9fd", label = "Digimon Adventure 02 - Tag Tamers (Japan) (En) (v1.4.5) (USC).ws" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X109F7, type="u8", condition="eq", value=0X69, action="DEMO_MODE", no_log=false, no_survey=false, desc="Vandemon" },
+        { address=0X109F7, type="u8", condition="eq", value=0XB1, action="DEMO_MODE", no_log=false, no_survey=false, desc="VenomVandemon" },
+        { address=0X109F7, type="u8", condition="eq", value=0XB8, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X109F7, type="u8", condition="eq", value=0X67, action="LOSE_LIFE", no_log=false, no_survey=false, desc="DeathMeramon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X109F7, type="u8", condition="eq", value=0X65, action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammon" },
+        { address=0X109F7, type="u8", condition="eq", value=0X6B, action="AMMO_STATE", no_log=true, no_survey=false, desc="SkullMammon" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X109F7, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[First Ryo Digimon ID] [8-Bits]" },
+      },
+    },
+  },
+}

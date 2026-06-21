@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dark Tales: From the Lost Soul",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "dark-tales-from-the-lost-soul",
+    file = "dark-tales-from-the-lost-soul.zip",
+    hashes = {
+      { hash = "d51fa83ed982ebbbc718771cf248b48c", label = "Dark Tales - From the Lost Soul (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

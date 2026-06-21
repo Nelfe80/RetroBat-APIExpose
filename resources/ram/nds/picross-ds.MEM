@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Picross DS",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picross-ds",
+    file = "picross-ds.zip",
+    hashes = {
+      { hash = "d043d8dfd723a4bf07dfc203c337ba7a", label = "Picross DS (USA) (En,Fr,Es).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X251EE1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Melon DS: Level (starting from 0)" },
+        { address=0X251EEC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy mode" },
+        { address=0X251EEC, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Free mode" },
+        { address=0X251EEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="current level" },
+        { address=0X3B34FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="When on the screen for choosing a puzzle within a level, this field contains the cursor location" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X251EDF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="This 8-bit field appears to be the most accurate identification of the current (or most recently" },
+        { address=0X3B4448, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best completion timestamp for puzzle B, 24 bits, see note for puzzle A above." },
+        { address=0X3B4510, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best completion timestamp for puzzle C, 24 bits, see note for puzzle A above." },
+        { address=0X3B45D8, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best completion timestamp for puzzle D, 24 bits, see note for puzzle A above." },
+        { address=0X3B4E70, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Best completion timestamp for puzzle O, 24 bits, see note for puzzle A above." },
+        { address=0X3BC4F3, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="It is uncertain how else this field is used but when this value is 0x2, 0x251eeb (selected menu)" },
+        { address=0X3BC5C4, type="u24le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="When viewing the results for the daily puzzles, this 24-bit field contains the average timestamp" },
+        { address=0X3BC5C8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Average timestamp for the No X Marks daily puzzle. See note for Endless Time Attack above." },
+        { address=0X3BC5CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Average timestamp for the Error Search daily puzzle. See note for Endless Time Attack above." },
+        { address=0X3BC5D0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Average timestamp for the Memory daily puzzle. See note for Endless Time Attack above." },
+        { address=0X3BC5D4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Average timestamp for the Secret daily puzzle. See note for Endless Time Attack above." },
+        { address=0X3BC7A4, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="When on the screen for selecting a puzzle within a level, this 16-bit field contains the best (h" },
+        { address=0X3BC7A8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best remaining time for the Sketch minigame of this level. See note for Catch minigame above." },
+        { address=0X3BC7AC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best remaining time for the Hit minigame of this level. See note for Catch minigame above." },
+      },
+    },
+  },
+}

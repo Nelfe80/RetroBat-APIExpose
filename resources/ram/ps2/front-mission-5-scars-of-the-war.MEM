@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Front Mission 5: Scars of the War",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "front-mission-5-scars-of-the-war",
+    file = "front-mission-5-scars-of-the-war.zip",
+    hashes = {
+      { hash = "c9a53a620b20ce7de4fac07a600a17bc", label = "Front Mission 5 - Scars of the War (Japan) (En) (Patch 4)" },
+    }
+  },
+
+  events = {
+  },
+}

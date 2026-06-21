@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "BloodRayne",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up, Horror"
+  },
+
+  rom = {
+    name = "bloodrayne",
+    file = "bloodrayne.zip",
+    hashes = {
+      { hash = "2a8ae3b1b2231ab409ffcc6949442c96", label = "BloodRayne (USA)" },
+      { hash = "b5699b80854b970373b532a4509ab4a1", label = "BloodRayne (USA) (Pt) (v1.0) (Jean Carlos)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X354054, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID (ASCII) (20 bytes)" },
+        { address=0X3BA0A1, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3BA0A0, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Regain Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X3BA0A0, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Show Weapons" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Rugby League 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "rugby-league-2",
+    file = "rugby-league-2.zip",
+    hashes = {
+      { hash = "9d31f5f3d725868e88375d50f6e2fc7d", label = "Rugby League 2 (Europe, Australia).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "The Combatribes",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "the-combatribes",
+    file = "the-combatribes.zip",
+    hashes = {
+      { hash = "d1489c3dc1891d6232aa48a262be2311", label = "ctribe.7z <The Combatribes (US, rev 2, set 1)>" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X093C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Meter (1/2) (0XX) Decimal 00-99 increased" },
+        { address=0X093C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Meter (1/2) (0XX) Decimal 00-99 decreased" },
+        { address=0X093D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Meter (2/2) (X00) Decimal 0-9 increased" },
+        { address=0X093D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Meter (2/2) (X00) Decimal 0-9 decreased" },
+      },
+    },
+  },
+}

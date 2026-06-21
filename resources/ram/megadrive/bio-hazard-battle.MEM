@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Bio-Hazard Battle",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "bio-hazard-battle",
+    file = "bio-hazard-battle.zip",
+    hashes = {
+      { hash = "2d6764f7a96bb8b640a0d18102756ed2", label = "Bio Hazard Battle (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF1E0, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Menu/In-game" },
+        { address=0XF1E0, type="u8", condition="eq", value=0XF8, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XF1E0, type="u8", condition="eq", value=0XFC, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0XF205, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue credits" },
+        { address=0XF281, type="u8", condition="eq", value=0X1F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title music" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF1D9, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0XF1D9, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0XF1D9, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0XF1D9, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hardest" },
+        { address=0XF1D9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options: Level (difficulty)" },
+        { address=0XF227, type="u8", condition="eq", value=0X00, action="LEVEL_NORMAL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0XF227, type="u8", condition="eq", value=0XFF, action="LEVEL_LEVEL_SELECT_ENABLED", no_log=false, no_survey=false, desc="Level Select enabled" },
+        { address=0XF227, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select enabled" },
+        { address=0XF227, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select flag." },
+        { address=0XF24A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 sub weapon level" },
+        { address=0XF24D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 charge attack level" },
+        { address=0XF25E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 sub weapon level" },
+        { address=0XF261, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 charge attack level" },
+      },
+      stage = {
+        { address=0XF1A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XF1D9, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Practice" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF1D8, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 total" },
+        { address=0XF1D8, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="4 total" },
+        { address=0XF1D8, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="5 total" },
+        { address=0XF1D8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Options: Extra Lives increased" },
+        { address=0XF1D8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Options: Extra Lives decreased" },
+        { address=0XF249, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0XF249, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0XF25D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives increased" },
+        { address=0XF25D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XF24B, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Implosion Pods (default)" },
+        { address=0XF24B, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spin Laser" },
+        { address=0XF24B, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Seeker Laser" },
+        { address=0XF24B, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fire Petal" },
+        { address=0XF24B, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nova" },
+        { address=0XF24B, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bond" },
+        { address=0XF25F, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Implosion Pods (default)" },
+        { address=0XF25F, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spin Laser" },
+        { address=0XF25F, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Seeker Laser" },
+        { address=0XF25F, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fire Petal" },
+        { address=0XF25F, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nova" },
+        { address=0XF25F, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bond" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XF252, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score 1/2." },
+        { address=0XF254, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score 2/2." },
+        { address=0XF266, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score 1/2." },
+        { address=0XF268, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score 2/2." },
+      },
+      collectibles = {
+        { address=0XF24B, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Plasma Ring" },
+        { address=0XF25F, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Plasma Ring" },
+      },
+    },
+  },
+}

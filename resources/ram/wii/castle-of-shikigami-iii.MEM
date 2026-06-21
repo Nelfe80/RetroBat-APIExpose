@@ -1,0 +1,121 @@
+return {
+  game = {
+    title = "Castle of Shikigami III",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "castle-of-shikigami-iii",
+    file = "castle-of-shikigami-iii.zip",
+    hashes = {
+      { hash = "d30d29b5bcc0ab82132cfa9f2783a570", label = "Castle of Shikigami III (USA)" },
+      { hash = "bd40d5dee58bef2b0e39cedaf4405cfc", label = "Castle of Shikigami III (USA) (Undub) (v1.0) (swosho)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X45AAC4, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X486FC4, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-bit BE]Pause" },
+        { address=0X486FE8, type="u32be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE]P1 Number of continues" },
+        { address=0X486FF4, type="u32be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE]Number of continues" },
+        { address=0X487084, type="u32be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE]P2 Number of continues" },
+        { address=0X48EB08, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE]Number of credits" },
+        { address=0X48EB0C, type="u32be", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="No, either on menus or demo mode" },
+        { address=0X520450, type="u32be", condition="eq", value=0X3AAA5CC3, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X487040, type="u32be", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SS rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="A rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="B rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="C rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="D rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="-C rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="-D rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X0E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="-E rank" },
+        { address=0X487040, type="u32be", condition="eq", value=0X0F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="-F rank" },
+        { address=0X487040, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]P1 Stage 1 result, these addresses works even if only P2 was active" },
+        { address=0X487044, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]Stage 2 result" },
+        { address=0X487048, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]Stage 3 result" },
+        { address=0X48704C, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]Stage 4 result" },
+        { address=0X487050, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]Stage 5 result" },
+        { address=0X4870DC, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]P2 Stage 1 result" },
+        { address=0X4870E0, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]P2 Stage 2 result" },
+        { address=0X4870E4, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]P2 Stage 3 result" },
+        { address=0X4870E8, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]P2 Stage 4 result" },
+        { address=0X4870EC, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]P2 Stage 5 result" },
+        { address=0X489274, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]Practice mode selected stage" },
+        { address=0X489278, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]Practice mode selected substage" },
+        { address=0X4E7CC4, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE]Current Stage alternative address" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X488430, type="u32be", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Very easy" },
+        { address=0X488430, type="u32be", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X488430, type="u32be", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X488430, type="u32be", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X488430, type="u32be", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Very hard" },
+        { address=0X488430, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-bit BE]Life charge increased" },
+        { address=0X488430, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE]Life charge decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X473ACC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Practice mode 5-1 best score" },
+        { address=0X486FD8, type="u32be", condition="eq", value=0X0051331A, action="SCORE_STATE", no_log=false, no_survey=false, desc="JP" },
+        { address=0X486FD8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]P1 Score" },
+        { address=0X487074, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]P2 Score" },
+        { address=0X488534, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 1-1 boss score" },
+        { address=0X488538, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 1-2 boss score" },
+        { address=0X48853C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 2-1 boss score" },
+        { address=0X488540, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 2-2 boss score" },
+        { address=0X488544, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 3-1 boss score" },
+        { address=0X488548, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 3-2 boss score" },
+        { address=0X48854C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 4-1 boss score" },
+        { address=0X488550, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 4-2 boss score" },
+        { address=0X488554, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 5-1 boss score" },
+        { address=0X488558, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE]Boss rush: Stage 5-2 boss score" },
+      },
+      collectibles = {
+        { address=0X473AD0, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE]Practice mode 5-1 most coins increased" },
+        { address=0X486FFC, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE]Coins increased" },
+        { address=0X487098, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE]P2 Number of coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X489200, type="u32be", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="On final stats screen" },
+        { address=0X489220, type="u32be", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1-1 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1-2 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 2-1 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 2-2 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 3-1 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 3-2 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 4-1 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 4-2 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 5-1 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 5-2 Boss" },
+        { address=0X489220, type="u32be", condition="eq", value=0XFF, action="BOSS_HIT", no_log=false, no_survey=false, desc="Not on a boss fight" },
+        { address=0X489298, type="u32be", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss rush" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4E24E8, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE]Number of enemies destroyed in a run" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4891E8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE]Stage timer" },
+        { address=0X4E2524, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE]Boss timer(Display only)" },
+      },
+    },
+  },
+}

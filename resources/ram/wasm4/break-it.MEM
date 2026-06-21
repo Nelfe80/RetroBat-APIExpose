@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Break-It",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "break-it",
+    file = "break-it.zip",
+    hashes = {
+      { hash = "274aff5236b7c26241e370c4798b5f04", label = "Break-It (World) (v1.0) (douglett).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X444C, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X444C, type="u8", condition="eq", value=0X4, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X444C, type="u8", condition="eq", value=0X3, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Level Cleared" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4450, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+      stage = {
+        { address=0X4450, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4430, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hearts (Hp) decreased" },
+        { address=0X4430, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hearts (Hp) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4448, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (loops back to 0 when reaching the bit size limit)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "The Legend of Zelda: Majora's Mask 3D",
+    system = "3ds",
+    system_name = "Nintendo 3DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-legend-of-zelda-majoras-mask-3d",
+    file = "the-legend-of-zelda-majoras-mask-3d.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X5B59D74, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest: Deku Nuts" },
+        { address=0X765E6F1, type="u8", condition="eq", value=0X28, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Shop" },
+        { address=0X766EB44, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest in starting cave" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X765E6F1, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Map ID" },
+      },
+    },
+  },
+}

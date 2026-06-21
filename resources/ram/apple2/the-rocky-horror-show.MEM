@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "The Rocky Horror Show",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-rocky-horror-show",
+    file = "the-rocky-horror-show.zip",
+    hashes = {
+      { hash = "9893862a9a93f438f68884e3970ccc50", label = "The Rocky Horror Show.woz" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X29FE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Temperature level (pixels)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X25FC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1=Eddie active and freezer button can be pushed" },
+        { address=0X25FD, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1=Eddie returning to freezer" },
+      },
+    },
+  },
+}

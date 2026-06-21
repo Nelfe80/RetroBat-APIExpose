@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Fire & Ice",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "fire-ice",
+    file = "fire-ice.zip",
+    hashes = {
+      { hash = "85acf93edba54485466aeb840966082b", label = "Fire & Ice (Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01DB, type="u8", condition="eq", value=0X49, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Tela de continue" },
+        { address=0X01EA, type="u8", condition="eq", value=0X14, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstração" },
+        { address=0X029F, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Não jogável (demo)" },
+        { address=0X156C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="- Continues" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X19B7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Timer do continue" },
+      },
+    },
+  },
+}

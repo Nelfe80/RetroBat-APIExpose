@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Music: Music for Everyone",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "music-music-for-everyone",
+    file = "music-music-for-everyone.zip",
+    hashes = {
+      { hash = "a15d43eaf36b9bcd895d2e879510b060", label = "Music - Music for Everyone (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

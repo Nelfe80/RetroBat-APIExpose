@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Ridge Racer",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ridge-racer",
+    file = "ridge-racer.zip",
+    hashes = {
+      { hash = "05c8ad035d1efb4e22b50ff4405ab772", label = "Ridge Racer (Europe, Australia) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9F0E64, type="u8", condition="eq", value=0X0A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+      },
+      zone = {
+        { address=0X9F0E64, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 01" },
+        { address=0X9F0E68, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 02" },
+        { address=0X9F0E6C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 03" },
+        { address=0X9F0E70, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 04" },
+        { address=0X9F0E74, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 05" },
+        { address=0X9F0E78, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 06" },
+        { address=0X9F0E7C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 07" },
+        { address=0X9F0E80, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 08" },
+        { address=0X9F0E84, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Basic 09" },
+      },
+    },
+  },
+}

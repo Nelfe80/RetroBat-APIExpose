@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Shanghai: Triple-Threat",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "shanghai-triple-threat",
+    file = "shanghai-triple-threat.zip",
+    hashes = {
+      { hash = "fc4349e54db092e8426b6b7033175e54", label = "Shanghai - Triple-Threat (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

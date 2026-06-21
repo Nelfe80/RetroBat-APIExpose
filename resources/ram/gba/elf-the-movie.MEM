@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Elf: The Movie",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "elf-the-movie",
+    file = "elf-the-movie.zip",
+    hashes = {
+      { hash = "1fe0aa775a55230c0cf8236f4376dbe9", label = "Elf - The Movie (USA) (En,Fr,De,Es,It).gba" },
+      { hash = "beb83cb1e4ecae51a34ec3e99da384b4", label = "Elf - The Movie (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X142C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Build a Snowman level" },
+        { address=0X145E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Number [00=1]" },
+        { address=0X17F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Changes to 00 when loading level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X847C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit health (snowboarding) decreased" },
+        { address=0X847C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit health (snowboarding) increased" },
+        { address=0X88B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [Max=9] decreased" },
+        { address=0X88B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [Max=9] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1430, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit score" },
+      },
+    },
+  },
+}

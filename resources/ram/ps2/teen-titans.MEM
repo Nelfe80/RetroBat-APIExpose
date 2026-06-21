@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Teen Titans",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "teen-titans",
+    file = "teen-titans.zip",
+    hashes = {
+      { hash = "77685ff3d70b70ec7288489efca67b7b", label = "Teen Titans (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCD6234, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mid-Level Loading Flag (32-bit)" },
+        { address=0XCD6B94, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select ID (32-bit)" },
+        { address=0XEE2C50, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Counts Up For Every Cutscene Played In Current Level (32-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCD25D8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives (32-bit) increased" },
+        { address=0XCD25D8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives (32-bit) decreased" },
+        { address=0XCD25F0, type="u32le", condition="eq", value=0X19, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hive Soldier" },
+        { address=0XCD25F8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives (32-bit) increased" },
+        { address=0XCD25F8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives (32-bit) decreased" },
+        { address=0XCD2610, type="u32le", condition="eq", value=0X19, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hive Soldier" },
+        { address=0XCD2618, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P3 Lives (32-bit) increased" },
+        { address=0XCD2618, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P3 Lives (32-bit) decreased" },
+        { address=0XCD2630, type="u32le", condition="eq", value=0X19, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hive Soldier" },
+        { address=0XCD2638, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P4 Lives (32-bit) increased" },
+        { address=0XCD2638, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P4 Lives (32-bit) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCD25F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tournament of Heroes - P2 Score (32-bit)" },
+        { address=0XCD2614, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tournament of Heroes - P3 Score (32-bit)" },
+        { address=0XCD2634, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tournament of Heroes - P4 Score (32-bit)" },
+      },
+      collectibles = {
+        { address=0XCD25F0, type="u32le", condition="eq", value=0X23, action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammoth" },
+        { address=0XCD2610, type="u32le", condition="eq", value=0X23, action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammoth" },
+        { address=0XCD2630, type="u32le", condition="eq", value=0X23, action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammoth" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCD25F0, type="u32le", condition="eq", value=0X2A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocker" },
+        { address=0XCD25F0, type="u32le", condition="eq", value=0X2E, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cinderblock" },
+        { address=0XCD2610, type="u32le", condition="eq", value=0X2A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocker" },
+        { address=0XCD2610, type="u32le", condition="eq", value=0X2E, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cinderblock" },
+        { address=0XCD2630, type="u32le", condition="eq", value=0X2A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocker" },
+        { address=0XCD2630, type="u32le", condition="eq", value=0X2E, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cinderblock" },
+      },
+    },
+  },
+}

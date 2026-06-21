@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Super R.C. Pro-Am",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "super-r-c-pro-am",
+    file = "super-r-c-pro-am.zip",
+    hashes = {
+      { hash = "9ba2999ef3ecf9e27ac6c88e995c9d7a", label = "Super R.C. Pro-Am (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDA9C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="00=in game, 01-demo mode" },
+        { address=0XFFCB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01=standard car - 02 = speed demon" },
+        { address=0XFFDA, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="game over countdown" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDAB1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="battery level 0-4" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XDAB0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="amount of ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XDA7F, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="invincibility countdown (framesx1)" },
+        { address=0XDA80, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="invincibility countdown (framesx256)" },
+      },
+    },
+  },
+}

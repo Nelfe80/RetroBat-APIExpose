@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Sonny with a Chance",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "sonny-with-a-chance",
+    file = "sonny-with-a-chance.zip",
+    hashes = {
+      { hash = "6f77fffd61284467b6378c6fb0799628", label = "Sonny with a Chance (Europe) (En,Fr,De,Es,It) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4B174, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Savefile - Board 2 - Missions cleared (Unfinished) [5bit]" },
+        { address=0X4B180, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Savefile - Board 5 - Missions cleared (Unfinished) [5bit]" },
+        { address=0X4B194, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Savefile - Board 2 - Missions cleared (Finished) [5bit]" },
+        { address=0X4B1A0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Savefile - Board 5 - Missions cleared (Finished) [5bit]" },
+        { address=0X4C978, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quick Data - Board 2 - Missions cleared [5bit]" },
+        { address=0X4C984, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quick Data - Board 5 - Missions cleared [5bit]" },
+      },
+      stage = {
+        { address=0X4B230, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Savefile - Stats - Game Board played - Stage 1 [16bit]" },
+        { address=0X4B232, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Savefile - Stats - Game Board played - Stage 2 [16bit]" },
+        { address=0X4B234, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Savefile - Stats - Game Board played - Stage 3 [16bit]" },
+        { address=0X4B236, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Savefile - Stats - Game Board played - Stage 4 [16bit]" },
+        { address=0X4B238, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Savefile - Stats - Game Board played - Stage 5 [16bit]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4B1DC, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Savefile - Stats - Minigame played - Poster Switch [16bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4B170, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Savefile - Board 1 - Missions cleared (Unfinished) [5bit]" },
+        { address=0X4B178, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Savefile - Board 3 - Missions cleared (Unfinished) [5bit]" },
+        { address=0X4B17C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Savefile - Board 4 - Missions cleared (Unfinished) [5bit]" },
+        { address=0X4B190, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Savefile - Board 1 - Missions cleared (Finished) [5bit]" },
+        { address=0X4B198, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Savefile - Board 3 - Missions cleared (Finished) [5bit]" },
+        { address=0X4B19C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Savefile - Board 4 - Missions cleared (Finished) [5bit]" },
+        { address=0X4C974, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quick Data - Board 1 - Missions cleared [5bit]" },
+        { address=0X4C97C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quick Data - Board 3 - Missions cleared [5bit]" },
+        { address=0X4C980, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quick Data - Board 4 - Missions cleared [5bit]" },
+      },
+    },
+  },
+}

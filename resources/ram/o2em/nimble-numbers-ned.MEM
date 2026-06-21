@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Nimble Numbers Ned",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nimble-numbers-ned",
+    file = "nimble-numbers-ned.zip",
+    hashes = {
+      { hash = "98b2ed525aa9c060e8be6c6210d16e41", label = "Nimble Numbers Ned (USA).bin" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0020, type="u8", condition="eq", value=0X00000000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0034, type="u8", condition="eq", value=0X07, action="JUMPING", no_log=true, no_survey=false, desc="Struck by barrel" },
+        { address=0X0034, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Falling off of number" },
+        { address=0X0034, type="u8", condition="eq", value=0X09, action="JUMPING", no_log=true, no_survey=false, desc="Dead in the water" },
+      },
+    },
+  },
+}

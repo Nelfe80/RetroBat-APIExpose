@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fun 'n Games",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Action, Education"
+  },
+
+  rom = {
+    name = "fun-n-games",
+    file = "fun-n-games.zip",
+    hashes = {
+      { hash = "f1429487d9c880346a04e4214e1ea410", label = "Fun 'n Games (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

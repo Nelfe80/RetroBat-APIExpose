@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Dragon Quest (MSX2)",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-quest",
+    file = "dragon-quest.zip",
+    hashes = {
+      { hash = "32d02eee52a1bce4f21958d98571140b", label = "Dragon Quest (Japan) (En) (v201804xx) (Django).rom" },
+      { hash = "63672a3fdc8a481e3ac38ab1a36b5167", label = "Dragon Quest (1986)(Enix)(JP)[a].rom" },
+      { hash = "b6a39a89fb0df0be5dff7d64f5fe8900", label = "Dragon Quest (Japan).rom" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00C7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      zone = {
+        { address=0X0045, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X00C5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X00C5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X00CA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X00CA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X00E2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X00E2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X0102, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Max HP decreased" },
+        { address=0X0102, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X00BC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0X00C1, type="u8", condition="eq", value=0X6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Fighter's Ring" },
+        { address=0X00CF, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Fighter's Ring Equipped" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X00BE, type="u8", condition="eq", value=0X1, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Leather Shield" },
+        { address=0X00BE, type="u8", condition="eq", value=0X2, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield" },
+        { address=0X00BE, type="u8", condition="eq", value=0X3, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Mirror Shield" },
+        { address=0X00BE, type="u8", condition="eq", value=0X4, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Armor" },
+        { address=0X00BE, type="u8", condition="eq", value=0X5, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Steel Armor" },
+        { address=0X00BE, type="u8", condition="eq", value=0X6, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Magic Armor" },
+        { address=0X00BE, type="u8", condition="eq", value=0X7, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Roto's Armor" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X001A, type="u16le", condition="eq", value=0X0704, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Tantegel Castle 2F" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0D04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Tantegel Castle 1F" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0612, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Tantegel Castle 1F" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0615, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Brecconary" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0A11, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Garinham" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0604, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Garinham" },
+        { address=0X001A, type="u16le", condition="eq", value=0X1111, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Garin's Grave B1F" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0C07, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Kol" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0E01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Kol" },
+        { address=0X001A, type="u16le", condition="eq", value=0X1405, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Swamp Cave" },
+        { address=0X001A, type="u16le", condition="eq", value=0X1515, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Rimuldar" },
+        { address=0X001A, type="u16le", condition="eq", value=0X1716, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Rimuldar" },
+        { address=0X001A, type="u16le", condition="eq", value=0X1504, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cantlin" },
+        { address=0X001A, type="u16le", condition="eq", value=0X1908, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cantlin" },
+        { address=0X001A, type="u16le", condition="eq", value=0X190E, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cantlin" },
+        { address=0X001A, type="u16le", condition="eq", value=0X190F, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cantlin" },
+        { address=0X001A, type="u16le", condition="eq", value=0X091A, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cantlin" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0804, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Charlock Castle 1F" },
+        { address=0X001A, type="u16le", condition="eq", value=0X080F, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Charlock Castle 1F" },
+        { address=0X001A, type="u16le", condition="eq", value=0X0C11, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Charlock Castle 8F" },
+        { address=0X00DF, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="First Door Opened" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X337D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Script ID" },
+      },
+    },
+  },
+}

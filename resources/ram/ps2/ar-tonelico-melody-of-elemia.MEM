@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Ar tonelico: Melody of Elemia",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ar-tonelico-melody-of-elemia",
+    file = "ar-tonelico-melody-of-elemia.zip",
+    hashes = {
+      { hash = "183215f6b3fc6029b085e6b954902635", label = "Ar tonelico - Melody of Elemia (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD25724, type="u16le", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD21C87, type="u8", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Photon Glass - craftable" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X13C5B71, type="u8", condition="eq", value=0X0, action="TREASURE", no_log=false, no_survey=false, desc="taken" },
+        { address=0X13C6C91, type="u8", condition="eq", value=0X0, action="TREASURE", no_log=false, no_survey=false, desc="taken" },
+      },
+    },
+  },
+}

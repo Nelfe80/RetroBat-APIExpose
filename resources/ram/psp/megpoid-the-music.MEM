@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Megpoid the Music ♯",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "megpoid-the-music",
+    file = "megpoid-the-music.zip",
+    hashes = {
+      { hash = "3a8444aaaae91cd73e26d16ff6c2e055", label = "Megpoid the Music Sharp (Japan) (v1.04).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD66FA8, type="u16le", condition="eq", value=0X15, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+      events = {
+        { address=0XCE1F84, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Results Screen - Max Combo [Mirror]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCE1F80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Results Screen - Score [Mirror]" },
+      },
+    },
+  },
+}

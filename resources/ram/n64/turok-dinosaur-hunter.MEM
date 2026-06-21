@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Turok: Dinosaur Hunter",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "turok-dinosaur-hunter",
+    file = "turok-dinosaur-hunter.zip",
+    hashes = {
+      { hash = "ae5107efdd3c210e1edd4acd9b3cac31", label = "Turok - Dinosaur Hunter (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1196E8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0001 = Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X128D30, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 single-bits for Level 2 Keys" },
+        { address=0X128D34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 single-bits for Level 3 Keys" },
+        { address=0X128D38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 single-bits for Level 4 Keys" },
+        { address=0X128D3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 single-bits for Level 5 Keys" },
+        { address=0X128D40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 single-bits for Level 6 Keys" },
+        { address=0X128D44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 single-bits for Level 7 Keys" },
+        { address=0X128D48, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 single-bits for Level 8 keys, full keys is 1F for this address." },
+        { address=0X128D4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Access to Level 02" },
+        { address=0X128D50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Access to Level 3" },
+        { address=0X2C3A2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="First Raptor in Level 1" },
+      },
+      zone = {
+        { address=0X119544, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Level, Verbatim, Hub World Counts as World 2.....SOMETIMES." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1273D0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0001 = Mantis Alive, 0000 = Mantis Dead" },
+        { address=0X128E58, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0X128E58, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+      },
+      health = {
+        { address=0X111B18, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health for Turok, including HP over the current Max HP decreased" },
+        { address=0X111B18, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health for Turok, including HP over the current Max HP increased" },
+        { address=0X1273E0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mantis Health Bar 01 decreased" },
+        { address=0X1273E0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mantis Health Bar 01 increased" },
+        { address=0X1276C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="T-Rex Health Bar 01 decreased" },
+        { address=0X1276C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="T-Rex Health Bar 01 increased" },
+        { address=0X128CA8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Turok's MAX Health, increased by Mortal Wounds on Normal or Easy mode. decreased" },
+        { address=0X128CA8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Turok's MAX Health, increased by Mortal Wounds on Normal or Easy mode. increased" },
+        { address=0X2A271E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Campaigner Health Bar 02 decreased" },
+        { address=0X2A271E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Campaigner Health Bar 02 increased" },
+        { address=0X2A33DE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mantis Health Bar 02 decreased" },
+        { address=0X2A33DE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mantis Health Bar 02 increased" },
+        { address=0X2A3F66, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="T-Rex Health 02 decreased" },
+        { address=0X2A3F66, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="T-Rex Health 02 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X111C77, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Currently selected weapon out of 15 weapons, 00 through 0e" },
+        { address=0X128CB8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Alien Weapon ammunition" },
+        { address=0X128CDC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Red Alien Weapon ammunition" },
+        { address=0X128D18, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="01 = Particle Accelerator aka Shockwave Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X119414, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Appears to be 0000 during main game, 0001 during Demo increased" },
+        { address=0X128CD8, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="4x displayed number of rocket ammo ( because it's a quad rocket launcher )" },
+        { address=0X128E54, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Pieces, Triforces? increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1278C0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Longhunter Boss Health as well" },
+        { address=0X2A7776, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Longhunter Boss Health" },
+        { address=0X2C355E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1 Mech-Pur-Lin 'Boss' HP" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X128E6A, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Spiritual Invincibility Timer" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X128E6C, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Might be last checkpoint" },
+      },
+    },
+  },
+}

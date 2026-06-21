@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Carnival Games",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "carnival-games",
+    file = "carnival-games.zip",
+    hashes = {
+      { hash = "b2b2424b0d17575620ce799f98ac761e", label = "Carnival Games (USA) (Rev 2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X522A68, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X5CDD14, type="u32be", condition="eq", value=0X0F, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits / Results Screen" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5B107C, type="u32be", condition="eq", value=0X2F72696E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Toss" },
+        { address=0X5B107C, type="u32be", condition="eq", value=0X696E676B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Super Ring Toss" },
+        { address=0X5CDD53, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Super Ring Toss Unlocked increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Pinball Construction Set",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pinball-construction-set",
+    file = "pinball-construction-set.zip",
+    hashes = {
+      { hash = "555de587e36ce72fb538ab36fbbe8c30", label = "Pinball Construction Set (4am and san inc crack).dsk" },
+      { hash = "ff66f2aede62c4db61b97f223c009872", label = "Pinball Construction Set (1982)(Budgeco)(Disk 1 of 2)[cr Cat].do" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X401E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object slot 1" },
+        { address=0X401F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object Slot 2" },
+        { address=0X4020, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object Slot 3" },
+        { address=0X4021, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object Slot 4" },
+      },
+    },
+  },
+}

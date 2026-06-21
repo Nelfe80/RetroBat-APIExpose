@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Pokémon Diamond Version [Subset - Professor Oak Challenge]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-diamond-version-subset-professor-oak-challenge",
+    file = "pokemon-diamond-version-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "19b737ef011c2cc3cbce0e0c3b45b5ab", label = "Pokemon Diamond Version (Germany) [Subset - Professor Oak Challenge].nds" },
+      { hash = "7b3d7c197887857c646cb7a9d1e5778f", label = "Pokemon Diamond Version (Italy) [Subset - Professor Oak Challenge].nds" },
+      { hash = "b9ab1f8fcbb724daf78e6548e5832d79", label = "Pokemon Diamond Version (USA) [Subset - Professor Oak Challenge].nds" },
+      { hash = "e11ce29483c5598ee1a2867b14df47df", label = "Pokemon Diamond Version (Spain) [Subset - Professor Oak Challenge].nds" },
+      { hash = "f87d7a0d85173d27ff7a61058b35e004", label = "Pokemon Diamond Version (France) [Subset - Professor Oak Challenge].nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE26B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offset - Items on ground" },
+        { address=0X113FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offset - Underground" },
+        { address=0X1153C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offset - Underground" },
+        { address=0X11564, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offset - Underground" },
+        { address=0X555B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offset - level 1st pokemon in fight (8b)" },
+        { address=0X55674, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offset - (first) opponent level" },
+      },
+      stage = {
+        { address=0X11DDF, type="u8", condition="eq", value=0XB2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Flower Stage (cute, master)" },
+        { address=0X11DDF, type="u8", condition="eq", value=0XB4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Glass Stage (beauty, master)" },
+        { address=0X11DDF, type="u8", condition="eq", value=0XB6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cube Stage (smart, master)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE227, type="u8", condition="eq", value=0XB2, action="LIVES_STATE", no_log=false, no_survey=false, desc="team galaxie jubilife" },
+      },
+      health = {
+        { address=0XE284, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b0 HP up 225 decreased" },
+        { address=0XE284, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b0 HP up 225 increased" },
+        { address=0XE28A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b0 HP up 216 decreased" },
+        { address=0XE28A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b0 HP up 216 increased" },
+        { address=0X555CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Offset - 1st poke hp in fight decreased" },
+        { address=0X555CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Offset - 1st poke hp in fight increased" },
+        { address=0X5568C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Offset - Opponent1 HP decreased" },
+        { address=0X5568C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Offset - Opponent1 HP increased" },
+        { address=0X5574C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Offset - HP pokemon2 fighting decreased" },
+        { address=0X5574C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Offset - HP pokemon2 fighting increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X11DDF, type="u8", condition="eq", value=0XB3, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Pedestal (cool, master)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XE2B1, type="u8", condition="bit_true", bit=0, mask=0X01, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B1, type="u8", condition="bit_true", bit=1, mask=0X02, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B1, type="u8", condition="bit_true", bit=2, mask=0X04, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B1, type="u8", condition="bit_true", bit=3, mask=0X08, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B1, type="u8", condition="bit_true", bit=4, mask=0X10, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B1, type="u8", condition="bit_true", bit=5, mask=0X20, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B1, type="u8", condition="bit_true", bit=6, mask=0X40, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B1, type="u8", condition="bit_true", bit=7, mask=0X80, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B2, type="u8", condition="eq", value=0XB0, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B2, type="u8", condition="eq", value=0XB1, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2B2, type="u8", condition="eq", value=0XB2, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer 223" },
+        { address=0XE2E5, type="u8", condition="eq", value=0XB3, action="SWIMMING", no_log=true, no_survey=false, desc="swimmer F 230" },
+      },
+    },
+  },
+}

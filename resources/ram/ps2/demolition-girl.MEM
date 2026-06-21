@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Demolition Girl",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "demolition-girl",
+    file = "demolition-girl.zip",
+    hashes = {
+      { hash = "ccbc72712341d3ac73f44532a0d1aa46", label = "Demolition Girl (Europe)" },
+      { hash = "09ff9a75bf72ab6d4beb239fc2911545", label = "Simple 2000 Series Vol. 50 - The Daibijin (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3B2C42, type="u8", condition="eq", value=0X16, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3A26C8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Mission Clear text status" },
+        { address=0X3A7B48, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="JP - Mission Clear text status" },
+        { address=0X3E827E, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X3E827F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 2 clear flag" },
+        { address=0X3E8280, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 3 clear flag" },
+        { address=0X3E8281, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 4 clear flag" },
+        { address=0X3E8282, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 5 clear flag" },
+        { address=0X3E8283, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 6 clear flag" },
+        { address=0X3E8284, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 7 clear flag" },
+        { address=0X3E8285, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 8 clear flag" },
+        { address=0X3E8286, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 9 clear flag" },
+        { address=0X3E8287, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 10 clear flag" },
+        { address=0X3E8288, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 11 clear flag" },
+        { address=0X3E8289, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 12 clear flag" },
+        { address=0X3E828A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 13 clear flag" },
+        { address=0X3E828B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 14 clear flag" },
+        { address=0X3E828C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 15 clear flag" },
+        { address=0X3E828D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 16 clear flag" },
+        { address=0X3E828E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 17 clear flag" },
+        { address=0X3E828F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 18 clear flag" },
+        { address=0X3E8290, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 19 clear flag" },
+        { address=0X3E8291, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 20 clear flag" },
+        { address=0X3E8292, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 21 clear flag" },
+        { address=0X3E8293, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 22 clear flag" },
+        { address=0X3E8294, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 23 clear flag" },
+        { address=0X3E8295, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 24 clear flag" },
+        { address=0X3E8296, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="EU - Quest 25 clear flag" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2B3A34, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Helicopter - Current Health [32bit] decreased" },
+        { address=0X2B3A34, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Helicopter - Current Health [32bit] increased" },
+        { address=0X2B3A38, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Helicopter - Max Health [32bit] decreased" },
+        { address=0X2B3A38, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Helicopter - Max Health [32bit] increased" },
+        { address=0X3A7694, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit Float] JP - Fuselage Damage" },
+        { address=0X3E5F44, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit Float] Fuselage Damage (Results screen display)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3A2210, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="EU - Mission clear time" },
+        { address=0X3A2620, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="EU - Mission fail timer - Lose all health" },
+        { address=0X3A7690, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="JP - Clear Time" },
+        { address=0X3E5F40, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clear time (Results screen display)" },
+      },
+    },
+  },
+}

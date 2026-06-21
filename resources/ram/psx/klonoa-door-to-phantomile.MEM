@@ -1,0 +1,132 @@
+return {
+  game = {
+    title = "Klonoa: Door to Phantomile",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "klonoa-door-to-phantomile",
+    file = "klonoa-door-to-phantomile.zip",
+    hashes = {
+      { hash = "d32b1c377c9ca6454e64063c84f03f5f", label = "Klonoa - Door to Phantomile (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBDD71, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not in game" },
+        { address=0XBDEF8, type="u32le", condition="eq", value=0X225425, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0XBE368, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="game/pause flag" },
+        { address=0XBECA0, type="u8", condition="eq", value=0X2, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Cancel" },
+        { address=0XBECA0, type="u8", condition="eq", value=0X3, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Retry" },
+        { address=0XBECA0, type="u8", condition="eq", value=0X4, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Quit" },
+        { address=0XCAC52, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X187EC8, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Used on the ending credits, changes when the Diva song ends" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X867C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished extra stage f8?" },
+        { address=0XBE330, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mid-level cutscene = 01" },
+        { address=0XBE34E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="some other flag that goes 3 when starting a level" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1-1 The Beginnings of Gale" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1-2 The Diva and the Dark Spirit" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2-1 Deep in the Dying Forest" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2-2 Beyond the Backwards Waterfall" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3-1 Rebirth of the Forest" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3-2 The Stopped Gear" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4-1 A Village in Danger" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4-2 A Lull in the Wind" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5-1 The Four Orbs" },
+        { address=0XCAC52, type="u8", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5-2 Between Light and Darkness" },
+        { address=0XCAC52, type="u8", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="6-1 The Legendary Kingdom" },
+        { address=0XCAC52, type="u8", condition="eq", value=0XB, action="NEW_LEVEL", no_log=false, no_survey=false, desc="6-2 The Time of Restoration" },
+        { address=0XCAC52, type="u8", condition="eq", value=0XC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Final - The Dream at Nightmare's End" },
+        { address=0XCAC52, type="u8", condition="eq", value=0XD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extra - Klonoa's Grand Gale Strategy" },
+        { address=0XCAC52, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0XCAC56, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Extra Stage Unlocked" },
+        { address=0XCAC56, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Music Player Unlocked" },
+        { address=0XCAC56, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="?" },
+        { address=0XCAC74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Each bit represents which prisoners were rescued in each level, up until 7f" },
+        { address=0X10E5CE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Phantomilians Rescued [Current Level]" },
+        { address=0X10E60C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gems Collected [Current Level]" },
+      },
+      stage = {
+        { address=0XBEC24, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="c8 Playable stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBE348, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death flag" },
+        { address=0X106792, type="u16le", condition="eq", value=0X22, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (flag)" },
+        { address=0X106792, type="u16le", condition="eq", value=0X26, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (burned)" },
+        { address=0X106A9D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="3rd Boss HP [starts at 0x10] [changes to 0x106ed5 when you lose a life] increased" },
+        { address=0X106A9D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd Boss HP [starts at 0x10] [changes to 0x106ed5 when you lose a life] decreased" },
+        { address=0X10E5CA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X10E5CA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X10E5D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [6 = max] decreased" },
+        { address=0X10E5D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [6 = max] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBF2A4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Level Timer? [32-bit] [resets when entering a new area] increased" },
+        { address=0X106792, type="u16le", condition="eq", value=0X06, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring shot" },
+        { address=0X106792, type="u16le", condition="eq", value=0X07, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring shot in mid air" },
+        { address=0X106ED5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="3rd Boss HP (Only when entering and before dying once, refer to 0x106a9d) increased" },
+        { address=0X107048, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="New flag, Fight with Ghadius, inside the ring = 1 increased" },
+        { address=0X1075DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="New flag ring Ghadius = 01, outside = 02 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XBDEF8, type="u32le", condition="eq", value=0X633203, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss 1st phase" },
+        { address=0XBDEF8, type="u32le", condition="eq", value=0X524712, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss 2nd phase" },
+        { address=0XBDEF8, type="u32le", condition="eq", value=0X663203, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss 3rd phase" },
+        { address=0XBE344, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="1f = Vision end (no boss)" },
+        { address=0X106935, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="2nd Boss HP" },
+        { address=0X106939, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="2nd Boss HP Green bar" },
+        { address=0X106949, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="2nd Boss HP Red Bar (Differential)" },
+        { address=0X1069ED, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="5th Boss HP Green bar" },
+        { address=0X1069FD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="5th Boss HP Red Bar (Differential)" },
+        { address=0X106D6D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="1st boss HP, second address" },
+        { address=0X106E21, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="1st Boss HP" },
+        { address=0X106E25, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="1st Boss HP Green bar" },
+        { address=0X106E35, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="1st Boss HP Red Bar (Diferential)" },
+        { address=0X106ED9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="3rd Boss HP Green bar" },
+        { address=0X106EE9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="3rd Boss HP Red Bar (Differential)" },
+        { address=0X10706E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(Deprecated) Totem where Granny is on boss 3" },
+        { address=0X1070F1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last Boss HP (2nd phase) (After dying)" },
+        { address=0X10730D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last Boss HP (3rd phase) (after dying)" },
+        { address=0X107691, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last Boss HP 1st Phase (after dying)" },
+        { address=0X107745, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="6th Boss HP" },
+        { address=0X107749, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="6th Boss HP Green bar" },
+        { address=0X107759, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="6th Boss HP Red bar (Differential)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XBF01B, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Usually 0, changes to ff when jumping or taking damage" },
+        { address=0X106792, type="u16le", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Jumping/Mid air" },
+        { address=0X106792, type="u16le", condition="eq", value=0X0F, action="JUMPING", no_log=false, no_survey=false, desc="Jumping while holding enemy" },
+        { address=0X106792, type="u16le", condition="eq", value=0X1B, action="JUMPING", no_log=false, no_survey=false, desc="Double jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X106792, type="u16le", condition="eq", value=0X1C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Going inside a door" },
+        { address=0X106792, type="u16le", condition="eq", value=0X1F, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Coming outside from a door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1069E9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="4th Boss HP (1st time)" },
+      },
+    },
+  },
+}

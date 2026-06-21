@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Scooby-Doo! Classic Creep Capers",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "scooby-doo-classic-creep-capers",
+    file = "scooby-doo-classic-creep-capers.zip",
+    hashes = {
+      { hash = "01cd9938dae5dcdd4b264ae7f26c6d4d", label = "Scooby-Doo! - Classic Creep Capers (USA) (Rev 1).z64" },
+      { hash = "16cc6db10a56331b56f374b4fb254d5e", label = "Scooby-Doo! - Classic Creep Capers (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBB088, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="(8-bit) Title Screen" },
+        { address=0XBB0E8, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="(8-bit) Title Screen (v1.1)" },
+        { address=0XBB468, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(1-bit) Demo flag" },
+        { address=0XBB4C8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(1-bit) Demo flag (v1.1)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBB970, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Level Indicator" },
+        { address=0XBB9D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Level Indicator (v1.1)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X18C4F1, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="juke box episode 2 coin, works like a toggle - either coin can turn it on or off" },
+        { address=0X18C551, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="juke box episode 2 coin, works like a toggle - either coin can turn it on or off" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X18C4F1, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="art mobile episode 1 button, 1 - on 0 - off" },
+        { address=0X18C551, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="art mobile episode 1 button, 1 - on 0 - off" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Carnival Games: MiniGolf",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Sports, golf"
+  },
+
+  rom = {
+    name = "carnival-games-minigolf",
+    file = "carnival-games-minigolf.zip",
+    hashes = {
+      { hash = "dc8fbea2ff398441b89d1359ebb35571", label = "Carnival Games - MiniGolf (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+  },
+}

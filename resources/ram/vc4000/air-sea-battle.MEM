@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Air-Sea Battle",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "air-sea-battle",
+    file = "air-sea-battle.zip",
+    hashes = {
+      { hash = "62189ca0a1541840ab09c41210968bfb", label = "Air-Sea Battle (Europe).bin" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X055D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 score [8-bit BCD]" },
+        { address=0X055E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 score [8-bit BCD]" },
+      },
+    },
+  },
+}

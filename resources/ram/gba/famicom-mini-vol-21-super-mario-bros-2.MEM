@@ -1,0 +1,131 @@
+return {
+  game = {
+    title = "Famicom Mini Vol. 21: Super Mario Bros. 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "famicom-mini-vol-21-super-mario-bros-2",
+    file = "famicom-mini-vol-21-super-mario-bros-2.zip",
+    hashes = {
+      { hash = "5c46126c6a429a3704f15139dadb19be", label = "Famicom Mini 21 - Super Mario Bros. 2 (Japan).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X720E, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X7976, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X7976, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X7976, type="u8", condition="eq", value=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="Unpausing" },
+        { address=0X7976, type="u8", condition="eq", value=0X81, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pausing" },
+        { address=0X79A2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Countdown" },
+        { address=0X7A18, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stars on Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X721D, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the Ground" },
+        { address=0X7519, type="u8", condition="eq", value=0X26, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Warp Zone Text" },
+        { address=0X751C, type="u8", condition="eq", value=0X24, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loading/Princess Cutscene" },
+        { address=0X751C, type="u8", condition="eq", value=0XDC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Between Levels" },
+        { address=0X751C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Warp Zone Number Displayed/Cutscene Indicator:" },
+        { address=0X791A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Screen of Level" },
+        { address=0X791B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Next Screen of Level" },
+        { address=0X7960, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X7973, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Color Palette" },
+      },
+      zone = {
+        { address=0X795F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+        { address=0X7972, type="u8", condition="eq", value=0X0D, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 9 Notification Screen" },
+        { address=0X79FB, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X79FB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Boolean] Letter World Display Flag:" },
+      },
+      stage = {
+        { address=0X795C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Act Display" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X720E, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lives Screen" },
+        { address=0X730F, type="u8", condition="eq", value=0X05, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up" },
+        { address=0X7519, type="u8", condition="eq", value=0X47, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lives Screen" },
+        { address=0X7957, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Not Showing" },
+        { address=0X7957, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Showing" },
+        { address=0X7957, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Boolean] Lives Scren Flag: increased" },
+        { address=0X7957, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Boolean] Lives Scren Flag: decreased" },
+        { address=0X795A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Count increased" },
+        { address=0X795A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Count decreased" },
+        { address=0X79B1, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alive" },
+        { address=0X79B1, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dying" },
+      },
+      health = {
+        { address=0X7214, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Boolean] Power-Up: decreased" },
+        { address=0X721B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power-Up Type: decreased" },
+        { address=0X7239, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Most Recently Loaded Power-Up: decreased" },
+        { address=0X7315, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power-Up Collection Effect: decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X7214, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Unloaded" },
+        { address=0X7214, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Loaded" },
+        { address=0X721B, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X721B, type="u8", condition="eq", value=0X2E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Collectible" },
+        { address=0X721B, type="u8", condition="eq", value=0X30, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Flag" },
+        { address=0X7223, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-Up Alternate Sprite/Behavior" },
+        { address=0X7239, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Super Mushroom" },
+        { address=0X7239, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Fire Flower" },
+        { address=0X7239, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Starman" },
+        { address=0X7239, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1-Up" },
+        { address=0X7239, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Poison Mushroom" },
+        { address=0X725D, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-Up Speed (Signed)" },
+        { address=0X7315, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No Active Effect" },
+        { address=0X7315, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Super Mushroom/Fire Flower" },
+        { address=0X7315, type="u8", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1-Up Mushroom" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X730F, type="u8", condition="eq", value=0X00, action="SCORE_STATE", no_log=false, no_survey=false, desc="5,000 Points" },
+        { address=0X730F, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="2,000 Points" },
+        { address=0X730F, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="800 Points" },
+        { address=0X730F, type="u8", condition="eq", value=0X03, action="SCORE_STATE", no_log=false, no_survey=false, desc="400 Points" },
+        { address=0X730F, type="u8", condition="eq", value=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="100 Points" },
+        { address=0X79DD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 1,000,000's Place" },
+        { address=0X79DE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 100,000's Place" },
+        { address=0X79DF, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 10,000's Place" },
+        { address=0X79E0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 1,000's Place" },
+        { address=0X79E1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 100's Place" },
+        { address=0X79E2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 10's Place" },
+        { address=0X79E3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 1's Place" },
+      },
+      collectibles = {
+        { address=0X7948, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins Collected During This Phase increased" },
+        { address=0X795E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Count increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X7239, type="u8", condition="eq", value=0X00, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Super Mushroom" },
+        { address=0X7239, type="u8", condition="eq", value=0X01, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into Fire Flower" },
+        { address=0X7315, type="u8", condition="eq", value=0X06, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into Super Mushroom/Fire Flower" },
+        { address=0X799F, type="u8", condition="increase", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Starman Invincibility Timer started" },
+        { address=0X799F, type="u8", condition="decrease", action="INVINCIBILITY_STOP", no_log=false, no_survey=false, desc="Starman Invincibility Timer ended" },
+      },
+      player = {
+        { address=0X721D, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Aerial from Jump/Death" },
+        { address=0X7904, type="u8", condition="eq", value=0X00, action="SWIMMING", no_log=false, no_survey=false, desc="Unable" },
+        { address=0X7904, type="u8", condition="eq", value=0X01, action="SWIMMING", no_log=false, no_survey=false, desc="Able" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7977, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Pause Timer" },
+      },
+    },
+  },
+}

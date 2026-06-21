@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Show do Milhão: Volume 2",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "show-do-milhao-volume-2",
+    file = "show-do-milhao-volume-2.zip",
+    hashes = {
+      { hash = "06942fbf9e1c021bb6ce4787fefd5364", label = "Show do Milhao Volume 2 (Brazil).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5C60, type="u8", condition="eq", value=0XD4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+  },
+}

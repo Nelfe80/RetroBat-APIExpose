@@ -1,0 +1,130 @@
+return {
+  game = {
+    title = "The Mummy",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-mummy",
+    file = "the-mummy.zip",
+    hashes = {
+      { hash = "b4519fe726d7fd6cc17d569446a248ad", label = "Mummy, The (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9E928, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Ingame state. Means the player is ingame as a spectator (when combined with demo) or player." },
+        { address=0X9E928, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stage conclusion flag. The player has found the exit and will see the results." },
+        { address=0X9E928, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Game Over screen. Player loses all lives." },
+        { address=0X9E928, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Quit Game. Player has quit." },
+        { address=0X9E928, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Cinematic. Player stats will disappear and screen will be cropped." },
+        { address=0X9E928, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="??" },
+        { address=0X9E928, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo state." },
+        { address=0X9E928, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="??" },
+        { address=0X141D20, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8bit] Cursor. It will change when the player moves the cursor through the title." },
+        { address=0X1FFF74, type="u16le", condition="eq", value=0X74F8, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9E964, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Number of star keys/pieces collected. Ranges from 6 to 8 depending on each level." },
+        { address=0X9E970, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First star piece gem" },
+        { address=0X9E970, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Second star piece gem" },
+        { address=0X9E970, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Eighth star piece gem" },
+        { address=0XA07B0, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Locked" },
+        { address=0XA07B0, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XA07B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bit] Cairo Bonus Level Flag" },
+        { address=0XA0C20, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 bytes] Level progress. This array will change according to the player's progress in each leve" },
+      },
+      stage = {
+        { address=0X813B4, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81404, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81454, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X814A4, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X814F4, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81544, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81594, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X815E4, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81634, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81684, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81724, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81774, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X817C4, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+        { address=0X81814, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X816C4, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="0" },
+        { address=0X816D4, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="0" },
+        { address=0X816E4, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="First star key jewel" },
+        { address=0X816E4, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Second star key jewel" },
+        { address=0X816E4, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eighth star key jewel" },
+        { address=0X9D96C, type="u8", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Has died." },
+        { address=0X9E968, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32bit] Number of lives. increased" },
+        { address=0X9E968, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32bit] Number of lives. decreased" },
+        { address=0XA078C, type="u8", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="On" },
+        { address=0XA078C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bit] Infinite Lives Cheat State Flag increased" },
+        { address=0XA078C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bit] Infinite Lives Cheat State Flag decreased" },
+        { address=0XA07A0, type="u8", condition="eq", value=0X0, action="LIVES_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0XA07A0, type="u8", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XA07A0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bit] Infinite Lives Cheat Flag increased" },
+        { address=0XA07A0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bit] Infinite Lives Cheat Flag decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X9E95C, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[32bit] Treasure found. Ra's panels not included." },
+      },
+      weapon = {
+        { address=0XA0798, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="On" },
+        { address=0XA07AC, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0XA07AC, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9E978, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Bare hands state" },
+        { address=0X9E97C, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Torch state" },
+        { address=0X9E980, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Machete state" },
+        { address=0X9E984, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Pistol state" },
+        { address=0X9E986, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Pistol state" },
+        { address=0X9E988, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Shotgun state" },
+        { address=0X9E98A, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Shotgun state" },
+        { address=0X9E98C, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Lewis state" },
+        { address=0X9E98E, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Lewis state" },
+        { address=0X9E990, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="TNT state" },
+        { address=0X9E994, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Magic Amulet state" },
+        { address=0X9E998, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Sword state" },
+        { address=0XA0794, type="u8", condition="eq", value=0X1, action="AMMO_STATE", no_log=true, no_survey=false, desc="On" },
+        { address=0XA07A8, type="u8", condition="eq", value=0X0, action="AMMO_STATE", no_log=true, no_survey=false, desc="Locked" },
+        { address=0XA07A8, type="u8", condition="eq", value=0X1, action="AMMO_STATE", no_log=true, no_survey=false, desc="Unlocked" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA0790, type="u8", condition="eq", value=0X1, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="On" },
+        { address=0XA07A4, type="u8", condition="eq", value=0X0, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Locked" },
+        { address=0XA07A4, type="u8", condition="eq", value=0X1, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Unlocked" },
+      },
+      player = {
+        { address=0XA45DE, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[8bit]Seconds in the air. Starts counting when the player is climbing, has jumped or is falling." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA0C61, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[15 bytes] Number of treasures and ammo collected, panels lighten, enemies killed and urns broke" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9D7FA, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] (Master) Treasure spawn time. Treasures will disappear if it's set to zero." },
+        { address=0X9E628, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32bit] Game total time (remains active while paused)" },
+      },
+    },
+  },
+}

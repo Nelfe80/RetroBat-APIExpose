@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Konami's Billiards",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "konamis-billiards",
+    file = "konamis-billiards.zip",
+    hashes = {
+      { hash = "fc6d84b56c654da2bd5a07c51059795e", label = "Konami's Billiards (Europe).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X200B, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Screen from game over to main menu" },
+        { address=0X201E, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="In Game" },
+        { address=0X201E, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+  },
+}

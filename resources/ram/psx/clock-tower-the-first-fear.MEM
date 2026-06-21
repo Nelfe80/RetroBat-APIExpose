@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Clock Tower: The First Fear",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Horror"
+  },
+
+  rom = {
+    name = "clock-tower-the-first-fear",
+    file = "clock-tower-the-first-fear.zip",
+    hashes = {
+      { hash = "5b51cf86349dbdeeb182fe5ddeddb6d9", label = "Clock Tower - The First Fear (Japan) (De) (v1.0) (arcraith)" },
+      { hash = "af39da43d98ee691744332ece49515c8", label = "Clock Tower - The First Fear (Japan) (Es) (v1.0) (arcraith)" },
+      { hash = "f3dde1314f89869e7ed1d219c26254ab", label = "Clock Tower - The First Fear (Japan) (En) (v1.1) (arcraith)" },
+      { hash = "fc2df15253131dc6b3a992ca25a72cea", label = "Clock Tower - The First Fear (Japan) (Hu) (v1.0) (arcraith)" },
+      { hash = "4a756d1bd0869029d819d44d64dc451e", label = "Clock Tower - The First Fear (Japan) (Pt) (v1.2) (Matizhill)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1980DC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending S Cleared" },
+        { address=0X1980DE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending A Cleared" },
+        { address=0X1980E0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending B Cleared" },
+        { address=0X1980E2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending C Cleared" },
+        { address=0X1980E4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending D Cleared" },
+        { address=0X1980E6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending E Cleared" },
+        { address=0X1980E8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending F Cleared" },
+        { address=0X1980EA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending G Cleared" },
+        { address=0X1980EC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ending H Cleared" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X198A16, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X198A18, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X198A1A, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X198AA8, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Died" },
+      },
+      health = {
+        { address=0X198D68, type="u32le", condition="eq", value=0X0000, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Minimum" },
+        { address=0X198D68, type="u32le", condition="eq", value=0X0320, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Maximum" },
+        { address=0X198D68, type="u32le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X198878, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Light Switch (Main Hall)" },
+        { address=0X198AA4, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken" },
+        { address=0X198B66, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Don't Have" },
+        { address=0X198B66, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Have" },
+        { address=0X1D0C80, type="u32le", condition="eq", value=0X000C0F00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Glass broken on Taxidermy Room" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X198B66, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Info About Clock Tower Switch" },
+        { address=0X198D64, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Room" },
+        { address=0X1D1384, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Clock Tower Screen" },
+      },
+    },
+  },
+}

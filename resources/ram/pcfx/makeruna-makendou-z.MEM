@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Makeruna! Makendou Z",
+    system = "pcfx",
+    system_name = "PC-FX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "makeruna-makendou-z",
+    file = "makeruna-makendou-z.zip",
+    hashes = {
+      { hash = "759bdf3d8282c84dc79530d0d9340155", label = "Makeruna! Makendou Z (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XEBF0E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="character 1 level? (character or party slot?)" },
+        { address=0XEBF36, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="character 2 level? (character or party slot?)" },
+      },
+    },
+  },
+}

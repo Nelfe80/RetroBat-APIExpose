@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Naruto: Shinobi no Sato no Jintori Gassen",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "naruto-shinobi-no-sato-no-jintori-gassen",
+    file = "naruto-shinobi-no-sato-no-jintori-gassen.zip",
+    hashes = {
+      { hash = "843922a704cbab07fccdbd01f392bb51", label = "Naruto - Shinobi no Sato no Jintori Gassen (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7074A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Num Story Stages Finished [binary]" },
+        { address=0X13CDE5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="kekkai level (particular) 1+than value" },
+        { address=0X1F0F86, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background white" },
+      },
+      stage = {
+        { address=0X7073C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Code per Story Mode 8bit]" },
+        { address=0X7073D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Code Across Story Modes [8bit]" },
+        { address=0X70779, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="zoriwaraji,bit1=iruka,bit2=konohamaru,bit3=mizuki,bit4=hokage,bit5=narutoglasses,bit6=?bit7=stag" },
+        { address=0X7077A, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="surv,bit1=river,bit2=wave,bit3=bridge,bit4=hokage,bit5=academy,bit6=morihiru,bit7=?" },
+        { address=0X70CD0, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="tora, 11=kinobori,0f=bridge story,09=hokageyashiki bangaihen" },
+        { address=0X70CD0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Code [8bit]" },
+        { address=0X70CD2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Story Stage [8bit]" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X70770, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Unlock Treasure 1-8 [binary]" },
+        { address=0X70771, type="u16le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Unlock treasure 9-16 [binary]" },
+        { address=0X70772, type="u24le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Unlock Treasure 17-24 [binary]" },
+        { address=0X70773, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Unlock Treasure 25-32 [binary]" },
+        { address=0X70774, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Unlock Treasure 33-40 [binary]" },
+        { address=0X70775, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Unlock Treasure 41-48 [binary]" },
+        { address=0X70776, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Unlock Treasure 49-56 [binary]" },
+      },
+    },
+  },
+}

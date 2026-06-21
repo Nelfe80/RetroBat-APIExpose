@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Football Mania",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "football-mania",
+    file = "football-mania.zip",
+    hashes = {
+      { hash = "39499f530b7a1c531bd6a92652072ef6", label = "Soccer Mania (USA)" },
+      { hash = "5115be055c9570b4eadcc4ba9c9dccd7", label = "Football Mania (Europe) (En,Fr,De,Es,It,Nl,Sv,Da)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2B94D8, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="RED: GOAL [16-bits]" },
+        { address=0X2B94F4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="BLU: GOAL [16-bits]" },
+        { address=0X5F306C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="RED: GOAL true [32-bits]" },
+        { address=0X5F3FBC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="BLU: GOAL true [32-bits]" },
+        { address=0X6D722C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Skill Zones - Gate Crasher completed [0x00/0x01] [32-bits]" },
+        { address=0X6D7238, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Skill Zones - Canyon Chaos completed [0x00/0x01] [32-bits]" },
+        { address=0X6D7244, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Skill Zones - Spin the Shields completed [0x00/0x01] [32-bits]" },
+        { address=0X6D7250, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Skill Zones - Mummy Madness completed [0x00/0x01] [32-bits]" },
+        { address=0X6D725C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Skill Zones - Skills and Chills completed [0x00/0x01] [32-bits]" },
+        { address=0X6D7268, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Skill Zones - Shoot the Booty completed [0x00/0x01] [32-bits]" },
+      },
+      stage = {
+        { address=0X6D8434, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Challenge" },
+        { address=0X6D8434, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Chase" },
+        { address=0X6D8434, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Race to Space" },
+        { address=0X6D8434, type="u16le", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Space Showdown" },
+        { address=0X6D8434, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Select Stage [32-bits]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2D1105, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="RED: If you have a Power Up [8-bits] decreased" },
+        { address=0X2D1106, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="RED: Power-Up ID [8-bits] decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2B94DC, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="RED: Stats - Power-Ups Used [16-bits]" },
+        { address=0X2B94F8, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="BLU: Stats - Power-Ups Used [16-bits]" },
+        { address=0X2D1105, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No" },
+        { address=0X2D1105, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Preparing" },
+        { address=0X2D1105, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X2D1106, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0X2D1106, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Extra Ball" },
+        { address=0X2D1106, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rocket" },
+        { address=0X2D1106, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Weights" },
+        { address=0X2D1106, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Claw" },
+        { address=0X2D1106, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Football Boots" },
+        { address=0X2D1106, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mind Control" },
+        { address=0X2D1135, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="BLU: If you have a Power Up [8-bits]" },
+        { address=0X2D1136, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="BLU: Power-Up ID [8-bits]" },
+        { address=0X6D5C16, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Game - Power-Ups [0x00/0x01] [8-bits]" },
+      },
+    },
+  },
+}

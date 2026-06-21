@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Koto Battle: Tengai no Moribito",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "koto-battle-tengai-no-moribito",
+    file = "koto-battle-tengai-no-moribito.zip",
+    hashes = {
+      { hash = "43351cd46357bd1615a713490401fda8", label = "Koto Battle - Tengai no Moribito (Japan).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE290, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE28F, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier" },
+        { address=0XE291, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+    },
+  },
+}

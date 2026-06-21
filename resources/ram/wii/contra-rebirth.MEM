@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Contra ReBirth",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "contra-rebirth",
+    file = "contra-rebirth.zip",
+    hashes = {
+      { hash = "be4aa280acb7baa1369111440cf7aaf4", label = "Contra ReBirth (Europe) (WiiWare)" },
+      { hash = "30a358fa42357a508c612f6406fbae5d", label = "Contra ReBirth (USA) (WiiWare)" },
+      { hash = "7a0816b7e0ae536aa856dac2d49128e5", label = "Contra ReBirth (Japan) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Star Wars - Episode I: Racer",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "star-wars-episode-i-racer",
+    file = "star-wars-episode-i-racer.zip",
+    hashes = {
+      { hash = "1ee8800a4003e7f9688c5a35f929d01b", label = "Star Wars Episode I - Racer (USA).z64" },
+      { hash = "6ef9fed309f28bd59b605f128869aa00", label = "Star Wars Episode I - Racer (Europe) (En,Fr,De).z64" },
+    }
+  },
+
+  events = {
+    state = {
+      temporary = {
+        { address=0XA52D4, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Inactive" },
+        { address=0XA52D4, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA238F, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0XA78DF, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+      },
+    },
+  },
+}

@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Harry Potter and the Order of the Phoenix",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "harry-potter-and-the-order-of-the-phoenix",
+    file = "harry-potter-and-the-order-of-the-phoenix.zip",
+    hashes = {
+      { hash = "71e07ee86ea39d656165f151f3baad2d", label = "Harry Potter and the Order of the Phoenix (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X65A40E, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Voldemort Defeated" },
+        { address=0X683430, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X894E45, type="u8", condition="bit_true", bit=6, mask=0X40, action="SCORE_STATE", no_log=false, no_survey=false, desc="70 Pts" },
+        { address=0X894E45, type="u8", condition="bit_true", bit=7, mask=0X80, action="SCORE_STATE", no_log=false, no_survey=false, desc="300 Pts" },
+        { address=0X894E46, type="u8", condition="bit_true", bit=0, mask=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="400 Pts" },
+      },
+    },
+  },
+}

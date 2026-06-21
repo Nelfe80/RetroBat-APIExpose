@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Ultima Underworld: The Stygian Abyss",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "ultima-underworld-the-stygian-abyss",
+    file = "ultima-underworld-the-stygian-abyss.zip",
+    hashes = {
+      { hash = "f9bd37ddb5daac193a156d3a4dc38cc7", label = "Ultima Underworld - The Stygian Abyss (Japan)" },
+      { hash = "a96e88abb73b8bafa357c3052e67cfcc", label = "Ultima Underworld - The Stygian Abyss (Japan) (Rev 1)" },
+      { hash = "b9e93c3a242237c6fbd78a34fffd03ef", label = "Ultima Underworld - The Stygian Abyss (Japan) (En) (v1.1) (Gertius)" },
+    }
+  },
+
+  events = {
+  },
+}

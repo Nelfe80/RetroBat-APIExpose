@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Another Code: R - A Journey into Lost Memories",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "another-code-r-a-journey-into-lost-memories",
+    file = "another-code-r-a-journey-into-lost-memories.zip",
+    hashes = {
+      { hash = "1167999bf21487d4036e108c7ec70cf7", label = "Another Code R - A Journey into Lost Memories (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

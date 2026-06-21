@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Bionic Commando",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "bionic-commando",
+    file = "bionic-commando.zip",
+    hashes = {
+      { hash = "f89a33de3fa660a13ec29bb323efffa9", label = "Bionic Commando (USA).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0C7, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused = 01" },
+        { address=0XCD00, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Game" },
+        { address=0XDF4D, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen = 0x00" },
+        { address=0XDF52, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9040, type="u8", condition="eq", value=0XDD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Level" },
+        { address=0XC205, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Exited = ff" },
+        { address=0XC639, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="On Overworld = 00" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC480, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Sound Effect increased" },
+        { address=0XC480, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Sound Effect decreased" },
+        { address=0XDF43, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Life Points (Up to 8) increased" },
+        { address=0XDF43, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Life Points (Up to 8) decreased" },
+        { address=0XDF44, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total Life Points (Up to 8) increased" },
+        { address=0XDF44, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total Life Points (Up to 8) decreased" },
+        { address=0XDF45, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Lives increased" },
+        { address=0XDF45, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XDF4A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons: b0=Assault Riffle, b1=Grenade Launcher, b2=Wide Range Riffle, b3=Vulkan M274, b4=Mahcin" },
+        { address=0XDF4E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Equipped: 1=Assault Riffle, 2=Grenade Launcher, 3=Wide Range Riffle, 4=Vulkan M274, 5=Mah" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9040, type="u8", condition="eq", value=0X5F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Room" },
+        { address=0XC200, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Area Boss Win = 01" },
+        { address=0XC655, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Area 3, 4, 6" },
+        { address=0XC695, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Area 0, 8" },
+        { address=0XC6D5, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Area 7" },
+        { address=0XC715, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Area 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC208, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[2 Byte] Invincibility (frames)" },
+      },
+    },
+  },
+}

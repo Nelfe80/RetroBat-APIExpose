@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Crash Twinsanity",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "crash-twinsanity",
+    file = "crash-twinsanity.zip",
+    hashes = {
+      { hash = "deafedb73a960ab89ec9b6912c9afe87", label = "Crash Twinsanity (USA) (v2.00)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X309718, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Bit 1 = Paused" },
+        { address=0X98C145, type="u8", condition="eq", value=0XF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XB8D5FD, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X98C664, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C668, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C66C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C670, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C674, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C678, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C67C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C680, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C684, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C688, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C68C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C690, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C694, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C698, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C69C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X98C6A0, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XC1CA08, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Gem" },
+        { address=0XC1CA08, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cutscene 1" },
+        { address=0XC1CA09, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Life Crate" },
+        { address=0XC1CA74, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Life Crate" },
+        { address=0XC1D05C, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Life Crate" },
+        { address=0XC1D05C, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Life Crate" },
+        { address=0XC1D05C, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blue Gem" },
+        { address=0XC1D2E4, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Purple Gem" },
+        { address=0XC1D2E4, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yellow Gem" },
+        { address=0XCA7350, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Life Crate" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X98C630, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lives first bit" },
+        { address=0X98C632, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss Life (HUD) increased" },
+        { address=0X98C632, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss Life (HUD) decreased" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Jungle Bungle - Part 2 (Boss Fight) **If you die it goes back to being 0x01, once you beat the b" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X98C634, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Activates Boss Health HUD" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC3DD6C, type="u8", condition="eq", value=0X05, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3D6BB0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-bit Pointers] Sub-Object Data Array" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X00, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="N.Sanity Island" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Jungle Bungle" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X03, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Cavern Catastrophe" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X04, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Totem Hokum" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X05, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="N.Sanity Island (Boss Fight)" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X06, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Iceberg Lab" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X07, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Ice Climb" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Ice Climb (Boss Fight)" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X09, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Slip Slide Icecapades" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X0A, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="High Seas Hi-Jinks" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X0B, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="High Seas Hi-Jinks (Boss Fight)" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X0C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Iceberg Lab (Boss Fight)" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X0D, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Academy of Evil" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X0E, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Gone a bit Coco (CUT LEVEL)" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X0F, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Boiler Room Doom" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X10, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Boiler Room Doom (Boss Fight)" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X11, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Classroom Chaos" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X12, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Rooftop Rampage" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X13, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Academy of Evil (Boss Fight)" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X14, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Twinsanity Island" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X15, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Rock-Slide Rumble" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X16, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Bandicoot Pursuit" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X17, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Ant Agony" },
+        { address=0X98C6D8, type="u16le", condition="eq", value=0X18, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Twinsanity Island (Boss Fight)" },
+        { address=0X98C6E4, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Global Checkpoint related (Save Data)" },
+        { address=0X98C6EC, type="u16le", condition="eq", value=0XFFFF, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Not being used (not a global checkpoint)" },
+        { address=0X98C6EC, type="u16le", condition="eq", value=0X0005, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Left Cavern" },
+        { address=0XB955E8, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Local Checkpoint related" },
+        { address=0XB955F0, type="u16le", condition="eq", value=0XFFFF, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Not being used" },
+        { address=0XB956E8, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Global Checkpoint related" },
+        { address=0XB956F0, type="u16le", condition="eq", value=0XFFFF, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Not being used" },
+        { address=0XC1CA2C, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Level (N.Sanity Island 1) - Checkpoint related" },
+        { address=0XC1D308, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Level (Jungle Bungle 1) - Checkpoint related" },
+      },
+    },
+  },
+}

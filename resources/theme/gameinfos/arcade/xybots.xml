@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>triggerstick</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Turn Left</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Turn Right</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Turn Left</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Turn Right</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${blue}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 CAD 70000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 DAN 69000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 RMM 68000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 LVR 67000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 ED  66000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 BOB 65000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 DUG 64000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 PAT 63000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 EAR 62000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 SAM 61000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 ED  60000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 BOB 59000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 CJD 58000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 DES 57000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 PMC 56000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 SWC 55000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 MLW 54000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 EAR 53000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 BAF 52000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 HLC 51000</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 LBF 50000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 JMB 49000</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 GEL 48000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 CAL 47000</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 CEN 46000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 VNF 45000</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 RSN 44000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 BAB 43000</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 DSM 42000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 MNF 41000</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 KWH 40000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 IAE 39000</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 LSR 38000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 LEE 37000</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 JB  36000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 OWW 35000</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 YOU 34000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 AGN 33000</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 SNO 32000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 MOL 31000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

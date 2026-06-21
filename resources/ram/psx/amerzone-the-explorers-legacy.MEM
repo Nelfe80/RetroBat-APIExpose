@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Amerzone: The Explorer's Legacy",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "amerzone-the-explorers-legacy",
+    file = "amerzone-the-explorers-legacy.zip",
+    hashes = {
+      { hash = "cdef3fbc84ff01b6e4b57f84ac5710f6", label = "Amerzone - The Explorer's Legacy (Europe) (Disc 1)" },
+      { hash = "b3060c5bfd988725a5205097a38cba42", label = "Amerzone - The Explorer's Legacy (Europe) (Disc 2)" },
+      { hash = "439d3405711d724d21d348e55016ab6d", label = "Amerzone, L' (France) (Disc 1)" },
+      { hash = "025e1e47ba9def2a051cb874fa075d32", label = "Amerzone, L' (France) (Disc 2)" },
+      { hash = "0015374a4c87a5188a7d4d43a215257d", label = "Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 1)" },
+      { hash = "b5892c02d2da8680dd7d5f24d76891de", label = "Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 2)" },
+      { hash = "d3101536d2cffed847eae2975a8d268e", label = "Amerzone - El Legado del Explorador (Spain) (Disc 1)" },
+      { hash = "a36f761f297bf3b69b7e400bdb41c559", label = "Amerzone - El Legado del Explorador (Spain) (Disc 2)" },
+      { hash = "69794e42a0ee6211c95b38d2a0406551", label = "Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 1)" },
+      { hash = "ecf95dfb704472021366f9a848628662", label = "Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2)" },
+      { hash = "131b03b7d57f7e47b7e30455738e4ec7", label = "Amerzone - O Testamento do Explorador (Portugal) (Disc 1)" },
+      { hash = "636d95a35e59ea34fbcfe90967a1443a", label = "Amerzone - O Testamento do Explorador (Portugal) (Disc 2)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X96F18, type="u32le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="false" },
+        { address=0X96F18, type="u32le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="true" },
+        { address=0X96F18, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FLAG : Ground flowers given to the shaman flag (32-bit)" },
+        { address=0X9702C, type="u32le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="false" },
+        { address=0X9702C, type="u32le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="true" },
+        { address=0X9702C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FLAG : Ground Flowers picked up flag (32-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9489C, type="u32le", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="false" },
+        { address=0X9489C, type="u32le", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="true" },
+        { address=0X97F9C, type="u32le", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X97F9C, type="u32le", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X98028, type="u32le", condition="eq", value=0X0, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="false" },
+        { address=0X98028, type="u32le", condition="eq", value=0X1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="true" },
+        { address=0X98060, type="u32le", condition="eq", value=0X0, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Not Powered" },
+        { address=0X98060, type="u32le", condition="eq", value=0X1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Powered" },
+        { address=0X9807C, type="u32le", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="ON" },
+        { address=0X98090, type="u32le", condition="eq", value=0X1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ON" },
+      },
+    },
+  },
+}

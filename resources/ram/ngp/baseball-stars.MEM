@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Baseball Stars",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "baseball-stars",
+    file = "baseball-stars.zip",
+    hashes = {
+      { hash = "68ee2d5be4c81348bc499fc29819fd2d", label = "Baseball Stars - Pocket Sports Series (Japan, Europe) (En,Ja).ngp" },
+    }
+  },
+
+  events = {
+  },
+}

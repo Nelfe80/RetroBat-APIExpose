@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Newbery Winners: Bridge to Terabithia",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "newbery-winners-bridge-to-terabithia",
+    file = "newbery-winners-bridge-to-terabithia.zip",
+    hashes = {
+      { hash = "fb49ae5e13807c32c385330880167797", label = "Newbery Winners- Bridge to Terabithia.woz" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0480, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII] Asterisks surrounding the choices in Synonym Puzzle" },
+      },
+    },
+  },
+}

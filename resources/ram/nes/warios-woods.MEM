@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Wario's Woods",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "warios-woods",
+    file = "warios-woods.zip",
+    hashes = {
+      { hash = "bec7fa447c1c8e13a87bd4a5685ce563", label = "Wario's Woods (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6291, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1, 01 = Level 2, 0F = Level 16" },
+        { address=0X6291, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level, offset by 1" },
+        { address=0X7B50, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Game" },
+        { address=0X7B5F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2R" },
+        { address=0X7B5F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3R" },
+        { address=0X7B5F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4R" },
+        { address=0X7B5F, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5R" },
+        { address=0X7B5F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Rounds [Time Race]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6FC8, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fauster Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boom Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mad Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goro Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Selzer Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Drago Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fake Wario Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boom II Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Selzer II Boss Theme" },
+        { address=0X6FC8, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Wario Boss Theme" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7B50, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Race" },
+        { address=0X7B50, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Mode selected:" },
+        { address=0X7B52, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X7B52, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X7B52, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X7B52, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Race Difficulty:" },
+      },
+    },
+  },
+}

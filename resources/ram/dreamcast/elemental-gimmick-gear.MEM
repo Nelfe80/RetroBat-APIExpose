@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Elemental Gimmick Gear",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "elemental-gimmick-gear",
+    file = "elemental-gimmick-gear.zip",
+    hashes = {
+      { hash = "41b94ff357fab983a6eda4f4b69974bf", label = "Elemental Gimmick Gear (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X194308, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Energy point decreased" },
+        { address=0X194308, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Energy point increased" },
+        { address=0X19430A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Energy Point decreased" },
+        { address=0X19430A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Energy Point increased" },
+      },
+    },
+  },
+}

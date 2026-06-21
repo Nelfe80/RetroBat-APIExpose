@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Blaster Master: Overdrive",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "blaster-master-overdrive",
+    file = "blaster-master-overdrive.zip",
+    hashes = {
+      { hash = "1df6b3fdad3512fd42f9553353dcbfe5", label = "Blaster Master - Overdrive (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X28AAE0, type="u32be", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen/Intro" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X28AB2C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Gun level" },
+        { address=0X28AB30, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Homing missile level" },
+        { address=0X28AB34, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Grenade level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X28B18C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] SOPHIA max health decreased" },
+        { address=0X28B18C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] SOPHIA max health increased" },
+        { address=0X28B190, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] SOPHIA current health decreased" },
+        { address=0X28B190, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] SOPHIA current health increased" },
+        { address=0X28B194, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] SOPHIA max energy decreased" },
+        { address=0X28B194, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] SOPHIA max energy increased" },
+        { address=0X28B198, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] SOPHIA current energy decreased" },
+        { address=0X28B198, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] SOPHIA current energy increased" },
+        { address=0X28B42C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Alex max health in SOPHIA mode decreased" },
+        { address=0X28B42C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Alex max health in SOPHIA mode increased" },
+        { address=0X28B430, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Alex current health in SOPHIA mode decreased" },
+        { address=0X28B430, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Alex current health in SOPHIA mode increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X28AB28, type="u32be", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gun" },
+        { address=0X28AB28, type="u32be", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Homing missiles" },
+        { address=0X28AB28, type="u32be", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade launcher" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X28AAD8, type="u32be", condition="eq", value=0X0071, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 1 boss" },
+        { address=0X28AAD8, type="u32be", condition="eq", value=0X00FB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 2 boss" },
+        { address=0X28AAD8, type="u32be", condition="eq", value=0X0137, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 3 boss" },
+        { address=0X28AAD8, type="u32be", condition="eq", value=0X019B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 4 boss" },
+        { address=0X28AAD8, type="u32be", condition="eq", value=0X01FF, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 5 boss" },
+        { address=0X28AAD8, type="u32be", condition="eq", value=0X0263, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 6 boss" },
+        { address=0X28AAD8, type="u32be", condition="eq", value=0X02C7, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 7 boss" },
+        { address=0X28AAD8, type="u32be", condition="eq", value=0X032B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 8 final boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2895C4, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[Array of 156 bytes] [32-bit BE] Alex mode object pointers" },
+      },
+    },
+  },
+}

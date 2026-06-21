@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Starsky & Hutch",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "starsky-hutch",
+    file = "starsky-hutch.zip",
+    hashes = {
+      { hash = "47cdd40b09021b6a7283e37b94185979", label = "Starsky & Hutch (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

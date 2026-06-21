@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hellboy: The Science of Evil",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hellboy-the-science-of-evil",
+    file = "hellboy-the-science-of-evil.zip",
+    hashes = {
+      { hash = "1c2f95c43f51571e80bbed423e74504e", label = "Hellboy - The Science of Evil (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

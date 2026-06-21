@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Spider-Man 3",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "spider-man-3",
+    file = "spider-man-3.zip",
+    hashes = {
+      { hash = "5e2bb10bd447ac7cf55d97bcc141d10e", label = "Spider-Man 3 (USA).nds" },
+      { hash = "b7574636e0826fc15e35733dc4a7f257", label = "Spider-Man 3 (United Kingdom).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X134804, type="u16le", condition="eq", value=0X18, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+      events = {
+        { address=0X1370B8, type="u8", condition="bit_true", bit=1, mask=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Strike" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1366C8, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bio: Eddie Brock" },
+      },
+      health = {
+        { address=0X136EA0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X136EA0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X1370B8, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Upgrade 1" },
+        { address=0X1370B9, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Upgrade 2" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1366CA, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cutscene: Black Suit" },
+        { address=0X1366CA, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cutscene: Losing the Suit" },
+        { address=0X1366CB, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cheat: Black Suit" },
+        { address=0X1366D0, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Black Suit" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X136F54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hero Points" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X134804, type="u16le", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goblin Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1366CB, type="u8", condition="bit_true", bit=5, mask=0X20, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheat: Invincibility" },
+        { address=0X1366D0, type="u8", condition="bit_true", bit=2, mask=0X04, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+  },
+}

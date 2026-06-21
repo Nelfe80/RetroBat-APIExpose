@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "LEGO Friends",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "lego-friends",
+    file = "lego-friends.zip",
+    hashes = {
+      { hash = "b5c9529c8c32d75e2548760c5569f637", label = "LEGO Friends (USA) (En,Fr,Es,Pt).nds" },
+      { hash = "bb122274b6196efdd797f5831cc624c1", label = "LEGO Friends (Europe) (En,Fr,De,Es,It,Nl,Da).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X1A9AF4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money [32bit] increased" },
+      },
+    },
+  },
+}

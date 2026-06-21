@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Assassin's Creed: Bloodlines",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Adventure, Action"
+  },
+
+  rom = {
+    name = "assassins-creed-bloodlines",
+    file = "assassins-creed-bloodlines.zip",
+    hashes = {
+      { hash = "a2450c9ada6a53b157d8001b3de0804d", label = "Assassin's Creed - Bloodlines (Europe) (En,Fr,De,Es,It,Ru).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X18B379E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="8-bit -> Total Combo Kills" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA7A9B0, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="16-bit ->Upgrade Cost - 1st Weapon Damage Upgrade" },
+        { address=0XA7A9B2, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="16-bit -> Upgrade Cost - 2nd Weapon Damage Upgrade" },
+        { address=0XA7A9B4, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="16-bit -> Upgrade Cost - 3rd Weapon Damage Upgrade" },
+        { address=0XAA1300, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Float -> Used to calculate total health bars (Will always be 0x40400000[3.0]) decreased" },
+        { address=0XAA1300, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Float -> Used to calculate total health bars (Will always be 0x40400000[3.0]) increased" },
+        { address=0X1B737AA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maria's Red Health Bar (Acre Harbor Fortress) decreased" },
+        { address=0X1B737AA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maria's Red Health Bar (Acre Harbor Fortress) increased" },
+        { address=0X1BCAD26, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maria's Blue Health Bar (Acre Harbor Fortress) decreased" },
+        { address=0X1BCAD26, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maria's Blue Health Bar (Acre Harbor Fortress) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X18B3798, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit -> Total Bronze Coins Collected increased" },
+        { address=0X18B37A5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Silver Coins increased" },
+        { address=0X18B37A6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Silver Coins increased" },
+        { address=0X18B37A7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Silver Coins increased" },
+        { address=0X18B37A8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Silver Coins increased" },
+        { address=0X18B37A9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Silver Coins increased" },
+        { address=0X18B37AA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Silver Coins increased" },
+        { address=0X18B37AB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Silver Coins increased" },
+        { address=0X18B37AC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Silver coins increased" },
+        { address=0X18B37AD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount Lower4-> Silver coins Collected in Memory 1 increased" },
+        { address=0X18B37AE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Gold Coins increased" },
+        { address=0X18B37AF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitcount -> Gold Coins increased" },
+        { address=0X19CC728, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit bcd -> Total Silver Coins Found between all memories increased" },
+        { address=0X19CCCB0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit bcd -> Total Gold Coins Found between all memories increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA7A9C8, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="16-bit -> Cost - Automatic Block Upgrade" },
+        { address=0XA89662, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="8-bit (ASCII) -> What memory block the cursor are on in the menu" },
+        { address=0XAA9FE0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="32-bit -> Current Memory Block" },
+      },
+    },
+  },
+}

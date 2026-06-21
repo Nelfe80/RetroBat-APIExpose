@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-07: Math Quiz II (Multiplication & Division)",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Educational"
+  },
+
+  rom = {
+    name = "videocart-07-math-quiz-ii",
+    file = "videocart-07-math-quiz-ii.zip",
+    hashes = {
+      { hash = "86b77eafdf7b806e19e01724987e384f", label = "Math Quiz II - Multiplication + Division (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

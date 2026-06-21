@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Single Ennead",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "single-ennead",
+    file = "single-ennead.zip",
+    hashes = {
+      { hash = "2db76e2fd023434da45e5ab93e62172f", label = "Single Ennead (World).hex" },
+    }
+  },
+
+  events = {
+  },
+}

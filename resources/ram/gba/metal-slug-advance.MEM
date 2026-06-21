@@ -1,0 +1,147 @@
+return {
+  game = {
+    title = "Metal Slug Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Shooter, Run And Gun"
+  },
+
+  rom = {
+    name = "metal-slug-advance",
+    file = "metal-slug-advance.zip",
+    hashes = {
+      { hash = "584fa297b632cff5b54c2def93c0de2f", label = "Metal Slug Advance (Europe).gba" },
+      { hash = "6838eb5df807a0f3299ad76066d59d26", label = "Metal Slug Advance (USA).gba" },
+      { hash = "6eb8b130138582dc68e5e280606ec847", label = "Metal Slug Advance (USA) (Pl).gba" },
+      { hash = "7a98d4e8bcdd6fb3d3cda248be382683", label = "Metal Slug Advance (USA) (Ru) (MagicGame).gba" },
+      { hash = "eecc817eaa0ff2184fe7e1c25956d930", label = "Metal Slug Advance (USA) (Pt) (v1.0) (Central de Traducoes).gba" },
+      { hash = "f5070f5ab5c6e8228f08fa4e4c68d56d", label = "Metal Slug Advance (USA) (Ru).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X20E7, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Returning to Camp (From Pause during Mission)" },
+        { address=0X14D77, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="030 DEMON GOD Card Obtained" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC6D1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X14D7A, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="044 Effect On (Proof of clearing mission 1)" },
+        { address=0X14D7A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="044 M1 CLEAR Card Obtained" },
+        { address=0X14D7B, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="045 M2 CLEAR Card Obtained" },
+        { address=0X14D7B, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="046 M3 CLEAR Card Obtained" },
+        { address=0X14D7B, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="047 M4 CLEAR Card Obtained" },
+        { address=0X14D7B, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="048 M5 CLEAR Card Obtained" },
+        { address=0X14D7C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="049 ALL CLEAR Card Obtained" },
+        { address=0X14D7C, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="051 Effect On (Clears poison gas in the cave's depths)" },
+        { address=0X14D84, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="084 Description: Given for clearing with 'PAPER THIN'." },
+      },
+      stage = {
+        { address=0X14D7A, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="042 Effect On (Reveals spots of unseen hostages)" },
+        { address=0X14D7D, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="053 Effect On (Lets you enter hidden stage in the cave)" },
+        { address=0X14D7D, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="054 Effect On (Lets you enter hidden stage in the ruins)" },
+        { address=0X14D86, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="090 Description: Proof of saving 10 hostages." },
+        { address=0X14D86, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="091 Description: Proof of saving 20 hostages." },
+        { address=0X14D86, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="092 Description: Proof of saving 30 hostages." },
+        { address=0X14D87, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="093 Description: Proof of saving 40 hostages." },
+        { address=0X14D87, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="094 Effect On (Proof of saving 50 hostages." },
+        { address=0X14D87, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="095 Description: Proof of saving 60 hostages." },
+        { address=0X14D87, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="096 Description: Proof of saving 70 hostages." },
+        { address=0X14D88, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="097 Description: Proof of saving 80 hostages." },
+        { address=0X14D88, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="098 Description: Proof of saving 90 hostages." },
+        { address=0X14D88, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="099 Description: Proof of saving all hostages." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X14D85, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="086 SOLDIER A Card Obtained" },
+        { address=0X14D85, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="087 SOLDIER B Card Obtained" },
+        { address=0X14D85, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="088 SOLDIER C Card Obtained" },
+        { address=0X14D86, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="089 SOLDIER D Card Obtained" },
+      },
+      health = {
+        { address=0XC948, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XC948, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XCB88, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Twins (U) 1 decreased" },
+        { address=0XCB88, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Twins (U) 1 increased" },
+        { address=0XCB89, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Twins (U) 2 decreased" },
+        { address=0XCB89, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Twins (U) 2 increased" },
+        { address=0XCDF8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cabracan Health 1 (U) decreased" },
+        { address=0XCDF8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cabracan Health 1 (U) increased" },
+        { address=0XCDF9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cabracan Health 2 (U) decreased" },
+        { address=0XCDF9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cabracan Health 2 (U) increased" },
+        { address=0XCEC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health The Keesi III 1 decreased" },
+        { address=0XCEC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health The Keesi III 1 increased" },
+        { address=0XCEC9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health the Keesi III 2 decreased" },
+        { address=0XCEC9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health the Keesi III 2 increased" },
+        { address=0XD138, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Formor Health ?? decreased" },
+        { address=0XD138, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Formor Health ?? increased" },
+        { address=0XD548, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Formor?? decreased" },
+        { address=0XD548, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Formor?? increased" },
+        { address=0XD549, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Formor ??? decreased" },
+        { address=0XD549, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Formor ??? increased" },
+        { address=0XDE38, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Cabracan 1 decreased" },
+        { address=0XDE38, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Cabracan 1 increased" },
+        { address=0XDE39, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Cabracan 2 decreased" },
+        { address=0XDE39, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Cabracan 2 increased" },
+        { address=0XE0A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="The Keesi III Health 1 (U) decreased" },
+        { address=0XE0A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="The Keesi III Health 1 (U) increased" },
+        { address=0XE0A9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="The Keesi III Health 2 (U) decreased" },
+        { address=0XE0A9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="The Keesi III Health 2 (U) increased" },
+        { address=0X10129, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Formor Health (U) 2 decreased" },
+        { address=0X10129, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Formor Health (U) 2 increased" },
+        { address=0X14D70, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="002 Effect On Flag (Invincible, But your HP Drains)" },
+        { address=0X14D77, type="u8", condition="bit_true", bit=4, mask=0X10, action="HIT", no_log=false, no_survey=false, desc="031 Effect On (Decreases damage to player by 10%)" },
+        { address=0X14D77, type="u8", condition="bit_true", bit=6, mask=0X40, action="HIT", no_log=false, no_survey=false, desc="032 Effect On (Decreases damage to slug by 10%)" },
+        { address=0X14D78, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="033 Effect On (Decreases damage to slug by 20%)" },
+        { address=0X14D78, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="034 Effect On (Decreases damage to slug by 30%)" },
+        { address=0X14D78, type="u8", condition="bit_true", bit=4, mask=0X10, action="HIT", no_log=false, no_survey=false, desc="035 Effect On (Decreases damage to slug by 20%)" },
+        { address=0X14D78, type="u8", condition="bit_true", bit=6, mask=0X40, action="HIT", no_log=false, no_survey=false, desc="036 Effect On (Decreases damage to slug by 50%)" },
+        { address=0X14D7A, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="041 Effect On (Stomp on enemy tanks and damage them)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X14D7E, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="060 TREASURE BOX Card Obtained" },
+      },
+      weapon = {
+        { address=0X806D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon?" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X14D71, type="u8", condition="bit_true", bit=6, mask=0X40, action="AMMO_STATE", no_log=false, no_survey=false, desc="008 Effect On Flag (Doubles heavy machien gun ammo)" },
+        { address=0X14D72, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=false, no_survey=false, desc="009 Effect On (Doubles rocket launcher ammo)" },
+        { address=0X14D72, type="u8", condition="bit_true", bit=2, mask=0X04, action="AMMO_STATE", no_log=false, no_survey=false, desc="010 Effect On (Doubles laser shot ammo)" },
+        { address=0X14D72, type="u8", condition="bit_true", bit=4, mask=0X10, action="AMMO_STATE", no_log=false, no_survey=false, desc="011 Effect On (Doubles shotgun ammo)" },
+        { address=0X14D72, type="u8", condition="bit_true", bit=6, mask=0X40, action="AMMO_STATE", no_log=false, no_survey=false, desc="012 Effect On (Doubles flame shot ammo)" },
+        { address=0X14D73, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=false, no_survey=false, desc="013 Effect On (Doubles iron lizard ammo)" },
+        { address=0X14D73, type="u8", condition="bit_true", bit=2, mask=0X04, action="AMMO_STATE", no_log=false, no_survey=false, desc="014 Effect On (Doubles enemy chaser ammo)" },
+        { address=0X14D73, type="u8", condition="bit_true", bit=4, mask=0X10, action="AMMO_STATE", no_log=false, no_survey=false, desc="015 Effect On (Doubles drop shot ammo)" },
+        { address=0X14D73, type="u8", condition="bit_true", bit=6, mask=0X40, action="AMMO_STATE", no_log=false, no_survey=false, desc="016 Effect On (Doubles super grenade ammo)" },
+        { address=0X14D7D, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="056 COIN Card Obtained" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCF98, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Health Boss Formor Kaladgolg" },
+        { address=0XCF99, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Health Boss Formor Kaladgolg" },
+        { address=0XD2D8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Twins 1" },
+        { address=0XD2D9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Twins 2" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X14D79, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="039 Effect On (Increases heigh of slug's jump)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X14DE8, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level/Segment/Boss Timer?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Cooking Guide: Can't Decide What to Eat",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cooking-guide-cant-decide-what-to-eat",
+    file = "cooking-guide-cant-decide-what-to-eat.zip",
+    hashes = {
+      { hash = "27e69a62d56c8bbae07c95eade868e78", label = "Cooking Guide - Can't Decide What to Eat (Europe, Australia) (Rev 1).nds" },
+      { hash = "93c5d825b052f935cd73c9bae28cc43a", label = "Cooking Guide - Can't Decide What to Eat (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

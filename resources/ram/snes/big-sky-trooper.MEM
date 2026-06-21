@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Big Sky Trooper",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "big-sky-trooper",
+    file = "big-sky-trooper.zip",
+    hashes = {
+      { hash = "b771f65306b12ef1acf830953b9424d6", label = "Big Sky Trooper (Europe).sfc" },
+      { hash = "da63bb63008dfe25c3e387c25d217d36", label = "Big Sky Trooper (USA).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1E0A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Bar decreased" },
+        { address=0X1E0A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Bar increased" },
+        { address=0X3D05, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Fruit decreased" },
+        { address=0X3D05, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Fruit increased" },
+      },
+    },
+  },
+}

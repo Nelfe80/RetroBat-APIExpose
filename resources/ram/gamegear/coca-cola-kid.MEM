@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Coca-Cola Kid",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "coca-cola-kid",
+    file = "coca-cola-kid.zip",
+    hashes = {
+      { hash = "d259f6b3a437b7df069abb935553007a", label = "Sassou Shounen Eiyuuden Coca Cola Kid (Japan) (En) (v1.1) (Filler).gg" },
+      { hash = "dbede5c20828e3d251b05356d9176c79", label = "Coca-Cola Kid (Japan).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1299, type="u8", condition="eq", value=0X6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title/sound test" },
+        { address=0X12C7, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue (Silver discs in shop)" },
+        { address=0X12D8, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title, demo, intro" },
+        { address=0X12D8, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="ingame, game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12C0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage completed" },
+        { address=0X1E97, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="normal" },
+        { address=0X1EF7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage completed" },
+      },
+      stage = {
+        { address=0X1299, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ending" },
+        { address=0X1299, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X129B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (0=dead) increased" },
+        { address=0X129B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (0=dead) decreased" },
+      },
+      health = {
+        { address=0X12EB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP (3-5) decreased" },
+        { address=0X12EB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP (3-5) increased" },
+        { address=0X1526, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X1526, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X12EC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins: Current Stage (lost on death) increased" },
+        { address=0X12EC, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Coins: Current Stage (lost on death) empty" },
+        { address=0X12ED, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins Stored (from previous stages, not lot on death) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1726, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+  },
+}

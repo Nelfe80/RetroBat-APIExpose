@@ -1,0 +1,126 @@
+return {
+  game = {
+    title = "Super Metroid [Subset - Bonus]",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Adventure, Platform, Shooter"
+  },
+
+  rom = {
+    name = "super-metroid-subset-bonus",
+    file = "super-metroid-subset-bonus.zip",
+    hashes = {
+      { hash = "c88c75e90202868f4a4a97440734145b", label = "Super Metroid (Japan, USA) (En,Ja) [Subset - Bonus].sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0A28, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="Player Activity - 0x00 = menu, everything else changes based off actions. pause if 0x00 to preve" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD821, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shaktool has cleared the sand" },
+        { address=0XD822, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Metroid Room 1 cleared" },
+        { address=0XD822, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Metroid Room 2 cleared" },
+        { address=0XD822, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Metroid Room 3 cleared" },
+        { address=0XD822, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Metroid Room 4 cleared" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X17A4, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Both pirates dead" },
+        { address=0X17A6, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Both pirates dead" },
+        { address=0X17A8, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Both pirates dead" },
+        { address=0X17AA, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Both pirates dead" },
+        { address=0X1E98, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mother Brain is dead" },
+        { address=0X1E9A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Baby Metroid dead? Hyper?" },
+        { address=0X7808, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x00 - Mother Brain is dead" },
+      },
+      health = {
+        { address=0X09C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X09C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0X09C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Samus' max health decreased" },
+        { address=0X09C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Samus' max health increased" },
+        { address=0X09D4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max reserve health decreased" },
+        { address=0X09D4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max reserve health increased" },
+        { address=0X09D6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Current Reserve Health decreased" },
+        { address=0X09D6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Current Reserve Health increased" },
+        { address=0X0F8C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (first slot, used for phantoon fight) 16 bit decreased" },
+        { address=0X0F8C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (first slot, used for phantoon fight) 16 bit increased" },
+        { address=0X0FCC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Crocomire's tongue's health decreased" },
+        { address=0X0FCC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Crocomire's tongue's health increased" },
+        { address=0X100C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Baby Metroid's health when fighting Mother Brain decreased" },
+        { address=0X100C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Baby Metroid's health when fighting Mother Brain increased" },
+        { address=0X104C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Baby Metroid's health decreased" },
+        { address=0X104C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Baby Metroid's health increased" },
+        { address=0X781A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health ridley? decreased" },
+        { address=0X781A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health ridley? increased" },
+        { address=0XD873, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Tank (Room ID 1100)" },
+        { address=0XD874, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="missile tank (16bit room id 0700)" },
+        { address=0XD874, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Tank (Room ID 5B00)" },
+        { address=0XD874, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Missile Tank (Room ID D800, Visible)" },
+        { address=0XD874, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Missile Tank (Room ID D800, Hidden)" },
+        { address=0XD874, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="X Ray Scope (Room ID CE00)" },
+        { address=0XD874, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Power Bombs (Room ID 7C80)" },
+        { address=0XD879, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Tank (Room ID 9800 After Ridley)" },
+        { address=0XD87A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bit 0 = Energy Tank (Room ID EE00) decreased" },
+        { address=0XD87A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bit 0 = Energy Tank (Room ID EE00) increased" },
+        { address=0XD881, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Tank (Room ID 5500)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XD876, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Room ID 8800)" },
+        { address=0XD876, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ice Beam (Room ID 9000)" },
+        { address=0XD876, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Room ID F800)" },
+        { address=0XD876, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Room ID 8D00 - Crocomires Room)" },
+        { address=0XD876, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Room ID 0E00)" },
+        { address=0XD876, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Room ID 4100)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCD65, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sets to 0x00 during demo. Use to prevent accidental unlocks in demo. Use with menu check at 0x00" },
+        { address=0XD878, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Missile Tank (Room ID 8300 Gold Torizo)" },
+        { address=0XD878, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Super Missile (Room ID 8300 Gold Torizo)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD829, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="kraid" },
+        { address=0XD829, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="spore spawn" },
+        { address=0XD82A, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ridley" },
+        { address=0XD82A, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Crocomire" },
+        { address=0XD82A, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Gold Torizo" },
+        { address=0XD82B, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Phantoon" },
+        { address=0XD82C, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Draygon" },
+        { address=0XD82C, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Botwoon" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X09A5, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Hi-jump" },
+        { address=0X09A5, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Space Jump" },
+        { address=0X09B4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="x0080 = A button as JUMP" },
+        { address=0X0AF4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="value > 0 = Number of frames since Jump Button is pressed" },
+        { address=0XD872, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="Missile Tank (Room ID 1900, walljump location)" },
+        { address=0XD876, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="Hi Jump Boots (Room ID E500)" },
+        { address=0XD883, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Bit 2 = Space Jump (Room ID AA00)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1FFA, type="u8", condition="eq", value=0XE2, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Transitions, 0x71 appears when going DOWN an elevator," },
+        { address=0XD820, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="MB's glass is broken" },
+        { address=0XD870, type="u8", condition="bit_true", bit=1, mask=0X02, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Missile Tank (Room ID FE00, Underwater)" },
+        { address=0X129E1, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks over the ship(1-8)" },
+        { address=0X12AC4, type="u8", condition="eq", value=0X0C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Left up room's door closed" },
+        { address=0X12AC4, type="u8", condition="eq", value=0X82, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Left up room's door open" },
+        { address=0X12C21, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks over the ship(2-8)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Fire Emblem Gaiden",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "fire-emblem-gaiden",
+    file = "fire-emblem-gaiden.zip",
+    hashes = {
+      { hash = "4dbb6f0ec751a0ffb79d0a755cc770ab", label = "Fire Emblem Gaiden (Japan) (En) (v1.01) (Artemis251).nes" },
+      { hash = "6548264e1278f916af20eda700e75e43", label = "Fire Emblem Gaiden (Japan) (En) (v0.9a) (Gaiden Guy).nes" },
+      { hash = "80eb5117de63422898c3e80eb8745bac", label = "Fire Emblem Gaiden (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7A74, type="u8", condition="eq", value=0X1, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X743E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld turns taken." },
+        { address=0X7477, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="player phase, 1 = enemy phase." },
+        { address=0X7477, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Probably overworld phase" },
+      },
+      stage = {
+        { address=0X04C6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Battle stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X05AD, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="normal, 1 = battle finished, 2 = alm dead?" },
+        { address=0X7A74, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Duma's death quote." },
+      },
+      health = {
+        { address=0X033C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player HP after damage." },
+        { address=0X033D, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy HP after damage." },
+        { address=0X6956, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="First Enemy Max HP. decreased" },
+        { address=0X6956, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="First Enemy Max HP. increased" },
+        { address=0X6995, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 Max HP. decreased" },
+        { address=0X6995, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 Max HP. increased" },
+        { address=0X69A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 current HP. decreased" },
+        { address=0X69A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 current HP. increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0320, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player weapon in battle." },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6E26, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Fear Shrine Speed Ring Chest Flag increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6961, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="First enemy (usually boss) current HP." },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6E2F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Fear Shrine Holy Bow and Holy/Silver Shield Chest Flags" },
+        { address=0X6E30, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Fear Shrine Magic Shield chest flag." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6E76, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Bit array used to determine what encounters in the current dungeon have been cleared." },
+      },
+    },
+  },
+}

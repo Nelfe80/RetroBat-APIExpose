@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Omega Horizon",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "omega-horizon",
+    file = "omega-horizon.zip",
+    hashes = {
+      { hash = "41ffd1a661c6424e41efc471a199425d", label = "Omega Horizon (World) (v1.3).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01DA, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X01DA, type="u8", condition="eq", value=0X7, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X01DA, type="u8", condition="eq", value=0X8, action="GAME_OVER", no_log=false, no_survey=false, desc="Ending" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X03B5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Character Health decreased" },
+        { address=0X03B5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Character Health increased" },
+        { address=0X03B7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Character Max Health decreased" },
+        { address=0X03B7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Character Max Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X03AE, type="u8", condition="eq", value=0X5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Suit Room" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X03AE, type="u8", condition="eq", value=0X7, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ooze Boss Passage" },
+        { address=0X03AE, type="u8", condition="eq", value=0X8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ooze Boss Room" },
+        { address=0X03AE, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Turret Boss Passage" },
+        { address=0X03AE, type="u8", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="Turret Boss Room" },
+      },
+    },
+  },
+}

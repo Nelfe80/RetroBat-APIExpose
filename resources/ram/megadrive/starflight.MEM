@@ -1,0 +1,111 @@
+return {
+  game = {
+    title = "Starflight",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Role-Playing, Sandbox"
+  },
+
+  rom = {
+    name = "starflight",
+    file = "starflight.zip",
+    hashes = {
+      { hash = "b95b8da835e866c90e6c6520def207b2", label = "Starflight (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC372, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Disabled" },
+        { address=0XC372, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Enabled" },
+        { address=0XFFE6, type="u8", condition="eq", value=0XF4, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X82EA, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Space Flight | Ground Exploration" },
+        { address=0X8334, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Planet landing zone selector - cursor - Vertical" },
+        { address=0X833A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Planet landing zone selector - cursor - Horizontal" },
+        { address=0X939A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Planet landing zone selector - Horizontal" },
+        { address=0X939C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Planet landing zone selector Vertical" },
+        { address=0XC949, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game clear" },
+      },
+      zone = {
+        { address=0XF617, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Logged" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9AAC, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Blank (No characteristics, set with fighting AI but don't have weapons. Die instantly)" },
+      },
+      health = {
+        { address=0X936C, type="u8", condition="eq", value=0X01C0, action="HIT", no_log=false, no_survey=false, desc="Destruction of Ship / TV" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X9824, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Z (Buzz Bombs)" },
+        { address=0X9824, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon F (Fusion Blaster)" },
+        { address=0X9824, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon T (Photon Torpedo)" },
+        { address=0X9824, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon L[Lance)" },
+        { address=0X9824, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon B (Twin-Beam)" },
+        { address=0X9824, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon P [Phaser]" },
+        { address=0X9827, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon C (Pulse Cannon)" },
+        { address=0X9A1F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Installed Cargo Pods + Weapon 1 - Rev A" },
+        { address=0XB28C, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Disabled" },
+        { address=0XB28C, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Armed" },
+        { address=0XB85B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] System Efficiency - Weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X956A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] [RESOURCES] Gold increased" },
+        { address=0XAC8A, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Has item 'on hand'" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X936E, type="u16be", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Disabled/Depleted" },
+        { address=0X936E, type="u16be", condition="eq", value=0X190, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Max Class 5 Shield value" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4D0D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8bit] [PROGRESS] Crystal Planet was destroyed" },
+        { address=0X9594, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Operations" },
+        { address=0X9594, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Crew" },
+        { address=0X9594, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Ship Construction" },
+        { address=0X9594, type="u8", condition="eq", value=0X03, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Trade Depot" },
+        { address=0X9594, type="u8", condition="eq", value=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Exit Door" },
+        { address=0XA8EE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] [System] Number of celestial objects in current system" },
+        { address=0XC2E5, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Not Destroyed" },
+        { address=0XC2E5, type="u8", condition="eq", value=0X05, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed, after Arth's destruction" },
+        { address=0XC2E5, type="u8", condition="eq", value=0X15, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed in time" },
+        { address=0XF509, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0XF541, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0XF541, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Logged" },
+        { address=0XF55F, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0XF5A3, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0XF5D5, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0XF5EB, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0XF5EF, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0XF617, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X82EA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] [EXPLORATION] Type of screen" },
+        { address=0X9326, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Space Encounter - State" },
+        { address=0X978C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Current active letter in writing input" },
+        { address=0X9AAA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Space Encounter - AI stance" },
+        { address=0X9AAC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Space Encounter - Race of AI Ships" },
+        { address=0XAC78, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16bit] [ARTIFACTS] Black Egg 2" },
+        { address=0XAC7A, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16bit] [ARTIFACTS] Black Egg 3" },
+        { address=0XC2E5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] [PROGRESS] Crystal Planet" },
+        { address=0XFFB4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Space Encounter - Communication" },
+        { address=0XFFE6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Displayed message type" },
+      },
+    },
+  },
+}

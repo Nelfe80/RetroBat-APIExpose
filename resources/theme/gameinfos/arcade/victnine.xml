@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>button b = 2nd base  |  Used to throw the ball back to a specific base when fielding</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>button c = 3rd base  |  On MA/MB cab, only button 'c' is active and throws only to 3rd base</text>
+			<color>${white}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>button C = select new player when subbing or swing bat when batting. When fielding, this picks up the ball.</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button4" extra="true">
+			<text>button A = substitute player</text>
+			<color>${red}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>button a = 1st base</text>
+			<color>${green}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>button d = home base</text>
+			<color>${orange}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 4</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button 5</text>
+			<color>${white}</color>
+		</text>
+		<text name="p2button3" extra="true">
+			<text>C</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button4" extra="true">
+			<text>A</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button5" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Button 6</text>
+			<color>${orange}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

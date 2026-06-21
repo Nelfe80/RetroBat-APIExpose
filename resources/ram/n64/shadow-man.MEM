@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Shadow Man",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Adventure, Horror"
+  },
+
+  rom = {
+    name = "shadow-man",
+    file = "shadow-man.zip",
+    hashes = {
+      { hash = "b457298b87b85bbf950f24867daa9475", label = "Shadow Man (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4DF16, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16 bit) Background Audio Volume" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X30A9A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) 1=Temple of Life unlocked increased" },
+        { address=0X30A9A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) 1=Temple of Life unlocked decreased" },
+        { address=0X75F34, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit0=shadowman on living side bit3,4,5,6,7=life upgrades increased" },
+        { address=0X75F34, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit0=shadowman on living side bit3,4,5,6,7=life upgrades decreased" },
+        { address=0X75F4C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit0=Deadside shotguns (cheat) bit1=pea soup bit2=twig boy bit3=invisible man bit7=deadsider bit" },
+        { address=0X75F4D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit0=deadwing (cheat) bit1=blood shot bit2=big head" },
+      },
+      health = {
+        { address=0X75B14, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Hero Total HP decreased" },
+        { address=0X75B14, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Hero Total HP increased" },
+        { address=0X75B18, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Hero Current HP decreased" },
+        { address=0X75B18, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Hero Current HP increased" },
+        { address=0X464D80, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) random enemy HP decreased" },
+        { address=0X464D80, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) random enemy HP increased" },
+        { address=0X472130, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) random enemy HP decreased" },
+        { address=0X472130, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) random enemy HP increased" },
+        { address=0X492AC8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) random enemy HP decreased" },
+        { address=0X492AC8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) random enemy HP increased" },
+        { address=0X497978, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) random enemy HP decreased" },
+        { address=0X497978, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) random enemy HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X75B2C, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="(32 bit) shotgun ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X30AEE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(8 bit) 1=Asylum: Engline Block unlocked" },
+      },
+    },
+  },
+}

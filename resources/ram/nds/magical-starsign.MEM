@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Magical Starsign",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "magical-starsign",
+    file = "magical-starsign.zip",
+    hashes = {
+      { hash = "dddad732d175382ebc810dad3118e08a", label = "Magical Starsign (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X17F768, type="u16le", condition="eq", value=0X1C8, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Seam - Shishkabab Cavern midway? (Razen)" },
+        { address=0X17F768, type="u16le", condition="eq", value=0X1C9, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Seam - Shishkabab Cavern exit? (Razen)" },
+      },
+    },
+  },
+}

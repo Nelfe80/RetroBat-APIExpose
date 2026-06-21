@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Shadow Hearts: From the New World",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shadow-hearts-from-the-new-world",
+    file = "shadow-hearts-from-the-new-world.zip",
+    hashes = {
+      { hash = "746f53bd942782653b388c1aed2d9f43", label = "Shadow Hearts - From the New World (USA)" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X1009B8, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="New York Detective Agency, Potted Plant, Talisman of Luck" },
+        { address=0X1009B8, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="New York Detective Agency, Chest, Mana Leaf" },
+        { address=0X1009B8, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="New York Detective Agency, Chest, Thera Leaf" },
+        { address=0X1009B9, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="New York Detective Agency, Guitar, Pure Leaf" },
+        { address=0X1009BA, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="New York Chelsea, Chest, Coral Lariat" },
+        { address=0X1009BA, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="New York Upper West Side, Car, Mana Leaf" },
+        { address=0X1009BB, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="New York Times Square, Chest, Tent" },
+        { address=0X1009BB, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="New York Times Square, Sign, Thera Leaf" },
+        { address=0X1009BD, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater 1F, Floor, Mana Leaf" },
+        { address=0X1009BD, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater 2F, Chest, Thera Leaf" },
+        { address=0X1009BD, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater 2F, Floor, Seal of Luck" },
+        { address=0X1009BD, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater 2F, Chest, Aqua Edge" },
+        { address=0X1009BD, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater 2F, Chest, Leather Belt" },
+        { address=0X1009BE, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater 3F, Chest, Thera Leaf" },
+        { address=0X1009BE, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater 3F, Chest, Tent" },
+        { address=0X1009BF, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater 3F, Floor, Pure Leaf" },
+        { address=0X1009BF, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Erick Theater Marlowe's Room, Chest, Heat Edge" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X101145, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ore" },
+      },
+    },
+  },
+}

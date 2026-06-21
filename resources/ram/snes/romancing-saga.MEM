@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Romancing SaGa",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "romancing-saga",
+    file = "romancing-saga.zip",
+    hashes = {
+      { hash = "1b373f73dcadd3dab6830bf07d36584b", label = "Romancing Sa-Ga (Japan) (Rev 1) (En) (v1.2) (DDSTranslation).sfc" },
+      { hash = "be7435592c3b20da2ff1f814616c3d19", label = "Romancing Sa-Ga (Japan).sfc" },
+      { hash = "91d84cbb88f28c50f14c8302cfa1dcd1", label = "Romancing Sa-Ga (Japan) (Rev 1).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1206, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="pause?" },
+        { address=0X1684, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="pause" },
+        { address=0X1705, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="current music? 0x14 = game | 0x21= intro | 0x18 = title|" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0054, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Weapon 1 Level" },
+        { address=0X0056, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Weapon 2 Level" },
+        { address=0X0154, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="slot 3 weapon 1 level" },
+        { address=0X10D6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="b5 meeting over going to isthmus | b4 monsters cleared from Monster's Keep" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X008A, type="u8", condition="eq", value=0X1D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier 1" },
+        { address=0X008A, type="u8", condition="eq", value=0X1E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier 2" },
+      },
+      health = {
+        { address=0X000E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Slot 1 Current HP decreased" },
+        { address=0X000E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Slot 1 Current HP increased" },
+        { address=0X0010, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Slot 1 Max HP decreased" },
+        { address=0X0010, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Slot 1 Max HP increased" },
+        { address=0X008E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="slot 2 HP current decreased" },
+        { address=0X008E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="slot 2 HP current increased" },
+        { address=0X0090, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="slot 2 hp max decreased" },
+        { address=0X0090, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="slot 2 hp max increased" },
+        { address=0X010E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="slot 3 current hp decreased" },
+        { address=0X010E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="slot 3 current hp increased" },
+        { address=0X0110, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 max hp decreased" },
+        { address=0X0110, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 max hp increased" },
+        { address=0X1600E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hero slot 1 hp decreased" },
+        { address=0X1600E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hero slot 1 hp increased" },
+        { address=0X16010, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="slot 1 hp max decreased" },
+        { address=0X16010, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="slot 1 hp max increased" },
+        { address=0X1700E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy current hp decreased" },
+        { address=0X1700E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy current hp increased" },
+        { address=0X17010, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy max hp decreased" },
+        { address=0X17010, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy max hp increased" },
+        { address=0X1710E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy 2 current hp decreased" },
+        { address=0X1710E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy 2 current hp increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0044, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Experience" },
+        { address=0X0053, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon 1" },
+        { address=0X0055, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Two" },
+        { address=0X0153, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="slot 3 weapon 1" },
+        { address=0X0155, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="slot 3 weapon slot 2" },
+        { address=0X1009, type="u8", condition="eq", value=0X2B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Loban Weapon Shop" },
+        { address=0X1009, type="u8", condition="eq", value=0X3D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bruelle South Weapon Shop" },
+        { address=0X1009, type="u8", condition="eq", value=0X3E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bruelle North Weapon Shop" },
+        { address=0X1009, type="u8", condition="eq", value=0XB8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Valhalland Weapon Shop" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1006, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X1113, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Valhalland South Cave - 200 Gold" },
+        { address=0X111B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b6 treasure chest Expensive ring increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X10D1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="b4567 killed 1st boss (flame dog) in frontier dungeon" },
+        { address=0X10D2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="b4567 killed 3rd boss in frontier dungeon balbar" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0151, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield slot" },
+      },
+    },
+  },
+}

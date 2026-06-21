@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Kotoba no Puzzle: Mojipittan Daijiten",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kotoba-no-puzzle-mojipittan-daijiten",
+    file = "kotoba-no-puzzle-mojipittan-daijiten.zip",
+    hashes = {
+      { hash = "fe74f8039dd883241a51dcf752871d0a", label = "Kotoba no Puzzle - Mojipittan Daijiten (Japan) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X15EFF24, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 2 - Puzzle 24 [32bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X15EFC40, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 12 High Score [32bit]" },
+        { address=0X15EFC48, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 5 High Score [32bit]" },
+        { address=0X15EFC54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 7 High Score [32bit]" },
+        { address=0X15EFCC0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 10 High Score [32bit]" },
+        { address=0X15EFCDC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 2 - Puzzle 25 High Score [32bit]" },
+        { address=0X15EFCF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 3 High Score [32bit]" },
+        { address=0X15EFD14, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 19 High Score [32bit]" },
+        { address=0X15EFD2C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 11 High Score [32bit]" },
+        { address=0X15EFD34, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 2 - Puzzle 23 High Score [32bit]" },
+        { address=0X15EFD44, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 13 High Score [32bit]" },
+        { address=0X15EFD5C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 14 High Score [32bit]" },
+        { address=0X15EFD68, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 1 High Score [32bit]" },
+        { address=0X15EFD90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 17 High Score [32bit]" },
+        { address=0X15EFD94, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 20 High Score [32bit]" },
+        { address=0X15EFDA0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 16 High Score [32bit]" },
+        { address=0X15EFDAC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 18 High Score [32bit]" },
+        { address=0X15EFDC0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 2 - Puzzle 22 High Score [32bit]" },
+        { address=0X15EFDC8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 9 High Score [32bit]" },
+        { address=0X15EFDD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 4 High Score [32bit]" },
+        { address=0X15EFDDC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 2 High Score [32bit]" },
+        { address=0X15EFDE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 15 High Score [32bit]" },
+        { address=0X15EFDE8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 6 High Score [32bit]" },
+        { address=0X15EFE08, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 2 - Puzzle 21 High Score [32bit]" },
+        { address=0X15EFE30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doki Doki Puzzle - Level 1 - Puzzle 8 High Score [32bit]" },
+        { address=0X15F01B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Kotsu Kotsu Puzzle - Level 1 - Puzzle 1 High Score [32bit]" },
+        { address=0X15F01BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Kotsu Kotsu Puzzle - Level 1 - Puzzle 2 High Score [32bit]" },
+        { address=0X15F01C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Kotsu Kotsu Puzzle - Level 1 - Puzzle 5 High Score [32bit]" },
+      },
+    },
+  },
+}

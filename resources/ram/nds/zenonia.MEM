@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Zenonia",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "zenonia",
+    file = "zenonia.zip",
+    hashes = {
+      { hash = "8363ec6b8ad85bc8c80e70efc5482c06", label = "ZENONIA (Europe, Australia)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3160D4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bits] Player exp to next level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X315DEC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bits] Player Max HP decreased" },
+        { address=0X315DEC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bits] Player Max HP increased" },
+        { address=0X316000, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bits] Player current HP decreased" },
+        { address=0X316000, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bits] Player current HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X313BE4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bits] Amount of gold held increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Pokémon Emerald Version [Subset - Professor Oak Challenge]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "pokemon-emerald-version-subset-professor-oak-challenge",
+    file = "pokemon-emerald-version-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "31446456df04356cb9f2145bada42ed2", label = "Pokemon - Emerald Version [Subset - Professor Oak Challenge].gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0F48, type="u8", condition="eq", value=0X79, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Up" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2C79A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Pokemon 1 - Health decreased" },
+        { address=0X2C79A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Pokemon 1 - Health increased" },
+        { address=0X2C7FE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Pokemon 2 - Health decreased" },
+        { address=0X2C7FE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Pokemon 2 - Health increased" },
+        { address=0X2C862, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Pokemon 3 - Health decreased" },
+        { address=0X2C862, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Pokemon 3 - Health increased" },
+        { address=0X2C8C6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Pokemon 4 - Health decreased" },
+        { address=0X2C8C6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Pokemon 4 - Health increased" },
+        { address=0X2C92A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Pokemon 5 - Health decreased" },
+        { address=0X2C92A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Pokemon 5 - Health increased" },
+        { address=0X2C98E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Pokemon 6 - Health decreased" },
+        { address=0X2C98E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Pokemon 6 - Health increased" },
+      },
+    },
+  },
+}

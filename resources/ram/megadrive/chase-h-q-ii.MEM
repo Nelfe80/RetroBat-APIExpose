@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Chase H.Q. II",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Racing"
+  },
+
+  rom = {
+    name = "chase-h-q-ii",
+    file = "chase-h-q-ii.zip",
+    hashes = {
+      { hash = "1801efc4655e4523f1b7221d6b169ec9", label = "Super H.Q. (Japan).md" },
+      { hash = "4d0899ee497d971e1b7b8e3d719c70c7", label = "Chase H.Q. II (USA) (Ru).md" },
+      { hash = "93cacc2d10b6176afa16e4d08ab6ee1c", label = "Chase H.Q. II (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X09FA, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x00 - Not paused" },
+        { address=0X0A04, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="'Continue?': Seconds left" },
+        { address=0X0A06, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="'Continue?': Frames (decreases $a04)" },
+        { address=0XD06A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XD0A2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo: automatic driving" },
+        { address=0XD59E, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5 credits cheat" },
+        { address=0XD5A0, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5 credits cheat entered length (holding Down, press C, A, A, B, A, A, C, A, A)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD5A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select (1 to 3) cheat" },
+        { address=0XD5A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select (1 to 3) cheat entered length (holding Left, press B, B, C, A, B, C, B, C, A)" },
+      },
+      stage = {
+        { address=0X0820, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage: frames elapsed" },
+        { address=0X5036, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Distance driven in current stage" },
+        { address=0XD056, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X594A, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage (actual)" },
+        { address=0XBC8C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage (shown)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBCA8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-score, high bytes" },
+        { address=0XBCAA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-score, low bytes" },
+        { address=0XBCB2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score on this stage from driving divided by 10, high bytes" },
+        { address=0XBCB4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score on this stage from driving divided by 10, low bytes" },
+        { address=0XD034, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score divided by 10, high bytes" },
+        { address=0XD036, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score divided by 10, low bytes" },
+        { address=0XD038, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score shown in Mission Clear screen divided by 10, high bytes" },
+        { address=0XD03A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score shown in Mission Clear screen divided by 10, low bytes" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBC56, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="0x00 - Car is not destroyed" },
+      },
+    },
+  },
+}

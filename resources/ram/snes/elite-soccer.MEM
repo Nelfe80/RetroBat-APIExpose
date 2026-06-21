@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Elite Soccer",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "elite-soccer",
+    file = "elite-soccer.zip",
+    hashes = {
+      { hash = "4db096b5d157e41b5d26acb6e6cf8420", label = "Elite Soccer (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X138E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="goal team 1" },
+      },
+    },
+  },
+}

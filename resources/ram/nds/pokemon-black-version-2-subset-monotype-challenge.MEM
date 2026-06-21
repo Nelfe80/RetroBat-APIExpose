@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Black Version 2 [Subset - Monotype Challenge]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-black-version-2-subset-monotype-challenge",
+    file = "pokemon-black-version-2-subset-monotype-challenge.zip",
+    hashes = {
+      { hash = "e3a74ebe23e0a2056552a8ffda95a0a6", label = "Pokemon - Black Version 2 [Subset - Monotype Challenge].nds" },
+    }
+  },
+
+  events = {
+  },
+}

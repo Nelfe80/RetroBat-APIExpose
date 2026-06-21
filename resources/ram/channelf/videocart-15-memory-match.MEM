@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Videocart-15: Memory Match",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "videocart-15-memory-match",
+    file = "videocart-15-memory-match.zip",
+    hashes = {
+      { hash = "2b3ca549e27579e4519a765fd8f52d0f", label = "Memory Match 1 & 2 (USA).bin" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X003E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="amount of moves (or score 1P)" },
+        { address=0X003F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="score 1P (or score 2P)" },
+      },
+    },
+  },
+}

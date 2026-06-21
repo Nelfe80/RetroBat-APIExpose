@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Area-51",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "area-51",
+    file = "area-51.zip",
+    hashes = {
+      { hash = "549945962f242c5f028718e157990bee", label = "Area 51 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X435900, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="game is paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4F09A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8biit] Lv quit boolean, will flip it 0x01 if the player quits a level." },
+        { address=0X4F938F, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Super Contagious Body" },
+        { address=0X4F938F, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alien Propaganda Sites" },
+        { address=0X4F938F, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Employee Repriimand" },
+        { address=0X4F938F, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="New Employee Name Policy" },
+        { address=0X4F939D, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lower Level Map" },
+      },
+      stage = {
+        { address=0X4F938F, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Unknown Airtifacts Discovery" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4ECF90, type="u24le", condition="eq", value=0X433, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life or Death" },
+        { address=0X4F09AC, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life or Death" },
+        { address=0X4F9390, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Unknown Lifeform" },
+        { address=0X4F9394, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Request Form Letter" },
+        { address=0X4F9395, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Illuminati Dollar Bill" },
+        { address=0X4F9395, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Capacity Overload Orders" },
+        { address=0X4F9395, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Servo Arm Manual" },
+        { address=0X4F9395, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Big Foot Canister" },
+        { address=0X4F9395, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alien Implosion Technology" },
+        { address=0X4F939F, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="Alien Turret Life-form" },
+      },
+      health = {
+        { address=0X4F938D, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Syringe" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4F9392, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Groom Lake Weapons Testing Facility" },
+        { address=0X4F9396, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dr. Cray Weapon Experiments" },
+        { address=0XFC8AE4, type="u16le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Scanner" },
+        { address=0XFC8AE4, type="u16le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol" },
+        { address=0XFC8AE4, type="u16le", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rifle" },
+        { address=0XFC8AE4, type="u16le", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="2x Rifle" },
+        { address=0XFC8AE4, type="u16le", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0XFC8AE4, type="u16le", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="2x Shotgun" },
+        { address=0XFC8AE4, type="u16le", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sniper" },
+        { address=0XFC8AE4, type="u16le", condition="eq", value=0X12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Alien Mode" },
+      },
+    },
+  },
+}

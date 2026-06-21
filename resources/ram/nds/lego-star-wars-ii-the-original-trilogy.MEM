@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "LEGO Star Wars II: The Original Trilogy",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "lego-star-wars-ii-the-original-trilogy",
+    file = "lego-star-wars-ii-the-original-trilogy.zip",
+    hashes = {
+      { hash = "59f291a67879961384f3815b5f69883b", label = "LEGO Star Wars II - The Original Trilogy (USA) (Rev 1).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X101974, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7E1} Previous Loading Zone ID [32bit]" },
+        { address=0X1019B4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7E1} Last Loading Zone ID [32bit]" },
+        { address=0X1019CC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7E1} Level Intro ID [32bit]" },
+        { address=0X102674, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7P} Loading Zone ID [32bit]" },
+        { address=0X103E00, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7E1} Studs collected in current Level [32bit]" },
+        { address=0X103E28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7E1} Level Progress" },
+        { address=0X103E29, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode IV - Level 1 - Minikit" },
+        { address=0X103E2A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode IV - Level 2 - Minikit" },
+        { address=0X103E2B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode IV - Level 3 - Minikit" },
+        { address=0X103E2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode IV - Level 3 - True Jedi" },
+        { address=0X103E2D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode IV - Level 4 - Minikit" },
+        { address=0X103E2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode IV - Level 5 - Minikit" },
+        { address=0X103E2F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 1 - Minikit" },
+        { address=0X103E30, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 1 - Minikit" },
+        { address=0X103E31, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 2 - Minikit" },
+        { address=0X103E32, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 3 - Minikit" },
+        { address=0X103E33, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 4 - Minikit" },
+        { address=0X103E34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 4 - Minikit" },
+        { address=0X103E35, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 5 - Minikit" },
+        { address=0X103E36, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode VI - Level 1 - Minikit" },
+        { address=0X103E37, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode VI - Level 1 - True Jedi" },
+        { address=0X103E38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode VI - Level 2 - Minikit" },
+        { address=0X103E39, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode VI - Level 3 - Minikit" },
+        { address=0X103E3A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode VI - Level 4 - Minikit" },
+        { address=0X103E3B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode VI - Level 4 - Minikit" },
+        { address=0X103E3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode VI - Level 5 - Minikit" },
+        { address=0X103E3D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode VI - Level 6 - Minikit" },
+        { address=0X104ABC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7P} Studs collected in current Level [32bit]" },
+        { address=0X104AE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7P} Level Progress [? Bytes]" },
+        { address=0X104AE5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode IV - Level 1 - Minikit" },
+        { address=0X10827D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7E1} Level Information [8bit]" },
+        { address=0X108310, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7E1} Story Levels unlocked" },
+        { address=0X108311, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 4" },
+        { address=0X108314, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7E1} Free Play Levels unlocked" },
+        { address=0X108315, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit0 | Episode V - Level 4" },
+        { address=0X108FC8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{AL7P} Levels unlocked [? Bytes]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1082C1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="--- Bit0 | Bossk" },
+        { address=0X1082D1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="--- Bit0 | Bossk" },
+        { address=0X108F79, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="--- Bit0 | Bossk" },
+        { address=0X108F89, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="--- Bit0 | Bossk" },
+      },
+    },
+  },
+}

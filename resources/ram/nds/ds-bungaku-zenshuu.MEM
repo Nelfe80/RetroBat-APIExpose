@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "DS Bungaku Zenshuu",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ds-bungaku-zenshuu",
+    file = "ds-bungaku-zenshuu.zip",
+    hashes = {
+      { hash = "d25ee9071406aa6421b8d16b5b7b2d3d", label = "DS Bungaku Zenshuu (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

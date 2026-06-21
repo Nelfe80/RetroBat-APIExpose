@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Mach Breakers",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Track & Field"
+  },
+
+  rom = {
+    name = "mach-breakers",
+    file = "mach-breakers.zip",
+    hashes = {
+      { hash = "48388dbd5dbcefb76dd9410b993e7fc2", label = "machbrkr.zip" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X485E8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Nb Continues used current run" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4777A, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Maximum Speed Clear Info" },
+        { address=0X4777C, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Hyper Glider Clear Info" },
+        { address=0X4777E, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Block Buster Clear Info" },
+        { address=0X47780, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Beast Hole Clear Info" },
+        { address=0X47782, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Super Stunt Clear Info" },
+        { address=0X47784, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Deep Diver Clear Info" },
+        { address=0X47786, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Ground Spike Clear Info" },
+        { address=0X47788, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Future Gate Clear Info" },
+        { address=0X4778C, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Ice Break Clear Info" },
+        { address=0X4778E, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Bomb's Away Clear Info" },
+        { address=0X47790, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Monster Drag Clear Info" },
+        { address=0X48B32, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Difficulty Level" },
+      },
+      zone = {
+        { address=0X1A1402, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[16 Bit] World Record Check" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4762E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 1 Score" },
+        { address=0X47648, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 2 Score" },
+        { address=0X47662, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 3 Score" },
+        { address=0X4767C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 4 Score" },
+        { address=0X47696, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 5 Score" },
+        { address=0X476B0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 6 Score" },
+        { address=0X476CA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 7 Score" },
+        { address=0X476E4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 8 Score" },
+        { address=0X476FE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 10 Score" },
+        { address=0X47718, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 11 Score" },
+        { address=0X47732, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 12 Score" },
+        { address=0X4774C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Record 13 Score" },
+        { address=0X47796, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] P1 Total Points" },
+        { address=0X477A2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] P2 Total Points" },
+        { address=0X477AE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Current Game Score (Try 1)" },
+        { address=0X477B2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Current Game Score Try 2" },
+      },
+      collectibles = {
+        { address=0X48B30, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 Bit] Coin Options - Free Play increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X4778A, type="u16le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[16 Bit] Rapid Jump Clear Info" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ice Age 3: Dawn of the Dinosaurs",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure, platformer"
+  },
+
+  rom = {
+    name = "ice-age-3-dawn-of-the-dinosaurs",
+    file = "ice-age-3-dawn-of-the-dinosaurs.zip",
+    hashes = {
+      { hash = "ade44b164be5814c01eb2009e6886c3a", label = "Ice Age - Dawn of the Dinosaurs (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+  },
+}

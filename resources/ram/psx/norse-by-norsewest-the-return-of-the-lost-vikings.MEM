@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Norse by Norsewest: The Return of the Lost Vikings",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform, Puzzle, Strategy"
+  },
+
+  rom = {
+    name = "norse-by-norsewest-the-return-of-the-lost-vikings",
+    file = "norse-by-norsewest-the-return-of-the-lost-vikings.zip",
+    hashes = {
+      { hash = "ede37b5772905622de67db9a5710ca9a", label = "Norse by Norsewest - The Return of the Lost Vikings (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X94A08, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Off/On" },
+      },
+    },
+  },
+}

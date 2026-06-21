@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Taboo: The Sixth Sense",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "taboo-the-sixth-sense",
+    file = "taboo-the-sixth-sense.zip",
+    hashes = {
+      { hash = "334936fce3f4d7d0e028bc4589e2b81b", label = "Taboo - The Sixth Sense (USA) (Rev 1).nes" },
+      { hash = "4a9f9a808d6d7127a2dd4caa5e6aebb6", label = "Taboo - The Sixth Sense (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo mode if 0?" },
+      },
+    },
+  },
+}

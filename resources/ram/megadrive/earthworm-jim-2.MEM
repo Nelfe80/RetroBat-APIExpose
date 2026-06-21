@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Earthworm Jim 2",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "earthworm-jim-2",
+    file = "earthworm-jim-2.zip",
+    hashes = {
+      { hash = "2ed39b147fa5fa67d6d0707f54a5a078", label = "Earthworm Jim 2 (USA).md" },
+      { hash = "48ae14e7a771e48513c5ae6f8cd9a56b", label = "Earthworm Jim 2 (USA) (Ru) (NewGame).md" },
+      { hash = "fa52bcb320299c6b51c7f47caa303da8", label = "Earthworm Jim 2 (Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X943A, type="u8", condition="bit_true", bit=7, mask=0X80, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Irrelevant since pressing Start would unpause and stop the cheats." },
+        { address=0XA1EF, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XA200, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="number of continues" },
+        { address=0XFEFE, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0XFEFE, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused / Cheat Menu" },
+        { address=0XFF1F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Player 1 Controls - Inverted? (Not While Paused)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA20C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flags Collected in Level Ate" },
+        { address=0XFBC2, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Staying Still" },
+        { address=0XFBC2, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Moving to the Right" },
+        { address=0XFBC2, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Moving to the Left" },
+        { address=0XFBC2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Is Jim Moving on the Ground?" },
+        { address=0XFBE1, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the Ground" },
+        { address=0XFBE1, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In the Air" },
+        { address=0XFBE1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Is Jim on the Ground?" },
+        { address=0XFC20, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Turns on until the next level starts." },
+        { address=0XFC20, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cheated to Next Level?" },
+        { address=0XFDF3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Memory Game Round Number" },
+        { address=0XFF29, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puppy Love Current Round (0 Index)" },
+      },
+      stage = {
+        { address=0XA1A7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+        { address=0XA202, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Beaten Stage" },
+        { address=0XA20F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Semi Stage Flag?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X965A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life / Continue Data (Not Change-able) increased" },
+        { address=0X965A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life / Continue Data (Not Change-able) decreased" },
+        { address=0X9692, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life [8x] x = 10 porcent [not changeable] increased" },
+        { address=0X9692, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life [8x] x = 10 porcent [not changeable] decreased" },
+        { address=0XA1EB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Counter increased" },
+        { address=0XA1EB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Counter decreased" },
+      },
+      health = {
+        { address=0XA4A2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="meat hp / Pedro pupa hp [hard] decreased" },
+        { address=0XA4A2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="meat hp / Pedro pupa hp [hard] increased" },
+        { address=0XA510, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pedro pupa Health decreased" },
+        { address=0XA510, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pedro pupa Health increased" },
+        { address=0XFAFC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jim's Health (hundred's digit) [8-bit ASCII] decreased" },
+        { address=0XFAFC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jim's Health (hundred's digit) [8-bit ASCII] increased" },
+        { address=0XFAFE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jim's Health (one's digit) [8-bit ASCII] decreased" },
+        { address=0XFAFE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jim's Health (one's digit) [8-bit ASCII] increased" },
+        { address=0XFAFF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jim's Health (ten's digit) [8-bit ASCII] decreased" },
+        { address=0XFAFF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jim's Health (ten's digit) [8-bit ASCII] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9672, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count Display Digit 1" },
+        { address=0X9677, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Display Digit 2 of Ammo Count?" },
+        { address=0X967A, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count Display Digit 2 (if required)" },
+        { address=0X967F, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Display Digit 3 of Ammo Count?" },
+        { address=0X9682, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count Display Digit 3 (if required)" },
+        { address=0X9687, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Display Digit 4 of Ammo Count?" },
+        { address=0X968A, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Count Display Digit 4 (if required)" },
+        { address=0XFAE4, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Regular Gun Stored Ammo" },
+        { address=0XFAE6, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Three Finger Gun Stored Ammo" },
+        { address=0XFAE8, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Mega Plasma Gun Stored Ammo" },
+        { address=0XFAEA, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Bubble Gun Stored Ammo" },
+        { address=0XFAEC, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Homing Missiles Stored Ammo" },
+        { address=0XFAF0, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Barn Blaster Stored Ammo" },
+        { address=0XFF06, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Unclear - Active During Whip increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA1C5, type="u8", condition="eq", value=0XFF, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X966F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Display Digit 1 of Ammo Count?" },
+      },
+    },
+  },
+}

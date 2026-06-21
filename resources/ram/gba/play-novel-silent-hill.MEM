@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Play Novel: Silent Hill",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Visual Novel"
+  },
+
+  rom = {
+    name = "play-novel-silent-hill",
+    file = "play-novel-silent-hill.zip",
+    hashes = {
+      { hash = "9a2269e62d38e4784309314cb41bc9f7", label = "Play Novel - Silent Hill (Japan) (En) (v0.1) (07151129).gba" },
+      { hash = "df9bd674970714489629e97a8bcd32f7", label = "Play Novel - Silent Hill (Japan).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2A05, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen/Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X86B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background?" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X86D8, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jumps on Ending" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2971, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="16 Switchboard" },
+        { address=0X9F84, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current Checkpoint - Harry" },
+        { address=0X9F88, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current Checkpoint - Cybil" },
+        { address=0X9F8C, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Possible Andy Checkpoint?" },
+      },
+    },
+  },
+}

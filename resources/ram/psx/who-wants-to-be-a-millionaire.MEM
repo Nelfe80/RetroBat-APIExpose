@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Who Wants to Be a Millionaire",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "who-wants-to-be-a-millionaire",
+    file = "who-wants-to-be-a-millionaire.zip",
+    hashes = {
+      { hash = "f5d5948793840335717da4b0c9d32328", label = "Who Wants to Be a Millionaire (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

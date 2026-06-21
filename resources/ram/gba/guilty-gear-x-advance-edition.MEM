@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Guilty Gear X Advance Edition",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "guilty-gear-x-advance-edition",
+    file = "guilty-gear-x-advance-edition.zip",
+    hashes = {
+      { hash = "509139bb43b0fa487056e6068c46ab70", label = "Guilty Gear X - Advance Edition (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X8730, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Display combo 0 = Invisible | 1 - Visible" },
+        { address=0X8732, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hit Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X85F6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Current round - 0a = Finish" },
+        { address=0X86F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds won" },
+        { address=0X870C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds won" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X86FC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[2 Byte] P1 - Health: 01b8 = perfect | 0000 - Death" },
+      },
+      health = {
+        { address=0XAF76, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[2 Byte] P1 - Health decreased" },
+        { address=0XAF76, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[2 Byte] P1 - Health increased" },
+        { address=0XAF86, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[2 Byte] P2 - Health decreased" },
+        { address=0XAF86, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[2 Byte] P2 - Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAF7A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 - Daze counter" },
+        { address=0XAF8A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 - Daze counter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Speedball 2: Brutal Deluxe",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "speedball-2-brutal-deluxe",
+    file = "speedball-2-brutal-deluxe.zip",
+    hashes = {
+      { hash = "ae982c9a1de304ada59b089603c7bd9c", label = "Speedball 2 - Brutal Deluxe (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFFF4, type="u8", condition="eq", value=0X86, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0DC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Found by Halbarad] decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0DC0, type="u8", condition="eq", value=0X37, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="freeze" },
+        { address=0X0DC0, type="u8", condition="eq", value=0X39, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Minus symbol" },
+        { address=0X0DC0, type="u8", condition="eq", value=0X3A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Plus symbol" },
+        { address=0X0DC0, type="u8", condition="eq", value=0X3B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Star" },
+        { address=0X0DC0, type="u8", condition="eq", value=0X3C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Egg-timer" },
+        { address=0X0DC0, type="u8", condition="eq", value=0X3F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Key" },
+        { address=0X0DC0, type="u8", condition="eq", value=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shield" },
+      },
+    },
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! GX: Tag Force Evolution",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "yu-gi-oh-gx-tag-force-evolution",
+    file = "yu-gi-oh-gx-tag-force-evolution.zip",
+    hashes = {
+      { hash = "c0f082e076251f5a30455a0bb04d613c", label = "Yu-Gi-Oh! GX - The Beginning of Destiny (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3566F0, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="on Title menu" },
+        { address=0X1588EB8, type="u16le", condition="eq", value=0X0005, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X356882, type="u16le", condition="eq", value=0X1F40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Heart eight hearts" },
+        { address=0X356882, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Syrus Heart Level" },
+        { address=0X356894, type="u16le", condition="eq", value=0X1F40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Heart eight hearts" },
+        { address=0X356894, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chumley Heart Level" },
+        { address=0X3568A6, type="u16le", condition="eq", value=0X1F40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Heart eight hearts" },
+        { address=0X3568A6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alexis Heart Level" },
+        { address=0X3568B8, type="u16le", condition="eq", value=0X1F40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Heart eight hearts" },
+        { address=0X3568B8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chazz Heart Level" },
+        { address=0X3568CA, type="u16le", condition="eq", value=0X1F40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Heart eight hearts" },
+        { address=0X3568CA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bastion Heart Level" },
+        { address=0X3568DC, type="u16le", condition="eq", value=0X1F40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Heart eight hearts" },
+        { address=0X3568DC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zane Heart Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X365B44, type="u16le", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="Slifer Red Dorm" },
+        { address=0X365B48, type="u16le", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="Slifer Red Dorm" },
+      },
+    },
+  },
+}

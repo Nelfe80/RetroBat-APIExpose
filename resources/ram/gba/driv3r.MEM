@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Driv3r",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Racing, Shooter"
+  },
+
+  rom = {
+    name = "driv3r",
+    file = "driv3r.zip",
+    hashes = {
+      { hash = "3fbc7fda7d0bbaa03ec037e710cf1dd8", label = "Driv3r (USA).gba" },
+      { hash = "48d7f169a879773bab490c4c1a9dfd5b", label = "Driv3r (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

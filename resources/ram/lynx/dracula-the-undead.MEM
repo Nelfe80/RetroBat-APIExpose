@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Dracula: The Undead",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "dracula-the-undead",
+    file = "dracula-the-undead.zip",
+    hashes = {
+      { hash = "3ff35996887c2ff95e275085efbbbbed", label = "Dracula the Undead (USA, Europe).lnx" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XD935, type="u8", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Room" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD95A, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Antechamber>Bedchamber Door Opened" },
+        { address=0XD95B, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bedroom->Hallway Door Opened" },
+      },
+    },
+  },
+}

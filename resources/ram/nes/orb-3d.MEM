@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Orb-3D",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "orb-3d",
+    file = "orb-3d.zip",
+    hashes = {
+      { hash = "16ee1811bfdad088a1237e64cec3f4ce", label = "Orb-3D (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0028, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fuel Property: Refuel amount when level completed. 40 ($28) fuel." },
+        { address=0X03E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level/Enigma Chamber. Changes shortly before the current level grid scene transitions to" },
+      },
+      stage = {
+        { address=0X0025, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fuel Property: Low Fuel warning level, and fuel loss when paddle misses Orb. 20 ($14) fuel, 10 (" },
+        { address=0X0026, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fuel Property: Critical Fuel warning level, and fuel loss when Chaser collides with Orb. 10 ($0a" },
+      },
+    },
+  },
+}

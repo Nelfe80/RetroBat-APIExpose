@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Jurassic Park",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jurassic-park",
+    file = "jurassic-park.zip",
+    hashes = {
+      { hash = "fee5032759c495abc72e405c63c90e1f", label = "Jurassic Park (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0C44, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause?" },
+        { address=0X0C9A, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause?" },
+        { address=0X0CF0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause?" },
+        { address=0XC332, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01=demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0020, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="New Level Is Loading .." },
+        { address=0X0021, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level is Loading or Reloading" },
+        { address=0X0AE7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Room ID" },
+        { address=0X0B20, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ff=ground; c1=triceratops" },
+        { address=0X0BAD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="T-Rex (Level 7) Status 03=attack; 04=roar; 08=Stunned; 0c=hitted" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0052, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Num Lives increased" },
+        { address=0X0052, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Num Lives decreased" },
+      },
+      health = {
+        { address=0X0054, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X0054, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0044, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Selected" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0BAC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="T-Rex (Level 7) Timer Stun" },
+        { address=0XC056, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer Level" },
+        { address=0XC058, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer Level" },
+      },
+    },
+  },
+}

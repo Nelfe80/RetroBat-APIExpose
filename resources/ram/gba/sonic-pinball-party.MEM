@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Sonic Pinball Party",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Flipper"
+  },
+
+  rom = {
+    name = "sonic-pinball-party",
+    file = "sonic-pinball-party.zip",
+    hashes = {
+      { hash = "95ce5443198044f4546a42d9d67be0e2", label = "Sonic Pinball Party (Europe) (En,Ja,Fr,De,Es,It).gba" },
+      { hash = "de40b1738a7c670ca28ddf44bb908df6", label = "Sonic Pinball Party (USA) (En,Ja,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1AE6, type="u8", condition="eq", value=0X40, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0X2A08, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      events = {
+        { address=0X3AAF0, type="u32le", condition="eq", value=0X080B287C, action="COMBO_HIT", no_log=false, no_survey=false, desc="Boomerang (no clue, but pretty sure it's a specific combo likely involing AX R)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0110, type="u16le", condition="eq", value=0X1A64, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone1" },
+        { address=0X0110, type="u16le", condition="eq", value=0X4D30, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone2" },
+        { address=0X0110, type="u16le", condition="eq", value=0X3673, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone3" },
+        { address=0X0110, type="u16le", condition="eq", value=0X76BB, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone4" },
+        { address=0X0110, type="u16le", condition="eq", value=0X6136, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone6, 7, and 8" },
+        { address=0X1AE6, type="u8", condition="eq", value=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear!" },
+        { address=0X2948, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone1" },
+        { address=0X2948, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Moon Zone" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3AAF0, type="u32le", condition="eq", value=0X02035510, action="HIT", no_log=false, no_survey=false, desc="damage to boss (unfortunatley not specific to the form of damage)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2988, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+      collectibles = {
+        { address=0X29EE, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring" },
+        { address=0X3D138, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="all letters RING" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0112, type="u16le", condition="eq", value=0X4A53, action="BOSS_HIT", no_log=false, no_survey=false, desc="NiGHTS Boss fight" },
+        { address=0X2948, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss table" },
+        { address=0X29EE, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Nightmarian Mode (boss fight)" },
+        { address=0X29EE, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss deafeated bonus countdown" },
+        { address=0X3D1A8, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="all collected, leading to the next Ideya entry as the boss entry." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3AAF0, type="u32le", condition="eq", value=0X080B2ABC, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ax L (hit the DRMY loop object hole)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3D138, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]" },
+        { address=0X3D148, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]" },
+        { address=0X3D14A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]" },
+        { address=0X3D190, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]" },
+        { address=0X3D1A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]" },
+        { address=0X3D1B0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]" },
+        { address=0X3E0CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]" },
+      },
+    },
+  },
+}

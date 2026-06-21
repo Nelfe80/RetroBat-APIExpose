@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Low G Man: The Low Gravity Man",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "low-g-man-the-low-gravity-man",
+    file = "low-g-man-the-low-gravity-man.zip",
+    hashes = {
+      { hash = "34d59639a79fa576e2e7d86593261fe4", label = "Low G Man - The Low Gravity Man (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0066, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="substage:" },
+        { address=0X00BF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0639, type="u8", condition="eq", value=0X8, action="LIVES_STATE", no_log=false, no_survey=false, desc="full" },
+        { address=0X0639, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0639, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life/health remaining: increased" },
+        { address=0X0639, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life/health remaining: decreased" },
+        { address=0X0656, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="fireballs remaining increased" },
+        { address=0X0656, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="fireballs remaining decreased" },
+        { address=0X06D6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives (starts from 1) increased" },
+        { address=0X06D6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives (starts from 1) decreased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X064B, type="u8", condition="eq", value=0X7, action="JUMPING", no_log=false, no_survey=false, desc="jump down / falling / skidding" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0738, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time remaining (hex)" },
+      },
+    },
+  },
+}

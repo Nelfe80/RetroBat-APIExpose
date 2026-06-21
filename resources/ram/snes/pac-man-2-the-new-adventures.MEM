@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Pac-Man 2: The New Adventures",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "pac-man-2-the-new-adventures",
+    file = "pac-man-2-the-new-adventures.zip",
+    hashes = {
+      { hash = "ed318ba5888f6e50851f166fee7023e2", label = "Pac-Man 2 - The New Adventures (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0120, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0124, type="u8", condition="eq", value=0X04, action="GAME_OVER", no_log=false, no_survey=false, desc="In-Game" },
+        { address=0X0124, type="u8", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause?" },
+        { address=0X0124, type="u8", condition="eq", value=0X0C, action="GAME_OVER", no_log=false, no_survey=false, desc="Fading" },
+        { address=0X0124, type="u8", condition="eq", value=0X13, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0900, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels:" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X091C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X091C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X7E0509, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="6th item obtained flag" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0914, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score:" },
+        { address=0X0918, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score:" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0120, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game State:" },
+        { address=0X080C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial:" },
+      },
+    },
+  },
+}

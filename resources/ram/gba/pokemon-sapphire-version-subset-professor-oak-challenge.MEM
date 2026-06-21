@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Sapphire Version [Subset - Professor Oak Challenge]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "pokemon-sapphire-version-subset-professor-oak-challenge",
+    file = "pokemon-sapphire-version-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "bec888af544cd36872e422c4cfb1dc74", label = "Pokemon Sapphire Version [Subset - Professor Oak Challenge].gba" },
+    }
+  },
+
+  events = {
+  },
+}

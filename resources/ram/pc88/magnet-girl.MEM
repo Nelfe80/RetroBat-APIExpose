@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Magnet Girl",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "magnet-girl",
+    file = "magnet-girl.zip",
+    hashes = {
+      { hash = "f1296ead6a441f087120b3e2eab016a9", label = "Magnet Girl.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAED0, type="u8", condition="eq", value=0XF4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XAED0, type="u8", condition="eq", value=0XD6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Transition between Title Screen and Stage Select" },
+        { address=0XAED0, type="u8", condition="eq", value=0XDC, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0XAED0, type="u8", condition="eq", value=0XD4, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Transition between Stage Select/Give Up and In-Game" },
+        { address=0XAED0, type="u8", condition="eq", value=0XD9, action="GAME_OVER", no_log=false, no_survey=false, desc="Give Up/Game Over" },
+        { address=0XAED1, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA003, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0XA640, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Clear" },
+      },
+    },
+  },
+}

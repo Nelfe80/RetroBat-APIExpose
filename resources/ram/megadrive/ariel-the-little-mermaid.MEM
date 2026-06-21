@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Ariel the Little Mermaid",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ariel-the-little-mermaid",
+    file = "ariel-the-little-mermaid.zip",
+    hashes = {
+      { hash = "4916ade6b213b1f56864239db56fef0d", label = "Ariel - The Little Mermaid (USA, Europe).md" },
+      { hash = "5d3ef6589dfcea277b8f9d0980a47a33", label = "Ariel the Little Mermaid (USA, Europe) (Ru).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA614, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Current continues" },
+        { address=0XA616, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 - Demo mode" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X434B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA60E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current lives increased" },
+        { address=0XA60E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current lives decreased" },
+      },
+      health = {
+        { address=0X404C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current player health decreased" },
+        { address=0X404C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current player health increased" },
+        { address=0X48BA, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damageless address" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA60C, type="u16be", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Current treasure [16-bit Hex]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4935, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health - Medusa middle snake and other bosses" },
+        { address=0X499F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health - Medusa right snake" },
+        { address=0X4A09, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health - Medusa left snake" },
+      },
+    },
+  },
+}

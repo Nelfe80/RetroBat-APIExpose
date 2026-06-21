@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "levers",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "levers",
+    file = "levers.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X4175, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X416D, type="u32be", condition="change", action="SCORE_STATE", min=10, max=10, no_log=false, no_survey=false, desc="Score delta 10-10: Score delta 10-10" },
+        { address=0X416D, type="u32be", condition="change", action="SCORE_STATE", color="orange", min=20, max=30, no_log=false, no_survey=false, desc="Score delta 20-30: Score delta 20-30" },
+        { address=0X416D, type="u32be", condition="change", action="SCORE_STATE", color="cyan", min=40, max=60, no_log=false, no_survey=false, desc="Score delta 40-60: Score delta 40-60" },
+        { address=0X416D, type="u32be", condition="change", action="SCORE_STATE", color="green", min=70, max=200, no_log=false, no_survey=false, desc="Score delta 70-200: Score delta 70-200" },
+        { address=0X416D, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=210, max=1000, no_log=false, no_survey=false, desc="Score delta 210-1000: Score delta 210-1000" },
+      },
+    },
+  },
+}

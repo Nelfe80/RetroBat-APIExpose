@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Short Circuit",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "short-circuit",
+    file = "short-circuit.zip",
+    hashes = {
+      { hash = "d99b72fca37252d0c5496a9ff27f1d32", label = "Short Circuit (1987)(Ocean Software).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X78D0, type="u8", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Caught in high security area/Game Over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1596, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="End of Act 1 Value (Clean) [Bitcheck]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X039E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 0xxxx (Clean)" },
+        { address=0X039F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - x0xxx (Clean)" },
+        { address=0X03A0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - xx0xx (Clean)" },
+        { address=0X03A1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - xxx0x (Clean)" },
+        { address=0X03A2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - xxxx0 (Clean)" },
+        { address=0X03B7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 0xxxx" },
+        { address=0X03B8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - x0xxx" },
+        { address=0X03B9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - xx0xx" },
+        { address=0X03BA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - xxx0x" },
+        { address=0X03BB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - xxxx0" },
+      },
+      collectibles = {
+        { address=0X1513, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="ff - Key Ring Obtained increased" },
+        { address=0X15E0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0xff - Key Ring Obtained (Clean) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1537, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="ff - Jump Activator Hardware Obtained" },
+        { address=0X1604, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="0xff - Jump Activator Hardware Obtained (Clean)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1585, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="ff - Door Key Obtained" },
+        { address=0X1652, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="0xff - Door Key Obtained (Clean)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15C2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Fire Alarm System" },
+      },
+    },
+  },
+}

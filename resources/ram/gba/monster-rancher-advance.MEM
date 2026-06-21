@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Monster Rancher Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Life Simulation, Role-Playing"
+  },
+
+  rom = {
+    name = "monster-rancher-advance",
+    file = "monster-rancher-advance.zip",
+    hashes = {
+      { hash = "45256cfa2c1f404cc91e6d5c34d1d4ce", label = "Monster Rancher Advance (USA).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X10E82, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster Health 1 [probably don't use] decreased" },
+        { address=0X10E82, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster Health 1 [probably don't use] increased" },
+        { address=0X10FD6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster Health 2 [probably don't use] decreased" },
+        { address=0X10FD6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster Health 2 [probably don't use] increased" },
+      },
+    },
+  },
+}

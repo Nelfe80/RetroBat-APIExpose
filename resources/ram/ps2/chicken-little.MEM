@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Chicken Little",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "chicken-little",
+    file = "chicken-little.zip",
+    hashes = {
+      { hash = "427823675d0bcb65bd2f3d1e9e55cd25", label = "Disney's Chicken Little (USA)" },
+      { hash = "82c893b4f661d6683f1f352876fb85c9", label = "Disney's Chicken Little (USA) (60fps) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X555734, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X519A04, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Level Select ID" },
+        { address=0X519A08, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Level Complete / Next Level Check" },
+        { address=0X55A1CC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Level Complete? | Space Armada" },
+        { address=0X192E194, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Level Complete Check | Space Armada" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X518914, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32 Bit] Total Cards Collected | Final Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X512588, type="u32le", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+  },
+}

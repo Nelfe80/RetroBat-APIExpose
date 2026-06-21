@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Armored Core: Project Phantasma",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "armored-core-project-phantasma",
+    file = "armored-core-project-phantasma.zip",
+    hashes = {
+      { hash = "c8532b090b3255edce77b1c0598e9865", label = "Armored Core - Project Phantasma (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4314B, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X4314B, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X4314B, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Leaved/Failure" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X43108, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Search and Destroy" },
+        { address=0X43108, type="u8", condition="eq", value=0X07, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Main Facility" },
+        { address=0X43108, type="u8", condition="eq", value=0X0D, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Receiving Base" },
+        { address=0X43108, type="u8", condition="eq", value=0X0E, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Detachment" },
+        { address=0X43108, type="u8", condition="eq", value=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy Secret Base" },
+        { address=0X43141, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X43141, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X43141, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Leaved/Failure" },
+        { address=0X43147, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X43147, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X43147, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Leaved/Failure" },
+        { address=0X4314D, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X4314D, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X4314D, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Leaved/Failure" },
+        { address=0X4314E, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X4314E, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X4314E, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Leaved/Failure" },
+        { address=0X43150, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Sortie Selected" },
+        { address=0X43150, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X43150, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Leaved/Failure" },
+      },
+    },
+  },
+}

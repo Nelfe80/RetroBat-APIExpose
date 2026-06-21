@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Wheel of Fortune",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "wheel-of-fortune",
+    file = "wheel-of-fortune.zip",
+    hashes = {
+      { hash = "94a70fed0893d60084b59d4e4a955924", label = "Wheel of Fortune (1987)(Sharedata)(US).dsk" },
+      { hash = "5f7d5ebc16f129d6967fff6539e272fb", label = "Wheel of Fortune (1987)(Sharedata)(US)(Side A).dsk" },
+      { hash = "a67b2944154b4dda4731cb2e31d81691", label = "Wheel of Fortune (1987)(Sharedata)(US)(Side B).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X05EF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+        { address=0X0600, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[9 bytes ASCII] Round 1 category" },
+        { address=0X0609, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[9 bytes ASCII] Round 2 category" },
+        { address=0X0612, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[9 bytes ASCII] Round 3 category" },
+        { address=0X061B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[9 bytes ASCII] Bonus round category" },
+      },
+    },
+  },
+}

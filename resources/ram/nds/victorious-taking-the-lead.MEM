@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Victorious: Taking the Lead",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "victorious-taking-the-lead",
+    file = "victorious-taking-the-lead.zip",
+    hashes = {
+      { hash = "daf4779d405c052e1e253817d247e0e9", label = "Victorious - Taking the Lead (USA) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "OverBlood",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "overblood",
+    file = "overblood.zip",
+    hashes = {
+      { hash = "248e739606f2fe50a8ddf914ad48e040", label = "OverBlood (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCF7B0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Bit 0 - Game is paused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCF8F4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life meter value increased" },
+        { address=0XCF8F4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life meter value decreased" },
+        { address=0XCF8FC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy life meter value (Part 1) increased" },
+        { address=0XCF8FC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy life meter value (Part 1) decreased" },
+        { address=0XCF8FD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy life meter value (Part 2, used when total health greater than 0xff) increased" },
+        { address=0XCF8FD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy life meter value (Part 2, used when total health greater than 0xff) decreased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCFC1C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Control Puzzle - Highlighted Option" },
+      },
+    },
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Defender of the Crown",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "defender-of-the-crown",
+    file = "defender-of-the-crown.zip",
+    hashes = {
+      { hash = "1306c9291c5d2748f88ea652cb5baf9e", label = "Defender of the Crown (France).nes" },
+      { hash = "18631bde2e4c7db7c2b21d9fb43dcb10", label = "Defender of the Crown (Europe).nes" },
+      { hash = "6a664d771721116be8a72a3e83914164", label = "Defender of the Crown (USA).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X00CF, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Defending in battle army - Soldiers [8bit]" },
+        { address=0X00D3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Attacking in battle army - Soldiers [8bit]" },
+        { address=0X0593, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Army: Soldiers [8bit]" },
+        { address=0X0641, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Garrison: Soldiers" },
+      },
+      health = {
+        { address=0X0511, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health in flail fight or castle raid decreased" },
+        { address=0X0511, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health in flail fight or castle raid increased" },
+        { address=0X0512, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy health in caste raid [8bit] decreased" },
+        { address=0X0512, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy health in caste raid [8bit] increased" },
+        { address=0X0513, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent health in flail fight [8bit] decreased" },
+        { address=0X0513, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent health in flail fight [8bit] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X05D7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure [8bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X009D, type="u16le", condition="eq", value=0X33FF, action="MONEY_STATE", no_log=false, no_survey=false, desc="The enemy's gold (success) - Castle raid" },
+      },
+    },
+  },
+}

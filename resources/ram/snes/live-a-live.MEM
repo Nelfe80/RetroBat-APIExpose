@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Live-A-Live",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "live-a-live",
+    file = "live-a-live.zip",
+    hashes = {
+      { hash = "65884a7aff5949fa171072fd994f29ee", label = "Live-A-Live (Japan) (En) (v2.0 Deluxe) (Aeon Genesis).sfc" },
+      { hash = "c223de99d22665b62c91e02727963bd4", label = "Live A Live (Japan).sfc" },
+      { hash = "dc2e53cbf532a14c28f0a3840d65fa57", label = "Live-A-Live (Japan) (En) (v1.00b) (Aeon Genesis).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X06BF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds" },
+        { address=0X0D46, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Prehistoric" },
+        { address=0X0E06, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Sundown" },
+        { address=0X0E46, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Masaru" },
+        { address=0X0E86, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Akira's Level (8-bit)" },
+        { address=0X0EC6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Ninja!" },
+        { address=0X0F46, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bel level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0B01, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unicorn Hair" },
+        { address=0X0B01, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Flame Mail" },
+        { address=0X0C01, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[39 bytes] Medieval Inventory Item Quantity - [8-Bits]" },
+        { address=0X1208, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01 = mecanical enemy dead" },
+      },
+      health = {
+        { address=0X0D48, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Pogo decreased" },
+        { address=0X0D48, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Pogo increased" },
+        { address=0X0DC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Master decreased" },
+        { address=0X0DC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Master increased" },
+        { address=0X0E08, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Character 2 decreased" },
+        { address=0X0E08, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Character 2 increased" },
+        { address=0X0E49, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Masaru decreased" },
+        { address=0X0E49, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Masaru increased" },
+        { address=0X0E88, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Akira's Current HP (16-bit) decreased" },
+        { address=0X0E88, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Akira's Current HP (16-bit) increased" },
+        { address=0X0E8A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Akira's Maximum HP (16-bit) decreased" },
+        { address=0X0E8A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Akira's Maximum HP (16-bit) increased" },
+        { address=0X0F08, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP main player decreased" },
+        { address=0X0F08, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP main player increased" },
+        { address=0X0F88, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Samo decreased" },
+        { address=0X0F88, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Samo increased" },
+        { address=0XAA00, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP (16-bit) decreased" },
+        { address=0XAA00, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP (16-bit) increased" },
+        { address=0XAA10, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 Current HP (16-bit) decreased" },
+        { address=0XAA10, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 Current HP (16-bit) increased" },
+        { address=0XAA20, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 Current HP (16-bit) decreased" },
+        { address=0XAA20, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 Current HP (16-bit) increased" },
+        { address=0XAA30, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 Current HP (16-bit) decreased" },
+        { address=0XAA30, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 Current HP (16-bit) increased" },
+        { address=0XAA40, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 Current HP (16-bit) decreased" },
+        { address=0XAA40, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 Current HP (16-bit) increased" },
+        { address=0XEA28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Boxing / Ninja / Kung-Fu 1 decreased" },
+        { address=0XEA28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Boxing / Ninja / Kung-Fu 1 increased" },
+        { address=0XEA29, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Boxing / Ninja / Kung-Fu 2 decreased" },
+        { address=0XEA29, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Boxing / Ninja / Kung-Fu 2 increased" },
+        { address=0XEA2A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Boxing / Ninja / Kung-Fu 3 decreased" },
+        { address=0XEA2A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Boxing / Ninja / Kung-Fu 3 increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0A08, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="0a = open door watanabe" },
+      },
+    },
+  },
+}

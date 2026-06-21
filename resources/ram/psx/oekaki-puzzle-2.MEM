@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Oekaki Puzzle 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "oekaki-puzzle-2",
+    file = "oekaki-puzzle-2.zip",
+    hashes = {
+      { hash = "5a4181e59095a6dcfa32c9bc538e160a", label = "SuperLite 1500 Series - Oekaki Puzzle 2 (Japan)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1FFF24, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32bit] Timer - Minutes (Ones)" },
+        { address=0X1FFF28, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32bit] Timer - Seconds (Tens)" },
+        { address=0X1FFF2C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32bit] Timer - Seconds (Ones)" },
+      },
+    },
+  },
+}

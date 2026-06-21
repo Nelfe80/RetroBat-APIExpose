@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Nayuta no Kiseki [Subset - Boss Challenges]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nayuta-no-kiseki-subset-boss-challenges",
+    file = "nayuta-no-kiseki-subset-boss-challenges.zip",
+    hashes = {
+      { hash = "b079f140baf6c592dff8b53385955861", label = "Nayuta no Kiseki (Japan) (En) (Flame) (4.15) [Subset - Bonus].iso" },
+      { hash = "f6e123671e85305561e771a996f72262", label = "Nayuta no Kiseki (Japan) (En) (dackst) (1.08) [Subset - Bonus].iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB952A2, type="u32be", condition="eq", value=0X6C6F676F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="logo" },
+        { address=0XB952A2, type="u32be", condition="eq", value=0X7469746C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X133B353, type="u32be", condition="eq", value=0X30313032, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Terra, The Other World (map)" },
+        { address=0X133B353, type="u32be", condition="eq", value=0X38313030, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The Core of the Inner World" },
+      },
+      stage = {
+        { address=0X107FBC4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Both - Stage Stat Tracking - Highest Chain" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X134178C, type="u16le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lower Difficulty and Retry available)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Fairy Clothes (1)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Tight Suit (2)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Slit Mini (3)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Crimson Dress (4)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Dance Costume (5)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Witch's Robe (6)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA6, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gothic Dress (7)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA7, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Formal Sailor (8)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA8, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ethereal Clothes (9)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XA9, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Maid Dress (10)" },
+        { address=0X133AB08, type="u16le", condition="eq", value=0XFFFF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nothing" },
+      },
+      weapon = {
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Wooden Sword (1)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Short Sword (2)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Legion Knife (3)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Crescent Sword (4)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Crystal Edge (5)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Durandal (6)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Executor (7)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Seventh Heaven (8)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Chrono Blade (9)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X14, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Woodcutter Axe (1)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X15, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spiked Mace (2)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X16, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sacerdos (3)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X17, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rune Axe (4)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X18, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sledgehammer (5)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X19, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Luna Rossa (6)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X1A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Crimson Sword (7)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X1B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lost Dragon (8)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X1C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Caladbolg (9)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0X1D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Meteor Buster(10)" },
+        { address=0X133A9BC, type="u16le", condition="eq", value=0XFFFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X133AB0A, type="u16le", condition="eq", value=0XB1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Halo Ring (8)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X133B353, type="u32be", condition="eq", value=0X35313031, action="BOSS_HIT", no_log=false, no_survey=false, desc="Heliograd/Upper Stratum (Before Boss)" },
+        { address=0X133B353, type="u32be", condition="eq", value=0X35303939, action="BOSS_HIT", no_log=false, no_survey=false, desc="Heliograd/Upper Stratum (Boss)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X107FB28, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Both - Gear Craft - Gear Shield (0x01 if unlocked)" },
+        { address=0X133A9C2, type="u16le", condition="eq", value=0X6B, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Altair Shield (8)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF857C4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Both - Stage time when starting boss fight" },
+        { address=0X10714D0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Both - Currently Playing Music" },
+        { address=0X107FBC0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Both - Stage Stat Tracking - Time (max is 0x2BF1F)" },
+        { address=0X107FBC8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Both - Stage Stat Tracking - Number of Times You Took Damage" },
+      },
+    },
+  },
+}

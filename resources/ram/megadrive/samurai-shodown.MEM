@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "Samurai Shodown",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "samurai-shodown",
+    file = "samurai-shodown.zip",
+    hashes = {
+      { hash = "53f38d512735c46dfab47d13be2538e6", label = "Samurai Shodown (USA) (Enhanced Colors) (v2.0) (Pyron).md" },
+      { hash = "d50b365a99d5efae6164ef084e808ff2", label = "Samurai Shodown (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3566, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Off;" },
+        { address=0X3566, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="On." },
+        { address=0X44EB, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Begin Demo;" },
+        { address=0X44EB, type="u8", condition="eq", value=0X19, action="DEMO_MODE", no_log=false, no_survey=false, desc="Full time." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3059, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="30 Seconds;" },
+        { address=0X3059, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60 Seconds;" },
+        { address=0X3059, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="99 Seconds;" },
+        { address=0X3059, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Infinite." },
+        { address=0X3059, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round time battle 8bits" },
+        { address=0X305A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easiest;" },
+        { address=0X305A, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hardest." },
+        { address=0X305A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty level battle 8bits" },
+        { address=0X44EA, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easiest;" },
+        { address=0X44EA, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hardest." },
+        { address=0X44EA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty level menu 8bits" },
+        { address=0X44ED, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="30 Seconds;" },
+        { address=0X44ED, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60 Seconds;" },
+        { address=0X44ED, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="99 Seconds;" },
+        { address=0X44ED, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Infinite." },
+        { address=0X44ED, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round time menu 8bits" },
+        { address=0XAA52, type="u8", condition="eq", value=0X0D, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game finished." },
+        { address=0XAA54, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Haohmaru level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Nakoruru level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hanzo level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Galford level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wan-Fu level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ukyo level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kyoshiro level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gen-An level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jubei level bugged;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jubei level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tam Tam level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Charlotte level;" },
+        { address=0XAA54, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amakusa level." },
+        { address=0XAA5C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round;" },
+        { address=0XAA5C, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished Bonus round;" },
+        { address=0XABC1, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On;" },
+        { address=0XABC1, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Off." },
+        { address=0XABC1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round 8bits" },
+      },
+      stage = {
+        { address=0XAA52, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus round 1;" },
+        { address=0XAA52, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus round 2;" },
+        { address=0XAA52, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus round 3;" },
+        { address=0XAA52, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages 8bits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X483E, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X498E, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+      },
+      health = {
+        { address=0X483E, type="u8", condition="eq", value=0X29, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Red health bar begin;" },
+        { address=0X483E, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full health." },
+        { address=0X483E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 health 8Bits" },
+        { address=0X498E, type="u8", condition="eq", value=0X29, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Red health bar begin;" },
+        { address=0X498E, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full health" },
+        { address=0X498E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2/CPU health 8bits" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X44EB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time left to begin Demo 8bits" },
+      },
+    },
+  },
+}

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Kong",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kong",
+    file = "kong.zip",
+    hashes = {
+      { hash = "57c1fa57baaacce9b1c64d7e95c6b4e0", label = "Kong (World) (v1.0.4).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X015B, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X016C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X016B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X016B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X015B, type="u8", condition="eq", value=0X05, action="SCORE_STATE", no_log=false, no_survey=false, desc="High scores" },
+        { address=0X0169, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

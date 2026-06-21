@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Tokyo Xtreme Racer 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "tokyo-xtreme-racer-3",
+    file = "tokyo-xtreme-racer-3.zip",
+    hashes = {
+      { hash = "5a3355677a9bd77143904deb8b8ee893", label = "Tokyo Xtreme Racer 3 (USA)" },
+      { hash = "d4c9dcb4ef14e7ef0b94a0ebc5d1a8ce", label = "Tokyo Xtreme Racer 3 (USA) (Money Glitch Fix)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8052D2, type="u8", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+        { address=0X80EC58, type="u8", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+      },
+      events = {
+        { address=0X41EAAA, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(16-bit) Win Combo" },
+        { address=0X41EEF0, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(8-bit) Max Win Combo Today" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X41E90C, type="u8", condition="eq", value=0X0D, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal (For Time Attack)" },
+        { address=0X816913, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X806AD0, type="u8", condition="eq", value=0X77, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Driver" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8153B0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32-bit) Player's Money in Quest mode. increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3AF4D3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) Final Boss Beat Indicator" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X806AD0, type="u8", condition="eq", value=0X23, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Toyota Corolla Levin 3door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X41E90C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Race Result" },
+        { address=0X41EB4C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32-bit) Total time in Time Attack mode" },
+        { address=0X8052D2, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time attack" },
+        { address=0X8052D2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Game Mode in front end" },
+        { address=0X806AD0, type="u8", condition="eq", value=0X72, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timebomb Stalker" },
+        { address=0X806AD0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Vehicle Name ID" },
+        { address=0X80EC58, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time attack" },
+        { address=0X80EC58, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Game Mode while Driving" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X4360BB24, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Kandabashi C1 Inner Loop" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X434C2DB9, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Shibakouen C1 Outer Loop" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X45B8E60F, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ariake ShinKanjou CCL" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X4509F5B0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Daiba ShinKanjou CWL" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X44F75D21, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Route 13 Area Wangan Out" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0XC4CAA43A, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Daikoku Futou Wangan In" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0XC3948282, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Shibaura Yokohane Out" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0XC4525469, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Shioiri Yokohane In" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0XC61F8292, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Asada Yokohama CCL" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0XC5D83333, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Asada Yokohama CWL" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X450E7226, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Meieki Nagoya Kanjou" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X43E8A24F, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Kurokawa W. Higashimeihan" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X4613DD92, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Shinanobashi Kanjou Shortcut" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X461BFC99, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Yotsuhashi Kanjou Long" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X45F5E83C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Shiomibashi Sakai Out" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X45EAD4DF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sakai Sakai In" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X4585EAFC, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W. Nagahori Wangan Out" },
+        { address=0X82BD90, type="u32le", condition="eq", value=0X456FE94C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Oohama Wangan In" },
+        { address=0X82BD90, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32-bit) Unique identifier for Time Attack" },
+        { address=0X17F595E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) UI element for Course Select for Time Attack Mode" },
+      },
+    },
+  },
+}

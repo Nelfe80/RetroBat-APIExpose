@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Gun</text>
+			<color>${red}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>Guided Bomb</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Unknown</text>
+			<color>${green}</color>
+		</text>
+		<text name="button7" extra="true">
+			<text>Unknown</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Gun</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button3" extra="true">
+			<text>Guided Bomb</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button5" extra="true">
+			<text>Unknown</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button7" extra="true">
+			<text>Unknown</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1  R.SHOBU  231500</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 A N D O H 200100</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3  HIYAMUTA 175000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 TSUMI NAG 102400</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MATSUE    89600</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6  TAKAHARA 64000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7  ZVEA ACD 60100</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 AAAAAAAAA 51200</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9   MR. M   22000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10           16200</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Tecmo World Cup '93",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Sports, Football"
+  },
+
+  rom = {
+    name = "tecmo-world-cup-93",
+    file = "tecmo-world-cup-93.zip",
+    hashes = {
+      { hash = "81f530d169c5c04c8faf8db367bbcd63", label = "Tecmo World Cup '93 (Europe).sms" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0175, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Config - Time [8bit]" },
+        { address=0X0408, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time - Half [8bit]" },
+        { address=0X040C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time - Finish Actual Time [8bit]" },
+        { address=0X0414, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time - Trigger Counter [8bit]" },
+        { address=0X0417, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time ( X0 : 00 ) [8bit]" },
+        { address=0X0418, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time ( 0X : 00 ) [8bit]" },
+        { address=0X0419, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time ( 00 : X0 ) [8bit]" },
+        { address=0X041A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time ( 00 : 0X ) [8bit]" },
+        { address=0X1134, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Goals Team 1 [8bit]" },
+        { address=0X1135, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Goals Team 2 [8bit]" },
+      },
+    },
+  },
+}

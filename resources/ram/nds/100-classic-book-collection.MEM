@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "100 Classic Book Collection",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "100-classic-book-collection",
+    file = "100-classic-book-collection.zip",
+    hashes = {
+      { hash = "eb2ffcd0e17b434745700a893d2bce4e", label = "100 Classic Books (USA).nds" },
+    }
+  },
+
+  events = {
+  },
+}

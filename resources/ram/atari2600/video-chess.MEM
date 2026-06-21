@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Video Chess",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action, Strategy, Board Game, plateau"
+  },
+
+  rom = {
+    name = "video-chess",
+    file = "video-chess.zip",
+    hashes = {
+      { hash = "f0b7db930ca0e548c41a97160b9f6275", label = "Video Chess (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

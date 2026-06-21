@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tony Hawk's Downhill Jam",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "tony-hawks-downhill-jam",
+    file = "tony-hawks-downhill-jam.zip",
+    hashes = {
+      { hash = "a6c6879b9dcf9a67991f4cf81462498c", label = "Tony Hawk's Downhill Jam (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

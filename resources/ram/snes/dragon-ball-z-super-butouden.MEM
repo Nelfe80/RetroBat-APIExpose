@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Super Butouden",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-ball-z-super-butouden",
+    file = "dragon-ball-z-super-butouden.zip",
+    hashes = {
+      { hash = "a2543e309e1cfa7edfdc13bb30f3d60c", label = "Dragon Ball Z - Super Butouden (Japan).sfc" },
+      { hash = "dd909b890fe4c2505d289361368ec22a", label = "Dragon Ball Z - Super Butouden (France).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X107E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Option 2 - Continues" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1085, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Option 2 - Lifebar increased" },
+        { address=0X1085, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Option 2 - Lifebar decreased" },
+      },
+      health = {
+        { address=0X0540, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Total Health [16bit] decreased" },
+        { address=0X0540, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Total Health [16bit] increased" },
+        { address=0X0560, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Current Health [16bit] decreased" },
+        { address=0X0560, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Current Health [16bit] increased" },
+        { address=0X0562, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Energy [16bit] decreased" },
+        { address=0X0562, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Energy [16bit] increased" },
+        { address=0X0640, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Total Health [16bit] decreased" },
+        { address=0X0640, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - Total Health [16bit] increased" },
+        { address=0X0660, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Current Health [16bit] decreased" },
+        { address=0X0660, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - Current Health [16bit] increased" },
+        { address=0X0662, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Energy [16bit] decreased" },
+        { address=0X0662, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - Energy [16bit] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0514, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 - Total Points [32bit]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X107F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Option 3 - Block Specials" },
+      },
+    },
+  },
+}

@@ -1,0 +1,111 @@
+return {
+  game = {
+    title = "40 Winks",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "40-winks",
+    file = "40-winks.zip",
+    hashes = {
+      { hash = "78d2b2a7035386a305486d23092dd031", label = "40 Winks (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8C568, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] 0x01: Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8BDBC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Winks on current level" },
+        { address=0X8BDC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Winks collected on current level" },
+        { address=0X8E04F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Segments" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB06AC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Zzz Total (Life) increased" },
+        { address=0XB06AC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Zzz Total (Life) decreased" },
+        { address=0XB06AE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives Total increased" },
+        { address=0XB06AE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives Total decreased" },
+        { address=0XB06B4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Tokens [10/extra life] increased" },
+        { address=0XB06B4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Tokens [10/extra life] decreased" },
+        { address=0XB06C2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Zzz Total (Life; Text) increased" },
+        { address=0XB06C2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Zzz Total (Life; Text) decreased" },
+        { address=0XB06C4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives Total (Text) increased" },
+        { address=0XB06C4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives Total (Text) decreased" },
+        { address=0XB06CA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Tokens [10/extra life; Text] increased" },
+        { address=0XB06CA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Tokens [10/extra life; Text] decreased" },
+      },
+      health = {
+        { address=0X8DE04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Power Ups decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X8DE04, type="u8", condition="eq", value=0XDC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Jester" },
+        { address=0X8DE04, type="u8", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Caveman" },
+        { address=0X8DE04, type="u8", condition="eq", value=0XA4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ninja" },
+        { address=0X8DE04, type="u8", condition="eq", value=0X64, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Superhero" },
+        { address=0X8DE04, type="u8", condition="eq", value=0X34, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X8DE04, type="u8", condition="eq", value=0X30, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Princess" },
+        { address=0X8DE04, type="u8", condition="eq", value=0X74, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Caveman" },
+        { address=0X8DE04, type="u8", condition="eq", value=0X9C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Monk" },
+        { address=0X8DE04, type="u8", condition="eq", value=0XD4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Superhero" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8E42C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Health [Text]" },
+        { address=0X90D0E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Tumble Nightmare Boss Health + Final Boss Health" },
+        { address=0X90D6E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Tumble Space Boss Health" },
+        { address=0X9108E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Ruff Nightmare Boss Health + Final Boss Health" },
+        { address=0X910EE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Ruff Space Boss Health" },
+        { address=0X9187E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Tumble Prehistoric Boss Health" },
+        { address=0X91BFE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Ruff Prehistoric Boss Health" },
+        { address=0X9218E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Tumble Castle Boss Health" },
+        { address=0X924F0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Tumble Pirate Boss Health" },
+        { address=0X9250E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Ruff Castle Boss Health" },
+        { address=0X926EE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Ruff Pirate Boss Health" },
+        { address=0X930EE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Tumble Underwater Boss Health" },
+        { address=0X9346E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Ruff Underwater Boss Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X8DE04, type="u8", condition="eq", value=0X64, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Superhero" },
+        { address=0X8DE04, type="u8", condition="eq", value=0XD4, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Superhero" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8E8EB, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Open" },
+        { address=0X90B3F, type="u8", condition="eq", value=0X80, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X90B3F, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X92602, type="u8", condition="eq", value=0X25, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Behind Caveman Door" },
+        { address=0X92602, type="u8", condition="eq", value=0X30, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Behind 40 Cog Door" },
+        { address=0X93172, type="u8", condition="eq", value=0X19, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Waterfall Switch Room" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X905A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Nightmare Dreamclock" },
+        { address=0X905A9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Nightmare Dreamclock Partial" },
+        { address=0X905AA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Space Dreamclock" },
+        { address=0X905AB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Pirate Dreamclock Partial" },
+        { address=0X905AC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Underwater Dreamclock Partial" },
+        { address=0X905AD, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Underwater Dreamclock" },
+        { address=0X905AE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Prehistoric Dreamclock" },
+        { address=0X905AF, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Prehistoric Dreamclock Partial" },
+        { address=0X905B0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Castle Dreamclock" },
+        { address=0XB06B0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Power Up Timer" },
+        { address=0XB06C6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Power Up Timer [16-bit; Text]" },
+      },
+    },
+  },
+}

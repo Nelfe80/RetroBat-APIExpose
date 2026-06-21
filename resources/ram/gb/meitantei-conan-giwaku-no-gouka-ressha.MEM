@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Meitantei Conan: Giwaku no Gouka Ressha",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "meitantei-conan-giwaku-no-gouka-ressha",
+    file = "meitantei-conan-giwaku-no-gouka-ressha.zip",
+    hashes = {
+      { hash = "f75fde95c0c8e957c9fe76d546e5180a", label = "Meitantei Conan - Giwaku no Gouka Ressha (Japan) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+  },
+}

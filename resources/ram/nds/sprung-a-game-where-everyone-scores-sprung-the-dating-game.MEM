@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Sprung: A Game Where Everyone Scores | Sprung: The Dating Game",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Life Simulation, Visual Novel"
+  },
+
+  rom = {
+    name = "sprung-a-game-where-everyone-scores-sprung-the-dating-game",
+    file = "sprung-a-game-where-everyone-scores-sprung-the-dating-game.zip",
+    hashes = {
+      { hash = "744dcc72a0396faf3ccb243a85f18dd7", label = "Sprung - The Dating Game (Europe).nds" },
+      { hash = "96bf8e04217075084637ce82976ca3e6", label = "Sprung - A Game Where Everyone Scores (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X17F1FC, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In menu (title screen, selecting scene, etc)" },
+        { address=0X17F1FC, type="u8", condition="eq", value=0X20, action="PAUSE_ON", no_log=false, no_survey=false, desc="In game (reading or choosing dialogue, in pause menu, game over)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1DAC02, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hello Ladies!" },
+        { address=0X1DAC03, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dan the Ladies Man" },
+        { address=0X1E10EB, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eat yellow snow and die (Golden Line Notebook)" },
+        { address=0X1E10EC, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="He lives in a cave, plotting evil against us 'kids' (Golden Line Notebook)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1E10E4, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money" },
+        { address=0X1E10E4, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Twenty bucks (Money)" },
+        { address=0X1E10E4, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Twenty-five bucks (Money)" },
+        { address=0X1E10E4, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Fifty bucks (Money)" },
+        { address=0X1E10E4, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="One hundred bucks (Money)" },
+        { address=0X1E10E4, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Five hundred bucks (Money)" },
+        { address=0X1E10E5, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="A thousand bucks (Money)" },
+        { address=0X1E10E5, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Two thousand bucks (Money)" },
+        { address=0X1E10E5, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Five thousand bucks (Money)" },
+        { address=0X1E10EA, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Medal" },
+        { address=0X1E10F3, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver Ring" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1E1FF4, type="u8", condition="eq", value=0X0B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ex-Boyfriend Roadblock" },
+      },
+    },
+  },
+}

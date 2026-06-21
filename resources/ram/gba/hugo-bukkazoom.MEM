@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hugo: Bukkazoom!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "hugo-bukkazoom",
+    file = "hugo-bukkazoom.zip",
+    hashes = {
+      { hash = "0a9e96e8273142fc5ed60511a726a14f", label = "Hugo - Bukkazoom! (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi,Pl).gba" },
+    }
+  },
+
+  events = {
+  },
+}

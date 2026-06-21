@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Monsters, Inc. Scare Island",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "monsters-inc-scare-island",
+    file = "monsters-inc-scare-island.zip",
+    hashes = {
+      { hash = "f5836e9aa72bd731894b9fd9e8dd513f", label = "Disney-Pixar Monsters, Inc. - Scare Island (Europe)" },
+      { hash = "6694177a7b22739ea019ca21ec95c029", label = "Disney/Pixar Monsters, Inc. - Scare Island (Europe) (Widescreen) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2E6A58, type="u32le", condition="eq", value=0X4C544954, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen (TITLE.BI)" },
+        { address=0X84EAC4, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Game Unpaused" },
+        { address=0X84EAC4, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2E6A58, type="u32le", condition="eq", value=0X4F474F4C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Logos (LOGOS.BI)" },
+        { address=0X2E6A58, type="u32le", condition="eq", value=0X825249869, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Urban Pursuit (MP01.BIN)" },
+        { address=0X2E6A58, type="u32le", condition="eq", value=0X842027085, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Desert Pursuit (MP02.BIN)" },
+        { address=0X2E6A58, type="u32le", condition="eq", value=0X858804301, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arctic Pursuit (MP03.BIN)" },
+        { address=0X2E6A58, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] [ASCII] Level ID" },
+      },
+      stage = {
+        { address=0X2E6A58, type="u32le", condition="eq", value=0X52544341, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Orientation (ACTR01.B)" },
+      },
+    },
+  },
+}

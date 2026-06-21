@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Crash Bandicoot 2: Cortex Strikes Back",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "crash-bandicoot-2-cortex-strikes-back",
+    file = "crash-bandicoot-2-cortex-strikes-back.zip",
+    hashes = {
+      { hash = "ba4f186dfc511de240826fb47affff6e", label = "Crash Bandicoot 2 - Cortex Strikes Back (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5F180, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X5F180, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X6CB71, type="u8", condition="eq", value=0X3C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screens" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6CB71, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Warp Room" },
+        { address=0X6CB71, type="u8", condition="eq", value=0X1E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Turtle Woods" },
+        { address=0X6CB71, type="u8", condition="eq", value=0X0E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Snow Go" },
+        { address=0X6CB71, type="u8", condition="eq", value=0X19, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hang Eight" },
+        { address=0X6CB71, type="u8", condition="eq", value=0X27, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Totally Fly" },
+        { address=0X6CB71, type="u8", condition="eq", value=0X28, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Secret Ending" },
+        { address=0X6CB71, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID (8-bit)" },
+      },
+      stage = {
+        { address=0X6CB82, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Leaving Normal Stage" },
+        { address=0X6CB82, type="u8", condition="eq", value=0X81, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Entering Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6CC28, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Air Crash Death Path" },
+        { address=0X6CC28, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Road to Ruin Death Path" },
+        { address=0X6CC28, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Piston it Away Death Path" },
+        { address=0X6CC28, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Night Fight Death Path" },
+        { address=0X6CC29, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cold Hard Crash Death Path" },
+        { address=0X6CC30, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Air Crash Death Path" },
+        { address=0X6CC30, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Road to Ruin Death Path" },
+        { address=0X6CC30, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Piston it Away Death Path" },
+        { address=0X6CC30, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Night Fight Death Path" },
+        { address=0X6CC31, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diggin' It Death Path" },
+        { address=0X6CC31, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cold Hard Crash Death Path" },
+        { address=0X6CEC0, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Air Crash Death Path" },
+        { address=0X6CEC0, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Road to Ruin Death Path" },
+        { address=0X6CEC0, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Piston it Away Death Path" },
+        { address=0X6CEC0, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Night Fight Death Path" },
+        { address=0X6CEC1, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diggin' It Death Path" },
+        { address=0X6CEC1, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cold Hard Crash Death Path" },
+        { address=0X6CEC8, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Air Crash Death Path" },
+        { address=0X6CEC8, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Road to Ruin Death Path" },
+        { address=0X6CEC8, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Piston it Away Death Path" },
+        { address=0X6CEC8, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Night Fight Death Path" },
+        { address=0X6CEC9, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diggin' It Death Path" },
+        { address=0X6CEC9, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cold Hard Crash Death Path" },
+        { address=0X6DA24, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Air Crash Death Path" },
+        { address=0X6DA24, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Road to Ruin Death Path" },
+        { address=0X6DA24, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Piston it Away Death Path" },
+        { address=0X6DA24, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Night Fight Death Path" },
+        { address=0X6DA25, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diggin' It Death Path" },
+        { address=0X6DA25, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cold Hard Crash Death Path" },
+        { address=0X6DA2C, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Air Crash Death Path" },
+        { address=0X6DA2C, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Road to Ruin Death Path" },
+        { address=0X6DA2C, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Piston it Away Death Path" },
+        { address=0X6DA2C, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Night Fight Death Path" },
+        { address=0X6DA2D, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diggin' It Death Path" },
+        { address=0X6DA2D, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cold Hard Crash Death Path" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6CC2F, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Ruination Emerald Path Gem" },
+        { address=0X6CC37, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Ruination Emerald Path" },
+        { address=0X6CC37, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Emerald" },
+        { address=0X6CEC7, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Ruination Emerald Path Gem" },
+        { address=0X6CECF, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Ruination Emerald Path" },
+        { address=0X6CECF, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Emerald" },
+        { address=0X6DA2B, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Ruination Emerald Path Gem" },
+        { address=0X6DA33, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Ruination Emerald Path" },
+        { address=0X6DA33, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Emerald" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6CB82, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Crash Dance (Bosses only)" },
+        { address=0X6CB82, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Leaving Boss Stage" },
+      },
+    },
+  },
+}

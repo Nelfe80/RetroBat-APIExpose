@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Crisis Core: Final Fantasy VII",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "crisis-core-final-fantasy-vii",
+    file = "crisis-core-final-fantasy-vii.zip",
+    hashes = {
+      { hash = "fc2099ae9b174c54ee02e9827da9cea9", label = "Crisis Core - Final Fantasy VII (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA21C2B, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA43E6E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zack Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA43E48, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Zack Current HP decreased" },
+        { address=0XA43E48, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Zack Current HP increased" },
+        { address=0XA43E4C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Zack Total HP decreased" },
+        { address=0XA43E4C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Zack Total HP increased" },
+        { address=0XA44108, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Zack Health (In Battle) decreased" },
+        { address=0XA44108, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Zack Health (In Battle) increased" },
+        { address=0XA48A08, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP (Battle) decreased" },
+        { address=0XA48A08, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP (Battle) increased" },
+        { address=0XA48A0C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Max HP (Battle) decreased" },
+        { address=0XA48A0C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Max HP (Battle) increased" },
+        { address=0XA48E98, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP (Battle) decreased" },
+        { address=0XA48E98, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP (Battle) increased" },
+        { address=0XA49328, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP (Battle) decreased" },
+        { address=0XA49328, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP (Battle) increased" },
+        { address=0XA497B8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 HP (Battle) decreased" },
+        { address=0XA497B8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 HP (Battle) increased" },
+        { address=0XA49C48, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 HP (Battle) decreased" },
+        { address=0XA49C48, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 HP (Battle) increased" },
+        { address=0XA4A0D8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 HP (Battle) decreased" },
+        { address=0XA4A0D8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 HP (Battle) increased" },
+        { address=0XA4A568, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 7 HP (Battle) decreased" },
+        { address=0XA4A568, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 7 HP (Battle) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA22163, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Chapter 2 Treasures]" },
+        { address=0XA22164, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Chapter 2 Treasures]" },
+        { address=0XA22165, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Chapter 2 Treasures]" },
+        { address=0XA22166, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chapter 3 Treasures" },
+        { address=0XA22167, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chapter 3 Treasures" },
+        { address=0XA22174, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0XA22175, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0XA22176, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0XA2217C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0XA2217D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0XA2217E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0XA22193, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0XA22195, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+        { address=0XA2219F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+      },
+    },
+  },
+}

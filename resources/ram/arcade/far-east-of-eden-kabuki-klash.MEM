@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Far East of Eden: Kabuki Klash",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "far-east-of-eden-kabuki-klash",
+    file = "far-east-of-eden-kabuki-klash.zip",
+    hashes = {
+      { hash = "fbfe71c6e74ab201017b28d5c4e0a636", label = "kabukikl.7z <Far East of Eden - Kabuki Klash / Tengai Makyou - Shin Den>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFDB6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUE" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="GAME OVER" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUE" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="GAME OVER" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X50E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--CPU ROUND WIN--" },
+        { address=0X50E9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--PLAYER ROUND WIN--" },
+        { address=0X50F4, type="u8", condition="eq", value=0X00, action="LEVEL_EASY", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X50F4, type="u8", condition="eq", value=0X02, action="LEVEL_NORMAL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X50F4, type="u8", condition="eq", value=0X07, action="LEVEL_HARD", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X50F4, type="u8", condition="eq", value=0X04, action="LEVEL_MVS", no_log=false, no_survey=false, desc="Mvs" },
+        { address=0X50F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--LEVEL SELECT-- [AES]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0757, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="--HP CPU DINAMIC-- 2 decreased" },
+        { address=0X0757, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="--HP CPU DINAMIC-- 2 increased" },
+        { address=0X2B57, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="--HP CPU DINAMIC-- 1 decreased" },
+        { address=0X2B57, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="--HP CPU DINAMIC-- 1 increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X50C4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="--SCORE POINT--" },
+        { address=0X50C5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="--SCORE POINT--" },
+        { address=0X50C6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="--SCORE POINT--" },
+        { address=0X50C7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="--SCORE POINT--" },
+      },
+    },
+  },
+}

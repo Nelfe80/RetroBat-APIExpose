@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "WWF Super WrestleMania",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-super-wrestlemania",
+    file = "wwf-super-wrestlemania.zip",
+    hashes = {
+      { hash = "70eba780bf858588f4d7b58d4f864480", label = "WWF Super WrestleMania (Japan) (En).sfc" },
+      { hash = "ee3584fc51c6c1de4e5cd796f0652645", label = "WWF Super WrestleMania (USA).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X06EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Energy decreased" },
+        { address=0X06EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Energy increased" },
+        { address=0X06EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent 1 Energy decreased" },
+        { address=0X06EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent 1 Energy increased" },
+        { address=0X06F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="TBA Energy decreased" },
+        { address=0X06F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="TBA Energy increased" },
+        { address=0X06F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tag Partner Energy decreased" },
+        { address=0X06F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tag Partner Energy increased" },
+        { address=0X06F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent 2 Energy decreased" },
+        { address=0X06F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent 2 Energy increased" },
+        { address=0X0858, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X0858, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X085A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X085A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X085C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X085C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X085E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X085E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X0860, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X0860, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X0862, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X0862, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X0864, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X0864, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X0866, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X0866, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X0868, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X0868, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+        { address=0X086A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve decreased" },
+        { address=0X086A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Survivor Series Energy when in reserve increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0560, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Some 16 bit counter" },
+      },
+    },
+  },
+}

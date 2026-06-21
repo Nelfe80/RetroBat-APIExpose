@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "007: From Russia with Love",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "007-from-russia-with-love",
+    file = "007-from-russia-with-love.zip",
+    hashes = {
+      { hash = "6fe5673e447048f4fa236ad65415f7c5", label = "007 - From Russia with Love (Asia) (En).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "New Play Control! Donkey Kong Jungle Beat",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "new-play-control-donkey-kong-jungle-beat",
+    file = "new-play-control-donkey-kong-jungle-beat.zip",
+    hashes = {
+      { hash = "5f282906162730eaee53362864311796", label = "Donkey Kong Jungle Beat (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

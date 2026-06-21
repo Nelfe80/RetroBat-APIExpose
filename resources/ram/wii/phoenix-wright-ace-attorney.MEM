@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Phoenix Wright: Ace Attorney",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "phoenix-wright-ace-attorney",
+    file = "phoenix-wright-ace-attorney.zip",
+    hashes = {
+      { hash = "28938c0b385c0db9c559fe4affdb9e6a", label = "Phoenix Wright - Ace Attorney (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X110CA508, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X110CA508, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X110CA508, type="u8", condition="eq", value=0X0C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Episode Cleared" },
+      },
+    },
+  },
+}

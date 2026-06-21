@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Super Monkey Ball Adventure",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform, Racing"
+  },
+
+  rom = {
+    name = "super-monkey-ball-adventure",
+    file = "super-monkey-ball-adventure.zip",
+    hashes = {
+      { hash = "9ba37b39940f2c1e8503be0d7746f185", label = "Super Monkey Ball Adventure (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

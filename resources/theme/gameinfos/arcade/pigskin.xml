@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>analog_stick</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Punch</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Pass</text>
+			<color>${red}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Team Attitude</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Punch</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Pass</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Team Attitude</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${orange}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${orange}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

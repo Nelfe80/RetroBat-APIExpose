@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Aoi Blink | Blue Blink",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "aoi-blink-blue-blink",
+    file = "aoi-blink-blue-blink.zip",
+    hashes = {
+      { hash = "f1a8431d75e05812590d0f23135eecaa", label = "Aoi Blink (Japan).pce" },
+    }
+  },
+
+  events = {
+  },
+}

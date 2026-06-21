@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "International Superstar Soccer '98",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "international-superstar-soccer-98",
+    file = "international-superstar-soccer-98.zip",
+    hashes = {
+      { hash = "7dcc05b98e2fa690b478808ebbad5d1a", label = "International Superstar Soccer '98 (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X14C57B, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Golden Goal" },
+      },
+      zone = {
+        { address=0X147EE1, type="u8", condition="eq", value=0X2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World League" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1A8AFE, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="GAME : P1 score (16-bit)" },
+        { address=0X1A997A, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="GAME : CPU score (16-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCC5EA, type="u16be", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="1sec" },
+        { address=0XCC5EA, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GAME : Time elapsed (16-bit)" },
+        { address=0X14C56D, type="u8", condition="eq", value=0X0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="3 mins" },
+        { address=0X14C56D, type="u8", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="5 mins" },
+        { address=0X14C56D, type="u8", condition="eq", value=0X2, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="7 mins" },
+        { address=0X14C56D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="OPTION : Game Time (8-bit)" },
+        { address=0X14C57B, type="u8", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra time" },
+        { address=0X14C57B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="OPTIONS : Extra time mode (8-bit)" },
+      },
+    },
+  },
+}

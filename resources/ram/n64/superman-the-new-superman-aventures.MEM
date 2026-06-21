@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Superman: The New Superman Aventures",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "superman-the-new-superman-aventures",
+    file = "superman-the-new-superman-aventures.zip",
+    hashes = {
+      { hash = "3f64b4f72e61225ef3ae93976c9bfc7c", label = "Superman - The New Superman Aventures (USA) (En,Fr,Es).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD6228, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01=demo" },
+        { address=0X143F72, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="pause menu option highlighted" },
+        { address=0X143F79, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="bit4=not paused?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD9DBC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty level" },
+        { address=0XD9DE0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="current level" },
+        { address=0XD9DE1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Something with version of level or whatever. =04 Ending version of introduction level" },
+        { address=0XD9DEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level select screen" },
+        { address=0XD9DF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="current level highlighted mission select" },
+        { address=0X13F598, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="pieces collected in level 14" },
+        { address=0X13F604, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="superman is flying" },
+        { address=0X13F604, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="landing" },
+        { address=0X13F604, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="00=superman is grounded" },
+        { address=0X15F464, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID? (Clone)" },
+        { address=0X160D64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Superman Wins (Level 1 - Ride 1)" },
+        { address=0X160EE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Superman Wins (Level 2 - Dam)" },
+        { address=0X161124, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Superman Wins (Level 3 - Ride 2)" },
+        { address=0X16146C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Superman Wins (Level 5 - Ride 3)" },
+        { address=0X163250, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ending Note 1 (Level 4 - Lexcorp)" },
+        { address=0X163254, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ending Note 2 (Level 4 - Lexcorp)" },
+        { address=0X163258, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ending Note 3 (Level 4 - Lexcorp)" },
+        { address=0X16325C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ending Note 4 (Level 4 - Lexcorp)" },
+        { address=0X163260, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ending Note 5 (Level 4 - Lexcorp)" },
+        { address=0X1A43F9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cars on level (?) 2" },
+        { address=0X2750F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Thugs on level defeated 1" },
+        { address=0X277CC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Thugs on level defeated 2" },
+        { address=0X31C26C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cars on level (?) 1" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X22CDD6, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Superman HP decreased" },
+        { address=0X22CDD6, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Superman HP increased" },
+        { address=0X22CDDA, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Superman HP Display decreased" },
+        { address=0X22CDDA, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Superman HP Display increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1442D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Ring Section? increased" },
+        { address=0X1442D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Ring Sections? increased" },
+        { address=0X1442DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of skipped rings increased" },
+        { address=0X1442E0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Complete Ring Section? (01) increased" },
+        { address=0X1442E4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total rings in section? increased" },
+        { address=0X1442EA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring ID Passed Through increased" },
+        { address=0X144336, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Level Result increased" },
+        { address=0X15F468, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Ring Section increased" },
+        { address=0X17A35A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Level Skip Code Entering increased" },
+        { address=0X17A41A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="HP Refill Cheat Entering increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15ED70, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time remaining" },
+      },
+    },
+  },
+}

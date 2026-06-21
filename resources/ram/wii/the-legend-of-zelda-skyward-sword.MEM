@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "The Legend of Zelda: Skyward Sword",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "the-legend-of-zelda-skyward-sword",
+    file = "the-legend-of-zelda-skyward-sword.zip",
+    hashes = {
+      { hash = "87e34cb2815034f60f13a75ed9324372", label = "Legend of Zelda, The - Skyward Sword (USA) (En,Fr,Es) (Rev 2)" },
+      { hash = "4b1b8a3aca1575d4bed0b467deb7b97a", label = "Legend of Zelda, The - Skyward Sword (USA) (En,Fr,Es) (Rev 1)" },
+      { hash = "a2bbe134422ecab1684b79305cd5ea3e", label = "Legend of Zelda, The - Skyward Sword (USA) (En,Fr,Es)" },
+      { hash = "92689dc97cfa1c5a5d766be750fe43da", label = "Legend of Zelda, The - Skyward Sword (Europe) (En,Fr,De,Es,It)" },
+      { hash = "445b76d4b988bfe14d510f3c9331a7d0", label = "Legend of Zelda, The - Skyward Sword (Europe) (En,Fr,De,Es,It) (Rev 1)" },
+      { hash = "b3a051148a83b71bd93ec758b0571c79", label = "Legend of Zelda, The - Skyward Sword (Europe) (En,Fr,De,Es,It) (Rev 2)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5B51E0, type="u32be", condition="eq", value=0X46343031, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sealed Grounds" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X95A766, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maximum HP [16-bit BE] decreased" },
+        { address=0X95A766, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maximum HP [16-bit BE] increased" },
+        { address=0X95A76A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP [16-bit BE] decreased" },
+        { address=0X95A76A, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP [16-bit BE] increased" },
+        { address=0XB19B65, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Imprisoned I HP (likely dynamic) decreased" },
+        { address=0XB19B65, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Imprisoned I HP (likely dynamic) increased" },
+        { address=0XB4DC63, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Scaldera HP (may be dynamic) decreased" },
+        { address=0XB4DC63, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Scaldera HP (may be dynamic) increased" },
+        { address=0XB6D9E5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Moldarach HP (may be dynamic) decreased" },
+        { address=0XB6D9E5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Moldarach HP (may be dynamic) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X955E59, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Emerald Tablet" },
+        { address=0X957EC9, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X957EC9, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="20 Rupees (Waterfall Cave)" },
+        { address=0X957EC9, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="20 Rupees (Outside)" },
+        { address=0X957EF1, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Revitalizing Potion (Impa's Temple)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X955E57, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Fireshield Earrings" },
+        { address=0X958410, type="u16be", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wooden Shield Moblins defeated (16-bit BE)" },
+        { address=0X958412, type="u16be", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Metal Shield Moblins defeated (16-bit BE)" },
+        { address=0X95A815, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Slot index of the currently equipped shield." },
+        { address=0XB7689B, type="u8", condition="eq", value=0X49, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield is being brandished, especially for a shield bash" },
+        { address=0XB76966, type="u16be", condition="eq", value=0XE1, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield bashing" },
+      },
+    },
+  },
+}

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "R?MJ: The Mystery Hospital",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "r-mj-the-mystery-hospital",
+    file = "r-mj-the-mystery-hospital.zip",
+    hashes = {
+      { hash = "8f23ce8731602f6d21704f53ae6070fd", label = "RMJ - The Mystery Hospital (Japan) (Disc 2) (Fears Behind) (En) (v1.0) (SnowyAria)" },
+      { hash = "ca180596fedf9f983c1cd01b2791d055", label = "RMJ - The Mystery Hospital (Japan) (Disc 1) (What's Going On) (En) (v1.0) (SnowyAria)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X95D1C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP minor. decreased" },
+        { address=0X95D1C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP minor. increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X14CC90, type="u16le", condition="eq", value=0XFFFF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="None." },
+        { address=0X14CC90, type="u16le", condition="eq", value=0X0000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="x1." },
+        { address=0X14CC90, type="u16le", condition="eq", value=0X0001, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="x2." },
+        { address=0X14CCB4, type="u16le", condition="eq", value=0XFFFF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="None." },
+        { address=0X14CCB4, type="u16le", condition="eq", value=0X0000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="x1." },
+        { address=0X14CCB4, type="u16le", condition="eq", value=0X0001, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="x2." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X95D64, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="HP major." },
+      },
+    },
+  },
+}

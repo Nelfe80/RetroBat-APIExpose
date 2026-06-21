@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Dora the Explorer: Journey to the Purple Planet",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dora-the-explorer-journey-to-the-purple-planet",
+    file = "dora-the-explorer-journey-to-the-purple-planet.zip",
+    hashes = {
+      { hash = "60921f5b289f4150a6a62f5e142905dc", label = "Nick Jr. Dora the Explorer - Journey to the Purple Planet (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3CD9D0, type="u32le", condition="eq", value=0X9B6F3C, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+        { address=0X3CD9D4, type="u32le", condition="eq", value=0X94EB40, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Operation Wolf",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Gun"
+  },
+
+  rom = {
+    name = "operation-wolf",
+    file = "operation-wolf.zip",
+    hashes = {
+      { hash = "2f18128b8d3adc968b0f993968175efd", label = "opwolf.7z <Operation Wolf (World, set 1)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X006A, type="u8", condition="eq", value=0X75, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X0C9C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hostages (Cleared)" },
+        { address=0X0CDE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Enemy Clear Rate (Actual)" },
+        { address=0X0CE2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Enemies Cleared (Actual)" },
+        { address=0X0CE4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Enemies Cleared" },
+        { address=0X0D17, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of ground vehicles on screen" },
+      },
+      stage = {
+        { address=0X006A, type="u8", condition="eq", value=0X22, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Action" },
+        { address=0X006A, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Saved Hostages" },
+        { address=0X006A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Does a countdown to get next stage ready" },
+        { address=0X0D7C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 and 5 possible extra stage info" },
+        { address=0X18BE, type="u8", condition="eq", value=0X13, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 villager up" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X03A2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemies remaining (Soldier)" },
+        { address=0X18A5, type="u8", condition="eq", value=0X14, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Villager Died" },
+      },
+      health = {
+        { address=0X0C58, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (1f = fatal) decreased" },
+        { address=0X0C58, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (1f = fatal) increased" },
+        { address=0X18BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Villager Health (Jungle) decreased" },
+        { address=0X18BA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Villager Health (Jungle) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X096C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16bit - 1xxxx+" },
+        { address=0X096E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit - Score 1000s" },
+      },
+      collectibles = {
+        { address=0X0D76, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Credit/Coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X18A5, type="u8", condition="eq", value=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Still Alive" },
+        { address=0X18DA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health (Jungle)" },
+        { address=0X18DE, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 2 boss up" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X09F6, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer for Continue Play" },
+      },
+    },
+  },
+}

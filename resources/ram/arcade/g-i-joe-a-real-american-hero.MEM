@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "G.I. Joe: A Real American Hero",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "g-i-joe-a-real-american-hero",
+    file = "g-i-joe-a-real-american-hero.zip",
+    hashes = {
+      { hash = "94f40cd22046f82f39831d7ce1572c61", label = "gijoe.7z <G.I. Joe (World, EAB, set 1)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 - Demo Mode" },
+        { address=0X0062, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0422, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage number" },
+        { address=0X0CF4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression - 16-bit" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0399, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Credits Mode in Game Options: 02 = 1 Credit, 2 Lives (Default) increased" },
+        { address=0X0399, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Credits Mode in Game Options: 02 = 1 Credit, 2 Lives (Default) decreased" },
+        { address=0X0CFC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0CFC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XF169, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dipswitch - Lives per credit increased" },
+        { address=0XF169, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dipswitch - Lives per credit decreased" },
+      },
+      health = {
+        { address=0X0C2E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0C2E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X38AE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="CC health decreased" },
+        { address=0X38AE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="CC health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0CFA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 16-bit - hex" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF16A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dipswitch - Difficulty" },
+      },
+    },
+  },
+}

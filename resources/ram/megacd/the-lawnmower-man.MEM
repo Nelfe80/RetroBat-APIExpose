@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Lawnmower Man",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-lawnmower-man",
+    file = "the-lawnmower-man.zip",
+    hashes = {
+      { hash = "8b4d90416e102bfee7449d5e18947030", label = "Lawnmower Man, The (Europe)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1E82C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Quick Time Event Input Result (8-Bit)" },
+      },
+    },
+  },
+}

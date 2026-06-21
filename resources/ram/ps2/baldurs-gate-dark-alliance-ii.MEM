@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Baldur's Gate: Dark Alliance II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "baldurs-gate-dark-alliance-ii",
+    file = "baldurs-gate-dark-alliance-ii.zip",
+    hashes = {
+      { hash = "b0509a4de0ee63e18a649bf71e2e5258", label = "Baldur's Gate - Dark Alliance II (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X316AD4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quest - Clear Baldur's Gate's Sewers" },
+        { address=0X360200, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10 Cheat Used" },
+        { address=0X55FFDD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Current Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X56002C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Player 1 Current HP decreased" },
+        { address=0X56002C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Player 1 Current HP increased" },
+        { address=0X560030, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Player 1 Max HP decreased" },
+        { address=0X560030, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Player 1 Max HP increased" },
+        { address=0X560044, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Player 1 Current Energy decreased" },
+        { address=0X560044, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Player 1 Current Energy increased" },
+        { address=0X560048, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Player 1 Max Energy decreased" },
+        { address=0X560048, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Player 1 Max Energy increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X560064, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 Current Gold increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X31665C, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Quest - Destroy the Red Fang Maurauders" },
+        { address=0X31675C, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Quest - Destroy Firewind Manor" },
+        { address=0X316E04, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Quest - Destroy Mordoc SeLanmere" },
+        { address=0X316EBC, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Quest - Destroy Draezen Direhand" },
+      },
+    },
+  },
+}

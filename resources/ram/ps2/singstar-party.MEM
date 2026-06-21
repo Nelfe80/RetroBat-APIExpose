@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "SingStar Party",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "singstar-party",
+    file = "singstar-party.zip",
+    hashes = {
+      { hash = "77ed7e5738395aebf93527597004a099", label = "SingStar Party (Europe, Australia)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2DBFC4, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Is Game Paused" },
+      },
+    },
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Digital Monster: Ver. WonderSwan",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "digital-monster-ver-wonderswan",
+    file = "digital-monster-ver-wonderswan.zip",
+    hashes = {
+      { hash = "d5f7fbf06c57aa50f08c14e64d2e02a2", label = "Digimon - Ver. WonderSwan (Hong Kong) (En).ws" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X10EDA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Medal Data [8-Bit] [Bitflag]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X115CD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle Lifebar value - Player increased" },
+        { address=0X115CD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Lifebar value - Player decreased" },
+        { address=0X115CE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle Lifebar graphic - Player increased" },
+        { address=0X115CE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Lifebar graphic - Player decreased" },
+        { address=0X115CF, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle Lifebar value - Opponent increased" },
+        { address=0X115CF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Lifebar value - Opponent decreased" },
+        { address=0X115D0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle Lifebar graphic - Opponent increased" },
+        { address=0X115D0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle Lifebar graphic - Opponent decreased" },
+      },
+      health = {
+        { address=0X11553, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ver. 1 Training opponent health decreased" },
+        { address=0X11553, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ver. 1 Training opponent health increased" },
+        { address=0X115C9, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle Health - Player decreased" },
+        { address=0X115C9, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle Health - Player increased" },
+        { address=0X115CB, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle Health - Opponent decreased" },
+        { address=0X115CB, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle Health - Opponent increased" },
+      },
+    },
+  },
+}

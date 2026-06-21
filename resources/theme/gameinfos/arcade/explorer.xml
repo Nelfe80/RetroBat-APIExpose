@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ROP 13000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 GIZ 12500</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 SEZ 12000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 DAC 11500</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 LUP 11000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 ENP 10500</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

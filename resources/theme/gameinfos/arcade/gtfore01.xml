@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Left</text>
+			<color>${red}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>Backspin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Right</text>
+			<color>${green}</color>
+		</text>
+		<text name="button7" extra="true">
+			<text>Fly By</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

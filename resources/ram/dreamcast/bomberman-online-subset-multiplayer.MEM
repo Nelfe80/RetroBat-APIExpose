@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bomberman Online [Subset - Multiplayer]",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "bomberman-online-subset-multiplayer",
+    file = "bomberman-online-subset-multiplayer.zip",
+    hashes = {
+      { hash = "47fc98f54ff09de13b8b063768933de6", label = "Bomberman Online (USA) [Subset - Multi]" },
+    }
+  },
+
+  events = {
+  },
+}

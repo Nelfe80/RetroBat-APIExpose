@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Guitar Rock Tour",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "guitar-rock-tour",
+    file = "guitar-rock-tour.zip",
+    hashes = {
+      { hash = "5b007d7e20a481f3f92dc965d990a202", label = "Guitar Rock Tour (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X32200C, type="u8", condition="eq", value=0X00, action="LEVEL_EASY", no_log=false, no_survey=false, desc="EASY" },
+        { address=0X32200C, type="u8", condition="eq", value=0X01, action="LEVEL_MEDIUM", no_log=false, no_survey=false, desc="MEDIUM" },
+        { address=0X32200C, type="u8", condition="eq", value=0X02, action="LEVEL_HARD", no_log=false, no_survey=false, desc="HARD" },
+        { address=0X32200C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="< LEVEL SELECT >" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBA1D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Score" },
+      },
+    },
+  },
+}

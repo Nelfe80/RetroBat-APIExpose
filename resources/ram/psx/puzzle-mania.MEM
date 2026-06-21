@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Puzzle Mania",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-mania",
+    file = "puzzle-mania.zip",
+    hashes = {
+      { hash = "74447450c0658ec8a499b4dfde93a2dd", label = "Puzzle Mania (Japan) (Major Wave)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X467A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="If you beat the level 1 and can level select in sound cube" },
+        { address=0X467A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="If you beat the level 2 and can level select in sound cube" },
+        { address=0X467AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="If you beat the level 3 and can level select in sound cube" },
+        { address=0X467B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="If you beat the level 4 and can level select in sound cube" },
+        { address=0X467B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="If you beat the level 5 and can level select in sound cube" },
+        { address=0X467B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="If you beat the level 6 and can level select in sound cube" },
+        { address=0X467BC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="If you beat the level 7 and can level select in sound cube" },
+        { address=0X467C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="If you beat the level 8 and can level select in sound cube" },
+      },
+      stage = {
+        { address=0X119956, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This tells you what stage you on in on sound cube." },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X119974, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="This tells how much energy you have in Sound cube. decreased" },
+        { address=0X119974, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="This tells how much energy you have in Sound cube. increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Fred Couples Golf",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "fred-couples-golf",
+    file = "fred-couples-golf.zip",
+    hashes = {
+      { hash = "fb2f22baffdbe79cd255d8ec9cb133ad", label = "Fred Couples Golf (USA).gg" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0B52, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="- 0x01 when talking to Caddie" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0253, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Caddie ingame 00 to 04 counter clockwise" },
+      },
+    },
+  },
+}

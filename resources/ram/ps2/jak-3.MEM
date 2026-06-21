@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Jak 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jak-3",
+    file = "jak-3.zip",
+    hashes = {
+      { hash = "f6acd86c693f66fe1a29db979f22cd1b", label = "Jak 3 (USA) (Debug Patch) (Bartis1989)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5C0653, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Unlock the Dust Demon" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X5C0649, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mirror World" },
+        { address=0X5C0651, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mirror World" },
+      },
+      stage = {
+        { address=0X5C0650, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Scene Player Act 1" },
+        { address=0X5C0650, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Scene Player Act 2" },
+        { address=0X5C0650, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Scene Player Act 3" },
+        { address=0X5C0650, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level Select Act 1" },
+        { address=0X5C0650, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level Select Act 2" },
+        { address=0X5C0650, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level Select Act 3" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X5C0655, type="u8", condition="bit_true", bit=3, mask=0X08, action="HIT", no_log=false, no_survey=false, desc="Concussor Damage Upgrade" },
+        { address=0X5C0655, type="u8", condition="bit_true", bit=5, mask=0X20, action="HIT", no_log=false, no_survey=false, desc="Blaster Damage Upgrade" },
+        { address=0X5C0656, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="Vulcan Fury Damage Upgrade" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5C064A, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=true, no_survey=false, desc="Unlimited Ammo" },
+        { address=0X5C0652, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=true, no_survey=false, desc="Unlimited Ammo" },
+        { address=0X5C0655, type="u8", condition="bit_true", bit=4, mask=0X10, action="AMMO_STATE", no_log=true, no_survey=false, desc="Plasmite RPG Ammo Efficiency" },
+        { address=0X5C0656, type="u8", condition="bit_true", bit=2, mask=0X04, action="AMMO_STATE", no_log=true, no_survey=false, desc="Needle Lazer Ammo Efficiency" },
+        { address=0X5C0656, type="u8", condition="bit_true", bit=5, mask=0X20, action="AMMO_STATE", no_log=true, no_survey=false, desc="Super Nova Ammo Efficiency" },
+        { address=0X5C0656, type="u8", condition="bit_true", bit=6, mask=0X40, action="AMMO_STATE", no_log=true, no_survey=false, desc="Increased Red Ammo Capacity" },
+        { address=0X5C0656, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Increased Yellow Ammo Capacity" },
+        { address=0X5C0657, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=true, no_survey=false, desc="Increased Blue Ammo Capacity" },
+        { address=0X5C0657, type="u8", condition="bit_true", bit=1, mask=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Increased Dark Ammo Capacity" },
+      },
+    },
+  },
+}

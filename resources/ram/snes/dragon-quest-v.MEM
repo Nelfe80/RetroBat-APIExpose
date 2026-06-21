@@ -1,0 +1,143 @@
+return {
+  game = {
+    title = "Dragon Quest V",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-quest-v",
+    file = "dragon-quest-v.zip",
+    hashes = {
+      { hash = "5651c58a1c87c42f6b91519969658a88", label = "Dragon Quest V - Tenkuu no Hanayome (Japan) (En) (DeJap) (2.01F) (Alt).sfc" },
+      { hash = "a1222de3d989fdafd3311f37d89cd025", label = "Dragon Quest V - Tenkuu no Hanayome (Japan) (En) (DeJap) (2.01F).sfc" },
+      { hash = "d8e95e744e66e7ec30d9591f71dafd0a", label = "Dragon Quest V - Tenkuu no Hanayome (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2190, type="u8", condition="eq", value=0XB6, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="end of child phase (child)" },
+        { address=0X2190, type="u8", condition="eq", value=0XB5, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="hero's statue taken (teen)" },
+        { address=0X2190, type="u8", condition="eq", value=0XB4, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="return to Master Dragon after defeating Mildrath" },
+        { address=0X2190, type="u8", condition="eq", value=0XB3, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="end of intro, boat (child)" },
+        { address=0X2190, type="u8", condition="eq", value=0XB2, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="boat arrives at Vista Harbos (teen)" },
+        { address=0X2190, type="u8", condition="eq", value=0XB1, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="begin game, also end game" },
+        { address=0X2190, type="u8", condition="eq", value=0XB0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="end of child phase (child)" },
+        { address=0X21B6, type="u8", condition="eq", value=0XB0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="watch Pusan meditate, Zenithia (later) [resets when done], watch credits" },
+        { address=0X21BA, type="u8", condition="eq", value=0XB6, action="DEMO_MODE", no_log=false, no_survey=false, desc="pull second lever, 3F Demon's Tower (teen)" },
+        { address=0X21BA, type="u8", condition="eq", value=0XB5, action="DEMO_MODE", no_log=false, no_survey=false, desc="reveal faerie castle, Mysterious Lake (later)" },
+        { address=0X21BA, type="u8", condition="eq", value=0XB4, action="DEMO_MODE", no_log=false, no_survey=false, desc="Ivol turns into ring, Great Temple (later)" },
+        { address=0X21BA, type="u8", condition="eq", value=0XB3, action="DEMO_MODE", no_log=false, no_survey=false, desc="message from mother, Great Temple (later)" },
+        { address=0X21BA, type="u8", condition="eq", value=0XB2, action="DEMO_MODE", no_log=false, no_survey=false, desc="gain control of hero, Slavery (teen)" },
+        { address=0X21BA, type="u8", condition="eq", value=0XB1, action="DEMO_MODE", no_log=false, no_survey=false, desc="open the water gate, near Mountain Village (teen)" },
+        { address=0X21BA, type="u8", condition="eq", value=0XB0, action="DEMO_MODE", no_log=false, no_survey=false, desc="use the holy chamberpot, 6F Evil Mountain (later)" },
+        { address=0X21C0, type="u8", condition="eq", value=0XB5, action="DEMO_MODE", no_log=false, no_survey=false, desc="examine the demon jar with Flora, Shrine west of Mountain Village (teen)" },
+        { address=0X21C0, type="u8", condition="eq", value=0XB2, action="DEMO_MODE", no_log=false, no_survey=false, desc="talk to chancellor, 10F Demon's Tower (teen)" },
+        { address=0X21C1, type="u8", condition="eq", value=0XB6, action="DEMO_MODE", no_log=false, no_survey=false, desc="turned to stone, 11F Demon's Tower (teen)" },
+        { address=0X21C1, type="u8", condition="eq", value=0XB5, action="DEMO_MODE", no_log=false, no_survey=false, desc="listen to Ludman's plea, Salabona (later)" },
+        { address=0X21C1, type="u8", condition="eq", value=0XB4, action="DEMO_MODE", no_log=false, no_survey=false, desc="talk to lady on way out of Ludman's, Salabona (later)" },
+        { address=0X21C1, type="u8", condition="eq", value=0XB3, action="DEMO_MODE", no_log=false, no_survey=false, desc="talk to Andy, Salabona (later)" },
+        { address=0X21C1, type="u8", condition="eq", value=0XB2, action="DEMO_MODE", no_log=false, no_survey=false, desc="leave Ludman's house (after defeating Buorn), Salabona (later)" },
+        { address=0X21C1, type="u8", condition="eq", value=0XB1, action="DEMO_MODE", no_log=false, no_survey=false, desc="witness Ludman send guard to watch pot, Salabona (later)" },
+        { address=0X21C1, type="u8", condition="eq", value=0XB0, action="DEMO_MODE", no_log=false, no_survey=false, desc="examine jar, shrine west of mountain village (later)" },
+        { address=0X21E1, type="u8", condition="eq", value=0XB2, action="DEMO_MODE", no_log=false, no_survey=false, desc="fight Mammoo and Balloon, 10F Demon Tower (teen)" },
+        { address=0X21F8, type="u8", condition="eq", value=0XB6, action="DEMO_MODE", no_log=false, no_survey=false, desc="defeat Loenar and Orc King, 2F Demon Tower (teen)" },
+        { address=0X21F8, type="u8", condition="eq", value=0XB5, action="DEMO_MODE", no_log=false, no_survey=false, desc="defeat Leonar guard, 2F Demon Tower (teen)" },
+        { address=0X21F8, type="u8", condition="eq", value=0XB4, action="DEMO_MODE", no_log=false, no_survey=false, desc="defeat Lv.20 Orc, 10F Demon Tower (teen)" },
+        { address=0X21F8, type="u8", condition="eq", value=0XB3, action="DEMO_MODE", no_log=false, no_survey=false, desc="defeat Lv.35 Wyvern, 10F Demon Tower (teen)" },
+        { address=0X21F8, type="u8", condition="eq", value=0XB0, action="DEMO_MODE", no_log=false, no_survey=false, desc="set when completing 'child' act" },
+        { address=0X21F9, type="u8", condition="eq", value=0XB6, action="DEMO_MODE", no_log=false, no_survey=false, desc="set when completing 'child' act" },
+        { address=0X21F9, type="u8", condition="eq", value=0XB5, action="DEMO_MODE", no_log=false, no_survey=false, desc="push boulder into hole, Demon Tower" },
+        { address=0X21F9, type="u8", condition="eq", value=0XB4, action="DEMO_MODE", no_log=false, no_survey=false, desc="set when completing 'child' act" },
+        { address=0X21F9, type="u8", condition="eq", value=0XB3, action="DEMO_MODE", no_log=false, no_survey=false, desc="push boulder into hole, Demon Tower" },
+        { address=0X21F9, type="u8", condition="eq", value=0XB2, action="DEMO_MODE", no_log=false, no_survey=false, desc="complete generation one" },
+        { address=0X21F9, type="u8", condition="eq", value=0XB0, action="DEMO_MODE", no_log=false, no_survey=false, desc="complete generation one" },
+        { address=0X221E, type="u8", condition="eq", value=0XB1, action="DEMO_MODE", no_log=false, no_survey=false, desc="hidden item in Kabochi" },
+        { address=0X221E, type="u8", condition="eq", value=0XB0, action="DEMO_MODE", no_log=false, no_survey=false, desc="hidden item in Shahanna" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2192, type="u8", condition="eq", value=0XB3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="defeat first battle, overworld (child)" },
+      },
+      zone = {
+        { address=0X21D6, type="u8", condition="eq", value=0XB3, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="message from mother, Dark World Portal (later)" },
+        { address=0X21D6, type="u8", condition="eq", value=0XB2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="pick up sages stone, Dark World Portal (later)" },
+      },
+      stage = {
+        { address=0X2052, type="u8", condition="eq", value=0XB7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ring of Life equipped" },
+        { address=0X2052, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Character Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2195, type="u8", condition="eq", value=0XB6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="spend night at Sancho's after freeing injured man, Santa Rosa (child)" },
+        { address=0X2195, type="u8", condition="eq", value=0XB5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="agree to escort Bianca and her mother back to Alcapa, Santa Rosa (child)" },
+        { address=0X2195, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="finish escorting Bianca and her mother [also resets 20 bit], Alcapa (child)" },
+        { address=0X2195, type="u8", condition="eq", value=0XB3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bianca follows hero around Alcapa, Alcapa (child)" },
+        { address=0X2195, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="talk to punks torturing cat, Alcapa (child)" },
+        { address=0X2195, type="u8", condition="eq", value=0XB1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="spend night in Alcapa, Alcapa (child)" },
+        { address=0X2195, type="u8", condition="eq", value=0XB0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bianca joins the party again, Alcapa (child)" },
+        { address=0X21D6, type="u8", condition="eq", value=0XB5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ojiron requests audience after rescuing wife, Granvania (later)" },
+        { address=0X21D6, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="talk with Ojiron after he requests audience, Granvania (later)" },
+      },
+      health = {
+        { address=0X21BF, type="u8", condition="eq", value=0XB2, action="HEALTH_STATE", no_log=false, no_survey=false, desc="see mother's birthplace on map, Granvania (later) [resets after seeing map]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X21AB, type="u8", condition="eq", value=0XB3, action="COIN_GAIN", no_log=false, no_survey=false, desc="collect ring of flame, volcano (teen)" },
+        { address=0X21AB, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="? (between fire ring and water ring)" },
+        { address=0X21AB, type="u8", condition="eq", value=0XB1, action="MONEY_STATE", no_log=false, no_survey=false, desc="give water ring to Ludman, Salabona (teen)" },
+        { address=0X21B5, type="u8", condition="eq", value=0XB6, action="MONEY_STATE", no_log=false, no_survey=false, desc="arrive at Faerie Village (later)" },
+        { address=0X21B5, type="u8", condition="eq", value=0XB5, action="COIN_GAIN", no_log=false, no_survey=false, desc="get glowing orb from queen, Palace of Faeries (later)" },
+        { address=0X21B5, type="u8", condition="eq", value=0XB4, action="MONEY_STATE", no_log=false, no_survey=false, desc="restor Master Dragon, Zenithia (later)" },
+        { address=0X21B5, type="u8", condition="eq", value=0XB3, action="COIN_GAIN", no_log=false, no_survey=false, desc="get Zenithian Bells, Zenithia (later)" },
+        { address=0X21B5, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="finish watching Pusan meditate, Zenithia (later)" },
+        { address=0X21B5, type="u8", condition="eq", value=0XB1, action="MONEY_STATE", no_log=false, no_survey=false, desc="talk to Henry about his bride, Reinhart (teen)" },
+        { address=0X21E6, type="u8", condition="eq", value=0XB5, action="COIN_GAIN", no_log=false, no_survey=false, desc="collect ring of flames (teen)" },
+        { address=0X223C, type="u8", condition="eq", value=0XB5, action="COIN_GAIN", no_log=false, no_survey=false, desc="collect ring of flames (teen)" },
+        { address=0X223C, type="u8", condition="eq", value=0XB1, action="COIN_GAIN", no_log=false, no_survey=false, desc="collect ring of water, Waterfall Cave (teen)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2197, type="u8", condition="eq", value=0XB1, action="BOSS_HIT", no_log=false, no_survey=false, desc="talk to boss ghost, Castle Lenoire (child)" },
+        { address=0X2197, type="u8", condition="eq", value=0XB0, action="BOSS_HIT", no_log=false, no_survey=false, desc="watch boss ghost leave throne room, Castle Lenoire (child)" },
+        { address=0X2198, type="u8", condition="eq", value=0XB6, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="defeat boss ghost, Castle Lenoire (child)" },
+        { address=0X2198, type="u8", condition="eq", value=0XB5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bianca wants to name the kitty, Alcapa (child)" },
+        { address=0X2198, type="u8", condition="eq", value=0XB4, action="BOSS_HIT", no_log=false, no_survey=false, desc="name the kitty, Alcapa (child)" },
+        { address=0X2198, type="u8", condition="eq", value=0XB1, action="BOSS_HIT", no_log=false, no_survey=false, desc="- return to Santa Rosa after retrieving the Flute of Spring (child)" },
+        { address=0X2198, type="u8", condition="eq", value=0XB0, action="BOSS_HIT", no_log=false, no_survey=false, desc="show golden orb to man outside church, Santa Rosa (child)" },
+        { address=0X21A7, type="u8", condition="eq", value=0XB3, action="BOSS_HIT", no_log=false, no_survey=false, desc="let boss ghost go free, Castle Lenoire (child)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X21B1, type="u8", condition="eq", value=0XB1, action="JUMPING", no_log=true, no_survey=false, desc="watch man jump into pit, cave west of Kabochi (teen)" },
+        { address=0X21B1, type="u8", condition="eq", value=0XB0, action="JUMPING", no_log=true, no_survey=false, desc="talk to man after jumping in pit, cave west of Kabochi (teen)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X21BC, type="u8", condition="eq", value=0XB1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="talk to guard about destroyed village, Reinhart (teen)" },
+        { address=0X21BD, type="u8", condition="eq", value=0XB5, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="push switch on column, Cave of Trials (teen)" },
+        { address=0X21C6, type="u8", condition="eq", value=0XB6, action="DOOR_OPENED", no_log=false, no_survey=false, desc="open dungeon door, Reinhart (teen)" },
+        { address=0X21E2, type="u8", condition="eq", value=0XB5, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="flip rusted switch, B3 underwater cave (later)" },
+        { address=0X21E2, type="u8", condition="eq", value=0XB0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="activate switch on pedestal under Reinhart bridge (teen)" },
+        { address=0X21E6, type="u8", condition="eq", value=0XB4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="unlock front door of Castle Lenoire (before later)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X21A9, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="b7: return to Granvania after un-statued (later)" },
+        { address=0X21AD, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="b7: time advances as statue (statue)" },
+        { address=0X21D7, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="b7: man launched from runaway cart, underwater cave (later)" },
+      },
+    },
+  },
+}

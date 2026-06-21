@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "NHL 2002",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "nhl-2002",
+    file = "nhl-2002.zip",
+    hashes = {
+      { hash = "200b0560c02ccefc8183f8bf60618013", label = "NHL 2002 (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA2D9AB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] NHL Cheat Cards - Profile 1 - Next Goal Wins - Diamond Only*" },
+        { address=0XA2D9AF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] NHL Cheat Cards - Profile 1 - Clear the Deck - Diamond Only" },
+        { address=0XA2DA2C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] NHL Cards Task List - Beginner - Level One" },
+        { address=0XA2DBA8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] NHL Cards Task List - Easy - Level One" },
+        { address=0XA2DD24, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] NHL Cards Task List - Medium - Level One" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X41B934, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] NHL Card points in current game, only updates after win / loss. Quit doesn't give points" },
+        { address=0X41C178, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Points Earned on Current Profile while in game - Away Team" },
+        { address=0X41C198, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Points Earned on Current Profile while in game - Home Team" },
+        { address=0X7AB5AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] NHL Cards - Card Points Profile 2" },
+        { address=0X8E8CAC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] NHL Cards - Card Points Profile 3" },
+        { address=0X8EB79C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] NHL Cards - Card Points Profile 4" },
+        { address=0XA2D6FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] NHL Cards - profile 1 card points" },
+      },
+      collectibles = {
+        { address=0XA2D97E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] NHL Cheat Cards - Profile 1 - Fired Up - Gold increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3B156C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16bit] In-game period timer" },
+        { address=0XA2D99C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] NHL Cheat Cards - Profile 1 - Frozen in Time - B" },
+        { address=0XA2D99D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] NHL Cheat Cards - Profile 1 - Frozen in Time - S" },
+        { address=0XA2D99E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] NHL Cheat Cards - Profile 1 - Frozen in Time - G" },
+      },
+    },
+  },
+}

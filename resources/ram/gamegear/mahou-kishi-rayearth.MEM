@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Mahou Kishi Rayearth",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "mahou-kishi-rayearth",
+    file = "mahou-kishi-rayearth.zip",
+    hashes = {
+      { hash = "846d48d0f4024c8094117599d0e1eef1", label = "Magic Knight Rayearth (Japan).gg" },
+      { hash = "b9b1a0f7d84c6d01fa53c56d87d23d53", label = "Magic Knight Rayearth (Japan) (En) (v1.0) (Filler).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001B, type="u24le", condition="eq", value=0X01, action="CORPORATE_SCREEN", no_log=false, no_survey=false, desc="Sega intro" },
+        { address=0X001B, type="u24le", condition="eq", value=0X03, action="GAME_PLAYING", no_log=false, no_survey=false, desc="walking around one of the levels" },
+        { address=0X001B, type="u24le", condition="eq", value=0X13, action="PAUSE_ON", no_log=false, no_survey=false, desc="transition (post-battle, post-phone call & post-pause menu)" },
+        { address=0X001B, type="u24le", condition="eq", value=0X1B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="transition (to title screen)" },
+        { address=0X001B, type="u24le", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X001B, type="u24le", condition="eq", value=0X23, action="PAUSE_ON", no_log=false, no_survey=false, desc="transition (to pause menu)" },
+        { address=0X001B, type="u24le", condition="eq", value=0X24, action="PAUSE_ON", no_log=false, no_survey=false, desc="pause menu (magic, order, items, exit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0044, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hikaru Level" },
+        { address=0X0054, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fuu Level" },
+        { address=0X0064, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="UMI Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X084F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X084F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X08A7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hikaru HP decreased" },
+        { address=0X08A7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hikaru HP increased" },
+        { address=0X08A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fuu HP decreased" },
+        { address=0X08A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fuu HP increased" },
+        { address=0X08A9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Umi HP decreased" },
+        { address=0X08A9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Umi HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0FBF, type="u8", condition="eq", value=0X06, action="TREASURE", no_log=false, no_survey=false, desc="Emerald Typhoon" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X001B, type="u24le", condition="eq", value=0X0B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="interact dialogue (with an object)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X001B, type="u24le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Game State" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Crazy Taxi",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "crazy-taxi",
+    file = "crazy-taxi.zip",
+    hashes = {
+      { hash = "af5473c02de706d47a13fddd523b47e4", label = "Crazy Taxi (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

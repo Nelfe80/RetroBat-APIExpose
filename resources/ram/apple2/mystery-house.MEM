@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Mystery House",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mystery-house",
+    file = "mystery-house.zip",
+    hashes = {
+      { hash = "2dbf63fd426870235da903fee3c5fcfe", label = "Mystery House (4am crack).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0087, type="u8", condition="eq", value=0X87, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over / try again prompt (startup frame)" },
+        { address=0X0087, type="u8", condition="eq", value=0X1B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over / try again prompt" },
+        { address=0X0830, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8-bit Boolean] Game Started (0x00 = yes, 0xff = no / title screen)" },
+        { address=0X0852, type="u8", condition="eq", value=0X1B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Hallway facing small bedroom (2F) / (Game's title screen and instructions)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0964, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the ground" },
+        { address=0X09C8, type="u8", condition="eq", value=0X0E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the ground" },
+        { address=0X09FA, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the ground" },
+        { address=0X0AAB, type="u8", condition="eq", value=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the ground" },
+        { address=0X0B53, type="u8", condition="eq", value=0X29, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the ground" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0841, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-bit Boolean] NPC Status - Joe (0 = alive, 1 = dead)" },
+        { address=0X0845, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-bit Boolean] NPC Status - Daisy (0 = alive, 1 = dead)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0834, type="u8", condition="eq", value=0X0D, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Trapdoor seen from telescope / Fire started in dining room while holding pitcher of water" },
+        { address=0X0839, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Front porch (door closed)" },
+        { address=0X0839, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Front porch (door open)" },
+        { address=0X0839, type="u8", condition="eq", value=0X06, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Library (door closed)" },
+        { address=0X0839, type="u8", condition="eq", value=0X07, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Library (door open)" },
+        { address=0X0839, type="u8", condition="eq", value=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Side yard (door open)" },
+        { address=0X0839, type="u8", condition="eq", value=0X09, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Side yard (door closed)" },
+        { address=0X0839, type="u8", condition="eq", value=0X0F, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Back yard (door closed, gate closed)" },
+        { address=0X0839, type="u8", condition="eq", value=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Back yard (door open, gate closed)" },
+        { address=0X0839, type="u8", condition="eq", value=0X11, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Back yard (door open, gate open)" },
+        { address=0X0839, type="u8", condition="eq", value=0X12, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Back yard (door closed, gate open)" },
+        { address=0X0839, type="u8", condition="eq", value=0X1C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Dining room (exterior door closed)" },
+        { address=0X0839, type="u8", condition="eq", value=0X1D, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Dining room (exterior door open)" },
+        { address=0X083B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8-bit Boolean] Front Door (0 = unlocked, 1 = closed and locked)" },
+        { address=0X0846, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8-bit Boolean] Player Opened Front Door at Start of Game (0 = no, 1 = yes)" },
+        { address=0X0848, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8-bit Boolean] Kitchen Door (0 = closed, 1 = opened)" },
+        { address=0X0852, type="u8", condition="eq", value=0X1D, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hallway facing nursery door (2F)" },
+        { address=0X0AE7, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Attic Trapdoor Status (0x27 = Active, 0xfd = Inactive)" },
+      },
+    },
+  },
+}

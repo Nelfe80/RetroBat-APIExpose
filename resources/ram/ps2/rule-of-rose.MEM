@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Rule of Rose",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Horror, Puzzle"
+  },
+
+  rom = {
+    name = "rule-of-rose",
+    file = "rule-of-rose.zip",
+    hashes = {
+      { hash = "2c5b44ff8eea3439253023176feada60", label = "Rule of Rose (Europe) (En,Fr,De,Es,It)" },
+      { hash = "33f1e96f8090f1e0673730674d1e14c4", label = "Rule of Rose (USA)" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0XA67866, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16Bit) Boss 1 HP" },
+      },
+    },
+  },
+}

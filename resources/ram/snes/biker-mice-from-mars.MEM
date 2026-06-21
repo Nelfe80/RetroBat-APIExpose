@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Biker Mice From Mars",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Racing"
+  },
+
+  rom = {
+    name = "biker-mice-from-mars",
+    file = "biker-mice-from-mars.zip",
+    hashes = {
+      { hash = "a1f47d45a9e5f93b3f10057d1d0e1469", label = "Biker Mice from Mars (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X003C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Main Screen" },
+        { address=0X004C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XFE44, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFE24, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player points - BCD" },
+        { address=0XFE26, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2nd biker points - BCD" },
+        { address=0XFE28, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="3rd biker points - BCD" },
+        { address=0XFE2A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="4th biker points - BCD" },
+        { address=0XFE2C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="5nd biker points - BCD" },
+        { address=0XFE2E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="6th biker points - BCD" },
+      },
+      collectibles = {
+        { address=0XFE30, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Decimal - Money x 100 increased" },
+      },
+    },
+  },
+}

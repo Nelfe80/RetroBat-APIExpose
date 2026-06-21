@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Dexter's Laboratory: Deesaster Strikes",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "dexters-laboratory-deesaster-strikes",
+    file = "dexters-laboratory-deesaster-strikes.zip",
+    hashes = {
+      { hash = "5e42d25ee9c5c16a7169f1c5a35b9451", label = "Dexter's Laboratory - Deesaster Strikes! (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X38CFC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode (2 bytes)" },
+        { address=0X38CFE, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Progress (2 bytes)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3A5B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked 1 (1 byte)" },
+        { address=0X3A5B5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked 2 (1 byte)" },
+        { address=0X3A5B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked 3 (1 byte)" },
+        { address=0X3A5B7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked 4 (1 byte)" },
+        { address=0X3A6A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (2 bytes)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3A5BC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (2 bytes) increased" },
+        { address=0X3A5BC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (2 bytes) decreased" },
+        { address=0X3A5D8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting Lives (4 bytes) increased" },
+        { address=0X3A5D8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting Lives (4 bytes) decreased" },
+      },
+      health = {
+        { address=0X3A5BE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (2 bytes) decreased" },
+        { address=0X3A5BE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (2 bytes) increased" },
+        { address=0X3A808, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Bar Presentation (4 bytes) decreased" },
+        { address=0X3A808, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Bar Presentation (4 bytes) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3A69C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo (4 bytes)" },
+      },
+    },
+  },
+}

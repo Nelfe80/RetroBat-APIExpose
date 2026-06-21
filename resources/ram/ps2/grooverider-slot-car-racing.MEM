@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Grooverider: Slot Car Racing",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "grooverider-slot-car-racing",
+    file = "grooverider-slot-car-racing.zip",
+    hashes = {
+      { hash = "fc05f407e3bb7eccf27e5182df8e3341", label = "Grooverider (Europe, Australia) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

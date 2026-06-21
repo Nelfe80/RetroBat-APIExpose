@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Riven: The Sequel to Myst",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "riven-the-sequel-to-myst",
+    file = "riven-the-sequel-to-myst.zip",
+    hashes = {
+      { hash = "0982e1d6c7abdf3b856b5997205dfb24", label = "Riven - The Sequel to Myst (USA) (Disc 2)" },
+      { hash = "14e27458859f6dc2dad3ee3f0831202a", label = "Riven - The Sequel to Myst (USA) (Disc 4)" },
+      { hash = "484ffba3c92a48ded7fb1214f5523397", label = "Riven - The Sequel to Myst (USA) (Disc 3)" },
+      { hash = "4d4db496b855176ebf8d61ddd3a2ccee", label = "Riven - The Sequel to Myst (USA) (Disc 5)" },
+      { hash = "766bbc6609c1510738e80e1d0d1ec166", label = "Riven - The Sequel to Myst (USA) (Disc 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X10168, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Dome Island Telescope Hatch Combo" },
+        { address=0X101A6, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Prison Island Catherine Elevator Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10016, type="u16le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Empty" },
+        { address=0X10016, type="u16le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Full" },
+        { address=0X10016, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boiler Water Level" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10096, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Survey Island Gold Elevator State increased" },
+        { address=0X100F2, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Jungle Door To Clearing increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1000E, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Boiler Door Lock" },
+        { address=0X10012, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Crater Boiler Door" },
+        { address=0X10026, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Crater Double Doors" },
+        { address=0X10028, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Lab Front Door" },
+        { address=0X1002A, type="u16le", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X1002A, type="u16le", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X10030, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Lab Back Door" },
+        { address=0X10034, type="u16le", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X10034, type="u16le", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X10046, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Maybe: Lab stove door state" },
+        { address=0X10062, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Crater Dome Door" },
+        { address=0X1007C, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Temple Hidden Door" },
+        { address=0X1007E, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Temple Main Door" },
+        { address=0X1009A, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Survey Island Maglev Door" },
+        { address=0X100C0, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Dome Temple Projector Door (Bugged)" },
+        { address=0X100F8, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Jungle Door to Cave" },
+        { address=0X100FA, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Execution Tower Door" },
+        { address=0X10102, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Execution Ledge Door" },
+        { address=0X10110, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Execution Prison Secret Door" },
+        { address=0X10114, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Rebel Cave Door" },
+        { address=0X10128, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Village Door Knock State" },
+        { address=0X10136, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Classroom Door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1008C, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Prison Island Combo Counter" },
+        { address=0X100DC, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Dome Island Telescope Hatch Combo Counter" },
+      },
+    },
+  },
+}

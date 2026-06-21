@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Hellfire",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "hellfire",
+    file = "hellfire.zip",
+    hashes = {
+      { hash = "aba24904fb04dd2402068c3cfe75bb9b", label = "hellfire2a.7z <Hellfire (2P set, older)>" },
+      { hash = "b66919c828e3d861ff48b08b306e95cb", label = "hellfire1.7z <Hellfire (1P set)>" },
+      { hash = "e4c1a5aaf59f7204ca1e411d8bf060bd", label = "hellfire.7z <Hellfire (2P set)>" },
+      { hash = "fb214e12aaa88aea8829493a8c444fd6", label = "hellfire1a.7z <Hellfire (1P set, older)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19002, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X19004, type="u8", condition="eq", value=0X30, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0X19004, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 Lives" },
+        { address=0X19004, type="u8", condition="eq", value=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="4 Lives" },
+        { address=0X19004, type="u8", condition="eq", value=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="5 Lives" },
+        { address=0X19004, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting Lives increased" },
+        { address=0X19004, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting Lives decreased" },
+      },
+    },
+  },
+}

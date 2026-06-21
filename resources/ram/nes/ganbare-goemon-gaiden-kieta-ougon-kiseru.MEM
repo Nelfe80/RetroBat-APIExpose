@@ -1,0 +1,135 @@
+return {
+  game = {
+    title = "Ganbare Goemon Gaiden: Kieta Ougon Kiseru",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ganbare-goemon-gaiden-kieta-ougon-kiseru",
+    file = "ganbare-goemon-gaiden-kieta-ougon-kiseru.zip",
+    hashes = {
+      { hash = "29988a46ed6e64521f9143b37ae9d126", label = "Ganbare Goemon Gaiden - Kieta Ougon Kiseru (Japan) (En) (v0.99c) (Adventurous).nes" },
+      { hash = "ae9b18b69ee9fe316bc64d6fbf9f8b4a", label = "Ganbare Goemon Gaiden - Kieta Ougon Kiseru (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006C, type="u8", condition="eq", value=0X54, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon" },
+        { address=0X006C, type="u8", condition="eq", value=0X55, action="DEMO_MODE", no_log=false, no_survey=false, desc="Mini Demon" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X005D, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hometown" },
+        { address=0X005D, type="u8", condition="eq", value=0X1C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Halls Of Temple" },
+        { address=0X005D, type="u8", condition="eq", value=0X57, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Inside Rooms Of Temple" },
+        { address=0X005D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Directories of Overworld, Towns, Places, Inside of Buildings, and Battle Locations? (Not good ad" },
+        { address=0X02BB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld, Towns, Places, Inside of Buildings, and Backgrounds for Battle?" },
+        { address=0X601D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goemon's Level" },
+        { address=0X601E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ebisumaru's Level" },
+        { address=0X601F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Koban's Level" },
+        { address=0X6020, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yae's Level" },
+        { address=0X6021, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lin's Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X006B, type="u8", condition="eq", value=0X50, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Trying to Equip To Dead Party Member" },
+        { address=0X006B, type="u8", condition="eq", value=0X90, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dialogue With NPC, Party Member Dies" },
+        { address=0X006B, type="u8", condition="eq", value=0XDB, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Playing Dead In Battle" },
+        { address=0X6142, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier" },
+      },
+      health = {
+        { address=0X006B, type="u8", condition="eq", value=0X88, action="HIT", no_log=false, no_survey=false, desc="Enemy Taking Damage / In a Dungeon? / Overburdened" },
+        { address=0X006B, type="u8", condition="eq", value=0X89, action="HIT", no_log=false, no_survey=false, desc="Party Member Taking Damage" },
+        { address=0X006B, type="u8", condition="eq", value=0XEF, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max HP Up / Witch's House Before Choosing Who to Heal Poison" },
+        { address=0X6024, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Goemon's Current Health decreased" },
+        { address=0X6024, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Goemon's Current Health increased" },
+        { address=0X6026, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Ebisumaru's Current Health decreased" },
+        { address=0X6026, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Ebisumaru's Current Health increased" },
+        { address=0X6028, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Koban's Current Health decreased" },
+        { address=0X6028, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Koban's Current Health increased" },
+        { address=0X602A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Yae's Current Health decreased" },
+        { address=0X602A, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Yae's Current Health increased" },
+        { address=0X602C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Lin's Current Health decreased" },
+        { address=0X602C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Lin's Current Health increased" },
+        { address=0X6034, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Goemon's Max Health decreased" },
+        { address=0X6034, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Goemon's Max Health increased" },
+        { address=0X6036, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Ebisumaru's Max Health decreased" },
+        { address=0X6036, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Ebisumaru's Max Health increased" },
+        { address=0X6038, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Koban's Max Health decreased" },
+        { address=0X6038, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Koban's Max Health increased" },
+        { address=0X603A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Yae's Max Health decreased" },
+        { address=0X603A, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Yae's Max Health increased" },
+        { address=0X603C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Lin's Max Health decreased" },
+        { address=0X603C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Lin's Max Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6154, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Bear's Castle" },
+        { address=0X6155, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Bear's Castle" },
+        { address=0X6156, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Haikara's Prison, Hokkaido Passage, Tongari Mountain, Floating Castle & Ninnin" },
+        { address=0X6158, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Golden Mountain" },
+        { address=0X6159, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Dodeka Mountain, Golden Mountain & Trick Island" },
+        { address=0X615C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Treasure Mountain" },
+        { address=0X615D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Acchicchi Cave" },
+        { address=0X615E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Acchicchi Cave" },
+        { address=0X615F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Acchicchi Cave & Tantrum Mountain" },
+        { address=0X6160, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Tantrum Mountain" },
+        { address=0X6161, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Magistrate Mansion & Tantrum Mountain" },
+        { address=0X6162, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure Flags] Great Edo's Castle & Research Institute" },
+      },
+      weapon = {
+        { address=0X006B, type="u8", condition="eq", value=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="First Hit Allowed / Inside Weapon Shop / Inside Armor Shop / Inside Item Shop" },
+        { address=0X006B, type="u8", condition="eq", value=0X81, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Looking At Weapon Shop's Selection / Looking At Armor Shop's Selection / Looking At Item Shop's" },
+        { address=0X006B, type="u8", condition="eq", value=0X83, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Leaving Weapon Shop / Leaving Armor Shop / Leaving Item Shop" },
+        { address=0X006B, type="u8", condition="eq", value=0XF4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Luck Up / Confirming To Sleep At Inn / Sleeping At Inn / Confirming To Check Weapons / Confirmin" },
+        { address=0X00BB, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+        { address=0X60E5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Goemon's Equipped Weapon" },
+        { address=0X60E6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ebisumaru's Equipped Weapon" },
+        { address=0X60E7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Koban's Equipped Weapon" },
+        { address=0X60E8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Yae's Equipped Weapon" },
+        { address=0X60E9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lin's Equipped Weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X006B, type="u8", condition="eq", value=0X45, action="SCORE_STATE", no_log=false, no_survey=false, desc="Not Enough Jutsu Points (All Party Members)" },
+      },
+      collectibles = {
+        { address=0X006B, type="u8", condition="eq", value=0X2F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Opening Chest for Money / Critical From Goemon earlygame? might be wrong" },
+        { address=0X006B, type="u8", condition="eq", value=0XCD, action="MONEY_STATE", no_log=false, no_survey=false, desc="Got Money" },
+        { address=0X006C, type="u8", condition="eq", value=0X4E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin God" },
+        { address=0X0091, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Damage Dealt To Enemy / Damage Dealt To Party Member / Amount Of EXP Gained / Amount of Money Ga" },
+        { address=0X0091, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Damage Dealt To Enemy / Damage Dealt To Party Member / Amount Of EXP Gained / Amount of Money Ga" },
+        { address=0X60EC, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Current Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X006B, type="u8", condition="eq", value=0XC3, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="after defeating last boss" },
+        { address=0X006B, type="u8", condition="eq", value=0XE9, action="BOSS_HIT", no_log=false, no_survey=false, desc="Item dropped from Boss" },
+        { address=0X006B, type="u8", condition="eq", value=0XEA, action="BOSS_HIT", no_log=false, no_survey=false, desc="Received Item from Boss/Witch's House Menu Before Revive" },
+        { address=0X006C, type="u8", condition="eq", value=0X6D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bossbot" },
+        { address=0X628B, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="not started" },
+        { address=0X72A8, type="u8", condition="eq", value=0XB6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goro's Boss Room" },
+        { address=0X72A8, type="u8", condition="eq", value=0XC9, action="BOSS_HIT", no_log=false, no_survey=false, desc="Neo Sumo Boss Room" },
+        { address=0X72A8, type="u8", condition="eq", value=0XF0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bad Magi Boss Room at Magistrate Mansion" },
+        { address=0X72A8, type="u8", condition="eq", value=0XE6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ohana Boss Room" },
+        { address=0X72A8, type="u8", condition="eq", value=0XE7, action="BOSS_HIT", no_log=false, no_survey=false, desc="War Mech Boss Room" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X006B, type="u8", condition="eq", value=0X33, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switching out an item" },
+        { address=0X6148, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Locked" },
+        { address=0X6148, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Opened" },
+      },
+    },
+  },
+}

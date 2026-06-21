@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Broken Sword: The Shadow of the Templars",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Adventure, Point And Click"
+  },
+
+  rom = {
+    name = "broken-sword-the-shadow-of-the-templars",
+    file = "broken-sword-the-shadow-of-the-templars.zip",
+    hashes = {
+      { hash = "0041789771fab4154eb638b4bcc68641", label = "Broken Sword - The Shadow of the Templars (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "5bf98eb8cc6247b4edf7b9b5b08dbab9", label = "Broken Sword - The Shadow of the Templars (USA) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Fire Heroes",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "fire-heroes",
+    file = "fire-heroes.zip",
+    hashes = {
+      { hash = "56f708a952f974e5783bb26880358f01", label = "Fire Heroes (Europe) (En,Fr,Es,It)" },
+      { hash = "7f1c3e071bd8366c5b72e1ce9310ddc0", label = "Hard Luck - Return of the Heroes (Japan)" },
+      { hash = "5034bb0d9210359b7019ed14b1c1b1fd", label = "Hard Luck - Return of the Heroes (Japan) (Widescreen) (v1.0) (Souzooka)" },
+      { hash = "7c791dc7cdf348f83c38863506ea87c1", label = "Fire Heroes (Europe) (En,Fr,Es,It) (Widescreen) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X432A48, type="u16le", condition="eq", value=0X6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Score screen tally finished; cross button prompt sliding into view (transitions from 2 IF n" },
+        { address=0X432A48, type="u16le", condition="eq", value=0X7, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score finished being tallied; wait a sec (transitions from 2 IF points goal met)" },
+        { address=0X432A88, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level selected; should also be the value which persists into episodes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1F9D864, type="u8", condition="eq", value=0X3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X432A48, type="u16le", condition="eq", value=0X2, action="SCORE_STATE", no_log=false, no_survey=false, desc="Game Score being tallied" },
+        { address=0X432A48, type="u16le", condition="eq", value=0X4, action="SCORE_STATE", no_log=false, no_survey=false, desc="Transition to Game Score Screen" },
+        { address=0X432A48, type="u16le", condition="eq", value=0X5, action="SCORE_STATE", no_log=false, no_survey=false, desc="Game Score Screen coming into view" },
+        { address=0X432A48, type="u16le", condition="eq", value=0X8, action="SCORE_STATE", no_log=false, no_survey=false, desc="Flash after score tally (from 7)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X432A5C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[PAL]" },
+        { address=0X1F9D8B8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[PAL]" },
+      },
+    },
+  },
+}

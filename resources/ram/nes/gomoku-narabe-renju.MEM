@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Gomoku Narabe Renju",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "gomoku-narabe-renju",
+    file = "gomoku-narabe-renju.zip",
+    hashes = {
+      { hash = "b501844dd9cf3364fe376be19be979a1", label = "Gomoku Narabe (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00FE, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X00FE, type="u8", condition="eq", value=0X0E, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X009A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elementary Level" },
+        { address=0X009A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Intermediate Level" },
+        { address=0X009A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Advanced Level" },
+      },
+    },
+  },
+}

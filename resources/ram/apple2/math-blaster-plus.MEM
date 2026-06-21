@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Math Blaster Plus",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "math-blaster-plus",
+    file = "math-blaster-plus.zip",
+    hashes = {
+      { hash = "562cbcebf080f5bbb718d302f290a170", label = "Math Blaster Plus (4am crack) side B.dsk" },
+      { hash = "80d32a9cfdf0b2ceaa813f9b7f1bc373", label = "Math Blaster Plus (4am crack) side A.dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X151BC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+  },
+}

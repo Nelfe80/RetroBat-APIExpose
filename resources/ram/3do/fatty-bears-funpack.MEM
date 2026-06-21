@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fatty Bear's Funpack",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Adventure, Education"
+  },
+
+  rom = {
+    name = "fatty-bears-funpack",
+    file = "fatty-bears-funpack.zip",
+    hashes = {
+      { hash = "f148536a4e707a4418aad19ba80a9515", label = "Fatty Bear's Fun Pack (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

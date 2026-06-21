@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "SpongeBob SquarePants: Revenge of the Flying Dutchman",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "spongebob-squarepants-revenge-of-the-flying-dutchman",
+    file = "spongebob-squarepants-revenge-of-the-flying-dutchman.zip",
+    hashes = {
+      { hash = "0be6c13af62a0f75651bb2acbc397a56", label = "SpongeBob SquarePants - Revenge of the Flying Dutchman (USA, Europe).gba" },
+      { hash = "f27ec053bccc03c8219a6d04169d402a", label = "2 Games in 1 - SpongeBob SquarePants - Revenge of the Flying Dutchman + SpongeBob SquarePants - SuperSponge (Europe).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCF1E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+        { address=0XCF1E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level Select" },
+        { address=0XCF1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- In Level or Not" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0A58, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="- Chapter Counter" },
+      },
+    },
+  },
+}

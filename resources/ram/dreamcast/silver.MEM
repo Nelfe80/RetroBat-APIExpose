@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Silver",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "silver",
+    file = "silver.zip",
+    hashes = {
+      { hash = "dc5cb7c5ceb73d5d22a7ff1759f5b7f6", label = "Silver (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC2CDFC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="David Current HP decreased" },
+        { address=0XC2CDFC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="David Current HP increased" },
+        { address=0XC2CE04, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="David Max HP decreased" },
+        { address=0XC2CE04, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="David Max HP increased" },
+        { address=0XC2CEAC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="David Current HP decreased" },
+        { address=0XC2CEAC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="David Current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC2CFF8, type="u32le", condition="eq", value=0X8CDED568, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Short Sword," },
+        { address=0XC2CFF8, type="u32le", condition="eq", value=0X8CDEA020, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Catapult (Slingshot)," },
+        { address=0XCB8C90, type="u32le", condition="eq", value=0X8CDECB18, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Short sword" },
+        { address=0XCB8CB4, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Potential Weapon Inventory Quantity 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC2CFEC, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="David Shield Equipped?" },
+        { address=0XCB8AA0, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Potential Shield Inventory 1?" },
+        { address=0XCB8AC4, type="u32le", condition="eq", value=0X8CDEC960, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wooden Shield" },
+      },
+    },
+  },
+}

@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Shin Nekketsu Kouha: Kunio-tachi no Banka",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "shin-nekketsu-kouha-kunio-tachi-no-banka",
+    file = "shin-nekketsu-kouha-kunio-tachi-no-banka.zip",
+    hashes = {
+      { hash = "55dca6402fc0574da700ec36a823551b", label = "Shin Nekketsu Kouha - Kunio-tachi no Banka (Japan) (Ru) (Shedevr).sfc" },
+      { hash = "73754658aae9024f23570b494ee86f01", label = "Shin Nekketsu Kouha - Kunio-tachi no Banka (Japan).sfc" },
+      { hash = "fa61d22a6ecfbc59369726807c4be474", label = "Shin Nekketsu Kouha - Kunio-tachi no Banka (Japan) (En) (v1.0) (AGTP).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00AE, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0094, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kunio Health decreased" },
+        { address=0X0094, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kunio Health increased" },
+        { address=0X0096, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Riki Health decreased" },
+        { address=0X0096, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Riki Health increased" },
+        { address=0X0098, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Misako Health decreased" },
+        { address=0X0098, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Misako Health increased" },
+        { address=0X009A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kyoko Health decreased" },
+        { address=0X009A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kyoko Health increased" },
+        { address=0X009C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy A Health decreased" },
+        { address=0X009C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy A Health increased" },
+        { address=0X009E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy B Health decreased" },
+        { address=0X009E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy B Health increased" },
+        { address=0X00A0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy C Health decreased" },
+        { address=0X00A0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy C Health increased" },
+        { address=0X00A2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy D Health decreased" },
+        { address=0X00A2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy D Health increased" },
+        { address=0X00A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kunio Healthbar Fill decreased" },
+        { address=0X00A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kunio Healthbar Fill increased" },
+        { address=0X00A6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Riki Healthbar Fill decreased" },
+        { address=0X00A6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Riki Healthbar Fill increased" },
+        { address=0X00A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Misako Healthbar Fill decreased" },
+        { address=0X00A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Misako Healthbar Fill increased" },
+        { address=0X00AA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kyoko Healthbar Fill decreased" },
+        { address=0X00AA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kyoko Healthbar Fill increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X11CF, type="u8", condition="eq", value=0X9F, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Kick (A)" },
+        { address=0X11CF, type="u8", condition="eq", value=0XA0, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Knee (down)" },
+        { address=0X11CF, type="u8", condition="eq", value=0XA1, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Grab (Y)" },
+      },
+    },
+  },
+}

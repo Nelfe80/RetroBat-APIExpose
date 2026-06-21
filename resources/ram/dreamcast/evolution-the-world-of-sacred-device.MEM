@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Evolution: The World of Sacred Device",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "evolution-the-world-of-sacred-device",
+    file = "evolution-the-world-of-sacred-device.zip",
+    hashes = {
+      { hash = "b9f833bbe7d6c425469ed110c7c4dadf", label = "Evolution - The World of Sacred Device (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X131258, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In-Game or Not-in-Battle" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X224FDE, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Blind Ruins;" },
+        { address=0X224FDE, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Descent Ruins;" },
+        { address=0X224FDE, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Heaven Ruins;" },
+        { address=0X224FDE, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shades Ruins;" },
+        { address=0X224FDE, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sheol Ruins" },
+        { address=0X259014, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MAG Hand Parts Level" },
+        { address=0X259028, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MAG Lightning Parts Level" },
+        { address=0X259062, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chain Skill - Blade Parts Level, up to 0x05" },
+        { address=0XC3F380, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MAG Level (dynamic, testing for this)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X25908E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pepper Skills - Energy Cart Parts, up to 0x05 decreased" },
+        { address=0X25908E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pepper Skills - Energy Cart Parts, up to 0x05 increased" },
+        { address=0XC3F38C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="MAG Current HP decreased" },
+        { address=0XC3F38C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="MAG Current HP increased" },
+        { address=0XC3F38E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="MAG Max HP decreased" },
+        { address=0XC3F38E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="MAG Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2332CC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit Money increased" },
+        { address=0X23334C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[EU] 32-bit Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X22829F, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit3=Final Boss defeated" },
+        { address=0X2282DA, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit7=last boss defeated" },
+        { address=0X228364, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Party Split up after boss defeated" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X259B24, type="u8", condition="eq", value=0X15, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Record;" },
+      },
+    },
+  },
+}

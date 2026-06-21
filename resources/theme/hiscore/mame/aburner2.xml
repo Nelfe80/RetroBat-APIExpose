@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 YU.  7000000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 KIM  6500000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 BIN  6000000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 SAD  5500000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 KEY  5000000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 HIR  4500000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 Y.N  4000000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 PIG  3500000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 MON  2500000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 TO3  2000000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 LU4  1900000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 KEN  1800000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 NAO  1700000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 YAS  1600000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 KTG  1500000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 MAC  1400000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 USA  1300000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 P    1200000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 HOB  1100000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 GOK  1000000</text>
+		</text>
+	</view>
+</theme>

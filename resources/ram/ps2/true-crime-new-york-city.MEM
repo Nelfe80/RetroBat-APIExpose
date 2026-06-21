@@ -1,0 +1,124 @@
+return {
+  game = {
+    title = "True Crime: New York City",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "true-crime-new-york-city",
+    file = "true-crime-new-york-city.zip",
+    hashes = {
+      { hash = "10bc0bd2350e5c49bd8be520b60a05f1", label = "True Crime - New York City (USA)" },
+      { hash = "3a6c49b6d174fa16e3fb6a0e5b986c92", label = "True Crime - New York City (SLUS-21106) [42A9C4EC]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X501964, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X84E6C2, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8-bit Boolean] Options: Subtitles - Off/On" },
+        { address=0X1FFFC10, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-bit Boolean] Paused" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X84E638, type="u32le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Intro Act" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X84DC90, type="u32le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0X84DC90, type="u32le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="task accepted" },
+        { address=0X84DC90, type="u32le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="completed" },
+        { address=0X84DC94, type="u32le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0X84DC94, type="u32le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="task accepted" },
+        { address=0X84DC94, type="u32le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="completed" },
+        { address=0X84DC98, type="u32le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0X84DC98, type="u32le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="task accepted" },
+        { address=0X84DC98, type="u32le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="completed" },
+        { address=0X84DC9C, type="u32le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0X84DC9C, type="u32le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="task accepted" },
+        { address=0X84DC9C, type="u32le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="completed" },
+        { address=0X84DCA0, type="u32le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0X84DCA0, type="u32le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="task accepted" },
+        { address=0X84DCA0, type="u32le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="completed" },
+      },
+      health = {
+        { address=0X4FD9D0, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit Boolean] Cheat Activated:2x Damage" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00E2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Default" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00E3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Jeans" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00E4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Casual" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00E5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Baggy" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00E6, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Stylish" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00E8, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Business Suit" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00E9, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Vengence skin" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00EA, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Police Uniform" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00EB, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pinstripe Suit" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00EC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="White Suit" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00ED, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Street" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00EE, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hustler" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00EF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Love Daddy" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00F0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Zoot Suit" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00F1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rain Coat" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00F2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Anime" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00F3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hip Hop" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00F5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Puma" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00F6, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Puma Special" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00F8, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cowboy" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X00FC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Monk" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X0101, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Black Leather" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X0102, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pimp" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X0104, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Tourist" },
+        { address=0X84DF54, type="u16le", condition="eq", value=0X0105, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Windbreaker" },
+      },
+      weapon = {
+        { address=0X4FE9FC, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Equipped" },
+        { address=0X84D794, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Evidence Quantity: Weapon Parts" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X93DACE6C, action="WEAPON_STATE", no_log=false, no_survey=false, desc=".45 ACP" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X98314A4F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Beanbag Shotgun" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X94F6EFAA, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Caltrops" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X448BE621, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flashlight" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0XDA3C16AE, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Stun Gun" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X170D039D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="9mm SMG" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X4FD475D0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Standard Shotgun" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0XF90362B1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="4.6mm PDW" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X14E9494C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="5.56 Assault Rifle" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X95897000, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tranquilizer" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0XF129675B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Stun Baton" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0XD5971636, action="WEAPON_STATE", no_log=false, no_survey=false, desc=".45 Special" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X2523D910, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tactical Shotgun" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X88C39FC9, action="WEAPON_STATE", no_log=false, no_survey=false, desc="5.56mm Bullpup AR" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X4E6DE05F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sledge Hammer" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X52AF417B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="5.56mm Carbine" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0XFDC2E8A9, action="WEAPON_STATE", no_log=false, no_survey=false, desc="7.62 Auto Sniper" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0X0083FB12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="FlashBang" },
+        { address=0X84DCAC, type="u32le", condition="eq", value=0XEC0F1B55, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rotary Cannon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X84D7B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Career Points" },
+        { address=0X84D7B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Good Cop Points" },
+        { address=0X84D7BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bad Cop Points" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X84D793, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Evidence Quantity: Sex Objects" },
+        { address=0X84E64A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="ASCII 20 bytes current objective" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X84E63C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Major Cases (will depend of the chapter you are in)" },
+      },
+    },
+  },
+}

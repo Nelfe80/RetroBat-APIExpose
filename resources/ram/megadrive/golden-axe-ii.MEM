@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Golden Axe II",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "golden-axe-ii",
+    file = "golden-axe-ii.zip",
+    hashes = {
+      { hash = "2c03b499edcc327b6cb80e41950ac710", label = "Golden Axe II (World) (Ru) (NewGame) (A).md" },
+      { hash = "2cd3573172961fa52f622f14ccff4e1a", label = "Golden Axe II (World).md" },
+      { hash = "3cda1e8bf2fc09e9a7595c2f3c32c1d6", label = "Golden Axe II (World) (Ru) (NewGame).md" },
+      { hash = "7e93bd52d851c7f15c114452b3f911d5", label = "Golden Axe II (World) (Fr) (v1.0) (Terminus).md" },
+      { hash = "d471636e1e04ac40b8b042d24e8e8233", label = "Golden Axe II (World) (Enhanced Colors) (v1.0) (Pyron).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0771, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Bit 0 - 8 Credits Cheat Active" },
+        { address=0X07E9, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0822, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) horizontal coordinates inside the screen (not inside the level)" },
+      },
+      stage = {
+        { address=0X07E6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X078C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) - starting life bars (can be altered in menu). 00 - 3 life bars, 01 - 4, 02 - 5 life bar" },
+        { address=0X078C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - starting life bars (can be altered in menu). 00 - 3 life bars, 01 - 4, 02 - 5 life bar" },
+        { address=0X083F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) - Player's life bar during duel mode increased" },
+        { address=0X083F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - Player's life bar during duel mode decreased" },
+        { address=0X0880, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lifes (old note - can changes during use of magic) increased" },
+        { address=0X0880, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lifes (old note - can changes during use of magic) decreased" },
+        { address=0X0881, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) - Number of lives increased" },
+        { address=0X0881, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - Number of lives decreased" },
+        { address=0X0891, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total of Deaths" },
+        { address=0X0987, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - health of first soldier on screen" },
+        { address=0X0A2B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - Health of the second soldier on screen" },
+        { address=0X0ACF, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - Health of the third soldier on screen" },
+        { address=0X0B73, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) - life bar of main boss in the level (or one of the enemy when 4 enemies on the screen)" },
+        { address=0X0B73, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - life bar of main boss in the level (or one of the enemy when 4 enemies on the screen)" },
+        { address=0X0C17, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) - life bar of main of second boss in stage 5 (headless knight) increased" },
+        { address=0X0C17, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - life bar of main of second boss in stage 5 (headless knight) decreased" },
+        { address=0X1385, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) - life bar of enemy 2 (duel mode) increased" },
+        { address=0X1385, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - life bar of enemy 2 (duel mode) decreased" },
+      },
+      health = {
+        { address=0X0885, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X0885, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X07CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) - stage level during duel mode increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0006, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) - pause value 01, other time value 00" },
+        { address=0X07B9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8 bit) - Demo = 01 / other time = 00" },
+        { address=0X2581, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8 bit) - small bonus stages value = 02, other time = 00" },
+      },
+    },
+  },
+}

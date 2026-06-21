@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Bloons",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bloons",
+    file = "bloons.zip",
+    hashes = {
+      { hash = "6a90bc76dba0c3414a20d1e422706d21", label = "Bloons (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1889978, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (no save)" },
+        { address=0X18C9988, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (w save)" },
+      },
+    },
+  },
+}

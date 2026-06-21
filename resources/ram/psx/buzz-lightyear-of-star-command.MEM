@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Buzz Lightyear of Star Command",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "buzz-lightyear-of-star-command",
+    file = "buzz-lightyear-of-star-command.zip",
+    hashes = {
+      { hash = "de9cada49170a5fd2b564753dcd9c726", label = "Disney-Pixar Buzz Lightyear of Star Command (USA)" },
+      { hash = "1be458209e626474c8e5f10589a248a7", label = "Disney-Pixar Buzz Lightyear of Star Command (USA) (60fps) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB57E6, type="u16le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[16 Bit] Credits" },
+        { address=0XB5896, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (Fr)" },
+        { address=0XB595E, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (EU)" },
+        { address=0XB5C2E, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (De)" },
+        { address=0XB5C3E, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (It)" },
+        { address=0XB5C46, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (Es)" },
+        { address=0XD48A2, type="u8", condition="bit_true", bit=2, mask=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAA2B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="01 = in a level (EU)" },
+        { address=0XAA41C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32 = in a level (US)" },
+      },
+      zone = {
+        { address=0XD48A6, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[BitCount] Medals | Trade World 1" },
+        { address=0XD48A9, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[BitCount] Medals | Ice World" },
+        { address=0XD48AC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[BitCount] Medals | Trade World 2" },
+        { address=0XD4CF1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ice World medals (De)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XB57DE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (US) decreased" },
+        { address=0XB57DE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (US) increased" },
+        { address=0XB588E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (Fr) decreased" },
+        { address=0XB588E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (Fr) increased" },
+        { address=0XB5956, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (EU) decreased" },
+        { address=0XB5956, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (EU) increased" },
+        { address=0XD77E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Zurg's throne room: platform's health (US) decreased" },
+        { address=0XD77E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Zurg's throne room: platform's health (US) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XAA47C, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Weapon power ups collected" },
+      },
+      weapon = {
+        { address=0XB48D8, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=true, no_survey=false, desc="basic laser" },
+        { address=0XB48D9, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="2nd weapon in inventory (US)" },
+        { address=0XB48DA, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="3rd weapon in inventory (US)" },
+        { address=0XB4988, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="1st weapon in inventory (Fr)" },
+        { address=0XB4A50, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="1st weapon in inventory (EU)" },
+        { address=0XB4A51, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="2nd weapon in inventory (EU)" },
+        { address=0XB4A52, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="3rd weapon in inventory (EU)" },
+        { address=0XB4D20, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="1st weapon in inventory (De)" },
+        { address=0XB4D30, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="1st weapon in inventory (It)" },
+        { address=0XB4D38, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="1st weapon in inventory (Es)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB8A14, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Plasma gun ammo * 0x10 (US)" },
+        { address=0XB8A16, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Arc laser ammo (US)" },
+        { address=0XB8A18, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Rapidfire gun ammo (US)" },
+        { address=0XB8A1A, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Missile launcher ammo (US)" },
+        { address=0XB8A1E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Mine launcher ammo (US)" },
+        { address=0XB8A20, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Flamethrower ammo (US)" },
+        { address=0XB8A22, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Force field ammo (US)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAA4B0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss' shield's health (US)" },
+        { address=0XD7720, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss' health (US)" },
+        { address=0XD77D0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss' health (Fr)" },
+        { address=0XD7898, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss' health (EU)" },
+        { address=0XD7B68, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss' health (De)" },
+        { address=0XD7B78, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss' health (It)" },
+        { address=0XD7B80, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss' health (Es)" },
+      },
+    },
+  },
+}

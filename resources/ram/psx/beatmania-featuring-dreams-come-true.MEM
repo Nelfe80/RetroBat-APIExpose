@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Beatmania featuring Dreams Come True",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "beatmania-featuring-dreams-come-true",
+    file = "beatmania-featuring-dreams-come-true.zip",
+    hashes = {
+      { hash = "7f16804d8213907fe867a4aef7c7112a", label = "Beatmania featuring Dreams Come True (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X94029, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Bit0] Demo Check" },
+        { address=0X94500, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Menu" },
+        { address=0X94504, type="u8", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Menu/Playing" },
+        { address=0X94504, type="u8", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X94504, type="u8", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      events = {
+        { address=0X9F9B8, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Current Combo" },
+        { address=0X9F9BA, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16 Bit] P2 Current Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9403C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X9403C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X9403C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X9403C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extreme" },
+        { address=0X9403C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Option - Level" },
+        { address=0X94504, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="DJ Level" },
+        { address=0XCF388, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Cleared" },
+        { address=0XCF38C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Cleared" },
+      },
+      stage = {
+        { address=0X945F2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stages" },
+        { address=0XCF388, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Failed" },
+        { address=0XCF38C, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Failed" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X94504, type="u8", condition="eq", value=0X0B, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Ranking" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0XA, action="SCORE_STATE", no_log=false, no_survey=false, desc="262500 to 999999" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0XB, action="SCORE_STATE", no_log=false, no_survey=false, desc="225000 to 262499" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0XC, action="SCORE_STATE", no_log=false, no_survey=false, desc="187500 to 224999" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0XD, action="SCORE_STATE", no_log=false, no_survey=false, desc="150000 to 187499" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0XE, action="SCORE_STATE", no_log=false, no_survey=false, desc="112500 to 149999" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0XF, action="SCORE_STATE", no_log=false, no_survey=false, desc="75000 to 112499" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0X40164, action="SCORE_STATE", no_log=false, no_survey=false, desc="A" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0X36EE8, action="SCORE_STATE", no_log=false, no_survey=false, desc="B" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0X2DC6C, action="SCORE_STATE", no_log=false, no_survey=false, desc="C" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0X249F0, action="SCORE_STATE", no_log=false, no_survey=false, desc="D" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0X1B774, action="SCORE_STATE", no_log=false, no_survey=false, desc="E" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0X124F8, action="SCORE_STATE", no_log=false, no_survey=false, desc="F" },
+        { address=0X9F9C0, type="u32le", condition="eq", value=0X927C, action="SCORE_STATE", no_log=false, no_survey=false, desc="G" },
+        { address=0X9F9C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Total Score For this Session" },
+        { address=0X9F9C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Total Score For this Session" },
+        { address=0X9FB68, type="u32le", condition="eq", value=0X0186A0, action="SCORE_STATE", no_log=false, no_survey=false, desc="100k Perfect" },
+        { address=0X9FB68, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Result Screen - Score" },
+        { address=0X9FB6C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Result Screen - Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9FA44, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Song Playing Timer" },
+      },
+    },
+  },
+}

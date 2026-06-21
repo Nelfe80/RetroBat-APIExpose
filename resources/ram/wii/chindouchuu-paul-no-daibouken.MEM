@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Chindouchuu!! Paul no Daibouken",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "chindouchuu-paul-no-daibouken",
+    file = "chindouchuu-paul-no-daibouken.zip",
+    hashes = {
+      { hash = "0d0b038420c7129f72a46adf3ebe355b", label = "Chindouchuu!! Paul no Daibouken (Japan) (WiiWare)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3180, type="u32be", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE ASCII] Title ID" },
+        { address=0X17DF28, type="u32be", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Options - Subtitles" },
+        { address=0X63E9B8, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-bit BE] {ProcGame} Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X17DEF0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Current Level" },
+      },
+      stage = {
+        { address=0X17DF08, type="u32be", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Is Big (Stage 2-1A)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X17DF00, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Life increased" },
+        { address=0X17DF00, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Life decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17DEFC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X63E9C0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] {ProcGame} Paused timer (for flashing text)" },
+      },
+    },
+  },
+}

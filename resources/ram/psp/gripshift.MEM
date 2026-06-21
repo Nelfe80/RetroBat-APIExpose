@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "GripShift",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "gripshift",
+    file = "gripshift.zip",
+    hashes = {
+      { hash = "db39c0d5ee1bedbc46b46e7151ee95d0", label = "Gripshift (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAD9DC4, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Current title" },
+        { address=0XE8F63C, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Current Credits EUR (32bits)" },
+        { address=0XE947FC, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Current Credits USA 32bits" },
+      },
+    },
+  },
+}

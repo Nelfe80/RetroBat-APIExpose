@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Kanon",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Visual Novel"
+  },
+
+  rom = {
+    name = "kanon",
+    file = "kanon.zip",
+    hashes = {
+      { hash = "b11d0af8a1c342d17f62130f729f6ca6", label = "Kanon (Japan) (Best-ban)" },
+    }
+  },
+
+  events = {
+  },
+}

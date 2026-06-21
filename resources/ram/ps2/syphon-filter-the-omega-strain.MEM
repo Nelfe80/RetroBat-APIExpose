@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Syphon Filter: The Omega Strain",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "syphon-filter-the-omega-strain",
+    file = "syphon-filter-the-omega-strain.zip",
+    hashes = {
+      { hash = "2a00e8c6f465908f220c23b39a7a5013", label = "Syphon Filter - The Omega Strain (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Mega Man Battle & Chase",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "mega-man-battle-chase",
+    file = "mega-man-battle-chase.zip",
+    hashes = {
+      { hash = "21c8ec4552af9306ff7a650dc00e3036", label = "Rockman - Battle & Chase (Japan) (PlayStation the Best for Family)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCD7C8, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XDC898, type="u32le", condition="eq", value=0X00010001, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Roll Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X136BCE, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Roll Course" },
+        { address=0X136BCE, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Gutsman Course" },
+        { address=0X136BCE, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shadow Man Course" },
+        { address=0X136BCE, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Proto Man" },
+        { address=0X136BCE, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ice Man" },
+        { address=0X136BCE, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Napalm Man" },
+        { address=0X136BCF, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mega Man Course" },
+        { address=0X136BCF, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared Bass Course" },
+        { address=0X136BCF, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared Willy Course" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCD7B8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Demo Timer 16 bits" },
+      },
+    },
+  },
+}

@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "~Z~ ~Demo~ God of War II: E3 Demo 2006",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "z-demo-god-of-war-ii-e3-demo-2006",
+    file = "z-demo-god-of-war-ii-e3-demo-2006.zip",
+    hashes = {
+      { hash = "293b3563255c8ec7c20ef6d84d1e277a", label = "God of War [Demo] (SCUS-97467) [56EC00B5]" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X6A8954, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo [32-bits]" },
+        { address=0X894578, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo (1) [32-bits]" },
+        { address=0X89457C, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo (2) [32-bits]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X894208, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [Float] decreased" },
+        { address=0X894208, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [Float] increased" },
+      },
+    },
+  },
+}

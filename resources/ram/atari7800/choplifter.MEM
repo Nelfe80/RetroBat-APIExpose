@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Choplifter!",
+    system = "atari7800",
+    system_name = "Atari 7800",
+    genre = "Action, Shooter, Avion, Shoot'em up, Horizontal, Shoot'em Up"
+  },
+
+  rom = {
+    name = "choplifter",
+    file = "choplifter.zip",
+    hashes = {
+      { hash = "93e4387864b014c155d7c17877990d1e", label = "Choplifter! (USA).a78" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18EF, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag:" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1933, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages lost" },
+        { address=0X1934, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages in chopper (16 Max)" },
+        { address=0X1935, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages rescued" },
+        { address=0X1936, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Remaining in Far Left Barracks" },
+        { address=0X1937, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Remaining in Second from Left Barracks" },
+        { address=0X1938, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Remaining in Second from Right Barracks" },
+        { address=0X1939, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages remaining in far right barracks" },
+      },
+    },
+  },
+}

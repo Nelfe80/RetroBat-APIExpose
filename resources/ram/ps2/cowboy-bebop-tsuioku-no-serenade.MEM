@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Cowboy Bebop: Tsuioku no Serenade",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "cowboy-bebop-tsuioku-no-serenade",
+    file = "cowboy-bebop-tsuioku-no-serenade.zip",
+    hashes = {
+      { hash = "f9cbe990241760c3f0262d567ba35b42", label = "Cowboy Bebop - Tsuioku no Serenade (Japan) (En) (v1.0) (SONICMAN69)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X502A80, type="u32le", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X502A80, type="u32le", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X5CAA80, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spike" },
+        { address=0X5CAA80, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jet" },
+        { address=0X5CAA80, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Faye" },
+        { address=0X5CAA80, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge Stage Character (32-bit)" },
+      },
+    },
+  },
+}

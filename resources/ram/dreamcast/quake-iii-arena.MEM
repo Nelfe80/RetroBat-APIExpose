@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Quake III: Arena",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "quake-iii-arena",
+    file = "quake-iii-arena.zip",
+    hashes = {
+      { hash = "4e7ac91f508ad3cd045d63f60abafb45", label = "Quake III - Arena (USA)" },
+      { hash = "c46f66b072d111ddb8034f2dd5f08184", label = "Quake III - Arena (Europe) (En,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X313FE8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[4 bytes] Player health, pointed-to data A decreased" },
+        { address=0X313FE8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[4 bytes] Player health, pointed-to data A increased" },
+        { address=0X314300, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health, pointed-to data 2 decreased" },
+        { address=0X314300, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health, pointed-to data 2 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X10325C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[4 bytes] Arena options, multiplayer, weapon respawn - increments in fives" },
+        { address=0X17BD20, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Selected weapon, candidate A" },
+        { address=0X302656, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon bitflags, candidate A" },
+        { address=0X3058DC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon bitflags, candidate B" },
+        { address=0X3D9D58, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Selected weapon, candidate B" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3D9E48, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[4 bytes] Player machine-gun ammo, pointed-to data A" },
+        { address=0X3D9E54, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[4 bytes] Player rocket ammo" },
+        { address=0X3D9E60, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[4 bytes] Player plasma ammo" },
+      },
+    },
+  },
+}

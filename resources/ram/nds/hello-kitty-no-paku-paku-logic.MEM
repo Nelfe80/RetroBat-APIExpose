@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hello Kitty no Paku Paku & Logic",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "hello-kitty-no-paku-paku-logic",
+    file = "hello-kitty-no-paku-paku-logic.zip",
+    hashes = {
+      { hash = "f9fd586ed7e981ec07e827bce21675b7", label = "Hello Kitty no Paku Paku & Logic (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

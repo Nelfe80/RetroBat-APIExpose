@@ -1,0 +1,118 @@
+return {
+  game = {
+    title = "Sexy Parodius",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "sexy-parodius",
+    file = "sexy-parodius.zip",
+    hashes = {
+      { hash = "1154f3dcad6451bf365e08c6edf54f8f", label = "Sexy Parodius (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X23, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Please Continue" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X25, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X29, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X27, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending/Credits" },
+        { address=0X142EAA, type="u16le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X142EAA, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X142EF6, type="u16le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X142EF6, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1CFC0A, type="u16le", condition="eq", value=0X6787, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X1CFC0A, type="u16le", condition="eq", value=0X3434, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFD978, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arcade" },
+        { address=0XFD978, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Full" },
+        { address=0XFD978, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Screen Size (Needed for Danger Zone)" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 1" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 2" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 3A" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 3B" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 4A" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 4B" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 5" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission X" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 6" },
+        { address=0XFFB3C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Possible Level ID" },
+        { address=0X123CDC, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max" },
+        { address=0X123CDC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1P Ground Bomb it looks like" },
+      },
+      stage = {
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X13, action="STAGE_SELECT", no_log=false, no_survey=false, desc="Special Stage" },
+        { address=0XFFB3C, type="u16le", condition="eq", value=0X0A, action="STAGE_SELECT", no_log=false, no_survey=false, desc="Special Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFFA70, type="u16le", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life" },
+        { address=0X123C94, type="u16le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alive" },
+        { address=0X123C94, type="u16le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X142C7A, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Options: P1 Lives increased" },
+        { address=0X142C7A, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Options: P1 Lives decreased" },
+        { address=0X142DAA, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives (found by Tybis) increased" },
+        { address=0X142DAA, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives (found by Tybis) decreased" },
+      },
+      health = {
+        { address=0X123CDA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Looks to be Shot Powerup decreased" },
+        { address=0X12413C, type="u16le", condition="eq", value=0X0D, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X12413C, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Alex Health Displayed?" },
+        { address=0X124156, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Decimal) Health for Alex decreased" },
+        { address=0X124156, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Decimal) Health for Alex increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X123CDA, type="u16le", condition="eq", value=0X1D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Max" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X142D14, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(Decimal) Saved Highest Score" },
+        { address=0X142D18, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score (Decimal)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 1 Boss" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X17, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 2 Boss" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X15, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 3A Boss" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X16, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 3B Boss" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X1A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 4A Boss" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X19, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 4B Boss" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X18, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 5 Boss" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X1C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 6 'Boss'" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X1D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Special Stage Boss" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X22, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission X Boss 1" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X1F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission X Boss 2" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission X Boss 3" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission X Boss 4" },
+        { address=0XFFAF4, type="u24le", condition="eq", value=0X1B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission X Boss 5" },
+        { address=0X129D4C, type="u16le", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated" },
+        { address=0X1433C4, type="u16le", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated" },
+        { address=0X1433C6, type="u16le", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X142F20, type="u16le", condition="eq", value=0X300, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mission Complete" },
+        { address=0X142F20, type="u16le", condition="eq", value=0X200, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mission Complete" },
+        { address=0X142F20, type="u16le", condition="eq", value=0X50, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mission Complete" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X142F20, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(Decimal) Mission Objective" },
+      },
+    },
+  },
+}

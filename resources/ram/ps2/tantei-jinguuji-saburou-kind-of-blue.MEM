@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tantei Jinguuji Saburou: Kind of Blue",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tantei-jinguuji-saburou-kind-of-blue",
+    file = "tantei-jinguuji-saburou-kind-of-blue.zip",
+    hashes = {
+      { hash = "98634df510947bb1b5268ce2c565b1da", label = "Tantei Jinguuji Saburou - Kind of Blue (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

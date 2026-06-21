@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Loaded",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "loaded",
+    file = "loaded.zip",
+    hashes = {
+      { hash = "09d9b76b0d6818beb33d8554b5759e26", label = "Loaded (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4B144, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="OPTIONS : Continues (32-bit)" },
+        { address=0XA1174, type="u16le", condition="eq", value=0X0, action="DEMO_MODE", no_log=false, no_survey=false, desc="false" },
+        { address=0XA1174, type="u16le", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="true" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X316A4, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Prison - Holding Cells" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Prison - Administration Level" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Upper Service Conduit" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lower Service Conduit" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Gate" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Desert" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Badlands" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Space Port Level 1" },
+        { address=0X4B134, type="u16le", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Space Port Level 2" },
+        { address=0X4B134, type="u16le", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Docking Bay" },
+        { address=0X4B134, type="u16le", condition="eq", value=0XB, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scrap Yard" },
+        { address=0X4B134, type="u16le", condition="eq", value=0XC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Processing Plant" },
+        { address=0X4B134, type="u16le", condition="eq", value=0XD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Recycling Center" },
+        { address=0X4B134, type="u16le", condition="eq", value=0XE, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Control Center" },
+        { address=0X4B134, type="u16le", condition="eq", value=0XF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Security Level" },
+        { address=0X4B134, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL : current level ID (32-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4B140, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="OPTIONS : Lives (32-bit) increased" },
+        { address=0X4B140, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="OPTIONS : Lives (32-bit) decreased" },
+        { address=0XCDF42, type="u16le", condition="eq", value=0XA, action="LIVES_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0XCDF42, type="u16le", condition="eq", value=0X14, action="LIVES_STATE", no_log=false, no_survey=false, desc="2" },
+        { address=0XCDF42, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="PLAYER : lives (16-bit) increased" },
+        { address=0XCDF42, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="PLAYER : lives (16-bit) decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XCDF3C, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power up" },
+      },
+      weapon = {
+        { address=0XCDF40, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="PLAYER : Special weapon (16-bit)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4B180, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="STATS : Score (32-bit)" },
+      },
+      collectibles = {
+        { address=0XCDF3E, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="PLAYER : Ammo (16-bit)" },
+        { address=0XCDF4A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="PLAYER : Gold coins (16-bit) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCDF4E, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="PLAYER : Object destroyed (16-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFD014, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="LEVEL : Timer (32-bit)" },
+      },
+    },
+  },
+}

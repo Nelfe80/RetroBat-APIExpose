@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "19XX: The War Against Destiny",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "19xx-the-war-against-destiny",
+    file = "19xx-the-war-against-destiny.zip",
+    hashes = {
+      { hash = "33a48137bd598345260024f173986b35", label = "19xx.7z <19XX - the war against destiny (960104 Euro)>" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XFF82EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+        { address=0XFF8337, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: have power up" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFF8306, type="u32be", condition="change", action="TREASURE", color="blue", min=5000, max=5000, no_log=false, no_survey=false, desc="Score delta 5000-5000: Score 5000" },
+        { address=0XFF8306, type="u32be", condition="change", action="TREASURE", color="silver", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Score 10000" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFF8306, type="u32be", condition="change", action="SCORE_STATE", color="white", min=110, max=200, no_log=false, no_survey=false, desc="Score delta 110-200: Score 110" },
+        { address=0XFF8306, type="u32be", condition="change", action="SCORE_STATE", color="white", min=210, max=290, no_log=false, no_survey=false, desc="Score delta 210-290: Score 210" },
+        { address=0XFF8306, type="u32be", condition="change", action="SCORE_STATE", color="white", min=300, max=300, no_log=false, no_survey=false, desc="Score delta 300-300: Medals" },
+        { address=0XFF8306, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Score 500" },
+        { address=0XFF8306, type="u32be", condition="change", action="SCORE_STATE", color="red", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Score 1000" },
+        { address=0XFF8306, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=3000, max=3000, no_log=false, no_survey=false, desc="Score delta 3000-3000: Score 3000" },
+        { address=0XFF8306, type="u32be", condition="change", action="SCORE_STATE", color="white", min=1700, max=1700, no_log=false, no_survey=false, desc="Score delta 1700-1700: Bomber at start" },
+      },
+      collectibles = {
+        { address=0XFF4D15, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFF8305, type="u8", condition="decrease", action="BOMB_FIRED", no_log=false, no_survey=false, desc="bomb: bombs" },
+        { address=0XFF830F, type="u8", condition="decrease", action="BOMB_FIRED", no_log=false, no_survey=false, desc="bomb: have max bomb power" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFF8306, type="u32be", condition="change", action="OBJECT_DESTROYED", color="silver", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Planes" },
+        { address=0XFF8306, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Ships, big planes etc" },
+      },
+    },
+  },
+}

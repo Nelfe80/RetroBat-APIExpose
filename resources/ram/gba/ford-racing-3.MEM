@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Ford Racing 3",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "ford-racing-3",
+    file = "ford-racing-3.zip",
+    hashes = {
+      { hash = "3ceccc2582e3c35c5d729ae508dd465f", label = "Ford Racing 3 (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "a3b2dd184e80764a1a3c0d7799089327", label = "Ford Racing 3 (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

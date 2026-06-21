@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Lester the Unlikely",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "lester-the-unlikely",
+    file = "lester-the-unlikely.zip",
+    hashes = {
+      { hash = "bb8e9e7429145404f0e4186ad0161fc8", label = "Lester the Unlikely (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X25F5, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Num of continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level, plus two, selected in Level Select screen" },
+        { address=0X25E7, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First Level" },
+        { address=0X25E7, type="u8", condition="eq", value=0X15, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Level" },
+        { address=0X25E7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8599, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Num of lives increased" },
+        { address=0X8599, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Num of lives decreased" },
+      },
+      health = {
+        { address=0X859B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current player health decreased" },
+        { address=0X859B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current player health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2518, type="u16le", condition="eq", value=0X6, action="TREASURE", no_log=false, no_survey=false, desc="green emerald" },
+      },
+      weapon = {
+        { address=0X251A, type="u16le", condition="eq", value=0XFFFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="no weapon" },
+        { address=0X251A, type="u16le", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="rock" },
+        { address=0X251A, type="u16le", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="boomerang" },
+        { address=0X251A, type="u16le", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="sword" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X25EA, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="8-bit Timer that increments every 4 seconds. Resets on death and new level" },
+      },
+    },
+  },
+}

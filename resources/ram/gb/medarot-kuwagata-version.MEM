@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Medarot: Kuwagata Version",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "medarot-kuwagata-version",
+    file = "medarot-kuwagata-version.zip",
+    hashes = {
+      { hash = "a9c9d6b6759c28f2b3986717f4df2f98", label = "Medarot - Kuwagata Version (Japan) (Rev 1) (SGB Enhanced).gb" },
+      { hash = "49515d0da23d5ea4bde8a06dff4a9904", label = "Medarot - Kuwagata Version (Japan) (En) (v0.6.7) (No Portraits) (Cash Medal Chameleon).gb" },
+      { hash = "15f7a1936bac5b46b90255f6d75966b0", label = "Medarot - Kuwagata Version (Japan) (En) (v0.6.7) (Portraits) (Cash Medal Chameleon).gb" },
+      { hash = "f0871152b2e929c83f7be0d7fdf36f55", label = "Medarot - Kuwagata Version (Japan) (En) (US) (v0.6.7) (No Portraits) (Cash Medal Chameleon).gb" },
+      { hash = "7ffbde321a427200815c38bdb37e69b0", label = "Medarot - Kuwagata Version (Japan) (En) (US) (v0.6.7) (Portraits) (Cash Medal Chameleon).gb" },
+      { hash = "217ad540e5ea1c25b4c5d6a5860c0f7b", label = "Medarot - Kuwagata Version (Japan) (En) (EN20240408) (Portraits) (Cash Medal Chameleon).gb" },
+      { hash = "41a324c8fa014d60246887e68bfa931c", label = "Medarot - Kuwagata Version (Japan) (En) (EN20240408) (No Portraits) (Cash Medal Chameleon).gb" },
+      { hash = "02a0e14217691fe1c58aff43fe1adc8e", label = "Medarot - Kuwagata Version (Japan) (En) (US) (20240408) (Portraits) (Cash Medal Chameleon).gb" },
+      { hash = "724d0eecbf6d2ded8c6caa87c7aabe5a", label = "Medarot - Kuwagata Version (Japan) (En) (US) (20240408) (No Portraits) (Cash Medal Chameleon).gb" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XC93A, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money [16bit BE] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC766, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Option - Battle Time Limit [8bit]" },
+      },
+    },
+  },
+}

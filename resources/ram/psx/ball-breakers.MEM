@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Ball Breakers",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Sports"
+  },
+
+  rom = {
+    name = "ball-breakers",
+    file = "ball-breakers.zip",
+    hashes = {
+      { hash = "ddb4a43198808c44b73f9dd039c6fda1", label = "Ball Breakers (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE46A0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="In-Game Pause" },
+      },
+    },
+  },
+}

@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Legendary Super Warriors",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "dragon-ball-z-legendary-super-warriors",
+    file = "dragon-ball-z-legendary-super-warriors.zip",
+    hashes = {
+      { hash = "ac46bc779e1e844674de1d4c13d06f96", label = "Dragon Ball Z - Legendary Super Warriors (USA).gbc" },
+      { hash = "c663691b1eca7eeeb501c4d00b4b186f", label = "Dragon Ball Z - Legendary Super Warriors (Europe).gbc" },
+      { hash = "ffa003fa747731a9fd547260598538cb", label = "Dragon Ball Z - Les Guerriers Legendaires (France).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC018, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen + Story" },
+        { address=0XC018, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="New Game (only on title screen and if multiplayer and battle mode have been unlocked)" },
+        { address=0XC020, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="01after pressing continue" },
+      },
+      events = {
+        { address=0XCE3F, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Card #077 - Cell Combo - Amount owned" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCC1E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lvl 1" },
+        { address=0XCC1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gohan - Level" },
+        { address=0XCC2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Piccolo - Level" },
+        { address=0XCC3E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Krillin star level (-1)" },
+        { address=0XCC4E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="goku level 4=level5" },
+        { address=0XCC5E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="vegeta level" },
+        { address=0XCCAE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="gotenks level" },
+        { address=0XCCBE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Vegeto - Level" },
+      },
+      stage = {
+        { address=0XCDF3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Card #001 - 3 Stage Atk - Amount owned" },
+        { address=0XCDF4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Card #002 - 4 Stage Atk - Amount owned" },
+        { address=0XCDF5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Card #003 - 5 Stage Atk - Amount owned" },
+        { address=0XCDF6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Card #004 - 6 Stage Atk - Amount owned" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCC21, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Gohan - Life Upgrades increased" },
+        { address=0XCC21, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gohan - Life Upgrades decreased" },
+      },
+      health = {
+        { address=0XCACE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="current health decreased" },
+        { address=0XCACE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="current health increased" },
+        { address=0XCADB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="goku or slot 2 health? decreased" },
+        { address=0XCADB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="goku or slot 2 health? increased" },
+        { address=0XCAF5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #1 Health decreased" },
+        { address=0XCAF5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #1 Health increased" },
+        { address=0XCAF6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp slot 1 cpu? decreased" },
+        { address=0XCAF6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp slot 1 cpu? increased" },
+        { address=0XCB02, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #2 Health decreased" },
+        { address=0XCB02, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #2 Health increased" },
+        { address=0XCDF9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card #007 - Energy Wave - Amount owned decreased" },
+        { address=0XCDF9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card #007 - Energy Wave - Amount owned increased" },
+        { address=0XCDFA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card #008 - Energy Bomb - Amount owned decreased" },
+        { address=0XCDFA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card #008 - Energy Bomb - Amount owned increased" },
+        { address=0XCE3A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card #072 - Energy Slash - Amount owned decreased" },
+        { address=0XCE3A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card #072 - Energy Slash - Amount owned increased" },
+        { address=0XCE3B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card #073 - Energy Slice - Amount owned decreased" },
+        { address=0XCE3B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card #073 - Energy Slice - Amount owned increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCCAD, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Unlock Gotenks (and forms): (permanent?)" },
+      },
+    },
+  },
+}

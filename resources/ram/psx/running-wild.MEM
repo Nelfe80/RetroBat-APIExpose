@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Running Wild",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "running-wild",
+    file = "running-wild.zip",
+    hashes = {
+      { hash = "34a34bafa20147f6050d9d326c62d1a8", label = "Running Wild (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7C890, type="u16le", condition="eq", value=0X0990, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles" },
+        { address=0X7C890, type="u16le", condition="eq", value=0XB6E0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X7C950, type="u16le", condition="eq", value=0X00000007, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7C950, type="u16le", condition="eq", value=0X00000003, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trials" },
+        { address=0X7C950, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

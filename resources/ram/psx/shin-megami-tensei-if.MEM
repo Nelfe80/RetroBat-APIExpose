@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Shin Megami Tensei If...",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-if",
+    file = "shin-megami-tensei-if.zip",
+    hashes = {
+      { hash = "e21a96340bdf8f709de25e17272fce4a", label = "Shin Megami Tensei If... (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X109D15, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Number of defeated demons?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X108DF2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player's level" },
+        { address=0X108E7E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Partner's level" },
+        { address=0X109B24, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Inventory seems to start somewhere around here" },
+        { address=0X109E18, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="From here to 0x109e37 are mirrors of the demon analyze info. Unclear why." },
+      },
+      zone = {
+        { address=0X109DD8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Pride unlocked" },
+        { address=0X109DDA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - Seen Hazama statue in World of Envy" },
+        { address=0X109DDB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Sloth treasure D" },
+        { address=0X109DDC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World of Sloth Tunnels start" },
+        { address=0X109DE6, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 1 - World of Envy 1F Silver Chest" },
+        { address=0X109DEE, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Greed 3F-B Chest" },
+        { address=0X109DEF, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Greed 3F-B Chest" },
+        { address=0X109E38, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Gluttony B1F Chest B" },
+        { address=0X109E39, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Sloth B2F Chest" },
+        { address=0X109E3A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Envy 1F Chest" },
+        { address=0X109E3B, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Pride 3F Chest C" },
+        { address=0X109E3C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Sloth B1F Chest" },
+        { address=0X109E3D, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Envy 2F Chest" },
+        { address=0X109E3E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Greed 2F-B Chest" },
+        { address=0X109E3F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 0 - World of Greed 3F Chest (Thunderfang Axe)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X108DEA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Player's current HP decreased" },
+        { address=0X108DEA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Player's current HP increased" },
+        { address=0X108DEC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Player's maximum HP decreased" },
+        { address=0X108DEC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Player's maximum HP increased" },
+        { address=0X108E76, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Partner's current HP decreased" },
+        { address=0X108E76, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Partner's current HP increased" },
+        { address=0X108E78, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Partner's maximum HP. decreased" },
+        { address=0X108E78, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Partner's maximum HP. increased" },
+        { address=0X109592, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Enemy 0 Health decreased" },
+        { address=0X109592, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Enemy 0 Health increased" },
+        { address=0X109594, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Enemy 0 max health decreased" },
+        { address=0X109594, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Enemy 0 max health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X108DD4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Player's guardian points" },
+        { address=0X108E60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Partner's guardian points" },
+      },
+      collectibles = {
+        { address=0X109DD7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 1 - Got Ring of Restraint increased" },
+        { address=0X109DED, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 3 - Got Ring of Tolerance increased" },
+      },
+    },
+  },
+}

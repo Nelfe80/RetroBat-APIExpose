@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Rise of the Robots",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting, Action"
+  },
+
+  rom = {
+    name = "rise-of-the-robots",
+    file = "rise-of-the-robots.zip",
+    hashes = {
+      { hash = "b99c62007547882829c4553c89e34821", label = "Rise of the Robots (Europe).sfc" },
+      { hash = "db35a37e7b84d4168171c49e6cb9d827", label = "Rise of the Robots (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0600, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo protection and menu selection" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0628, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round number" },
+        { address=0X10C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="enemy round win count" },
+      },
+      stage = {
+        { address=0X0642, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0F4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health decreased" },
+        { address=0X0F4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health increased" },
+        { address=0X109A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy health decreased" },
+        { address=0X109A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0F6E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16bit) player score" },
+        { address=0X10BC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16bit) enemy score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1801, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility code" },
+      },
+    },
+  },
+}

@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "MotorStorm: Arctic Edge",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "motorstorm-arctic-edge",
+    file = "motorstorm-arctic-edge.zip",
+    hashes = {
+      { hash = "8120dfc07fba7b02b2c1edd0aaca9c4b", label = "MotorStorm - Arctic Edge (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X32D9EC, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-bit bitflag] Game Pause" },
+        { address=0XFE6C9C, type="u8", condition="eq", value=0X0B, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Resume" },
+        { address=0XFE6C9C, type="u8", condition="eq", value=0X0C, action="PAUSE_ON", no_log=false, no_survey=false, desc="Ghost Select" },
+        { address=0XFE6C9C, type="u8", condition="eq", value=0X0D, action="PAUSE_ON", no_log=false, no_survey=false, desc="Options" },
+        { address=0XFE6C9C, type="u8", condition="eq", value=0X0E, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0XFE6C9C, type="u8", condition="eq", value=0X0F, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4B4D20, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit bitflag] Badge In The Zone" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4732CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Invitational event score" },
+        { address=0X4B2E80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Festival Points" },
+        { address=0XCA719C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player Time Ticker Score" },
+        { address=0XCA71A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Time Ticker Target Score" },
+        { address=0X184B738, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Festival Points Display" },
+      },
+      collectibles = {
+        { address=0X327004, type="u32le", condition="eq", value=0X3A99, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rust" },
+        { address=0X327004, type="u32le", condition="eq", value=0X3A9A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rust (R)" },
+        { address=0X327004, type="u32le", condition="eq", value=0X3AFD, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rust" },
+        { address=0X327004, type="u32le", condition="eq", value=0X3AFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rust (R)" },
+        { address=0X327004, type="u32le", condition="eq", value=0X3BCA, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Crush" },
+        { address=0X4B4D0C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit bitflag] Badge Arctic Edge Gold increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X327004, type="u32le", condition="eq", value=0X3BCC, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time To Rock" },
+        { address=0X32D9E0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Countdown timer" },
+        { address=0X32D9F8, type="u16le", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X32D9F8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Mode" },
+        { address=0X346D30, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer in Seconds" },
+        { address=0X346D34, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer in milliseconds" },
+        { address=0X346D38, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X472720, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap Counter" },
+        { address=0X472788, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Timer" },
+        { address=0X4732A4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Festival Time Finished" },
+        { address=0X4B4E0C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Best Time" },
+        { address=0X9C2B98, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Speed event time left in seconds F2" },
+        { address=0XFE6C9C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Pause Menu" },
+        { address=0X12FDF3C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Best Overall Time" },
+        { address=0X12FDF40, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Best Vehicle Time" },
+        { address=0X12FDF44, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Best Ghost Time" },
+        { address=0X12FDF48, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Best Session Time" },
+        { address=0X12FE01C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Split 1" },
+        { address=0X12FE020, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Split 2" },
+        { address=0X12FE024, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Split 3" },
+        { address=0X184C1C0, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X184C1C0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Wreckreaction" },
+      },
+    },
+  },
+}

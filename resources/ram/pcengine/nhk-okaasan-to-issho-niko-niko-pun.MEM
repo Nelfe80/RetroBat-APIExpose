@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "NHK Okaasan to Issho: Niko Niko Pun",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "nhk-okaasan-to-issho-niko-niko-pun",
+    file = "nhk-okaasan-to-issho-niko-niko-pun.zip",
+    hashes = {
+      { hash = "29c04086539f0e7b2a3b251e2290dc51", label = "Niko Niko Pun (Japan).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01FE, type="u8", condition="eq", value=0X5B, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Failed stage (time over or not enough fruit delivered)" },
+        { address=0X01FE, type="u8", condition="eq", value=0X96, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Animal talking in door (first door of stage or second door sliding puzzle solved)" },
+        { address=0X01FE, type="u8", condition="eq", value=0XB6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X01FE, type="u8", condition="eq", value=0XB9, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage completion (flowers talking)" },
+        { address=0X01FE, type="u8", condition="eq", value=0XC3, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending/credits" },
+        { address=0X01FE, type="u8", condition="eq", value=0XCE, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage loading" },
+        { address=0X01FE, type="u8", condition="eq", value=0XD6, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-game (unpaused) / Demo mode" },
+        { address=0X01FE, type="u8", condition="eq", value=0XDE, action="PAUSE_ON", no_log=false, no_survey=false, desc="In-game (paused)" },
+        { address=0X0F8F, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0F8F, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo ending" },
+        { address=0X0F90, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="6: Ruins" },
+        { address=0X0F90, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="1: Beach" },
+        { address=0X0F90, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="2: Forest" },
+        { address=0X0F90, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="3: Field" },
+        { address=0X0F90, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="4: Rocky Cave" },
+        { address=0X0F90, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="5: Ice Cavern" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0201, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1: Beach" },
+        { address=0X0201, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2: Forest" },
+        { address=0X0201, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3: Field" },
+        { address=0X0201, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4: Rocky Cave" },
+        { address=0X0201, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="5: Ice Cavern" },
+        { address=0X0201, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="6: Ruins" },
+        { address=0X0201, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ending" },
+        { address=0X0201, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0522, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (0 - 3) decreased" },
+        { address=0X0522, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (0 - 3) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0F8E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Demo Timer (0 - 4; Ends at 4)" },
+        { address=0X1621, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Stage Timer - Seconds Remaining" },
+        { address=0X1622, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Stage Timer - Refills Remaining" },
+      },
+    },
+  },
+}

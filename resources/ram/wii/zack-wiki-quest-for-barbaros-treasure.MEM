@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Zack & Wiki: Quest for Barbaros' Treasure",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "zack-wiki-quest-for-barbaros-treasure",
+    file = "zack-wiki-quest-for-barbaros-treasure.zip",
+    hashes = {
+      { hash = "197ad0f7799245511cee8eb950040dab", label = "Zack & Wiki - Quest for Barbaros' Treasure (USA)" },
+      { hash = "f045b665b5fdaf445004695cd2c480d2", label = "Zack & Wiki - Quest for Barbaros' Treasure (Europe) (En,Fr,De,Es,It) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB894FF, type="u8", condition="bit_true", bit=4, mask=0X10, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB89500, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Traps Cleared Jingle" },
+        { address=0XB895B6, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2nd level unlocked" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XB894E9, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Vase" },
+        { address=0XB894E9, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Bell" },
+        { address=0XB894EC, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 9" },
+        { address=0XB894EC, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 10" },
+        { address=0XB894EC, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 11" },
+        { address=0XB894EC, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 12" },
+        { address=0XB894EC, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 13" },
+        { address=0XB894EC, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 14" },
+        { address=0XB894EC, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 15" },
+        { address=0XB894EC, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 16" },
+        { address=0XB894ED, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 1" },
+        { address=0XB894ED, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 2" },
+        { address=0XB894ED, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 3" },
+        { address=0XB894ED, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 4" },
+        { address=0XB894ED, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 5" },
+        { address=0XB894ED, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 6" },
+        { address=0XB894ED, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 7" },
+        { address=0XB894ED, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 8" },
+        { address=0XB894F0, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="BIONIC COMMANDO" },
+        { address=0XB894F0, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="MEGAMAN" },
+        { address=0XB894F0, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="1941" },
+        { address=0XB894F0, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="CAPTAIN COMMANDO" },
+        { address=0XB894F0, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="VARTH" },
+        { address=0XB894F0, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="MEGAMAN X" },
+        { address=0XB894F0, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="ECO FIGHTERS" },
+        { address=0XB894F0, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="ARMORED WARRIORS" },
+        { address=0XB894F3, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 17" },
+        { address=0XB894F3, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 18" },
+        { address=0XB894F3, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 19" },
+        { address=0XB894F3, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 20" },
+        { address=0XB894F3, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 21" },
+        { address=0XB894F3, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 22" },
+        { address=0XB894F3, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 23" },
+        { address=0XB894F3, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Secret Treasure Map 24" },
+        { address=0XB894F8, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="To Treasure Island!" },
+        { address=0XB894FC, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Island" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB895EC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Related to Hirame Q points" },
+      },
+      collectibles = {
+        { address=0XB894E4, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Fragment" },
+        { address=0XB894E4, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Fragment" },
+        { address=0XB894EB, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Old Broom" },
+        { address=0XB894EB, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Paint Broom" },
+        { address=0XB894EB, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Eerie Picture 1" },
+        { address=0XB894EB, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Eerie Picture 2" },
+        { address=0XB894EB, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Faucet" },
+        { address=0XB894EB, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Green Honey" },
+        { address=0XB894EB, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Purple Shock" },
+        { address=0XB89500, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Appearance" },
+        { address=0XB89500, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Rising Bell Ring" },
+        { address=0XB89E8C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] In-Game Coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB89500, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Nice One Boss 1" },
+        { address=0XB89500, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Nice One Boss 2" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XB89501, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=true, no_survey=false, desc="Sitting" },
+        { address=0XB89501, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=true, no_survey=false, desc="Flattened" },
+        { address=0XB89501, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Climbing a Ladder" },
+        { address=0XB89501, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=true, no_survey=false, desc="Vine Sliding" },
+        { address=0XB89501, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=true, no_survey=false, desc="Throwing" },
+        { address=0XB89501, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=true, no_survey=false, desc="Handbell" },
+        { address=0XB89501, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="Itemize" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB894EA, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Mast" },
+      },
+    },
+  },
+}

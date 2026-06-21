@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Yoshi Touch & Go",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "yoshi-touch-go",
+    file = "yoshi-touch-go.zip",
+    hashes = {
+      { hash = "b8e34ec550c2e62934b75bdeee8b8656", label = "Yoshi Touch & Go (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFB91C, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode [32bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFD62C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Rankings Screen - Invalid Score [32bit]" },
+        { address=0X3384B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Yoshi - Score [32bit]" },
+        { address=0X338544, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Baby Mario - Score [32bit]" },
+        { address=0X33EB5C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Balloon Pop - Score [32bit]" },
+        { address=0X3475D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Rankings Screen - Current Score [32bit]" },
+        { address=0X3547A0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Attack - Level Version [32bit]" },
+        { address=0X3A3DD8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Balloon Pop [32bit]" },
+        { address=0X3A3DDC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Rankings - Score Attack [256 Bytes; 32 Bytes each Entry]" },
+      },
+    },
+  },
+}

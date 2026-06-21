@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Kids Station: Kikansha Thomas to Nakamatachi",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "kids-station-kikansha-thomas-to-nakamatachi",
+    file = "kids-station-kikansha-thomas-to-nakamatachi.zip",
+    hashes = {
+      { hash = "210d56b1e7acbf93c1d0c5955092bddb", label = "Kids Station - Kikansha Thomas to Nakama-tachi (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

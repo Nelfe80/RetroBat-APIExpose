@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Phantasy Star Online Ver. 2",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "phantasy-star-online-ver-2",
+    file = "phantasy-star-online-ver-2.zip",
+    hashes = {
+      { hash = "9181677ea271be5fa1e1215a76bea565", label = "Phantasy Star Online Ver. 2 (USA) (En,Ja,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XFA2EE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Foie Spell Level" },
+        { address=0XFA2EE5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gifoie Spell Level" },
+        { address=0XFA2EE6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rafoie Spell Level" },
+        { address=0XFA2EE7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Barta Spell Level" },
+        { address=0XFA2EE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gibarta Spell Level" },
+        { address=0XFA2EE9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rabarta Spell Level" },
+        { address=0XFA2EEA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zonde Spell Level" },
+        { address=0XFA2EEB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gizonde Spell Level" },
+        { address=0XFA2EEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Razonde Spell Level" },
+        { address=0XFA2EED, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grants Spell Level" },
+        { address=0XFA2EEE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Deband Spell Level" },
+        { address=0XFA2EEF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jellen Spell Level" },
+        { address=0XFA2EF0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zalure Spell Level" },
+        { address=0XFA2EF1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shifta Spell Level" },
+        { address=0XFA2EF2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ryuker Spell Level" },
+        { address=0XFA2EF3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Resta Spell Level" },
+        { address=0XFA2EF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Anti Spell Level" },
+        { address=0XFA2EF5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reverser Spell Level" },
+        { address=0XFA2EF6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Megid Spell Level" },
+        { address=0XFA36F8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level (0x00 = 1)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XFA2E10, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0XFA2E10, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XFA36C4, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Equipped - Values are fucky, though" },
+      },
+    },
+  },
+}

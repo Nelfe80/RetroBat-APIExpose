@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Golden Axe: The Revenge of Death Adder",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "golden-axe-the-revenge-of-death-adder",
+    file = "golden-axe-the-revenge-of-death-adder.zip",
+    hashes = {
+      { hash = "9543d4ee190f2eda6b62ba886656e12f", label = "ga2u.7z <Golden Axe: The Revenge of Death Adder (US, Rev A)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAC2F, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode Active" },
+        { address=0XAC2F, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode Inactive" },
+        { address=0XAC81, type="u24le", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1 Credit" },
+        { address=0XAC81, type="u24le", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="2 Credits" },
+        { address=0XAC81, type="u24le", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="3 Credits" },
+        { address=0XAC81, type="u24le", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="4 Credits" },
+        { address=0XAC81, type="u24le", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5 Credits" },
+        { address=0XAC85, type="u24le", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1 Credit" },
+        { address=0XAC85, type="u24le", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="2 Credits" },
+        { address=0XAC85, type="u24le", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="3 Credits" },
+        { address=0XAC85, type="u24le", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="4 Credits" },
+        { address=0XAC85, type="u24le", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5 Credits" },
+        { address=0XAC89, type="u24le", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1 Credit" },
+        { address=0XAC89, type="u24le", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="2 Credits" },
+        { address=0XAC89, type="u24le", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="3 Credits" },
+        { address=0XAC89, type="u24le", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="4 Credits" },
+        { address=0XAC89, type="u24le", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5 Credits" },
+        { address=0XAC8D, type="u24le", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1 Credit" },
+        { address=0XAC8D, type="u24le", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="2 Credits" },
+        { address=0XAC8D, type="u24le", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="3 Credits" },
+        { address=0XAC8D, type="u24le", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="4 Credits" },
+        { address=0XAC8D, type="u24le", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="5 Credits" },
+        { address=0XAC93, type="u16le", condition="eq", value=0X07, action="GAME_OVER", no_log=false, no_survey=false, desc="Score Screen (Game Over)" },
+        { address=0XAC93, type="u16le", condition="eq", value=0X1E, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAC93, type="u16le", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Complete!" },
+      },
+      stage = {
+        { address=0XAC93, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Select" },
+        { address=0XAC93, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0XAC93, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0XAC93, type="u16le", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0XAC93, type="u16le", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0XAC93, type="u16le", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0XAC93, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0141, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X0141, type="u8", condition="eq", value=0X84, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Inactive (playing)" },
+        { address=0XACB9, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Active" },
+        { address=0XACB9, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Inactive (playing)" },
+        { address=0XB430, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XB530, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X91F0E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Count - All Players" },
+      },
+      health = {
+        { address=0X010C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Health decreased" },
+        { address=0X010C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB44C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 - Death Count" },
+      },
+      collectibles = {
+        { address=0XB312, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 Coin 1 Credit (Default)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB31A, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="4 (Default)" },
+        { address=0XB31B, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1 Player (Default)" },
+        { address=0XB31C, type="u8", condition="eq", value=0X28, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="40 Vitality (Default)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB432, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 1 - Continues Used Counter" },
+        { address=0XB532, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2 - Continues Used Counter" },
+      },
+    },
+  },
+}

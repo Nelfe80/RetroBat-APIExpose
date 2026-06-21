@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Rockin' Kats",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "rockin-kats",
+    file = "rockin-kats.zip",
+    hashes = {
+      { hash = "89eed34ca4a758a5e6c1187907638957", label = "New York Nyankies (Japan).nes" },
+      { hash = "d25ea57f0dfa04fe0916d6ad74274acf", label = "Rockin' Kats (Europe).nes" },
+      { hash = "ef9502bbc4b7698603aa8410e3dccf1c", label = "Rockin' Kats (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X005A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="ff = Demo" },
+        { address=0X005C, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Demo" },
+        { address=0X005C, type="u8", condition="eq", value=0X3F, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Post-Credits Climb" },
+        { address=0X005C, type="u8", condition="eq", value=0X40, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Post-credits conveyor" },
+        { address=0X005C, type="u8", condition="eq", value=0X41, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Post-credits Cave climb" },
+        { address=0X005C, type="u8", condition="eq", value=0X42, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Post-credits Sewer" },
+        { address=0X005C, type="u8", condition="eq", value=0X43, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Post-credits Playland Climb" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X041F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X041F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0423, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0423, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X040D, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money(16-bit) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X005C, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Falling Lights Hallway/Boss Cutscene" },
+        { address=0X005C, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Downtown Boss (Bull Band)" },
+        { address=0X005C, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Western Adventure Boss (Big Eagle)" },
+        { address=0X005C, type="u8", condition="eq", value=0X1C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sky Ace Boss" },
+        { address=0X005C, type="u8", condition="eq", value=0X26, action="BOSS_HIT", no_log=false, no_survey=false, desc="Playland Boss (Clown Dog)" },
+        { address=0X005C, type="u8", condition="eq", value=0X3E, action="BOSS_HIT", no_log=false, no_survey=false, desc="I Love New York Final Boss" },
+        { address=0X005C, type="u8", condition="eq", value=0X44, action="BOSS_HIT", no_log=false, no_survey=false, desc="Post-credits Final Boss refight" },
+        { address=0X04B9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+        { address=0X04BA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="HP of Secondary boss target" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X053C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object No 3 bitflags" },
+        { address=0X053D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object No 2 bitflags" },
+        { address=0X053E, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving vertically" },
+        { address=0X053E, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Placed high?" },
+        { address=0X053E, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Collectable item" },
+        { address=0X053E, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Direction thrown (0x00=Left, 0x01=Right)" },
+        { address=0X053E, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Held in Hand" },
+        { address=0X053E, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Being thrown" },
+        { address=0X053E, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Offscreen (loading?)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Mashed: Fully Loaded",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mashed-fully-loaded",
+    file = "mashed-fully-loaded.zip",
+    hashes = {
+      { hash = "d7eed39f8c9e9f8241d3d0b538ab3dab", label = "Drive to Survive (USA)" },
+      { hash = "e6302582e8c4477933fbec082faafab6", label = "Mashed - Fully Loaded (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4FB3E4, type="u32le", condition="eq", value=0X28, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Demo" },
+        { address=0X53EBF8, type="u32le", condition="eq", value=0X54, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demolition" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X555B4C, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rookie" },
+        { address=0X555B4C, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amateur" },
+        { address=0X555B4C, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pro" },
+        { address=0X555B4C, type="u16le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elite" },
+        { address=0X555B4C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC-U] | [32 Bit] Difficulty Level (Quick Battle)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4F8018, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[NTSC-U] | [32 Bit] Track ID decreased" },
+        { address=0X50B1D4, type="u32le", condition="eq", value=0X42480000, action="HIT", no_log=false, no_survey=false, desc="Max Damage" },
+        { address=0X50B1FC, type="u32le", condition="eq", value=0X42480000, action="HIT", no_log=false, no_survey=false, desc="Max Damage" },
+        { address=0X50B224, type="u32le", condition="eq", value=0X42480000, action="HIT", no_log=false, no_survey=false, desc="Max Damage" },
+        { address=0X50B24C, type="u32le", condition="eq", value=0X42480000, action="HIT", no_log=false, no_survey=false, desc="Max Damage" },
+        { address=0X555B30, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[NTSC-U] | [32 Bit] Power Ups (Quick Battle) decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X4F8018, type="u16le", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Angel Peak" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Kharga Temple" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Neustein" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Fort Gidlow" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ventura Blvd" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Demolition" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Keister Bay" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Polar Wharf" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Tierra Piedra" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X09, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Koko Bay" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Silver Creek" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Timgidski" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X0C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Redpool Tip" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X0D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nukov" },
+        { address=0X4F8018, type="u16le", condition="eq", value=0X0E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hattan City" },
+        { address=0X555B30, type="u32le", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off" },
+        { address=0X555B30, type="u32le", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Standard" },
+        { address=0X555B30, type="u32le", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Chaos" },
+      },
+      weapon = {
+        { address=0X791A68, type="u32le", condition="eq", value=0X00425E48, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Machine Gun" },
+        { address=0X791A68, type="u32le", condition="eq", value=0X00425E88, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Drum Bomb" },
+        { address=0X791A68, type="u32le", condition="eq", value=0X00425EC8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Guided Missile" },
+        { address=0X791A68, type="u32le", condition="eq", value=0X00425F08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mine" },
+        { address=0X791A68, type="u32le", condition="eq", value=0X00425F48, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Thrower" },
+        { address=0X791A68, type="u32le", condition="eq", value=0X00425F88, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X791A68, type="u32le", condition="eq", value=0X00425FC8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flash" },
+        { address=0X791A68, type="u32le", condition="eq", value=0X00426008, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Oil Slick" },
+        { address=0X791A68, type="u32le", condition="eq", value=0X00426048, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mortar" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X004FE330, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mortar" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X00501530, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Drum Bomb" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X00501800, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flash" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X005018DC, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Guided Missile" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X00501BB0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Machine Gun" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X00501D10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Oil Slick" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X00503A00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mine" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X005048A0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Thrower" },
+        { address=0X791A6C, type="u32le", condition="eq", value=0X00505EB0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4FACA0, type="u16le", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="Challenge Cup (Gold)" },
+        { address=0X4FE33C, type="u32le", condition="eq", value=0X03, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max Ammo" },
+        { address=0X501538, type="u32le", condition="eq", value=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max Ammo" },
+        { address=0X501BC0, type="u32le", condition="eq", value=0X32, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max Ammo" },
+        { address=0X501C08, type="u32le", condition="eq", value=0X32, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max Ammo" },
+        { address=0X503A08, type="u32le", condition="eq", value=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max Ammo" },
+        { address=0X555590, type="u32le", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X555B50, type="u32le", condition="eq", value=0X09, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switchblade" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4FACA0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[NTSC-U] | [32 Bit] Current Game Mode (Gameplay)" },
+      },
+    },
+  },
+}

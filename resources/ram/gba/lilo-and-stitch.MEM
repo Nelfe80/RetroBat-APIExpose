@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Lilo and Stitch",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "lilo-and-stitch",
+    file = "lilo-and-stitch.zip",
+    hashes = {
+      { hash = "3a1325d0afa9ec59246673fb01878a09", label = "Lilo & Stitch (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8A4C, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Finish" },
+      },
+      stage = {
+        { address=0X8A4C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage - Current Stage" },
+        { address=0XE154, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage - Section" },
+        { address=0XF280, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage - Enemies Eliminated" },
+        { address=0XF290, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage - Total Enemies" },
+        { address=0X14A4C, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Has Picked" },
+        { address=0X14A4C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage - Vehicle is available to pick" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9140, type="u8", condition="eq", value=0XFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="Gameover" },
+        { address=0X9140, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player - Lives increased" },
+        { address=0X9140, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player - Lives decreased" },
+        { address=0XF238, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bonus - No Death [Flag]" },
+      },
+      health = {
+        { address=0X8790, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Stitch - Health Bar decreased" },
+        { address=0X8790, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Stitch - Health Bar increased" },
+        { address=0X8E90, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lilo - Health Bar decreased" },
+        { address=0X8E90, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lilo - Health Bar increased" },
+        { address=0XF29C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Bonus - Perfect (Flag, No Damage)" },
+        { address=0X14A58, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Tank - Health" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8A58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player - Score [32 Bits, Decimal]" },
+      },
+      collectibles = {
+        { address=0X7DD8, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Player - Special Ammo (1, Display)" },
+        { address=0X11444, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Player - Special Ammo (2, Value)" },
+        { address=0X11DD0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Player - Special Ammo flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X14A58, type="u8", condition="eq", value=0XFFFF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Vehicle Destroyed" },
+      },
+    },
+  },
+}

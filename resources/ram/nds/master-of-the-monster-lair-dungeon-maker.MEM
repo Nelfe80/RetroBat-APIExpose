@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Master of the Monster Lair | Dungeon Maker",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "master-of-the-monster-lair-dungeon-maker",
+    file = "master-of-the-monster-lair-dungeon-maker.zip",
+    hashes = {
+      { hash = "83176f94fdd72d3a7953827ddbd7bc33", label = "Master of the Monster Lair (USA).nds" },
+      { hash = "97d5760962bfc9b5bba10e1bfac33d48", label = "Dungeon Maker (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X203F38, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Avatar - Current HP (Overworld) [16bits]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X204082, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 bit] Life Stone Quest increased" },
+        { address=0X204082, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 bit] Life Stone Quest decreased" },
+      },
+      health = {
+        { address=0XB64AC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Avatar - Current HP (Combat) [16bits] decreased" },
+        { address=0XB64AC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Avatar - Current HP (Combat) [16bits] increased" },
+        { address=0XB6740, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Monster 1 Current HP decreased" },
+        { address=0XB6740, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Monster 1 Current HP increased" },
+        { address=0XB6744, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Monster 1 Max HP decreased" },
+        { address=0XB6744, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Monster 1 Max HP increased" },
+        { address=0XB681C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Middle Monster Current HP decreased" },
+        { address=0XB681C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Middle Monster Current HP increased" },
+        { address=0XB68F8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster Right Current HP decreased" },
+        { address=0XB68F8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster Right Current HP increased" },
+        { address=0XB68FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monster Right Max HP decreased" },
+        { address=0XB68FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monster Right Max HP increased" },
+        { address=0X203F3A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Avatar - Max HP [16bits] decreased" },
+        { address=0X203F3A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Avatar - Max HP [16bits] increased" },
+        { address=0X203FA0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Slime HP decreased" },
+        { address=0X203FA0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Slime HP increased" },
+        { address=0X203FA2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Slime Max HP decreased" },
+        { address=0X203FA2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Slime Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1F6264, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B1F - Buried Ring Location increased" },
+        { address=0X20406C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 bit] Shell Ring Quest increased" },
+        { address=0X204074, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 bit] Hell Ring Quest increased" },
+        { address=0X20407C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 bit] Performer Ring Quest increased" },
+        { address=0X207FFC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="--- Bit0 | Platinum Coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X20406E, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16 bit] Otter Corps Boss Quest" },
+      },
+    },
+  },
+}

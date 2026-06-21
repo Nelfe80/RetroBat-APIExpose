@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Bishoujo Senshi Sailor Moon S: Jougai Rantou! Shuyaku Soudatsusen",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "bishoujo-senshi-sailor-moon-s-jougai-rantou-shuyaku-soudatsusen",
+    file = "bishoujo-senshi-sailor-moon-s-jougai-rantou-shuyaku-soudatsusen.zip",
+    hashes = {
+      { hash = "bfac50cdae38c51dff55d15edec85451", label = "Bishoujo Senshi Sailor Moon S - Jougai Rantou! Shuyaku Soudatsusen (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X10F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level?" },
+        { address=0X1B14, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Difficulty Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1049, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life p1 | 60 Full | 00 Nothing increased" },
+        { address=0X1049, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life p1 | 60 Full | 00 Nothing decreased" },
+        { address=0X10C9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life p2 - Full = 60 nothing = 00 increased" },
+        { address=0X10C9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life p2 - Full = 60 nothing = 00 decreased" },
+      },
+      health = {
+        { address=0X0800, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health Bar decreased" },
+        { address=0X0800, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health Bar increased" },
+        { address=0X0801, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health Bar decreased" },
+        { address=0X0801, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health Bar increased" },
+        { address=0X1BB8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="If health is edited decreased" },
+        { address=0X1BB8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="If health is edited increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0803, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer - 0X" },
+        { address=0X0804, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer - X0" },
+        { address=0X1B16, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Settings - Time" },
+      },
+    },
+  },
+}

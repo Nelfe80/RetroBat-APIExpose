@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Chimera",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "chimera",
+    file = "chimera.zip",
+    hashes = {
+      { hash = "b0cd30f6b9d94b301346300d2b5341d9", label = "Chimera (USA, Europe).sv" },
+      { hash = "d906273a6e173c34b0a696669b22f8ab", label = "Chimera (USA, Europe) (Ending Patch) (gde).sv" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0209, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="paused? (8-bit boolean)" },
+        { address=0X06CB, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="in title screen; 1-3: directional A, directional B, rotational" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0256, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="room background (8-bit)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0222, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="score (16-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5FF0, type="u32le", condition="eq", value=0X36, action="DOOR_OPENED", no_log=false, no_survey=false, desc="DOOR_SN" },
+        { address=0X5FF0, type="u32le", condition="eq", value=0X37, action="DOOR_OPENED", no_log=false, no_survey=false, desc="DOOR_EW" },
+      },
+    },
+  },
+}

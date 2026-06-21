@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Little Nicky",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "little-nicky",
+    file = "little-nicky.zip",
+    hashes = {
+      { hash = "246526c5a9dd42e6bf8d35708ca24ee9", label = "Little Nicky (USA).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC0BE, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="- Stages/Scenes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC0B9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="- Life Bar starts at 0x05 increased" },
+        { address=0XC0B9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="- Life Bar starts at 0x05 decreased" },
+      },
+    },
+  },
+}

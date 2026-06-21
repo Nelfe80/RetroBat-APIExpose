@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Tarot no Yakata",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tarot-no-yakata",
+    file = "tarot-no-yakata.zip",
+    hashes = {
+      { hash = "0ac77a4b8ef41442d5bfa2148be8efcd", label = "Tarot no Yakata (Japan).gg" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X1FE6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Related to selecting your astrological sign. Switches from 62 to 0E or 0F after confirmation and" },
+      },
+    },
+  },
+}

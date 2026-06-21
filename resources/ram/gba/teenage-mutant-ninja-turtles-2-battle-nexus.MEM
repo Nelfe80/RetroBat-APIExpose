@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Teenage Mutant Ninja Turtles 2: Battle Nexus",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "teenage-mutant-ninja-turtles-2-battle-nexus",
+    file = "teenage-mutant-ninja-turtles-2-battle-nexus.zip",
+    hashes = {
+      { hash = "7c025e9175c0a09ed3c4bf1d4e956737", label = "Teenage Mutant Ninja Turtles 2 - Battle Nexus (USA) (Pt) (v1.0) (Welblade).gba" },
+      { hash = "c726e8e7cdc865879dd12b97f26f7ae7", label = "Teenage Mutant Ninja Turtles 2 - Battle Nexus (USA) (Ru) (v1.3) (MagicTeam).gba" },
+      { hash = "ca1d048ee77eee2999afe12d7c3d0df8", label = "Teenage Mutant Ninja Turtles 2 - Battle Nexus (USA) (Ru) (v2.0) (MagicTeam).gba" },
+      { hash = "da96ce67d0ddad72e032632c8fd9994a", label = "Teenage Mutant Ninja Turtles 2 - Battle Nexus (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X3C20, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID (8-bit)" },
+        { address=0X3C24, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Stage ID in world (8-bit)" },
+        { address=0X15576, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World selected in menu (8-bit)" },
+      },
+      stage = {
+        { address=0X3D40, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Battle Mode Stage ID (8-bit)" },
+        { address=0X15578, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage selected in menu for Base (8-bit)" },
+        { address=0X1557A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage?" },
+        { address=0X15580, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage selected in menu for Prison (8-bit)" },
+        { address=0X15588, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage selected in menu for Jungle (8-bit)" },
+        { address=0X15590, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage selected in menu for Japan (8-bit)" },
+        { address=0X15598, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage selected in menu for NY (8-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X07B5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Turtle health (editable) (max = 0x48) decreased" },
+        { address=0X07B5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Turtle health (editable) (max = 0x48) increased" },
+        { address=0X17CC1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (8-bit) decreased" },
+        { address=0X17CC1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (8-bit) increased" },
+        { address=0X17E89, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP (8-bit) decreased" },
+        { address=0X17E89, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP (8-bit) increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Avatar: The Last Airbender - The Burning Earth",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "avatar-the-last-airbender-the-burning-earth",
+    file = "avatar-the-last-airbender-the-burning-earth.zip",
+    hashes = {
+      { hash = "a086ef1e35c3b0c64519b05805957cf8", label = "Nickelodeon Avatar - The Last Airbender - The Burning Earth (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1738DAC, type="u8", condition="eq", value=0X3E80000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X587300, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Cheat Unlimited Health decreased" },
+        { address=0X587300, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Cheat Unlimited Health increased" },
+        { address=0X1738DAC, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[Float] Active Character Health" },
+      },
+    },
+  },
+}

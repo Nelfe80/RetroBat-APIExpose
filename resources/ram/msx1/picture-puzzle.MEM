@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Picture Puzzle (HAL Laboratory)",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picture-puzzle",
+    file = "picture-puzzle.zip",
+    hashes = {
+      { hash = "9383ba8643fd1000b5cc099cf9d46822", label = "Picture Puzzle (Japan).rom" },
+      { hash = "ac0bc988775b9c65c92cfb200f9b1beb", label = "Picture Puzzle (Japan) (Alt).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X230E, type="u16le", condition="eq", value=0X1F60, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="titlescreen" },
+        { address=0X2320, type="u8", condition="eq", value=0XB1, action="DEMO_MODE", no_log=false, no_survey=false, desc="puzzle complete (does not get set during demo mode)" },
+        { address=0X2321, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen & demo mode [boolean]" },
+        { address=0X2B00, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen logo [150-bytes]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2316, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="seconds on clock when player 1 asked for help" },
+        { address=0X2317, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="seconds on clock when player 2 asked for help" },
+        { address=0X2319, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="time (minutes)" },
+        { address=0X231A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="time (seconds)" },
+        { address=0X2320, type="u8", condition="eq", value=0XB4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="60 minute time elapsed" },
+        { address=0X2320, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="some puzzle flags [lower4 bits]" },
+        { address=0X2332, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="enabling bit7 will stop fractional second timer" },
+        { address=0X2334, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="fractional seconds timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Crüe Ball: Heavy Metal Pinball",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Flipper"
+  },
+
+  rom = {
+    name = "crue-ball-heavy-metal-pinball",
+    file = "crue-ball-heavy-metal-pinball.zip",
+    hashes = {
+      { hash = "d062b85cbbd54f57de313d09e5c0bfec", label = "Crue Ball - Heavy Metal Pinball (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X840A, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Music Demo" },
+        { address=0X845E, type="u8", condition="eq", value=0X04, action="GAME_OVER", no_log=false, no_survey=false, desc="Last Ball (the moment this hits 4 is Game Over)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB45F, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 1: Fast Lane" },
+        { address=0XB45F, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 2: Rather Be Happy" },
+        { address=0XB45F, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 3: Epicenter" },
+        { address=0XB45F, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 4: Grab It" },
+        { address=0XB45F, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 5: Too Far Away" },
+        { address=0XB45F, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 6: Twister Flipper" },
+        { address=0XB45F, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 7: You Need It" },
+        { address=0XB45F, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 8: Slipping Fast" },
+        { address=0XB45F, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Volume Level 9: Feeding Frenzy" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8432, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [16-bit] [BCD]" },
+        { address=0X8434, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [16-bit] [BCD]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB4D5, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ricochet Effect and Light Cue" },
+        { address=0XB4DB, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Drop Targets down, weird Diamond thing is up, switches back to 00 when Diamond Drops are finishe" },
+      },
+    },
+  },
+}

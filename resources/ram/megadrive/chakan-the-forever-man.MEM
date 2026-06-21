@@ -1,0 +1,123 @@
+return {
+  game = {
+    title = "Chakan: The Forever Man",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "chakan-the-forever-man",
+    file = "chakan-the-forever-man.zip",
+    hashes = {
+      { hash = "8844a97b65994de94cf398cf4a3217c3", label = "Chakan (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF51, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Possibly 01 on title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4881, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terrestrial Air Dimension Level 3" },
+        { address=0X4887, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terrestrial Air Dimension Level 3" },
+        { address=0X488D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terrestrial Air Dimension Level 3" },
+        { address=0X68CD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Elemental Fire Dimension 2 - Clear Potion" },
+        { address=0XBF82, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Opening Text Flag - Elkenrod" },
+        { address=0XBF83, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Opening Text Flag - Spider Queen" },
+        { address=0XBF84, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Opening Text Flag - Dragonfly King" },
+        { address=0XBF85, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Opening Text Flag - Mantis" },
+        { address=0XC05C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Potions" },
+      },
+      stage = {
+        { address=0XD4FA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Terrestrial Earth Dimension Stage 2 explosions triggered (01)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X241D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X241D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X24A1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X24A1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X25A1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X25A1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X2929, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X2929, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X2D83, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X2D83, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X3CA7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X3CA7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X3EA7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X3EA7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X41A7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X41A7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X41AB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X41AB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X42A7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X42A7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X4445, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X4445, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X463D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X463D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X4F2D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X4F2D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X5063, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X5063, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X515F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X515F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X522D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X522D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X5767, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X5767, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X5C03, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X5C03, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0XC0D1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XC0D1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC046, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC0CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 1 -Entering door in Terrestrial Water Dimension 3 increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC0DE, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Shield Spell/After Hit Invincibility Timer" },
+      },
+      player = {
+        { address=0XC03F, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="High Jump Spell Active" },
+        { address=0XC0C9, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Bit 4 - Jumping/Hanging" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBF96, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell Y Coordinates - Earth Dimension" },
+        { address=0XBF98, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell Y Coordinates - Fire Dimension" },
+        { address=0XBF9A, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell Y Coordinates - Water Dimension" },
+        { address=0XBF9C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell Y Coordinates - Air Dimension" },
+        { address=0XBF9E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell X Coordinates - Earth Dimension" },
+        { address=0XBFA0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell X Coordinates - Fire Dimension" },
+        { address=0XBFA2, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell X Coordinates - Water Dimension" },
+        { address=0XBFA4, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell X Coordinates - Air Dimension" },
+        { address=0XBFA6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell Active - Earth Dimension" },
+        { address=0XBFA8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell Active - Fire Dimension" },
+        { address=0XBFAA, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell Active - Water Dimension" },
+        { address=0XBFAC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Spell Active - Air Dimension" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBADA, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Exit Timer" },
+        { address=0XC078, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Hourglass Time Passed - Current Level, Each increase = 10%" },
+      },
+    },
+  },
+}

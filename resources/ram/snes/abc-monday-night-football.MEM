@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "ABC Monday Night Football",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "abc-monday-night-football",
+    file = "abc-monday-night-football.zip",
+    hashes = {
+      { hash = "acaab9b12349f4aa3c6669878dc35ef4", label = "ABC Monday Night Football (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

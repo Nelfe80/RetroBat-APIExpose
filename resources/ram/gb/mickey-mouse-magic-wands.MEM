@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Mickey Mouse: Magic Wands!",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "mickey-mouse-magic-wands",
+    file = "mickey-mouse-magic-wands.zip",
+    hashes = {
+      { hash = "38b65d28ac0bd619f5dee5a45d5fc542", label = "Mickey Mouse - Magic Wands! (USA, Europe) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC3A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC339, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives remaining increased" },
+        { address=0XC339, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives remaining decreased" },
+        { address=0XC33A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Candies in inventory" },
+        { address=0XC890, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="0x80 when 1-up text is showing after collecting a 1-up cake increased" },
+        { address=0XC890, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x80 when 1-up text is showing after collecting a 1-up cake decreased" },
+      },
+      health = {
+        { address=0XC3A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0XC3A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC3BE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1/3/4 health information" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC6A0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ice block 2" },
+        { address=0XC6B0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ice block 3" },
+        { address=0XC6C0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ice block 4" },
+        { address=0XC6D0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ice block 5" },
+        { address=0XC6E0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ice block 6" },
+        { address=0XC6F0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ice block 7" },
+        { address=0XC700, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ice block 8" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC694, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 1 sub-timer" },
+        { address=0XC695, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 1 main timer" },
+        { address=0XC6A4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 2 sub-timer" },
+        { address=0XC6A5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 2 main timer" },
+        { address=0XC6B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 3 sub-timer" },
+        { address=0XC6B5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 3 main timer" },
+        { address=0XC6C4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 4 sub-timer" },
+        { address=0XC6C5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 4 main timer" },
+        { address=0XC6D4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 5 sub-timer" },
+        { address=0XC6D5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 5 main timer" },
+        { address=0XC6E4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 6 sub-timer" },
+        { address=0XC6E5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 6 main timer" },
+        { address=0XC6F4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 7 sub-timer" },
+        { address=0XC6F5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 7 main timer" },
+        { address=0XC704, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 8 sub-timer" },
+        { address=0XC705, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ice block 8 main timer" },
+      },
+    },
+  },
+}

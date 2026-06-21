@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hunter: The Reckoning",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "hunter-the-reckoning",
+    file = "hunter-the-reckoning.zip",
+    hashes = {
+      { hash = "eaf4bf58ffdb7f8a3e4f2370ac18e973", label = "Hunter - The Reckoning (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

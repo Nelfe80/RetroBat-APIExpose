@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Madagascar",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "madagascar",
+    file = "madagascar.zip",
+    hashes = {
+      { hash = "11e59f830fec5702011173cac6c9c7d9", label = "Madagascar (Europe).gba" },
+      { hash = "aa99d027561a92eb5a5af4e48f6e560c", label = "Madagascar (Spain).gba" },
+      { hash = "97af9c00a5718832b7e5e46f9e434820", label = "Madagascar (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE40C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected level from menu" },
+      },
+      zone = {
+        { address=0XDDB0, type="u8", condition="eq", value=0X78, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Max value (120 coins)" },
+        { address=0XDDB0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Total collected coins for Wild World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE484, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="no alerts remaining, been caught 5 times (dead)" },
+      },
+      health = {
+        { address=0XE48C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0XE48C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X102E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bonus Lemur rave best score" },
+      },
+      collectibles = {
+        { address=0XDD94, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XDD96, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XDD98, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XDD9A, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XDD9C, type="u8", condition="eq", value=0X55, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (85 coins)" },
+        { address=0XDD9E, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XDDA0, type="u8", condition="eq", value=0X14, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (20 coins)" },
+        { address=0XDDA2, type="u8", condition="eq", value=0X4B, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (75 coins)" },
+        { address=0XDDA4, type="u8", condition="eq", value=0X14, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (20 coins)" },
+        { address=0XDDA6, type="u8", condition="eq", value=0X78, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (120 coins)" },
+        { address=0XDDA8, type="u8", condition="eq", value=0X82, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (130 coins)" },
+        { address=0XDDAA, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XDDAE, type="u8", condition="eq", value=0X4B, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max Value (75 coins)" },
+        { address=0XDDB2, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XDDB4, type="u8", condition="eq", value=0X78, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (120 coins)" },
+        { address=0XDDB6, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="max value" },
+        { address=0XDDB8, type="u8", condition="eq", value=0X78, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (120 coins)" },
+        { address=0XDDBA, type="u8", condition="eq", value=0X7D, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (125 coins)" },
+        { address=0XDDBC, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XDDBE, type="u8", condition="eq", value=0X6E, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (110 coins)" },
+        { address=0XDDC0, type="u8", condition="eq", value=0X00, action="COIN_GAIN", no_log=false, no_survey=false, desc="Max value (no coins)" },
+        { address=0XE41C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current collected coins in current stage increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDDAC, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Max value (no coins)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE484, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Guard alerts remaining" },
+        { address=0X103D4, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="In level stage timer" },
+      },
+    },
+  },
+}

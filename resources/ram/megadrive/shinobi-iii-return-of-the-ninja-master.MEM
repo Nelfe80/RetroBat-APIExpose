@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Shinobi III: Return of the Ninja Master",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "shinobi-iii-return-of-the-ninja-master",
+    file = "shinobi-iii-return-of-the-ninja-master.zip",
+    hashes = {
+      { hash = "5a8f7c6437d239690b4a15287d841c26", label = "Shinobi III - Return of the Ninja Master (Europe).md" },
+      { hash = "691eeff9c5741724a8751ec0fa9cfbf0", label = "Shinobi III - Return of the Ninja Master (USA).md" },
+      { hash = "6ce59f3e7ee52dc8c6df7b4d8a166826", label = "Super Shinobi II, The (Japan, Korea) (Ja).md" },
+      { hash = "bcedff37eb20ea289bd3b7e4f4de84a6", label = "Shinobi III - Return of the Ninja Master (USA) [Ru) (NewGame).md" },
+      { hash = "c3dbe1d6d1cf04d87d57277dfc8d2ac9", label = "Shinobi III - Return of the Ninja Master (USA) (Pt) (Rigues).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0030, type="u8", condition="eq", value=0XDA, action="DEMO_MODE", no_log=false, no_survey=false, desc="playing" },
+        { address=0X37B1, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XE000, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-Bits Background progress X" },
+        { address=0XE004, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-Bits Background progress Y" },
+      },
+      stage = {
+        { address=0X37AB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit]Sub-Sub Stage" },
+        { address=0X37AC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8bit) sub-stage" },
+        { address=0X37AD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X37E1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0X37E1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+      health = {
+        { address=0X37E8, type="u8", condition="eq", value=0XDEAD, action="HEALTH_STATE", no_log=false, no_survey=false, desc="00" },
+        { address=0X37E8, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health" },
+        { address=0X37EC, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="damage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X37B2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16bit) score x10e4" },
+        { address=0X37B4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16bit) score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4188, type="u8", condition="eq", value=0X0F, action="BOSS_HIT", no_log=false, no_survey=false, desc="full" },
+        { address=0X4189, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="02 when the last boss is on the second form." },
+        { address=0X41AE, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="1st form full" },
+        { address=0X41AE, type="u8", condition="eq", value=0X1C, action="BOSS_HIT", no_log=false, no_survey=false, desc="2nd form full" },
+        { address=0X41B4, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="full" },
+        { address=0X41B4, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="defeated" },
+        { address=0X41C4, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="full" },
+        { address=0X41C4, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X4230, type="u8", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="full" },
+        { address=0X4284, type="u8", condition="eq", value=0X28, action="BOSS_HIT", no_log=false, no_survey=false, desc="full" },
+        { address=0X4284, type="u8", condition="eq", value=0XFF, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0XF080, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16bit) f940 = 1st sub-boss room" },
+        { address=0XF822, type="u16be", condition="eq", value=0X0693, action="BOSS_HIT", no_log=false, no_survey=false, desc="sub-boss match / boss 6 - 1st form" },
+        { address=0XF822, type="u16be", condition="eq", value=0X6452, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="sub-boss defeated" },
+        { address=0XF822, type="u16be", condition="eq", value=0X697F, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 1 / boss 6 - 2nd form" },
+        { address=0XF822, type="u16be", condition="eq", value=0XF5AF, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 2, 4, 5" },
+        { address=0XF822, type="u16be", condition="eq", value=0X62E9, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 3" },
+        { address=0XF822, type="u16be", condition="eq", value=0X7934, action="BOSS_HIT", no_log=false, no_survey=false, desc="last boss" },
+        { address=0XF9F6, type="u16be", condition="eq", value=0X061F, action="BOSS_HIT", no_log=false, no_survey=false, desc="- Intro sub boss - check to achievement" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X000A, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="invincibility cheat = 52" },
+      },
+      player = {
+        { address=0X4156, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(lower4) 2 = using fushin ninjitsu (high jump)" },
+      },
+    },
+  },
+}

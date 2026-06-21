@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Ninja Spirit",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "ninja-spirit",
+    file = "ninja-spirit.zip",
+    hashes = {
+      { hash = "7ac403ffd11ddf3e81720b86ddf627af", label = "pce/saigonin.7z <Saigo no Nindou - Ninja Spirit>" },
+      { hash = "7ed620b8a4a302dde75f074eabd4ead8", label = "Saigo no Nindou - Ninja Spirit (Japan).pce" },
+      { hash = "adecf9e9d9be8a300818ad2cc09d49fe", label = "Ninja Spirit (USA).pce" },
+      { hash = "de4903d9b5b375d93b334ff6e913ee95", label = "Ninja Spirit (USA) (Es) (Wave) (1.0).pce" },
+      { hash = "ecae850f720be11410dd81542ff22c56", label = "tg16/nspirit.7z <Ninja Spirit>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0039, type="u8", condition="eq", value=0X0A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X05CF, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Distance in stage" },
+        { address=0X05D3, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Distance in stage" },
+        { address=0X0B4A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Number (1-6)" },
+        { address=0X0B6A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (0x00 - 0x07)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0B68, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives remaining (0x00 = Game Over) increased" },
+        { address=0X0B68, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives remaining (0x00 = Game Over) decreased" },
+      },
+      health = {
+        { address=0X17C9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X17C9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X004D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="bit0 - Weapons HUD not visible" },
+        { address=0X14B6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0B70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score X 100 - 32-bit" },
+        { address=0X1FF8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score X100 - 32-bit" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0B6C, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Flags" },
+      },
+    },
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Street Fighter III: 2nd Impact - Giant Attack",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "street-fighter-iii-2nd-impact-giant-attack",
+    file = "street-fighter-iii-2nd-impact-giant-attack.zip",
+    hashes = {
+      { hash = "a131ffa84de530bcb6841d1d83b1ac9a", label = "sfiii2.7z <Street Fighter III 2nd Impact: Giant Attack (USA 970930)>" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X15596, type="u8", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Perfect" },
+        { address=0X15596, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Stage" },
+      },
+    },
+  },
+}

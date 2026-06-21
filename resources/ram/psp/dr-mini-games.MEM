@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Dr. Mini Games",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dr-mini-games",
+    file = "dr-mini-games.zip",
+    hashes = {
+      { hash = "a487f202e1bb1c32501357c17da9b56d", label = "Dr. Mini Games (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9EEB8C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (32bit / 1024)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9EEB74, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (32bit / 1024)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9EDB18, type="u16le", condition="eq", value=0X00000400, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Getting Destroyed" },
+        { address=0X9EDC14, type="u16le", condition="eq", value=0X00000400, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Getting Destroyed" },
+        { address=0X9EDD10, type="u16le", condition="eq", value=0X00000400, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Getting Destroyed" },
+        { address=0X9EDE0C, type="u16le", condition="eq", value=0X00000400, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Getting Destroyed" },
+        { address=0X9EDF08, type="u16le", condition="eq", value=0X00000400, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Getting Destroyed" },
+      },
+    },
+  },
+}

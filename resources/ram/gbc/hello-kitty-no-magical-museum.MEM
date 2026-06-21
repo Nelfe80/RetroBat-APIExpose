@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Hello Kitty no Magical Museum",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "hello-kitty-no-magical-museum",
+    file = "hello-kitty-no-magical-museum.zip",
+    hashes = {
+      { hash = "80a38e6992aca201386e581cf1f817ff", label = "Hello Kitty no Magical Museum (Japan) (En) (v1.0) (Doki Doki Translations).gbc" },
+      { hash = "b868fa9f3cecfa2d39df43a5d1b13b60", label = "Hello Kitty no Magical Museum (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC20E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+      stage = {
+        { address=0XC0A2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progress - Flower" },
+        { address=0XC0A3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progress - Apple" },
+        { address=0XC0A4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progress - Star" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pinocchio's Puzzle",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "pinocchios-puzzle",
+    file = "pinocchios-puzzle.zip",
+    hashes = {
+      { hash = "8b4ec988b9a5add51447d4b677014c9a", label = "Pinocchio's Puzzle (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Duel Monsters 4: Battle of Great Duelist - Yugi Deck",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "yu-gi-oh-duel-monsters-4-battle-of-great-duelist-yugi-deck",
+    file = "yu-gi-oh-duel-monsters-4-battle-of-great-duelist-yugi-deck.zip",
+    hashes = {
+      { hash = "e3809354341cfb1f2ebb3e4dd1bc8828", label = "Yu-Gi-Oh! Duel Monsters 4 - Battle of Great Duelist - Yuugi Deck (Japan).gbc" },
+      { hash = "54a5f9b4bae5ebd452e56277f5ee82df", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Yugi Deck (De).gbc" },
+      { hash = "1dcb73c62167339df4c848ba466547db", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Yugi Deck (Es).gbc" },
+      { hash = "0b7253cff85faac4dd2b9fc441f52feb", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Yugi Deck (Fr).gbc" },
+      { hash = "a47e4e4e97d8c78448af704df7db689f", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Yugi Deck (It).gbc" },
+      { hash = "97819d8701876ae3d3deee8b98749e8a", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Yugi Deck (Ja).gbc" },
+      { hash = "0b9b51fdd41a15a10d02d7fbf64ac7de", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Yugi Deck (En).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

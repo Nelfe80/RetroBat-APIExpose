@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Super Tekkyuu Fight!",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "super-tekkyuu-fight",
+    file = "super-tekkyuu-fight.zip",
+    hashes = {
+      { hash = "96c38a14f55c58b51435e9bdb0235998", label = "Super Tekkyuu Fight! (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0AA9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0A96, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Volcano world completed" },
+        { address=0X0A97, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Snow world completed" },
+        { address=0X0A98, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Water world completed" },
+        { address=0X0A99, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Forest world completed" },
+        { address=0X0A9A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ruins world completed" },
+        { address=0X0A9B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Technological world completed" },
+        { address=0X0A9C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Dimensional world completed" },
+      },
+      zone = {
+        { address=0X0921, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World choosed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0934, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives increased" },
+        { address=0X0934, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives decreased" },
+      },
+      health = {
+        { address=0X0933, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP *Maybe i use this* decreased" },
+        { address=0X0933, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP *Maybe i use this* increased" },
+        { address=0XC21C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP decreased" },
+        { address=0XC21C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP increased" },
+        { address=0XC39C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hp 2 decreased" },
+        { address=0XC39C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hp 2 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC31C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+  },
+}

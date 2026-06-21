@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Nuts & Milk",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nuts-milk",
+    file = "nuts-milk.zip",
+    hashes = {
+      { hash = "8aa4399eede7ffd1070ddc4fb2f100c7", label = "Nuts & Milk (1983)(Hudson Soft)(JP).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2603, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X2607, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not playing" },
+        { address=0X2607, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2604, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Default & Round 1" },
+        { address=0X2604, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current round" },
+        { address=0X2605, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X2605, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Round cleared" },
+        { address=0X2608, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Playing an edited level" },
+        { address=0X2649, type="u8", condition="eq", value=0X36, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gameplay1 (Overrides original level)" },
+        { address=0X2649, type="u8", condition="eq", value=0X37, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gameplay2 (Overrides original level)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2603, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Amount of lives increased" },
+        { address=0X2603, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amount of lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X261D, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (multiplied by 10)" },
+        { address=0X261F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-score (multiplied by 10)" },
+      },
+      collectibles = {
+        { address=0X2651, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Timer of frames for demo, decreases until it hits 0x0, triggering the demo increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2612, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Gray block removed" },
+      },
+    },
+  },
+}

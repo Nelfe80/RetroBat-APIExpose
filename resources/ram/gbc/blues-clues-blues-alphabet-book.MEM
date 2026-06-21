@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Blue's Clues: Blue's Alphabet Book",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "blues-clues-blues-alphabet-book",
+    file = "blues-clues-blues-alphabet-book.zip",
+    hashes = {
+      { hash = "6af9bb4957485a0f5cebc9b44e805392", label = "Blue's Clues - Blue's Alphabet Book (USA).gbc" },
+      { hash = "e3846151ea7d911c9b0b76de2fe5239a", label = "Blue's Clues - Blue's Alphabet Book (USA) (Rev 1) (Proto).gbc" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XCEF3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+        { address=0XCEF7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

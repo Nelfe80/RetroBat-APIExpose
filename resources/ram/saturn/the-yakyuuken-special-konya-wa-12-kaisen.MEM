@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Yakyuuken Special: Kon'ya wa 12-kaisen!!",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-yakyuuken-special-konya-wa-12-kaisen",
+    file = "the-yakyuuken-special-konya-wa-12-kaisen.zip",
+    hashes = {
+      { hash = "ab23e4d8d4af873a7ae224a24acc26fa", label = "Yakyuuken Special, The - Kon'ya wa 12-kaisen!! (Japan) (1M)" },
+    }
+  },
+
+  events = {
+  },
+}

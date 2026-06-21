@@ -1,0 +1,121 @@
+return {
+  game = {
+    title = "Hexen: Beyond Heretic",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "hexen-beyond-heretic",
+    file = "hexen-beyond-heretic.zip",
+    hashes = {
+      { hash = "e1ff775a5a5ec3d49eda5a28c9c63421", label = "Hexen (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC702C, type="u32le", condition="eq", value=0X00000000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Normal gameplay, title screen, boot" },
+        { address=0XC702C, type="u32le", condition="eq", value=0X80117F4C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo loaded and playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC8444, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XCF834, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On" },
+        { address=0XCF834, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Switch" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC7F90, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0XC7F90, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0XE7C6C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0XE7C6C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XE7DA0, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Emerald" },
+      },
+      weapon = {
+        { address=0XE7DA4, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="First piece on Seven Portals" },
+        { address=0XE7DA8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon Equipped" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XE7C76, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Parameter Value" },
+      },
+      player = {
+        { address=0XD3740, type="u32le", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Wolf Chapel Jumping Flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XEA1EC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Puzzle Switches Solved in Episode 2" },
+        { address=0XEC426, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Hit" },
+        { address=0X11A058, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X11A058, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X11F338, type="u16le", condition="eq", value=0X0000, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not triggered" },
+        { address=0X11F338, type="u16le", condition="eq", value=0X0001, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Triggered" },
+        { address=0X11F4B4, type="u16le", condition="eq", value=0X0000, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not triggered" },
+        { address=0X11F4B4, type="u16le", condition="eq", value=0X0001, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Triggered" },
+        { address=0X122B68, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X122B68, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X122BD8, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X122BD8, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X122C48, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X122C48, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X124164, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X124164, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X124440, type="u16le", condition="eq", value=0XAB, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Active" },
+        { address=0X1253E4, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X1253E4, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12699C, type="u16le", condition="eq", value=0X009C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12699C, type="u16le", condition="eq", value=0X009D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X128618, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X128618, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X128678, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X128678, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X128D74, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X128D74, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12A054, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12A054, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12A318, type="u16le", condition="eq", value=0X009C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12A318, type="u16le", condition="eq", value=0X009D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12BFF8, type="u16le", condition="eq", value=0XAB, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Active" },
+        { address=0X12C0C8, type="u16le", condition="eq", value=0XAB, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Active" },
+        { address=0X12C358, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12C358, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12C3E8, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12C3E8, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12C438, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12C438, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12C488, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12C488, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12C8C8, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12C8C8, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12C938, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12C938, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12D62C, type="u16le", condition="eq", value=0X9F, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12D62C, type="u16le", condition="eq", value=0XA0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X12EE84, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X12EE84, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X133984, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X133984, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X13487C, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X13487C, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+        { address=0X1348EC, type="u16le", condition="eq", value=0X115, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Not pulled" },
+        { address=0X1348EC, type="u16le", condition="eq", value=0X119, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pulled" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X12BCD0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Clock Working" },
+      },
+    },
+  },
+}

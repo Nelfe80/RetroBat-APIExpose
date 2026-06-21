@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Dragon Quest VII",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-quest-vii",
+    file = "dragon-quest-vii.zip",
+    hashes = {
+      { hash = "53aea21ec24c5d70abd48dee9527c47d", label = "Dragon Warrior VII (USA) (Disc 1)" },
+      { hash = "8b4fba614a9debf9496195c435072eea", label = "Dragon Warrior VII (USA) (Disc 2)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1021F, type="u8", condition="eq", value=0XB5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="items in Underground Pyramid" },
+        { address=0X10276, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground Pyramid event flags" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1020F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="items in MechSoldier base" },
+      },
+      health = {
+        { address=0XE0500, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="last damage done" },
+        { address=0XE084A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="monster 0 HP decreased" },
+        { address=0XE084A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="monster 0 HP increased" },
+        { address=0XE08F6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="monster 1 HP decreased" },
+        { address=0XE08F6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="monster 1 HP increased" },
+        { address=0XE09A2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="monster 2 HP decreased" },
+        { address=0XE09A2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="monster 2 HP increased" },
+        { address=0XE0A4E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="monster 3 HP decreased" },
+        { address=0XE0A4E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="monster 3 HP increased" },
+        { address=0XE0AFA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="monster 4 HP decreased" },
+        { address=0XE0AFA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="monster 4 HP increased" },
+        { address=0XE0BA6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="monster 5 HP decreased" },
+        { address=0XE0BA6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="monster 5 HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X11368, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money increased" },
+        { address=0XE3D88, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="combat gold earned increased" },
+        { address=0X14292C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="current coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X100D3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit4 - indicates presence of NPC/Boss in map" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X102E2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="switches in Tower of Darkness" },
+      },
+    },
+  },
+}

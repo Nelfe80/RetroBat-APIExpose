@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Donald's Alphabet Chase",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "donalds-alphabet-chase",
+    file = "donalds-alphabet-chase.zip",
+    hashes = {
+      { hash = "b6712d0f0a84e8fb7bf8c0461bd11eb4", label = "Donald's Alphabet Chase (1988) (Westwood Associates) (Cracked).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

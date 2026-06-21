@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Boxyboy",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Puzzle-Game"
+  },
+
+  rom = {
+    name = "boxyboy",
+    file = "boxyboy.zip",
+    hashes = {
+      { hash = "c316ad2e57400feaf16fcaff67935b00", label = "Boxyboy (USA).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A47, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8 Bit] Demo Flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0055, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level State" },
+      },
+      stage = {
+        { address=0X0200, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Max Stage ID Unlocked" },
+        { address=0X0203, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage ID" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0011, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Step Counter" },
+      },
+    },
+  },
+}

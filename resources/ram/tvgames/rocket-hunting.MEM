@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Rocket Hunting",
+    system = "tvgames",
+    system_name = "Elektor TV Games Computer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rocket-hunting",
+    file = "rocket-hunting.zip",
+    hashes = {
+      { hash = "ff5f7f6c0bba34a081acb131653ca758", label = "Rocket Hunting (Europe) (ESS-010-9).tvc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X17CA, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8bit] e=Title Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X17DB, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Refueling" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X172A, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8bit] Fuel Station Destroyed" },
+        { address=0X175C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8bit] 4d=Station Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1767, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] ff= Game Over Timer" },
+      },
+    },
+  },
+}

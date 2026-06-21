@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Dance Dance Revolution GB3",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Music, Dancing"
+  },
+
+  rom = {
+    name = "dance-dance-revolution-gb3",
+    file = "dance-dance-revolution-gb3.zip",
+    hashes = {
+      { hash = "3ced79ad60ab5195058d5d658550f04f", label = "Dance Dance Revolution GB 3 (Japan).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8036, type="u8", condition="eq", value=0XC7, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XC0C4, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Arcade" },
+        { address=0XC57E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01= Demo Mode" },
+      },
+      events = {
+        { address=0XC5BC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="max combo" },
+        { address=0XC5F4, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Current Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC52A, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Default (4)" },
+        { address=0XC52A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Game Level" },
+        { address=0XE52A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="game level" },
+      },
+      stage = {
+        { address=0XC52B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Max Stage" },
+        { address=0XC52C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Free Play Stage Level" },
+        { address=0XE52B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="max stage" },
+        { address=0XE52C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="free play stage level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC5CC, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Starting Health" },
+        { address=0XC5CC, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[8 Bit] Health" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC5CD, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit BCD] Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Britney's Dance Beat",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "britneys-dance-beat",
+    file = "britneys-dance-beat.zip",
+    hashes = {
+      { hash = "bb1a8e9129d4d2dcb4bbb3e4879ee97b", label = "Britney's Dance Beat (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2BE9, type="u8", condition="bit_true", bit=0, mask=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Overprotected (Concert Mode)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2BE8, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tour Book Photo 1 Flag (Used to clear Baby One More Time in Practice)" },
+        { address=0X2BE8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tour Book Photo 2 Flag (Used to clear Oops I Did it Again in Practice)" },
+        { address=0X2BE8, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tour Book Photo 3 Flag (Used to clear Closer in Practice, and unlocks Sliding Puzzle 2)" },
+        { address=0X2BE8, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tour Book Photo Flag 4 (Used to clear Overprotected on Practice)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X040A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Target Level Score" },
+        { address=0X040C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Your Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2BD1, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Baby One More Time" },
+        { address=0X2BD1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Song ID" },
+        { address=0X2BE8, type="u8", condition="bit_true", bit=5, mask=0X20, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Hit Me Baby One More Time (Concert Mode)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Crisis Beat",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "crisis-beat",
+    file = "crisis-beat.zip",
+    hashes = {
+      { hash = "bd484a01ccd716bb5ce756da0b3edd31", label = "Crisis Beat (Europe)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X588AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels 8bit" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5890C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifes 8bit increased" },
+        { address=0X5890C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifes 8bit decreased" },
+        { address=0XAEF4E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life P1 8bit increased" },
+        { address=0XAEF4E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life P1 8bit decreased" },
+        { address=0XB1642, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss Life 16bit increased" },
+        { address=0XB1642, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss Life 16bit decreased" },
+        { address=0XB1782, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="2nd Boss Life 16bits increased" },
+        { address=0XB1782, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd Boss Life 16bits decreased" },
+        { address=0XB18C2, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="3rd Boss Life 16bit increased" },
+        { address=0XB18C2, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd Boss Life 16bit decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X58920, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points 32bits 1/2" },
+        { address=0XAF0A0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points 32bits 2/2" },
+      },
+    },
+  },
+}

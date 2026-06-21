@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "SpyHunter",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing, Shooter"
+  },
+
+  rom = {
+    name = "spyhunter",
+    file = "spyhunter.zip",
+    hashes = {
+      { hash = "6f883638e22fe0739f19d769f306a9a4", label = "SpyHunter (USA)" },
+      { hash = "f1217b30bff54ac31c6886c20ec3069c", label = "SpyHunter (USA) (Widescreen 60FPS) (v1.0) (Souzooka)" },
+      { hash = "37832a2a37b5f7a3403b0da0046a8de5", label = "SpyHunter (Europe) (En,Fr,De,Es,It)" },
+      { hash = "400d0c1c41ebf3d8743ff65cf7f1b3f1", label = "SpyHunter (Europe) (Widescreen 50FPS) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+  },
+}

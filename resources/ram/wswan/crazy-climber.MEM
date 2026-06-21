@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Crazy Climber",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "crazy-climber",
+    file = "crazy-climber.zip",
+    hashes = {
+      { hash = "0ed3a08a3a9858f65d1487889645dc55", label = "Crazy Climber (Japan).ws" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X01C8, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24bit BE]" },
+      },
+    },
+  },
+}

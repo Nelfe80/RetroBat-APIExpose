@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Space Station Silicon Valley",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "space-station-silicon-valley",
+    file = "space-station-silicon-valley.zip",
+    hashes = {
+      { hash = "488611af773cec5b7ecc5bd3efb754bb", label = "Spacestation Silicon Valley (Europe) (En,Fr,De,Es,It,Nl,Sv) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0XCB2D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Point blocks collected" },
+      },
+    },
+  },
+}

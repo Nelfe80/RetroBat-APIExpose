@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Barnstorming",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "barnstorming",
+    file = "barnstorming.zip",
+    hashes = {
+      { hash = "f8240e62d8c0a64a61e19388414e3104", label = "Barnstorming (USA).a26" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0024, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage part?" },
+      },
+    },
+  },
+}

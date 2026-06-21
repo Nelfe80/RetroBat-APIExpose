@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Winter Olympic Games: Lillehammer '94",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "winter-olympic-games-lillehammer-94",
+    file = "winter-olympic-games-lillehammer-94.zip",
+    hashes = {
+      { hash = "c895fd98f59546c54c2a5c015a9dd2bc", label = "Winter Olympic Games - Lillehammer '94 (USA) (En,Fr,De,Es,It,Pt,Sv,No).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X106BA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current round" },
+        { address=0X1E7D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skill level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X107A0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Ski Jump: Total score (1/100th points)" },
+        { address=0X10912, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Moguls: Turns score (1/100th points)" },
+        { address=0X10914, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Moguls: Air score (1/100th points)" },
+        { address=0X10916, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Moguls: Speed score (1/100th points)" },
+        { address=0X1E72C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Ski Jump record score (1/100th points)" },
+        { address=0X1E740, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Moguls record score (1/100th points)" },
+      },
+      collectibles = {
+        { address=0X106BE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Austria: Gold medals increased" },
+        { address=0X106C0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Finland: Gold medals increased" },
+        { address=0X106C2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="USA: Gold medals increased" },
+        { address=0X106C4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Canada: Gold medals increased" },
+        { address=0X106C6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Germany: Gold medals increased" },
+        { address=0X106C8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Japan: Gold medals increased" },
+        { address=0X106CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sweden: Gold medals increased" },
+        { address=0X106CC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Spain: Gold medals increased" },
+        { address=0X106CE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Great Britain: Gold medals increased" },
+        { address=0X106D0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Switzerland: Gold medals increased" },
+        { address=0X106D2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Italy: Gold medals increased" },
+        { address=0X106D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="France: Gold medals increased" },
+        { address=0X106D6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Australia: Gold medals increased" },
+        { address=0X106D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Norway: Gold medals increased" },
+        { address=0X106DA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Brazil: Gold medals increased" },
+        { address=0X106DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Russia: Gold medals increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X001A, type="u24le", condition="eq", value=0XA5BE, action="JUMPING", no_log=true, no_survey=false, desc="Ski Jump" },
+        { address=0X10438, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Ski Jump" },
+        { address=0X1043C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Mini-Olympics: Is Ski Jump selected?" },
+        { address=0X106B4, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Ski Jump" },
+        { address=0X107A6, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Ski Jump: Wind speed" },
+        { address=0X107A8, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Ski Jump: Distance (meters)" },
+        { address=0X107AA, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Ski Jump: Distance (1/100th meters)" },
+        { address=0X107AC, type="u16le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Ski Jump: Speed meter" },
+        { address=0X107B5, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=true, no_survey=false, desc="Before jump/successful landing" },
+        { address=0X107B5, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Airborne" },
+        { address=0X107B5, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=true, no_survey=false, desc="Shaky landing" },
+        { address=0X107B5, type="u8", condition="eq", value=0X03, action="JUMPING", no_log=true, no_survey=false, desc="Crashed" },
+        { address=0X107B5, type="u8", condition="eq", value=0X04, action="JUMPING", no_log=true, no_survey=false, desc="Finished (distance less than 100m)" },
+        { address=0X107BE, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=true, no_survey=false, desc="Yes" },
+        { address=0X107CA, type="u8", condition="eq", value=0X0C, action="JUMPING", no_log=true, no_survey=false, desc="No, but shaky landing" },
+        { address=0X107CA, type="u8", condition="eq", value=0X23, action="JUMPING", no_log=true, no_survey=false, desc="Yes" },
+        { address=0X1091A, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="About to jump" },
+        { address=0X1091A, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=true, no_survey=false, desc="About to jump" },
+        { address=0X1E71C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Ski Jump record name [15-byte ASCII]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X186E, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Launching (before timer starts)" },
+        { address=0X186E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Luge/Bobsleigh: Player state" },
+        { address=0X1884, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Luge/Bobsleigh: Elapsed event time" },
+        { address=0X10422, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Final event time (minutes)" },
+        { address=0X10424, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Final event time (seconds)" },
+        { address=0X10426, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Final event time (1/50th seconds)" },
+        { address=0X10870, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2's elapsed time [24-bit]" },
+        { address=0X1088A, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 3's elapsed time [24-bit]" },
+        { address=0X108A4, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 4's elapsed time [24-bit]" },
+        { address=0X1E718, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Biathlon record time [24-bit]" },
+        { address=0X1E754, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Luge record time [24-bit]" },
+        { address=0X1E768, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bobsleigh record time [24-bit]" },
+        { address=0X1E77C, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Short Track record time [24-bit]" },
+        { address=0X1E790, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="SuperG record time [24-bit]" },
+        { address=0X1E7A4, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Downhill record time [24-bit]" },
+        { address=0X1E7B8, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Giant Slalom record time [24-bit]" },
+        { address=0X1E7CC, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slalom record time [24-bit]" },
+      },
+    },
+  },
+}

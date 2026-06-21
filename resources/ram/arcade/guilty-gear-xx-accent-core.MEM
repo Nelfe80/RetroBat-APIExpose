@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Guilty Gear XX Accent Core",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "guilty-gear-xx-accent-core",
+    file = "guilty-gear-xx-accent-core.zip",
+    hashes = {
+      { hash = "5648f05c564835fc91e702ca5ff0f437", label = "ggxxac.zip" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1CC8C0, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0X1CC8FC, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0X1CEDCA, type="u8", condition="eq", value=0X0A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+      events = {
+        { address=0X1D4976, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 Current Combo (16-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CD384, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Won Rounds (8-bit)" },
+        { address=0X1CED50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - CPU Rounds (8-bit)" },
+        { address=0X1CEDA3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - VS Rounds (8-bit)" },
+      },
+      stage = {
+        { address=0X1CEDCA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Stage (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1688034, type="u16le", condition="eq", value=0XBF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Instakill" },
+      },
+      health = {
+        { address=0X1CED51, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Settings - Damage (8-bit)" },
+        { address=0X168803A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health (16-bit) decreased" },
+        { address=0X168803A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health (16-bit) increased" },
+        { address=0X1688152, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health (16-bit) decreased" },
+        { address=0X1688152, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health (16-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1CEDA8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Score (32-bit)" },
+        { address=0X1CFF34, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Ranking - First - Score (32-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1CED52, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Settings - Time (8-bit)" },
+      },
+    },
+  },
+}

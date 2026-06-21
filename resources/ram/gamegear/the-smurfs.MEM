@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "The Smurfs",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-smurfs",
+    file = "the-smurfs.zip",
+    hashes = {
+      { hash = "c8337c47ed211075b9acf4867d8c0e18", label = "Smurfs, The (Europe) (En,Fr,De,Es).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18B6, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="9f=paused" },
+        { address=0X18C1, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Music ID? 39 when rescue a smurf; 30 - menu; 21=Game Over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X190F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Use for Level ID? 90 = Bonus Stage of the Bubbles; 80 = Bonus Stage the Dam; 88 = Bonus Stage th" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1923, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - ff=Game Over increased" },
+        { address=0X1923, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - ff=Game Over decreased" },
+        { address=0X1924, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Health. ff=Dead" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X18EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1944, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Music On/Off Switch" },
+      },
+    },
+  },
+}

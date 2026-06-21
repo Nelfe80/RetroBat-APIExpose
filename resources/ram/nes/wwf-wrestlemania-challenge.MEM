@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "WWF WrestleMania Challenge",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-wrestlemania-challenge",
+    file = "wwf-wrestlemania-challenge.zip",
+    hashes = {
+      { hash = "afdcc5263d084e8c40d35f4dea7e9647", label = "WWF WrestleMania - Challenge (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0001, type="u8", condition="eq", value=0X7A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title theme." },
+        { address=0X0031, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="May be the demo mode? 00 when the player is controlling. 0f when in demo mode?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X03D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1's Health decreased" },
+        { address=0X03D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1's Health increased" },
+        { address=0X03D1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2's Health decreased" },
+        { address=0X03D1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2's Health increased" },
+        { address=0X04B5, type="u8", condition="eq", value=0X07, action="HIT", no_log=false, no_survey=false, desc="Trying to kick out/ Taking Damage While Down." },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X045F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="In/Out Ring Toggle? increased" },
+        { address=0X04B5, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Standing on Ring Post." },
+        { address=0X0617, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="82 = P1 Pin. 81 = P2 Pin. Helpful to toggle in/out ring counter. increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0001, type="u8", condition="eq", value=0X5A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bossman." },
+      },
+    },
+    state = {
+      player = {
+        { address=0X04B5, type="u8", condition="eq", value=0X33, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Fist." },
+        { address=0X04B5, type="u8", condition="eq", value=0X19, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Fist on the Top (Into Ring)." },
+        { address=0X04B5, type="u8", condition="eq", value=0X09, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Fist (To Outside)." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0611, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Count Out Timer ( Also associated w/ Pin" },
+        { address=0X0615, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Pinfall/ Count Out Counter (Player 1)" },
+        { address=0X0616, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Pinfall Counter (Player 2)" },
+        { address=0X0620, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counts down any time you do a punch/headbutt or perform a move. Not sure if it's useful." },
+      },
+    },
+  },
+}

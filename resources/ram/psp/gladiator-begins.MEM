@@ -1,0 +1,111 @@
+return {
+  game = {
+    title = "Gladiator Begins",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "gladiator-begins",
+    file = "gladiator-begins.zip",
+    hashes = {
+      { hash = "a6f3051075c5273686427d8244f6ed8f", label = "Gladiator Begins (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAA3637, type="u8", condition="eq", value=0XC8, action="DEMO_MODE", no_log=false, no_survey=false, desc="'Demon'" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAA41E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Single Sword Level" },
+        { address=0XAA41EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dual Sword Level" },
+        { address=0XAA41F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shield Level" },
+        { address=0XAA41F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pugilist Level" },
+        { address=0XAA42C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Smash Skill Level" },
+        { address=0XAA42C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Body Blow Skill Level" },
+        { address=0XAA42C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Swift Shot Skill Level" },
+        { address=0XAA42CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Evade Thrust Skill Level" },
+        { address=0XAA42D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mach Thrust Skill Level" },
+        { address=0XAA42D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rock Breaker Skill Level" },
+        { address=0XAA42DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Turn Slash Skill Level" },
+        { address=0XAA42E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Side Swipe Skill Level" },
+        { address=0XAA42E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bash Skill Level" },
+        { address=0XAA42E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sudden Strike Skill Level" },
+        { address=0XAA42EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Twin Thrust Skill Level" },
+        { address=0XAA42F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Twist Skill Level" },
+        { address=0XAA42F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hurricane Skill Level" },
+        { address=0XAA42F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Leg Slicer Skill Level" },
+        { address=0XAA42FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Push Skill Level" },
+        { address=0XAA4300, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wolf Fang Skill Level" },
+        { address=0XAA4304, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pilebunker Skill Level" },
+        { address=0XAA4308, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shield Ram Skill Level" },
+        { address=0XAA430C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shield Bash Skill Level" },
+        { address=0XAA4310, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stealth Needle Skill Level" },
+        { address=0XAA4314, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Double Thrust Skill Level" },
+        { address=0XAA4318, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Charge Skill Level" },
+        { address=0XAA431C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bowling Skill Level" },
+        { address=0XAA4320, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Double Stinger Skill Level" },
+        { address=0XAA4324, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Edge Skill Level" },
+        { address=0XAA4328, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Air Raid Skill Level" },
+        { address=0XAA432C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cyclone Skill Level" },
+        { address=0XAA4330, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slide Cutter Skill Level" },
+        { address=0XAA4334, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Double Bash Skill Level" },
+        { address=0XAA4338, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Back Thrust Skill Level" },
+        { address=0XAA433C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fury Skill Level" },
+        { address=0XAA4340, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wild Dance Skill Level" },
+        { address=0XAA4344, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Step Slash Skill Level" },
+        { address=0XAA4348, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Twin Spikes Skill Level" },
+        { address=0XAA434C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Twin Beat Skill Level" },
+        { address=0XAA4350, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sting Skill Level" },
+        { address=0XAA4354, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Double Slice Skill Level" },
+        { address=0XAA4358, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sweep Slash Skill Level" },
+        { address=0XAA435C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gut Cutter Skill Level" },
+        { address=0XAA4360, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cross Cutter Skill Level" },
+        { address=0XAA4364, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mole Killer Skill Level" },
+        { address=0XAA4368, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wing Skill Level" },
+        { address=0XAA436C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Twin Fang Skill Level" },
+        { address=0XAA4370, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Double Claw Skill Level" },
+        { address=0XAA4374, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="One-Two Skill Level" },
+        { address=0XAA4378, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elbow Arrow Skill Level" },
+        { address=0XAA437C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Knuckle Smash Skill Level" },
+        { address=0XAA4380, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Drop Kick Skill Level" },
+        { address=0XAA4384, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Knucke Hook Skill Level" },
+        { address=0XAA4388, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Headbutt Skill Level" },
+        { address=0XAA4390, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Middle Kick Skill Level" },
+        { address=0XAA4394, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="High Kick Skill Level" },
+        { address=0XAA4398, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Savate Skill Level" },
+        { address=0XAA439C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Left Pistons Skill Level" },
+        { address=0XAA43A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sliding Low Kick Skill Level" },
+        { address=0XAA43A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Punisher Skill Level" },
+        { address=0XAA43A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Knee Blast Skill Level" },
+        { address=0XAA43AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Double Hammer Skill Level" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAA3651, type="u8", condition="eq", value=0XC8, action="WEAPON_STATE", no_log=true, no_survey=false, desc="'Human Weapon'" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAA36BC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bits] Money increased" },
+        { address=0XAA36C4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bits] Total Prize Money increased" },
+        { address=0XAA36F4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-Bits] Highest Prize Money Gained increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XAA356C, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[32-Bits] Shield SP Amount" },
+      },
+      player = {
+        { address=0XAA42D0, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jump Thrust Skill Level" },
+        { address=0XAA438C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jump Kick Skill Level" },
+      },
+    },
+  },
+}

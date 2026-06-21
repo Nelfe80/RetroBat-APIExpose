@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Scotland Yard: Hunting Mister X",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "scotland-yard-hunting-mister-x",
+    file = "scotland-yard-hunting-mister-x.zip",
+    hashes = {
+      { hash = "c5a29173b5be9bf73905f5dc2001a14a", label = "Scotland Yard - Hunting Mister X (Europe) (En,De,It) (Rev 1).nds" },
+    }
+  },
+
+  events = {
+  },
+}

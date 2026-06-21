@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Tales of VS.",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tales-of-vs",
+    file = "tales-of-vs.zip",
+    hashes = {
+      { hash = "57512ec8845a707f03a398ec4cc67803", label = "Tales of VS (Japan).iso" },
+      { hash = "8ee6f8aae2984630cfedc7272854f6e5", label = "Tales of Versus (En) (v.005-alpha) (Life Bottle Productions).iso" },
+    }
+  },
+
+  events = {
+  },
+}

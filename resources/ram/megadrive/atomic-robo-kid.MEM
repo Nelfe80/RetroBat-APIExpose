@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Atomic Robo-Kid",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "atomic-robo-kid",
+    file = "atomic-robo-kid.zip",
+    hashes = {
+      { hash = "1742442f5472eb25bf202e85c481c50e", label = "Atomic Robo-Kid (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8012, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="in attract mode/demo" },
+        { address=0X8012, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0XFDC5, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X802C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+        { address=0X846A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+        { address=0X846B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X803A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) increased" },
+        { address=0X803A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X8206, type="u8", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="all weapons owned" },
+        { address=0X820A, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="fusion" },
+        { address=0X820A, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="3-way laser" },
+        { address=0X820A, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="missile" },
+        { address=0X820A, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="5-way" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X80F6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (16-bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X802A, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 1" },
+        { address=0X802A, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 2" },
+        { address=0X802A, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 3" },
+        { address=0X802A, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 4 duel 1" },
+        { address=0X802A, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 5" },
+        { address=0X802A, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 6" },
+        { address=0X802A, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 7" },
+        { address=0X802A, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 8 duel 2" },
+        { address=0X802A, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 9" },
+        { address=0X802A, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 10" },
+        { address=0X802A, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 11" },
+        { address=0X802A, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 12" },
+        { address=0X802A, type="u8", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 13" },
+        { address=0X802A, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 14" },
+        { address=0X802A, type="u8", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 15" },
+        { address=0X802A, type="u8", condition="eq", value=0X0F, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 16" },
+        { address=0X802A, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 17" },
+        { address=0X802A, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="act 18" },
+        { address=0X802A, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="final scene (use for end game)" },
+        { address=0X8894, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 1 and 4 health" },
+        { address=0X8954, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 2 and 3 health" },
+        { address=0X8ED2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back lower cannon" },
+        { address=0X8EF4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back lower cannon" },
+        { address=0X8F0C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back lower cannon" },
+        { address=0X8F18, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back lower cannon" },
+        { address=0X8F32, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back upper cannon" },
+        { address=0X8F54, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back upper cannon" },
+        { address=0X8F6C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back upper cannon" },
+        { address=0X8F78, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back upper cannon" },
+        { address=0X9F5A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back lower cannon" },
+        { address=0X9FB8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back lower cannon" },
+        { address=0X9FBA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="possible boss 1 back lower cannon" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X8214, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="orange pickup (shield?)" },
+        { address=0X8216, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="on" },
+        { address=0X83CA, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="freeze on this value for no hit detection" },
+      },
+    },
+  },
+}

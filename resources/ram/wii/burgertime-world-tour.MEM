@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "BurgerTime World Tour",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "burgertime-world-tour",
+    file = "burgertime-world-tour.zip",
+    hashes = {
+      { hash = "2cca3b44ae06bf869855ba67f5c7d304", label = "BurgerTime World Tour (Europe) (WiiWare)" },
+      { hash = "53ff6118ca613b4f03d09c1f3f9ce39e", label = "BurgerTime World Tour (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Track & Field | Hyper Olympic",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Track & Field"
+  },
+
+  rom = {
+    name = "track-field-hyper-olympic",
+    file = "track-field-hyper-olympic.zip",
+    hashes = {
+      { hash = "182108fdc04cb85544aa24277cf128bc", label = "hyprolym.7z <Hyper Olympic>" },
+      { hash = "b9c859be9290f0ba75d5f80c1709b692", label = "trackfld.7z <Track & Field>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X181E, type="u32be", condition="eq", value=0X10030210, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="32" },
+        { address=0X181E, type="u32be", condition="eq", value=0X10030310, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="33" },
+      },
+    },
+  },
+}

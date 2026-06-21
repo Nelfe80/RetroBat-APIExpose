@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Barnyard",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "barnyard",
+    file = "barnyard.zip",
+    hashes = {
+      { hash = "fc422b53b0abd79012f8b37793d2f1f1", label = "Nickelodeon Barnyard (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X541534, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="when playing a minigame, this is a pre-game/results screen indicator. it also turns to this when" },
+        { address=0X541560, type="u16le", condition="eq", value=0X38, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="post credits cutscene" },
+        { address=0XECE8D8, type="u8", condition="eq", value=0XFFFFFFFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="not standing in a squirt spot/paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X54152C, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="inside an area(so either gopher underground or barn)" },
+        { address=0X541530, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="in overworld, not playing minigame" },
+        { address=0X586DFC, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on the ground while riding bike" },
+        { address=0X654C80, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gopher Underground Related Value" },
+        { address=0X6ED354, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(US) Root Overworld Data" },
+        { address=0X717BDC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(US) Root Overworld Data - Note Found by Excessiveiser" },
+        { address=0XE9A0D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 = loading the overworld after a minigame" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE9A114, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(US) [32-bit] score from the most recent minigame" },
+      },
+      collectibles = {
+        { address=0XEA15E4, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold rush is in effect" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XE9A0CC, type="u32le", condition="eq", value=0X4, action="JUMPING", no_log=true, no_survey=false, desc="mud jumpers" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDD38C8, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(US)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Silent Service",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Vehicle Simulation"
+  },
+
+  rom = {
+    name = "silent-service",
+    file = "silent-service.zip",
+    hashes = {
+      { hash = "c278e2e24b65e6bc04ce042a224e8081", label = "Silent Service (USA) (Rev 1).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X003B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overall difficulty level" },
+        { address=0X00D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zoom level of the map" },
+        { address=0X00E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skill level" },
+        { address=0X0208, type="u8", condition="eq", value=0XC5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="difficulty level options" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0179, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="adversary ship energy decreased" },
+        { address=0X0179, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="adversary ship energy increased" },
+      },
+    },
+  },
+}

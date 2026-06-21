@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Genso Suikoden: Tsumugareshi Hyakunen no Toki",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "genso-suikoden-tsumugareshi-hyakunen-no-toki",
+    file = "genso-suikoden-tsumugareshi-hyakunen-no-toki.zip",
+    hashes = {
+      { hash = "eb4e0dea9107a9f277eb65cb55e25834", label = "Gensou Suikoden - Tsumugareshi Hyakunen no Toki (Japan) (En) (v1.0.2) (Twisted Phoenix).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA6A4F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hero's level" },
+        { address=0XA6A564, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Myra's level" },
+        { address=0XA6A5D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ilia's level" },
+        { address=0XA6A63C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ducas' level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA6C6D6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 4 - talk to armorer while soldiers are coming" },
+        { address=0XA6C6D7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 5 - talk to elderly woman at item shop while soldiers are coming" },
+        { address=0XA6C6D8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 7 - talk to man in house while soldiers are coming" },
+      },
+      health = {
+        { address=0XA6A4FC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero's current HP decreased" },
+        { address=0XA6A4FC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero's current HP increased" },
+        { address=0XA6A568, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Myra's current HP (display) decreased" },
+        { address=0XA6A568, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Myra's current HP (display) increased" },
+        { address=0XA6A5D4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ilia's current HP decreased" },
+        { address=0XA6A5D4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ilia's current HP increased" },
+        { address=0XA6A641, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ducas' current HP decreased" },
+        { address=0XA6A641, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ducas' current HP increased" },
+        { address=0XA6AC2E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero's current HP (actual) decreased" },
+        { address=0XA6AC2E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero's current HP (actual) increased" },
+        { address=0XA6AC36, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Myra's current HP (actual) decreased" },
+        { address=0XA6AC36, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Myra's current HP (actual) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA6BB12, type="u16le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Amount of Emerald in inventory" },
+      },
+      weapon = {
+        { address=0XA6A56E, type="u16le", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Illia's equipped weapon" },
+        { address=0XA6A5DA, type="u16le", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Ducas' equipped weapon" },
+        { address=0XA6C6D4, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="bit 2 - talked to the older man in the weapon shop" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA6A4A2, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hero's equipped ring 1 increased" },
+        { address=0XA6A4A6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hero's equipped ring 2 increased" },
+        { address=0XA6A50E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Myra's equipped ring 1 increased" },
+        { address=0XA6A512, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Myra's equipped ring 2 increased" },
+        { address=0XA6A57A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Illia's equipped ring 1 increased" },
+        { address=0XA6A57E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Illia's equipped ring 2 increased" },
+        { address=0XA6A5E6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ducas' equipped ring 1 increased" },
+        { address=0XA6A5EA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ducas' equipped ring 2 increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Santa's Factory",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "santas-factory",
+    file = "santas-factory.zip",
+    hashes = {
+      { hash = "d65b44b7b77db44aa8d08d57f0210175", label = "Santa's Factory (World).hex" },
+    }
+  },
+
+  events = {
+  },
+}

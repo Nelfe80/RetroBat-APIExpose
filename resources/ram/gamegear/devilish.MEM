@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Devilish",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "devilish",
+    file = "devilish.zip",
+    hashes = {
+      { hash = "f0ceed28d0e83bc4adc688d06d12bf2e", label = "Devilish (USA).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0B1F, type="u8", condition="eq", value=0X85, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Clear (Time Trial)" },
+        { address=0X0B1F, type="u8", condition="eq", value=0X89, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Clear (Campaign)" },
+        { address=0X0B1F, type="u8", condition="eq", value=0XAE, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0B1F, type="u8", condition="eq", value=0XD3, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0X1FEC, type="u16le", condition="eq", value=0X16, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+        { address=0X1FEC, type="u16le", condition="eq", value=0X17, action="PAUSE_ON", no_log=false, no_survey=false, desc="not paused in game" },
+        { address=0X1FEC, type="u16le", condition="eq", value=0X27, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screne" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0B1F, type="u8", condition="eq", value=0X85, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear (Time Trial)" },
+        { address=0X0B1F, type="u8", condition="eq", value=0X89, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear (Campaign)" },
+        { address=0X1FEC, type="u16le", condition="eq", value=0X15, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level loading" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0B1F, type="u8", condition="eq", value=0X24, action="SCORE_STATE", no_log=false, no_survey=false, desc="Time Trial without high score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1FEC, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="13 = Time Trial Reset" },
+      },
+    },
+  },
+}

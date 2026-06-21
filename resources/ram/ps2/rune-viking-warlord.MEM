@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Rune: Viking Warlord",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "rune-viking-warlord",
+    file = "rune-viking-warlord.zip",
+    hashes = {
+      { hash = "7be4ce54ba166a19ca9b527d29d2867c", label = "Rune - Viking Warlord (USA)" },
+      { hash = "78d83d2a9124ead2ae9ef7cb2443ab31", label = "Rune - Viking Warlord (SLUS-20109) [3A09007C]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X398414, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X443568, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Burn switch (Dark Tower)" },
+        { address=0X443C08, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cage switch (Dark Tower)" },
+        { address=0X136FA94, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Rune Stone destroyed = 01" },
+        { address=0X1384F78, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door switch closed = 01 (Dark Streets)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9D0E70, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Rune of Shield Timer" },
+        { address=0X9E9270, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Rune of Super Damage Timer" },
+        { address=0X12DB910, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clockwork Foe [01= Live; 03 = Dead]" },
+      },
+    },
+  },
+}

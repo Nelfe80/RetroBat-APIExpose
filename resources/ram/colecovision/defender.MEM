@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Defender",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "defender",
+    file = "defender.zip",
+    hashes = {
+      { hash = "00123e08f138b7094601ea8d13d5336d", label = "Defender (USA).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001C, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0062, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X013B, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X001C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Counter increased" },
+        { address=0X001C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Counter decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0001, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE BCD] Player 1's Score" },
+        { address=0X0004, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE BCD] Player 2's Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X001E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Humanoids Counter" },
+      },
+    },
+  },
+}

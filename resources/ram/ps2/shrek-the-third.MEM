@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Shrek the Third",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shrek-the-third",
+    file = "shrek-the-third.zip",
+    hashes = {
+      { hash = "650e95cd5c475453006057b48c179282", label = "DreamWorks Shrek the Third (USA)" },
+      { hash = "29a1d7f67580120498d305bdec44d81e", label = "DreamWorks Shrek the Third (USA) [Minigames Serial]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X531C70, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Overlay Check | Minigames" },
+        { address=0X66E904, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Check" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5A5938, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Menu Image Background" },
+        { address=0X66C1EC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Level Completion Fade Out Check" },
+        { address=0X66E91C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit BE | 35 Bytes] Level ID ASCII" },
+        { address=0X66F250, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Scene Select Level Unlocked" },
+        { address=0X66F273, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Perfect" },
+        { address=0X66F273, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tourist" },
+        { address=0X66F273, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Finisher" },
+        { address=0X66F273, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sports Fan" },
+        { address=0X66F273, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tremendous" },
+        { address=0X66F2A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BitFlags] Academy Grounds - Tourist Quest" },
+        { address=0X66F2C0, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Academy Grounds" },
+        { address=0X66F2EA, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Commentary: Academy Grounds" },
+      },
+      stage = {
+        { address=0X66F2EE, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Academy Grounds" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X66C170, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit Float] Death Animation Duration" },
+        { address=0X66C438, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] Total Deaths in Current Scene" },
+      },
+      health = {
+        { address=0X66F2E9, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="Bonus Damage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X66C43C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Gold Far Far Coins Collected In Current Scene increased" },
+        { address=0X66C440, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Red Far Far Coins Collected In Current Scene increased" },
+        { address=0X66F25C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Far Far Coins increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X66F2D0, type="u32le", condition="eq", value=0X02, action="SWIMMING", no_log=true, no_survey=false, desc="Swim Trunks" },
+        { address=0X66F2E8, type="u8", condition="bit_true", bit=1, mask=0X02, action="SWIMMING", no_log=true, no_survey=false, desc="Costume (Shrek): Swim Trunks" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X66F275, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Perfect" },
+        { address=0X66F275, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tourist" },
+        { address=0X66F275, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Finisher" },
+        { address=0X66F275, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The King" },
+        { address=0X66F275, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rescuer" },
+        { address=0X66F2A9, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[BitFlags] Prison Cell Block - Tourist Quest" },
+        { address=0X66F2C1, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Prison Cell Block" },
+        { address=0X66F2EA, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Commentary: Prison Cell Block" },
+        { address=0X66F2EE, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Prison Cell Block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X66C174, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[32 Bit Float] Total Time Spent in Level" },
+      },
+    },
+  },
+}

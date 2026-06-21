@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "Steel Dragon EX",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "steel-dragon-ex",
+    file = "steel-dragon-ex.zip",
+    hashes = {
+      { hash = "e866bdee565ffca0f35a6db7876ea63e", label = "Steel Dragon EX (Europe) (En,Fr,De,Es)" },
+      { hash = "dbc84948d30a659e3abf4e083805da53", label = "Steel Dragon EX (Europe) (En,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E4E44, type="u8", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo active" },
+        { address=0X1E4F1C, type="u16le", condition="eq", value=0X8, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X1E4F1C, type="u16le", condition="eq", value=0X9, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending/credits" },
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3139, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3230, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/High Score" },
+        { address=0X23188E, type="u16le", condition="eq", value=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="In game (including demo)" },
+        { address=0X23188E, type="u16le", condition="eq", value=0XA0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X242610, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[SD] Credits (8-bit)" },
+        { address=0X3964D4, type="u16le", condition="eq", value=0X3E7, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending/credits" },
+        { address=0X7D5CE0, type="u16le", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/menu" },
+        { address=0X7D5CE0, type="u16le", condition="eq", value=0XA, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/menu (after starting a level)" },
+        { address=0X16123C0, type="u32le", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/In-game; check 0x23188e or 0x1e4f1c to determine which" },
+        { address=0X16123C0, type="u32le", condition="eq", value=0X4, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E4F18, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[SD] Current Sub-Level (32-bit)" },
+        { address=0X1E4F1C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[SD] Current Level (32-bit)" },
+        { address=0X3964C0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[SDE] Level Started Flag (32-bit)" },
+        { address=0X3964D4, type="u16le", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="EX1" },
+        { address=0X3964D4, type="u16le", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="EX2" },
+        { address=0X3964D4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[SDE] Level ID (32-bit)" },
+      },
+      stage = {
+        { address=0X43F674, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 1 Stars (32-bit)" },
+        { address=0X43F678, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 2 Stars (32-bit)" },
+        { address=0X43F67C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 3 Stars (32-bit)" },
+        { address=0X43F680, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 4 Stars (32-bit)" },
+        { address=0X43F684, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 5 Stars (32-bit)" },
+        { address=0X43F688, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 6 Stars (32-bit)" },
+        { address=0X43F68C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 7 Stars (32-bit)" },
+        { address=0X43F690, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 8 Stars (32-bit)" },
+        { address=0X43F694, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage EX1 Stars (32-bit)" },
+        { address=0X43F698, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage EX2 Stars (32-bit)" },
+        { address=0X44FDB4, type="u16le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage can be selected in practice mode" },
+        { address=0X44FDB4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 1 Practice Flag (32-bit)" },
+        { address=0X44FDB8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 2 Practice Flag (32-bit)" },
+        { address=0X44FDBC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 3 Practice Flag (32-bit)" },
+        { address=0X44FDC0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 4 Practice Flag (32-bit)" },
+        { address=0X44FDC4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 5 Practice Flag (32-bit)" },
+        { address=0X44FDC8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 6 Practice Flag (32-bit)" },
+        { address=0X44FDCC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 7 Practice Flag (32-bit)" },
+        { address=0X44FDD0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage 8 Practice Flag (32-bit)" },
+        { address=0X44FDD4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage EX1 Practice Flag (32-bit)" },
+        { address=0X44FDD8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[SDE] Stage EX2 Practice Flag (32-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1E4F70, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[SD] P1 Lives (16-bit) increased" },
+        { address=0X1E4F70, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[SD] P1 Lives (16-bit) decreased" },
+        { address=0X1E4F72, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[SD] P2 Lives (16-bit) increased" },
+        { address=0X1E4F72, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[SD] P2 Lives (16-bit) decreased" },
+        { address=0X2409D8, type="u24le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X43F63C, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[SDE] Lives (32-bit) increased" },
+        { address=0X43F63C, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[SDE] Lives (32-bit) decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1E4F50, type="u16le", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Vulcan" },
+        { address=0X1E4F50, type="u16le", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lightning" },
+        { address=0X1E4F50, type="u16le", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile" },
+        { address=0X44FB9C, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[SDE] Weapon Stock (32-bit)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1E4F30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[SD] High Score (32-bit)" },
+        { address=0X1E4F60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[SD] P1 Score (32-bit)" },
+        { address=0X1E4F64, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[SD] P2 Score (32-bit)" },
+        { address=0X43F638, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[SDE] Score (32-bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3032, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1 Boss" },
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3034, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 2 & 7 Boss" },
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3036, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 3 Boss" },
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3038, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 4 First Boss" },
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3130, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 5 Boss" },
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3132, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 6 Boss" },
+        { address=0X1F3617, type="u16be", condition="eq", value=0X3135, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 8 Boss, i.e. Shienryu" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA0EB30, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Timer (32-bit)" },
+      },
+    },
+  },
+}

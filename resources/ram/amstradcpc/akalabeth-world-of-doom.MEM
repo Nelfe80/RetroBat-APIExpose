@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Akalabeth: World of Doom",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "akalabeth-world-of-doom",
+    file = "akalabeth-world-of-doom.zip",
+    hashes = {
+      { hash = "636a3ec7f8a677300a757b84739e4471", label = "Akalabeth World Of Doom (UK) (2015) (Richard Garriot).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X87E6, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level of Play [MBF32 LE]" },
+        { address=0X8888, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dungeon Level [MBF32 LE]" },
+      },
+    },
+  },
+}

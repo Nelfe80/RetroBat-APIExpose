@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "DJMax Portable Black Square (Korea)",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "djmax-portable-black-square",
+    file = "djmax-portable-black-square.zip",
+    hashes = {
+      { hash = "7ddace94085fe542486d67605e0ecba9", label = "DJ Max Portable - Black Square (Korea) (En,Ja,Ko) (v1.13).iso" },
+    }
+  },
+
+  events = {
+  },
+}

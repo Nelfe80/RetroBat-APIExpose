@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Snood",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "snood",
+    file = "snood.zip",
+    hashes = {
+      { hash = "66f4a5a101822a779fdfecf366e73c96", label = "Snood (USA).gba" },
+      { hash = "a9572991316ac2e105abfec80aaeb02e", label = "Snood (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00F4, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Menu Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00F4, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Display Current Level" },
+        { address=0X0164, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Number [8bit]" },
+        { address=0X0170, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Child" },
+        { address=0X0170, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X0170, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Medium" },
+        { address=0X0170, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X0170, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Evil" },
+        { address=0X0170, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Journey Mode Level Difficulty Flag [8bit]" },
+        { address=0X0ECC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Snoods Fired on Current Level" },
+      },
+      stage = {
+        { address=0X61C4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Danger Level Character ID [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0EA8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives [8bit] increased" },
+        { address=0X0EA8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives [8bit] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0E8C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32bit]" },
+        { address=0X0EB0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bonus Score [32bit]" },
+      },
+    },
+  },
+}

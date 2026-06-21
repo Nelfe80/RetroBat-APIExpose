@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Lord of the Jungle",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "lord-of-the-jungle",
+    file = "lord-of-the-jungle.zip",
+    hashes = {
+      { hash = "298d6fdb1c424eff2b2b677a67e420bb", label = "Lord of the Jungle (Europe) (En,Fr,De,Nl)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X429EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Movie Timer - 7ce8" },
+        { address=0X4CA68, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bit] Timer" },
+      },
+    },
+  },
+}

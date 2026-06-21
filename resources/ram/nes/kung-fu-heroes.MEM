@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Kung-Fu Heroes",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "kung-fu-heroes",
+    file = "kung-fu-heroes.zip",
+    hashes = {
+      { hash = "6acc48763f67b72abb79d30af9dcf988", label = "Kung-Fu Heroes (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001E, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Situation: 01 = title, 06 = demo, 0c = in-game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0028, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X006B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Kill streak, without deaths or leaving level" },
+        { address=0X04D0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X04D0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0X04F0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives increased" },
+        { address=0X04F0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X04C0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score Digit 1" },
+        { address=0X04C1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score Digit 2" },
+        { address=0X04C2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score Digit 3" },
+        { address=0X04C3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score Digit 4" },
+        { address=0X04C4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score Digit 5" },
+        { address=0X04C5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score Digit 6" },
+        { address=0X04C6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score Digit 7" },
+        { address=0X04C7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score Digit 8" },
+        { address=0X04E0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score Digit 1" },
+        { address=0X04E1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score Digit 2" },
+        { address=0X04E2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score Digit 3" },
+        { address=0X04E3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score Digit 4" },
+        { address=0X04E4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score Digit 5" },
+        { address=0X04E5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score Digit 6" },
+      },
+      collectibles = {
+        { address=0X002B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Bags increased" },
+        { address=0X0150, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Bags/Apples increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0610, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object ID" },
+        { address=0X0648, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object ID" },
+        { address=0X0658, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 1 ID" },
+        { address=0X065A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 1 Y Pos" },
+        { address=0X065B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 1 X Pos" },
+        { address=0X0660, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 2 ID" },
+        { address=0X0662, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 2 Y Pos" },
+        { address=0X0663, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 2 X Pos" },
+        { address=0X0668, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 3 ID" },
+        { address=0X066A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 3 Y Pos" },
+        { address=0X066B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 3 X Pos" },
+        { address=0X0670, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 4 ID" },
+        { address=0X0672, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 4 Y Pos" },
+        { address=0X0673, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 4 X Pos" },
+        { address=0X0678, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 5 ID" },
+        { address=0X067A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 5 Y Pos" },
+        { address=0X067B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 5 X Pos" },
+        { address=0X0680, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 6 ID" },
+        { address=0X0682, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 6 Y Pos" },
+        { address=0X0683, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object 6 X Pos" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0015, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Title screen/intermission timer" },
+        { address=0X07D5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy 4 Time Remaining" },
+        { address=0X07DD, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy 3 Time Remaining" },
+        { address=0X07E5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy 2 Time Remaining" },
+        { address=0X07ED, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy 1 Time Remaining" },
+      },
+    },
+  },
+}

@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "Who Am I?: Plants and Animals of the Desert",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "who-am-i-plants-and-animals-of-the-desert",
+    file = "who-am-i-plants-and-animals-of-the-desert.zip",
+    hashes = {
+      { hash = "324018e7dd19c0c9c0541a695712670b", label = "Who Am I - Plants and Animals of the Desert (4am crack) disk 2 side B.dsk" },
+      { hash = "36a6f49c16db06273a9c74bddb853746", label = "Who Am I - Plants and Animals of the Desert (4am crack) disk 1 side A.dsk" },
+      { hash = "7653502c96cba5261281965738677277", label = "Who Am I - Plants and Animals of the Desert (4am crack) disk 2 side A.dsk" },
+      { hash = "e0114692d9cf647e62ab084a91c7b6a9", label = "Who Am I - Plants and Animals of the Desert (4am crack) disk 1 side B.dsk" },
+      { hash = "ecb2f1ee2311ae3f2ddc13bf8ec5be4b", label = "Who Am I - Plants and Animals of the Desert (4am crack) work disk.dsk" },
+    }
+  },
+
+  events = {
+  },
+}

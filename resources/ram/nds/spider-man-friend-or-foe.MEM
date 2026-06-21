@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Spider-Man: Friend or Foe",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "spider-man-friend-or-foe",
+    file = "spider-man-friend-or-foe.zip",
+    hashes = {
+      { hash = "0960234b73dbb0a717bdf007782dc61b", label = "Spider-Man - Friend or Foe (USA).nds" },
+      { hash = "1af632168660fd7aab133a48bc27ef26", label = "Spider-Man - Friend or Foe (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

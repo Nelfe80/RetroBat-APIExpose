@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Vib-Ripple",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "vib-ripple",
+    file = "vib-ripple.zip",
+    hashes = {
+      { hash = "ff5f4ce4a7a7bd1994e64f5547532eea", label = "Vib-Ripple (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

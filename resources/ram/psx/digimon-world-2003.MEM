@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "Digimon World 2003",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "digimon-world-2003",
+    file = "digimon-world-2003.zip",
+    hashes = {
+      { hash = "edacecc75882feead9a67fdd9a8910ca", label = "Digimon World 2003 (Europe) (En,Fr,De,Es,It)" },
+      { hash = "f176b849b3f25d3163f02280f32c67e7", label = "Digimon World 2003 (Europe) (Pt) (v1.01) (Julio Gawleta)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X48D68, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Current Room on Pause Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4A04C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Agumon Level" },
+        { address=0X4ABE0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Renamon Level" },
+        { address=0XAC062, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of rounds won by player" },
+        { address=0XAC12A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Rounds won by opponent" },
+        { address=0XB0578, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Opponent Rounds won" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X49898, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kumamon - Current HP decreased" },
+        { address=0X49898, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kumamon - Current HP increased" },
+        { address=0X4989A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kumamon - MAX HP decreased" },
+        { address=0X4989A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kumamon - MAX HP increased" },
+        { address=0X49C74, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Monmon HP decreased" },
+        { address=0X49C74, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Monmon HP increased" },
+        { address=0X4A050, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Agumon Current HP decreased" },
+        { address=0X4A050, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Agumon Current HP increased" },
+        { address=0X4A052, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Agumon Total HP decreased" },
+        { address=0X4A052, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Agumon Total HP increased" },
+        { address=0X4ABE4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Renamon Current HP decreased" },
+        { address=0X4ABE4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Renamon Current HP increased" },
+        { address=0X4ABE6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Renamon Total HP decreased" },
+        { address=0X4ABE6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Renamon Total HP increased" },
+        { address=0XA44D8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1st Enemy Digimon HP decreased" },
+        { address=0XA44D8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1st Enemy Digimon HP increased" },
+        { address=0XA44F8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2nd Enemy Digimon HP decreased" },
+        { address=0XA44F8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2nd Enemy Digimon HP increased" },
+        { address=0XA4518, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3rd Enemy Digimon HP decreased" },
+        { address=0XA4518, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3rd Enemy Digimon HP increased" },
+        { address=0XAC052, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player's HP decreased" },
+        { address=0XAC052, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player's HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X48DBF, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Agumon Suit" },
+      },
+      weapon = {
+        { address=0X48E0C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons [Up to 0x048e7e]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X48DD9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold ID increased" },
+        { address=0X490D7, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 1 - Card Ammount" },
+        { address=0X490E3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 2 - Card Ammount" },
+        { address=0X490EF, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album Page 3 - Card Ammount" },
+        { address=0X490FB, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 4 - Card Ammount" },
+        { address=0X49107, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 5 - Card Ammount" },
+        { address=0X49113, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 6 - Card Ammount" },
+        { address=0X4911F, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album Page 7 - Card Ammount" },
+        { address=0X4912B, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 8 - Card Ammount" },
+        { address=0X49137, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 9 - Card Ammount" },
+        { address=0X49143, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 10 - Card Ammount" },
+        { address=0X4914F, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album Page 11 - Card Ammount" },
+        { address=0X4915B, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 12 - Card Ammount" },
+        { address=0X49167, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 13 - Card Ammount" },
+        { address=0X49173, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 14 - Card Ammount" },
+        { address=0X4917F, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album Page 15 - Card Ammount" },
+        { address=0X4918B, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 16 - Card Ammount" },
+        { address=0X4918D, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Gabumon card ammount" },
+        { address=0X49197, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 17 - Card Ammount" },
+        { address=0X491A3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 18 - Card Ammount" },
+        { address=0X491AF, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 19 - Card Ammount" },
+        { address=0X491BB, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 20 - Card Ammount" },
+        { address=0X491C7, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 21 - Card Ammount" },
+        { address=0X491D3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 22 - Card Ammount" },
+        { address=0X491DF, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album Page 23 - Card Ammount" },
+        { address=0X491EB, type="u24le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 24 - Card Ammount" },
+        { address=0X491F7, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 25 - Card Ammount" },
+        { address=0X49203, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album page 26 - Card Ammount" },
+        { address=0X4920F, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Card Album Page 27 - Card Ammount" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X48EC3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shields [Up to 0x048ed3]" },
+      },
+    },
+  },
+}

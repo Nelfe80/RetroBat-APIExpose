@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "TimeSplitters 2 [Subset - Platinum Trophies]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "timesplitters-2-subset-platinum-trophies",
+    file = "timesplitters-2-subset-platinum-trophies.zip",
+    hashes = {
+      { hash = "b31214ff09dc1e4c231f1a1b75443d85", label = "TimeSplitters 2 [Subset - Platinum Trophies].iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X5CBDDC, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X5CBDF0, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X5CBE04, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+  },
+}

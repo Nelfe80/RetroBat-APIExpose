@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Ike! Ike!! Hamusuta",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ike-ike-hamusuta",
+    file = "ike-ike-hamusuta.zip",
+    hashes = {
+      { hash = "f917b92a7bf2b661e28e2038d47712d3", label = "Ike! Ike!! Hamusuta (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X30A038, type="u16le", condition="eq", value=0XEAC, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X30A038, type="u16le", condition="eq", value=0X1568, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In Stage" },
+        { address=0X30A050, type="u8", condition="eq", value=0X7, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X30A0D8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[b0] Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C2151, type="u8", condition="eq", value=0XB3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X1C2151, type="u8", condition="eq", value=0XB4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X1C2151, type="u8", condition="eq", value=0XB5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X1C2151, type="u8", condition="eq", value=0XB6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X1C2151, type="u8", condition="eq", value=0XB7, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X1C2152, type="u8", condition="eq", value=0XB0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X1C2152, type="u8", condition="eq", value=0XB1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0X1C2152, type="u8", condition="eq", value=0XB2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 8" },
+        { address=0X1C2152, type="u8", condition="eq", value=0XB3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 9" },
+        { address=0X1C2152, type="u8", condition="eq", value=0XB4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 10" },
+        { address=0X1C2155, type="u8", condition="eq", value=0XB3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear a stage without dying" },
+        { address=0X1C2155, type="u8", condition="eq", value=0XB5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear a stage and beat the record time" },
+        { address=0X1C2157, type="u8", condition="eq", value=0XB5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear a stage without dashing (pressing B)" },
+        { address=0X1C2157, type="u8", condition="eq", value=0XB6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear a stage without collecting seeds" },
+        { address=0X30A038, type="u16le", condition="eq", value=0XE3C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Screen" },
+        { address=0X30A050, type="u8", condition="eq", value=0X5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+      stage = {
+        { address=0X1C20FC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Best Seed %" },
+        { address=0X1C2100, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 Best Seed %" },
+        { address=0X1C2104, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 Best Seed %" },
+        { address=0X1C2108, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 Best Seed %" },
+        { address=0X1C210C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 Best Seed %" },
+        { address=0X1C2110, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 Best Seed %" },
+        { address=0X1C2114, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 Best Seed %" },
+        { address=0X1C2118, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8 Best Seed %" },
+        { address=0X1C211C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 Best Seed %" },
+        { address=0X1C2120, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 10 Best Seed %" },
+        { address=0X1C2155, type="u8", condition="eq", value=0XB4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Collect all seeds in a stage" },
+        { address=0X1C2155, type="u8", condition="eq", value=0XB6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Defeat Super Funcolo (Stage 1)" },
+        { address=0X1C2156, type="u8", condition="eq", value=0XB2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Defeat Cat King (Stage 8)" },
+        { address=0X1C2156, type="u8", condition="eq", value=0XB7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Defeat Big Nyoro (Stage 9)" },
+        { address=0X1C2157, type="u8", condition="eq", value=0XB0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Defeat Giant Gyoppi (Stage 9)" },
+        { address=0X1C2157, type="u8", condition="eq", value=0XB1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Defeat Perch (Stage 8)" },
+        { address=0X1C218C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X30A050, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Restart" },
+        { address=0X30A050, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X30A050, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Exit" },
+        { address=0X30A050, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Battle" },
+        { address=0X30A050, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage State" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1C2155, type="u8", condition="eq", value=0XB1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die" },
+        { address=0X1C21B4, type="u8", condition="eq", value=0X5, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1C21B4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1C21B4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X30A050, type="u8", condition="eq", value=0X6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1C2157, type="u8", condition="eq", value=0XB2, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Return to the stage select screen after reaching the stage checkpoint" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1C2124, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 1 Best Time (60 FPS)" },
+        { address=0X1C2128, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 2 Best Time (60 FPS)" },
+        { address=0X1C212C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 3 Best Time (60 FPS)" },
+        { address=0X1C2130, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 4 Best Time (60 FPS)" },
+        { address=0X1C2134, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 5 Best Time (60 FPS)" },
+        { address=0X1C2138, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 6 Best Time (60 FPS)" },
+        { address=0X1C213C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 7 Best Time (60 FPS)" },
+        { address=0X1C2140, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 8 Best Time (60 FPS)" },
+        { address=0X1C2144, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 9 Best Time (60 FPS)" },
+        { address=0X1C2148, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 10 Best Time (60 FPS)" },
+        { address=0X1C2155, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Achievements" },
+        { address=0X30A088, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Remaining (60 FPS)" },
+      },
+    },
+  },
+}

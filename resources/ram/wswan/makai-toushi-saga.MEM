@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Makai Toushi SaGa",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "makai-toushi-saga",
+    file = "makai-toushi-saga.zip",
+    hashes = {
+      { hash = "957137e7d5249c02fecff063e0c86e87", label = "Makai Toushi Sa-Ga (Japan).wsc" },
+      { hash = "f1d130f871a4440be635322c73662049", label = "Makai Toushi Sa-Ga (Japan) (En) (v1.2) (Tower Reversed).wsc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD005, type="u8", condition="eq", value=0X6F, action="DEMO_MODE", no_log=false, no_survey=false, desc="Great Demon" },
+        { address=0XD005, type="u8", condition="eq", value=0X70, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Lord" },
+        { address=0XD0F9, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit 0 - GreatDemon" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD005, type="u8", condition="eq", value=0X5F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eye" },
+        { address=0XD005, type="u8", condition="eq", value=0X64, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Knight" },
+        { address=0XD0F7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 0 - DeathEye" },
+        { address=0X10A4C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Defeated Death Machine" },
+      },
+      health = {
+        { address=0XD006, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character A current HP decreased" },
+        { address=0XD006, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character A current HP increased" },
+        { address=0XD008, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character A max HP decreased" },
+        { address=0XD008, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character A max HP increased" },
+        { address=0XD025, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character B current HP decreased" },
+        { address=0XD025, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character B current HP increased" },
+        { address=0XD027, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character B max HP decreased" },
+        { address=0XD027, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character B max HP increased" },
+        { address=0XD044, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character C current HP decreased" },
+        { address=0XD044, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character C current HP increased" },
+        { address=0XD046, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character C max HP decreased" },
+        { address=0XD046, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character C max HP increased" },
+        { address=0XD063, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character D current HP decreased" },
+        { address=0XD063, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character D current HP increased" },
+        { address=0XD065, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character D max HP decreased" },
+        { address=0XD065, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character D max HP increased" },
+        { address=0XD71D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 HP in battle decreased" },
+        { address=0XD71D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 HP in battle increased" },
+        { address=0XD73D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Charatcer 2 HP in battle decreased" },
+        { address=0XD73D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Charatcer 2 HP in battle increased" },
+        { address=0XD75D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 3 HP in battle decreased" },
+        { address=0XD75D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 3 HP in battle increased" },
+        { address=0XD77D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 4 HP in battle decreased" },
+        { address=0XD77D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 4 HP in battle increased" },
+        { address=0XD79D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0XD79D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0XD79F, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 max HP decreased" },
+        { address=0XD79F, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 max HP increased" },
+        { address=0XD7BD, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0XD7BD, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0XD7BF, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 max HP decreased" },
+        { address=0XD7BF, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 max HP increased" },
+        { address=0XD7DD, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0XD7DD, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0XD7DF, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 max HP decreased" },
+        { address=0XD7DF, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 max HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XDBFC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon/skill being used for attack" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD005, type="u8", condition="eq", value=0X39, action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammonite" },
+      },
+    },
+  },
+}

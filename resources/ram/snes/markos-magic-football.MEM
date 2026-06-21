@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Marko's Magic Football",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "markos-magic-football",
+    file = "markos-magic-football.zip",
+    hashes = {
+      { hash = "3982f2846969f59f19b02cb1238713f3", label = "Marko's Magic Football (Europe) (En,Fr,De,Es).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

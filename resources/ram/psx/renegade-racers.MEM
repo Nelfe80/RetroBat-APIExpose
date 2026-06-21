@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Renegade Racers",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "renegade-racers",
+    file = "renegade-racers.zip",
+    hashes = {
+      { hash = "859a641fc6fc59af964f4dc450f0718e", label = "Renegade Racers (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X91A9B, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dropzone" },
+        { address=0X91ACB, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fairground Fun" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAB83A, type="u16le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XAB83A, type="u16le", condition="eq", value=0X800, action="LIVES_STATE", no_log=false, no_survey=false, desc="full life" },
+      },
+      health = {
+        { address=0XAB838, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PLAYER : Health bar filling (16-bit) decreased" },
+        { address=0XAB838, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PLAYER : Health bar filling (16-bit) increased" },
+        { address=0XAB83A, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="PLAYER : Health (16-bit)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X91A9B, type="u8", condition="eq", value=0X3, action="TREASURE", no_log=false, no_survey=false, desc="Treasure hunt" },
+        { address=0XAB83C, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="PLAYER : Flattened balloons/treasures (32-bit)" },
+        { address=0XC56E0, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="RACE : Win Condition - Treasures found (32-bit)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X91A98, type="u8", condition="eq", value=0X3, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Race" },
+        { address=0XAB81A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="PLAYER : Last target score (16-bit)" },
+        { address=0XAB81C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="PLAYER : Total target score (16-bit)" },
+        { address=0XC56E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="RACE : Win Condition - Target points (32-bit)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XAB6B4, type="u8", condition="eq", value=0X4, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0XAB6B5, type="u8", condition="eq", value=0X4, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0XABD58, type="u16le", condition="eq", value=0X0, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="false" },
+        { address=0XABD58, type="u16le", condition="eq", value=0X1, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="true" },
+      },
+      player = {
+        { address=0XAB80C, type="u32le", condition="eq", value=0X96000, action="JUMPING", no_log=true, no_survey=false, desc="1 yard" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X91A9B, type="u8", condition="eq", value=0X2, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Challenge" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X91A9B, type="u8", condition="eq", value=0X6, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Air Time" },
+        { address=0X91A9B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="RACE : Race ID (8-bit)" },
+        { address=0XC56DC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="RACE : Time Limit (32-bit)" },
+        { address=0XC56F0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="RACE : Win Condition - Yards (Air Time objective) (32-bit)" },
+      },
+    },
+  },
+}

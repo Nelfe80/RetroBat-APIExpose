@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Cyborg Hunter",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "cyborg-hunter",
+    file = "cyborg-hunter.zip",
+    hashes = {
+      { hash = "ac90d79743cac1afcd7049f7b4e73bc4", label = "Cyborg Hunter (USA, Europe, Brazil) (En).sms" },
+      { hash = "d104f53494a3d5847a1320faf38e8bc5", label = "Cyborg Hunter (USA, Europe, Brazil) (Fr) (Terminus).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X004D, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X0080, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue from level" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0051, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Floor level" },
+        { address=0X0062, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Partition 1 Clear" },
+        { address=0X0063, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Partition 2 Clear" },
+        { address=0X0064, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Partition 3 Clear" },
+        { address=0X0070, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Cyborgs in Level A defeated" },
+        { address=0X0071, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Cyborgs in Level B defeated" },
+        { address=0X0072, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Cyborgs in Level C defeated" },
+        { address=0X0073, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Cyborgs in Level D defeated" },
+        { address=0X0074, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Cyborgs in Level E defeated" },
+        { address=0X0075, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Cyborgs in Level F defeated" },
+        { address=0X0076, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="All Cyborgs in Level G defeated" },
+      },
+      zone = {
+        { address=0X0050, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World (0-6)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X021B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X021B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0X02DB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Cyborg Life increased" },
+        { address=0X02DB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cyborg Life decreased" },
+        { address=0X02FB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Minor Cyborg Life increased" },
+        { address=0X02FB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Minor Cyborg Life decreased" },
+      },
+      health = {
+        { address=0X0053, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0X0053, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X005F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Selected Weapon" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X005D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Value" },
+      },
+    },
+  },
+}

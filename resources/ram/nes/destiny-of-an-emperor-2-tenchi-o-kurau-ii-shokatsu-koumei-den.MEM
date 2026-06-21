@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Destiny of an Emperor 2 | Tenchi o Kurau II: Shokatsu Koumei Den",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "destiny-of-an-emperor-2-tenchi-o-kurau-ii-shokatsu-koumei-den",
+    file = "destiny-of-an-emperor-2-tenchi-o-kurau-ii-shokatsu-koumei-den.zip",
+    hashes = {
+      { hash = "f13a4cdcfdc4bb1dbed28afcd74ee307", label = "Tenchi wo Kurau II - Shokatsu Koumei Den (Japan) (En) (v1.12) (Dynamic Designs).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001F, type="u8", condition="eq", value=0X0F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In Game" },
+        { address=0X00EA, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X00EA, type="u16le", condition="eq", value=0X0A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Menu/Shops/Inn/House" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X602B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Party Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X60A2, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="7th Slot Soldiers (16-bit)" },
+        { address=0X60A5, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="6th Slot Soldiers (16-bit)" },
+        { address=0X60A8, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="5th Slot Soldiers (16-bit)" },
+        { address=0X60AB, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="4th Slot Soldiers (16-bit)" },
+        { address=0X60AE, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd Slot Soldiers (16-bit)" },
+        { address=0X60B1, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd Slot Soldiers (16-bit)" },
+        { address=0X60B4, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st Slot Soldiers (16-bit)" },
+        { address=0X662D, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="7th Slot Soldiers (16-bit)" },
+        { address=0X6630, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="6th Slot Soldiers (16-bit)" },
+        { address=0X6633, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="5th Slot Soldiers (16-bit)" },
+        { address=0X6636, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="4th Slot Soldiers (16-bit)" },
+        { address=0X6639, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd Slot Soldiers (16-bit)" },
+        { address=0X663C, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd Slot Soldiers (16-bit)" },
+        { address=0X663F, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st Slot Soldiers (16-bit)" },
+        { address=0X6642, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Leader Soldiers (16-bit)" },
+        { address=0X6645, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd Enemy Soldiers (16-bit)" },
+        { address=0X6648, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd Enemy Soldiers (16-bit)" },
+        { address=0X664B, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="4th Enemy Soldiers (16-bit)" },
+        { address=0X664E, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="5th Enemy Soldiers (16-bit)" },
+        { address=0X6651, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="7th Slot Total Soldiers (16-bit)" },
+        { address=0X6654, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="6th Slot Total Soldiers (16-bit)" },
+        { address=0X6657, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="5th Slot Total Soldiers (16-bit)" },
+        { address=0X665A, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="4th Slot Total Soldiers (16-bit)" },
+        { address=0X665D, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd Slot Total Soldiers (16-bit)" },
+        { address=0X6660, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd Slot Total Soldiers (16-bit)" },
+        { address=0X6663, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st Slot Total Soldiers (16-bit)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0100, type="u8", condition="eq", value=0XFF, action="TREASURE", no_log=false, no_survey=false, desc="Obtain Item from NPC" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X602C, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (24-bit) increased" },
+        { address=0X6500, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money" },
+        { address=0X6500, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money" },
+        { address=0X6501, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6500, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Leather (Shield)" },
+      },
+    },
+  },
+}

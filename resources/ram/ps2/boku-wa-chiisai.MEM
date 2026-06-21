@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Boku wa Chiisai",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "boku-wa-chiisai",
+    file = "boku-wa-chiisai.zip",
+    hashes = {
+      { hash = "9825816d8a95c82f17434e08734bf5f4", label = "Boku wa Chiisai (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

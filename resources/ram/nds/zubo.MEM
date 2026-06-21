@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Zubo",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music, Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "zubo",
+    file = "zubo.zip",
+    hashes = {
+      { hash = "81a2f16f97a16950e4c14a0f71c12a13", label = "Zubo (Europe) (En,Fr,De,Es,It,Nl,Sv).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1B87DA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Roundup recruited (8-bit)" },
+        { address=0X1B9040, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Roundup XP Bar (32-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1B8B32, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Goldie recruited (8-bit)" },
+        { address=0X1B8ED8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Goldie XP Bar (32-bit)" },
+      },
+      health = {
+        { address=0X1F1050, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party member 1 HP (16-Bit) decreased" },
+        { address=0X1F1050, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party member 1 HP (16-Bit) increased" },
+        { address=0X1F1180, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party member 2 HP (16-Bit) decreased" },
+        { address=0X1F1180, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party member 2 HP (16-Bit) increased" },
+        { address=0X1F12B0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party member 3 HP (16-Bit) decreased" },
+        { address=0X1F12B0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party member 3 HP (16-Bit) increased" },
+        { address=0X1F13FC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP (16-Bit) decreased" },
+        { address=0X1F13FC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP (16-Bit) increased" },
+        { address=0X1F152C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP (16-Bit) decreased" },
+        { address=0X1F152C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP (16-Bit) increased" },
+        { address=0X1F165C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP (16-bit) decreased" },
+        { address=0X1F165C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP (16-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B8F08, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Practice Mode score (16-bit)" },
+      },
+    },
+  },
+}

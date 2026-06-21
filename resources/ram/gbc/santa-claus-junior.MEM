@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Santa Claus Junior",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "santa-claus-junior",
+    file = "santa-claus-junior.zip",
+    hashes = {
+      { hash = "5df6d1ec0e9241e1ed8a8ee7ff318631", label = "Santa Claus Junior (Europe).gbc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XC11E, type="u8", condition="eq", value=0XF3, action="LIVES_STATE", no_log=false, no_survey=false, desc="life collected" },
+        { address=0XCC76, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="On" },
+        { address=0XCC76, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Unlimited Lives & Invincibility increased" },
+        { address=0XCC76, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unlimited Lives & Invincibility decreased" },
+      },
+    },
+  },
+}

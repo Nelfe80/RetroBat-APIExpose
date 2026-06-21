@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Klondike",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "klondike",
+    file = "klondike.zip",
+    hashes = {
+      { hash = "360c6991324e3840afea96fb63e628ad", label = "Klondike (USA) (Sega Channel).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0020, type="u8", condition="eq", value=0X0E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0020, type="u8", condition="eq", value=0XEE, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

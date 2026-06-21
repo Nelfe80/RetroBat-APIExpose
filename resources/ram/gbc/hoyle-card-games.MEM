@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Hoyle Card Games",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "hoyle-card-games",
+    file = "hoyle-card-games.zip",
+    hashes = {
+      { hash = "83087e1a3fa7160a59ee7e4f0b5c3671", label = "Hoyle Card Games (USA).gbc" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0XD603, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Crazy 8s - Current Suit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC0B2, type="u8", condition="eq", value=0XE, action="BOSS_HIT", no_log=false, no_survey=false, desc="BigBoss" },
+      },
+    },
+  },
+}

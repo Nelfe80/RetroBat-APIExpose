@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Alone in the Dark",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Horror, Shooter"
+  },
+
+  rom = {
+    name = "alone-in-the-dark",
+    file = "alone-in-the-dark.zip",
+    hashes = {
+      { hash = "f0639ee18fd0cf61c335b63544a5e49b", label = "Alone in the Dark (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X84471C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select Episode ID (32-bit)" },
+        { address=0X844720, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select Chapter ID (32-bit)" },
+        { address=0X8B1694, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID (ASCII) (12 bytes)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XAE766C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (Float) decreased" },
+        { address=0XAE766C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (Float) increased" },
+      },
+    },
+  },
+}

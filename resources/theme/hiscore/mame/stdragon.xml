@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 KEN 190700</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 -*/ 75900</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 M.I 28200</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4  ♥/ 20400</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 A.I 18300</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 ♥·  13900</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 K.J 13100</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 I.I 12500</text>
+		</text>
+	</view>
+</theme>

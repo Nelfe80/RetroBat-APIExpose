@@ -1,0 +1,105 @@
+return {
+  game = {
+    title = "Ys IV: Mask of the Sun [Subset - Bonus]",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ys-iv-mask-of-the-sun-subset-bonus",
+    file = "ys-iv-mask-of-the-sun-subset-bonus.zip",
+    hashes = {
+      { hash = "a66aa34aa7907ab86b83007d97fd2d1a", label = "Ys IV - Mask of the Sun (Japan) [Subset - Bonus].sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0935, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+        { address=0X0A6D, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+        { address=0X0B63, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit1=roo/demon transformation" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X097F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Exp to next level (0-255)" },
+        { address=0X0980, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Exp to next level (x255)" },
+        { address=0X098B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0AA8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Lifebar Max HP increased" },
+        { address=0X0AA8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Lifebar Max HP decreased" },
+        { address=0X0AAA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Lifebar Current HP increased" },
+        { address=0X0AAA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Lifebar Current HP decreased" },
+        { address=0X0B23, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="komodo mini boss soldiers" },
+        { address=0X1D13E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BOSS 4 - Soldier 1/11" },
+        { address=0X1D1FE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BOSS 4 - Soldier 1/11" },
+        { address=0X1D2BE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BOSS 4 - Soldier 1/11" },
+        { address=0X1D31E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BOSS 4 - Soldier 1/11" },
+        { address=0X1D37E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BOSS 4 - Soldier 1/11" },
+        { address=0X1D3DE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BOSS 4 - Soldier 1/11" },
+        { address=0X1D43E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BOSS 4 - Soldier 1/11" },
+      },
+      health = {
+        { address=0X0971, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP - Total decreased" },
+        { address=0X0971, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP - Total increased" },
+        { address=0X0973, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP - Current decreased" },
+        { address=0X0973, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP - Current increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0232, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Highlighted Item Slot: Weapon" },
+        { address=0X0999, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Highlighted Item Slot: Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0983, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (0-255) increased" },
+        { address=0X0984, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold (x255) increased" },
+        { address=0X0B57, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Pedestral" },
+        { address=0X0B5C, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ice Mountain 1000 gold (2nd)" },
+        { address=0X0B5C, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ice Mountain 1000 gold (1st)" },
+        { address=0X0B5C, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Forest South 1000 gold (0x86)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1D01E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSS 2 - Ice Golem" },
+        { address=0X1D07E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSS 3 - Dark Knight / Centaur" },
+        { address=0X1D0DE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSS 8 - Bami" },
+        { address=0X1D19E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSS 5 - Beastmaster" },
+        { address=0X1D25E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSS 1 - Lemnos / Minotaur" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0234, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Highlighted Item Slot: Shield" },
+        { address=0X099B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Highlighted Item Slot: Shield" },
+        { address=0X0B52, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Leather Shield" },
+        { address=0X0B53, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Middle Shield" },
+        { address=0X0B53, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Large Shield" },
+        { address=0X0B53, type="u8", condition="bit_true", bit=2, mask=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Kite Shield" },
+        { address=0X0B53, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Flame Shield" },
+        { address=0X0B53, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Thunder Shield" },
+        { address=0X0B53, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Plate Shield" },
+        { address=0X0B53, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Shield" },
+        { address=0X0B54, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Hero Shield" },
+        { address=0X0B5B, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Mountain Flame Shield" },
+        { address=0X0B5B, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Mountain Thunder Shield (0x6f)" },
+        { address=0X0B5B, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Flame Mountain Ice Shield (0xbd?)" },
+        { address=0X0B5C, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Silver Citadel Hero Shield (0x0a)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0B26, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="switch bronze square" },
+        { address=0X0B28, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="event door silver citadel" },
+      },
+    },
+  },
+}

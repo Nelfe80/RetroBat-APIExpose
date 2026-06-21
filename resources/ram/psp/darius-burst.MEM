@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Darius Burst",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "darius-burst",
+    file = "darius-burst.zip",
+    hashes = {
+      { hash = "22059d89dbfd1a5ac4ed61e8706be4b0", label = "Dariusburst (Japan) (En,Ja).iso" },
+    }
+  },
+
+  events = {
+  },
+}

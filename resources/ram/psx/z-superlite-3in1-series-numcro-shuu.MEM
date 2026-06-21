@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "~Z~ SuperLite 3in1 Series: NumCro-shuu",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-superlite-3in1-series-numcro-shuu",
+    file = "z-superlite-3in1-series-numcro-shuu.zip",
+    hashes = {
+      { hash = "ef1fcf4f07a26200624ab9c320b8bb0b", label = "SuperLite 3in1 Series - NumCro-shuu (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X62857, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This tell if you are in the stage select" },
+      },
+    },
+  },
+}

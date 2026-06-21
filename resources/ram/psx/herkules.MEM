@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Herkules",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Education, Puzzle"
+  },
+
+  rom = {
+    name = "herkules",
+    file = "herkules.zip",
+    hashes = {
+      { hash = "c761af0e56ad51467b485a75f69803e1", label = "Herkules (Europe) (En,De)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X4D918, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Movie Timer - 85d6" },
+        { address=0X1F7EF0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Puzzle Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "In the Groove",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "in-the-groove",
+    file = "in-the-groove.zip",
+    hashes = {
+      { hash = "e29ba9badc1b2d06d85a0214a3af9a59", label = "In the Groove (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X62CED4, type="u32le", condition="eq", value=0X7BA0F0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Menu" },
+        { address=0X62CED4, type="u32le", condition="eq", value=0XFDE100, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Production Credits" },
+        { address=0X62CED4, type="u32le", condition="eq", value=0X111E150, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Splash Title Screen" },
+        { address=0X62CED4, type="u32le", condition="eq", value=0X113BD90, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration Screen" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X62CED4, type="u32le", condition="eq", value=0X827E10, action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Scores on Courses Double" },
+        { address=0X62CED4, type="u32le", condition="eq", value=0X8DF200, action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Scores on Songs Double" },
+        { address=0X62CED4, type="u32le", condition="eq", value=0X982870, action="SCORE_STATE", no_log=false, no_survey=false, desc="Double Score Summary" },
+        { address=0X62CED4, type="u32le", condition="eq", value=0X113B370, action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Scores on Songs Single" },
+        { address=0X62CED4, type="u32le", condition="eq", value=0X15C4D50, action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Scores on Courses Single" },
+        { address=0X62CED4, type="u32le", condition="eq", value=0X15D62F0, action="SCORE_STATE", no_log=false, no_survey=false, desc="Single Score Summary" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X62CED4, type="u32le", condition="eq", value=0X847D90, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tutorial Time" },
+        { address=0X62CED4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Screen Manager: Active Screen [32-bit] -- NOT RELIABLE! Aim to replace as soon as possible." },
+      },
+    },
+  },
+}

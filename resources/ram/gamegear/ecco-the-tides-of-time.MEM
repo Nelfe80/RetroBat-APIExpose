@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Ecco: The Tides of Time",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ecco-the-tides-of-time",
+    file = "ecco-the-tides-of-time.zip",
+    hashes = {
+      { hash = "8f8cbaef1a8e1becfcc7f07b134a3d83", label = "Ecco - The Tides of Time (USA, Europe, Brazil) (En).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0AE8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="value changing fast on pause screen" },
+        { address=0X0AF6, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="intro/title/credits/loading ?" },
+        { address=0X18E1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="DEMO" },
+        { address=0X1FEB, type="u8", condition="eq", value=0X2A, action="DEMO_MODE", no_log=false, no_survey=false, desc="boot" },
+        { address=0X1FEB, type="u8", condition="eq", value=0X39, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0000, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background graph (first byte)" },
+        { address=0X01CD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level screen 1st letter" },
+        { address=0X049C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level screen password 1st letter (see 0x1cc)" },
+        { address=0X049D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level screen password 1st letter display (08 = on)" },
+        { address=0X04A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level screen password last letter" },
+        { address=0X04A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level screen password last letter display" },
+        { address=0X06FE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background graph (last byte)" },
+        { address=0X07F2, type="u8", condition="eq", value=0X55, action="NEW_LEVEL", no_log=false, no_survey=false, desc="text/level screen" },
+        { address=0X07F2, type="u8", condition="eq", value=0X99, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level display" },
+        { address=0X0AC8, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on, 00 = off" },
+        { address=0X0AC8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="light (background)" },
+        { address=0X0AD3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="light foreground" },
+        { address=0X0B11, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level reset (no health)" },
+        { address=0X0C77, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="graph background : 2 values" },
+        { address=0X0E35, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level screen displayed (01)" },
+        { address=0X1FAE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="text appear = (54 82) 40 in most levels (other values not consistent)" },
+        { address=0X1FB9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="value changes when level screen/map pops/disappears" },
+        { address=0X1FFE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="when text/level screen on, 03" },
+        { address=0X1FFF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="when text/level screen on, 04" },
+      },
+      stage = {
+        { address=0X01CD, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="active (creates a blue square for the letter)" },
+        { address=0X0954, type="u8", condition="eq", value=0X11, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="out of water, 12 = back in (works in 3d stages too)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0954, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="enemy dead" },
+        { address=0X0AC0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="black screen (transition lv/death/sonar/map)" },
+        { address=0X0AC2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="black screen (transition lv/death/sonar/map)" },
+        { address=0X1D66, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="ring units ('life' for 3D levels) increased" },
+        { address=0X1D66, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ring units ('life' for 3D levels) decreased" },
+      },
+      health = {
+        { address=0X0B11, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="3&half" },
+        { address=0X0B11, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="3" },
+        { address=0X0B11, type="u8", condition="eq", value=0X03, action="HEALTH_STATE", no_log=true, no_survey=false, desc="2&half" },
+        { address=0X0B11, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="2" },
+        { address=0X0B11, type="u8", condition="eq", value=0X05, action="HEALTH_STATE", no_log=true, no_survey=false, desc="1&half" },
+        { address=0X0B11, type="u8", condition="eq", value=0X06, action="HEALTH_STATE", no_log=true, no_survey=false, desc="1" },
+        { address=0X0B11, type="u8", condition="eq", value=0X07, action="HEALTH_STATE", no_log=true, no_survey=false, desc="half" },
+        { address=0X0B11, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="HP display" },
+        { address=0X0B12, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0B12, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X1C09, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="globe holder hp (max = 0F min = 00) decreased" },
+        { address=0X1C09, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="globe holder hp (max = 0F min = 00) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0777, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="00, 04, 0c = ring size in 3d swim increased" },
+        { address=0X0C6D, type="u32le", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="fish ? / 06 = gold fish ? / 07 = red fish ? / 20 = red & grey fish ? / 2d = shiny fish ? / 1e =" },
+        { address=0X0C6D, type="u32le", condition="eq", value=0X31, action="MONEY_STATE", no_log=false, no_survey=false, desc="teleport ring" },
+        { address=0X1D5B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="ring size in 3d swim : 00 small, 01 medium, 02 large increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X090B, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="sfx : sonar, jump out of water, charge" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0C6D, type="u32le", condition="eq", value=0X3C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="dolphin blocking path (lv1 &4)" },
+      },
+    },
+  },
+}

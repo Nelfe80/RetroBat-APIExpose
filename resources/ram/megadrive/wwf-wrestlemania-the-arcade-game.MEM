@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "WWF WrestleMania: The Arcade Game",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports, Lutte"
+  },
+
+  rom = {
+    name = "wwf-wrestlemania-the-arcade-game",
+    file = "wwf-wrestlemania-the-arcade-game.zip",
+    hashes = {
+      { hash = "72a02a9eb90740ef618f8fce968c4a1b", label = "WWF WrestleMania - The Arcade Game (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6183, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Current title" },
+        { address=0X6276, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause:" },
+      },
+      events = {
+        { address=0XB31C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 bit] - 1'st player combo line" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAB00, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1'st Player's win round" },
+        { address=0XAB02, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2'nd Player rounds" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF4E8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="- 2'nd player life option increased" },
+        { address=0XF4E8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="- 2'nd player life option decreased" },
+        { address=0XF4E9, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="10%" },
+        { address=0XF4E9, type="u8", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="100%" },
+        { address=0XF4E9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="- Life option increased" },
+        { address=0XF4E9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="- Life option decreased" },
+      },
+      health = {
+        { address=0XB312, type="u16be", condition="eq", value=0X00A4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="100%" },
+        { address=0XB312, type="u16be", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player's hp" },
+        { address=0XB320, type="u8", condition="eq", value=0XA4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="100%" },
+        { address=0XB320, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="2'nd player hp" },
+        { address=0XB32E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] 1'st enemy hp decreased" },
+        { address=0XB32E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] 1'st enemy hp increased" },
+        { address=0XB33C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] 2'nd enemy hp decreased" },
+        { address=0XB33C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] 2'nd enemy hp increased" },
+        { address=0XB34A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3'rd enemy hp decreased" },
+        { address=0XB34A, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3'rd enemy hp increased" },
+        { address=0XF4DD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Infinite hp cheat decreased" },
+        { address=0XF4DD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Infinite hp cheat increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X85D4, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo Counter" },
+        { address=0XAAE6, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time (10x)" },
+        { address=0XAAE8, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time" },
+      },
+    },
+  },
+}

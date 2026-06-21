@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "RoboCop",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "robocop",
+    file = "robocop.zip",
+    hashes = {
+      { hash = "4d95586eac0286d269875ebcf864a1e0", label = "RoboCop (USA).nes" },
+      { hash = "6af804277d5151d9f766bf476d2a027d", label = "RoboCop (USA) (Fr) (v1.0) (Terminus).nes" },
+      { hash = "6d7af07156398466e2a606509aa23baf", label = "RoboCop (Europe).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0010, type="u8", condition="eq", value=0X0A, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Regular Stages" },
+        { address=0X0010, type="u8", condition="eq", value=0X0B, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Transistion between parts of regular stages" },
+        { address=0X0010, type="u8", condition="eq", value=0X0F, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage finished" },
+        { address=0X0010, type="u8", condition="eq", value=0X10, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over screen" },
+        { address=0X0010, type="u8", condition="eq", value=0X13, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Training Stages" },
+        { address=0X0043, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue active?" },
+        { address=0X040C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues used" },
+        { address=0X0843, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue active?" },
+        { address=0X1043, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue active?" },
+        { address=0X1843, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue active?" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0017, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Location in stage" },
+        { address=0X0066, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X05E1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="with Stage" },
+        { address=0X0600, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="with Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X06B7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="80 = extra life increased" },
+        { address=0X06B7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="80 = extra life decreased" },
+      },
+      health = {
+        { address=0X058D, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Thug (Boss 1) damage count*3" },
+        { address=0X05A5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gangster 3's HP decreased" },
+        { address=0X05A5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gangster 3's HP increased" },
+        { address=0X05BD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gangster 1's HP decreased" },
+        { address=0X05BD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gangster 1's HP increased" },
+        { address=0X05EB, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Instant damage" },
+        { address=0X05EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Robocop P Begin= 0 End= 17 decreased" },
+        { address=0X05EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Robocop P Begin= 0 End= 17 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0061, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0085, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] Score" },
+        { address=0X0086, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score middle byte" },
+        { address=0X0087, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score high byte" },
+        { address=0X0088, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(48-bit) Score on HUD" },
+        { address=0X0887, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pontua????????o 3 01=65536 points" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0050, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Also boss room" },
+        { address=0X05CF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="HP Boss active" },
+        { address=0X1B98, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Triggers when boss is defeated" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0016, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Current action - 60 = Block, 61 = Neutral, 65 = Shot, 6e = Punch" },
+        { address=0X0588, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Secret wall is broken (2)" },
+        { address=0X1D88, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Secret Wall Broken?" },
+      },
+    },
+  },
+}

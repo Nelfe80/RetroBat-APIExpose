@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Goemon's Great Adventure",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "goemons-great-adventure",
+    file = "goemons-great-adventure.zip",
+    hashes = {
+      { hash = "29bc5c1a24d3979d376ad421000ac9cb", label = "Goemon's Great Adventure (USA).z64" },
+      { hash = "96ca36d474e82c270a129d775c63167a", label = "Ganbare Goemon - Dero Dero Douchuu Obake Tenkomori (Japan).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X88244, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underworld Castle 2" },
+        { address=0X88244, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underworld Castle 1" },
+        { address=0X88278, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="N Pass - Underworld B - 3 max" },
+        { address=0X8827A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="N Pass - Underworld A - 8 max" },
+      },
+      zone = {
+        { address=0X88346, type="u8", condition="eq", value=0X6E, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town" },
+        { address=0X88346, type="u8", condition="eq", value=0XD7, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Tea Shop" },
+        { address=0X88346, type="u8", condition="eq", value=0XD8, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Resturant 1" },
+        { address=0X88346, type="u8", condition="eq", value=0XE2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Jail" },
+        { address=0X88346, type="u8", condition="eq", value=0XD9, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Inn" },
+        { address=0X88346, type="u8", condition="eq", value=0XDA, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Shop" },
+        { address=0X88346, type="u8", condition="eq", value=0XE4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Well" },
+        { address=0X88346, type="u8", condition="eq", value=0XDF, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Small House 1" },
+        { address=0X88346, type="u8", condition="eq", value=0XDE, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Small House 2" },
+        { address=0X88346, type="u8", condition="eq", value=0XDD, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Small House 3" },
+        { address=0X88346, type="u8", condition="eq", value=0XE0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Small House 4" },
+        { address=0X88346, type="u8", condition="eq", value=0XE5, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Well 2" },
+        { address=0X88346, type="u8", condition="eq", value=0XE1, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Big House" },
+        { address=0X88346, type="u8", condition="eq", value=0XE3, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Resturant 2" },
+        { address=0X88346, type="u8", condition="eq", value=0XDB, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Floating World Town Plasma House" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X88247, type="u8", condition="bit_true", bit=0, mask=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lost'n Town 1up" },
+        { address=0X88280, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X88280, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0X8828E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives increased" },
+        { address=0X8828E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives decreased" },
+      },
+      health = {
+        { address=0X88287, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X88287, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X88292, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 Gold increased" },
+        { address=0X88346, type="u8", condition="eq", value=0X15, action="MONEY_STATE", no_log=false, no_survey=false, desc="Digadig Gold Mine" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X88346, type="u8", condition="eq", value=0X27, action="BOSS_HIT", no_log=false, no_survey=false, desc="Edo Castle Boss Fight/Impact Fight" },
+        { address=0X88346, type="u8", condition="eq", value=0X37, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ryugu Climb/Boss fight" },
+        { address=0X88346, type="u8", condition="eq", value=0X63, action="BOSS_HIT", no_log=false, no_survey=false, desc="Underworld Castle Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X88346, type="u8", condition="eq", value=0X1D, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Edo Checkpoint" },
+        { address=0X88346, type="u8", condition="eq", value=0X3A, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Ryugu Checkpoint" },
+        { address=0X88346, type="u8", condition="eq", value=0X4E, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Mafu Checkpoint" },
+        { address=0X88346, type="u8", condition="eq", value=0X62, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Underworld Checkpoint" },
+        { address=0X88346, type="u8", condition="eq", value=0X77, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Floating Checkpoint" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X88346, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Area ID (8-bit)" },
+      },
+    },
+  },
+}

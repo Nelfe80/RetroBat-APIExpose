@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Air",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "air",
+    file = "air.zip",
+    hashes = {
+      { hash = "5049dd74998b16d055e214d56894d15a", label = "AIR (Japan) (v1.02) (En) (v0.9) (patr0805).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8DF6FC, type="u32le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="> Title Screen" },
+        { address=0X8E5A20, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Summer Route/Title Screen" },
+      },
+    },
+  },
+}

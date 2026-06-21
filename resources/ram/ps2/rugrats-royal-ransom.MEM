@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Rugrats: Royal Ransom",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rugrats-royal-ransom",
+    file = "rugrats-royal-ransom.zip",
+    hashes = {
+      { hash = "6959213136b4679680a16e9344169647", label = "Nickelodeon Rugrats - Royal Ransom (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3F64EC, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Opening credits" },
+        { address=0X3F64EC, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3F64DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID, currently loaded level" },
+        { address=0X3F6514, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Array of 104 bytes] Level unlocked, indexed by level id starting at index 1, see list of id's i" },
+        { address=0X3F65D8, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X3F65D8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Array of 104 bytes] Big battery collected, indexed by level id starting at index 1, see list of" },
+        { address=0X3F98C2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Array of 54 bytes] Little batteries shown as left to collect in level on level select screen, i" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3F64F8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current funny money increased" },
+        { address=0X3F64FC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current coins increased" },
+        { address=0X3F6698, type="u32le", condition="eq", value=0X003F6724, action="MONEY_STATE", no_log=false, no_survey=false, desc="Secret Funny Money" },
+        { address=0X3F672C, type="u32le", condition="eq", value=0X003F67B8, action="MONEY_STATE", no_log=false, no_survey=false, desc="Secret Funny Money" },
+        { address=0X3F68C0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Array of 6912 bytes] Collectables gathered in up to a 96-bit bitfield for each level, funny mon" },
+        { address=0X3F9924, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Array of 54 bytes] Funny money amount in dollars shown as left to collect in level on level sel" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X419E24, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float] Seconds elapsed since last loading time, doesn't accumulate while paused" },
+        { address=0X41B10C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Paused menu open" },
+      },
+    },
+  },
+}

@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "The Wizard of Oz: Beyond the Yellow Brick Road",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-wizard-of-oz-beyond-the-yellow-brick-road",
+    file = "the-wizard-of-oz-beyond-the-yellow-brick-road.zip",
+    hashes = {
+      { hash = "395ff0ee9455217ed8aa31a30a3fef89", label = "Wizard of Oz, The - Beyond the Yellow Brick Road (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE6432, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Inventory - Logger Weapon - Demolition Axe" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XE6448, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Round - Characters per Turn" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE63EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Inventory - Item - Life Tree Ash increased" },
+        { address=0XE63EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Inventory - Item - Life Tree Ash decreased" },
+        { address=0XE6430, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Inventory - Scarecrow Weapon - Soldier Spear" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XE63F5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Human Weapon - Stray Cane" },
+        { address=0XE63F6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Human Weapon - Shepherd Cane" },
+        { address=0XE63F7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Human Weapon - Wonder Wand" },
+        { address=0XE63F8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Human Weapon - Helix Wand" },
+        { address=0XE63F9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Human Weapon - Magic Cane" },
+        { address=0XE63FA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Human Weapon - Wizard Cane" },
+        { address=0XE63FC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Scarecrow Weapon - Hitch Spear" },
+        { address=0XE63FD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Scarecrow Weapon - Cypress Spear" },
+        { address=0XE63FE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Scarecrow Weapon - Harvest Spear" },
+        { address=0XE63FF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Scarecrow Weapon - Pride Spear" },
+        { address=0XE6400, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Scarecrow Weapon - Bolt Spear" },
+        { address=0XE6401, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Scarecrow Weapon - Scared Spear" },
+        { address=0XE6403, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Lion Weapon - Cat Paw" },
+        { address=0XE6404, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Lion Weapon - Lynx Knuckle" },
+        { address=0XE6405, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Lion Weapon - Panther Claw" },
+        { address=0XE6406, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Lion Weapon - Tiger Claw" },
+        { address=0XE6407, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Lion Weapon - Lion Talon" },
+        { address=0XE6408, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Lion Weapon - Beast Talon" },
+        { address=0XE640A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Logger Weapon - Tin Axe" },
+        { address=0XE640B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Logger Weapon - Rough Axe" },
+        { address=0XE640C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Logger Weapon - Silver Axe" },
+        { address=0XE640D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Logger Weapon - Alloy Axe" },
+        { address=0XE640E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Logger Weapon - Artisan Axe" },
+        { address=0XE642D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Human Weapon - Queasy Cane" },
+        { address=0XE642E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Human Weapon - Excite Cane" },
+        { address=0XE642F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Scarecrow Weapon - Strength Spear" },
+        { address=0XE6431, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Inventory - Logger Weapon - Small Axe" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE62E5, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Coins [16bit] increased" },
+        { address=0XE63FB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory - Item - Gold Cluster increased" },
+        { address=0XE640F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory - Logger Weapon - Great Gold Axe increased" },
+      },
+    },
+  },
+}

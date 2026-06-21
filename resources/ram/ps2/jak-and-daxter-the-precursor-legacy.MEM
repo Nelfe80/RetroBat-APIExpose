@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Jak and Daxter: The Precursor Legacy",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jak-and-daxter-the-precursor-legacy",
+    file = "jak-and-daxter-the-precursor-legacy.zip",
+    hashes = {
+      { hash = "977f4b1c88368cd690c187983b2efd0d", label = "Jak and Daxter - The Precursor Legacy (USA) (Debug Patch) (Bartis1989)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1B1BF0, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Menu Selections" },
+        { address=0X618C04, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X618C04, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X182860, type="u8", condition="eq", value=0X00000000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X198DE0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health? decreased" },
+        { address=0X198DE0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health? increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X137264, type="u32le", condition="eq", value=0X616E6966, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Area" },
+        { address=0X17AAAC, type="u32le", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="On Ledge Before Klaww Boss" },
+        { address=0X17AAAC, type="u32le", condition="eq", value=0X3F800000, action="BOSS_HIT", no_log=false, no_survey=false, desc="On the Stones Fighting Klaww Boss" },
+        { address=0X2AB538, type="u32le", condition="eq", value=0X2E6E6966, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Area" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X799379, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

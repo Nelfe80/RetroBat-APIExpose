@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "999: Nine Hours, Nine Persons, Nine Doors",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "999-nine-hours-nine-persons-nine-doors",
+    file = "999-nine-hours-nine-persons-nine-doors.zip",
+    hashes = {
+      { hash = "31498d5450bb386f388e450ad1fe8f5a", label = "Kyokugen Dasshutsu - 9-jikan, 9-nin, 9 no Tobira (Japan).nds" },
+      { hash = "7ade38ca60377a283d9f99884bc03bdc", label = "Nine Hours, Nine Persons, Nine Doors (USA).nds" },
+      { hash = "b3a8515440c1da4b8ff04647a71aaabe", label = "Nine Hours, Nine Persons, Nine Doors (USA) (Faster Text) (1.0) (NoOneee).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1E51B1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(J) Escape room cleared flag" },
+      },
+    },
+  },
+}

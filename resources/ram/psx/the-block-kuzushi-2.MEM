@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "The Block Kuzushi 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-block-kuzushi-2",
+    file = "the-block-kuzushi-2.zip",
+    hashes = {
+      { hash = "b310d035122073031234c9b066075170", label = "Simple 1500 Series Vol. 45 - The Block Kuzushi 2 (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C0E04, type="u16le", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration" },
+        { address=0X1DD0C3, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off/On" },
+        { address=0X1DD0C8, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1DD0C8, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Retry Stage" },
+        { address=0X1DD0C8, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Exit" },
+        { address=0X1FFED2, type="u8", condition="eq", value=0X1C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Loading" },
+        { address=0X1FFEEC, type="u32le", condition="eq", value=0X00000000, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X1FFEEC, type="u32le", condition="eq", value=0X00000080, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Intro" },
+        { address=0X1FFEEC, type="u32le", condition="eq", value=0X01100080, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Result Screen" },
+        { address=0X1FFEEC, type="u32le", condition="eq", value=0X801BD718, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+      events = {
+        { address=0X1B1870, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Attack Mode Ranking Save Slot 1: Max Combo" },
+        { address=0X1B1960, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Endless Mode Ranking Save Slot 1: Max Combo" },
+        { address=0X1B1A50, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Expert Mode Ranking Save Slot 1: Max Combo" },
+        { address=0X1EC0BC, type="u8", condition="eq", value=0XFF, action="COMBO_HIT", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1EC0C4, type="u8", condition="eq", value=0XFF, action="COMBO_HIT", no_log=false, no_survey=false, desc="Max" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1B1877, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Not Cleared/Cleared" },
+        { address=0X1B1962, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Endless Mode Ranking Save Slot 1: Level Reached" },
+        { address=0X1B1A57, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Not Cleared/Cleared" },
+        { address=0X1D6BD2, type="u8", condition="eq", value=0X31, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lv1" },
+        { address=0X1D6BD2, type="u8", condition="eq", value=0X39, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lv9" },
+        { address=0X1D6BD2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ball Speed Level Display Digit 1 (Endless Mode)" },
+        { address=0X1D6BD3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ball Speed Level Display Digit 2 (Endless Mode)" },
+        { address=0X1D6BD4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ball Speed Level Display Digit 3 (Endless Mode)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1DD0C0, type="u8", condition="eq", value=0X0A, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max (Dec: 10)" },
+        { address=0X1DD0C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives Left increased" },
+        { address=0X1DD0C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives Left decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B1790, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Attack Mode Ranking Save Slot 10: Score" },
+        { address=0X1B1868, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Attack Mode Ranking Save Slot 1: Score" },
+        { address=0X1B1880, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Mode Ranking Save Slot 10: Score" },
+        { address=0X1B1958, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Mode Ranking Save Slot 1: Score" },
+        { address=0X1B1970, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Expert Mode Ranking Save Slot 10: Score" },
+        { address=0X1B1A48, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Expert Mode Ranking Save Slot 1: Score" },
+        { address=0X1EC0B8, type="u32le", condition="eq", value=0X3B9AC9FF, action="SCORE_STATE", no_log=false, no_survey=false, desc="Max (Dec: 999999999)" },
+        { address=0X1EC0B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1BD6C8, type="u32be", condition="eq", value=0X71717171, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enabled" },
+        { address=0X1BD6C8, type="u32be", condition="eq", value=0X70707070, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Powered Up" },
+        { address=0X1BD6CC, type="u32be", condition="eq", value=0X71717171, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enabled" },
+        { address=0X1BD6CC, type="u32be", condition="eq", value=0X70707070, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Powered Up" },
+        { address=0X1BD6D0, type="u32be", condition="eq", value=0X71717171, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enabled" },
+        { address=0X1BD6D0, type="u32be", condition="eq", value=0X70707070, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Powered Up" },
+        { address=0X1BD6D4, type="u32be", condition="eq", value=0X71717171, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enabled" },
+        { address=0X1BD6D4, type="u32be", condition="eq", value=0X70707070, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Powered Up" },
+      },
+      player = {
+        { address=0X1E9990, type="u16le", condition="eq", value=0X0000, action="JUMPING", no_log=true, no_survey=false, desc="No Jump" },
+        { address=0X1E9990, type="u16le", condition="eq", value=0X0100, action="JUMPING", no_log=true, no_survey=false, desc="Ball rising" },
+        { address=0X1E9990, type="u16le", condition="eq", value=0XFF00, action="JUMPING", no_log=true, no_survey=false, desc="Ball falling" },
+        { address=0X1E9990, type="u16le", condition="eq", value=0X000C, action="JUMPING", no_log=true, no_survey=false, desc="Bounce after hitting a destructible Block" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1B1964, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Endless Mode Ranking Save Slot 1: Blocks Destroyed" },
+        { address=0X1BD6C8, type="u32be", condition="eq", value=0X00000000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X1BD6CC, type="u32be", condition="eq", value=0X00000000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X1BD6D0, type="u32be", condition="eq", value=0X00000000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X1BD6D4, type="u32be", condition="eq", value=0X00000000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+      },
+    },
+  },
+}

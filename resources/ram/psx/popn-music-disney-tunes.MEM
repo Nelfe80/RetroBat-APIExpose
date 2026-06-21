@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Pop'n Music: Disney Tunes",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "popn-music-disney-tunes",
+    file = "popn-music-disney-tunes.zip",
+    hashes = {
+      { hash = "471183338ca16b1767271c4e8d1d6b29", label = "Pop'n Music - Disney Tunes (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8C770, type="u16le", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Menu/Title Screen" },
+        { address=0X8C770, type="u16le", condition="eq", value=0X0C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X8C770, type="u16le", condition="eq", value=0X0F, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X8C770, type="u16le", condition="eq", value=0X10, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XCEEB2, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Perfect" },
+        { address=0XCEEB4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Good" },
+        { address=0XCEEB6, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Bad" },
+        { address=0XCEEBE, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Gauge" },
+        { address=0XCEEF2, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Great" },
+        { address=0XCEEF4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Good" },
+        { address=0XCEEF6, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Bad" },
+        { address=0XCEEFE, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Gauge" },
+        { address=0XCEF32, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Great" },
+        { address=0XCEF34, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Good" },
+        { address=0XCEF36, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Bad" },
+        { address=0XCEF3E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Gauge" },
+        { address=0XCF0A3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Arcade - Current Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCEEEC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Stage 1 Score" },
+        { address=0XCEF2C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Stage 2 Score" },
+        { address=0XCEF6C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Stage 3 Score" },
+      },
+      collectibles = {
+        { address=0XCEEE6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Coins increased" },
+        { address=0XCEF26, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Coins increased" },
+        { address=0XCEF66, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Coins increased" },
+        { address=0XCF0B2, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Arcade - Total Coins increased" },
+      },
+    },
+  },
+}

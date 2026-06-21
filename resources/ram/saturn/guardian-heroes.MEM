@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Guardian Heroes",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Beat 'em Up, Role-Playing"
+  },
+
+  rom = {
+    name = "guardian-heroes",
+    file = "guardian-heroes.zip",
+    hashes = {
+      { hash = "a237d6119f2a6f99122abc497e48e28e", label = "Guardian Heroes (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11DBA5, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Continues" },
+        { address=0X11DFC8, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X11DFC8, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen" },
+        { address=0X132B6C, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X132B84, type="u8", condition="eq", value=0X06, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Playing" },
+        { address=0X13447C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Bool] Potential Demo Indicator" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X133F74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Player Level (Not in Arena)" },
+      },
+      stage = {
+        { address=0X11DFC8, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Between Story Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X11DB5E, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Hero" },
+        { address=0X11DB5E, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldiers" },
+        { address=0X11DB5E, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead" },
+        { address=0X11DB6A, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Hero" },
+        { address=0X11DB6A, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldiers" },
+        { address=0X11DB6A, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead" },
+        { address=0X11DB76, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Hero" },
+        { address=0X11DB76, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldiers" },
+        { address=0X11DB76, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead" },
+        { address=0X11DB82, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Hero" },
+        { address=0X11DB82, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldiers" },
+        { address=0X11DB82, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead" },
+        { address=0X11DB8E, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Hero" },
+        { address=0X11DB8E, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldiers" },
+        { address=0X11DB8E, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead" },
+        { address=0X11DB9A, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Hero" },
+        { address=0X11DB9A, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldiers" },
+        { address=0X11DB9A, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead" },
+      },
+      health = {
+        { address=0X133F5E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Player HP (not in Arena) decreased" },
+        { address=0X133F5E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Player HP (not in Arena) increased" },
+        { address=0X13415E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] 2nd Enemy HP Maleable decreased" },
+        { address=0X13415E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] 2nd Enemy HP Maleable increased" },
+        { address=0X13435E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] 3rd Enemy HP Maleable decreased" },
+        { address=0X13435E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] 3rd Enemy HP Maleable increased" },
+        { address=0X13445E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] 3rd Enemy HP Maleable decreased" },
+        { address=0X13445E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] 3rd Enemy HP Maleable increased" },
+        { address=0X144CF2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Enemy HP decreased" },
+        { address=0X144CF2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Enemy HP increased" },
+        { address=0X144DF2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] 2nd Enemy HP decreased" },
+        { address=0X144DF2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] 2nd Enemy HP increased" },
+        { address=0X144EF2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] 3rd Enemy HP decreased" },
+        { address=0X144EF2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] 3rd Enemy HP increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Legend of the River King 2",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "legend-of-the-river-king-2",
+    file = "legend-of-the-river-king-2.zip",
+    hashes = {
+      { hash = "3519c45ce55aad2f0565513723c90672", label = "Legend of the River King 2 (USA) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCF51, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game load-up screen/in the GBC BIOS screen" },
+        { address=0XCF51, type="u8", condition="eq", value=0X64, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0XCF51, type="u8", condition="eq", value=0X68, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Fish/Delete" },
+        { address=0XCF51, type="u8", condition="eq", value=0X70, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Entering name for new file=" },
+        { address=0XCF51, type="u8", condition="eq", value=0X6C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="At the file select screen" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCF5E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Current HP decreased" },
+        { address=0XCF5E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Current HP increased" },
+        { address=0XCF60, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Max HP decreased" },
+        { address=0XCF60, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Max HP increased" },
+        { address=0XD3D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fishing Memo: Shphead - BIG Tag decreased" },
+        { address=0XD3D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fishing Memo: Shphead - BIG Tag increased" },
+        { address=0XD3D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fishing Memo: Shphead - Biggest Size Caught decreased" },
+        { address=0XD3D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fishing Memo: Shphead - Biggest Size Caught increased" },
+        { address=0XD3DA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fishing Memo: Shphead - Average size of fish caught decreased" },
+        { address=0XD3DA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fishing Memo: Shphead - Average size of fish caught increased" },
+        { address=0XD3DB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fishing Memo: Shphead - Number Caught decreased" },
+        { address=0XD3DB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fishing Memo: Shphead - Number Caught increased" },
+        { address=0XD420, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fishing Memo: W. Shphd - BIG Tag decreased" },
+        { address=0XD420, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fishing Memo: W. Shphd - BIG Tag increased" },
+        { address=0XD421, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fishing Memo: W. Shphd - Biggest Size Caught decreased" },
+        { address=0XD421, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fishing Memo: W. Shphd - Biggest Size Caught increased" },
+        { address=0XD422, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fishing Memo: W. Shphd - Average size of fish caught decreased" },
+        { address=0XD422, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fishing Memo: W. Shphd - Average size of fish caught increased" },
+        { address=0XD423, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fishing Memo: W. Shphd - Number Caught decreased" },
+        { address=0XD423, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fishing Memo: W. Shphd - Number Caught increased" },
+        { address=0XD4C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Flower Memo: Shprd P. - Number picked (Begins at 00 = 1) decreased" },
+        { address=0XD4C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Flower Memo: Shprd P. - Number picked (Begins at 00 = 1) increased" },
+        { address=0XD4FD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bug Memo: B. Grshpr - Number Caught (Begins at 00 = 1) decreased" },
+        { address=0XD4FD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bug Memo: B. Grshpr - Number Caught (Begins at 00 = 1) increased" },
+        { address=0XD4FE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bug Memo: G. Grshpr - Number Caught (Begins at 00 = 1) decreased" },
+        { address=0XD4FE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bug Memo: G. Grshpr - Number Caught (Begins at 00 = 1) increased" },
+        { address=0XD50E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bug Memo: L. Grshpr - Number Caught (Begins at 00 = 1) decreased" },
+        { address=0XD50E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bug Memo: L. Grshpr - Number Caught (Begins at 00 = 1) increased" },
+        { address=0XD61F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy current HP decreased" },
+        { address=0XD61F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy current HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCF64, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player Current G (Money - Max is 999/03e7) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCF51, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Screen (used for save protection - all saved progress loads in and out multiple times wh" },
+      },
+    },
+  },
+}

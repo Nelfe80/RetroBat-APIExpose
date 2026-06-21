@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Kanji Sonomama: DS Rakubiki Jiten",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kanji-sonomama-ds-rakubiki-jiten",
+    file = "kanji-sonomama-ds-rakubiki-jiten.zip",
+    hashes = {
+      { hash = "f01057d1482279b1edf53ff3284b1cf4", label = "Kanji Sonomama - DS Rakubiki Jiten (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

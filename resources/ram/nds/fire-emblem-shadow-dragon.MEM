@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Fire Emblem: Shadow Dragon",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "fire-emblem-shadow-dragon",
+    file = "fire-emblem-shadow-dragon.zip",
+    hashes = {
+      { hash = "77649c837f98a6e3eee6833e7bfa10be", label = "Fire Emblem - Shadow Dragon (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X254DCC, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X254DCC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Uncleared" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XE43F4, type="u32le", condition="eq", value=0X35EF31CE, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Castle Indoors" },
+        { address=0X197C6C, type="u16le", condition="eq", value=0X591C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door" },
+      },
+    },
+  },
+}

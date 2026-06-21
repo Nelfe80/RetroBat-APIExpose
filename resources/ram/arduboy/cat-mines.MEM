@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cat Mines",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cat-mines",
+    file = "cat-mines.zip",
+    hashes = {
+      { hash = "5c49a9f8bd8eb721d1195399e160d7d4", label = "Cat Mines (World).hex" },
+    }
+  },
+
+  events = {
+  },
+}

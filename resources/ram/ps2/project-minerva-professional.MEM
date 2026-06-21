@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Project Minerva Professional",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "project-minerva-professional",
+    file = "project-minerva-professional.zip",
+    hashes = {
+      { hash = "113f6a1007f14171ba5bc1aa017ded70", label = "Project Minerva Professional (Europe) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+  },
+}

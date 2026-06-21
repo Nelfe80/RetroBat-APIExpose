@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "~Z~ 16 Tales [Vol. 1-4]",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-16-tales-vol-1-4",
+    file = "z-16-tales-vol-1-4.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE102E, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="This Value is for the Credits. hThis value goes to FFFF right before going back to oooo one you" },
+      },
+    },
+  },
+}

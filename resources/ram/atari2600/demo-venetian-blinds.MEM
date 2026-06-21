@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "~Demo~ Venetian Blinds",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Demo"
+  },
+
+  rom = {
+    name = "demo-venetian-blinds",
+    file = "demo-venetian-blinds.zip",
+    hashes = {
+      { hash = "d08fccfbebaa531c4a4fa7359393a0a9", label = "Venetian Blinds Demo (USA) (Demo).a26" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "NiGHTS into Dreams...",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Compilation"
+  },
+
+  rom = {
+    name = "nights-into-dreams",
+    file = "nights-into-dreams.zip",
+    hashes = {
+      { hash = "d8ad49a2d8d9b69a9fa6c4e987a663a4", label = "NiGHTS into Dreams... (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X64E650, type="u16le", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X64E650, type="u16le", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Selection" },
+      },
+    },
+  },
+}

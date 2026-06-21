@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Dungeon Master: Theron's Quest",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dungeon-master-therons-quest",
+    file = "dungeon-master-therons-quest.zip",
+    hashes = {
+      { hash = "3e7078e2e99c13c548e5c7a668448bf6", label = "Dungeon Master - Theron's Quest (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001D, type="u8", condition="eq", value=0X6C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen | File Select" },
+        { address=0X001D, type="u8", condition="eq", value=0X6E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X001D, type="u8", condition="eq", value=0X75, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X078A, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon's Gate" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2AB23, type="u8", condition="eq", value=0X98, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Opened" },
+        { address=0X2AB23, type="u8", condition="eq", value=0X9C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Closed" },
+      },
+    },
+  },
+}

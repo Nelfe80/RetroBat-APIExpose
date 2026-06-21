@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "Castlevania: Curse of Darkness",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "castlevania-curse-of-darkness",
+    file = "castlevania-curse-of-darkness.zip",
+    hashes = {
+      { hash = "2b7f82a188f00cc7084067672086f819", label = "Castlevania - Curse of Darkness (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB171E4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Flame Demon Lv.31 Steal" },
+        { address=0XB171F0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Thunder Demon Lv.27 Steal" },
+        { address=0XB171FC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Frost Demon Lv.28 Steal" },
+        { address=0XB17208, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Lesser Demon Lv.13 Steal" },
+        { address=0XB17424, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Flame Demon Lv.38 Steal" },
+        { address=0XB17430, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Flame Demon Lv.43 Steal" },
+        { address=0XB1743C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Thunder Demon Lv.38 Steal" },
+        { address=0XB17448, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Thunder Demon Lv.43 Steal" },
+        { address=0XB17454, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Frost Demon Lv.38 Steal" },
+        { address=0XB17460, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Frost Demon Lv.43 Steal" },
+        { address=0XB1746C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B4 - Lesser Demon Lv.23 Steal" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAE5D31, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B1 - Minotaur Death Flag" },
+        { address=0XAE6471, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B1 - Skeleton Diver Death" },
+        { address=0XAE6BD0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B-1 Wyvern Death" },
+        { address=0XB16EE4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Bone Soldier Lv.13 Steal" },
+        { address=0XB16EF0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Undead Lord Lv.33 Steal" },
+        { address=0XB17058, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Dead Fencer Lv.12 Steal" },
+        { address=0XB17064, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Dead Baron Lv.12 Steal" },
+        { address=0XB170DC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Death Riper Lv.29 Steal" },
+        { address=0XB17124, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Death Lv.51 Steal" },
+        { address=0XB17790, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Death Ripper Lv.75 Steal" },
+        { address=0XB1779C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Dead Fencer Lv.30 Steal" },
+        { address=0XB177B4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Death Ripper Lv.40 Steal" },
+        { address=0XB177C0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Dead Baron Lv.31 Steal" },
+        { address=0XB178C8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Bone Soldier Lv.18 Steal" },
+        { address=0XB178E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Bone Soldier Lv.38 Steal" },
+        { address=0XB178F8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Undead Lord Lv.38 Steal" },
+        { address=0XB17904, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B4 - Undead Lord Lv.43 Steal" },
+      },
+      health = {
+        { address=0XAE3154, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B3 - Hector HP UP Garibaldi Temple decreased" },
+        { address=0XAE3154, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B3 - Hector HP UP Garibaldi Temple increased" },
+        { address=0XAE3275, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - Hector HP UP Aiolon Ruins decreased" },
+        { address=0XAE3275, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - Hector HP UP Aiolon Ruins increased" },
+        { address=0XAE32F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B2 - Half of Abandonned Castle HP UP decreased" },
+        { address=0XAE32F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B2 - Half of Abandonned Castle HP UP increased" },
+        { address=0XAE3578, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B2 - Hector HP UP Cordova decreased" },
+        { address=0XAE3578, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B2 - Hector HP UP Cordova increased" },
+        { address=0XAE35F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - Hector HP UP Baljhet Mountains decreased" },
+        { address=0XAE35F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - Hector HP UP Baljhet Mountains increased" },
+        { address=0XAE53F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - Half of Abandonned Castle HP UP decreased" },
+        { address=0XAE53F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - Half of Abandonned Castle HP UP increased" },
+        { address=0XAEFAE8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Character HP decreased" },
+        { address=0XAEFAE8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Character HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAED160, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32 bit] Last Crafted Weapon" },
+        { address=0XAEFB74, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16 bit] Equiped Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAE31F0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B3 - Purity Ring Eneomaos Machine Tower/Thunder Whip increased" },
+        { address=0XAE31FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B5 - Earth Ring Eneomaos Machine Tower increased" },
+        { address=0XAE341C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B1 - Absolute Zero Ring Forest of Jigramunt increased" },
+        { address=0XAE3420, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B2 - Rare Ring Forest of Jigramunt increased" },
+        { address=0XAE3470, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B4 - Void Ring Infinite Corridor increased" },
+        { address=0XAE3574, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B3 - Wind Ring (Cordova) increased" },
+        { address=0XAE35AD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B1 - Medusa Ring Dracula's Castle increased" },
+        { address=0XAF8014, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Gold increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAE5472, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="B1 - 1st Boss Win Flag" },
+        { address=0XAE855B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Crazy Armor Boss Cutscene" },
+        { address=0XAEA99A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Indicator 01" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XAEFBA0, type="u32le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[32 bit] Invincible Vase Frames" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAEB168, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 bit] Boss Rush Timer" },
+      },
+    },
+  },
+}

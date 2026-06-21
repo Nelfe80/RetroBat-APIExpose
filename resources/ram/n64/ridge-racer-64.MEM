@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Ridge Racer 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "ridge-racer-64",
+    file = "ridge-racer-64.zip",
+    hashes = {
+      { hash = "990f97d56456fc23e52bd263e709e21e", label = "RR64 - Ridge Racer 64 (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X219E0, type="u16be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ingame/Demo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X43530, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit - Stage 1, 2, 3" },
+        { address=0X43531, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit - Stage 3, 7" },
+        { address=0X43532, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit - Stage 4, 5, 6" },
+        { address=0X43533, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit - Stage 6, 8" },
+        { address=0X43534, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit - Stage 1, 2, 3 (Z-Class)" },
+        { address=0X43535, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit - Stage 3, 7 (Z-Class)" },
+        { address=0X43536, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit - Stage 4, 5, 6 (Z-Class)" },
+        { address=0X43537, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit - Stage 6, 8 (Z-Class)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4353C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mode GrandPrix, Car Attack, Time Attack, Multiplayer" },
+        { address=0X56454, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 1" },
+        { address=0X56458, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 2" },
+        { address=0X5645C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 3" },
+        { address=0X56460, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 4" },
+        { address=0X56464, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 5" },
+        { address=0X56468, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 6" },
+        { address=0X5646C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 7" },
+        { address=0X56470, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 8" },
+        { address=0X56474, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 9" },
+        { address=0X56478, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time 10" },
+      },
+    },
+  },
+}

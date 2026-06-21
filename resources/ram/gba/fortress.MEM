@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Fortress",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "fortress",
+    file = "fortress.zip",
+    hashes = {
+      { hash = "db64d910feec15dc3f3bc90c151e731b", label = "Fortress (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10E04, type="u32le", condition="eq", value=0X80004AD, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Intro credits" },
+        { address=0X10E04, type="u32le", condition="eq", value=0X800076D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen, Mode select, environment intro, Win screen" },
+        { address=0X10E04, type="u32le", condition="eq", value=0X800B241, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X30BE, type="u16le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Medieval" },
+      },
+    },
+  },
+}

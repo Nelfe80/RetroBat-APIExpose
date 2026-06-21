@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Donkey Konga 2 (USA)",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "donkey-konga-2",
+    file = "donkey-konga-2.zip",
+    hashes = {
+      { hash = "3720b4306b4588ccefb09ed0c5bbcdc9", label = "Donkey Konga 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XFAAE88, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Song - Current Combo [32-bit BE]" },
+        { address=0XFAAE8C, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Song - Max Combo [32-bit BE]" },
+        { address=0XFAB688, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P2 - Current Combo [32-bit BE]" },
+        { address=0XFAB68C, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P2 - Max Combo [32-bit BE]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X127573C, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Rhythm Keeper Lives [32-bit BE] increased" },
+        { address=0X127573C, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rhythm Keeper Lives [32-bit BE] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XF7F8CC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score - Challenge Mode [32-bit BE]" },
+        { address=0XFAA96C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Song - Current Score [32-bit BE]" },
+        { address=0X1275738, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Rhythm Keeper Score [32-bit BE]" },
+      },
+      collectibles = {
+        { address=0XF66C44, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Coins [32-bit BE] increased" },
+      },
+    },
+  },
+}

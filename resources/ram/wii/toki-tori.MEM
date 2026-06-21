@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Toki Tori",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "toki-tori",
+    file = "toki-tori.zip",
+    hashes = {
+      { hash = "9daf4b57d207367310c4d529bb1994ee", label = "Toki Tori (USA) (WiiWare)" },
+      { hash = "47e862362a4ab8e097a60a601d7e27e2", label = "Toki Tori (Europe) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

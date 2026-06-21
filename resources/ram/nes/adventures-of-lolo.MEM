@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Adventures of Lolo",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "adventures-of-lolo",
+    file = "adventures-of-lolo.zip",
+    hashes = {
+      { hash = "bd377b49dcc269c6270ec0ea6336baf5", label = "Adventures of Lolo (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

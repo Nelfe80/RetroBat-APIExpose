@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "1944",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "1944-the-loop-master",
+    file = "1944-the-loop-master.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X9226A5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: energy" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X921D88, type="u32be", condition="change", action="TREASURE", color="white", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Gift or POW" },
+        { address=0X921D88, type="u32be", condition="change", action="TREASURE", color="white", min=5000, max=5000, no_log=false, no_survey=false, desc="Score delta 5000-5000: Various medium" },
+        { address=0X921D88, type="u32be", condition="change", action="TREASURE", color="blue", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Various high" },
+        { address=0X921D88, type="u32be", condition="change", action="TREASURE", color="white", min=20000, max=20000, no_log=false, no_survey=false, desc="Score delta 20000-20000: Bamboo Sprout" },
+        { address=0X921D88, type="u32be", condition="change", action="TREASURE", min=50000, max=50000, no_log=false, no_survey=false, desc="Score delta 50000-50000: Holstein" },
+        { address=0X921D88, type="u32be", condition="change", action="TREASURE", color="white", min=80000, max=80000, no_log=false, no_survey=false, desc="Score delta 80000-80000: Strawberry" },
+        { address=0X921D88, type="u32be", condition="change", action="TREASURE", color="green", min=100000, max=100000, no_log=false, no_survey=false, desc="Score delta 100000-100000: Dragonfly" },
+      },
+      weapon = {
+        { address=0X922429, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: fire power" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X921D88, type="u32be", condition="change", action="SCORE_STATE", color="red", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Various" },
+      },
+      collectibles = {
+        { address=0X921D51, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X922405, type="u8", condition="decrease", action="BOMB_FIRED", no_log=false, no_survey=false, desc="bomb: bombs" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X921D88, type="u32be", condition="change", action="OBJECT_DESTROYED", color="orange", min=300, max=390, no_log=false, no_survey=false, desc="Score delta 300-390: Destroy orange plane" },
+        { address=0X921D88, type="u32be", condition="change", action="OBJECT_DESTROYED", color="blue", min=400, max=490, no_log=false, no_survey=false, desc="Score delta 400-490: Destroy blue plane, antiaircraft" },
+        { address=0X921D88, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=10, max=290, no_log=false, no_survey=false, desc="Score delta 10-290: Simple Ship" },
+        { address=0X921D88, type="u32be", condition="change", action="OBJECT_DESTROYED", color="green", min=510, max=990, no_log=false, no_survey=false, desc="Score delta 510-990: Medium Planes,tanks or ships" },
+        { address=0X921D88, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=1000, max=1990, no_log=false, no_survey=false, desc="Score delta 1000-1990: Destroy crane, houses, stuff" },
+      },
+    },
+  },
+}

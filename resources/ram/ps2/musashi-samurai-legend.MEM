@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Musashi: Samurai Legend",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "musashi-samurai-legend",
+    file = "musashi-samurai-legend.zip",
+    hashes = {
+      { hash = "a3627b8be19e327d20645ec85b04d9f4", label = "Musashi - Samurai Legend (USA)" },
+      { hash = "ff0213ae5c55451ef220620d88b3dd47", label = "Musashi - Samurai Legend (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X686650, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Katana Upgrade Level (EU)" },
+        { address=0X6C6BAC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level [Float]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X6C6B88, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP [Float] decreased" },
+        { address=0X6C6B88, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP [Float] increased" },
+        { address=0X6C6B8C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP [Float] decreased" },
+        { address=0X6C6B8C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP [Float] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X6C76EC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6C6BA8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money [Float] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6C76ED, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Weapons" },
+      },
+    },
+  },
+}

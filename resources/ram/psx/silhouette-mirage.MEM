@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Silhouette Mirage",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform, Shooter"
+  },
+
+  rom = {
+    name = "silhouette-mirage",
+    file = "silhouette-mirage.zip",
+    hashes = {
+      { hash = "fe8235409193c1725f11ab970f1aa289", label = "Silhouette Mirage (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1006C, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Tutorial/Credits Minigame" },
+        { address=0X10071, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Main Game, All save prompts, Transition from Ending FMVs to Main Menu, Options menu, Load Game s" },
+        { address=0X10071, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game over (Happens the moment the player can't continue)" },
+        { address=0X10071, type="u8", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending credits FMV (City) and its Zohar credits" },
+        { address=0X10071, type="u8", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending credits FMV (Wasteland) and its Zohar credits" },
+        { address=0X10071, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Main Menu (Instantly becomes 0x00 when an option is pressed), Transition from Main Game into End" },
+        { address=0X12FFA0, type="u16le", condition="eq", value=0XFFFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Timer disabled (Waiting on trigger from cutscene or player)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10020, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player - Stored current Health value upon starting level (Found by BacklogOddy)" },
+        { address=0X10022, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player - Stored Health capacity value upon starting level (Found by BacklogOddy)" },
+        { address=0X10024, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player - Stored current Spirit value upon starting level (Found by BacklogOddy)" },
+        { address=0X10026, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player - Stored Spiirit capacity value upon starting level (Found by BacklogOddy)" },
+        { address=0X1002A, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Route 7-3-1?" },
+        { address=0X1002A, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Route 7-2-1" },
+        { address=0X1002A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Route 7-2-0" },
+        { address=0X1002A, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Route 7-3-0" },
+        { address=0X1002A, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Reaper secret boss" },
+        { address=0X1006D, type="u8", condition="eq", value=0X09, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="'Area Cleared' screen" },
+        { address=0X1006E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pablo level" },
+        { address=0X1006E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4-2 first visit" },
+        { address=0X1006E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Boolean] Path Choice, Paired with a Level (0x1006d) to determine the route taken." },
+      },
+      zone = {
+        { address=0X1006E, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Route B - Choice + Restore World - Geluve" },
+      },
+      stage = {
+        { address=0X1006C, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 1, Shamain" },
+        { address=0X1006C, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 2, Raqia" },
+        { address=0X1006C, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 3, Shehaqim" },
+        { address=0X1006C, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 4, Machonom" },
+        { address=0X1006C, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 5, Mathey" },
+        { address=0X1006C, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 6, Eruza" },
+        { address=0X1006C, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 7, Eden" },
+        { address=0X1006C, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Super Core Fighter II" },
+        { address=0X1006C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (found by BacklogOddy)" },
+        { address=0X1006F, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting Retries (Stage Select)" },
+        { address=0X10073, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select [0 = Off, 1 On]" },
+        { address=0X1137AE, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X12FF90, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 4-1 - Stage Data struct (Overlay)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1006F, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Last Retry/No more Retries" },
+        { address=0X1006F, type="u8", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="Starting Retries (New Game)" },
+        { address=0X1006F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Retries remaining (Retry, Lives, Life) increased" },
+        { address=0X1006F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Retries remaining (Retry, Lives, Life) decreased" },
+        { address=0X1384A0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Area 3-4 - Stage Section Data - PART TWO, Used from Malak boss death onwards (See 0x14a9c6 for P" },
+        { address=0X14A9C6, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Area 3-4 - Stage Section Data - PART ONE, Used untiil Malak boss death (Overlay)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10028, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player - Saved Money value upon starting level increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X12FFA0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Area 4-1 - Stage Section Data timer for pauses (Overlay)" },
+      },
+    },
+  },
+}

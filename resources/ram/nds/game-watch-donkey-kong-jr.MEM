@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Game & Watch: Donkey Kong Jr.",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "game-watch-donkey-kong-jr",
+    file = "game-watch-donkey-kong-jr.zip",
+    hashes = {
+      { hash = "bae780bb33e992a7641becacdd8d9c5e", label = "Game & Watch - Donkey Kong Jr. (USA, Europe)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X143938, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bits] Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X14C078, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bits] Screen?" },
+      },
+    },
+  },
+}

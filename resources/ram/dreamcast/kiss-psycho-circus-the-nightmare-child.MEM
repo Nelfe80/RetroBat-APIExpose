@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Kiss: Psycho Circus - The Nightmare Child",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Horror, Shooter"
+  },
+
+  rom = {
+    name = "kiss-psycho-circus-the-nightmare-child",
+    file = "kiss-psycho-circus-the-nightmare-child.zip",
+    hashes = {
+      { hash = "09f84da4ba177e954737e1cdb4cc69c8", label = "KISS Psycho Circus - The Nightmare Child (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X760B40, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Level 1/2" },
+        { address=0X760B44, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Level 2/2" },
+      },
+      stage = {
+        { address=0X37E538, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="accuracy - stage 1" },
+        { address=0X37E540, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 - kills current" },
+        { address=0X5C5BDC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="difficulty stage 1?" },
+        { address=0X5C5C24, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 - kills current" },
+        { address=0X786136, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="HP - Stage 2 (visual) fixed" },
+        { address=0X786212, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="HP - Stage 2 (visual mirored) fixed" },
+        { address=0XD0881A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="HP - Stage 2 (real)" },
+        { address=0XD08822, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="HP - Stage 2 (real mirrored)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X75DF88, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Equipped" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBFA45C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Ice Cannon" },
+        { address=0XC13BC4, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Ice Cannon Fake" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X95056A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss 1 Health 4 -aac" },
+        { address=0X951016, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss 1 Health 1" },
+        { address=0X9B7532, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss 2 Health 6" },
+        { address=0X9B80BE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss 2 Health 3 -b8c" },
+      },
+    },
+  },
+}

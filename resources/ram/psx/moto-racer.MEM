@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Moto Racer",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "moto-racer",
+    file = "moto-racer.zip",
+    hashes = {
+      { hash = "fd87e03dbf4400399ddd46ad73b73b30", label = "Moto Racer (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10058, type="u8", condition="eq", value=0X0, action="DEMO_MODE", no_log=false, no_survey=false, desc="playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA5510, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on ground" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8EB60, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Lap1 Time" },
+        { address=0X8EB64, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Lap2 Time" },
+        { address=0X8EB68, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Lap3 Time" },
+        { address=0X8EB6C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Lap4 Time" },
+        { address=0X8EB70, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Lap5 Time" },
+        { address=0X8EB74, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Lap6 Time" },
+        { address=0X8EB78, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Lap7 Time" },
+        { address=0X8EB7C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Lap8 Time" },
+        { address=0X8EB80, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 Lap1 Time (same structure as P1)" },
+        { address=0X8EBA0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P3 Lap1 Time (same structure as P1)" },
+        { address=0X8EBC0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P4 Lap1 Time (same structure as P1)" },
+        { address=0X8EBE0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P5 Lap1 Time (same structure as P1)" },
+        { address=0X8EC00, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P6 Lap1 Time (same structure as P1)" },
+        { address=0X8EC20, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P7 Lap1 Time (same structure as P1)" },
+        { address=0X8EC40, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P8 Lap1 Time (same structure as P1)" },
+        { address=0X8F4CC, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Race Time left (16 bit, hex)" },
+      },
+    },
+  },
+}

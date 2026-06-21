@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "One Piece: Grand Adventure",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "one-piece-grand-adventure",
+    file = "one-piece-grand-adventure.zip",
+    hashes = {
+      { hash = "77f6884dc2019d9a54feb357711d628a", label = "Shonen Jump's One Piece - Grand Adventure (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X1C189A0, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fusha Village Sea Area" },
+        { address=0X1C189A0, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Orange Village Sea Area" },
+        { address=0X1C189A0, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Syrup Village Sea Area" },
+        { address=0X1C189A0, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Rogue Town Sea Area" },
+        { address=0X1C189A0, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Drum Kingdom Sea Area" },
+        { address=0X1C189A0, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Inshore Alabasta Kingdom" },
+        { address=0X1C189A0, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Alabasta Kingdom Sea Area" },
+        { address=0X1C189A0, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Graveyard of Ships" },
+        { address=0X1C189A1, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Jaya Sea Area" },
+        { address=0X1C189A1, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Skypiea" },
+      },
+      stage = {
+        { address=0X1C2F803, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X1C2F803, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2." },
+        { address=0X1C2F803, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8-bit) First Character Level" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1C189AD, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cannons, Weapons" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1C2F80C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Experience Points)" },
+      },
+      collectibles = {
+        { address=0X1C189A8, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Head Ring (Bon Clay Start)" },
+        { address=0X1C189A9, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring" },
+      },
+    },
+  },
+}

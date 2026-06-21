@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Truck Racing",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "truck-racing",
+    file = "truck-racing.zip",
+    hashes = {
+      { hash = "682e802a1387c63e3a25bc7e66346898", label = "Truck Racing (Europe)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1E8790, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time Minutes [8bit]" },
+        { address=0X1E8798, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time Microseconds [8bit]" },
+      },
+    },
+  },
+}

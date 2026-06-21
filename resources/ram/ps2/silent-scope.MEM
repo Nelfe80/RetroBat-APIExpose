@@ -1,0 +1,124 @@
+return {
+  game = {
+    title = "Silent Scope",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "silent-scope",
+    file = "silent-scope.zip",
+    hashes = {
+      { hash = "754a24380deb46fc93f94edba67498bf", label = "Silent Scope (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2A1984, type="u16le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [US]" },
+        { address=0X2D6950, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X2D6950, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Menu" },
+        { address=0X7FE16C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused (01) [US]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X258A0C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: Farm - Time Attack" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: Farm - Perfect Shot" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: Farm - Pop-up Targets" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: Farm - Quick Shot" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: River - Time Attack" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: River - Perfect Shot" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: River - Pop-up Targets" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: River - Quick Shot" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: Cave - Time Attack" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: Cave - Perfect Shot" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: Cave - Pop-up Targets" },
+        { address=0X258A0C, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training: Cave - Quick Shot" },
+        { address=0X258A0C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training Level ID [US]" },
+        { address=0X28C6DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Outdoor Shooting Range Level ID" },
+        { address=0X2D6190, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Downtown" },
+        { address=0X2D6190, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stadium" },
+        { address=0X2D6190, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Highway" },
+        { address=0X2D6190, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hotel" },
+        { address=0X2D6190, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Night Vision" },
+        { address=0X2D6190, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Indoor Shooting Range" },
+        { address=0X2D6190, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Outdoor Shooting Range/Training Mode/Challenge 100" },
+        { address=0X2D6190, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID - Story Mode/Time Attack Mode" },
+        { address=0X2D6200, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Progress" },
+        { address=0X2D6202, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Progress" },
+        { address=0X2D6212, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete (01)" },
+        { address=0X7FDAD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Outdoor Shooting Range Levels Unlocked [US]" },
+        { address=0X7FDAD9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Outdoor Shooting Range Levels Unlocked [US]" },
+      },
+      stage = {
+        { address=0X258770, type="u8", condition="eq", value=0X6D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - Farm: Time Attack" },
+        { address=0X258770, type="u8", condition="eq", value=0X6E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - Farm: Perfect Shot" },
+        { address=0X258770, type="u8", condition="eq", value=0X6F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - Farm: Pop-up Targets" },
+        { address=0X258770, type="u8", condition="eq", value=0X70, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - Farm: Quick Shot" },
+        { address=0X258770, type="u8", condition="eq", value=0X71, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - River: Time Attack" },
+        { address=0X258770, type="u8", condition="eq", value=0X72, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - River: Perfect Shot" },
+        { address=0X258770, type="u8", condition="eq", value=0X73, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - River: Pop-up Targets" },
+        { address=0X258770, type="u8", condition="eq", value=0X74, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - River: Quick Shot" },
+        { address=0X258770, type="u8", condition="eq", value=0X75, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - Cave: Time Attack" },
+        { address=0X258770, type="u8", condition="eq", value=0X76, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - Cave: Perfect Shot" },
+        { address=0X258770, type="u8", condition="eq", value=0X77, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - Cave: Pop-up Targts" },
+        { address=0X258770, type="u8", condition="eq", value=0X78, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Training Mode - Cave: Quick Shot" },
+        { address=0X258770, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Outdoor Shooting Range/Challenge 100/Training Mode Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2C6BAC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Babes Discovered/Bonus Life Obtained increased" },
+        { address=0X2C6BAC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Babes Discovered/Bonus Life Obtained decreased" },
+        { address=0X2D52A2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bonus Life Notification Timer increased" },
+        { address=0X2D52A2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bonus Life Notification Timer decreased" },
+        { address=0X2D61B0, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss 1 Life Mirror [16-Bit] [US] increased" },
+        { address=0X2D61B0, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss 1 Life Mirror [16-Bit] [US] decreased" },
+        { address=0X2D61B6, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss 1 Max Life 1 Mirror [16-Bit] [US] increased" },
+        { address=0X2D61B6, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss 1 Max Life 1 Mirror [16-Bit] [US] decreased" },
+        { address=0X2D61C4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss 2 Life Mirror [16-Bit] [US] increased" },
+        { address=0X2D61C4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss 2 Life Mirror [16-Bit] [US] decreased" },
+        { address=0X2D61CA, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss 2 Max Life Mirror [16-Bit] [US] increased" },
+        { address=0X2D61CA, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss 2 Max Life Mirror [16-Bit] [US] decreased" },
+        { address=0X2D68F8, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Life [16-Bit] [US] increased" },
+        { address=0X2D68F8, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Life [16-Bit] [US] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2D68D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32-Bit] [US]" },
+      },
+      collectibles = {
+        { address=0X7FDAE0, type="u8", condition="eq", value=0X07, action="MONEY_STATE", no_log=false, no_survey=false, desc="SS (Gold Cup)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2D6190, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Big Boss" },
+        { address=0X2D61AE, type="u8", condition="eq", value=0X9F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Cobra (Car)" },
+        { address=0X2D61AE, type="u8", condition="eq", value=0XA4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Monica" },
+        { address=0X2D61C2, type="u8", condition="eq", value=0X9E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Scorpion (Both Fights)" },
+        { address=0X2D61C2, type="u8", condition="eq", value=0X9F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Cobra (All Fights)" },
+        { address=0X2D61C2, type="u8", condition="eq", value=0XA0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hornet" },
+        { address=0X2D61C2, type="u8", condition="eq", value=0XA1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Jerry" },
+        { address=0X2D61C2, type="u8", condition="eq", value=0XA4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Monica" },
+        { address=0X2D61C2, type="u8", condition="eq", value=0XA5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Tom" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2587BC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Outdoor Shooting Range Total Targets [US]" },
+        { address=0X2587C0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Outdoor Shooting Range Targets Hit [US]" },
+        { address=0X2D6950, type="u8", condition="eq", value=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Outdoor Shooting Range" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2D691E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reload/Next Round Chambered Timer [US]" },
+      },
+    },
+  },
+}

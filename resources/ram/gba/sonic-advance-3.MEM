@@ -1,0 +1,118 @@
+return {
+  game = {
+    title = "Sonic Advance 3",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "sonic-advance-3",
+    file = "sonic-advance-3.zip",
+    hashes = {
+      { hash = "310498d4b2e3cc44ed69557903c4a54e", label = "Sonic Advance 3 (USA) (Ru) (MagicGame).gba" },
+      { hash = "e0533faf6aa36e3111669574f1c5df92", label = "Sonic Advance 3 (USA) (En,Ja,Fr,De,Es,It).gba" },
+      { hash = "e6b78109c11d82f621db846da70bc30a", label = "Sonic Advance 3 (Europe) (En,Ja,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X08A4, type="u8", condition="eq", value=0X05, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Getting the Medal/Finishing the Stage" },
+        { address=0X08A4, type="u8", condition="eq", value=0X08, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Entering a Stage/Lobby" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0544, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos de la Zona 1 (Chaos from Zone 1)" },
+        { address=0X0545, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos de la Zona 1 (Chaos from Zone 1)" },
+        { address=0X0546, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos Zona 2 (Chaos from Zone 2)" },
+        { address=0X0547, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos de la Zona 2 (Chaos from Zone 2)" },
+        { address=0X0548, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 3" },
+        { address=0X0549, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 3" },
+        { address=0X054A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 4" },
+        { address=0X054B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 4" },
+        { address=0X054C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 5" },
+        { address=0X054D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 5" },
+        { address=0X054E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 6" },
+        { address=0X054F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 6" },
+        { address=0X0550, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 7" },
+        { address=0X0551, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chaos from Zone 7" },
+        { address=0X0559, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zona 1 (Route 99 Stage Completeds) (Bits 0 - 3)" },
+        { address=0X055A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zona 2 (Sunset Hill Stages Completed) (Bits 0 - 3)" },
+        { address=0X055B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zona 3 (Ocean Base Stages Completeds) (Bits 0 - 3)" },
+        { address=0X055C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zona 4 (Toy Kingdom Stages Completed) (Bits 0 - 3)" },
+        { address=0X055D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zona 5 (Twinkle Snow Stages Completeds) (Bits 0 - 3)" },
+        { address=0X055E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zona 6 (Cyber Track Stages Completeds) (Bits 0 - 3)" },
+        { address=0X055F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zona 7 (Chaos Angel Stages Completeds) (Bits 0 - 3)" },
+        { address=0X0925, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Visible" },
+      },
+      zone = {
+        { address=0X08A9, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World" },
+      },
+      stage = {
+        { address=0X0567, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Anillos de la Zona 1-1 (Route 99 Act 1 Medals)(Bits 0 - 2)" },
+        { address=0X0568, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Anillos de la Zona 1-2 (Route 99 Act 2 Medals)(Bits 0 - 2)" },
+        { address=0X0569, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Route 99 Act 3 Medals (Bits 0 - 2)" },
+        { address=0X056B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sunset Hill Act 1 Medals (Bits 0 - 2)" },
+        { address=0X056C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sunset Hill Act 2 Medals (Bits 0 - 2)" },
+        { address=0X056D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sunset Hill Act 3 Medals (Bits 0 - 2)" },
+        { address=0X056F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ocean Base Act 1 Medals (Bits 0 - 2)" },
+        { address=0X0570, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ocean Base Act 2 Medals (Bits 0 - 2)" },
+        { address=0X0571, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ocean Base Act 3 Medals (Bits 0 - 2)" },
+        { address=0X0573, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Toy Kingdom Act 1 Medals (Bits 0 - 2)" },
+        { address=0X0574, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Toy Kingdom Act 2 Medals (Bits 0 - 2)" },
+        { address=0X0575, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Toy Kingdom Act 3 Medals (Bits 0 - 2)" },
+        { address=0X0577, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Twinkle Snow Act 1 Medals (Bits 0 - 2)" },
+        { address=0X0578, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Twinkle Snow Act 2 Medals (Bits 0 - 2)" },
+        { address=0X0579, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Twinkle Snow Act 3 Medals (Bits 0 - 2)" },
+        { address=0X057B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cyber Track Act 1 Medals (Bits 0 - 2)" },
+        { address=0X057C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cyber Track Act 2 Medals (Bits 0 - 2)" },
+        { address=0X057D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cyber Track Act 3 Medals (Bits 0 - 2)" },
+        { address=0X057F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chaos Angel Act 1 Medals (Bits 0 - 2)" },
+        { address=0X0580, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chaos Angel Act 2 Medals (Bits 0 - 2)" },
+        { address=0X0581, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chaos Angel Act 3 Medals (Bits 0 - 2)" },
+        { address=0X08AA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0954, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0954, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0560, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Zona -Altar Emerald- (Altar Emerald Completed) (Bit 3)" },
+        { address=0X0562, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Contador de esmeraldas (Emerald Count) (Bits 0 - 6)" },
+        { address=0X0586, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Zona 8-4 (Altar Emerald Medals) (Bits 0 - 2)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X08C1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bits] Last checkpoint you obtained during a stage. increased" },
+        { address=0X094C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+        { address=0X4874, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings in Special Stage increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X056A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Anillos de la Zona 1-4 (Route 99 Boss Act Medals)(Bits 0 - 2)" },
+        { address=0X056E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Medallas 2-4 (Sunset Hill Boss Act Medals) (Bit 0 - 2)" },
+        { address=0X0572, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Medallas 3-4 (Ocean Base Boss Act Medals) (Bits 0 - 2)" },
+        { address=0X0576, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Medallas 4-4 (Toy Kingdom Boss Act Medals) (Bits 0 - 2)" },
+        { address=0X057A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Medallas 5-4 (Twinkle Snow Boss Act Medals)(Bits 0 - 2)" },
+        { address=0X057E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Medallas 6-4 (Cyber Track Boss Act Medals) (Bits 0 - 2)" },
+        { address=0X0582, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Medallas 7-4 (Chaos Angel Boss Act Medals) (Bits 0 - 2)" },
+        { address=0X49DE, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss is Defeated Flag?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X08C0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8-Bits] When the time runs out, it will change to 0x01 and you will automatically receive a bro" },
+        { address=0X092C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Push the Switch Mini-game" },
+      },
+    },
+  },
+}

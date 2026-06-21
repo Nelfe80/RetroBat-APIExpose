@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Body Count",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "body-count",
+    file = "body-count.zip",
+    hashes = {
+      { hash = "5128015e3441f5bbc9f8a59d9cfbe76b", label = "Body Count (Europe) (En,Fr,De,Es,It).md" },
+    }
+  },
+
+  events = {
+  },
+}

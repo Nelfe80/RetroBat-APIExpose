@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Muramasa: The Demon Blade",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "muramasa-the-demon-blade",
+    file = "muramasa-the-demon-blade.zip",
+    hashes = {
+      { hash = "3e8de2850c5716f932e2c2c1479e1c5a", label = "Muramasa - The Demon Blade (USA)" },
+      { hash = "aa5cf58eca4d8f18921c76cd7c6b2260", label = "Muramasa - The Demon Blade (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDA70C4, type="u32be", condition="eq", value=0X39, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XDA7528, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon God Gauntlet" },
+        { address=0XDA7530, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not acquired" },
+        { address=0XDA7530, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Acquired" },
+        { address=0XDA7534, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not acquired" },
+        { address=0XDA7534, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Acquired" },
+        { address=0XE1D2C4, type="u32be", condition="eq", value=0X39, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XE27090, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-bit BE] [NTSC] Pause Flag" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XDA7592, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nagasone Kotetsu sword flag (see 0xda758d for values) Kisuke Act 1" },
+        { address=0XDA7597, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Iganokami Kanemichi sword flag (see 0xda758d for values) Kisuke Act 2" },
+        { address=0XDA759B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Magoroku Kanemoto sword flag (see 0xda758d for values) Kisuke Act 3" },
+        { address=0XDA75A0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kogarasumaru sword flag (see 0xda758d for values) Kisuke Act 4" },
+        { address=0XDA75A4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kumokiri sword flag (see 0xda758d for values) Kisuke Act 5" },
+        { address=0XDA75A9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Osafune Kanemitsu sword flag (see 0xda758d for values) Kisuke Act 6" },
+        { address=0XDA75AD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Goro Masamune sword flag (see 0xda758d for values) Kisuke Act 7" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XDA7334, type="u32be", condition="eq", value=0XB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fight active, lasts until CS immediately after boss reward screen" },
+        { address=0XE1D534, type="u32be", condition="eq", value=0XB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fight active, lasts until CS immediately after boss reward screen" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XDA6C60, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="//Start of a stable block of data" },
+        { address=0XDA766B, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="whole" },
+        { address=0XDA766B, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken" },
+        { address=0XDA768F, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="whole" },
+        { address=0XDA768F, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken" },
+        { address=0XDA76B3, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="whole" },
+        { address=0XDA76B3, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken" },
+        { address=0XE1D85C, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="whole" },
+        { address=0XE1D85C, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken" },
+        { address=0XE1D880, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="whole" },
+        { address=0XE1D880, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken" },
+        { address=0XE1D8A4, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="whole" },
+        { address=0XE1D8A4, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken" },
+        { address=0XE26C60, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="//Start of another block that seems stable" },
+        { address=0XE66C60, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="//Start of another block that looks stable" },
+      },
+    },
+  },
+}

@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Lupin III: The Castle of Cagliostro",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lupin-iii-the-castle-of-cagliostro",
+    file = "lupin-iii-the-castle-of-cagliostro.zip",
+    hashes = {
+      { hash = "14c078a9ed5c14ac54a6eb5e94fa34d2", label = "Lupin Sansei - Cagliostro no Shiro (Japan).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1AAF, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="on game over screen" },
+        { address=0X1AB1, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1AB1, type="u8", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ending" },
+        { address=0X1AB1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage [8 bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2171, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [8 bit] increased" },
+        { address=0X2171, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [8 bit] decreased" },
+        { address=0X218E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Remaining [8 bit] increased" },
+        { address=0X218E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Remaining [8 bit] decreased" },
+        { address=0X218F, type="u8", condition="eq", value=0XD9, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death" },
+      },
+      health = {
+        { address=0X218F, type="u8", condition="eq", value=0XF7, action="HEALTH_STATE", no_log=true, no_survey=false, desc="full" },
+        { address=0X218F, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health [8 bit] (manipulable)" },
+        { address=0X21C8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Sword Damage [8 bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2163, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Upper 4 Digits) [16 bit]" },
+        { address=0X2165, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Lower 4 Digits) [16 bit]" },
+      },
+      collectibles = {
+        { address=0X216D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins [8 bit] increased" },
+        { address=0X21CD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings [8 bit] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X21C7, type="u8", condition="eq", value=0X2, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken sword" },
+      },
+    },
+  },
+}

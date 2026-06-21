@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Word Searcher",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "word-searcher",
+    file = "word-searcher.zip",
+    hashes = {
+      { hash = "4411b1b83184976fe32264de70717de0", label = "Word Searcher (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C81EC, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X1C81EC, type="u8", condition="eq", value=0X20, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Viewing Credits" },
+        { address=0X1C81EC, type="u8", condition="eq", value=0X65, action="PAUSE_ON", no_log=false, no_survey=false, desc="Puzzle is paused." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1C81EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mini State, Including Current Page for Puzzles" },
+      },
+    },
+  },
+}

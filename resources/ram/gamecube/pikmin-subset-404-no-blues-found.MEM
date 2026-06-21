@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Pikmin [Subset - 404 No Blues Found]",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "pikmin-subset-404-no-blues-found",
+    file = "pikmin-subset-404-no-blues-found.zip",
+    hashes = {
+      { hash = "06dbfc76a3e2c4795d499c62007e6d50", label = "Pikmin (USA) (Rev 1) [Subset - No Blues]" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1247E9C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8 BIT] Geiger Counter Collected" },
+      },
+    },
+  },
+}

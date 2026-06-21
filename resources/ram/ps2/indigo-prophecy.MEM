@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Indigo Prophecy",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "indigo-prophecy",
+    file = "indigo-prophecy.zip",
+    hashes = {
+      { hash = "a88f791552404010043efc51c069c3c4", label = "Fahrenheit (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

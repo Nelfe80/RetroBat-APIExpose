@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "LEGO Batman 2: DC Super Heroes",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "lego-batman-2-dc-super-heroes",
+    file = "lego-batman-2-dc-super-heroes.zip",
+    hashes = {
+      { hash = "248663ce74250bb902cfddd93ad52946", label = "LEGO Batman 2 - DC Super Heroes (Europe) (En,Fr,De,Es,It,Nl,Da)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBCCB76, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Code Active Flag - Attract Studs (8-bit)" },
+        { address=0XCB2114, type="u32be", condition="eq", value=0X14E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X17E1708, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Indicator (32-bit BE)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC2E068, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Theatrical Pursuits" },
+        { address=0XC2E068, type="u32be", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Harboring a Criminal" },
+        { address=0XC2E068, type="u32be", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arkham Asylum Antics" },
+        { address=0XC2E068, type="u32be", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Asylum Assignment" },
+        { address=0XC2E068, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID (32-bit BE)" },
+        { address=0XCAB968, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In-Level Studs (64-bits)" },
+        { address=0XCAE827, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rescued" },
+        { address=0XCAE827, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In-Level Citizen in Peril Flag (8-bit)" },
+      },
+      zone = {
+        { address=0XC2E068, type="u32be", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Hub World / No Level" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBCCC7E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Code Active Flag - Gold Brick Finder (8-bit) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XBCCCC6, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Code Active Flag - Invincibility (8-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCAE80C, type="u32be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="In-Level Minikits Counter (32-bit BE)" },
+      },
+    },
+  },
+}

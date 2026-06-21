@@ -1,0 +1,116 @@
+return {
+  game = {
+    title = "Wario Land 4",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "wario-land-4",
+    file = "wario-land-4.zip",
+    hashes = {
+      { hash = "5fe47355a33e3fabec2a1607af88a404", label = "Wario Land 4 (USA, Europe).gba" },
+      { hash = "7fd9140d1985df814eb543de6330454a", label = "Wario Land 4 (USA, Europe) (Fr) (Pocket Traduction).gba" },
+      { hash = "c4f6c86b801e8fb0e92a5050a8d97972", label = "Wario Land 4 (USA, Europe) (Pt) (v1.0) (Trans-Center).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0C3A, type="u8", condition="eq", value=0X02, action="GAME_PLAYING", no_log=false, no_survey=false, desc="in stage" },
+        { address=0X0C3A, type="u8", condition="eq", value=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0003, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected level" },
+        { address=0X0023, type="u16le", condition="eq", value=0X12, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cuckoo Condor" },
+        { address=0X0023, type="u16le", condition="eq", value=0X13, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aerodent" },
+        { address=0X0023, type="u16le", condition="eq", value=0X14, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Catbat" },
+        { address=0X0023, type="u16le", condition="eq", value=0X15, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Diva" },
+        { address=0X0023, type="u16le", condition="eq", value=0X16, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spoiled Rotten" },
+        { address=0X0023, type="u16le", condition="eq", value=0X17, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Passage" },
+        { address=0X0023, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID (Stored until you select a new level)" },
+        { address=0X0AA4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pinball Zone Completion" },
+        { address=0X0C3C, type="u8", condition="eq", value=0X1F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Passage Clear?" },
+      },
+      stage = {
+        { address=0X0004, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Other Stage ID" },
+        { address=0X0023, type="u16le", condition="eq", value=0X11, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cractus" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X01FD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Golden Diva Health (8-bit) decreased" },
+        { address=0X01FD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Golden Diva Health (8-bit) increased" },
+        { address=0X0A5B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="golden diva health decreased" },
+        { address=0X0A5B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="golden diva health increased" },
+        { address=0X1910, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health of Wario decreased" },
+        { address=0X1910, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health of Wario increased" },
+        { address=0X1911, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Collect health decreased" },
+        { address=0X1911, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Collect health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X000A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Homerun Derby Score" },
+        { address=0X000C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Wario Hop Top Score" },
+        { address=0X000D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Wario Hop Top Score" },
+        { address=0X000E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Wario Roulette Top Score" },
+        { address=0X0B10, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hall of Hieroglyphs score" },
+        { address=0X0B20, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Palm Tree Paradise score" },
+        { address=0X0B24, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Wildflower Fields score" },
+        { address=0X0B28, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mystic Lake score" },
+        { address=0X0B2C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monsoon Jungle score" },
+        { address=0X0B30, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Curious Factory score" },
+        { address=0X0B34, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Toxic Landfill score" },
+        { address=0X0B38, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="40 Below Fridge score" },
+        { address=0X0B3C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pinball Zone score" },
+        { address=0X0B40, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Toy Block Tower score" },
+        { address=0X0B44, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="The Big Board score" },
+        { address=0X0B48, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Doodle Woods score" },
+        { address=0X0B4C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Domino Row score" },
+        { address=0X0B50, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Crescent Moon Village score" },
+        { address=0X0B54, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arabian Night score" },
+        { address=0X0B58, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Fiery Cavern score" },
+        { address=0X0B5C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hotel Horror score" },
+        { address=0X0B60, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Golden Passage score" },
+        { address=0X0BF8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Temp Score (16-bit)" },
+        { address=0X0BFA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Temp Score 2" },
+        { address=0X0BFC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X0BFD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X0BFE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X0BFF, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X0C00, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X3D60, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (16-Bit)" },
+        { address=0X3D62, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 2" },
+        { address=0X3DDC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Heart Countdown at score calculation" },
+        { address=0X47D6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame Temp Score" },
+        { address=0X47D7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame Temp Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X014D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1898, type="u8", condition="eq", value=0X01, action="SWIMMING", no_log=false, no_survey=false, desc="Swimming" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0AB0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Toy Block Tower Completion" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0BF0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time" },
+        { address=0X0BF1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time" },
+      },
+    },
+  },
+}

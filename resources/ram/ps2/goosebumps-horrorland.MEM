@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Goosebumps HorrorLand",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "goosebumps-horrorland",
+    file = "goosebumps-horrorland.zip",
+    hashes = {
+      { hash = "7f73b350d070c76af76a546a2d1c13de", label = "Goosebumps HorrorLand (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

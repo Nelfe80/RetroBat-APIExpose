@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Safari Race",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "safari-race",
+    file = "safari-race.zip",
+    hashes = {
+      { hash = "8384956e456a91ca59f9c5e72f1cb1c4", label = "Safari Race (Japan, Europe, Australia, New Zealand) (Ja).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0065, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X0065, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X007A, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Controlled" },
+        { address=0X007A, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X02C1, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16bit] BCD - Total Distance Goal Traveled (km)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X02BF, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Fuel Life Left increased" },
+        { address=0X02BF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Fuel Life Left decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X007E, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24bit] Score (BCD)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X02EF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[8bit BCD] Time - Minutes" },
+        { address=0X02F0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit BCD] Time - Hours" },
+      },
+    },
+  },
+}

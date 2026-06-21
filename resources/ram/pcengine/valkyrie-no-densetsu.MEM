@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Valkyrie no Densetsu",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "valkyrie-no-densetsu",
+    file = "valkyrie-no-densetsu.zip",
+    hashes = {
+      { hash = "c8e415bf9bf74284e51f8d96a22caff5", label = "Valkyrie no Densetsu (Japan) (En) (v1.0) (cabbage,Shawn Cox).pce" },
+      { hash = "f08a37d37a69315652e1a0ec8dbba650", label = "Valkyrie no Densetsu (Japan).pce" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X00D2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="00~06 = Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0A0F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="00~09 = Lives increased" },
+        { address=0X0A0F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="00~09 = Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X09ED, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="4 way shot;" },
+        { address=0X09ED, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="3 way shot;" },
+        { address=0X09ED, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="pierce shot;" },
+        { address=0X09ED, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="wide beam;" },
+        { address=0X09ED, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="guided missile;" },
+        { address=0X09ED, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="bomb;" },
+        { address=0X09ED, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="light sword;" },
+        { address=0X09ED, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="none;" },
+        { address=0X09EE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Reserve weapon _1" },
+        { address=0X09EF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Reserve weapon _2" },
+        { address=0X09F0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Reserve weapon _3" },
+        { address=0X09F1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Reserve weapon _4" },
+        { address=0X09F2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Reserve weapon _5" },
+        { address=0X09F3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Reserve weapon _6" },
+        { address=0X09F4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Reserve weapon _7" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X00C4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0000~FFFF = Gold (16bit) increased" },
+        { address=0X09FD, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="remaining ammo count of current weapon" },
+        { address=0X1AF0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0x90 during stage-transition-password display and Game Over increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0801, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1, 2, 4 Boss HP;" },
+        { address=0X0802, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 3 Boss HP;" },
+        { address=0X0807, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 4 Boss HP;" },
+        { address=0X080C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 2 Emerald Tree Boss" },
+        { address=0X0814, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 5 Boss HP;" },
+        { address=0X18A9, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit4 = First Mini-Boss Defeat" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X09D8, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="FF = Invincible" },
+        { address=0X09FF, type="u8", condition="bit_true", bit=5, mask=0X20, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Light Armor;" },
+        { address=0X09FF, type="u8", condition="bit_true", bit=6, mask=0X40, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Armor Piece 3;" },
+        { address=0X09FF, type="u8", condition="bit_true", bit=7, mask=0X80, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Armor Piece 2;" },
+      },
+    },
+  },
+}

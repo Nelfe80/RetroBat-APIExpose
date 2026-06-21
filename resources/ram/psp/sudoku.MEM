@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Sudoku",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sudoku",
+    file = "sudoku.zip",
+    hashes = {
+      { hash = "6438800701bda5b7c46ab6813f2eb5a3", label = "Sudoku (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XA0F7B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Total Points" },
+      },
+    },
+  },
+}

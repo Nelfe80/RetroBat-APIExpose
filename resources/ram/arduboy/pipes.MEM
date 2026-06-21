@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Pipes",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pipes",
+    file = "pipes.zip",
+    hashes = {
+      { hash = "1774d69cc164843f96ca10d6b72d21bb", label = "Pipes (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0B12, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Practice Levels Cleared" },
+        { address=0X0B13, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Easy Levels Cleared" },
+        { address=0X0B14, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Normal Leves Cleared" },
+        { address=0X0B15, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Hard Levels Cleared" },
+        { address=0X0B16, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Extreme Puzzles Cleared" },
+      },
+    },
+  },
+}

@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Initial D: Arcade Stage Ver. 3",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Driving"
+  },
+
+  rom = {
+    name = "initial-d-arcade-stage-ver-3",
+    file = "initial-d-arcade-stage-ver-3.zip",
+    hashes = {
+      { hash = "016e990c810854ed0d30fc9770745a13", label = "initdv3e.zip" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X31C9EC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Racers Cleared" },
+        { address=0X31CDD4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunta Level - Myogi [32 bit]" },
+        { address=0X31CDD8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunta Level - Usui [32 bit]" },
+        { address=0X31CDDC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunta Level - Akagi [32 bit]" },
+        { address=0X31CDE0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunta Level - Akina [32 bit]" },
+        { address=0X31CDE4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunta Level - Happogahara [32 bit]" },
+        { address=0X31CDE8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunta Level - Irohazaka [32 bit]" },
+        { address=0X31CDEC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunta Level - Shomaru [32 bit]" },
+        { address=0X31CDF0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunta Level - Tsuchisaka [32 bit]" },
+        { address=0X900B1C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Front Tire 1 Not Grounded [32 bit]" },
+        { address=0X900B20, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Front Tire 2 Not Grounded [32 bit]" },
+        { address=0X90102C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Back Tire 1 Not Grounded [32 bit]" },
+        { address=0X901030, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Back Tire 2 Not Grounded [32 bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X31C9E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total License Points [32 bit]" },
+        { address=0X1F98CE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Race Results - Battle Points [32 bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X31C99C, type="u16le", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X31C99C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mode [32 bit]" },
+        { address=0X31C9A4, type="u32le", condition="eq", value=0X0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Day, 1 = Night" },
+        { address=0X31C9A4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Map Time [32 bit]" },
+        { address=0X31CE34, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Menu Timer [32 bit]" },
+        { address=0X31CE40, type="u8", condition="eq", value=0X0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal, 1 = Simple" },
+        { address=0X31CE40, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Display [8 bit]" },
+        { address=0X9012F8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Entered Ditches [32 bit]" },
+        { address=0X91FB2C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Analysis - Times Entered Ditches [32 bit]" },
+        { address=0X91FB54, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Analysis - Total Time [32 bit]" },
+        { address=0X91FB58, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Analysis - Segment 1 Time [32 bit]" },
+        { address=0X91FB5C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Analysis - Segment 2 Time [32 bit]" },
+        { address=0X91FB60, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Analysis - Segment 3 Time [32 bit]" },
+        { address=0X91FB64, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Analysis - Segment 4 Time [32 bit]" },
+        { address=0XBFF958, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="End of Race Music [ASCII Text]" },
+        { address=0X1F98CC8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results - Total Time [32 bit]" },
+        { address=0X1F98CCC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results - Section/Lap 1 Time [32 bit]" },
+        { address=0X1F98CD0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results - Section/Lap 2 Time [32 bit]" },
+        { address=0X1F98CD4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results - Section/Lap 3 Time [32 bit]" },
+        { address=0X1F98CD8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Results - Section/Lap 4 Time [32 bit]" },
+      },
+    },
+  },
+}

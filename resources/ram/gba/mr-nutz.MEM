@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Mr. Nutz",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "mr-nutz",
+    file = "mr-nutz.zip",
+    hashes = {
+      { hash = "c0e95ca2df9d1a27c91ca6956095891c", label = "Mr Nutz (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X67C0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X60A0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage/State" },
+        { address=0X6812, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage but can be cheated with passwords, don't use" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X680B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X680B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X6814, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X6814, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6806, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="number of coins increased" },
+        { address=0X6807, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="number of coins x 256 increased" },
+      },
+    },
+  },
+}

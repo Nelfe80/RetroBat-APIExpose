@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Knights in the Nightmare",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "knights-in-the-nightmare",
+    file = "knights-in-the-nightmare.zip",
+    hashes = {
+      { hash = "5eeaa83607105f1fa60d4a516df56c81", label = "Knights in the Nightmare (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEDA37, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Talk" },
+        { address=0XEDA39, type="u8", condition="bit_true", bit=7, mask=0X80, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XEDA40, type="u8", condition="bit_true", bit=3, mask=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XEDA46, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="The Pause Menu" },
+        { address=0XEDA46, type="u8", condition="bit_true", bit=2, mask=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Talks" },
+        { address=0XEDA46, type="u8", condition="bit_true", bit=3, mask=0X08, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Talk Flow" },
+        { address=0X10DD60, type="u16le", condition="eq", value=0X7FFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XEDA47, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Leveling Up" },
+        { address=0XEFC23, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] [Knights Stats] Johann - Level" },
+        { address=0XEFC3B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] [Knights Stats] Bonn - Level" },
+        { address=0XEFC53, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] [Knights Stats] Moira - Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XEDA39, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="Damage Rate" },
+        { address=0XEDA40, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="Damage Calculations" },
+        { address=0XEDA43, type="u8", condition="bit_true", bit=5, mask=0X20, action="HIT", no_log=false, no_survey=false, desc="Damage Rate" },
+        { address=0XEE96C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32bit] Damage Dealt in current turn" },
+        { address=0XEE970, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32bit] Total Damage Dealt in battle" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XED9AA, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16bit] Inventory - Number of Weapons Possesed" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XEDA39, type="u8", condition="bit_true", bit=1, mask=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Experience Points" },
+        { address=0XEE97C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Exp points earned in turn" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XEDA3A, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Stages" },
+        { address=0XEDA46, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battles" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XEDA37, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objects" },
+        { address=0XEDA37, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroying Objects" },
+        { address=0XEDA3D, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Breaking Objects" },
+        { address=0XEDA43, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object Revival" },
+      },
+    },
+  },
+}

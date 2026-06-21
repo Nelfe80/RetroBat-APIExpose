@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "The Nekomura no Hitobito",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-nekomura-no-hitobito",
+    file = "the-nekomura-no-hitobito.zip",
+    hashes = {
+      { hash = "60a29232ebdb73e43cce05ad370d5b74", label = "Simple 2000 Series Vol. 116 - The Neko-mura no Hitobito - Pug Daikan no Akugyou Zanmai (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X167DC8F, type="u16be", condition="eq", value=0X4C45, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X167DC8F, type="u16be", condition="eq", value=0X524F, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+      events = {
+        { address=0X550430, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hair Crab Combo Platter In Catalog (16-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1FEDFC, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level starting" },
+        { address=0X5502C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Unlocked (Bit0)" },
+        { address=0X5502C9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Unlocked (Bit0)" },
+        { address=0X5502CA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 Unlocked (Bit0)" },
+        { address=0X5502CB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 Unlocked (Bit0)" },
+        { address=0X5502CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 Unlocked (Bit0)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X550364, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shark Soldier Kills (32-bit)" },
+        { address=0X550368, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shark Soldier Drop 1 (Bit0)" },
+        { address=0X550369, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shark Soldier Drop 2 (Bit0)" },
+        { address=0X55036A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shark Soldier Drop 3 (Bit0)" },
+      },
+      health = {
+        { address=0X553A54, type="u16le", condition="eq", value=0XC8, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0X553A54, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player HP (16-bit)" },
+        { address=0X5542D4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cat 1 HP (16-bit) decreased" },
+        { address=0X5542D4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cat 1 HP (16-bit) increased" },
+        { address=0X117BF08, type="u16le", condition="eq", value=0X12C, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full HP (Easy)" },
+        { address=0X117BF08, type="u16le", condition="eq", value=0X190, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full HP (Normal)" },
+        { address=0X117BF08, type="u16le", condition="eq", value=0X1F4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full HP (Hard)" },
+        { address=0X117BF08, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Pug HP (16-bit)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X55033C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Tanuki Kills (32-bit) increased" },
+        { address=0X550340, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Tanuki Drop 1 (Bit0) increased" },
+        { address=0X550340, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Gold Tanuki Drop 1 (Bit0) empty" },
+        { address=0X550341, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Tanuki Drop 2 (Bit0) increased" },
+        { address=0X550341, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Gold Tanuki Drop 2 (Bit0) empty" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X55034C, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Monkey Kills (32-bit)" },
+        { address=0X550350, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Monkey Drop 1 (Bit0)" },
+        { address=0X550351, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Monkey Drop 2 (Bit0)" },
+        { address=0X550352, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Monkey Drop 3 (Bit0)" },
+        { address=0X55039C, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Oni Kills (32-bit)" },
+        { address=0X5508B1, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Everfrost Village - Boss Defeated (Bit0)" },
+        { address=0X5DDD37, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1 Boss Enemies Remaining (8-bit ASCII)" },
+        { address=0X167DC8F, type="u16be", condition="eq", value=0X3130, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 (peach)" },
+        { address=0X167DC8F, type="u16be", condition="eq", value=0X552E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pug (normal visits and the last boss both load the same file)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X550512, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Machine Cataloged (16-bit)" },
+        { address=0X55087E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Everfrost Village - Cat Behind Door (Bit0)" },
+        { address=0X550882, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Fishy Castle - Cat Behind 5 Key Door (Bit0)" },
+        { address=0X5508AA, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Everfrost Village - Key Door (Bit0)" },
+      },
+    },
+  },
+}

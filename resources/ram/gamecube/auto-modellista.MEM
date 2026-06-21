@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Auto Modellista",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "auto-modellista",
+    file = "auto-modellista.zip",
+    hashes = {
+      { hash = "614fd0c4c641519e3e5080f593da7ae4", label = "Auto Modellista (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1B3036, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Race Levels Unlocked" },
+        { address=0X1B3037, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Upper 4] Level 1 Cleared" },
+        { address=0X1B3038, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Upper 4] Level 2 Cleared" },
+        { address=0X1B3039, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Upper 4] Level 3 Cleared" },
+        { address=0X1B303A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Upper 4] Level 4 Cleared" },
+        { address=0X1B303B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Upper 4] Level 5 Cleared" },
+        { address=0X1B303C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Upper 4] Level 6 Cleared" },
+        { address=0X1B303D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Upper 4] Level 7 Cleared" },
+        { address=0X1B304C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 1 - Ura Rokko Downhill Challenge Cup" },
+        { address=0X1B304D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 1 - Freshman's Challenge Cup 1" },
+        { address=0X1B304E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 1 - Loop Highway Challenge Cup" },
+        { address=0X1B304F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 2 - Akagi Downhill Challenge Cup" },
+        { address=0X1B3050, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 2 - Freshman's Challenge Cup 2" },
+        { address=0X1B3051, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 2 - Urban Challenge Cup I" },
+        { address=0X1B3052, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 2 - Rainy Street Challenge Cup 1" },
+        { address=0X1B3053, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 3 - Ura Rokko Hill Climb Challenge Cup" },
+        { address=0X1B3054, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 3 - Akagi Hillclimb Challenge Cup" },
+        { address=0X1B3055, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 3 - Loop Highway Challenge Cup 2" },
+        { address=0X1B3056, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 3 - Urban Challenge Cup II" },
+        { address=0X1B3057, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 3 - Rainy Street Challenge Cup 2" },
+        { address=0X1B3058, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 4 - Ura Rokko Masters Cup" },
+        { address=0X1B3059, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 4 - Akagi Masters Cup" },
+        { address=0X1B305A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 4 - Urban Masters Cup" },
+        { address=0X1B305B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 4 - Rainy Street Masters Cup" },
+        { address=0X1B305C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 4 - Loop Highway Masters Cup" },
+        { address=0X1B305D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 5 - Urban Championship" },
+        { address=0X1B305E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 5 - Mountain Championship" },
+        { address=0X1B305F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitflags] Level 6 - Auto Modellista Championship" },
+        { address=0X210C2F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X210C2F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X210C2F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X210C2F, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Expert" },
+        { address=0X210C2F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Arcade CPU Level" },
+        { address=0XBDFC49, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Career Mode - Current Selected Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X210D00, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit BE] Time Attack Record Time" },
+      },
+    },
+  },
+}

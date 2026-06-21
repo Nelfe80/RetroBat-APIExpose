@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Poptropica Adventures",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "poptropica-adventures",
+    file = "poptropica-adventures.zip",
+    hashes = {
+      { hash = "d32dffdd8650e745cfd3cc0a024df4bb", label = "Poptropica Adventures (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3CF200, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X14399E, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Displayed" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X143990, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No" },
+        { address=0X143990, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Displayed" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3CF1CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Catch/Dodge Score" },
+        { address=0X3CF26C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Maze Arcade - Score" },
+        { address=0X3CF270, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Arcade Machine - Puzzle score" },
+        { address=0X3CF284, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Jump & Race Arcade Score" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X14398F, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Displayed" },
+        { address=0X3CF260, type="u16le", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Lost" },
+      },
+    },
+  },
+}

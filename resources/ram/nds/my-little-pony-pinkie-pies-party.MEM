@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "My Little Pony: Pinkie Pie's Party",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "my-little-pony-pinkie-pies-party",
+    file = "my-little-pony-pinkie-pies-party.zip",
+    hashes = {
+      { hash = "95ecf773dee1f353e227dc7d7fd69ebd", label = "My Little Pony - Pinkie Pie's Party (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15C114, type="u16le", condition="eq", value=0X3B30, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Music" },
+        { address=0X15C114, type="u16le", condition="eq", value=0X3B90, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Menu/Credits Music" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1E9618, type="u32le", condition="eq", value=0X329C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Neutral" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XC574, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Talking to another pony" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XEF3C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cup" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF020, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sparkling object" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF104, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Party Streamer" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF278, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pinwheel" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF440, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ladybug" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF524, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pink flower" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF608, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Yellow Flower" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF6EC, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cupcake" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF7D0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cookies" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF970, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Clock ringing (Pinkie's House)" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF980, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Clock ringing (Pinkie's House)" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XF98C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Clock ringing (Pinkie's House)" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XFA8C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Caterpillar" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XFCF0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Butterfly" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XFE00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Whipped Cream" },
+        { address=0X1E9618, type="u32le", condition="eq", value=0XFF8C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Balloon" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E9618, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Interactable Objects - Animations when tapped on" },
+      },
+    },
+  },
+}

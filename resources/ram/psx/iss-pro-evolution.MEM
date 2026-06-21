@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "ISS Pro Evolution",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "iss-pro-evolution",
+    file = "iss-pro-evolution.zip",
+    hashes = {
+      { hash = "dc217a01c1c22795d45fb7cc2a565ee0", label = "ISS Pro Evolution (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X73DF3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="exhibition match, p1 shots on goal" },
+        { address=0X73DF4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="exhibition match, p2 (opponent) shots on goal" },
+        { address=0X73E03, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="exhibition match, p1 goals" },
+        { address=0X73E04, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="exhibition match, p2 (opponent) goals" },
+        { address=0XB876F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="match mode > exhibition match > weather (clear, rainy)" },
+        { address=0XB8771, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="match mode > exhibition match > level (easy, normal, hard)" },
+        { address=0XB8774, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="match mode > exhibition match > golden goal (no, yes)" },
+        { address=0XF2179, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="cup tournament format (tournament, round robin)" },
+        { address=0XF217C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="cup level (easy, normal, hard)" },
+      },
+    },
+  },
+}

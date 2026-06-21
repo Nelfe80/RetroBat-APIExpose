@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Black Magic",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "black-magic",
+    file = "black-magic.zip",
+    hashes = {
+      { hash = "57ce0a35c7580cc964368da2887b878e", label = "Black Magic.woz" },
+      { hash = "b2f2706629fbf84b980659d6535ced33", label = "Black Magic (1987)(Datasoft).dsk" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0089, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (display) decreased" },
+        { address=0X0089, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (display) increased" },
+        { address=0X00E5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health, actual decreased" },
+        { address=0X00E5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health, actual increased" },
+      },
+    },
+  },
+}

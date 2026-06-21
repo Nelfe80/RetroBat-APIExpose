@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Stratego - Next Edition",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "stratego-next-edition",
+    file = "stratego-next-edition.zip",
+    hashes = {
+      { hash = "f163f03897cb08b1f9287d049d3b5262", label = "Stratego - Next Edition (Europe) (En,Fr,De,Es,Nl).nds" },
+    }
+  },
+
+  events = {
+  },
+}

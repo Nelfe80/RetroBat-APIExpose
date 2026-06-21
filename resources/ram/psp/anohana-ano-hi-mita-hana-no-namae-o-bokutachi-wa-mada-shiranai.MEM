@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Anohana: Ano Hi Mita Hana no Namae o Bokutachi wa Mada Shiranai.",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "anohana-ano-hi-mita-hana-no-namae-o-bokutachi-wa-mada-shiranai",
+    file = "anohana-ano-hi-mita-hana-no-namae-o-bokutachi-wa-mada-shiranai.zip",
+    hashes = {
+      { hash = "d66afdebbed65655edd88fd29a8d607b", label = "Anohana - Ano Hi Mita Hana no Namae o Bokutachi wa Mada Shiranai. (Japan).iso" },
+    }
+  },
+
+  events = {
+  },
+}

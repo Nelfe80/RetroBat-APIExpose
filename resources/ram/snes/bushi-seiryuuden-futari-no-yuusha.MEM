@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Bushi Seiryuuden: Futari no Yuusha",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "bushi-seiryuuden-futari-no-yuusha",
+    file = "bushi-seiryuuden-futari-no-yuusha.zip",
+    hashes = {
+      { hash = "426aa798ebae52cde625ca533698949c", label = "Bushi Seiryuuden - Futari no Yuusha (Japan) (En) (v2.0) (DDSTranslation).sfc" },
+      { hash = "672d15e2200a5ca176233fcb10139e92", label = "Bushi Seiryuuden - Futari no Yuusha (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15F05, type="u8", condition="eq", value=0X12, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF4F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XF52A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Woku Level" },
+        { address=0XF74F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[7 bytes] Underworld Battle Records" },
+        { address=0X15F05, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="overworld" },
+      },
+      zone = {
+        { address=0XF4E2, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF4F2, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0XF4F2, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0XF4F4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max Life increased" },
+        { address=0XF4F4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max Life decreased" },
+        { address=0XF524, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Woku Life increased" },
+        { address=0XF524, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Woku Life decreased" },
+        { address=0XF526, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Woku Max Life increased" },
+        { address=0XF526, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Woku Max Life decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XF58E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Slot_" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0303, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 HP" },
+        { address=0X0305, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Max HP" },
+        { address=0X04E3, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 HP" },
+        { address=0X04E5, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 Max HP" },
+        { address=0X0543, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 HP" },
+        { address=0X0545, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Max HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF5F5, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Poles destroyed" },
+      },
+    },
+  },
+}

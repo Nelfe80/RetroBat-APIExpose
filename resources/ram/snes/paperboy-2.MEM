@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Paperboy 2",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "paperboy-2",
+    file = "paperboy-2.zip",
+    hashes = {
+      { hash = "55112a9e516a1d74eb4f446588616c85", label = "Paperboy 2 (USA).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0DA0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0DA0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+  },
+}

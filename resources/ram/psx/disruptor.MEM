@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Disruptor",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "disruptor",
+    file = "disruptor.zip",
+    hashes = {
+      { hash = "13d1301bf01065b8cc584a4b42982de7", label = "Disruptor (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7145C, type="u32le", condition="eq", value=0X4, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X77633, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hang out in the level and play" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X77660, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="32-bit Health decreased" },
+        { address=0X77660, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="32-bit Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X5725C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Start of in game text for weapon names." },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X77668, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="32-bit Psycho Power 'Ammo'" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7146C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="32-bit" },
+        { address=0X77664, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="32-bit Maximum Health" },
+      },
+    },
+  },
+}

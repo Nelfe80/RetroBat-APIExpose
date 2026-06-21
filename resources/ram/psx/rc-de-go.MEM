@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "RC de Go!",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "rc-de-go",
+    file = "rc-de-go.zip",
+    hashes = {
+      { hash = "c74bb723c5e7586fdfcf4614123c1955", label = "RC de Go! (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAB6D0, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0XAB838, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Splash Screen - Intro Video" },
+        { address=0XAB838, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XAB838, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="RC de GO!" },
+        { address=0XAB846, type="u16le", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XAB934, type="u16le", condition="eq", value=0X0C, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over!" },
+        { address=0XB9B2C, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32 Bit] Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAB864, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Only on this screen, other than that, it's 0x00" },
+        { address=0XAB8EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Total Result Level" },
+        { address=0XAB904, type="u16le", condition="eq", value=0X00, action="LEVEL_BEGINNER", no_log=false, no_survey=false, desc="Beginner" },
+        { address=0XAB904, type="u16le", condition="eq", value=0X01, action="LEVEL_NORMAL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0XAB904, type="u16le", condition="eq", value=0X02, action="LEVEL_EXPERT", no_log=false, no_survey=false, desc="Expert" },
+        { address=0XAB904, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Level Select" },
+        { address=0XAB966, type="u16le", condition="eq", value=0X00, action="LEVEL_BEGINNER", no_log=false, no_survey=false, desc="Beginner" },
+        { address=0XAB966, type="u16le", condition="eq", value=0X01, action="LEVEL_NORMAL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0XAB966, type="u16le", condition="eq", value=0X02, action="LEVEL_EXPERT", no_log=false, no_survey=false, desc="Expert" },
+        { address=0XAB966, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Level Select (It also increases when you upgrade your car)" },
+        { address=0XAB976, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Current Round" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XDBE4D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8 Bit] Practice - Points" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAB954, type="u16le", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Speed R/C Racing Circuit" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAB890, type="u8", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Mode" },
+        { address=0XAB890, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Game Mode" },
+        { address=0XAB8C8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Total Time Course" },
+        { address=0XAB8CC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit BCD] Total Time Course" },
+        { address=0XAB8FD, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0XAB8FD, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Free Run" },
+        { address=0XAB8FD, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Time Attack Mode" },
+        { address=0XAB90C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Time Over" },
+        { address=0XAB9C8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Current Lap Timer" },
+        { address=0XAB9D6, type="u16le", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sky Float Park" },
+        { address=0XAB9D6, type="u16le", condition="eq", value=0X05, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Night Skyscraper" },
+        { address=0XAB9D6, type="u16le", condition="eq", value=0X06, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="RC Circuit" },
+        { address=0XAB9D6, type="u16le", condition="eq", value=0X07, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Freighter Harbor" },
+        { address=0XAB9D6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Time Attack Selected Course" },
+        { address=0XABA4C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Race Timer" },
+        { address=0XABDE0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Practice Timer" },
+      },
+    },
+  },
+}

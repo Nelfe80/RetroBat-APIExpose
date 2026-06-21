@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Killer7",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Puzzle, Shooter"
+  },
+
+  rom = {
+    name = "killer7",
+    file = "killer7.zip",
+    hashes = {
+      { hash = "1d50ff73e97c412936457902fc3725fe", label = "Killer7 (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

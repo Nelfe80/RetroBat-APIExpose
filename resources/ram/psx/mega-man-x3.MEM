@@ -1,0 +1,122 @@
+return {
+  game = {
+    title = "Mega Man X3",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "mega-man-x3",
+    file = "mega-man-x3.zip",
+    hashes = {
+      { hash = "766a09b9ba8aa91aa1ee70e3ec227f19", label = "Mega Man X3 (Europe) (PAL to NTSC) (v1.0) (Sakitoshi)" },
+      { hash = "cb94b8cf85ea70a9c14cb6125acd7cde", label = "Mega Man X3 (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD86F5, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XD873E, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Beat the First Stage" },
+        { address=0XD873E, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Beat the Second Stage" },
+        { address=0XD873E, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Beat the third Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD8743, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XD8743, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XD9066, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+      health = {
+        { address=0XD8528, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health Sprite decreased" },
+        { address=0XD8528, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health Sprite increased" },
+        { address=0XD8746, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="yes but don't have extra hp" },
+        { address=0XD8747, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="yes but don't have extra hp" },
+        { address=0XD8748, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="yes but don't have extra hp" },
+        { address=0XD8749, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="yes but don't have extra hp" },
+        { address=0XD9091, type="u8", condition="eq", value=0XA0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max (full hearts)" },
+        { address=0XD9091, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Health" },
+        { address=0XD9D31, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 1 decreased" },
+        { address=0XD9D31, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 1 increased" },
+        { address=0XD9DA1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 2 decreased" },
+        { address=0XD9DA1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 2 increased" },
+        { address=0XD9E11, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 3 decreased" },
+        { address=0XD9E11, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 3 increased" },
+        { address=0XD9E81, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 4 decreased" },
+        { address=0XD9E81, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 4 increased" },
+        { address=0XD9EF1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 5 decreased" },
+        { address=0XD9EF1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 5 increased" },
+        { address=0XD9F61, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 6 decreased" },
+        { address=0XD9F61, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 6 increased" },
+        { address=0XD9FD1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 7 decreased" },
+        { address=0XD9FD1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 7 increased" },
+        { address=0XDA041, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 8 decreased" },
+        { address=0XDA041, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 8 increased" },
+        { address=0XDA0B1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 9 decreased" },
+        { address=0XDA0B1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 9 increased" },
+        { address=0XDA121, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Entity HP 10 decreased" },
+        { address=0XDA121, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Entity HP 10 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XD909B, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Buster" },
+        { address=0XD909B, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Acid B." },
+        { address=0XD909B, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="P. Bomb" },
+        { address=0XD909B, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Triad T." },
+        { address=0XD909B, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="S. Blade" },
+        { address=0XD909B, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ray S." },
+        { address=0XD909B, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="G. Well" },
+        { address=0XD909B, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Frost S." },
+        { address=0XD909B, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="T. Fang" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD874B, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Acid Bomb Ammo" },
+        { address=0XD874D, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Parasite Bomb Ammo" },
+        { address=0XD874F, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Triad T. Ammo" },
+        { address=0XD8751, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="S. Blade Ammo" },
+        { address=0XD8753, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ray S. Ammo" },
+        { address=0XD8759, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Tunnel Fang Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD86F4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Pode indicar boss sendo derrotado" },
+        { address=0XD8713, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Explosion = 7f" },
+        { address=0XD9D04, type="u8", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Explosion for a moment" },
+        { address=0XD9D44, type="u8", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss post-explosion" },
+        { address=0XD9D44, type="u8", condition="eq", value=0XFF, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Fully exploded; player gets control back" },
+        { address=0XF8FF6, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="6e boss defeated" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD8757, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Frost Shield Ammo" },
+        { address=0XD909A, type="u8", condition="eq", value=0X08, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility State" },
+        { address=0XD90E7, type="u8", condition="eq", value=0X08, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility state" },
+      },
+      player = {
+        { address=0XD8629, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0XD90A1, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0XD90A3, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD8711, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Snow Generator in blizzard buffalo destroyed" },
+        { address=0XD8767, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit is destroyed." },
+        { address=0XD8767, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Byte is destroyed." },
+        { address=0XD8767, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Vile destroyed in the factory level." },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Prince of Persia: The Forgotten Sands",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "prince-of-persia-the-forgotten-sands",
+    file = "prince-of-persia-the-forgotten-sands.zip",
+    hashes = {
+      { hash = "5b55ecc8470c8d50687bc86039bcbb42", label = "Prince of Persia - The Forgotten Sands (USA) (En,Fr,Es) (Rev 1)" },
+    }
+  },
+
+  events = {
+  },
+}

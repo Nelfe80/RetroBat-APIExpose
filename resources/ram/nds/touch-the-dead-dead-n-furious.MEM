@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Touch the Dead | Dead 'n' Furious",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Arcade, Shooter, first-person shooter"
+  },
+
+  rom = {
+    name = "touch-the-dead-dead-n-furious",
+    file = "touch-the-dead-dead-n-furious.zip",
+    hashes = {
+      { hash = "df49ac44ad6b6ae3ca7ae488b7c977b6", label = "Dead'n'Furious (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAF7E1, type="u8", condition="bit_true", bit=2, mask=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XAF7E0, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2 stage" },
+        { address=0XAF7E0, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3 stage (uncheck the bit 4)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAF7E6, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Left [16bit] (EU) increased" },
+        { address=0XAF7E6, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Left [16bit] (EU) decreased" },
+        { address=0XAFBA6, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Left [16bit] (USA) increased" },
+        { address=0XAFBA6, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Left [16bit] (USA) decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAF7DC, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Selected [32-bits] (EU)" },
+        { address=0XAF7EC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Crowbar - Weapon [8bit] (EU)" },
+        { address=0XAF7F4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Handgun - Weapon [8bit] (EU)" },
+        { address=0XAF7FC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun - Weapon [8bit] (EU)" },
+        { address=0XAF804, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="SMG - Weapon [8bit] (EU)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAF7F1, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Handgun - Ammo [8bit] (EU)" },
+        { address=0XAF7F9, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shotgun - Ammo [8bit] (EU)" },
+        { address=0XAF801, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="SMG - Ammo [8bit] (EU)" },
+        { address=0XAFBB1, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Left [8bit] (USA)" },
+      },
+    },
+  },
+}

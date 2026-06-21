@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Shin-chan: Aventuras en Cineland",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shin-chan-aventuras-en-cineland",
+    file = "shin-chan-aventuras-en-cineland.zip",
+    hashes = {
+      { hash = "0dbc85a954aba764a3bbae2e078d26f0", label = "Shin chan - Aventuras en Cineland (Spain).gba" },
+      { hash = "34d50b2e3fa34a53632f631b0605170a", label = "Shin chan - Aventuras en Cineland (Spain) (En) (v1.0) (LeonarthCG).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XAB1E, type="u8", condition="eq", value=0XC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="minigames" },
+        { address=0XAB1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XAB77, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels beaten 1-8" },
+        { address=0XAB78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels beaten 9-11...12?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB7C5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XB7C5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XB658, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy bonus from minigame decreased" },
+        { address=0XB658, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy bonus from minigame increased" },
+        { address=0XB81D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health mirror decreased" },
+        { address=0XB81D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health mirror increased" },
+        { address=0XBBD0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health mirror 2 decreased" },
+        { address=0XBBD0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health mirror 2 increased" },
+        { address=0X2FFEE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X2FFEE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB648, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) Current score" },
+        { address=0XBCE6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) Time Bonus score" },
+        { address=0XBCE8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) Energy Bonus Score" },
+        { address=0XBCEA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) Star score" },
+        { address=0XBCEC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) pack score" },
+        { address=0XBCEE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) TriPack score" },
+        { address=0XBCF0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) Total Score" },
+        { address=0XBCF2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) High score minigame" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X33E20, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated boss?" },
+        { address=0X33E26, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 HP" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XAB71, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Bit0 - Hiroshi Jump" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Medarot 3: Kuwagata Version",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "medarot-3-kuwagata-version",
+    file = "medarot-3-kuwagata-version.zip",
+    hashes = {
+      { hash = "dabfbdc9aba5f2edc21f884c52881e0d", label = "Medarot 3 - Kuwagata Version (Japan).gbc" },
+      { hash = "debaaabe98cfca4555b1f775d5ea35a2", label = "Medarot 3 - Kuwagata Version (Japan) (En) (v1.0) (Cash Medal Chameleon).gbc" },
+      { hash = "b378d40a74b79cfcc58984534c4ca25a", label = "Medarot 3 - Kuwagata Version (Japan) (En) (20250225) (Cash Medal Chameleon).gbc" },
+      { hash = "78e8483109e9c5ca67cbae6e4f33b20f", label = "Medarot 3 - Kuwagata Version (Japan) (En) (20250714) (Cash Medal Chameleon).gbc" },
+      { hash = "67d2e09c73913a919285177e23c61b52", label = "Medarot 3 - Kuwagata Version (Japan) (En) (20260228) (Cash Medal Chamaleon).gbc" },
+      { hash = "497e4cc5b0064617965aa70ab6d22d4d", label = "Medarot 3 - Kuwagata Version (Japan) (En-Us) (20260228) (Cash Medal Chamaleon).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

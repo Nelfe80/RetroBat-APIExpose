@@ -1,0 +1,141 @@
+return {
+  game = {
+    title = "The Munchables",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "the-munchables",
+    file = "the-munchables.zip",
+    hashes = {
+      { hash = "df20d7ce18b7eea04b0d5ebfa25073ac", label = "Munchables, The (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X584F3C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause flag" },
+        { address=0X58DCB0, type="u32be", condition="eq", value=0X15, action="GAME_PLAYING", no_log=false, no_survey=false, desc="level" },
+        { address=0X58DCB0, type="u32be", condition="eq", value=0X16, action="GAME_PLAYING", no_log=false, no_survey=false, desc="tutorial level until stuffed" },
+        { address=0X66F784, type="u32be", condition="eq", value=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen (save protection)" },
+      },
+      events = {
+        { address=0X6C39C4, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32-bit BE] Current Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X584EE4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear - I'm Stuffed" },
+        { address=0X584F10, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Total Max accorn current level" },
+        { address=0X584F14, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] accorns in level when entered" },
+      },
+      zone = {
+        { address=0X58DAF1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[ASCII] 50 bytes Current world (with space between bytes)" },
+        { address=0X10F1B321, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 - Star Ving Village Accorn flags 10 bytes" },
+        { address=0X10F1B351, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 - Star Ving Plains Accorn flags 20 bytes" },
+        { address=0X10F1B381, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 - Vs Brocco-Lee Accorn flags 5 bytes" },
+        { address=0X10F1B441, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="10 bytes array - World 6-1 Accorn flags" },
+        { address=0X10F1B471, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="20 bytes array - World 6-2 Accorn flags" },
+        { address=0X10F1B4A1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="5 bytes array - World 6-3 Accorn flags" },
+        { address=0X10F1B561, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="10 bytes array - World 3-1 Accorn flags" },
+        { address=0X10F1B591, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="20 bytes array - World 3-2 Accorn flags" },
+        { address=0X10F1B5C1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="5 bytes array - World 3-3 Accorn flags" },
+        { address=0X10F1B681, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="10 bytes array - World 4-1 Accorn flags" },
+        { address=0X10F1B6B1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="20 bytes array - World 4-2 Accorn flags" },
+        { address=0X10F1B6E1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="5 bytes array - World 4-3 Accorn flags" },
+        { address=0X10F1B7A1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="10 bytes array - World 5-1 Accorn flags" },
+        { address=0X10F1B7D1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="20 bytes array - World 5-2 Accorn flags" },
+        { address=0X10F1B801, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="5 bytes array - World 5-3 Accorn flags 5 bytes" },
+        { address=0X10F1B8C1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2-1 Accorn flags 10 bytes" },
+        { address=0X10F1B8F1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2-2 Accorn flags 20 bytes" },
+        { address=0X10F1B921, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="5 bytes array - World 2-3 Accorn flags 5 bytes" },
+        { address=0X10F1B9E1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 7-1 Accorn flags 10 bytes" },
+        { address=0X10F1BA11, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 7-2 Accorn flags 20 bytes" },
+        { address=0X10F1BA41, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="5 bytes array - World 7-3 Accorn flags 5 bytes" },
+        { address=0X10F1BB01, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 8-1 Accorn flags 10 bytes" },
+        { address=0X10F1BB31, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 8-2 Accorn flags 20 bytes" },
+        { address=0X10F1BB61, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="5 bytes array - World 8-3 Accorn flags" },
+      },
+      stage = {
+        { address=0X58DA71, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[ASCII] 50 bytes Current stage (with space between bytes)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X57E892, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Muncher animations decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X57E892, type="u16be", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="not moving" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="moving" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="game over" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X3D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="hurt from fire-elements" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="vacuumn Mode!" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X12, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="power up ending" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X27, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="end of dash attack" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X30, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="obtaining power up" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X62, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="start of dash attack" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X64, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="hurt" },
+        { address=0X57E892, type="u16be", condition="eq", value=0X65, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="final phase of vacuum mode" },
+        { address=0X60DD1A, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Vaccum" },
+        { address=0X60DD1A, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Quake" },
+        { address=0X60DD1A, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Speed" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X584F18, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] last level orbs score" },
+        { address=0X10F1B33C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] World 1 - Star Ving Village score" },
+        { address=0X10F1B36C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] World 1 - Star Ving Plains score" },
+        { address=0X10F1B39C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] World 1 - Vs Brocco-Lee score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X57E892, type="u16be", condition="eq", value=0X3D, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into hurt from fire-elements" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X584F00, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-bit BE] Current Objective value" },
+        { address=0X584F04, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-bit BE] Current Objective Total" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X584F24, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Current level timer" },
+        { address=0X10F1B31B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W1-1 number of times cleared" },
+        { address=0X10F1B34B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W1-2 number of times cleared" },
+        { address=0X10F1B37B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W1-3 number of times cleared" },
+        { address=0X10F1B3AB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W1-1 Mirrored number of times cleared" },
+        { address=0X10F1B3DB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W1-2 Mirrored number of times cleared" },
+        { address=0X10F1B40B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W1-3 Mirrored number of times cleared" },
+        { address=0X10F1B43B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W6-1 number of times cleared" },
+        { address=0X10F1B46B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W6-2 number of times cleared" },
+        { address=0X10F1B49B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W6-3 number of times cleared" },
+        { address=0X10F1B55B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W3-1 number of times cleared" },
+        { address=0X10F1B58B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W3-2 number of times cleared" },
+        { address=0X10F1B5BB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W3-3 number of times cleared" },
+        { address=0X10F1B67B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W4-1 number of times cleared" },
+        { address=0X10F1B6AB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W4-2 number of times cleared" },
+        { address=0X10F1B6DB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W4-3 number of times cleared" },
+        { address=0X10F1B79B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W5-1 number of times cleared" },
+        { address=0X10F1B7CB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W5-2 number of times cleared" },
+        { address=0X10F1B7FB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W5-3 number of times cleared" },
+        { address=0X10F1B8BB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W2-1 number of times cleared" },
+        { address=0X10F1B8EB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W2-2 number of times cleared" },
+        { address=0X10F1B91B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W2-3 number of times cleared" },
+        { address=0X10F1B9DB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W7-1 number of times cleared" },
+        { address=0X10F1BA0B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W7-2 number of times cleared" },
+        { address=0X10F1BA3B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W7-3 number of times cleared" },
+        { address=0X10F1BAFB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W8-1 number of times cleared" },
+        { address=0X10F1BB2B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W8-2 number of times cleared" },
+        { address=0X10F1BB5B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="W8-3 number of times cleared" },
+      },
+    },
+  },
+}

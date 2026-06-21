@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Godzilla",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "godzilla",
+    file = "godzilla.zip",
+    hashes = {
+      { hash = "7cb825305140bd57e6475ac54711c4f0", label = "godzilla.7z <Godzilla (Japan)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8440, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (8-bit)" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XADE8, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0XADE8, type="u16le", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7" },
+        { address=0XADE8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (16-bit)" },
+        { address=0XAE58, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Vs P2 Won Rounds (16-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAE54, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Story Lives / Vs Mode P1 Won Rounds (16-bit) increased" },
+        { address=0XAE54, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Story Lives / Vs Mode P1 Won Rounds (16-bit) decreased" },
+      },
+      health = {
+        { address=0XB048, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health (16-bit) decreased" },
+        { address=0XB048, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health (16-bit) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB148, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="P2/Boss Health (16-bit)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Stonekeep",
+    system = "dos",
+    system_name = "DOS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "stonekeep",
+    file = "stonekeep.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X592618, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruins of Stonekeep 1st Level Map Explored" },
+        { address=0X59262D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruins of Stonekeep 1st Level Map Explored" },
+        { address=0X592642, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruins of Stonekeep 1st Level Map Explored" },
+        { address=0X592657, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruins of Stonekeep 1st Level Map Explored" },
+        { address=0X5B7196, type="u8", condition="eq", value=0X64, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X5B7196, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stonekeep Level 1 Orc Health" },
+        { address=0X5D9149, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stregnth Level" },
+        { address=0X5D914D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strength Experience To Next Level" },
+        { address=0X5D9155, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Agility Level" },
+        { address=0X5D9159, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Agility Experience To Next Level" },
+        { address=0X5D9161, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Health Level" },
+        { address=0X5D9165, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Health Experience To Next Level" },
+        { address=0X5D9171, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Misile Level" },
+        { address=0X5D9175, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Missile Experience To Next Level" },
+        { address=0X5D9177, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Axe Level" },
+        { address=0X5D917B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Axe Experience To Next Level" },
+        { address=0X5D917D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Brawl Level" },
+        { address=0X5D9181, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Brawl Experience To Next Level" },
+        { address=0X5D9183, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dagger Level" },
+        { address=0X5D9187, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dagger Experience To Next Level" },
+        { address=0X5D9189, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hammer Level" },
+        { address=0X5D918D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hammer Experience To Next Level" },
+        { address=0X5D918F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Polearm Level" },
+        { address=0X5D9193, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Polearm Experience To Next Level" },
+        { address=0X5D9195, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sword Level" },
+        { address=0X5D9199, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sword Experience To Next Level" },
+        { address=0X5D919B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shield Level" },
+        { address=0X5D919F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shield Experience To Next Level" },
+        { address=0X5D91A1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stealth Level" },
+        { address=0X5D91A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stealth Experience To Next Level" },
+        { address=0X5D91A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magick Level" },
+        { address=0X5D91AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magick Experience To Next Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5B6F74, type="u8", condition="eq", value=0X64, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X5B6F74, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Entrance to Stonekeep Ant Health" },
+        { address=0X5D9163, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Experience decreased" },
+        { address=0X5D9163, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Experience increased" },
+        { address=0X5D916D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (Vitality) decreased" },
+        { address=0X5D916D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (Vitality) increased" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X23, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Healthy Potion" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X3B, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Healthy Potion" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X61, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Healthy Potion" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X64, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Healthy Potion" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X68, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Healthy Potion" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X7A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Healthy Potion" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X87, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Coin" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0XC9, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Coin" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X5D919D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Experience" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X81, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Small Wooden Shield" },
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X83, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Metal Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5DB4E4, type="u32le", condition="eq", value=0X72, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Sword" },
+      },
+    },
+  },
+}

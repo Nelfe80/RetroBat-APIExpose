@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ranma ½: Byakuran Aika",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ranma-12-byakuran-aika",
+    file = "ranma-12-byakuran-aika.zip",
+    hashes = {
+      { hash = "2b2e58c6d389fc0fb3de9ed1048152fc", label = "Ranma 1-2 - Byakuranaika (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

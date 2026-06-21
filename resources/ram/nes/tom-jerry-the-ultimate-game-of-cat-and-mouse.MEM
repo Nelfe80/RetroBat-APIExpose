@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Tom & Jerry: The Ultimate Game of Cat and Mouse!",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "tom-jerry-the-ultimate-game-of-cat-and-mouse",
+    file = "tom-jerry-the-ultimate-game-of-cat-and-mouse.zip",
+    hashes = {
+      { hash = "716dd6985bc80a3c547cc84b2c8d75e4", label = "Tom & Jerry - The Ultimate Game of Cat and Mouse! (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0022, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Seems to be Level Codes. 0000 Title, 0504 Level 1 0706 Level 2 etc" },
+        { address=0X049E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X0683, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 4 Tom Health" },
+      },
+      stage = {
+        { address=0X0461, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Section, starts at 00, usually goes to e8 but is not the same for every Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X015A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="This becomes FF when user inputs infinite-lives code increased" },
+        { address=0X015A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="This becomes FF when user inputs infinite-lives code decreased" },
+        { address=0X04A2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Lives increased" },
+        { address=0X04A2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Lives decreased" },
+      },
+      health = {
+        { address=0X046A, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="0x05 = Fall Damage Animation" },
+        { address=0X047C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Invincibility Seconds, 2 for damage, 11 for INK powerup" },
+        { address=0X04A3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X04A3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X0688, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fireplace Tom Health decreased" },
+        { address=0X0688, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fireplace Tom Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X04D9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ff becomes 06 with giant-ball weapon" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0682, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy Health, also Boss Health" },
+        { address=0X0686, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="First Boss Health" },
+      },
+    },
+  },
+}

@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Pachio-kun FX: Maboroshi no Shima Daisakusen",
+    system = "pcfx",
+    system_name = "PC-FX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pachio-kun-fx-maboroshi-no-shima-daisakusen",
+    file = "pachio-kun-fx-maboroshi-no-shima-daisakusen.zip",
+    hashes = {
+      { hash = "9c79291556d0b54a88c27420eced095a", label = "Pachio-kun FX - Maboroshi no Shima Daisakusen (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0061, type="u8", condition="eq", value=0X0E, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Character Select / Credits" },
+        { address=0X0061, type="u8", condition="eq", value=0X1F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X05BC, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32 Bit] Selection on Title Screen" },
+        { address=0X079E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Active | Ingame" },
+        { address=0XB9DF0, type="u16le", condition="eq", value=0X46, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBB9D0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Afternoon Park" },
+        { address=0XBB9D1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Peace Falbridge" },
+        { address=0XBB9D2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Lively Town" },
+        { address=0XBB9D3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Unite Museum" },
+        { address=0XBB9D4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Gentle Street" },
+        { address=0XBB9D5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Minimum China" },
+        { address=0XBB9D6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Cafe Harvest" },
+        { address=0XBB9D7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Mobius Chain Town" },
+        { address=0XBB9D8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Parlor Cleared | Invite Castle" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0598, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Display CPU Score" },
+        { address=0X0794, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] CPU Score" },
+        { address=0XBB9C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Total Score | Status" },
+      },
+    },
+  },
+}

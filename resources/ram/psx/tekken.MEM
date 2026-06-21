@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Tekken",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "tekken",
+    file = "tekken.zip",
+    hashes = {
+      { hash = "138a1ee7a95f5733fc6039723a170381", label = "Tekken (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB753C, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Character select" },
+        { address=0XB753C, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Fight" },
+        { address=0XB753C, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="ending" },
+        { address=0XB78DC, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="06 = continue screen ? freezes at 06" },
+        { address=0XB7914, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 = Demo" },
+        { address=0XB7E54, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="game over" },
+        { address=0XEDE90, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="YES" },
+      },
+      events = {
+        { address=0XB7C34, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="COMBO HITS" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X123134, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1P Rounds Won count" },
+        { address=0X124168, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU round won count" },
+        { address=0X12644C, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="infinite" },
+        { address=0X12644C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Time" },
+        { address=0X127344, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="easy" },
+        { address=0X127344, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="medium" },
+        { address=0X127344, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X127344, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Very hard" },
+        { address=0X127344, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ultra Hard" },
+        { address=0X127344, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level" },
+      },
+      stage = {
+        { address=0XB7B4C, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Acropolis" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Angkor Wat" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chicago" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fiji" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="King George Island" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kyoto" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stadium" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Monument Valley" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Szechwan" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Venezia" },
+        { address=0XB7B4C, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Windermere" },
+        { address=0XB7B4C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fight Stage" },
+        { address=0XE70C8, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Heihachi" },
+        { address=0XE70C8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage?" },
+        { address=0X127334, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final" },
+        { address=0X127334, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ending" },
+        { address=0X127334, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE ID" },
+        { address=0X1C0708, type="u8", condition="eq", value=0X1B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="last?" },
+        { address=0X1C0708, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="start" },
+        { address=0X1C0708, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="galaga stage?" },
+        { address=0X1C0710, type="u8", condition="eq", value=0X1F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="last?" },
+        { address=0X1C0710, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="galaga stage?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XB7DE4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P Health (On Screen) decreased" },
+        { address=0XB7DE4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P Health (On Screen) increased" },
+        { address=0XB7DE6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P Health (On Screen) decreased" },
+        { address=0XB7DE6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P Health (On Screen) increased" },
+        { address=0X1232DE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P Health decreased" },
+        { address=0X1232DE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P Health increased" },
+        { address=0X124312, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="CPU health decreased" },
+        { address=0X124312, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="CPU health increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XEDE39, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="40 = defense (block of CPU)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB78E4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Total rounds counter" },
+        { address=0XE5A60, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME STAGE 1 32 BIT" },
+        { address=0XE5A68, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME STAGE 2 32 BIT" },
+        { address=0XE5A70, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME STAGE 3 32 BIT" },
+        { address=0XE5A78, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME STAGE 4 32 BIT" },
+        { address=0XE5A80, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME STAGE 5 32 BIT" },
+        { address=0XE5A88, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME STAGE 6 32 BIT" },
+        { address=0XE5A90, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME STAGE 8 32 BIT" },
+        { address=0XE5A98, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME STAGE 8 32 BIT" },
+        { address=0XE5AA0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TOTAL IN GAME TIME FINAL STAGE 32 BIT" },
+      },
+    },
+  },
+}

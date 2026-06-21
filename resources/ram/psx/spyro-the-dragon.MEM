@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Spyro the Dragon (Japan)",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "spyro-the-dragon",
+    file = "spyro-the-dragon.zip",
+    hashes = {
+      { hash = "22ea62a64743559272479a3c4b99b2b1", label = "Spyro the Dragon (Japan)" },
+      { hash = "920f473f3a654af8a7d1970a4cc215af", label = "Spyro the Dragon (Japan, Asia) (Shokai Genteiban)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7F35C, type="u16le", condition="eq", value=0X01, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Level Transition" },
+        { address=0X7F35C, type="u16le", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Screen" },
+        { address=0X7F35C, type="u16le", condition="eq", value=0X0A, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Leaving Level" },
+        { address=0X7F35C, type="u16le", condition="eq", value=0X0D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X7F35C, type="u16le", condition="eq", value=0X0F, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X80BA8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of eggs collected in Artisans homeworld (J)" },
+        { address=0X80BC0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of eggs collected in Peace Keepers homeworld (J)" },
+        { address=0X80BD8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of eggs collected in Magic Crafters homeworld (J)" },
+        { address=0X80ED8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of dragons rescued in Artisans homeworld (J)" },
+        { address=0X80EF0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of dragons rescued in Peace Keppers homeworld (J)" },
+        { address=0X80F08, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of dragons rescued in Magic Crafters homeworld (J)" },
+        { address=0X80F20, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of dragons rescued in Beast Makers homeworld (J)" },
+        { address=0X80F38, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of dragons rescued in Dream Weavers homeworld (J)" },
+        { address=0X81020, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of gems collected in Artisans homeworld (J) [Artisans Home, 100 = max]" },
+        { address=0X81038, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of gems collected in Peace Keepers homeworld (J)" },
+        { address=0X81050, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of gems collected in Magic Crafters homeworld (J)" },
+        { address=0X81068, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of gems collected in Beast Makers homeworld (J)" },
+        { address=0X81080, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of gems collected in Dream Weavers homeworld (J)" },
+        { address=0X17C581, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bitflags for Artisans Homeworld Puzzle" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7F3C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (J) increased" },
+        { address=0X7F3C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (J) decreased" },
+        { address=0X7F480, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Balls for extra life (J) increased" },
+        { address=0X7F480, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Balls for extra life (J) decreased" },
+        { address=0X8183E, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="secret life container" },
+        { address=0X8183F, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="secret life container" },
+        { address=0X8183F, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="secret life container" },
+        { address=0X81B16, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="secret life container" },
+        { address=0X81DD0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives shown in screen (J) increased" },
+        { address=0X81DD0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives shown in screen (J) decreased" },
+        { address=0X81DE0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Balls for extra life shown in screen (J) increased" },
+        { address=0X81DE0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Balls for extra life shown in screen (J) decreased" },
+        { address=0XCAAFE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Toasty alive/dead (J)" },
+      },
+      health = {
+        { address=0X829FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spyro's health (J) decreased" },
+        { address=0X829FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spyro's health (J) increased" },
+      },
+    },
+  },
+}

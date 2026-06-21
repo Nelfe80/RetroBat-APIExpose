@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Team Umizoomi",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "team-umizoomi",
+    file = "team-umizoomi.zip",
+    hashes = {
+      { hash = "7dac6ee7983f4972f7ee73491d4cda47", label = "Nickelodeon Team - Umizoomi (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

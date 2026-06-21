@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Stitch: Experiment 626",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "stitch-experiment-626",
+    file = "stitch-experiment-626.zip",
+    hashes = {
+      { hash = "5fb9e8df849b17aa66a3b827d0975c88", label = "Disney's Stitch - Experiment 626 (USA)" },
+      { hash = "43ead76d710c9ec352c81db12a6c650f", label = "Disney's Stitch - Experiment 626 (Europe) (Fr,De)" },
+      { hash = "86cf46fb474cb200eb79d018cede99e4", label = "Disney's Stitch - Experiment 626 (Europe) (Es,Pt)" },
+      { hash = "3902a6a828c306e8004287a26af1f1b8", label = "Disney's Stitch - Experiment 626 (Europe) (It,Nl)" },
+      { hash = "1b58e1988ae37edad4bf360eb6d89b65", label = "Disney's Stitch - Experiment 626 (Europe) (En,Sv)" },
+      { hash = "1edbe6aeaf1ee209eb1691e77cc819de", label = "Disney's Lilo and Stitch - Stitch no Daibouken (Japan)" },
+      { hash = "be32e99addd023aeb6c65be71b1b6ee3", label = "Disney's Stitch - Experiment 626 (Korea)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X37886C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Complete Check" },
+        { address=0X378E6C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Fr,De] | [8 Bit] Level Complete Check" },
+        { address=0X378FEC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Es,Pt | It,Nl] | [8 Bit] Level Complete Check" },
+        { address=0X3798EC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[En,Sv] | [8 Bit] Level Complete Check" },
+        { address=0X37A36C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Ja] | [8 Bit] Level Complete Check" },
+        { address=0X37A46C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Ko] | [8 Bit] Level Complete Check" },
+        { address=0X37BDB1, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Fr,De] | [32 Bit BE] Level Selected Related ASCII" },
+        { address=0X37BF31, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Es,Pt | It,Nl] | [32 Bit BE] Level Selected Related ASCII" },
+        { address=0X37C831, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[En,Sv] | [32 Bit BE] Level Selected Related ASCII" },
+        { address=0X37D2B1, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Ja] | [32 Bit BE] Level Selected Related ASCII" },
+        { address=0X37D3B1, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Ko] | [32 Bit BE] Level Selected Related ASCII" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1FFEB50, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[USA] | [32 Bit Float] Player Health (Static) decreased" },
+        { address=0X1FFEB50, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[USA] | [32 Bit Float] Player Health (Static) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X37B7B1, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[USA] | [32 Bit BE] Level Selected Related ASCII increased" },
+      },
+    },
+  },
+}

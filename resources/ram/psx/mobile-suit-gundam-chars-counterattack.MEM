@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Mobile Suit Gundam: Char's Counterattack",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mobile-suit-gundam-chars-counterattack",
+    file = "mobile-suit-gundam-chars-counterattack.zip",
+    hashes = {
+      { hash = "360d4f0fdf753f1e5b2ddc58852c6a25", label = "Mobile Suit Gundam - Char's Counterattack (Asia)" },
+      { hash = "8b16a29e5523557689b9dc6a73c1721f", label = "Mobile Suit Gundam - Char's Counterattack (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X604B9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage Nb - Battle Mode" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1237CC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Health - Battle Mode decreased" },
+        { address=0X1237CC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P1 Health - Battle Mode increased" },
+        { address=0X123828, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Health - Story Mode decreased" },
+        { address=0X123828, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P1 Health - Story Mode increased" },
+        { address=0X1267E8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P2 Health - Battle Mode decreased" },
+        { address=0X1267E8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P2 Health - Battle Mode increased" },
+        { address=0X126844, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P2 Health - Story Mode decreased" },
+        { address=0X126844, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P2 Health - Story Mode increased" },
+      },
+    },
+  },
+}

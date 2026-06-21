@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Platinum Version [Subset - Shiny Pokémon]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-platinum-version-subset-shiny-pokemon",
+    file = "pokemon-platinum-version-subset-shiny-pokemon.zip",
+    hashes = {
+      { hash = "df8bea54b8fe5796dcf729b364a1fdab", label = "Pokemon - Platinum Version (USA) [Subset - Shiny Pokemon].nds" },
+    }
+  },
+
+  events = {
+  },
+}

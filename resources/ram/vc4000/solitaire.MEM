@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Solitaire",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "solitaire",
+    file = "solitaire.zip",
+    hashes = {
+      { hash = "0b76cfa96c0b39f7493c1683f3b44f3b", label = "Solitaire (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Puzzler World 2012",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzler-world-2012",
+    file = "puzzler-world-2012.zip",
+    hashes = {
+      { hash = "7c70a7667908e14c6396ab292f3cae00", label = "Puzzler World 2012 (Europe).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X87F48, type="u16le", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X88764, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8B998, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="File 1 - Dropzone Novice" },
+        { address=0X8B99C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="File 1 - Dropzone Expert" },
+        { address=0X8B9A0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="File 1 - Dropzone Dynamo" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X8B8D4, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="File 1 - Treasure Hunter" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X887B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Timer" },
+        { address=0X8BA20, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="File 1 - Hard Times Ahead" },
+        { address=0X8BA40, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times won the Puzzler" },
+      },
+    },
+  },
+}

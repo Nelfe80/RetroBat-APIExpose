@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Private Idol Disc Tokubetsu-hen: Cosplayers",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-tokubetsu-hen-cosplayers",
+    file = "private-idol-disc-tokubetsu-hen-cosplayers.zip",
+    hashes = {
+      { hash = "65f0adeb7e6b61d7c47bf01e77cdf13b", label = "Private Idol Disc - Tokubetsu-hen - Cosplayers (Japan) (2M)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X136F56, type="u8", condition="eq", value=0X10, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

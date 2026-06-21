@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "NCAA Football 07",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ncaa-football-07",
+    file = "ncaa-football-07.zip",
+    hashes = {
+      { hash = "47dd90945d53d2fd1a000fdcea471c26", label = "NCAA Football 07 (USA) (v2.00).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD4AC38, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode Address" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD824B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Home Team Score (All Modes)" },
+        { address=0XD824B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Away Team Score (All Modes)" },
+      },
+    },
+  },
+}

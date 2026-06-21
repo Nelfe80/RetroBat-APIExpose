@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "Kahen Soukou Gunbike: Speed Power Gunbike",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kahen-soukou-gunbike-speed-power-gunbike",
+    file = "kahen-soukou-gunbike-speed-power-gunbike.zip",
+    hashes = {
+      { hash = "9c9a7f81cb24adbb87b8cdd442733465", label = "Kahen Soukou Gunbike - Speed Power Gunbike (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7F3E4, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Sora ni Mukatte - second option (credits song)" },
+        { address=0X1C32D2, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not paused" },
+        { address=0X1C32D2, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+      events = {
+        { address=0X1AE215, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="2 Rush!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X04, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gun! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X05, action="COMBO_HIT", no_log=false, no_survey=false, desc="Ga! Ga! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X06, action="COMBO_HIT", no_log=false, no_survey=false, desc="Z! Gan!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X07, action="COMBO_HIT", no_log=false, no_survey=false, desc="Z! Ga! Gan!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="Z! Ga! Ga! Gan!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X09, action="COMBO_HIT", no_log=false, no_survey=false, desc="Do! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X0A, action="COMBO_HIT", no_log=false, no_survey=false, desc="Do! Ga! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X0B, action="COMBO_HIT", no_log=false, no_survey=false, desc="Do! Ga! Ga! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X0C, action="COMBO_HIT", no_log=false, no_survey=false, desc="Zuba! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X0D, action="COMBO_HIT", no_log=false, no_survey=false, desc="Zuba! Ga! Gun!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X0E, action="COMBO_HIT", no_log=false, no_survey=false, desc="Zuba! Ga! Ga! Gun!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X0F, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gogya! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X10, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gogya! Ga! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X11, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gogya! Ga! Ga! Gun!!" },
+        { address=0X1AE215, type="u8", condition="eq", value=0X12, action="COMBO_HIT", no_log=false, no_survey=false, desc="!?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1AEE04, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X1C5678, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X1C5A6E, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1 campaign cleared" },
+        { address=0X1C5A6E, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="2 campaigns cleared" },
+        { address=0X1C5A6E, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="3 campaigns cleared" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1AE21C, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Not using Gun Weapon" },
+        { address=0X1AE21C, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Using Gun Weapon" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC321C, type="u16le", condition="eq", value=0X00B8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+        { address=0XC9AA8, type="u16le", condition="eq", value=0X0064, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+        { address=0XCD908, type="u16le", condition="eq", value=0X00DC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+        { address=0XD0940, type="u16le", condition="eq", value=0X00E4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+        { address=0XD1A0C, type="u16le", condition="eq", value=0X00D8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+        { address=0XD357C, type="u16le", condition="eq", value=0X00F0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+        { address=0XD3EB8, type="u16le", condition="eq", value=0X00F8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+        { address=0XD4028, type="u16le", condition="eq", value=0X00F8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+        { address=0XD61B4, type="u16le", condition="eq", value=0X0200, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP value" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X199E68, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Not executing Invincible Gun Dash" },
+        { address=0X199E68, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Executing Invincible Gun Dash" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X19D3AE, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Meter" },
+        { address=0X19D3AE, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Compass" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1AE215, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Rush combo counter" },
+        { address=0X1B0E56, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Speed counter" },
+        { address=0X1C32A0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Results screen countdown" },
+      },
+    },
+  },
+}

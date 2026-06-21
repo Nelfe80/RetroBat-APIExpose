@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Bubsy II",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "bubsy-ii",
+    file = "bubsy-ii.zip",
+    hashes = {
+      { hash = "87352883152efc168d1950cc0bbc73ab", label = "Bubsy II (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0394, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused = 1" },
+        { address=0X0396, type="u8", condition="eq", value=0X05, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X03BB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+        { address=0X0436, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Not Right - Demo Mode = 1" },
+        { address=0X0438, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Num Diving Suits (Sets to 99 with cheat BLUB at title screen)" },
+        { address=0X1AF2, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="CHEAT: Invulnerability = 1 (At title screen, CABCUD)" },
+        { address=0X31B4, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Other Options" },
+        { address=0X31B4, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="1st floor" },
+        { address=0X31B4, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="2nd floor" },
+        { address=0X31B4, type="u8", condition="eq", value=0X3, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="3rd floor" },
+        { address=0X31B4, type="u8", condition="eq", value=0X4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Grand tour" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0396, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Hub" },
+        { address=0X0396, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Music, 08 = Egypt, 09 = Camelot, 0a = Aerial, 0b = Space" },
+        { address=0X0396, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID? Palette?" },
+        { address=0X04B2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Starts Duplicates of Level Completion(necessary to manually 'clear' a level)" },
+        { address=0X1992, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ANY Wing Floor 1 Completed, whether it's World Tour or not." },
+        { address=0X1994, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ANY Wing Floor 2 Completed, whether it's World Tour or not." },
+        { address=0X1996, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ANY Wing Floor 3 Completed, whether it's World Tour or not." },
+        { address=0X19AC, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-bit might be Level-ID?" },
+        { address=0X1B1A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-ID, although some levels are the same" },
+        { address=0X2DBF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="check for Level-ID" },
+        { address=0X33A0, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Could be Level-ID, maybe 16-bit, identical to 0x33ae" },
+      },
+      zone = {
+        { address=0X1990, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Either Floor 3 or World Tour -->" },
+        { address=0X1A7A, type="u16be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Series of 16-bit slots that become 0x0000 - 0x0003 while a level is active. Might be useful for" },
+      },
+      stage = {
+        { address=0X03A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Floor - Combine with Current-Wing and Current-Level-Type to know which exact level you'r" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X03C4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x01 Advances to next screen, but works on death or victory" },
+        { address=0X0400, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Num lives to display increased" },
+        { address=0X0400, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Num lives to display decreased" },
+        { address=0X0404, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Accurate Lives Counter (updates immediately) increased" },
+        { address=0X0404, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Accurate Lives Counter (updates immediately) decreased" },
+      },
+      health = {
+        { address=0X1B75, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X1B75, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0360, type="u8", condition="bit_true", bit=6, mask=0X40, action="SCORE_STATE", no_log=false, no_survey=false, desc="PlayForPoints/Time" },
+        { address=0X03FC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score, upper-16" },
+        { address=0X03FE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score, lower-16" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0396, type="u8", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+        { address=0X19A0, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Starting Floor Number - if this is different from 0x001990, you will advance one floor after def" },
+        { address=0X1AF4, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0x01 Indicates boss defeat, but stays active after going to next Hub world; can be used, but wit" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X305E, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump Bonus Multiplier" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0476, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="First of many Level Complete Flags;" },
+      },
+    },
+  },
+}

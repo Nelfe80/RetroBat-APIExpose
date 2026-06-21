@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Cocoto Kart Racer",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cocoto-kart-racer",
+    file = "cocoto-kart-racer.zip",
+    hashes = {
+      { hash = "2bc67cfff79e63e509e146a0cd3a0252", label = "Cocoto Kart Racer (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XE4890, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bit BE] Tournament Player 1 Total Points" },
+      },
+    },
+  },
+}

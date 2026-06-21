@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "WWF In Your House",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-in-your-house",
+    file = "wwf-in-your-house.zip",
+    hashes = {
+      { hash = "d01bc089be1e483df704b62bf444bd01", label = "WWF In Your House (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X130DE0, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bit] P1 Life increased" },
+        { address=0X130DE0, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bit] P1 Life decreased" },
+        { address=0X130E00, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bit] P2 Life increased" },
+        { address=0X130E00, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bit] P2 Life decreased" },
+        { address=0X130E08, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bit] P3 Life increased" },
+        { address=0X130E08, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bit] P3 Life decreased" },
+        { address=0X130E10, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bit] P4 Life increased" },
+        { address=0X130E10, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bit] P4 Life decreased" },
+      },
+    },
+  },
+}

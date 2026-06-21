@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Mr. Do!",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Maze"
+  },
+
+  rom = {
+    name = "mr-do",
+    file = "mr-do.zip",
+    hashes = {
+      { hash = "811b4a59b7163b53b663ce7a0209469a", label = "mrdo.7z <Mr. Do!>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0006, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X01A1, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Hide a Previusly Displayed Game ? (Including Demo)" },
+        { address=0X01A1, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Credits Available" },
+        { address=0X01A1, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode Active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X009B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 1" },
+        { address=0X009B, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 2" },
+        { address=0X009B, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 10" },
+        { address=0X009B, type="u8", condition="eq", value=0X11, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 11" },
+        { address=0X009B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Level" },
+        { address=0X00C7, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="<Not Cleared Yet>" },
+        { address=0X00C7, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Enemies Killed" },
+        { address=0X00C7, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Cherries Collected" },
+        { address=0X00C7, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Diamond Picked Up" },
+        { address=0X00C7, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Extra Mr.Do (from Letters)" },
+        { address=0X1883, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background color? 28 = muncher attack" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0097, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Life" },
+        { address=0X0097, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0X0097, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 Lives" },
+        { address=0X0097, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="4 Lives" },
+        { address=0X0097, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Extra Lives increased" },
+        { address=0X0097, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Extra Lives decreased" },
+        { address=0X0F76, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="04 = death" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X007E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hundreds scored for food ate or apple dropped" },
+        { address=0X0098, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score xx0000" },
+        { address=0X0099, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score 00xx00" },
+        { address=0X009A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score 0000xx" },
+        { address=0X00B3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Previous 2 Scene Score XX0000" },
+        { address=0X00B4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Previous 2 Scene Score 00XX00" },
+        { address=0X00B5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Scene 'a' tens" },
+        { address=0X00B6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Scene 'a' mins" },
+        { address=0X00B7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Scene 'a' secs" },
+        { address=0X00B8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Scene 'a' 1/60secs" },
+        { address=0X00B9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Scene 'a' Clear method 01 = enemies 02 = cherries" },
+        { address=0X00BA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Previous 1 Scene Score XX0000" },
+        { address=0X00BB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Previous 1 Scene Score 00XX00" },
+        { address=0X00C0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Scene 'b' Clear method 01 = enemies 02 = cherries" },
+        { address=0X00C1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Current Scene Score XX0000" },
+        { address=0X00C2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Current Scene Score 00XX00" },
+        { address=0X00C3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Scene score tens" },
+        { address=0X0C26, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Misc sounds, 25 = highscore Cherry collect chain = 8 if 500 bonus awarded" },
+      },
+    },
+  },
+}

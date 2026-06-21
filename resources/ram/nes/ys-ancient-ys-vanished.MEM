@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Ys: Ancient Ys Vanished",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "ys-ancient-ys-vanished",
+    file = "ys-ancient-ys-vanished.zip",
+    hashes = {
+      { hash = "0dd5689c2e799d5530d57f8a3e6b2a39", label = "Ys - Ancient Ys Vanished (Japan) (En) (v1.0) (Makoknight).nes" },
+      { hash = "41da606caba53bde346a44a132cb333a", label = "Ys (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X035C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 bit] XP to Level" },
+      },
+      stage = {
+        { address=0X006E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Character Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0358, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Current Health decreased" },
+        { address=0X0358, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Current Health increased" },
+        { address=0X0359, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Max Health decreased" },
+        { address=0X0359, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Max Health increased" },
+        { address=0X0360, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health Bar decreased" },
+        { address=0X0360, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health Bar increased" },
+        { address=0X0361, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Enemy Health Bar decreased" },
+        { address=0X0361, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Enemy Health Bar increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X000B, type="u8", condition="eq", value=0X13, action="TREASURE", no_log=false, no_survey=false, desc="Darm Tower Treasure Room" },
+        { address=0X0532, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[8bit] [Lower4] Treasure Box Key" },
+      },
+      weapon = {
+        { address=0X000B, type="u8", condition="eq", value=0X45, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rosetti's Weapon Shop" },
+        { address=0X0071, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Equipped Weapon Strength" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X035E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 bit] Gold increased" },
+        { address=0X04F4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Bit0] Sealed Mine Timer Ring Chest increased" },
+        { address=0X04F5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Bit0] Lower Sealed Mine BridgeTimer Ring Chest increased" },
+        { address=0X051A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Power Ring increased" },
+        { address=0X051B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Ring Mail increased" },
+        { address=0X051C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Timer Ring increased" },
+        { address=0X051D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Heal Ring increased" },
+        { address=0X051E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Evil Ring increased" },
+        { address=0X052E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Gold Pedestal increased" },
+        { address=0X052F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Sapphire Ring increased" },
+        { address=0X0551, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring bought at market" },
+        { address=0X0551, type="u8", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring turned in" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X000B, type="u8", condition="eq", value=0X81, action="BOSS_HIT", no_log=false, no_survey=false, desc="Wizard Boss" },
+        { address=0X000B, type="u8", condition="eq", value=0X82, action="BOSS_HIT", no_log=false, no_survey=false, desc="Vampire Boss" },
+        { address=0X000B, type="u8", condition="eq", value=0X83, action="BOSS_HIT", no_log=false, no_survey=false, desc="Wyrm Boss" },
+        { address=0X000B, type="u8", condition="eq", value=0X84, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mantis Boss" },
+        { address=0X000B, type="u8", condition="eq", value=0X85, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stone Idol Boss" },
+        { address=0X000B, type="u8", condition="eq", value=0X86, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ifrit Boss" },
+        { address=0X000B, type="u8", condition="eq", value=0X87, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dark Fact Boss" },
+        { address=0X000B, type="u8", condition="eq", value=0X88, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fact Boss" },
+        { address=0X0555, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] Shrine Boss Defeated 0xff" },
+        { address=0X0556, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] Flooded Mine Boss Defeated 0xff" },
+        { address=0X0557, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] 2nd Shrine Boss Defeated 0xff" },
+        { address=0X0558, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] Darm Tower First Boss Defeated 0xff" },
+        { address=0X0559, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] Darm Tower Third Boss Defeated 0xff" },
+        { address=0X055A, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] Darm Tower Second Boss Defeated 0xff" },
+        { address=0X055B, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] Darm Tower Final Boss Defeated 0xff" },
+        { address=0X055C, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[8bit] Darm Tower Fact Boss Defeated 0xff" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0072, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] Equipped Shield Defense" },
+        { address=0X0502, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Small Shield" },
+        { address=0X0503, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Middle Shield" },
+        { address=0X0504, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Large Shield" },
+        { address=0X0505, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Silver Shield" },
+        { address=0X0506, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] [Lower4] Battle Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X055E, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8bit] Bad Air Pillar Destroyed 0xff" },
+      },
+    },
+  },
+}

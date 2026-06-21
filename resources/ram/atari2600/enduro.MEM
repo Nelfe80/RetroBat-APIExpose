@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Enduro",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "enduro",
+    file = "enduro.zip",
+    hashes = {
+      { hash = "94b92a882f6dbaa6993a46e2dcc58402", label = "Enduro (USA).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[BCD] Day count (00 = demo)" },
+      },
+    },
+  },
+}

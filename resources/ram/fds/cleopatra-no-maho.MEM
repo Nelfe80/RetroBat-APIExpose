@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Cleopatra no Maho",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "cleopatra-no-maho",
+    file = "cleopatra-no-maho.zip",
+    hashes = {
+      { hash = "a5a0a7aaa6dcab91fe29250f6c89a808", label = "Cleopatra no Mahou (Japan) [b].fds" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0X001E, type="u16le", condition="eq", value=0XC642, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shop" },
+        { address=0X001E, type="u16le", condition="eq", value=0XC69E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shop Interior" },
+      },
+    },
+  },
+}

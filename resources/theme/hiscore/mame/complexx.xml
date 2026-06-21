@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 STB  7245</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 DEH  5687</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 KJP  4103</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 SDB  2388</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 RTP  1962</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 TCS  1798</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 LPB  1206</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8  !2  1150</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 MGP  973</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 SDC  873</text>
+		</text>
+	</view>
+</theme>

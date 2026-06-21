@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dig Dug II",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Maze"
+  },
+
+  rom = {
+    name = "dig-dug-ii",
+    file = "dig-dug-ii.zip",
+    hashes = {
+      { hash = "41a0650143c8ecb5a8dc5b2ef2938e00", label = "digdug2.7z <Dig Dug II (New Ver.)>" },
+    }
+  },
+
+  events = {
+  },
+}

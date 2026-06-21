@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Dragon Quest III [Subset - Gold Medals]",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-quest-iii-subset-gold-medals",
+    file = "dragon-quest-iii-subset-gold-medals.zip",
+    hashes = {
+      { hash = "498e4e521efe5539290ca6c4425d34cd", label = "Dragon Warrior III [Subset - Gold Medals].gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA0D2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonite" },
+        { address=0XA153, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="MiniDemon" },
+        { address=0XA1A1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="WingDemon" },
+        { address=0XA1DA, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="DemonSwrd" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC561, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hero level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA0A5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="DeadStool" },
+        { address=0XA0AB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="DeadHound" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA036, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Slime gold medals increased" },
+        { address=0X10001, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Slime gold medals (when viewing Medal Book) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA183, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BossTroll" },
+        { address=0XA1EF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BossTroll" },
+      },
+    },
+  },
+}

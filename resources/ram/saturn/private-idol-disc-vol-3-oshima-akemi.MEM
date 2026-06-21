@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 3: Oshima Akemi",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-3-oshima-akemi",
+    file = "private-idol-disc-vol-3-oshima-akemi.zip",
+    hashes = {
+      { hash = "ab9ec49bedc2dfb675a8a8ca901f8366", label = "Private Idol Disc Vol. 3 - Akemi Ooshima (Japan) (2M)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X13761A, type="u8", condition="eq", value=0X6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X13761A, type="u8", condition="eq", value=0X8, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X13761A, type="u8", condition="eq", value=0XC, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Load credits" },
+      },
+    },
+  },
+}

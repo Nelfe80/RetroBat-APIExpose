@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Suikoden [Subset - Bonus]",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "suikoden-subset-bonus",
+    file = "suikoden-subset-bonus.zip",
+    hashes = {
+      { hash = "aee2831fca931a89392155018894277c", label = "Gensou Suikoden (Japan) [Subset - Bonus]" },
+      { hash = "e95934c522a1f2522acd8bfcb4ff43f8", label = "Suikoden [Subset - Bonus]" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X19913C, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Taken" },
+        { address=0X1991CC, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Taken" },
+        { address=0X19925C, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Taken" },
+        { address=0X1992EC, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Taken" },
+        { address=0X19937C, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Taken" },
+        { address=0X1999D8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16-bit Teo health decreased" },
+        { address=0X1999D8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16-bit Teo health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1999BC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Pahn health during duel increased" },
+      },
+    },
+  },
+}

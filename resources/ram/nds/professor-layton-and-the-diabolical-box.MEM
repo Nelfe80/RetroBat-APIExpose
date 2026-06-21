@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Professor Layton and the Diabolical Box",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "professor-layton-and-the-diabolical-box",
+    file = "professor-layton-and-the-diabolical-box.zip",
+    hashes = {
+      { hash = "269687b48107a669825c3762f917c301", label = "Professor Layton and Pandora's Box (Europe, Australia).nds" },
+      { hash = "32e35509e692dff1e3e44c1a1d1c1bb7", label = "Profesor Layton y la Caja de Pandora, El (Spain).nds" },
+      { hash = "39978b9ba19dbe405ebebd60fa1d3f10", label = "Professor Layton und die Schatulle der Pandora (Germany).nds" },
+      { hash = "a0834625548daa8fda9fec64fd220361", label = "Professeur Layton et la Boite de Pandore (France).nds" },
+      { hash = "4569d3ef3f12b8ba1e3cc9051094042e", label = "Professor Layton en de Doos van Pandora (Netherlands).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1E6B0B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hamster Level 6-Value" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1E6899, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alley Dead End (Dylan)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1E6AB4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Hint Coins (16bit) increased" },
+        { address=0X1E6AB6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Hint Coins (16bit) increased" },
+      },
+    },
+  },
+}

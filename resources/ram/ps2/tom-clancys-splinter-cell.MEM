@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Tom Clancy's Splinter Cell",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Stealth"
+  },
+
+  rom = {
+    name = "tom-clancys-splinter-cell",
+    file = "tom-clancys-splinter-cell.zip",
+    hashes = {
+      { hash = "74d131f9787fe98d749ef3e6854f784a", label = "Tom Clancy's Splinter Cell (USA)" },
+      { hash = "c32cb006a5cb0fbb992cccd083a8870b", label = "Tom Clancy's Splinter Cell (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

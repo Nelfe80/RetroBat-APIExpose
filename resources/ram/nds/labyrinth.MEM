@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Labyrinth (Ravensburger)",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "labyrinth",
+    file = "labyrinth.zip",
+    hashes = {
+      { hash = "21bb71c2ba4215770f2d1ede0b3ace3c", label = "Labyrinth (Europe) (En,Fr,De,It) (Rev 1) (Ravensburger).nds" },
+      { hash = "29d3125f0381caf4d9c00a7ddbe20af3", label = "thinkSMART - Labyrinth (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XEC8CD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Player - Current Goal" },
+      },
+    },
+  },
+}

@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Pieces",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "pieces",
+    file = "pieces.zip",
+    hashes = {
+      { hash = "f0da10d1a7311ffdf1270dfb38ca3dbb", label = "Pieces (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0674, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="All Play Stage ID [starts at 00]" },
+        { address=0X2CE4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage [Vs] [NOT]" },
+        { address=0X2D0E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vs Stage 1 Genre ID [ff in all play]" },
+        { address=0X2D10, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vs Stage 2 Genre ID" },
+        { address=0X2D12, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vs Stage 3 Genre ID" },
+        { address=0X2D14, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vs Stage 4 Genre ID" },
+        { address=0X2D16, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vs Stage 5 Genre ID" },
+        { address=0X50B4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vs Opponent ID [First stage]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2D1E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16bit all play score 1p [dec]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1746, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="16bit=Cursor Block Item" },
+        { address=0X174E, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="16bit = Piece block item" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2D50, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="all play minute timer [dec]" },
+        { address=0X2D54, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Player Timer 3c=max [Seconds timer all play [dec]]" },
+        { address=0X2D56, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Opponent Timer" },
+      },
+    },
+  },
+}

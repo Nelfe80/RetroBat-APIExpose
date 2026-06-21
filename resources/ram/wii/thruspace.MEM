@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "ThruSpace",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "thruspace",
+    file = "thruspace.zip",
+    hashes = {
+      { hash = "99ddd13b8a2de028cbf9bf659451dd1a", label = "ThruSpace (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X473C29, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background" },
+      },
+      zone = {
+        { address=0X473C2C, type="u32be", condition="eq", value=0X0101, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="=== - World Leaderboard" },
+      },
+      stage = {
+        { address=0X473C2A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage/Level Selected" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X473C2C, type="u32be", condition="eq", value=0X0100, action="SCORE_STATE", no_log=false, no_survey=false, desc="=== - High Scores" },
+        { address=0X473DF4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Score" },
+      },
+    },
+  },
+}

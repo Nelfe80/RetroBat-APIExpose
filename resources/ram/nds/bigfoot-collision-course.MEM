@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Bigfoot: Collision Course",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "bigfoot-collision-course",
+    file = "bigfoot-collision-course.zip",
+    hashes = {
+      { hash = "6467d69a5703c5db45fe48f651c8c35e", label = "Bigfoot - Collision Course (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X3EA30, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32bit Best Time - Wandering Tree Amateur increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3EA2C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Best Time - Rocky Mountain Amateur" },
+        { address=0X3EA34, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Best Time - Devil's Drive Amateur" },
+        { address=0X3EA38, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Best Time - Riverbed Route Amateur" },
+        { address=0X3EA3C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Best Time - Rattlesnake Amateur" },
+        { address=0X3EA40, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Best Time - Icy Escape Amateur" },
+        { address=0X3EA44, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Best Time - Muddy Mayhem Amateur" },
+        { address=0X3EA48, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Best Time - Snake Bite Gulch Amateur" },
+      },
+    },
+  },
+}

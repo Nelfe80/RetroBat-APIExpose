@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Frogger's Adventures: Temple of the Frog",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "froggers-adventures-temple-of-the-frog",
+    file = "froggers-adventures-temple-of-the-frog.zip",
+    hashes = {
+      { hash = "228cbf6936579b32b8cc6d7b092dad9c", label = "Frogger's Adventures - Temple of the Frog (USA) (En,Fr,De,Es,It).gba" },
+      { hash = "75af521c08dea3eed23d31c002a3e47f", label = "Frogger's Adventures - Temple of the Frog (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X34B7, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Setting - Continues" },
+        { address=0X3502, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of Continues (save file 1?)" },
+        { address=0X5339, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X5339, type="u8", condition="eq", value=0X18, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X5339, type="u8", condition="eq", value=0X1D, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Selecting Level/Viewing Credits" },
+        { address=0X5348, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Pause Switch (stops movement)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X533C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bitflags] Levels Complete" },
+        { address=0X533D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bitflags] Levels Complete" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X34B6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Game Setting - Life increased" },
+        { address=0X34B6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game Setting - Life decreased" },
+        { address=0X3525, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Save File 3 Lives increased" },
+        { address=0X3525, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Save File 3 Lives decreased" },
+        { address=0X35E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0X35E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+        { address=0X611C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bitflags] Lives Collected increased" },
+        { address=0X611C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflags] Lives Collected decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3526, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Save File 3 Coins increased" },
+        { address=0X35E2, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Coins increased" },
+        { address=0X6114, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Coins Collected increased" },
+        { address=0X6115, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Coins Collected increased" },
+        { address=0X6116, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Coins Collected increased" },
+        { address=0X6117, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Coins Collected increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3730, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Sky Boss - Frogger's Blue Gem Count" },
+        { address=0X37A0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Sky Boss - Boss's Blue Gem Count" },
+        { address=0X5339, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goblin Caverns Boss" },
+        { address=0X5339, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ancient Ruins Boss" },
+        { address=0X5339, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sea Town Boss" },
+        { address=0X5339, type="u8", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sky City Boss" },
+        { address=0X5339, type="u8", condition="eq", value=0X16, action="BOSS_HIT", no_log=false, no_survey=false, desc="Temple of the Frog Boss" },
+        { address=0X5339, type="u8", condition="eq", value=0X17, action="BOSS_HIT", no_log=false, no_survey=false, desc="Temple of the Frog Boss 2" },
+        { address=0X7ED1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Frogger State - Mr D Boss" },
+        { address=0X7EDD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Frogger State - Ancient Ruins, Frog Temple II, Rattlesnake Boss, Sky Boss" },
+        { address=0X7EE5, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Frogger State - Goblin Caverns II, Ancient Ruins II, Goblin Boss" },
+        { address=0X7EE9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Frogger State - Sea Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X35E5, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Last Checkpoint ID reached" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X613A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sky Boss - Round Counter" },
+      },
+    },
+  },
+}

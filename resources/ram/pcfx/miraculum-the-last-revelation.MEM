@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Miraculum: The Last Revelation",
+    system = "pcfx",
+    system_name = "PC-FX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "miraculum-the-last-revelation",
+    file = "miraculum-the-last-revelation.zip",
+    hashes = {
+      { hash = "8f3fd1415e179b17f5ca60cc5b3ecc55", label = "Miraculum - The Last Revelation (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

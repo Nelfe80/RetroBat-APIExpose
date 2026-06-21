@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Richard Scarry's Busytown",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "richard-scarrys-busytown",
+    file = "richard-scarrys-busytown.zip",
+    hashes = {
+      { hash = "06ddc929a7bf834c40344ac83a4acc97", label = "Richard Scarry's Busytown (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBB15, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0 when watching the demo, 2 otherwise" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCD96, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Darkness level (0-5) (The Wind)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XFCDA, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="0F to 18 on Good Swimmer dialogue (The Wind)" },
+        { address=0XFCF6, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="0F to 18 on Good Swimmer dialogue (The Wind)" },
+      },
+    },
+  },
+}

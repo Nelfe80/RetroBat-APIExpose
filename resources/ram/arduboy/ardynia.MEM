@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Ardynia",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ardynia",
+    file = "ardynia.zip",
+    hashes = {
+      { hash = "73d6ed9d2fe4d7be3cab822065971d00", label = "Ardynia (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X01BB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Overworld Keys on Hand" },
+        { address=0X01C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="flipping this inverts the terrain between Overworld, Dungeon & Cavern. Can be used as an identii" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X01C1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Dungeon 1 Boss Key" },
+        { address=0X01C2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Dungeon 2 Boss Key" },
+        { address=0X01C3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Dungeon 3 Boss Key" },
+        { address=0X06B4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0X06D1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X01AB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cell Object Identfier" },
+        { address=0X01AF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cell Object Identfier" },
+      },
+    },
+  },
+}

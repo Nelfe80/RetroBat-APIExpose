@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Prince of Persia 2: The Shadow and the Flame",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "prince-of-persia-2-the-shadow-and-the-flame",
+    file = "prince-of-persia-2-the-shadow-and-the-flame.zip",
+    hashes = {
+      { hash = "8eb86c3a88c4faa2cb17e53854f665e2", label = "Prince of Persia 2 (USA).sfc" },
+      { hash = "e16cb90295703d01771a87ea51f29ea0", label = "Prince of Persia 2 (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X020A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x01 - Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X061A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear stage?" },
+        { address=0X06BE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level id (00 to 12)" },
+      },
+      stage = {
+        { address=0X0206, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 = Level Skip cheat active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0014, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead status?" },
+        { address=0X0957, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player current life increased" },
+        { address=0X0957, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player current life decreased" },
+        { address=0X0959, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy current life increased" },
+        { address=0X0959, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy current life decreased" },
+        { address=0X0977, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player total life increased" },
+        { address=0X0977, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player total life decreased" },
+        { address=0X0979, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy total life increased" },
+        { address=0X0979, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy total life decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,109 @@
+return {
+  game = {
+    title = "Power Rangers: Lightspeed Rescue",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "power-rangers-lightspeed-rescue",
+    file = "power-rangers-lightspeed-rescue.zip",
+    hashes = {
+      { hash = "c3c4b88e40538c1c99b85313bc88df6d", label = "Saban's Power Rangers - Lightspeed Rescue (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCC00, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Bronze)" },
+        { address=0XCC00, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Silver)" },
+        { address=0XCC00, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Bronze)" },
+        { address=0XCC00, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Silver)" },
+        { address=0XCC00, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Bronze)" },
+        { address=0XCC00, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Silver)" },
+        { address=0XCC01, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Bronze)" },
+        { address=0XCC01, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Silver)" },
+        { address=0XCC01, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Bronze)" },
+        { address=0XCC01, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Silver)" },
+        { address=0XCC01, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Bronze)" },
+        { address=0XCC01, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Silver)" },
+        { address=0XCC02, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Bronze)" },
+        { address=0XCC02, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Silver)" },
+        { address=0XCC02, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Bronze)" },
+        { address=0XCC02, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Silver)" },
+        { address=0XCC02, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Bronze)" },
+        { address=0XCC02, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Silver)" },
+        { address=0XCC03, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Bronze)" },
+        { address=0XCC03, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Silver)" },
+        { address=0XCC03, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Bronze)" },
+        { address=0XCC03, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Silver)" },
+        { address=0XCC03, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Bronze)" },
+        { address=0XCC03, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Silver)" },
+        { address=0XCC04, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Bronze)" },
+        { address=0XCC04, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rescue Completed (Silver)" },
+        { address=0XCC04, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Bronze)" },
+        { address=0XCC04, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle Completed (Silver)" },
+        { address=0XCC04, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Bronze)" },
+        { address=0XCC04, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Megazord Completed (Silver)" },
+      },
+      stage = {
+        { address=0XCC20, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="City" },
+        { address=0XCC20, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bay" },
+        { address=0XCC20, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Plant" },
+        { address=0XCC20, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Subway" },
+        { address=0XCC20, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dam" },
+        { address=0XCC20, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Diabolico Stage" },
+        { address=0XCC20, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Selected:" },
+        { address=0XCC23, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rescue" },
+        { address=0XCC23, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Battle" },
+        { address=0XCC23, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="megazord" },
+        { address=0XCC23, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="substage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC7E2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ranger Life increased" },
+        { address=0XC7E2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ranger Life decreased" },
+        { address=0XCC28, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Megazord Lifes increased" },
+        { address=0XCC28, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Megazord Lifes decreased" },
+      },
+      health = {
+        { address=0XC7E3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ranger Energy decreased" },
+        { address=0XC7E3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ranger Energy increased" },
+        { address=0XC829, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Megazord Health decreased" },
+        { address=0XC829, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Megazord Health increased" },
+        { address=0XC8B3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Megazord Health decreased" },
+        { address=0XC8B3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Megazord Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC0A6, type="u24le", condition="eq", value=0X25, action="SCORE_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0XC0A6, type="u24le", condition="eq", value=0X26, action="SCORE_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0XC0A6, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="At Result Screen Sprite ID of Total Score:" },
+      },
+      collectibles = {
+        { address=0XC0A6, type="u24le", condition="eq", value=0X24, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC7D6, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Punch" },
+        { address=0XC7D6, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Break Door" },
+        { address=0XC7D6, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Put Out Fire" },
+        { address=0XC7D6, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cut Cable" },
+        { address=0XC7D6, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Use Medicine" },
+        { address=0XC7D6, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Use Grappling Hook" },
+        { address=0XC7D6, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sword" },
+        { address=0XC7DA, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="In Rescue Mission - Break Door Collected Flag" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC7C0, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16-Bits] Timer Seconds" },
+      },
+    },
+  },
+}

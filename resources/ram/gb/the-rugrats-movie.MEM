@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "The Rugrats Movie",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-rugrats-movie",
+    file = "the-rugrats-movie.zip",
+    hashes = {
+      { hash = "d29cc1b6fe7709a6d16f00c779499de2", label = "Rugrats Movie, The (USA) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC0BD, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completed" },
+        { address=0XC21F, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First door" },
+        { address=0XC21F, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Second door" },
+        { address=0XC21F, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Third door" },
+        { address=0XC21F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Key location in Hospital level" },
+        { address=0XC259, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cellar (Part 1)" },
+        { address=0XC259, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="House (Part 2)" },
+        { address=0XC259, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Garden (Part 3)" },
+        { address=0XC259, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First Door" },
+        { address=0XC259, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Second Door" },
+        { address=0XC259, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Third Door" },
+        { address=0XC259, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fourth Door" },
+        { address=0XC259, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 + 2 sublevels" },
+        { address=0XDE09, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="House" },
+        { address=0XDE09, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hospital" },
+        { address=0XDE09, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Train Crash Site" },
+        { address=0XDE09, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Light Woods" },
+        { address=0XDE09, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dark Woods" },
+        { address=0XDE09, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Ride" },
+        { address=0XDE09, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruins" },
+        { address=0XDE09, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XC853, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Small jump" },
+        { address=0XC853, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=true, no_survey=false, desc="Medium jump" },
+        { address=0XC853, type="u8", condition="eq", value=0X03, action="JUMPING", no_log=true, no_survey=false, desc="High jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC218, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Special item needed (or mine cart activated)" },
+      },
+    },
+  },
+}

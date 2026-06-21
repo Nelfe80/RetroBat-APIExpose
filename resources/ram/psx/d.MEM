@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "D",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "d",
+    file = "d.zip",
+    hashes = {
+      { hash = "73b69b4a0a2068ed48133718b87f78d2", label = "D (USA) (Disc 2)" },
+      { hash = "f8ea53791a8e60d7347002ce0ec9cb63", label = "D (USA) (Disc 1)" },
+      { hash = "fb3a02f80db367c5fbabfa94d7ddb6de", label = "D (USA) (Disc 3)" },
+    }
+  },
+
+  events = {
+  },
+}

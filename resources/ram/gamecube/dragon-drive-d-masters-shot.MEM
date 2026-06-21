@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dragon Drive: D-Masters Shot",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "dragon-drive-d-masters-shot",
+    file = "dragon-drive-d-masters-shot.zip",
+    hashes = {
+      { hash = "d40352400f815d89647328306384bef8", label = "Dragon Drive - D-Masters Shot (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

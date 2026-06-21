@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "High School Musical: Livin' the Dream",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "high-school-musical-livin-the-dream",
+    file = "high-school-musical-livin-the-dream.zip",
+    hashes = {
+      { hash = "b940eae646950fc687e9ad29f8d43e0d", label = "High School Musical - Livin' the Dream (USA).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1B020, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1B020, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+  },
+}

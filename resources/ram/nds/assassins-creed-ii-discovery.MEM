@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Assassin's Creed II: Discovery",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Platform, Stealth"
+  },
+
+  rom = {
+    name = "assassins-creed-ii-discovery",
+    file = "assassins-creed-ii-discovery.zip",
+    hashes = {
+      { hash = "78933bb9d50bed7451cc62b5cb876a9a", label = "Assassin's Creed II - Discovery (USA) (En,Fr,Es) (NDSi Enhanced).nds" },
+      { hash = "8d886183f5a751d89b3dc99110c2df15", label = "Assassin's Creed II - Discovery (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1315A0, type="u32le", condition="eq", value=0X00010001, action="PAUSE_ON", no_log=false, no_survey=false, desc="On Pause Screen" },
+        { address=0X131680, type="u32le", condition="eq", value=0X00010001, action="PAUSE_ON", no_log=false, no_survey=false, desc="On Pause Screen" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1315A0, type="u32le", condition="eq", value=0X00020001, action="SCORE_STATE", no_log=false, no_survey=false, desc="20" },
+        { address=0X1315A0, type="u32le", condition="eq", value=0X00040001, action="SCORE_STATE", no_log=false, no_survey=false, desc="40" },
+        { address=0X1315A0, type="u32le", condition="eq", value=0X00060001, action="SCORE_STATE", no_log=false, no_survey=false, desc="60" },
+        { address=0X1315A0, type="u32le", condition="eq", value=0X00080001, action="SCORE_STATE", no_log=false, no_survey=false, desc="80" },
+        { address=0X1315A0, type="u32le", condition="eq", value=0X000A0001, action="SCORE_STATE", no_log=false, no_survey=false, desc="100" },
+        { address=0X1315A0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] [32-bit] Synch Points/Rank" },
+        { address=0X131680, type="u32le", condition="eq", value=0X00020001, action="SCORE_STATE", no_log=false, no_survey=false, desc="20" },
+        { address=0X131680, type="u32le", condition="eq", value=0X00040001, action="SCORE_STATE", no_log=false, no_survey=false, desc="40" },
+        { address=0X131680, type="u32le", condition="eq", value=0X00060001, action="SCORE_STATE", no_log=false, no_survey=false, desc="60" },
+        { address=0X131680, type="u32le", condition="eq", value=0X00080001, action="SCORE_STATE", no_log=false, no_survey=false, desc="80" },
+        { address=0X131680, type="u32le", condition="eq", value=0X000A0001, action="SCORE_STATE", no_log=false, no_survey=false, desc="100" },
+        { address=0X131680, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[EU] [32-bit] Synch Points/Rank" },
+        { address=0X13A5A0, type="u16le", condition="eq", value=0X10CC, action="SCORE_STATE", no_log=false, no_survey=false, desc="All Cheats Unlocked" },
+        { address=0X13A5A0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[USA] [16-bit] Animus Hacks Points" },
+        { address=0X13A680, type="u16le", condition="eq", value=0X10CC, action="SCORE_STATE", no_log=false, no_survey=false, desc="All Cheats Unlocked" },
+        { address=0X13A680, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[EU] [16-bit] Animus Hacks Points" },
+      },
+    },
+  },
+}

@@ -1,0 +1,125 @@
+return {
+  game = {
+    title = "Ys III: Wanderers From Ys",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "ys-iii-wanderers-from-ys",
+    file = "ys-iii-wanderers-from-ys.zip",
+    hashes = {
+      { hash = "6cc7932a676998747556dbbb6bd86666", label = "Ys III - Wanderers From Ys (Japan) (En) (Vice Translations) (1.0).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0038, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0056, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Game Over/Redmont" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0500, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is to determine you level in the game." },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0501, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Currant HP decreased" },
+        { address=0X0501, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Currant HP increased" },
+        { address=0X0502, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X0502, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X0D01, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Currant HP decreased" },
+        { address=0X0D01, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Currant HP increased" },
+        { address=0X0D02, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X0D02, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X1501, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Currant HP decreased" },
+        { address=0X1501, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Currant HP increased" },
+        { address=0X1502, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X1502, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X1D01, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Currant HP decreased" },
+        { address=0X1D01, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Currant HP increased" },
+        { address=0X1D02, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X1D02, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0056, type="u8", condition="eq", value=0X36, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon shop" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0056, type="u8", condition="eq", value=0X63, action="MONEY_STATE", no_log=false, no_survey=false, desc="Start of clock tower - Protect Ring chest" },
+        { address=0X0505, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X050B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Power (how much the rings can be used) increased" },
+        { address=0X0510, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="No ring equipped" },
+        { address=0X0510, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Power Ring" },
+        { address=0X0510, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Shield Ring" },
+        { address=0X0510, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Ring" },
+        { address=0X0510, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Heal Ring" },
+        { address=0X0510, type="u8", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="Protect Ring" },
+        { address=0X05C1, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Power Ring Chest" },
+        { address=0X05C2, type="u8", condition="bit_true", bit=1, mask=0X02, action="COIN_GAIN", no_log=false, no_survey=false, desc="Agreed to help Edgar and get the time ring" },
+        { address=0X05C2, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Got the Heal Ring from Dogi after returning from Eldarm Mountain" },
+        { address=0X05E1, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Banded Armor" },
+        { address=0X05E1, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Battle Armor" },
+        { address=0X05E1, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Wood Shieldx" },
+        { address=0X05E1, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Small Shield" },
+        { address=0X05E1, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Large Shield" },
+        { address=0X05E1, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Banded Shield" },
+        { address=0X05E1, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Battle Shield" },
+        { address=0X05E1, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Power Ring" },
+        { address=0X0DE1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This value is for shields and rings increased" },
+        { address=0X15E1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This value is for shields and rings increased" },
+        { address=0X1DE1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This value is for shields and rings increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0056, type="u8", condition="eq", value=0X19, action="BOSS_HIT", no_log=false, no_survey=false, desc="Long area before the Istersiva boss" },
+        { address=0X0056, type="u8", condition="eq", value=0X1A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Istersiva boss room" },
+        { address=0X0056, type="u8", condition="eq", value=0X34, action="BOSS_HIT", no_log=false, no_survey=false, desc="Giren boss room" },
+        { address=0X0056, type="u8", condition="eq", value=0X44, action="BOSS_HIT", no_log=false, no_survey=false, desc="Wing Bird boss screen" },
+        { address=0X0056, type="u8", condition="eq", value=0X79, action="BOSS_HIT", no_log=false, no_survey=false, desc="Gildias boss room" },
+        { address=0X0056, type="u8", condition="eq", value=0X51, action="BOSS_HIT", no_log=false, no_survey=false, desc="Blue Knight boss room" },
+        { address=0X0056, type="u8", condition="eq", value=0X56, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fourth screen of part 1 of castle - Splits to first boss" },
+        { address=0X0056, type="u8", condition="eq", value=0X58, action="BOSS_HIT", no_log=false, no_survey=false, desc="First screen past statue blockade - Leads to second boss and room with Battle Armor" },
+        { address=0X0056, type="u8", condition="eq", value=0X5C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fifth screen on route to Halvager - Screen before boss" },
+        { address=0X0056, type="u8", condition="eq", value=0X5F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Halvager boss room" },
+        { address=0X0056, type="u8", condition="eq", value=0X60, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fire Wolf boss room" },
+        { address=0X0056, type="u8", condition="eq", value=0X68, action="BOSS_HIT", no_log=false, no_survey=false, desc="Garland boss room" },
+        { address=0X0056, type="u8", condition="eq", value=0X78, action="BOSS_HIT", no_log=false, no_survey=false, desc="Warp to final boss" },
+        { address=0X0412, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss Health" },
+        { address=0X05C5, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dogi talks to you after the final boss" },
+        { address=0X05C5, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Spoke to Gardner after the final boss" },
+        { address=0X0C12, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss Health Graphic" },
+        { address=0X1412, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss Health" },
+        { address=0X1C12, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0056, type="u8", condition="eq", value=0X21, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Room with Small Shield chest" },
+        { address=0X0056, type="u8", condition="eq", value=0X5B, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Fourth screen on route to Halvager - Battle Shield" },
+        { address=0X050F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Equipped Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0056, type="u8", condition="eq", value=0X0D, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Other side of the locked door in the Tigray Quarry" },
+        { address=0X0056, type="u8", condition="eq", value=0X0E, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Locked Door to the deeper part of Tigray Quarry" },
+        { address=0X0056, type="u8", condition="eq", value=0X5D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Statue blockade that requires beating Halvager to pass" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0056, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Screen ID" },
+        { address=0X0510, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Ring Equipped" },
+      },
+    },
+  },
+}

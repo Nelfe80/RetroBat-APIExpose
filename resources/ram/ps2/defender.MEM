@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Defender",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "defender",
+    file = "defender.zip",
+    hashes = {
+      { hash = "ec563b24a51853bb33988d2caf1de34a", label = "Defender (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5653C8, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="32-Bit - Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5653C4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="32-Bit - Lives increased" },
+        { address=0X5653C4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="32-Bit - Lives decreased" },
+      },
+    },
+  },
+}

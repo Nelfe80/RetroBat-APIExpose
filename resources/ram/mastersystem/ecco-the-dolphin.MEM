@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Ecco the Dolphin",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ecco-the-dolphin",
+    file = "ecco-the-dolphin.zip",
+    hashes = {
+      { hash = "4ce5c749b2710698a97d851552b5a404", label = "Ecco The Dolphin (Europe, Brazil) (Es) (v1.0) (Wave).sms" },
+      { hash = "bea00f9b73ac248bafa7e406a5489b32", label = "Ecco The Dolphin (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0953, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] Pause Toggle" },
+        { address=0X0BAF, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8Bit] Demo Mode" },
+        { address=0X0BB0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8bit] Level Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0BF5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X03EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Unlimited Life Toggle increased" },
+        { address=0X03EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Unlimited Life Toggle decreased" },
+      },
+      health = {
+        { address=0X0AC2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] HP decreased" },
+        { address=0X0AC2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] HP increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X046C, type="u8", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="[8bit] Swim Trough Toggle" },
+      },
+    },
+  },
+}

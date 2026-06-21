@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Waku Waku Sonic Patrol Car",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Driving"
+  },
+
+  rom = {
+    name = "waku-waku-sonic-patrol-car",
+    file = "waku-waku-sonic-patrol-car.zip",
+    hashes = {
+      { hash = "cf7549120c48837e48f266721ef8c15e", label = "soniccar.zip" },
+    }
+  },
+
+  events = {
+  },
+}

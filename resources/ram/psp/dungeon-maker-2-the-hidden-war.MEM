@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Dungeon Maker 2: The Hidden War",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dungeon-maker-2-the-hidden-war",
+    file = "dungeon-maker-2-the-hidden-war.zip",
+    hashes = {
+      { hash = "7afc2b8aa79c64f2e0717f4b14b8f6d8", label = "Dungeon Maker II - The Hidden War (USA).iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XD11E32, type="u8", condition="eq", value=0XB0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Have the dungeon walls become a dead-end?!" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD11E32, type="u8", condition="eq", value=0XB5, action="SCORE_STATE", no_log=false, no_survey=false, desc="Convenient floor movement points!" },
+      },
+      collectibles = {
+        { address=0XCFDC28, type="u8", condition="eq", value=0XB5, action="MONEY_STATE", no_log=false, no_survey=false, desc="Holy Ring" },
+        { address=0XCFE7B4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32 bit) Gold increased" },
+        { address=0XD11B2F, type="u8", condition="eq", value=0XB7, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Bracelet" },
+        { address=0XD11B39, type="u8", condition="eq", value=0XB0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Moon Ring" },
+        { address=0XD11B39, type="u8", condition="eq", value=0XB1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Sun Ring" },
+        { address=0XD11B39, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Specter Ring" },
+        { address=0XD11B39, type="u8", condition="eq", value=0XB3, action="MONEY_STATE", no_log=false, no_survey=false, desc="Folded Ring" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD11B10, type="u8", condition="eq", value=0XB4, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Oaken Shield" },
+        { address=0XD11B10, type="u8", condition="eq", value=0XB5, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Stone Shield" },
+        { address=0XD11B10, type="u8", condition="eq", value=0XB6, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Lava Shield" },
+        { address=0XD11B10, type="u8", condition="eq", value=0XB7, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD11E30, type="u8", condition="eq", value=0XB4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Town/Outdoor Market" },
+        { address=0XD11E32, type="u8", condition="eq", value=0XB1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Target a door!" },
+        { address=0XD11E34, type="u8", condition="eq", value=0XB2, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Placement Menu" },
+      },
+    },
+  },
+}

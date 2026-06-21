@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Towers: Lord Baniff's Deceit",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "towers-lord-baniffs-deceit",
+    file = "towers-lord-baniffs-deceit.zip",
+    hashes = {
+      { hash = "0d7bca4e08d522493491484896f7f3cc", label = "Towers - Lord Baniff's Deceit (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC321, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level" },
+        { address=0XC692, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[128bits] Items On Ground" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC323, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Max HP decreased" },
+        { address=0XC323, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Max HP increased" },
+        { address=0XC32D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] HP decreased" },
+        { address=0XC32D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] HP increased" },
+        { address=0XD127, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 1F Goblin Health decreased" },
+        { address=0XD127, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 1F Goblin Health increased" },
+        { address=0XD12F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 1F Goblin Health decreased" },
+        { address=0XD12F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 1F Goblin Health increased" },
+        { address=0XD137, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 1F Goblin Health decreased" },
+        { address=0XD137, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 1F Goblin Health increased" },
+        { address=0XD13F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 1F Goblin Health decreased" },
+        { address=0XD13F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 1F Goblin Health increased" },
+        { address=0XD147, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 1F Golem Health decreased" },
+        { address=0XD147, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 1F Golem Health increased" },
+        { address=0XD14F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 1F Golem Health decreased" },
+        { address=0XD14F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 1F Golem Health increased" },
+        { address=0XD157, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 1F Golem Health decreased" },
+        { address=0XD157, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 1F Golem Health increased" },
+        { address=0XD15F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 2F Goblin Health decreased" },
+        { address=0XD15F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 2F Goblin Health increased" },
+        { address=0XD167, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 2F Golem Health decreased" },
+        { address=0XD167, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 2F Golem Health increased" },
+        { address=0XD177, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 2F Goblin Health decreased" },
+        { address=0XD177, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 2F Goblin Health increased" },
+        { address=0XD17F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 2F Skeleton Health decreased" },
+        { address=0XD17F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 2F Skeleton Health increased" },
+        { address=0XD187, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 2F Golem Health decreased" },
+        { address=0XD187, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 2F Golem Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC500, type="u8", condition="eq", value=0X90, action="MONEY_STATE", no_log=false, no_survey=false, desc="Regenerative" },
+        { address=0XC500, type="u8", condition="eq", value=0X91, action="MONEY_STATE", no_log=false, no_survey=false, desc="Feather Fall/Silver" },
+        { address=0XC500, type="u8", condition="eq", value=0X92, action="MONEY_STATE", no_log=false, no_survey=false, desc="Fire Protection" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD57F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12600, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] 5F Door Puzzle Button One" },
+        { address=0X12640, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] 5F Door Puzzle Button Two" },
+        { address=0X12680, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] 5F Door Puzzle Button Three" },
+        { address=0X126C0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] 5F Door Puzzle Button Four" },
+      },
+    },
+  },
+}

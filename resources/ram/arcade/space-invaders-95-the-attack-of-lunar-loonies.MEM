@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Space Invaders '95: The Attack of Lunar Loonies",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "space-invaders-95-the-attack-of-lunar-loonies",
+    file = "space-invaders-95-the-attack-of-lunar-loonies.zip",
+    hashes = {
+      { hash = "6fdd6bfdcecb35abbe9ffbdc5fb294a1", label = "spcinv95.7z <Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5O 1995/06/14)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8819, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="player/charactert selection" },
+        { address=0X8819, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="ingame" },
+        { address=0XFFCA, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+      events = {
+        { address=0X10CEE, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 combo streak" },
+        { address=0X10D6E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P2 combo streak" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X882E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0x9c=round completed screen" },
+        { address=0X17521, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0x26=stage completed?" },
+      },
+      stage = {
+        { address=0X156DA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage/round?" },
+        { address=0X156DC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage/round?" },
+        { address=0X156E2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="enemies left on current stage?" },
+        { address=0X15980, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id (hex)" },
+        { address=0X174F8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="kills in bonus stage 2?" },
+        { address=0X64800, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id (dec) hud?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X10CDE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 lives increased" },
+        { address=0X10CDE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 lives decreased" },
+        { address=0X10CE6, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(16-bit) 1P counter shots fired in single life - hex increased" },
+        { address=0X10CE6, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(16-bit) 1P counter shots fired in single life - hex decreased" },
+        { address=0X10D5E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 lives increased" },
+        { address=0X10D5E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 lives decreased" },
+        { address=0X10D66, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(16-bit) 2P counter shots fired in single life - hex increased" },
+        { address=0X10D66, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(16-bit) 2P counter shots fired in single life - hex decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X10B84, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="hi-score (16-bit) dec" },
+        { address=0X10CCE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 score (16-bit) dec" },
+        { address=0X10D4E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 score (16-bit) dec" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X10DC6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="round 5 boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1019F, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Monitor (default=normal)" },
+        { address=0X1019F, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Attract Sound (default=with)" },
+      },
+    },
+  },
+}

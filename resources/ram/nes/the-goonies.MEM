@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "The Goonies",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-goonies",
+    file = "the-goonies.zip",
+    hashes = {
+      { hash = "465dc95c995e70b3a161f06d67c1942d", label = "Goonies (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0003, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo on = 01?" },
+        { address=0X0046, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="game over?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X001F, type="u8", condition="eq", value=0X83, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="stage completed" },
+      },
+      stage = {
+        { address=0X00A3, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X00A3, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2" },
+        { address=0X00A3, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Passageway A" },
+        { address=0X00A3, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3" },
+        { address=0X00A3, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 4" },
+        { address=0X00A3, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Passageway B" },
+        { address=0X00A3, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X00A3, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Passageway C" },
+        { address=0X00A3, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 (final)" },
+        { address=0X00A3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0046, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0046, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X00A0, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0X00A0, type="u8", condition="eq", value=0X17, action="HEALTH_STATE", no_log=false, no_survey=false, desc="full" },
+        { address=0X00A0, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health" },
+        { address=0X00A1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Bar decreased" },
+        { address=0X00A1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Bar increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0D5D, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="headphone" },
+        { address=0X0D5D, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Raincoat" },
+        { address=0X0D5D, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="helmet" },
+        { address=0X0D5D, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="fire suit" },
+        { address=0X0D5D, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="backpack" },
+        { address=0X0D5D, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Armor Suit" },
+        { address=0X0D5D, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="spring shoes" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X07F0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score: 000,0XX" },
+        { address=0X07F1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score: 00X,X00" },
+        { address=0X07F2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score: XX0,000" },
+        { address=0X07F3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: 000,0XX" },
+        { address=0X07F4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: 00X,X00" },
+        { address=0X07F5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: XX0,000" },
+      },
+      collectibles = {
+        { address=0X05F2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slingshot (ammo)" },
+        { address=0X05F3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Bombs (ammo)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X004C, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="cross invincibility frames" },
+        { address=0X05F6, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility (frames)" },
+        { address=0X0D5D, type="u8", condition="eq", value=0X03, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into fire suit" },
+      },
+      player = {
+        { address=0X0049, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Equipment: b0=Headphones, b1=Raincoat, b2=Helmet, b3=FlameSuit, b4=Backpack, b5=Armor, b6=Jump S" },
+      },
+    },
+  },
+}

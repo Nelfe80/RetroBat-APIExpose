@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "M&M's Kart Racing",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "m-ms-kart-racing",
+    file = "m-ms-kart-racing.zip",
+    hashes = {
+      { hash = "3c9175e016d8810e3610e252d118557b", label = "M&M's Kart Racing (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1E4D08, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Chocolate Factory" },
+        { address=0X1E4D09, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - The Streets" },
+        { address=0X1E4D0A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - The House" },
+        { address=0X1E4D0B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - The Farm" },
+        { address=0X1E4D0C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Forest" },
+        { address=0X1E4D0D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Mountains" },
+        { address=0X1E4D0E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Beach" },
+        { address=0X1E4D0F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Sea Carrier" },
+        { address=0X1E4D10, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Arctic" },
+        { address=0X1E4D11, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Alien Space Craft" },
+        { address=0X1E4D12, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Alien HQ" },
+        { address=0X1E4D13, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Abscract World" },
+        { address=0X1E4D14, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Chocolate Volcano" },
+        { address=0X1E4D15, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - Coliseum" },
+        { address=0X1E4D16, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Race Clear Flag - The Stadium" },
+        { address=0X677048, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X677048, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Car is Touching the Ground" },
+      },
+      zone = {
+        { address=0X676CA2, type="u8", condition="eq", value=0X0C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Abstract World" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1E525A, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Yellow M&M's Total Chocolate Coins increased" },
+        { address=0X1E525E, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Red M&M's Total Chocolate Coins increased" },
+        { address=0X1E5260, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Green M&M's Total Chocolate Coins increased" },
+        { address=0X1E5264, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Blue M&M's Total Chocolate Coins increased" },
+        { address=0X1E5266, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Orange M&M's Total Chocolate Coins increased" },
+        { address=0X1E526A, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Total Chocolate Coins increased" },
+        { address=0X677054, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Chocolate Coin Requirement increased" },
+        { address=0X677056, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Chocolate Coin Count for Current Race increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E4C70, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Chocolate Factory" },
+        { address=0X1E4C74, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - The Streets" },
+        { address=0X1E4C78, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - The House" },
+        { address=0X1E4C7C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - The Farm" },
+        { address=0X1E4C80, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Forest" },
+        { address=0X1E4C84, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Mountains" },
+        { address=0X1E4C88, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Beach" },
+        { address=0X1E4C8C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Sea Carrier" },
+        { address=0X1E4C90, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Arctic" },
+        { address=0X1E4C94, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Alien Space Craft" },
+        { address=0X1E4C98, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Alien HQ" },
+        { address=0X1E4C9C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Abstract World" },
+        { address=0X1E4CA0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Chocolate Volcano" },
+        { address=0X1E4CA4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - Coliseum" },
+        { address=0X1E4CA8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time - The Stadium" },
+        { address=0X1E4CAC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Chocolate Factory" },
+        { address=0X1E4CB0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - The Streets" },
+        { address=0X1E4CB4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - The House" },
+        { address=0X1E4CB8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - The Farm" },
+        { address=0X1E4CBC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Forest" },
+        { address=0X1E4CC0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Mountains" },
+        { address=0X1E4CC4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Beach" },
+        { address=0X1E4CC8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Sea Carrier" },
+        { address=0X1E4CCC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Arctic" },
+        { address=0X1E4CD0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Alien Space Craft" },
+        { address=0X1E4CD4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Alien HQ" },
+        { address=0X1E4CD8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Abstract World" },
+        { address=0X1E4CDC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Chocolate Volcano" },
+        { address=0X1E4CE0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - Coliseum" },
+        { address=0X1E4CE4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Tournament Race Time - The Stadium" },
+        { address=0X1F32D4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Lap Time for Most Recently Completed Lap" },
+        { address=0X676C98, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Best Lap Time for Current Race" },
+        { address=0X677080, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16-bit BE] Time Spent Driving on Two Wheels" },
+        { address=0X677610, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Race Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pimp My Ride",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pimp-my-ride",
+    file = "pimp-my-ride.zip",
+    hashes = {
+      { hash = "47f01b2a3f9889b22ebd0c286ce17d5e", label = "MTV Pimp My Ride (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

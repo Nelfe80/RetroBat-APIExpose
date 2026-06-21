@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dragon Quest & Final Fantasy in Itadaki Street Special",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "dragon-quest-final-fantasy-in-itadaki-street-special",
+    file = "dragon-quest-final-fantasy-in-itadaki-street-special.zip",
+    hashes = {
+      { hash = "61dd8446cfff1e8150b45a01727810c6", label = "Dragon Quest & Final Fantasy in Itadaki Street Special (Japan) (En) (v3.7) (Choppasmith)" },
+    }
+  },
+
+  events = {
+  },
+}

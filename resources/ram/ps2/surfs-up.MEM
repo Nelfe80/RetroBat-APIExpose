@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Surf's Up",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "surfs-up",
+    file = "surfs-up.zip",
+    hashes = {
+      { hash = "759d0fa5bd97beb655cf511a9940ce11", label = "Surf's Up (USA)" },
+      { hash = "695d5190f23c53d384737ba12f7a303d", label = "Surf's Up (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

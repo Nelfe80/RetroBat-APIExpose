@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Wacky Races",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "wacky-races",
+    file = "wacky-races.zip",
+    hashes = {
+      { hash = "ad9fa05b7e9817730e062e3cada64532", label = "Wacky Races Starring Dastardly & Muttley (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2C4530, type="u32le", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X2D3C13, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not Paused" },
+        { address=0X2D3C13, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2BE591, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X2BE591, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Star" },
+        { address=0X2BE591, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE591, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clock" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2BE685, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Not Completed" },
+        { address=0X2BE685, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Completed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2BE511, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE513, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE514, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE518, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE51A, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE51B, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE51F, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE521, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE522, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE526, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE528, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE529, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE548, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE548, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE549, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE549, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE54A, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE54A, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE54B, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE54B, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE54C, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE54C, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE55F, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE55F, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE560, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE560, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE561, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE561, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE562, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE562, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE563, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE563, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE576, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE576, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE577, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE577, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE578, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE578, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE579, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE579, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE57A, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE57A, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE58D, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE58D, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE58E, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE58E, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE58F, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE58F, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE590, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+        { address=0X2BE590, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock" },
+      },
+    },
+  },
+}

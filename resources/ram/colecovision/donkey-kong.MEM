@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Donkey Kong",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "donkey-kong",
+    file = "donkey-kong.zip",
+    hashes = {
+      { hash = "613a3e457758e274a0e0819ff6aa2d43", label = "Donkey Kong (USA, Europe) (v1.1).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0046, type="u8", condition="eq", value=0X0F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0196, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 = Umbrella in Stage 2 and 3" },
+        { address=0X01A2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 = First Hammer in Stage 1" },
+        { address=0X01A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 = Hat in Stage 2 and 3" },
+        { address=0X01AE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 = Purse in Stage 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0034, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Last Life" },
+        { address=0X0034, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="No lives, can't move" },
+        { address=0X0034, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0034, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0098, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Death Sound" },
+        { address=0X0099, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X0099, type="u8", condition="eq", value=0XF0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X0099, type="u8", condition="eq", value=0X50, action="LOSE_LIFE", no_log=false, no_survey=false, desc="It will only go here when the address 0x0098 goes to 0" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0030, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x10 (found by Schlim)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X002E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X0035, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level NOT STAGE:" },
+      },
+    },
+  },
+}

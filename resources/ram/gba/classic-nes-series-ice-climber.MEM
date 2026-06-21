@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Classic NES Series: Ice Climber",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "classic-nes-series-ice-climber",
+    file = "classic-nes-series-ice-climber.zip",
+    hashes = {
+      { hash = "bc62fa1f6a3f1421c802aba76f1f4732", label = "Classic NES Series - Ice Climber (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+  },
+}

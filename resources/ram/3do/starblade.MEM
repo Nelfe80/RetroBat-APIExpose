@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Starblade",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "starblade",
+    file = "starblade.zip",
+    hashes = {
+      { hash = "15a0ecf45f13bcb56e5ece58e0085622", label = "Starblade (Canada)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X90060, type="u32le", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X90430, type="u16le", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X90438, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XD75F6, type="u8", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X90410, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9042C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X9040A, type="u16le", condition="eq", value=0X37, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Max" },
+      },
+    },
+  },
+}

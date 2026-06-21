@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Rocky Rodent",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "rocky-rodent",
+    file = "rocky-rodent.zip",
+    hashes = {
+      { hash = "bb457a174348e3e0d6a05026c1c57f22", label = "Rocky Rodent (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06FE, type="u8", condition="eq", value=0X1F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="garcia's factory" },
+      },
+    },
+  },
+}

@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Bishoujo Senshi Sailor Moon R",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "bishoujo-senshi-sailor-moon-r",
+    file = "bishoujo-senshi-sailor-moon-r.zip",
+    hashes = {
+      { hash = "39b1e06fae0d6176c6ec4bb98f842eb7", label = "Bishoujo Senshi Sailor Moon R (Japan).sfc" },
+      { hash = "e9edb964870c5435ca45a51c26905612", label = "Bishoujo Senshi Sailor Moon R (Japan) (En) (v1.0) (FuSoYa).sfc" },
+      { hash = "fe12d164a7607d3f09f14b3c1cf50775", label = "Bishoujo Senshi Sailor Moon R (Japan) (Pt) (Central MiB).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="screen, 1=in game, 2=demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X006B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select, 00 - 1-1, 02 - 1-2, 04 - 1-3, 06 - 2-1," },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0758, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0X0758, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+      health = {
+        { address=0X0740, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X0740, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X0840, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP Bar decreased" },
+        { address=0X0840, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP Bar increased" },
+        { address=0X0841, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP Bar decreased" },
+        { address=0X0841, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP Bar increased" },
+        { address=0X08C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy 2 hp decreased" },
+        { address=0X08C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy 2 hp increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0738, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Change to 86 to be invincible" },
+      },
+    },
+  },
+}

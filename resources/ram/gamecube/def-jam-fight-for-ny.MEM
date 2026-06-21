@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Def Jam: Fight for NY",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "def-jam-fight-for-ny",
+    file = "def-jam-fight-for-ny.zip",
+    hashes = {
+      { hash = "88f6ea7d763a2928810f387a457e5d51", label = "Def Jam - Fight for NY (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

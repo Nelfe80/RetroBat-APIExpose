@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Duel Monsters II: Dark Duel Stories",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Card"
+  },
+
+  rom = {
+    name = "yu-gi-oh-duel-monsters-ii-dark-duel-stories",
+    file = "yu-gi-oh-duel-monsters-ii-dark-duel-stories.zip",
+    hashes = {
+      { hash = "782b88b1bf9768a2b1b139177a0c1c33", label = "Yu-Gi-Oh! Duel Monsters II - Dark Duel Stories (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "e2a25621d6701b8fd75444ceb6d42e91", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters II - Dark Duel Stories (De).gbc" },
+      { hash = "4e855f025c999cc8cbbe002927c26542", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters II - Dark Duel Stories (Fr).gbc" },
+      { hash = "b9d30c4fe3f4e0801b0e187b07b6f6fa", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters II - Dark Duel Stories (Es).gbc" },
+      { hash = "f7000cf59d9f402f88053b58b285399f", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters II - Dark Duel Stories (En).gbc" },
+      { hash = "338b94a31ee1186f884229fba4ac78f6", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters II - Dark Duel Stories (It).gbc" },
+      { hash = "17a43887863c2e485ca72940f4738f79", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters II - Dark Duel Stories (Ja).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XDB1E, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Selection" },
+        { address=0XDB1E, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 Selection" },
+        { address=0XDB1E, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 Selection" },
+        { address=0XDB1E, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0XDB1E, type="u8", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0XFFDC, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yami Yugi" },
+        { address=0XFFDC, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yami bakura" },
+        { address=0XFFDC, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shadi" },
+        { address=0XFFDC, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ishizu" },
+        { address=0XFFDC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 Opponent:" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA6DD, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="408 - 'Giant Mech-soldier'" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA705, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bits] Cartbrige 'Deck Volume' Points Limit" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA6E3, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="454 - 'Destroyer Golem'" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA05B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Cartridge Cards Counter Array Base" },
+      },
+    },
+  },
+}

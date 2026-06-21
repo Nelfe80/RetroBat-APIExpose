@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Puzzled",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzled",
+    file = "puzzled.zip",
+    hashes = {
+      { hash = "9108d1246f11d0e0f2cec608e79efd65", label = "Puzzled (USA).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC3F5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo active" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC18E, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Timer" },
+      },
+    },
+  },
+}

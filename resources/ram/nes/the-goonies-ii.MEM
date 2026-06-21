@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "The Goonies II",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-goonies-ii",
+    file = "the-goonies-ii.zip",
+    hashes = {
+      { hash = "00b56614b73b76dea1877808b501d4cb", label = "Goonies 2 - Fratelli Saigo no Chousen (Japan).nes" },
+      { hash = "6ce1f32c9177b0b79b390b5ce6a2db52", label = "Goonies II, The (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0008, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract mode flag" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0022, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0022, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0503, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life meter modifier increased" },
+        { address=0X0503, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life meter modifier decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X050B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon bit-map: bit0=yoyo bit1=slingshot bit2=boomerang bit3=bomb bit4=molotov" },
+        { address=0X0517, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Main weapon modifier" },
+        { address=0X0518, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="sub weapon modifier" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X050E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Slingshot ammo" },
+      },
+    },
+  },
+}

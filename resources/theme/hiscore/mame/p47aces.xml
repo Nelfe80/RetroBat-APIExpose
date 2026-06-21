@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1  AQ 72680</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 -.· 21050</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 YOU 20180</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ABC 3210</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 QQQ 2970</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 SQN 1994</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 AXA 1111</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 BPG 618</text>
+		</text>
+	</view>
+</theme>

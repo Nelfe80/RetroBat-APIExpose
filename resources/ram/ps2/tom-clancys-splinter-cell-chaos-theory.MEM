@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Tom Clancy's Splinter Cell: Chaos Theory",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tom-clancys-splinter-cell-chaos-theory",
+    file = "tom-clancys-splinter-cell-chaos-theory.zip",
+    hashes = {
+      { hash = "d365c8253aa332d3c98b469ea62f9a88", label = "Tom Clancy's Splinter Cell - Chaos Theory (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X86A4B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alt Level ID? (ASCII Text)" },
+        { address=0XB9A034, type="u8", condition="eq", value=0X23, action="NEW_LEVEL", no_log=false, no_survey=false, desc="maximum intensity" },
+        { address=0XB9A034, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] First level - How bright the lighting effect is for night vision" },
+        { address=0X14F3FDC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="cheat for unlocking all levels, counts from 0 to 5 for square" },
+        { address=0X14F3FE0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="cheat for unlocking all levels, counts from 0 to 5 for circle" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1C2203C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[8bit] Current ammo for SC20k (rifle)" },
+        { address=0X1C22044, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[8bit] Extra ammo for SC-20k" },
+        { address=0X1C3220C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[8bit] Current Ammo for SC pistol" },
+        { address=0X1C32214, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[8bit] Extra Ammo for SC pistol" },
+      },
+    },
+  },
+}

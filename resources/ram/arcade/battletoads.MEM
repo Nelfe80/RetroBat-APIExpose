@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Battletoads",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "battletoads",
+    file = "battletoads.zip",
+    hashes = {
+      { hash = "7056d1adf36953ae1be0439e9e8b988a", label = "btoads.7z <Battletoads>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X58C8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Used to check progression check for continueless" },
+        { address=0X3410A, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[8bit] Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBDD4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[DIPSWITCH] Difficulty Level" },
+        { address=0X34060, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[DIPSWITCH] Difficulty Level" },
+      },
+      stage = {
+        { address=0X58CA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X04AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X04AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+        { address=0X052C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 Health decreased" },
+        { address=0X052C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 Health increased" },
+        { address=0X4DE0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health (Mirror) decreased" },
+        { address=0X4DE0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health (Mirror) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4DFA, type="u32le", condition="eq", value=0XC15B, action="SCORE_STATE", no_log=false, no_survey=false, desc="54m 59s if 0x004dfc = 0" },
+        { address=0X4DFA, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Time submitted to high scores as current played character" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4D6E, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4DE4, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Continue Timer - Seconds" },
+        { address=0X4DE6, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Continue Timer - Mili Seconds" },
+      },
+    },
+  },
+}

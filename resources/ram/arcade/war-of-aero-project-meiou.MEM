@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "War of Aero: Project MEIOU",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "war-of-aero-project-meiou",
+    file = "war-of-aero-project-meiou.zip",
+    hashes = {
+      { hash = "dc2d5fe754c346c1e4c83913861869d4", label = "wrofaero.7z <War of Aero - Project MEIOU>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X100690, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1007D8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting lives Dipswitch increased" },
+        { address=0X1007D8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting lives Dipswitch decreased" },
+        { address=0X10081E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X10081E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X100826, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Score (multiply by 100 for displayed score)" },
+      },
+    },
+  },
+}

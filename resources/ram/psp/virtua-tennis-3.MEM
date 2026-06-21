@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Virtua Tennis 3",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "virtua-tennis-3",
+    file = "virtua-tennis-3.zip",
+    hashes = {
+      { hash = "f919187843403c0143b65f079b3d63b1", label = "Virtua Tennis 3 (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XE749F8, type="u32le", condition="eq", value=0X0F, action="SCORE_STATE", no_log=false, no_survey=false, desc="15" },
+        { address=0XE749F8, type="u32le", condition="eq", value=0X1E, action="SCORE_STATE", no_log=false, no_survey=false, desc="30" },
+        { address=0XE749F8, type="u32le", condition="eq", value=0X28, action="SCORE_STATE", no_log=false, no_survey=false, desc="40" },
+        { address=0XE749F8, type="u32le", condition="eq", value=0X32, action="SCORE_STATE", no_log=false, no_survey=false, desc="Adv" },
+        { address=0XE749F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Points - Exhibition" },
+        { address=0XE749FC, type="u32le", condition="eq", value=0X0F, action="SCORE_STATE", no_log=false, no_survey=false, desc="15" },
+        { address=0XE749FC, type="u32le", condition="eq", value=0X1E, action="SCORE_STATE", no_log=false, no_survey=false, desc="30" },
+        { address=0XE749FC, type="u32le", condition="eq", value=0X28, action="SCORE_STATE", no_log=false, no_survey=false, desc="40" },
+        { address=0XE749FC, type="u32le", condition="eq", value=0X32, action="SCORE_STATE", no_log=false, no_survey=false, desc="Adv" },
+        { address=0XE749FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="CPU Points - Exhibition" },
+      },
+      collectibles = {
+        { address=0XD1C7F4, type="u32le", condition="eq", value=0X11, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Medal" },
+      },
+    },
+  },
+}

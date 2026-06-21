@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Mahjong Solitaire",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mahjong-solitaire",
+    file = "mahjong-solitaire.zip",
+    hashes = {
+      { hash = "8d1933e18c5ee08b2f0d38da1b28eef6", label = "Mahjong Solitaire (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDFD884, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="- 0x03 = Paused" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE05F54, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage Timer" },
+        { address=0XE05F58, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage Timer" },
+      },
+    },
+  },
+}

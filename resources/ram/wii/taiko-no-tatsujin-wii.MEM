@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Taiko no Tatsujin Wii",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "taiko-no-tatsujin-wii",
+    file = "taiko-no-tatsujin-wii.zip",
+    hashes = {
+      { hash = "1dafbac77a650aeaaf918030e84ebe6c", label = "Taiko no Tatsujin Wii (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X151D8CC, type="u32be", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X151D8CC, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X10001BC2, type="u8", condition="bit_true", bit=5, mask=0X20, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="The Carnivorous Carnival Song - 10 Songs after 99999 hits or after staff credits" },
+        { address=0X10001BC7, type="u8", condition="bit_true", bit=1, mask=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Kodama (こだま) - After staff credits" },
+      },
+      events = {
+        { address=0X7ABCD4, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit BE] P1 Result - Max Combo" },
+        { address=0X7ABD00, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit BE] P2 Result - Max Combo" },
+        { address=0X114D6AF4, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit BE] Ingame - Max Combo" },
+        { address=0X114D6AF8, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit BE] Ingame - Current Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X7ABCF4, type="u32be", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Full Combo" },
+        { address=0X7ABCF4, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X7ABD20, type="u32be", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Full Combo" },
+        { address=0X7ABD20, type="u32be", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X10001BC0, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Toccata and Fugue and Rock (トッカータとフーガとロック) Song - Clear 100 songs" },
+        { address=0X10001BC0, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kare Kano Kanon (カレ・カノ・カノン) Song - Clear 200 songs" },
+        { address=0X10001BC0, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Happy de Rippa! (ハッピーでリッパ！) Song - Black Don level 1" },
+        { address=0X10001BC0, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sengoku Sangen (戦国三弦) Song - Kindergarten Don Level 1" },
+        { address=0X10001BC1, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menkui Miracle (メンクイミラクル) Song - Black Don level 3" },
+        { address=0X10001BC1, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hole in the wall Song - Gangster Don level 4" },
+        { address=0X10001BC1, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kaze no Fantasy (風のファンタジー) Song - Black Don level 5" },
+        { address=0X10001BC2, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yozakura Shanikusai (夜桜謝肉祭) Song - Student Don Level 1" },
+        { address=0X10001BC5, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wada-Don (わだどん) SFX - Baby Don Level 2" },
+        { address=0X10001BC5, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fart (おなら) SFX - Baby Don Level 3" },
+        { address=0X10001BC5, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tambourine (タンバリン) SFX - Baby Don level 4" },
+        { address=0X10001BC5, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Robot (ロボット) SFX - Baby Don Level 5" },
+        { address=0X10001BC5, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Donko (どん子) SFX - Kindergarten Don Level 2" },
+        { address=0X10001BC6, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fireworks (はなび) SFX - Kindergarten Don level 3" },
+        { address=0X10001BC6, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Thunder Taiko (カミナリ太鼓) SFX - Kindergarten Don level 4" },
+        { address=0X10001BC6, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster (かいじゅう) SFX - Kindergarten Don level 5" },
+        { address=0X10001BC6, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Laughter (おわらい) SFX - Student Don level 2" },
+        { address=0X10001BC6, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Feeling Good (きもちイイ) SFX - Student Don level 5" },
+        { address=0X10001BC6, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Metal Taiko (メタル太鼓) SFX - Gangster Don level 1" },
+        { address=0X10001BC6, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gangster Don (ツッパリどん) SFX - Gangster Don level 3" },
+        { address=0X10001BC6, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gorgeous Taiko (ゴージャス太鼓) SFX - Black Don level 2" },
+        { address=0X10001BC7, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Daisuki (だいすき) SFX - Black Don level 4" },
+        { address=0X10001BC9, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quad Speed - Clear 50 songs on Muzukashi" },
+        { address=0X10001BC9, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Invisible Notes - Clear 50 songs on Futsuu" },
+        { address=0X10001BC9, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Reverse Notes - Clear 50 songs on Kantan" },
+        { address=0X100027B6, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+      },
+      stage = {
+        { address=0X10001BC2, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE 0. ac11 Song - Student Don level 4" },
+        { address=0X10001FB0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Byte BE] Kantan - Stage 0.ac11 statistic" },
+        { address=0X10002230, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Byte BE] Futsuu - Stage 0.ac11 statistic" },
+        { address=0X100024B0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Byte BE] Muzukashi - Stage 0.ac11 statistic" },
+        { address=0X10002730, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Byte BE] Oni - Stage 0.ac11 statistic" },
+        { address=0X10005335, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Dojo - User 3 - Current Stage Chosen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6F8690, type="u32be", condition="eq", value=0X22, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Requiem from Dies Irae" },
+        { address=0X6F8690, type="u32be", condition="eq", value=0X27, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Star Soldier Medley" },
+        { address=0X10001AB0, type="u16be", condition="eq", value=0X19, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Oni - 50 Any Crowns - Kanpeki Modifier (Sudden Death)" },
+        { address=0X10001BC9, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sudden Death - Clear 50 songs on Oni" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7ABCD0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit BE] P1 Result - Score" },
+        { address=0X7ABCFC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit BE] P2 Result - Score" },
+        { address=0X114D6AE4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit BE] Ingame - Score" },
+      },
+      collectibles = {
+        { address=0X10001AB0, type="u16be", condition="eq", value=0X1A, action="MONEY_STATE", no_log=false, no_survey=false, desc="100 Gold Crowns - Rotter Tarmination Song" },
+        { address=0X10001AB0, type="u16be", condition="eq", value=0X1B, action="MONEY_STATE", no_log=false, no_survey=false, desc="200 Gold Crowns - Sexy SFX" },
+        { address=0X10001AB0, type="u16be", condition="eq", value=0X71, action="MONEY_STATE", no_log=false, no_survey=false, desc="Two types of crowns, silver and gold" },
+        { address=0X10001BC8, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Sexy (おいろけ) SFX - Get 200 gold crowns (yikes)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X10001A8C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit BE] Total Hit Counter" },
+        { address=0X10001AB0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

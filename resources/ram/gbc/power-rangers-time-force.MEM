@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Power Rangers: Time Force",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "power-rangers-time-force",
+    file = "power-rangers-time-force.zip",
+    hashes = {
+      { hash = "7510fe2592accfa6ccd4745612e64f88", label = "Saban's Power Rangers - Time Force (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC597, type="u8", condition="eq", value=0X06, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0XC597, type="u8", condition="eq", value=0X0B, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Clear" },
+        { address=0XC597, type="u8", condition="eq", value=0X0D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC5F6, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Silver Hills" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underwater Base" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fabled City (Present Day)" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fabled City (In the Future)" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fabled City (In the Past)" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underwater Base Chapter 4" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle Chapter 4" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Energy Plant (In the Future)" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Castle (In the Past)" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Secret Base (Present Day)" },
+        { address=0XC5F6, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pocket Dimension" },
+        { address=0XC5F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID:" },
+        { address=0XC602, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bitflags Stages Completed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X104B7, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X104B7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Red Ranger Life: increased" },
+        { address=0X104B7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Red Ranger Life: decreased" },
+        { address=0X104B8, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X104B8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Blue Ranger Life: increased" },
+        { address=0X104B8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Blue Ranger Life: decreased" },
+        { address=0X104B9, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X104B9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Yellow Ranger Life: increased" },
+        { address=0X104B9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Yellow Ranger Life: decreased" },
+        { address=0X104BA, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X104BA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Pink Ranger Life: increased" },
+        { address=0X104BA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pink Ranger Life: decreased" },
+        { address=0X104BB, type="u8", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X104BB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Green Ranger Life: increased" },
+        { address=0X104BB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Green Ranger Life: decreased" },
+        { address=0X1200E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Megazord Life increased" },
+        { address=0X1200E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Megazord Life decreased" },
+        { address=0X1200F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Giant Mooger Life increased" },
+        { address=0X1200F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Giant Mooger Life decreased" },
+      },
+      health = {
+        { address=0X104BC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Red Ranger Energy decreased" },
+        { address=0X104BC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Red Ranger Energy increased" },
+        { address=0X104BD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Blue Ranger Energy decreased" },
+        { address=0X104BD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Blue Ranger Energy increased" },
+        { address=0X104BE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yellow Ranger Energy decreased" },
+        { address=0X104BE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yellow Ranger Energy increased" },
+        { address=0X104BF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pink Ranger Energy decreased" },
+        { address=0X104BF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pink Ranger Energy increased" },
+        { address=0X104C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Green Ranger Energy decreased" },
+        { address=0X104C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Green Ranger Energy increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X104B2, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fist" },
+        { address=0X104B2, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Staff" },
+        { address=0X104B2, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gun" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC597, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Explosion" },
+        { address=0XC597, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Megazord Boss Explosion" },
+        { address=0X120B4, type="u16le", condition="eq", value=0X0F80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pocket Dimension Trigger" },
+        { address=0X120C4, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Crab Mantis" },
+        { address=0X120C4, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Evil Merman" },
+        { address=0X120C4, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Three Eyes" },
+        { address=0X120C4, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Gluto" },
+        { address=0X120C4, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Nadira" },
+        { address=0X120C4, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Evil Merman Chapter 5" },
+        { address=0X120C4, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Frax" },
+        { address=0X120C4, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Armor Ghost" },
+      },
+    },
+  },
+}

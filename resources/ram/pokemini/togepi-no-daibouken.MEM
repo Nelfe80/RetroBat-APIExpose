@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Togepi no Daibouken",
+    system = "pokemini",
+    system_name = "Pokemon Mini",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "togepi-no-daibouken",
+    file = "togepi-no-daibouken.zip",
+    hashes = {
+      { hash = "a4eb2facaa5beb947f306ced2bf5cd15", label = "Togepi no Daibouken (Japan).min" },
+      { hash = "cac3842f010dba9e4155e459111b6ebd", label = "Togepi no Daibouken (Japan) (En) (Mr. Blinky) (1.0).min" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X04E1, type="u8", condition="eq", value=0X63, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X0634, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0E95, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01=goal?" },
+      },
+      stage = {
+        { address=0X05CF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="pichu sprite id for stages they are on" },
+        { address=0X0871, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="fearow returning togepi to the stage when sprite=02" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0E99, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="possible 01=stairs or death?" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0890, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="can be used for door opening" },
+        { address=0X0930, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch 1 Pressed State" },
+        { address=0X0931, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch 2 Pressed State" },
+        { address=0X0932, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch 3 Pressed State" },
+        { address=0X0933, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch 4 Pressed State" },
+        { address=0X0934, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="16bit rest switch id" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0662, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Automatic Pause Timer" },
+      },
+    },
+  },
+}

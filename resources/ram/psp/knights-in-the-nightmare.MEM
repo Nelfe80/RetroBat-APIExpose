@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Knights in the Nightmare",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "knights-in-the-nightmare",
+    file = "knights-in-the-nightmare.zip",
+    hashes = {
+      { hash = "34bdae291bc8ff732239e010f538addf", label = "Knights in the Nightmare (USA).iso" },
+    }
+  },
+
+  events = {
+  },
+}

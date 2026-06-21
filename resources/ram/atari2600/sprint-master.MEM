@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sprint Master",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "sprint-master",
+    file = "sprint-master.zip",
+    hashes = {
+      { hash = "5a8afe5422abbfb0a342fb15afd7415f", label = "Sprint Master (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

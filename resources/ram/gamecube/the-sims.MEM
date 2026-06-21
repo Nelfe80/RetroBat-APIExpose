@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Sims",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "the-sims",
+    file = "the-sims.zip",
+    hashes = {
+      { hash = "4b67fd311dc62e5b443e97fc79034172", label = "Sims, The (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

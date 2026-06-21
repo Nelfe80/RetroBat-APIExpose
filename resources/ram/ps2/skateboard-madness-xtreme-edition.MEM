@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Skateboard Madness: Xtreme Edition",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "skateboard-madness-xtreme-edition",
+    file = "skateboard-madness-xtreme-edition.zip",
+    hashes = {
+      { hash = "ef5ce2d6826ff907918996b5322dd080", label = "Skateboard Madness - Xtreme Edition (Europe)" },
+      { hash = "80e4004b1a1c050d042c323752aa4824", label = "Skateboard Madness - Xtreme Edition (Europe) (RA Compatibility) (v0.1) (Souzooka)" },
+    }
+  },
+
+  events = {
+  },
+}

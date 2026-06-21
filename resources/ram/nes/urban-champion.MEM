@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Urban Champion",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "urban-champion",
+    file = "urban-champion.zip",
+    hashes = {
+      { hash = "cb7f1463c90cdcdf5ef315c125f12fe2", label = "Urban Champion (World).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0084, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="fight on" },
+        { address=0X00C0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x00 - Not demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X001B, type="u32le", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="vencendo a luta" },
+        { address=0X001B, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="52=vencendo round" },
+        { address=0X0094, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ROUND 10, 20, 30 etc..." },
+        { address=0X00A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="TOP ROUND!" },
+      },
+      stage = {
+        { address=0X0095, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE!!!" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0080, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME:" },
+        { address=0X0081, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME:" },
+      },
+    },
+  },
+}

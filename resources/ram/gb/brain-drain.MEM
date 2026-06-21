@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Brain Drain",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "brain-drain",
+    file = "brain-drain.zip",
+    hashes = {
+      { hash = "56f304dbd0045521271de857ffc77fbe", label = "Brain Drain (Europe) (SGB Enhanced).gb" },
+      { hash = "0c7beead4f65e97a23b718ce20a1bf55", label = "Brain Drain (USA) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XFF90, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit level ID" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFFB2, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="8bit shock power up in stock" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFF98, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="menu timer before title screen goes to demo or hall of fame screen" },
+        { address=0XFFA7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8bit timer" },
+        { address=0XFFB1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8bit timer power up in stock" },
+      },
+    },
+  },
+}

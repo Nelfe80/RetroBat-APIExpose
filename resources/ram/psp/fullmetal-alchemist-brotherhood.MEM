@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Fullmetal Alchemist: Brotherhood",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fullmetal-alchemist-brotherhood",
+    file = "fullmetal-alchemist-brotherhood.zip",
+    hashes = {
+      { hash = "25cfe2de33d9256b61d16ed95cd5bfa4", label = "Fullmetal Alchemist - Brotherhood (Europe) (En,De).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X93D350, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen, Main Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9701D0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Edward Elric Level" },
+        { address=0X970260, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alphonse Elric Level" },
+        { address=0X9702F0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Roy Mustang Level" },
+        { address=0X970380, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Riza Hawkeye Level" },
+        { address=0X970410, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alex Louis Armstrong Level" },
+        { address=0X9704A0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Izumi Curtis Level" },
+        { address=0X970530, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ling Yao Level" },
+        { address=0X9705C0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lan Fan Level" },
+        { address=0X970650, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scar Level" },
+        { address=0X9706E0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="May Chang Level" },
+        { address=0X970770, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="King Bradley Level" },
+        { address=0X970800, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lust Level" },
+        { address=0X970890, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Glutonny Level" },
+        { address=0X970920, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Envy Level" },
+        { address=0X970B60, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Greed Level" },
+        { address=0X970BF0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Greed (Ling) Level" },
+        { address=0X970D18, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy Levels in Custom Battle" },
+      },
+      stage = {
+        { address=0X96FAF0, type="u8", condition="eq", value=0X41, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Resembol, Default" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X42, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="5th Laboratory" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X43, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Desert" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X44, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Devil's Nest" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X45, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="City Street" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X46, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sewers" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X47, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Station" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X48, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mobile Base" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X49, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rush Valley" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X4A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Barracks" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X4B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="City Outskirts" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X4C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Izumi's House" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X4D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Underground Facility" },
+        { address=0X96FAF0, type="u8", condition="eq", value=0X4E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fake Gate of Truth" },
+        { address=0X96FAF0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Battle Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X970D0C, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Signs of Life" },
+      },
+      health = {
+        { address=0X970D0C, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Healthy Mind and Body" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X970D0C, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Right Hand" },
+        { address=0X970D0C, type="u8", condition="eq", value=0X09, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Soul Signpost" },
+        { address=0X970D0C, type="u8", condition="eq", value=0X0E, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Soul Signpost" },
+        { address=0X970D0C, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Right Hand" },
+        { address=0X970D0C, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Soul Signpost" },
+      },
+    },
+  },
+}

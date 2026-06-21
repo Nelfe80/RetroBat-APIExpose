@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Mafia",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "mafia",
+    file = "mafia.zip",
+    hashes = {
+      { hash = "ae66a925e54de1bef0d18afd0779e078", label = "Mafia (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X4F3094, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Current HP" },
+        { address=0X4F31F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health HUD decreased" },
+        { address=0X4F31F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health HUD increased" },
+        { address=0X534B04, type="u8", condition="eq", value=0XEA, action="HIT", no_log=false, no_survey=false, desc="Difficulty & Damage" },
+        { address=0XFECE04, type="u8", condition="eq", value=0X1, action="HIT", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1253604, type="u8", condition="eq", value=0X1, action="HIT", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XA99358, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="No Weapon" },
+        { address=0XA99368, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="No Weapon" },
+        { address=0X144BD88, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bullets remaining in inventory weapon slot 1" },
+        { address=0X144BD98, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bullets remaining in inventory weapon slot 2" },
+        { address=0X144BDA8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bullets remaining in inventory weapon slot 3" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4F31F8, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[32-Bit-A] Current Magazine Ammo HUD" },
+        { address=0X4F31FC, type="u32le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[32-Bit-A] Total Ammo HUD" },
+        { address=0X4F3DC0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit-A] Free Ride Money #1 increased" },
+        { address=0XA1A76C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit-A] Free Ride Money #2 increased" },
+        { address=0X144BD84, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current ammo in magazine weapon slot 1" },
+        { address=0X144BD94, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current ammo in magazine weapon slot 2" },
+        { address=0X144BDA4, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current ammo in magazine weapon slot 3" },
+      },
+    },
+  },
+}

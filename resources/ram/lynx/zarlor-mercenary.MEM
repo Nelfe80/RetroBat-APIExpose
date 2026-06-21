@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Zarlor Mercenary",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "zarlor-mercenary",
+    file = "zarlor-mercenary.zip",
+    hashes = {
+      { hash = "d008f41ec119e2c5c6a0782aebf148a8", label = "Zarlor Mercenary (World).lnx" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3431, type="u8", condition="eq", value=0XBA, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over/Victory" },
+        { address=0X3431, type="u8", condition="eq", value=0XE5, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3431, type="u8", condition="eq", value=0X3C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-Cadmar Desert" },
+        { address=0X3431, type="u8", condition="eq", value=0X42, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop" },
+        { address=0X3431, type="u8", condition="eq", value=0X57, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2-Mesort Swamp" },
+        { address=0X3431, type="u8", condition="eq", value=0X5D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop" },
+        { address=0X3431, type="u8", condition="eq", value=0X72, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3-Docrit Sea" },
+        { address=0X3431, type="u8", condition="eq", value=0X78, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop" },
+        { address=0X3431, type="u8", condition="eq", value=0X8D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4-Sedimor Domes" },
+        { address=0X3431, type="u8", condition="eq", value=0X94, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop" },
+        { address=0X3431, type="u8", condition="eq", value=0XA8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5-Mardic Ice" },
+        { address=0X3431, type="u8", condition="eq", value=0XAE, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop" },
+        { address=0X3431, type="u8", condition="eq", value=0XC3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6-Cedmite City" },
+        { address=0X3431, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level ID" },
+      },
+      stage = {
+        { address=0X3431, type="u8", condition="eq", value=0XFC, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0046, type="u8", condition="eq", value=0X39, action="LIVES_STATE", no_log=false, no_survey=false, desc="LIFE" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAA30, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [BCD] Money Tens/Ones increased" },
+        { address=0XAA34, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [BCD] Money Hundreds/Thousands increased" },
+        { address=0XAA38, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [BCD] Money Ten Thousands/Hundred Thousands increased" },
+        { address=0XAA3C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] [BCD] Money Millions/Ten Millions increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XAA20, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] Super Shield" },
+      },
+    },
+  },
+}

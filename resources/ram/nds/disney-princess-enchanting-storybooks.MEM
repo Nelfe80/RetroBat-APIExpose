@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Disney Princess: Enchanting Storybooks",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "disney-princess-enchanting-storybooks",
+    file = "disney-princess-enchanting-storybooks.zip",
+    hashes = {
+      { hash = "f42c99c619f1552f3247c9a8c357b2c6", label = "Disney Princess - Enchanting Storybooks (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "DeJig: Aqua World",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "dejig-aqua-world",
+    file = "dejig-aqua-world.zip",
+    hashes = {
+      { hash = "eb2f9a20fb7fd30fae00ba9fe1592fd2", label = "DeJig - Aqua World (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0002, type="u8", condition="eq", value=0X47, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X0002, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x30 = Stage Select, in-game" },
+        { address=0X1328B5, type="u8", condition="eq", value=0XC8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X1328B5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0xd2 = Stage Select, in-game" },
+      },
+    },
+  },
+}

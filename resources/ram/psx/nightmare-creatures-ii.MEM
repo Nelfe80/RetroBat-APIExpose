@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Nightmare Creatures II",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure, Horror"
+  },
+
+  rom = {
+    name = "nightmare-creatures-ii",
+    file = "nightmare-creatures-ii.zip",
+    hashes = {
+      { hash = "4effa28718bcbb97ed48781411ee395d", label = "Nightmare Creatures II (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1409FC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2639C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Streamzone" },
+        { address=0XB9315, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Violence Level" },
+        { address=0X135864, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 612)" },
+        { address=0X18CFB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Health in Level 3" },
+        { address=0X18CFB4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 2)" },
+        { address=0X18D44C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 6)" },
+        { address=0X18D93C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 8)" },
+        { address=0X18D99C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 8)" },
+        { address=0X18DF98, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player HP in Level 4" },
+        { address=0X18DF9C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 4)" },
+        { address=0X18E11C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 7)" },
+        { address=0X18E17C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 7)" },
+        { address=0X18EC34, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 5)" },
+        { address=0X18EEE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player HP in Level 3 (note: Level 1 is considered level 0 in memory)" },
+        { address=0X18EEEC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wallace Situation (Level 3)" },
+      },
+      stage = {
+        { address=0XB913B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+        { address=0X1504CD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Loaded Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB9267, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Creature Life 4 increased" },
+        { address=0XB9267, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creature Life 4 decreased" },
+        { address=0X18D998, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Wallace Life 5 increased" },
+        { address=0X18D998, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wallace Life 5 decreased" },
+        { address=0X18DF58, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Wallace Life 4 increased" },
+        { address=0X18DF58, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wallace Life 4 decreased" },
+        { address=0X18DF59, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Wallace Life 3 increased" },
+        { address=0X18DF59, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wallace Life 3 decreased" },
+        { address=0X18E518, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Wallace Life 2 increased" },
+        { address=0X18E518, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wallace Life 2 decreased" },
+        { address=0X18E519, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Wallace Life 1 increased" },
+        { address=0X18E519, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wallace Life 1 decreased" },
+        { address=0X18E7C8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Creature Life 5 increased" },
+        { address=0X18E7C8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creature Life 5 decreased" },
+        { address=0X18EA78, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Creature Life 8 increased" },
+        { address=0X18EA78, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creature Life 8 decreased" },
+        { address=0X18F940, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Creature Life 1 increased" },
+        { address=0X18F940, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creature Life 1 decreased" },
+        { address=0X18FD48, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Creature Life 6 increased" },
+        { address=0X18FD48, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creature Life 6 decreased" },
+        { address=0X190558, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Creature Life 7 increased" },
+        { address=0X190558, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creature Life 7 decreased" },
+        { address=0X192848, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Creature Life 2 increased" },
+        { address=0X192848, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creature Life 2 decreased" },
+        { address=0X192AF8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Creature Life 3 increased" },
+        { address=0X192AF8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creature Life 3 decreased" },
+      },
+      health = {
+        { address=0X18D448, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (6) decreased" },
+        { address=0X18D448, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (6) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XAA83D, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Shotgun Fire" },
+        { address=0XAA83E, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Shotgun Bomb" },
+        { address=0XAA83F, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Fly" },
+        { address=0XAA840, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Shotgun2" },
+        { address=0XAA841, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Fire Axe" },
+        { address=0XAA842, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Fire" },
+        { address=0XAA843, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Lightning" },
+        { address=0XAA844, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Skull Ice" },
+        { address=0XAA845, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Skull" },
+        { address=0XAA846, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Spike power-up" },
+        { address=0XAA847, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up: Spike" },
+      },
+    },
+  },
+}

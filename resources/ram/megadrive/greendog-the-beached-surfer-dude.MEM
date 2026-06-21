@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Greendog: The Beached Surfer Dude!",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "greendog-the-beached-surfer-dude",
+    file = "greendog-the-beached-surfer-dude.zip",
+    hashes = {
+      { hash = "12199da6628b92c9bbd59460ae602a8c", label = "Greendog - The Beached Surfer Dude! (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0014, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title scene" },
+        { address=0X0014, type="u8", condition="eq", value=0X9, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X181F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause boolean" },
+        { address=0X361C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode = 0x01" },
+        { address=0X3620, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X3, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X26A1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Level item pickup = 0xff" },
+        { address=0X362A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cheats: Level Select" },
+        { address=0XFFB6, type="u8", condition="eq", value=0X0, action="LEVEL_GRENADA", no_log=false, no_survey=false, desc="Grenada" },
+        { address=0XFFB6, type="u8", condition="eq", value=0X1, action="LEVEL_AZTEC_1", no_log=false, no_survey=false, desc="Aztec 1" },
+        { address=0XFFB6, type="u8", condition="eq", value=0X17, action="LEVEL_AZTEC_6", no_log=false, no_survey=false, desc="Aztec 6" },
+        { address=0XFFB6, type="u8", condition="eq", value=0X18, action="LEVEL_EXIT", no_log=false, no_survey=false, desc="Exit" },
+        { address=0XFFB6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select cheat selection" },
+        { address=0XFFFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level if Level Select cheat was used" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sega Logo" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Intro" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X21, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last level" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X22, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ending cutscene" },
+        { address=0XFFFE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Scene Progression" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X17DC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Lives increased" },
+        { address=0X17DC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Lives decreased" },
+        { address=0X20FB, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alive" },
+        { address=0X20FB, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Just died" },
+        { address=0X23BE, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X20FA, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X20FA, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Health/HP Mirror" },
+        { address=0X23BE, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X23BE, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Health/HP" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17E0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (_X,XX0,000)" },
+        { address=0X17E2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (_0,00X,XXX)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X20FC, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Player invincibility frames" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X20E4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Inventory: Slot 1" },
+      },
+    },
+  },
+}

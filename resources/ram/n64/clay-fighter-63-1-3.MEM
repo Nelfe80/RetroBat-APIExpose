@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Clay Fighter 63 1/3",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "clay-fighter-63-1-3",
+    file = "clay-fighter-63-1-3.zip",
+    hashes = {
+      { hash = "3207bf22e305c488109b09a03706f36f", label = "Clay Fighter 63 1-3 (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X1F24BC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 Current Hit Total for Combo SS F5" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19B79A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On" },
+        { address=0X19B79A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Secret Options Choose Background (1 Player)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X106AC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP Visual Static decreased" },
+        { address=0X106AC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP Visual Static increased" },
+        { address=0X106ACC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP Visual Static decreased" },
+        { address=0X106ACC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP Visual Static increased" },
+        { address=0X19B796, type="u8", condition="eq", value=0X1, action="HEALTH_STATE", no_log=true, no_survey=false, desc="On" },
+        { address=0X19B796, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Display Health Meter" },
+        { address=0X1F2340, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Real HP SS F3 decreased" },
+        { address=0X1F2340, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Real HP SS F3 increased" },
+        { address=0X1F2710, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP Real SS F2 decreased" },
+        { address=0X1F2710, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP Real SS F2 increased" },
+        { address=0X1F2C40, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP Real SS F1 decreased" },
+        { address=0X1F2C40, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP Real SS F1 increased" },
+        { address=0X1F5BB0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP Real SS F2 decreased" },
+        { address=0X1F5BB0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP Real SS F2 increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X19B774, type="u8", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="On" },
+        { address=0X19B774, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Limit" },
+        { address=0X19B7A2, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="On" },
+        { address=0X19B7A2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Secret Options Claytality Timer" },
+        { address=0X1F89F4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State 5 Timer" },
+      },
+    },
+  },
+}

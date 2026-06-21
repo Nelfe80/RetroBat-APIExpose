@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "King's Field II",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "kings-field-ii",
+    file = "kings-field-ii.zip",
+    hashes = {
+      { hash = "54e0368be5fdb392d6fd0c39cf8489d3", label = "King's Field (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1994DD, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Visible" },
+        { address=0X1994DD, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0X1994DD, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="HUD MP/HP Visibility" },
+      },
+    },
+  },
+}

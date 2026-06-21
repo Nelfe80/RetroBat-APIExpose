@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "007: Quantum of Solace",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "007-quantum-of-solace",
+    file = "007-quantum-of-solace.zip",
+    hashes = {
+      { hash = "069a7d479543d5afa55a7fba628977b1", label = "007 - Quantum of Solace (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3CB440, type="u8", condition="eq", value=0X2, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X3CB440, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Loading Screen" },
+        { address=0X442A08, type="u32le", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3C9E78, type="u32le", condition="eq", value=0XFFFFFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Transition" },
+        { address=0X3CD018, type="u16le", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cutscene for the next level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3CD018, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Prerendered cutscenes and result or state screens" },
+      },
+    },
+  },
+}

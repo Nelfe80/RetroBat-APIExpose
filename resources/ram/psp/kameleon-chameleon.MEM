@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Kameleon | Chameleon",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kameleon-chameleon",
+    file = "kameleon-chameleon.zip",
+    hashes = {
+      { hash = "3d1d7e8ad57de51fa775f089551fef3f", label = "Kameleon (Europe).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X114B560, type="u32le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X114B560, type="u32le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds - Standard" },
+        { address=0X114B560, type="u32le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+        { address=0X114B560, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32-Bit - Option - Rounds" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X114B558, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="32-Bit - Option - Time" },
+      },
+    },
+  },
+}

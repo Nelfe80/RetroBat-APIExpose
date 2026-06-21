@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle - Echter Puzzlespass für Unterwegs: Sightseeing",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-echter-puzzlespass-fur-unterwegs-sightseeing",
+    file = "puzzle-echter-puzzlespass-fur-unterwegs-sightseeing.zip",
+    hashes = {
+      { hash = "109c20385d8c63e02a8d5a426864f1c3", label = "Sightseeing Puzzle - Echter Puzzlespass fuer Unterwegs (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

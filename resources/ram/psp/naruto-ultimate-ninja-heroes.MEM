@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Naruto: Ultimate Ninja Heroes",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "naruto-ultimate-ninja-heroes",
+    file = "naruto-ultimate-ninja-heroes.zip",
+    hashes = {
+      { hash = "b6bd0a0a1aec6e4abe5142200c5fd562", label = "Naruto - Ultimate Ninja Heroes (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XF20780, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Naruto" },
+        { address=0XF2078A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Sasuke" },
+        { address=0XF20794, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Lee" },
+        { address=0XF2079E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Gaara" },
+        { address=0XF207A8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Shikamaru" },
+        { address=0XF207B2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Neji" },
+        { address=0XF207BC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Sakura" },
+        { address=0XF207C6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Kakashi" },
+        { address=0XF207D0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Orochimaru" },
+        { address=0XF207EE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Hinata" },
+        { address=0XF207F8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Tenten" },
+        { address=0XF20802, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Choji" },
+        { address=0XF2080C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Ino" },
+        { address=0XF20816, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Kiba" },
+        { address=0XF20820, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Shino" },
+        { address=0XF2083E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Guy" },
+        { address=0XF20848, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Jiraiya" },
+        { address=0XF2085C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Itachi" },
+        { address=0XF20866, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Kisame" },
+        { address=0XF20870, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points - Tsunade" },
+      },
+      collectibles = {
+        { address=0XF20BFC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Scrolls increased" },
+      },
+    },
+  },
+}

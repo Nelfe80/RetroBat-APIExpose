@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Corpse Party -THE ANTHOLOGY- Sachiko no Renai Yugi: Hysteric Birthday 2U",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "corpse-party-the-anthology-sachiko-no-renai-yugi-hysteric-birthday-2u",
+    file = "corpse-party-the-anthology-sachiko-no-renai-yugi-hysteric-birthday-2u.zip",
+    hashes = {
+      { hash = "afcddc602f5d0022698cdeb0ccf8e129", label = "Corpse Party - The Anthology - Sachiko no Renai Yuugi - Hysteric Birthday 2U (Japan) (v1.01).iso" },
+    }
+  },
+
+  events = {
+  },
+}

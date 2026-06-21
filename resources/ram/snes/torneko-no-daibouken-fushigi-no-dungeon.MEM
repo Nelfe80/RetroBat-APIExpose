@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Torneko no Daibouken: Fushigi no Dungeon",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "torneko-no-daibouken-fushigi-no-dungeon",
+    file = "torneko-no-daibouken-fushigi-no-dungeon.zip",
+    hashes = {
+      { hash = "6c519cb2d7a0c7b197bb4d4377c82456", label = "Torneko no Daibouken - Fushigi no Dungeon (Japan).sfc" },
+      { hash = "f30ad84846629691a3946e00b3691a0e", label = "Torneko no Daibouken - Fushigi no Dungeon (Japan) (En) (MagicDestiny) (0.99).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0BDF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0BB7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Torneko's hp **/ decreased" },
+        { address=0X0BB7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Torneko's hp **/ increased" },
+        { address=0X0BCB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Torneko's HP /** decreased" },
+        { address=0X0BCB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Torneko's HP /** increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0E10, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hand of Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X21B03, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Indicator for amount of times died during tutorial dungeon increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0E11, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Hand of Shield" },
+        { address=0X0EA3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Supposedly the shield upgrade" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X005D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="act counter ?" },
+      },
+    },
+  },
+}

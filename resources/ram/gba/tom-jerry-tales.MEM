@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Tom & Jerry Tales",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tom-jerry-tales",
+    file = "tom-jerry-tales.zip",
+    hashes = {
+      { hash = "37f0505935e85c9cf7eebdae533536ef", label = "Tom and Jerry Tales (USA) (En,Fr,Es).gba" },
+      { hash = "85b02ee02e0ffda069ccdc9531248cb6", label = "Tom and Jerry Tales (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

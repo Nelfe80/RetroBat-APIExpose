@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Mega Man Battle Network 4.5: Real Operation",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "mega-man-battle-network-4-5-real-operation",
+    file = "mega-man-battle-network-4-5-real-operation.zip",
+    hashes = {
+      { hash = "5e294c4c1c2c5b914fda2c0855ff51d4", label = "Rockman EXE 4.5 - Real Operation (Japan) (En) (v1.2) (Spikeman).gba" },
+      { hash = "97c3b138b9797675dfb2135118347992", label = "Rockman EXE 4.5 - Real Operation (Japan) (Virtual Console).gba" },
+      { hash = "0f82bb24585c9ec64e99394c9d316315", label = "Rockman EXE 4.5 - Real Operation (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

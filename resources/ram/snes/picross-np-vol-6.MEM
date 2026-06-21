@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Picross NP Vol. 6",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picross-np-vol-6",
+    file = "picross-np-vol-6.zip",
+    hashes = {
+      { hash = "d86f9b3598db6c8f900ac2e12106b705", label = "Picross NP Vol. 6 (Japan) (NP).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1EF6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background music" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X202D3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Beginner A time" },
+      },
+    },
+  },
+}

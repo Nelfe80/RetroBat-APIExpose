@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Kamen Rider Ryuki",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kamen-rider-ryuki",
+    file = "kamen-rider-ryuki.zip",
+    hashes = {
+      { hash = "be31fb98e2b1dab7d542d05046529450", label = "Kamen Rider Ryuuki (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X750AE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Rounds Won" },
+        { address=0X750AF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2/CPU Rounds Won" },
+        { address=0X193210, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0X193210, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0X193210, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5" },
+        { address=0X193210, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Numer of Rounds" },
+      },
+      stage = {
+        { address=0X750B0, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenge Mode Over" },
+        { address=0X750B0, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Last Stage" },
+        { address=0X750B0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1CE830, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2/CPU HP (16-bit) decreased" },
+        { address=0X1CE830, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2/CPU HP (16-bit) increased" },
+        { address=0X1F1568, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP (16-bit) decreased" },
+        { address=0X1F1568, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP (16-bit) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X193274, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins (16-bit) increased" },
+      },
+    },
+  },
+}

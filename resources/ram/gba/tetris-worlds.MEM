@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Tetris Worlds",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tetris-worlds",
+    file = "tetris-worlds.zip",
+    hashes = {
+      { hash = "08aecb6882d9a73b2cac1316a5fbf31b", label = "Tetris Worlds (Europe) (En,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0B9B, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="In Game" },
+        { address=0X0B9B, type="u8", condition="eq", value=0X2, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause / In Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0150, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Starting Level [Lower4]" },
+        { address=0X3454, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level [Lower4]" },
+        { address=0X3458, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total Lines Cleared" },
+        { address=0X7830, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total Lines Cleared in Popular Mode" },
+      },
+      zone = {
+        { address=0X0158, type="u8", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Water" },
+        { address=0X0158, type="u8", condition="eq", value=0X1, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fire" },
+        { address=0X0158, type="u8", condition="eq", value=0X2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Air" },
+        { address=0X0158, type="u8", condition="eq", value=0X3, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Forest" },
+        { address=0X0158, type="u8", condition="eq", value=0X4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mountain" },
+        { address=0X0158, type="u8", condition="eq", value=0X5, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Snow" },
+        { address=0X0158, type="u8", condition="eq", value=0X7, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Random" },
+        { address=0X0158, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Choice [Lower4]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X782C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Popular Tetris Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X33D2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (Total Time) [16 bit]" },
+        { address=0X33DA, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer (Level Time)" },
+      },
+    },
+  },
+}

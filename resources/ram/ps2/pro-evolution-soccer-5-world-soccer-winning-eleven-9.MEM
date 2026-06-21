@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Pro Evolution Soccer 5 | World Soccer: Winning Eleven 9",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "pro-evolution-soccer-5-world-soccer-winning-eleven-9",
+    file = "pro-evolution-soccer-5-world-soccer-winning-eleven-9.zip",
+    hashes = {
+      { hash = "66e003eb595b866b1a2793548ff0ef28", label = "World Soccer Winning Eleven 9 (Japan) (En) (v5.0) (Fernando fk)" },
+      { hash = "a82946fa63805d16c13c98c45d4c44d0", label = "World Soccer Winning Eleven 9 (Japan)" },
+      { hash = "c2ccb430075c2b8bc3c9965b144f0c1f", label = "World Soccer Winning Eleven 9 (Korea)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Elevator Action: Old & New",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform, Shooter"
+  },
+
+  rom = {
+    name = "elevator-action-old-new",
+    file = "elevator-action-old-new.zip",
+    hashes = {
+      { hash = "7bb739ba35535f79bdb44e7161349ec1", label = "Elevator Action - Old & New (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

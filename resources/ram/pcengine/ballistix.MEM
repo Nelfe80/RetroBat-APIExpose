@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Ballistix",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Sports"
+  },
+
+  rom = {
+    name = "ballistix",
+    file = "ballistix.zip",
+    hashes = {
+      { hash = "9610910760ed0c034961866ceb7d4e23", label = "Ballistix (USA).pce" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1137, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals" },
+      },
+      stage = {
+        { address=0X1132, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2PL Stage" },
+      },
+    },
+  },
+}

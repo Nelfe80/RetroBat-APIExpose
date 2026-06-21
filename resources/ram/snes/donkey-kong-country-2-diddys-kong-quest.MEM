@@ -1,0 +1,121 @@
+return {
+  game = {
+    title = "Donkey Kong Country 2: Diddy's Kong Quest",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "donkey-kong-country-2-diddys-kong-quest",
+    file = "donkey-kong-country-2-diddys-kong-quest.zip",
+    hashes = {
+      { hash = "2ae8161cb714f2dad38f845674553a4b", label = "Donkey Kong Country 2 - Diddy's Kong Quest (Germany) (En,De) (Rev 1).sfc" },
+      { hash = "6ff526f388a179ec6eba9907eb8e3254", label = "Donkey Kong Country 2 - Diddy's Kong Quest (Europe) (En,Fr) (Rev 1).sfc" },
+      { hash = "83b97937eb3926446589b4ab9ee9c700", label = "Donkey Kong Country 2 - Diddy's Kong Quest (USA) (Rev 1) (MSU-1) (Remix Pack) (Matrizzle,Daniel Reimer) (v3.0).sfc" },
+      { hash = "98458530599b9dff8a7414a7f20b777a", label = "Donkey Kong Country 2 - Diddy's Kong Quest (USA) (En,Fr).sfc" },
+      { hash = "9d6a4985c77a132b0e8cdf57dcdf5d03", label = "Donkey Kong Country 2 - Diddy's Kong Quest (USA) (Rev1) (Pt).sfc" },
+      { hash = "b285148df1712acf50162bdbefdcf1e0", label = "Super Donkey Kong 2 - Dixie & Diddy (Japan) (Rev 1).sfc" },
+      { hash = "d323e6bb4ccc85fd7b416f58350bc1a2", label = "Donkey Kong Country 2 - Diddy's Kong Quest (USA) (En,Fr) (Rev 1).sfc" },
+      { hash = "deb3ec76b71419a4e793c70b49f105dd", label = "Donkey Kong Country 2 - Diddy's Kong Quest (USA) (Rev 1) (MSU-1) (Orchestral Set) (JUD6MENT).sfc" },
+      { hash = "f39d026f5bb47b1e8c72b36dca524849", label = "Donkey Kong Country 2 - Diddy's Kong Quest (Germany) (En,De).sfc" },
+      { hash = "f65bde686bda6226aea555858a74bb7d", label = "Super Donkey Kong 2 - Dixie & Diddy (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001C, type="u8", condition="eq", value=0X19, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Cranky, 2=Title, 1e=Credits" },
+        { address=0X05FB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Changing this initiates Demo Mode" },
+        { address=0X0601, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Around this is used in Demo Mode to control the player" },
+        { address=0X08C2, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Bit6 = Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X08E0, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="KongCoins, bit2=Swimming, bit3=EndLevelTarget, bit4=RambisSupercharge" },
+        { address=0X08E4, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SecretPassages, bit2=BonusLevels" },
+        { address=0X0E00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="01 = Checks if Diddy is on the ground?" },
+        { address=0X1715, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sprite region around here?" },
+        { address=0X59FF, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Krocodile Kore" },
+      },
+      zone = {
+        { address=0X06B1, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="CrocodileCauldron, 03=KremQuay" },
+        { address=0X06B1, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="KrazyKremland, 05=GloomyGulch, 06=KRoolsKeep, 07=FlyingKrock 09=KrazyKremland (Inside)" },
+        { address=0X06B1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID - 00=Overworld, A,B,C,D,E=LostWorld, 01=GangplankGalleon" },
+        { address=0X08DB, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Jungle Jinx," },
+        { address=0X08DB, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Black Ice Battle," },
+        { address=0X08DB, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Klobber Karnage," },
+        { address=0X08DB, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fiery Furnace" },
+        { address=0X08DB, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Animal Antics," },
+        { address=0X08DB, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Leave" },
+      },
+      stage = {
+        { address=0X01FF, type="u8", condition="eq", value=0XB5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map, ox80=Stage" },
+        { address=0X01FF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Status for being on the map or in a stage" },
+        { address=0X059D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Room Modifier ? - The room within a stage like bonuses" },
+        { address=0X059F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Room Modifier Exiting ? - The room within a stage like bonuses" },
+        { address=0X064B, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="False (In a stage)" },
+        { address=0X0682, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Changes Stage Name a bit and some map icons" },
+        { address=0X06AB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage IDs (editable)" },
+        { address=0X5982, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S2Croc, bit3,2=Dixie" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X060B, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="50 Lives Cheat" },
+        { address=0X08C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives counter in the HUD increased" },
+        { address=0X08C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives counter in the HUD decreased" },
+        { address=0X08C3, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="2Monkies, bit5=Dead, bit1=1Monkey" },
+        { address=0X0973, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life HUD Timer - 16bit increased" },
+        { address=0X0973, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life HUD Timer - 16bit decreased" },
+      },
+      health = {
+        { address=0X19BA, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16-Bits] The value goes down when the player hurts an enemy" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X08CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Banana Coins increased" },
+        { address=0X08CC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Krem Coins (currently held) increased" },
+        { address=0X08CE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="DK Coins increased" },
+        { address=0X091F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ammount of times that you need to press buttons to get out of the freeze effect during K. Rool's" },
+        { address=0X097E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Related to which Banana Coin the player collected increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0652, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health - Counts down, Shared with overworld stuff" },
+        { address=0X06A4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Related to boss phases?" },
+        { address=0X0E94, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="on stage or map status ? Reliable for boss fights" },
+        { address=0X59D3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="DKCoins - bit4=S2, bit3=S5, bit0=S9, bit1=Boss1" },
+        { address=0X59D6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="DKCoins - bit5=S7, bit4=S10, bit1=Boss2(notused), bit3=s29" },
+        { address=0X59DE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="DKCoins - bit3=boss3(notused), bit2=s30" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X16C8, type="u16le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Diddy Invincibility -16bit" },
+        { address=0X16EE, type="u16le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Dixie Invincibility -16bit" },
+      },
+      player = {
+        { address=0X08E2, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="AnimalBarrels, bit2=JumpingOnEnemies, bit6=AreaGuardian" },
+        { address=0X08E2, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="ExtraLivesBalloons, bit4=RattlysSuperjump, bit5=CrankysVGHeroCoins" },
+        { address=0X08E3, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="SecretDoors, bit2=RollJump" },
+        { address=0X0A38, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="01 = Did hit a enemie by jumping or rolling on them" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X08A6, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="01 = Activated a checkpoint in the current level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00D7, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Game Time - 1=18 Minutes and 3.75 Seconds" },
+        { address=0X00D8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Game Time - 1=276356.25 Seconds" },
+      },
+    },
+  },
+}

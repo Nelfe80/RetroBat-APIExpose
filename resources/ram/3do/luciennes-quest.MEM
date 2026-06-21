@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Lucienne's Quest",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "luciennes-quest",
+    file = "luciennes-quest.zip",
+    hashes = {
+      { hash = "1638121b1e867d1408e8785fbf5b6619", label = "Lucienne's Quest (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCB8F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lucienne level" },
+        { address=0XCB944, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lucienne exp to next level" },
+        { address=0XCB9A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ago's Level" },
+        { address=0XCBA50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Miminaga's level" },
+        { address=0XCD081, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Floor - HP Recovery +100" },
+        { address=0XCD081, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Floor - Leather Boot" },
+        { address=0XCD081, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Floor - 100 Gold" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCB904, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lucienne current HP decreased" },
+        { address=0XCB904, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lucienne current HP increased" },
+        { address=0XCB90C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lucienne max HP decreased" },
+        { address=0XCB90C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lucienne max HP increased" },
+        { address=0XCB9B0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ago's current HP decreased" },
+        { address=0XCB9B0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ago's current HP increased" },
+        { address=0XCB9B8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ago's max HP decreased" },
+        { address=0XCB9B8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ago's max HP increased" },
+        { address=0XCBA5C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Miminaga's current HP decreased" },
+        { address=0XCBA5C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Miminaga's current HP increased" },
+        { address=0XCBA64, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Miminaga's max HP decreased" },
+        { address=0XCBA64, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Miminaga's max HP increased" },
+        { address=0XCF494, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of HP Recovery+100 in inventory decreased" },
+        { address=0XCF494, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of HP Recovery+100 in inventory increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBDEA4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold possessed increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCB924, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Lucienne destroy stat" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBE1F0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8 Bit] Counter before overworld fight" },
+      },
+    },
+  },
+}

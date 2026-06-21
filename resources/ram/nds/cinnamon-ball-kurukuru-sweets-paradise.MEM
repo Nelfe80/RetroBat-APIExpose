@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Cinnamon Ball: Kurukuru Sweets Paradise",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "cinnamon-ball-kurukuru-sweets-paradise",
+    file = "cinnamon-ball-kurukuru-sweets-paradise.zip",
+    hashes = {
+      { hash = "d6af0ab467dadae2274bcf1c552c5952", label = "Cinnamoroll - Cinnamon Ball - Kurukuru Sweets Paradise (Japan).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1BFB2C, type="u8", condition="eq", value=0X7, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1BFB2C, type="u8", condition="eq", value=0X8, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1BFA6C, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear all?" },
+      },
+    },
+  },
+}

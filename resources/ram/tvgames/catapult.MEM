@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Catapult",
+    system = "tvgames",
+    system_name = "Elektor TV Games Computer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "catapult",
+    file = "catapult.zip",
+    hashes = {
+      { hash = "b0cb507cfdf9f5a4d4ee49ddddb31fe2", label = "Catapult (Europe) (ESS-010-5).tvc" },
+    }
+  },
+
+  events = {
+  },
+}

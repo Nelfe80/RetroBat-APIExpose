@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Ougon Kishi Garo",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ougon-kishi-garo",
+    file = "ougon-kishi-garo.zip",
+    hashes = {
+      { hash = "d148e4db7510e46bec196e9f2610f2d3", label = "Ougon Kishi Garo (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X43822C, type="u24le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[24 Bit] Stage ID (ASCII but reliable)" },
+        { address=0X1C1EAB4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Winner Flag for stage 2" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X14D656C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Gallery Points - Fixed" },
+        { address=0X1C1EA90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Gallery Points - Dynamic" },
+      },
+    },
+  },
+}

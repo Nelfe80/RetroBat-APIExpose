@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Skuljagger - Revolt of the Westicans",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "skuljagger-revolt-of-the-westicans",
+    file = "skuljagger-revolt-of-the-westicans.zip",
+    hashes = {
+      { hash = "665f1a4a60ee1f70fef1cde6d028fe4f", label = "Skuljagger - Revolt of the Westicans (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Sonic Wings Special",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "sonic-wings-special",
+    file = "sonic-wings-special.zip",
+    hashes = {
+      { hash = "e8f0345f32004c40ccae795c9a4ba7fa", label = "Sonic Wings Special (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDE3DA, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="1 (Game Paused)" },
+        { address=0XDE3DE, type="u8", condition="eq", value=0X0A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Endless" },
+        { address=0XDE418, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="During Demo, Intro, Highscores, Times" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDE3D9, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="When not playing" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X119F8A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] P1 Power Ups decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X119F8A, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Basic" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDE3D9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Stages Completed" },
+        { address=0XDE418, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Demo" },
+      },
+    },
+  },
+}

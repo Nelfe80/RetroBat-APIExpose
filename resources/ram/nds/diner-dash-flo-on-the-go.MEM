@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Diner Dash: Flo on the Go",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "diner-dash-flo-on-the-go",
+    file = "diner-dash-flo-on-the-go.zip",
+    hashes = {
+      { hash = "d6ab3258ba0c734efea3f9e9626fbc20", label = "Diner Dash - Flo on the Go (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15FA68, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Menus" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X15FA68, type="u16le", condition="eq", value=0X1F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Post-Level Screen (Story)" },
+        { address=0X15FA68, type="u16le", condition="eq", value=0X29, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Post-Level Screen (Endless)" },
+        { address=0X1620D4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[24 BIT PTR] Level Goals" },
+        { address=0X2BB740, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X2BB740, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Medium" },
+        { address=0X2BB740, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X2BB740, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 BIT] Level Number (Story Mode, 0 Indexed) OR Difficulty (Endless Mode)" },
+      },
+      zone = {
+        { address=0X2BB73C, type="u32le", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Cruise Ship" },
+        { address=0X2BB73C, type="u32le", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Train" },
+        { address=0X2BB73C, type="u32le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Submarine" },
+        { address=0X2BB73C, type="u32le", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Blimp" },
+        { address=0X2BB73C, type="u32le", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Spaceship" },
+        { address=0X2BB73C, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32 BIT] World Select" },
+      },
+    },
+  },
+}

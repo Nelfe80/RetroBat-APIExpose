@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Pearl Version [Subset - Professor Oak Challenge]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-pearl-version-subset-professor-oak-challenge",
+    file = "pokemon-pearl-version-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "78a72dd39b95f1c532f3c9f0004d7529", label = "Pokemon - Pearl Version [Subset - Professor Oak Challenge].nds" },
+    }
+  },
+
+  events = {
+  },
+}

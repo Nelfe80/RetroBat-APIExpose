@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Tak and the Power of Juju",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "tak-and-the-power-of-juju",
+    file = "tak-and-the-power-of-juju.zip",
+    hashes = {
+      { hash = "438be22c9e03529e2a03779a00d17b62", label = "Tak and the Power of Juju (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA1BF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sheep collected in current level" },
+        { address=0XA1C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sheep max in level" },
+      },
+      zone = {
+        { address=0X28E3C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Sheep collected World total" },
+        { address=0X28E88, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Sheep max in current world" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA1A1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current life number increased" },
+        { address=0XA1A1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current life number decreased" },
+        { address=0XA1DE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Orb limit (50 - new life)? increased" },
+        { address=0XA1DE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Orb limit (50 - new life)? decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X28E74, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Also sheep in current level - resets to 0 after finishing level, changing this does not affect s" },
+      },
+    },
+  },
+}

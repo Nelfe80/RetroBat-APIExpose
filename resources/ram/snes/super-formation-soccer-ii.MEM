@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Super Formation Soccer II",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "super-formation-soccer-ii",
+    file = "super-formation-soccer-ii.zip",
+    hashes = {
+      { hash = "f53baa0c5ecd0b3942c22260a569562e", label = "Super Formation Soccer II (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X075A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="goal A" },
+        { address=0X075B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="goal B" },
+        { address=0X1003, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal A 1" },
+        { address=0X1012, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal A 16" },
+      },
+    },
+  },
+}

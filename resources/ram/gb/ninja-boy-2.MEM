@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Ninja Boy 2",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ninja-boy-2",
+    file = "ninja-boy-2.zip",
+    hashes = {
+      { hash = "504e1a39167c467b15d5ad56b744ad48", label = "Ninja Boy 2 (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC000, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (01 = Paused)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC08A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      zone = {
+        { address=0XC0CB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC403, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP Display decreased" },
+        { address=0XC403, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP Display increased" },
+        { address=0XC423, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P HP, want this as 0 to block 2 player cheese decreased" },
+        { address=0XC423, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P HP, want this as 0 to block 2 player cheese increased" },
+        { address=0XC803, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Value P1 decreased" },
+        { address=0XC803, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Value P1 increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC084, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] Money increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC0A8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Saur Shield = Bit0" },
+        { address=0XC0AF, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Sentinel Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC0A5, type="u8", condition="bit_true", bit=6, mask=0X40, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Magidoor" },
+      },
+    },
+  },
+}

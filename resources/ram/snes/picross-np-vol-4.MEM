@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Picross NP Vol. 4",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picross-np-vol-4",
+    file = "picross-np-vol-4.zip",
+    hashes = {
+      { hash = "55a870d58c2ea285cb9cfcae1cea0a05", label = "Picross NP Vol. 4 (Japan) (NP).sfc" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X202BB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Beginner A time" },
+      },
+    },
+  },
+}

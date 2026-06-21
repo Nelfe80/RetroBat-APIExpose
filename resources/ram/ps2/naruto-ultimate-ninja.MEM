@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Naruto: Ultimate Ninja",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Fighting"
+  },
+
+  rom = {
+    name = "naruto-ultimate-ninja",
+    file = "naruto-ultimate-ninja.zip",
+    hashes = {
+      { hash = "530edd8903ed46ae9b2ff27de41f00df", label = "Naruto - Ultimate Ninja (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X83DCBC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{SLUS-21358} Difficulty Level [32bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X83D3CC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{SLUS-21358} Money [32bit] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X83DF1D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Naruto Saga - Times Cleared" },
+        { address=0X83DF1E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Sasuke Saga - Times Cleared" },
+        { address=0X83DF1F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Lee Saga - Times Cleared" },
+        { address=0X83DF20, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Gaara Saga - Times Cleared" },
+        { address=0X83DF21, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Shikamaru Saga - Times Cleared" },
+        { address=0X83DF22, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Neji Saga - Times Cleared" },
+        { address=0X83DF23, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Sakura Saga - Times Cleared" },
+        { address=0X83DF24, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Kakashi Saga - Times Cleared" },
+        { address=0X83DF25, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Orochimaru Saga - Times Cleared" },
+        { address=0X83DF26, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Haku Saga - Times Cleared" },
+        { address=0X83DF27, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Zabuza Saga - Times Cleared" },
+        { address=0X83DF28, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{SLUS-21358} Scenario - Hinata Saga - Times Cleared" },
+      },
+    },
+  },
+}

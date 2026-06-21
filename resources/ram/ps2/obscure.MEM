@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "ObsCure",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "obscure",
+    file = "obscure.zip",
+    hashes = {
+      { hash = "3f0b62e2eb5ac97a9e01663ca79a2c18", label = "ObsCure (USA) (En,Fr,Es)" },
+      { hash = "7645075cf5729f059d8202da46f29523", label = "Obscure (USA) (Pt) (v1.0) (Jean Carlos)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XCDCF10, type="u32le", condition="eq", value=0X01159850, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Died on Prologue" },
+      },
+      health = {
+        { address=0XC908A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Drink Save 2 decreased" },
+        { address=0XC908A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Drink Save 2 increased" },
+        { address=0XD53D88, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Drink Save1 decreased" },
+        { address=0XD53D88, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Drink Save1 increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC8EF14, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo Test 32bits" },
+        { address=0XCA34C8, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Pistol Ammo - Storeroom" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCDDB66, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="First Cutscene" },
+        { address=0XCDDB6F, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Second Cutscene" },
+        { address=0XCDDB6F, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Third Cutscene - Game Beaten" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC5B450, type="u16le", condition="eq", value=0X0A, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Opening a Door" },
+        { address=0XC5BC54, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked the door in Classroom Corridor" },
+        { address=0XCDDB04, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Monster open the door" },
+        { address=0XCDDB05, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Monster open the door" },
+        { address=0XCDDB31, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed Hall Cutscene" },
+        { address=0XCF8FF4, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked the door in Main Hall (Staf Room/Teacher's Lounge)" },
+        { address=0XCF90F4, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked Door in Teacher's Lounge - Save 2" },
+        { address=0XCF9134, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked Door in Teacher's Lounge" },
+        { address=0XCF9434, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked the door in Break Room" },
+        { address=0XD0A5D4, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked the door using the wheel in Break Room" },
+        { address=0XD0A614, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Event Flag - Unlocked the door in Teafcher's Lounge - 2nd Floor" },
+        { address=0XD0A714, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked Door in Main Hall 1st Floor" },
+        { address=0XD0A994, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked the door in Main Hall 2nd Floor" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCDDB00, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - Locker Room" },
+        { address=0XCDDB01, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - School (After Prologue)" },
+        { address=0XCDDB02, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - Celler" },
+        { address=0XCDDB03, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - Cell" },
+        { address=0XCDDB04, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - Cage Room" },
+        { address=0XCDDB05, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - Basement" },
+        { address=0XCDDB0D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - East Hallway - School" },
+        { address=0XCDDB7C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - East Walkway - School" },
+        { address=0XCDDB7D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - Storage Room" },
+        { address=0XCDDB7E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - Locker Room - Address 2" },
+        { address=0XCDDB7F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - Basketball Court" },
+        { address=0XCDDB9A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter Event Flag - East Hallway - School" },
+      },
+    },
+  },
+}

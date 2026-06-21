@@ -1,0 +1,145 @@
+return {
+  game = {
+    title = "Super Monkey Ball 2",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Puzzle, Strategy"
+  },
+
+  rom = {
+    name = "super-monkey-ball-2",
+    file = "super-monkey-ball-2.zip",
+    hashes = {
+      { hash = "d81400ce7450423e35c49ff3d8870568", label = "Super Monkey Ball 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X54DF84, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X55399A, type="u16be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[16-bit BE] Used continues quantity" },
+        { address=0X5BC477, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="bit3=paused" },
+        { address=0X9A5753, type="u8", condition="eq", value=0X07, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Cleared" },
+        { address=0X9A5753, type="u8", condition="eq", value=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X473114, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Level ID BACKUP" },
+        { address=0X473118, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Worldwide Level ID" },
+        { address=0X54DF46, type="u8", condition="eq", value=0X00, action="LEVEL_LEVEL_1", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X54DF46, type="u8", condition="eq", value=0X01, action="LEVEL_LEVEL_2", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X54DF46, type="u8", condition="eq", value=0X02, action="LEVEL_LEVEL_3", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X54DF46, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Bowling DX - Special Mode - Level Select" },
+        { address=0X54DFC8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Target DX - Rounds" },
+        { address=0X54DFD2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Billiards DX - COM Level Vs. Mode - Rotation/8 Ball/US Nine Ball" },
+        { address=0X54DFD5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Billiards DX - COM Level Tournament Mode/JPN Nine-ball" },
+        { address=0X54E005, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Soccer - COM Level" },
+        { address=0X54E012, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Baseball - COM Level" },
+        { address=0X54E021, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Tennis - Doubles - COM Level" },
+        { address=0X553973, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="goal!" },
+        { address=0X553973, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="time over!" },
+        { address=0X553973, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="fall out!" },
+        { address=0X553973, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="time stopped" },
+        { address=0X553973, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="replay" },
+        { address=0X553973, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completed stage" },
+        { address=0X553994, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Bananas remaining on level" },
+        { address=0X5539A8, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Blue" },
+        { address=0X5539A8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Green" },
+        { address=0X5539A8, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Red" },
+        { address=0X9246EE, type="u16be", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0X92DCA8, type="u32be", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Match" },
+        { address=0X92DCA8, type="u32be", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Win" },
+        { address=0X92DCA8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Tennis - Current Round" },
+        { address=0X92DCAB, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Match" },
+        { address=0X92DCAB, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Win" },
+        { address=0X92DCAB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Tennis - Current Round" },
+        { address=0X9369B0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Soccer - Goals" },
+        { address=0X9369B4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Soccer - Enemy Goals" },
+      },
+      zone = {
+        { address=0X54DBBD, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Story Mode - Current World" },
+      },
+      stage = {
+        { address=0X54DF52, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Beginner" },
+        { address=0X54DF52, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Advanced" },
+        { address=0X54DF52, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Expert" },
+        { address=0X54DF52, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Monkey Shot - Stage Select" },
+        { address=0X9246EE, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Progress/Current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5BC9A2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current in-game lives increased" },
+        { address=0X5BC9A2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current in-game lives decreased" },
+      },
+      health = {
+        { address=0X915164, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Dogfight - Health decreased" },
+        { address=0X915164, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Dogfight - Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5BCA1C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] In-game score" },
+        { address=0X5BE7D4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Total Score up to last floor" },
+        { address=0X62A298, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Current Play Points" },
+        { address=0X910BF0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Target 2 - Score" },
+        { address=0X9153D4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Dogfight - Score" },
+        { address=0X9153D8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Dogfight - Score COM1" },
+        { address=0X9153DC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Dogfight - Score COM2" },
+        { address=0X9153E0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Dogfight - Score COM3" },
+        { address=0X91E858, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Bowling Normal Mode Score" },
+        { address=0X91E984, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Bowling Strike Rule Score" },
+        { address=0X926230, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Current Points" },
+        { address=0X926232, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Current Points of CPU 1" },
+        { address=0X926234, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Current Points of CPU 2" },
+        { address=0X926236, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Current Points of CPU 3" },
+        { address=0X926238, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Current Points of CPU 4" },
+        { address=0X92623A, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Current Points of CPU 5" },
+        { address=0X92623C, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Current Points of CPU 6" },
+        { address=0X92623E, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monkey Race - Grand Prix - Current Points of CPU 7" },
+        { address=0X928B8D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Boat - Current Points" },
+        { address=0X92907D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Boat - Com 2 Points" },
+        { address=0X92956D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Boat - Com 3 Points" },
+        { address=0X929A5D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Boat - Com 4 Points" },
+        { address=0X93A87C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Shot - Score" },
+        { address=0X942D58, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Soccer - PK Score" },
+        { address=0X942D5C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Soccer - PK Score COM" },
+        { address=0X95476B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Fight Score" },
+        { address=0X9A5753, type="u8", condition="eq", value=0X0C, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Submit Screen" },
+        { address=0X9B103A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Baseball - Total Score COM" },
+        { address=0X9B103B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Monkey Baseball - Total Score" },
+        { address=0X9B1220, type="u8", condition="eq", value=0X0C, action="SCORE_STATE", no_log=false, no_survey=false, desc="Getting Points" },
+        { address=0X9B1220, type="u8", condition="eq", value=0X10, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Table" },
+      },
+      collectibles = {
+        { address=0X54DF31, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Lovely Heart Ring" },
+        { address=0X9369E3, type="u8", condition="eq", value=0X07, action="MONEY_STATE", no_log=false, no_survey=false, desc="PK Coin Toss" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9A5753, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5E07C0, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pressed" },
+        { address=0X5E1948, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Pressed" },
+        { address=0X5E2AD0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="bit0=correct switch in switch inferno" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X54DF2F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Monkey Race - Mode Select" },
+        { address=0X54DF31, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Monkey Race - Time Attack - Course Select" },
+        { address=0X54DF4B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Monkey Boat - Mode Select" },
+        { address=0X54DF4D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Monkey Boat - Time Attack - Course Select" },
+        { address=0X54DFF8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Monkey Dogfight - Time Limit" },
+        { address=0X915408, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Monkey Dogfight - Time Remaining" },
+        { address=0X9369E3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Monkey Soccer - Game State" },
+      },
+    },
+  },
+}

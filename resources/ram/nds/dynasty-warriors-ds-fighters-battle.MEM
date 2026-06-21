@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Dynasty Warriors DS: Fighter's Battle",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "dynasty-warriors-ds-fighters-battle",
+    file = "dynasty-warriors-ds-fighters-battle.zip",
+    hashes = {
+      { hash = "2720657b84de0aa0f45dd5b28ad59bc9", label = "Dynasty Warriors DS - Fighter's Battle (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X105848, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Combo (32bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCE3A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health (16bit) decreased" },
+        { address=0XCE3A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health (16bit) increased" },
+        { address=0XCE3A6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health (16bit) decreased" },
+        { address=0XCE3A6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health (16bit) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCE39D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+      },
+    },
+  },
+}

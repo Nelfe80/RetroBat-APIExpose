@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Uzumaki: Denshi Kaikihen",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "uzumaki-denshi-kaikihen",
+    file = "uzumaki-denshi-kaikihen.zip",
+    hashes = {
+      { hash = "eacb689de3482cf6e6da8befc7da65b2", label = "Uzumaki - Denshi Kaiki Hen (Japan) (Rev 4).ws" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X0655, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bits] - Trivia - Highscore" },
+        { address=0X0680, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bits] - Trivia - Current Score" },
+      },
+    },
+  },
+}

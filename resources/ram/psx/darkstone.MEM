@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Darkstone",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "darkstone",
+    file = "darkstone.zip",
+    hashes = {
+      { hash = "186c0d11694167c739cbbbe0df33669f", label = "Darkstone (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XEB8E7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEB994, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Dome Spell" },
+        { address=0XECF80, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="draak is dead=01" },
+      },
+      health = {
+        { address=0XEB8C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] max health with bonuses decreased" },
+        { address=0XEB8C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] max health with bonuses increased" },
+        { address=0XEB8C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] current health decreased" },
+        { address=0XEB8C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] current health increased" },
+        { address=0XEB8CE, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="minimum damage" },
+        { address=0XEB8D0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="maximum damage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XEB8D2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] stat points from leveling" },
+      },
+      collectibles = {
+        { address=0XEB878, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32bit gold increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XEB9E4, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Magic door spell" },
+        { address=0XEBB68, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="animations? 0d=standing in town or walking anywhere else. 10=walking in town. 0b=standing outsid" },
+        { address=0XFB89E, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="byte flag for destroying monolith" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEB890, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] display for how many times final boss was killed" },
+      },
+    },
+  },
+}

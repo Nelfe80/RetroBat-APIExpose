@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "The Ninja Warriors",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat'em Up"
+  },
+
+  rom = {
+    name = "the-ninja-warriors",
+    file = "the-ninja-warriors.zip",
+    hashes = {
+      { hash = "3d2bf0696342a31e50f1d81de49721f8", label = "Ninjawarriors (USA) (MSU-1) (Revenant).sfc" },
+      { hash = "a8711c9185c7a6c52b863567b188ce1e", label = "Ninjawarriors (USA).sfc" },
+      { hash = "c86c99d1454426b908c89fd1caa858dc", label = "Ninjawarriors Again, The (Japan).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

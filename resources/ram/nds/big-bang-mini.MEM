@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Big Bang Mini",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "big-bang-mini",
+    file = "big-bang-mini.zip",
+    hashes = {
+      { hash = "5a2bad2e663a89996caa54c7143490a2", label = "Big Bang Mini (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE7B52, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit Current Level" },
+        { address=0XE7B53, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Retro Zone" },
+        { address=0XE7B53, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit Some Kind of Level ID, freezing this value can force some specific level to load but not th" },
+      },
+      zone = {
+        { address=0XF675C, type="u16le", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Hong Kong" },
+        { address=0XF675C, type="u16le", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Aurora" },
+        { address=0XF675C, type="u16le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Kamakura" },
+        { address=0XF675C, type="u16le", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Luxor" },
+        { address=0XF675C, type="u16le", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Sawannah" },
+        { address=0XF675C, type="u16le", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="New York" },
+        { address=0XF675C, type="u16le", condition="eq", value=0X06, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Rio de Janeiro" },
+        { address=0XF675C, type="u16le", condition="eq", value=0X07, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Paris" },
+        { address=0XF675C, type="u16le", condition="eq", value=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Abyss" },
+        { address=0XF675C, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="16bits World" },
+      },
+      stage = {
+        { address=0XF6758, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="32 bit - Current Level - Stage 01 wiill be value 00" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X19B4D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32bit challenge high score" },
+        { address=0X19B4D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32bit Challenge current Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE7C51, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="0" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE7C6C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Missions - will increment by 01 each time a mission is complete" },
+        { address=0XF67E1, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="8bit Game Mode ID" },
+        { address=0X192C50, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="16bit - Incrementation by 1 each time you hit an enemy, reset to 0 when starting new level" },
+      },
+    },
+  },
+}

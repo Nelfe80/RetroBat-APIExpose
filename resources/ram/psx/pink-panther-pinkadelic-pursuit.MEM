@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Pink Panther: Pinkadelic Pursuit",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "pink-panther-pinkadelic-pursuit",
+    file = "pink-panther-pinkadelic-pursuit.zip",
+    hashes = {
+      { hash = "89845f204552381fef97a4db1e4dc568", label = "Pink Panther - Pinkadelic Pursuit (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X65E92, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Flag: Demo Mode" },
+        { address=0X70E57, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Flag: Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X62F04, type="u16le", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Luxitania" },
+        { address=0X62F04, type="u16le", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Construction Part 2" },
+        { address=0X62F04, type="u16le", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Egypt" },
+        { address=0X62F04, type="u16le", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Construction Part 1" },
+        { address=0X62F04, type="u16le", condition="eq", value=0XB, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dracula" },
+        { address=0X62F04, type="u16le", condition="eq", value=0XD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stone Age" },
+        { address=0X62F04, type="u16le", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lair" },
+        { address=0X62F04, type="u16le", condition="eq", value=0X14, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Uncle House" },
+        { address=0X62F04, type="u16le", condition="eq", value=0X16, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rail Way and Ice Rink" },
+        { address=0X62F04, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Posible Level ID:" },
+        { address=0X70E4F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flag: Ending Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X70C1E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X70C1E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X70C16, type="u16le", condition="eq", value=0X270F, action="MONEY_STATE", no_log=false, no_survey=false, desc="9999 (max)" },
+        { address=0X70E60, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="9999 Coins Activated" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X62F04, type="u16le", condition="eq", value=0X9, action="BOSS_HIT", no_log=false, no_survey=false, desc="GreenHouse (BOSS)" },
+        { address=0X62F04, type="u16le", condition="eq", value=0XE, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dinosaur (BOSS)" },
+        { address=0X62F04, type="u16le", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="The Attic (BOSS)" },
+        { address=0X70BB7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Used in Boss 'The Green House' and 'The Dinosaur' for squatting animation" },
+        { address=0X96355, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Dinosaur" },
+        { address=0X9A9D5, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health, Attic" },
+        { address=0X9B929, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health, Greenhouse" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X70C32, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Luxitania Door Painted" },
+        { address=0X70C32, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Luxitania Door Carpet" },
+        { address=0X70C33, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Railway Line Door Painted" },
+        { address=0X70C34, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Egypt Door Painted" },
+        { address=0X70C35, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Construction Site Part 1 Door Painted" },
+        { address=0X70C36, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Greenhouse Door Painted" },
+        { address=0X70C37, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Dracula's Castle Door Painted" },
+        { address=0X70C38, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Ice Rink Door Painted" },
+        { address=0X70C39, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Stone Age Door Painted" },
+        { address=0X70C3A, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Dinosaur Door Painted" },
+        { address=0X70C3B, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Construction Site Part 2 Door Painted" },
+        { address=0X70C3C, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Gangster's Lair Door Painted" },
+        { address=0X70C3D, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Attic Door Painted" },
+      },
+    },
+  },
+}

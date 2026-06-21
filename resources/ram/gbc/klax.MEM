@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Klax",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "klax",
+    file = "klax.zip",
+    hashes = {
+      { hash = "3bd0dad0c695a534b9e89264e09e2b11", label = "Klax (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

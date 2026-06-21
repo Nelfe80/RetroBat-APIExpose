@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Resident Evil 3: Nemesis [Subset - Nemesis Hunter]",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action, Adventure, Horror"
+  },
+
+  rom = {
+    name = "resident-evil-3-nemesis-subset-nemesis-hunter",
+    file = "resident-evil-3-nemesis-subset-nemesis-hunter.zip",
+    hashes = {
+      { hash = "ecaf17c8067cf7d36bdb0a760f271820", label = "Resident Evil 3 - Nemesis [Subset - Nemesis Hunter]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8998A8, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X8CE074, type="u8", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="First Cutscene - before the title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X899246, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background loaded, this memory show the background loaded, works with map id memory" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6AC858, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+      health = {
+        { address=0X6AC858, type="u8", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="Damaged" },
+        { address=0X6AC920, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 16 bits decreased" },
+        { address=0X6AC920, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 16 bits increased" },
+        { address=0X6AE5C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 16 bits - 2 decreased" },
+        { address=0X6AE5C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 16 bits - 2 increased" },
+        { address=0X6AF368, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 16 bits decreased" },
+        { address=0X6AF368, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 16 bits increased" },
+        { address=0X6AF990, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP - c decreased" },
+        { address=0X6AF990, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP - c increased" },
+        { address=0X6B342C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP - Jill depois de ser salva decreased" },
+        { address=0X6B342C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP - Jill depois de ser salva increased" },
+        { address=0X6C8824, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 16 bits decreased" },
+        { address=0X6C8824, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 16 bits increased" },
+        { address=0X6C8A94, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP - Nemesis - Carlos decreased" },
+        { address=0X6C8A94, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP - Nemesis - Carlos increased" },
+        { address=0X6C9644, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP - c decreased" },
+        { address=0X6C9644, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP - c increased" },
+        { address=0X893F60, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Player HP decreased" },
+        { address=0X893F60, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Player HP increased" },
+        { address=0X893F62, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Player HP decreased" },
+        { address=0X893F62, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Player HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X899202, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Infinite Assault Rifle" },
+        { address=0X899203, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=true, no_survey=false, desc="Infinite Ammo Gatling Gun" },
+        { address=0X899203, type="u8", condition="bit_true", bit=1, mask=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Infinite Ammo Rocket Launcher" },
+        { address=0X899406, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=true, no_survey=false, desc="Normal ammo" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X899276, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="Interaction Action Flag Clock Tower, will change events if you choose jump the window or not" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6C95BE, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy Type?" },
+        { address=0X8CE074, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Last Cutscene ID" },
+      },
+    },
+  },
+}

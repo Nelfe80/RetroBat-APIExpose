@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Viking Child",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "viking-child",
+    file = "viking-child.zip",
+    hashes = {
+      { hash = "44d7c4ea6b8d930075f5b05c94b5f973", label = "Viking Child (USA, Europe).lnx" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X129C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+  },
+}

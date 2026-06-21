@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Martian Gothic: Unification",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure, Horror"
+  },
+
+  rom = {
+    name = "martian-gothic-unification",
+    file = "martian-gothic-unification.zip",
+    hashes = {
+      { hash = "1e4cba080fe4c3c4c5bec498a7739a3a", label = "Martian Gothic - Unification (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1030C4, type="u16le", condition="eq", value=0XFFFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="No Text" },
+        { address=0X1030D8, type="u16le", condition="eq", value=0XFFFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="No Text" },
+        { address=0X1033B8, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On Title" },
+        { address=0X1033C0, type="u8", condition="bit_true", bit=4, mask=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles" },
+        { address=0X10B5D4, type="u8", condition="eq", value=0X74, action="GAME_OVER", no_log=false, no_survey=false, desc="Character's Met - Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10B698, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Whittaker's Grave - Ghost Appears out of Ground" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X10B5D4, type="u8", condition="eq", value=0X0B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Walk Dorm" },
+        { address=0X10B5D4, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Walkway 2" },
+        { address=0X10B5D4, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Walkway 1" },
+        { address=0X10B5F5, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="MOOD Chamber - Ask about Nondead" },
+        { address=0X10B60B, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="MOOD - Ask about Martian Life" },
+        { address=0X10B60C, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="MOOD Chamber - Ask about Nondead/Allenby (flips between on and off - might need to exclude)" },
+        { address=0X10B614, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="MOOD Chamber - Ask about Nondead" },
+        { address=0X10B623, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="MOOD Chamber - Ask about Nondead" },
+        { address=0X10B670, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Arena Site 1 - Dialogue (Matlock) - City of the Dead" },
+        { address=0X10B6B1, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Bio Lab - Corpse comes to Life" },
+        { address=0X1365E0, type="u8", condition="eq", value=0XCE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Battery" },
+        { address=0X1365E0, type="u8", condition="eq", value=0XEB, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Microcorder (Dieta Mentz)" },
+      },
+      health = {
+        { address=0X1365E0, type="u8", condition="eq", value=0X84, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Boost" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X10B639, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="MOOD - Ask about Weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1365E0, type="u8", condition="eq", value=0X6C, action="AMMO_STATE", no_log=true, no_survey=false, desc="Piccolo Ammo" },
+        { address=0X1365E0, type="u8", condition="eq", value=0X9D, action="AMMO_STATE", no_log=true, no_survey=false, desc="Diabolus Ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X10B670, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Lonely Street - Use Crank on Door" },
+        { address=0X10B671, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Mai Lin Vent - Lower Vent Doors (Can be bugged and trigger too early causing softlock)" },
+        { address=0X10B672, type="u8", condition="bit_true", bit=6, mask=0X40, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Arboretum 3 - Dialogue (Karne) - Door's Padlocked" },
+        { address=0X10B673, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Simureal Chamber - Dialogue (Kenzo) - Penny Lane slide doors" },
+        { address=0X10B67C, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Carnaby Street - Airlock - Use Scarab on Door" },
+        { address=0X10B67D, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Carnaby Street - Airlock - Activate Airlock Door" },
+        { address=0X10B67D, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Lonely Street Airlock - Unlock Door" },
+        { address=0X10B67D, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Inocashira Douri 1 - Use Welder on Kitchen Door" },
+        { address=0X10B67E, type="u8", condition="bit_true", bit=7, mask=0X80, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Decontamination Room 2 - Door Unlocked" },
+        { address=0X10B683, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Broadway 2 - Start Cutting Door Lock" },
+        { address=0X10B683, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Broadway 2 - Cut Door Lock with Scalpel" },
+        { address=0X10B685, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Shuttle Bay - Flip Manual Override switch" },
+        { address=0X10B692, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Simureal Chamber - Door Unlocked" },
+        { address=0X10B6AF, type="u8", condition="eq", value=0X05, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Necropolis Elevator - Elevator Door Opens" },
+        { address=0X10B6AF, type="u8", condition="eq", value=0X07, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Necropolis Elevator - Doors Close in Necropolis" },
+        { address=0X10B720, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Time Square Decontamination - Attempt to open door (Matlock)" },
+        { address=0X10B724, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Inocashira Douri Decontamination - Attempt to open door (Karne)" },
+        { address=0X10CC31, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Closed" },
+        { address=0X10CC31, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Open" },
+        { address=0X10CC31, type="u8", condition="eq", value=0X06, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Closing (from Simureal Chamber)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X10B5D4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Map - Room ID" },
+        { address=0X10B6A3, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Event Flags" },
+        { address=0X1365E0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[1008 bytes] Inventory - Character - Karne - Base Address" },
+      },
+    },
+  },
+}

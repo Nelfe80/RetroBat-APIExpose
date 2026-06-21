@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Red Earth",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "red-earth",
+    file = "red-earth.zip",
+    hashes = {
+      { hash = "dca1e1bbf2dd8825021ea8264f8b136b", label = "redearth.7z <Red Earth / War-Zard (Euro 961121)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6075B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8 Bit] Demo mode flag" },
+        { address=0X7BCA5, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] System Configuration - Continue" },
+        { address=0X7BCAA, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8 Bit] System Configuration - Demo Sound" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X17A04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Game Configuration - Max Round" },
+      },
+      stage = {
+        { address=0X606E4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X17A06, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Game Configuration - Damage Level" },
+        { address=0X6A842, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Health decreased" },
+        { address=0X6A842, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P1 Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6A778, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] BCD Bonus Score Lower Half" },
+        { address=0X6A77A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] BCD Bonus Score Upper Half" },
+      },
+      collectibles = {
+        { address=0X7BCA6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 Bit] System Configuration - Coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6A716, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16 Bit] Boss Red Health" },
+        { address=0X6AAC2, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16 Bit] Boss Current Health" },
+        { address=0X6ABC6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8 Bit] Boss ID (Enemy Based)" },
+      },
+    },
+  },
+}

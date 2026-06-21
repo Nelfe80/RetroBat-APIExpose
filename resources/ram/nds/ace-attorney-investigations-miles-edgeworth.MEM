@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Ace Attorney Investigations: Miles Edgeworth",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Visual Novel"
+  },
+
+  rom = {
+    name = "ace-attorney-investigations-miles-edgeworth",
+    file = "ace-attorney-investigations-miles-edgeworth.zip",
+    hashes = {
+      { hash = "97e1dd782b500833d354dd340736013e", label = "Ace Attorney Investigations - Miles Edgeworth (USA).nds" },
+      { hash = "ca5905912fd9a6d03c2bc162f852d8ef", label = "Ace Attorney Investigations - Miles Edgeworth (Europe).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X128DB1, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X128DB1, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Connected" },
+        { address=0X128DD3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Logic Case 3 - Underground Ladder" },
+        { address=0X128DD9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Logic Case 3 - Underground Entrance" },
+        { address=0X12B4FC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background ID - Investigation (16bit)" },
+        { address=0X12B554, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background ID - Rebuttal (16bit)" },
+      },
+      stage = {
+        { address=0X128DDF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Logic Case 3 - Stage was Packed up" },
+        { address=0X128DE0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Logic Case 3 - In the Shadow of the Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X128DCD, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Logic Case 2 - Cause of Death" },
+      },
+      health = {
+        { address=0X128EC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Logic HP decreased" },
+        { address=0X128EC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Logic HP increased" },
+        { address=0X128ECC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP change display (32bit) decreased" },
+        { address=0X128ECC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP change display (32bit) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X128DC3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Logic Case 2 - Murder Weapon: Mr. lfly" },
+        { address=0X128DCC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Logic Case 2 - Weapon Couldn't be found" },
+        { address=0X128DCE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Logic Case 2 - A sizable Weapon" },
+        { address=0X128DD0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Logic Case 2 - Murder weapon: Mr. Ifly" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X128C68, type="u8", condition="eq", value=0X72, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Prop Sword" },
+        { address=0X128C68, type="u8", condition="eq", value=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Prop Sword (Updated)" },
+        { address=0X128DC4, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Logic Case 2 - Broken Glasses" },
+        { address=0X128DE5, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Logic Case 3 - Broken Prop Sword" },
+        { address=0X128DE6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Logic Case 3 - The door Leading Outside" },
+        { address=0X128E00, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Logic Case 5 - Undershirt from next Door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X128C70, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Evidence 5 ID" },
+      },
+    },
+  },
+}

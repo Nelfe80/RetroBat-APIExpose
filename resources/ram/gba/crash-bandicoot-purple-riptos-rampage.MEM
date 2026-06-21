@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Crash Bandicoot Purple: Ripto's Rampage",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "crash-bandicoot-purple-riptos-rampage",
+    file = "crash-bandicoot-purple-riptos-rampage.zip",
+    hashes = {
+      { hash = "15e37fb594c2dfe85b8b7ba3b7e565bd", label = "Crash Bandicoot Fusion (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "24ef180602e0658bbe38fabc5d09894c", label = "Crash Bandicoot Purple - Ripto's Rampage (USA) (Rev 1).gba" },
+      { hash = "a9c93a07964aa816a8e226ae0c735a41", label = "Crash Bandicoot Purple - Ripto's Rampage (USA).gba" },
+      { hash = "d62a474cc5635bb4b9e8604eae677444", label = "Crash Bandicoot Fusion (Europe) (Ru) (Pirate).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XEE70, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aku Aku level (US)" },
+        { address=0XEF50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aku Aku level (EU)" },
+        { address=0X16FC6, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Portal" },
+        { address=0X16FD2, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Gem" },
+        { address=0X16FF2, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Portal" },
+        { address=0X16FFE, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Gem" },
+        { address=0X170E6, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Gem" },
+        { address=0X3979C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spyro Party current round (US)" },
+        { address=0X3A150, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spyro Party current round (EU)" },
+      },
+      zone = {
+        { address=0XEDEC, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Wumpa Jungle world (entered)" },
+        { address=0XEDEE, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Arctic Cliff world (entered)" },
+        { address=0XEDF0, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fire Mountain world (entered)" },
+        { address=0XEDF0, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Tankin' Over the World" },
+        { address=0XEDFC, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fire Mountain world (no crystal)" },
+        { address=0XEDFC, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Tankin' Over the World" },
+        { address=0XEE08, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fire Mountain world (no gem)" },
+        { address=0XEE08, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Tankin' Over the World" },
+        { address=0XEE28, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+        { address=0XEECC, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Wumpa Jungle world (entered)" },
+        { address=0XEECE, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Arctic Cliff world (entered)" },
+        { address=0XEED0, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fire Mountain world (entered)" },
+        { address=0XEED0, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Tankin' Over the World" },
+        { address=0XEEDC, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fire Mountain world (no crystal)" },
+        { address=0XEEDC, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Tankin' Over the World" },
+        { address=0XEEE8, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fire Mountain world (no gem)" },
+        { address=0XEEE8, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Tankin' Over the World" },
+        { address=0XEF08, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current world (EU)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEE50, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wumpa fruit lost on death [hex]" },
+      },
+      health = {
+        { address=0X210EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tiny's health (US) decreased" },
+        { address=0X210EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tiny's health (US) increased" },
+        { address=0X28598, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Crash's health (Ripto and Cortex battle) (EU) decreased" },
+        { address=0X28598, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Crash's health (Ripto and Cortex battle) (EU) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X16FD3, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Relic" },
+        { address=0X16FFF, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Relic" },
+        { address=0X170E7, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Relic" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X284B0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss - player Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XEE60, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Party game objective count" },
+        { address=0XEE64, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Party game needed objective count" },
+        { address=0XEF34, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Party mode crates broken (EU)" },
+        { address=0XEF40, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Party mode objective progress (EU)" },
+        { address=0XEF44, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Party mode objective (EU)" },
+        { address=0X16FD1, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Nitro Switch Box" },
+        { address=0X16FD2, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Crate" },
+        { address=0X16FDB, type="u8", condition="bit_true", bit=0, mask=0X01, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater City Ruins" },
+        { address=0X16FFD, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Nitro Switch Box" },
+        { address=0X16FFE, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Crate" },
+        { address=0X17007, type="u8", condition="bit_true", bit=0, mask=0X01, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater City Ruins" },
+        { address=0X170E5, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Nitro Switch Box" },
+        { address=0X170E6, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Crate" },
+      },
+    },
+  },
+}

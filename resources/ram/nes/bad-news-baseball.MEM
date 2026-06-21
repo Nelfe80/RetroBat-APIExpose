@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Bad News Baseball",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "bad-news-baseball",
+    file = "bad-news-baseball.zip",
+    hashes = {
+      { hash = "7faf90637145b04a2f0c21d05960a7dc", label = "Bad News Baseball (USA).nes" },
+      { hash = "da08339f0905854d162d5e584e9b55f1", label = "Bad News Baseball (USA) (Girls Mode Enabled) (v1.0) (Searo).nes" },
+    }
+  },
+
+  events = {
+  },
+}

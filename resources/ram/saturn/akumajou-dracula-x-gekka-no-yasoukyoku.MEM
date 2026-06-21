@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Akumajou Dracula X: Gekka no Yasoukyoku",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "akumajou-dracula-x-gekka-no-yasoukyoku",
+    file = "akumajou-dracula-x-gekka-no-yasoukyoku.zip",
+    hashes = {
+      { hash = "b38060f45ab282ea629c91d630f81422", label = "Akumajou Dracula X - Gekka no Yasoukyoku (Japan) (2M)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15C709, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="N Demon" },
+        { address=0X15CA0E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon" },
+        { address=0X15D874, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Lesser Demon" },
+      },
+      events = {
+        { address=0X19A4DA, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Shiel combo id?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X15CA84, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death cs" },
+        { address=0X15D860, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+      health = {
+        { address=0X15C942, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X15C942, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X15C946, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="MAX HP decreased" },
+        { address=0X15C946, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="MAX HP increased" },
+        { address=0X15CAC5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP Librar decreased" },
+        { address=0X15CAC5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP Librar increased" },
+        { address=0X15CB50, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP Ent before reent Richt&Mar decreased" },
+        { address=0X15CB50, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP Ent before reent Richt&Mar increased" },
+        { address=0X15CB52, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP Ent decreased" },
+        { address=0X15CB52, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP Ent increased" },
+        { address=0X15CB56, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP Center decreased" },
+        { address=0X15CB56, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP Center increased" },
+        { address=0X15CB57, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP CC decreased" },
+        { address=0X15CB57, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP CC increased" },
+        { address=0X15CB5D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4 - HP RC decreased" },
+        { address=0X15CB5D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4 - HP RC increased" },
+        { address=0X15CB5E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="5 - HP CK decreased" },
+        { address=0X15CB5E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="5 - HP CK increased" },
+        { address=0X15CB63, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2 - HP CT decreased" },
+        { address=0X15CB63, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2 - HP CT increased" },
+        { address=0X15CB67, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP GWV decreased" },
+        { address=0X15CB67, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP GWV increased" },
+        { address=0X15CB6F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1 - HP Cat decreased" },
+        { address=0X15CB6F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1 - HP Cat increased" },
+        { address=0X15CB75, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP RE decreased" },
+        { address=0X15CB75, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP RE increased" },
+        { address=0X15CB78, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3 - HP BMG decreased" },
+        { address=0X15CB78, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3 - HP BMG increased" },
+        { address=0X15CB82, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4 - HP AntCh decreased" },
+        { address=0X15CB82, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4 - HP AntCh increased" },
+        { address=0X15CB84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="5 - HP RCK decreased" },
+        { address=0X15CB84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="5 - HP RCK increased" },
+        { address=0X15CB8A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="6 - HP ReCav decreased" },
+        { address=0X15CB8A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="6 - HP ReCav increased" },
+        { address=0X15CB8B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1 - HP RCT decreased" },
+        { address=0X15CB8B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1 - HP RCT increased" },
+        { address=0X15CB8D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4 - HP ReCav decreased" },
+        { address=0X15CB8D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4 - HP ReCav increased" },
+        { address=0X15CB91, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP DWL decreased" },
+        { address=0X15CB91, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP DWL increased" },
+        { address=0X15CB98, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0 - HP FC decreased" },
+        { address=0X15CB98, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0 - HP FC increased" },
+        { address=0X15CB99, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1 - HP FC decreased" },
+        { address=0X15CB99, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1 - HP FC increased" },
+        { address=0X19C0B4, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Amount of HP refilled with food/item or decrised by enemy/obsticle near value 01heal/00 damage" },
+        { address=0X19C634, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Doppleganger10 HP 16 decreased" },
+        { address=0X19C634, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Doppleganger10 HP 16 increased" },
+        { address=0X19D1B4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slogra HP 16 decreased" },
+        { address=0X19D1B4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slogra HP 16 increased" },
+        { address=0X19D774, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gaibon HP 16 decreased" },
+        { address=0X19D774, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gaibon HP 16 increased" },
+        { address=0X19DD34, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maria HP decreased" },
+        { address=0X19DD34, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maria HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X19A430, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Area related to karma coin increased" },
+        { address=0X19C0B6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="00 during regular game and damage / 01 heal increased" },
+        { address=0X19C0B6, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="00 during regular game and damage / 01 heal empty" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X15CAA1, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch" },
+        { address=0X15CAA9, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="0 - Switch Rev" },
+      },
+    },
+  },
+}

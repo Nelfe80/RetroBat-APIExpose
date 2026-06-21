@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Mega Man Star Force 3: Black Ace",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "mega-man-star-force-3-black-ace",
+    file = "mega-man-star-force-3-black-ace.zip",
+    hashes = {
+      { hash = "ecba14fcbfedac0184dd1b20990b1022", label = "Mega Man Star Force 3 - Black Ace (USA).nds" },
+      { hash = "750004f41de45d14e668dc23050cf3f5", label = "Mega Man Star Force 3 - Black Ace (USA) (Undub).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XF9438, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Small Energy] [8-Bits] decreased" },
+        { address=0XF9438, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Small Energy] [8-Bits] increased" },
+        { address=0XF9439, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Large Energy] [8-Bits] decreased" },
+        { address=0XF9439, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Large Energy] [8-Bits] increased" },
+        { address=0XF943A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Deluxe Energy] [8-Bits] decreased" },
+        { address=0XF943A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Deluxe Energy] [8-Bits] increased" },
+        { address=0X1C7FFC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] decreased" },
+        { address=0X1C7FFC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] increased" },
+        { address=0X1C81A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] decreased" },
+        { address=0X1C81A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] increased" },
+        { address=0X1C834C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] decreased" },
+        { address=0X1C834C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] increased" },
+        { address=0X1C84F4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Mega Man HP In Battle] [16-Bits] decreased" },
+        { address=0X1C84F4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Mega Man HP In Battle] [16-Bits] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XF9421, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/PntdFang] [8-Bits]" },
+        { address=0XF9422, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/StarHoop] [8-Bits]" },
+        { address=0XF9423, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/ShadowClaw] [8-Bits]" },
+        { address=0XF9425, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Aqua Fang] [8-Bits]" },
+        { address=0XF9426, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Storm Hoop] [8-Bits]" },
+        { address=0XF9427, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Parlyze Wing] [8-Bits]" },
+        { address=0XF9428, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/R-F Claw] [8-Bits]" },
+        { address=0XF9429, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Zenny Finder] [8-Bits]" },
+        { address=0XF942A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Titn Glove] [8-Bits]" },
+        { address=0XF942B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Flash Band] [8-Bits]" },
+        { address=0XF942C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/K. Knuckle] [8-Bits]" },
+        { address=0XF942D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Virus Claw] [8-Bits]" },
+        { address=0XF942E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Hypno Eye] [8-Bits]" },
+        { address=0XF942F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Impact Roar] [8-Bits]" },
+        { address=0XF9430, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Card Finder] [8-Bits]" },
+        { address=0XF9431, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Cosmic Rave] [8-Bits]" },
+        { address=0XF9432, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Chivalry] [8-Bits]" },
+        { address=0XF9433, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/White Fang] [8-Bits]" },
+        { address=0XF9434, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Gale Claw] [8-Bits]" },
+        { address=0XF9436, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/BN Blaster EX] [8-Bits]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF93B4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins/Credits increased" },
+        { address=0XF9424, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Weapon/QuickRing] [8-Bits] increased" },
+        { address=0XF9435, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Weapon/Danger Ring] [8-Bits] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF9E0C, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[Moon Destroyer R Record] [32-Bits]" },
+        { address=0XFCAA0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[Doors] [Bitflags]" },
+        { address=0XFCAA1, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[Doors] [Bitflags]" },
+      },
+    },
+  },
+}

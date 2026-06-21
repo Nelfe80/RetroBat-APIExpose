@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Just Dance 2019",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "just-dance-2019",
+    file = "just-dance-2019.zip",
+    hashes = {
+      { hash = "acd88e9d4e42dbf82e39105464fef987", label = "Just Dance 2019 (USA) (En,Fr,Es) (Rev 1)" },
+    }
+  },
+
+  events = {
+  },
+}

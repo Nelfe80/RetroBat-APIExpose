@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Medarot G: Kabuto Version",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "medarot-g-kabuto-version",
+    file = "medarot-g-kabuto-version.zip",
+    hashes = {
+      { hash = "6f9802a7094757a4e535f763ff9b7de4", label = "Medarot G - Kabuto (Japan).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X46B30, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kuwagata Medal Level" },
+        { address=0X46B3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kabuto Medal Level" },
+        { address=0X46B48, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jewel Beetle Medal Level" },
+        { address=0X46B54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clownfish Medal Level" },
+        { address=0X46B60, type="u8", condition="eq", value=0X64, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unobtained" },
+        { address=0X46B60, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hamster Medal Level" },
+        { address=0X46B6C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Civit Medal Level" },
+        { address=0X46B78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boar Medal Level" },
+        { address=0X46B84, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gibbon Medal Level" },
+        { address=0X46B90, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tree Frog Medal Level" },
+        { address=0X46B9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gecko Medal Level" },
+        { address=0X46BA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boy Medal Level" },
+        { address=0X46BB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Girl Medal Level" },
+        { address=0X46BC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="kuwagata 2 medal level" },
+        { address=0X46BCC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="kabuto 2 medal level" },
+        { address=0X46BD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alien medal level" },
+      },
+      stage = {
+        { address=0X0180, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gold Star" },
+        { address=0X0180, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Platinum Star" },
+        { address=0X0180, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gold Star" },
+        { address=0X0180, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Platinum Star" },
+        { address=0X0180, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gold Star" },
+        { address=0X0180, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Platinum Star" },
+        { address=0X0180, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gold Star" },
+        { address=0X0180, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Platinum Star" },
+        { address=0X0181, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gold Star" },
+        { address=0X0181, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Platinum Star" },
+        { address=0X0181, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gold Star" },
+        { address=0X0181, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Platinum Star" },
+        { address=0X0181, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gold Star" },
+        { address=0X0181, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Platinum Star" },
+        { address=0X0181, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blue Circle" },
+        { address=0X0181, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Red Circle" },
+        { address=0X0182, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blue Circle" },
+        { address=0X0182, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Red Circle" },
+        { address=0X0182, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blue Circle" },
+        { address=0X0182, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Red Circle" },
+        { address=0X0182, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blue Circle" },
+        { address=0X0182, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Red Circle" },
+        { address=0X0182, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blue Circle" },
+        { address=0X0182, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Red Circle" },
+        { address=0X0183, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blue Circle" },
+        { address=0X0183, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Red Circle" },
+        { address=0X0183, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blue Circle" },
+        { address=0X0183, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Red Circle" },
+        { address=0X0185, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Friend Archelogist at Frozen Stage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1803A, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Main Medabot Head Slot Current Ammo" },
+        { address=0X1803B, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Main Medabot Head Slot Max Ammo" },
+      },
+    },
+  },
+}

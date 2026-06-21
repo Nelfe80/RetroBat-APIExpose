@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Widgets Odyssey",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "widgets-odyssey",
+    file = "widgets-odyssey.zip",
+    hashes = {
+      { hash = "9e4e2570cc7ce6767576e3f3333c3010", label = "Widget's Odyssey (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X90AB78, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Overall Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X909591, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="8-bit - SFX Setting Switch" },
+        { address=0X909592, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="8-bit - Music Setting Switch" },
+      },
+    },
+  },
+}

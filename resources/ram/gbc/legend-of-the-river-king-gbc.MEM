@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Legend of the River King GBC",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "legend-of-the-river-king-gbc",
+    file = "legend-of-the-river-king-gbc.zip",
+    hashes = {
+      { hash = "b397066e3cad5ae33a31e4adfff0bff5", label = "Legend of the River King GBC (USA) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD3FD, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fish around bait" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD225, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health 16-bit decreased" },
+        { address=0XD225, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health 16-bit increased" },
+        { address=0XD226, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health 2 16-bit decreased" },
+        { address=0XD226, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health 2 16-bit increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD229, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Money (Gold) 16-bit increased" },
+        { address=0XD22A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Money (Gold) 16-bit increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD45B, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy Health" },
+      },
+    },
+  },
+}

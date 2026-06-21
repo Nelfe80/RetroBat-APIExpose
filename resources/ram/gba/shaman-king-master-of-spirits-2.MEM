@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Shaman King: Master of Spirits 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "shaman-king-master-of-spirits-2",
+    file = "shaman-king-master-of-spirits-2.zip",
+    hashes = {
+      { hash = "5af6a63f85fa386c7889695308dc32a4", label = "Shaman King - Master of Spirits 2 (USA).gba" },
+      { hash = "971e4440cb014dc10c4c834efaef5114", label = "Shaman King - Master of Spirits 2 (Europe) (En,Fr,De).gba" },
+      { hash = "f2c6cd5ee767f6f623874a54371fbb78", label = "Shonen Jump's - Shaman King - Master of Spirits 2 (USA) (Pt) (Trans-Center).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X6345, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage U and E" },
+      },
+    },
+  },
+}

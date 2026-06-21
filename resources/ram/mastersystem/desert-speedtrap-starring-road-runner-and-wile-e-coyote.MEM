@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Desert Speedtrap Starring Road Runner and Wile E. Coyote",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "desert-speedtrap-starring-road-runner-and-wile-e-coyote",
+    file = "desert-speedtrap-starring-road-runner-and-wile-e-coyote.zip",
+    hashes = {
+      { hash = "8fe55ade7b34aa4e42c5f63f4368497f", label = "Desert Speedtrap Starring Road Runner and Wile E. Coyote (Europe, Brazil) (En,Fr,De,Es,It).sms" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X02B5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifes (22 =2, 21=1,20 = 0) increased" },
+        { address=0X02B5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifes (22 =2, 21=1,20 = 0) decreased" },
+      },
+      health = {
+        { address=0X0AF9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (00 = 1, 01= 2, 02 =3, 03=4) decreased" },
+        { address=0X0AF9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (00 = 1, 01= 2, 02 =3, 03=4) increased" },
+      },
+    },
+  },
+}

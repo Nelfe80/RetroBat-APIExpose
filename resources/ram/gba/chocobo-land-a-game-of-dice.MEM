@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Chocobo Land: A Game of Dice",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "chocobo-land-a-game-of-dice",
+    file = "chocobo-land-a-game-of-dice.zip",
+    hashes = {
+      { hash = "6341167e3c3212c632e7956cf0e69119", label = "Chocobo Land - A Game of Dice (Japan).gba" },
+      { hash = "7b5f62775f7c63e8d93f0106de3eb261", label = "Chocobo Land - A Game of Dice (Japan) (En) (v1.0) (Nezz).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4514, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X4514, type="u8", condition="eq", value=0X9, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Cutscene" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4514, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X4596, type="u8", condition="eq", value=0XB3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Attempt to level a square (Levelling Squares)" },
+        { address=0X473C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="CP Goal" },
+        { address=0X521B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ally Level" },
+        { address=0X521C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ally Max Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4655, type="u8", condition="eq", value=0XB1, action="SCORE_STATE", no_log=false, no_survey=false, desc="Scores (Show leaderboard)" },
+      },
+      collectibles = {
+        { address=0X4B71, type="u8", condition="eq", value=0X3, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring" },
+        { address=0X566C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 - Ring Set Squares Owned increased" },
+        { address=0X566D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 - Ring Set Squares Owned increased" },
+        { address=0X566E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P3 - Ring Set Squares Owned increased" },
+        { address=0X566F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P4 - Ring Set Squares Owned increased" },
+        { address=0X5670, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 - Ring Set CP increased" },
+        { address=0X5674, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 - Ring Set CP increased" },
+        { address=0X5678, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P3 - Ring Set CP increased" },
+        { address=0X567C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P4 - Ring Set CP increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4597, type="u8", condition="eq", value=0XB2, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Magicite was used on an Ally who had immunity to it (Shielded Squares)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4595, type="u24le", condition="eq", value=0XB2, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="24: Congratulation (Blue Checkpoint Cystal - Complete 50 Hidden Arena maps)" },
+        { address=0X4595, type="u24le", condition="eq", value=0XB3, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Yellow Checkpoint Crystal - Complete all main maps and 50 Hidden Arena maps again" },
+        { address=0X4597, type="u8", condition="eq", value=0XB1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Landed on a Switch Point square (Switch Point Square)" },
+        { address=0X4778, type="u8", condition="eq", value=0XB0, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Blue" },
+        { address=0X4778, type="u8", condition="eq", value=0XB1, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Red" },
+        { address=0X4778, type="u8", condition="eq", value=0XB2, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Green" },
+        { address=0X4778, type="u8", condition="eq", value=0XB3, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Yellow" },
+        { address=0X4B70, type="u24le", condition="eq", value=0X2, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Point Square" },
+        { address=0X4B70, type="u24le", condition="eq", value=0X6, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Blue Checkpoint Crystal Square" },
+        { address=0X4B70, type="u24le", condition="eq", value=0X7, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Red Checkpoint Crystal Square" },
+        { address=0X4B70, type="u24le", condition="eq", value=0X8, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Green Checkpoint Crystal Square" },
+        { address=0X4B70, type="u24le", condition="eq", value=0X9, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Yellow Checkpoint Crystal Square" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X458D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[bitflags] Music Unlocked" },
+        { address=0X4740, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="b3 = Demo (Freeze map timer)" },
+      },
+    },
+  },
+}

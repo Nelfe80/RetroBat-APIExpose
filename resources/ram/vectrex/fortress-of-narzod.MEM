@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fortress of Narzod",
+    system = "vectrex",
+    system_name = "Vectrex",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "fortress-of-narzod",
+    file = "fortress-of-narzod.zip",
+    hashes = {
+      { hash = "e65b3262e9447a747d93e0ccb1dbb7df", label = "Fortress of Narzod (USA, Europe).vec" },
+    }
+  },
+
+  events = {
+  },
+}

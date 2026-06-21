@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 8: Furukawa Emiko",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-8-furukawa-emiko",
+    file = "private-idol-disc-vol-8-furukawa-emiko.zip",
+    hashes = {
+      { hash = "97e866568701ee06da35320d3586c6b6", label = "Private Idol Disc Vol. 8 - Emiko Furukawa (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X12C935, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X108DDE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Menu object thing for RP" },
+      },
+    },
+  },
+}

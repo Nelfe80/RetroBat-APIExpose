@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "The Magic of Scheherazade",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "the-magic-of-scheherazade",
+    file = "the-magic-of-scheherazade.zip",
+    hashes = {
+      { hash = "267e1882db5c6523d6d49cbb5edd470d", label = "Magic of Scheherazade, The (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0084, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Displayed Player Level" },
+        { address=0X030E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rod Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0081, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X0081, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X030A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss or Gilga's Health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0E0C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="FF = On Ground, 78 = Jumping" },
+      },
+    },
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Atomic Punk",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "atomic-punk",
+    file = "atomic-punk.zip",
+    hashes = {
+      { hash = "2eb9a6891fc79cd878d8bc12d04a0790", label = "Dynablaster (Europe).gb" },
+      { hash = "76010c6ff6bd0c4e8ac934dc69fb96ab", label = "Atomic Punk (USA).gb" },
+      { hash = "fc2d9eb9479543614b6e3d0d63c359aa", label = "Bomber Boy (Japan).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0F2, type="u8", condition="eq", value=0X04, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="GAME A CONTINUE" },
+        { address=0XD800, type="u8", condition="eq", value=0X85, action="GAME_OVER", no_log=false, no_survey=false, desc="GAME A Lost A Kid!/Game Over" },
+        { address=0XD800, type="u8", condition="eq", value=0X8A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="GAME A Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD800, type="u8", condition="eq", value=0X9D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="GAME B Died Pause" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC0B0, type="u8", condition="eq", value=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="empty, 00=invinsibility, 01=bomb, 02=fire, 03=skates, 04=remote, 05=wallpass, 06=bombthrow, 07=t" },
+        { address=0XC100, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="block" },
+        { address=0XC4C0, type="u8", condition="eq", value=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="empty, 00=invinsibility, 01=bomb, 02=fire, 03=skates, 04=remote, 05=wallpass, 06=bombthrow, 07=t" },
+        { address=0XD000, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Brick (destroyable)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC0B0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[10bytes] Game A" },
+        { address=0XC4C0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[30bytes] Game A" },
+      },
+    },
+  },
+}

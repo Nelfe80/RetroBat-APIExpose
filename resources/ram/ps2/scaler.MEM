@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Scaler",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "scaler",
+    file = "scaler.zip",
+    hashes = {
+      { hash = "adb1100688d075b8db92b47c573b8634", label = "Scaler (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X31D8AC, type="u32le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+      health = {
+        { address=0X31D8AC, type="u32le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Current Health Display" },
+        { address=0X45BA92, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Extra Health Point" },
+      },
+    },
+  },
+}

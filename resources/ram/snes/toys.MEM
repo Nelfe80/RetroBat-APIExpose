@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Toys",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "toys",
+    file = "toys.zip",
+    hashes = {
+      { hash = "a568d9a73a7c8c6ab1e2e88669c81d6d", label = "Toys - Let the Toy Wars begin! (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0011, type="u8", condition="eq", value=0X46, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0011, type="u8", condition="eq", value=0XFA, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In the stage 01" },
+        { address=0X0011, type="u8", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Always after exit an stage" },
+        { address=0X0011, type="u8", condition="eq", value=0X6F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In stage 02" },
+        { address=0X0011, type="u8", condition="eq", value=0XCE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In stage 03" },
+        { address=0X0011, type="u8", condition="eq", value=0XAC, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In last Stage" },
+        { address=0X004A, type="u8", condition="eq", value=0X9D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 02" },
+        { address=0X004A, type="u8", condition="eq", value=0X82, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 03" },
+        { address=0X004A, type="u8", condition="eq", value=0X8B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 01" },
+        { address=0X004A, type="u8", condition="eq", value=0X83, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="last stage" },
+      },
+    },
+  },
+}

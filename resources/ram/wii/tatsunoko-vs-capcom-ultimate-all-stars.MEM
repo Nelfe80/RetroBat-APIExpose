@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Tatsunoko vs. Capcom: Ultimate All-Stars",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "tatsunoko-vs-capcom-ultimate-all-stars",
+    file = "tatsunoko-vs-capcom-ultimate-all-stars.zip",
+    hashes = {
+      { hash = "6e4e409929d8884af41969d570732130", label = "Tatsunoko vs. Capcom - Ultimate All-Stars (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3EB7DC, type="u32be", condition="eq", value=0X0E, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X56169C, type="u32be", condition="eq", value=0X13, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Mini-Game (Roll)" },
+        { address=0X56169C, type="u32be", condition="eq", value=0X1F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X56169C, type="u32be", condition="eq", value=0X2D, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Mini-Game (Doronjo)" },
+      },
+      events = {
+        { address=0X9BDD98, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Hit Combo [32 bits BE]" },
+        { address=0X9BDD9C, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P2 - Hit Combo [32 bits BE]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3EBA8E, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Gallery: Geshellschaft (Clear Skies" },
+        { address=0X3EBDB8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block A Cleared [32 bits BE]" },
+        { address=0X3EBDBC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block B Cleared [32 bits BE]" },
+        { address=0X3EBDC0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block C Cleared [32 bits BE]" },
+        { address=0X3EBDC4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block D Cleared [32 bits BE]" },
+        { address=0X3EBDC8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block E Cleared [32 bits BE]" },
+        { address=0X3EBDCC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block F Cleared [32 bits BE]" },
+        { address=0X3EBDD0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block G Cleared [32 bits BE]" },
+        { address=0X3EBDD4, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block H Cleared [32 bits BE]" },
+        { address=0X3EBDD8, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block I Cleared [32 bits BE]" },
+        { address=0X3EBDDC, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Block J Cleared [32 bits BE]" },
+        { address=0X3ECC24, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ultimate Shooters - Final Stage Cleared Path ID? [32 bits BE]" },
+      },
+      stage = {
+        { address=0X3EB8F4, type="u32be", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Uncharted Region of China" },
+        { address=0X3EB8F4, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game - Stage [32 bits BE]" },
+        { address=0X3EBA8D, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Daigo Temple (Moonlight)" },
+        { address=0X3EBA8D, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Gesellschaft (Storm)" },
+        { address=0X3EBA8D, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Orbital Ring Systems Cargo Bay" },
+        { address=0X3EBA8D, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Willamette Parkview Mall" },
+        { address=0X3EBA8D, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Ark of Yamato" },
+        { address=0X3EBA8E, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Washinkyo, Amehon" },
+        { address=0X3EBA8E, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Galactor Base" },
+        { address=0X3EBA8E, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Burning Wasteland" },
+        { address=0X3EBA8E, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Les Vagas" },
+        { address=0X3EBA8E, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Daigo Temple (Cherry Blossoms)" },
+        { address=0X3EBA8E, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Aensland Castle" },
+        { address=0X3EBA8E, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Uncharted Region of China" },
+        { address=0X3EBA8F, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Wasteland" },
+        { address=0X3EBA8F, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Gallery: Yatterman's Workshop" },
+        { address=0X3EFBC0, type="u32be", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage (1st phase)" },
+        { address=0X3EFBC0, type="u32be", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage (2nd phase)" },
+        { address=0X3EFBC0, type="u32be", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage (3rd phase)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3EBA40, type="u32be", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="2-star (default)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3EB904, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game - Score [32 bits BE] // multiply by 100 to get the two padding zeroes?" },
+        { address=0X3EBE18, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Save Data [Ultimate Shooters] - Ryu High Score [32 bits BE]" },
+        { address=0X3EFC38, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Ultimate Shooters - Score [32 bits BE]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3EB7DC, type="u32be", condition="eq", value=0X05, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X3EB7DC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Mode [32 bits BE]" },
+        { address=0X3EB9F8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Time Attack Timer [32 bits BE] // works for Arcade too" },
+        { address=0X3EBA38, type="u32be", condition="eq", value=0X2E68, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="99 (default)" },
+        { address=0X3EBA38, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Settings - Time [32 bits BE]" },
+        { address=0X3EBA74, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Save Data - Time Played [32 bits BE]" },
+        { address=0X3EFBC0, type="u32be", condition="eq", value=0X0A, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ending" },
+        { address=0X3EFBC0, type="u32be", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack finished" },
+        { address=0X3EFBC0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Arcade Match [32 bits BE] // works for survival, and time attack (?)" },
+      },
+    },
+  },
+}

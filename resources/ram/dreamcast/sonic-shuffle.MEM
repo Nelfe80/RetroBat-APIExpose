@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Sonic Shuffle",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "sonic-shuffle",
+    file = "sonic-shuffle.zip",
+    hashes = {
+      { hash = "776e089db00eb7949bb24cffd25f1c10", label = "Sonic Shuffle (Europe) (En,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X23CF44, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="1P - Space Combo" },
+        { address=0X23D144, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="2P - Space Combo" },
+        { address=0X23D344, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="3P - Space Combo" },
+        { address=0X23D544, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="4P - Space Combo" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X520880, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P - Sonic Tank - Health decreased" },
+        { address=0X520880, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P - Sonic Tank - Health increased" },
+        { address=0X520884, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P - Sonic Tank - Health decreased" },
+        { address=0X520884, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P - Sonic Tank - Health increased" },
+        { address=0X520888, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3P - Sonic Tank - Health decreased" },
+        { address=0X520888, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3P - Sonic Tank - Health increased" },
+        { address=0X52088C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4P - Sonic Tank - Health decreased" },
+        { address=0X52088C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4P - Sonic Tank - Health increased" },
+        { address=0X5242A4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gargantua - Giant Health decreased" },
+        { address=0X5242A4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gargantua - Giant Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X356E1C, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald Coast Quest - Number Of Turns Passed" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X23CEC0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings In Bank increased" },
+        { address=0X23CEE4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="1P - Mini-Game Rings Gain / Loss increased" },
+        { address=0X23CEE4, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="1P - Mini-Game Rings Gain / Loss empty" },
+        { address=0X23CEE8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="2P - Mini-Game Rings Gain / Loss increased" },
+        { address=0X23CEE8, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="2P - Mini-Game Rings Gain / Loss empty" },
+        { address=0X23CEEC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="3P - Mini-Game Rings Gain / Loss increased" },
+        { address=0X23CEEC, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="3P - Mini-Game Rings Gain / Loss empty" },
+        { address=0X23CEF0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="4P - Mini-Game Rings Gain / Loss increased" },
+        { address=0X23CEF0, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="4P - Mini-Game Rings Gain / Loss empty" },
+        { address=0X23CF0C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="1P - Rings increased" },
+        { address=0X23CF48, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 1P - Various Mini-Games - Rings increased" },
+        { address=0X23D10C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="2P - Rings increased" },
+        { address=0X23D148, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 2P - Various Mini-Games - Rings increased" },
+        { address=0X23D30C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="3P - Rings increased" },
+        { address=0X23D348, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 3P - Various Mini-Games - Rings increased" },
+        { address=0X23D50C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="4P - Rings increased" },
+        { address=0X23D548, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 4P - Various Mini-Games - Rings increased" },
+        { address=0X504EB0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 1P - Sonic Live - Rings increased" },
+        { address=0X504EB4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 2P - Sonic Live - Rings increased" },
+        { address=0X504EB8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 3P - Sonic Live - Rings increased" },
+        { address=0X504EBC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 4P - Sonic Live - Rings increased" },
+        { address=0X50677C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="1P - Over The Bridge - Rings increased" },
+        { address=0X506888, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="2P - Over The Bridge - Rings increased" },
+        { address=0X506994, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="3P - Over The Bridge - Rings increased" },
+        { address=0X506AA0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="4P - Over The Bridge - Rings increased" },
+        { address=0X507C58, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bucket-O-Rings - Bottom Minecart Rings increased" },
+        { address=0X507C5C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bucket-O-Rings - Top Minecart Rings increased" },
+        { address=0X507D50, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 1P - Frosty Rumble - Rings increased" },
+        { address=0X507E48, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 2P - Frosty Rumble - Rings increased" },
+        { address=0X507F40, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 3P - Frosty Rumble - Rings increased" },
+        { address=0X508038, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 4P - Frosty Rumble - Rings increased" },
+        { address=0X508148, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 1P - Shadow Tag - Rings increased" },
+        { address=0X5082B0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 2P - Shadow Tag - Rings increased" },
+        { address=0X508418, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 3P - Shadow Tag - Rings increased" },
+        { address=0X508580, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 4P - Shadow Tag - Rings increased" },
+        { address=0X50C9BC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 1P - Psychic Sonic - Rings increased" },
+        { address=0X50CA68, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 2P - Psychic Sonic - Rings increased" },
+        { address=0X50CB14, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 3P - Psychic Sonic - Rings increased" },
+        { address=0X50CBC0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Signed 32-bit] 4P - Psychic Sonic - Rings increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X519088, type="u32le", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Number Jump - Current Number" },
+      },
+    },
+  },
+}

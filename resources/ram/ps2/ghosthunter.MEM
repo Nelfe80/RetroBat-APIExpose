@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ghosthunter",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "ghosthunter",
+    file = "ghosthunter.zip",
+    hashes = {
+      { hash = "f7c91bfd7ba77c4773b50c4780e0f4b3", label = "Ghosthunter (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

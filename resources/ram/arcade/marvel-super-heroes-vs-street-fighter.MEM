@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Marvel Super Heroes vs. Street Fighter",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "marvel-super-heroes-vs-street-fighter",
+    file = "marvel-super-heroes-vs-street-fighter.zip",
+    hashes = {
+      { hash = "0321dd1f8f8113fe4c2a558d67567f0e", label = "mshvsf.7z <Marvel Super Heroes vs Street Fighter (970625 Euro)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3A91, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="TITLE DEMO" },
+        { address=0X3A91, type="u8", condition="eq", value=0X08, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUE" },
+        { address=0X3A91, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="GAME OVER" },
+        { address=0X4904, type="u8", condition="eq", value=0X10, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUE" },
+        { address=0X4904, type="u8", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="GAME OVER" },
+        { address=0X4904, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="TITLE" },
+        { address=0X4944, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="DEMO" },
+      },
+      events = {
+        { address=0X3911, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="< HIT COMBOS > ( 1st )" },
+        { address=0X4111, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="< HIT COMBOS > ( 2st )" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X4880, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="INATIVE" },
+        { address=0X4880, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="FIST BATTLE" },
+        { address=0X4880, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ENDING" },
+        { address=0X4880, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="< STAGES PROGRESSIVE >" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3861, type="u8", condition="eq", value=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="LP - HP" },
+        { address=0X3A50, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="< HP 1P - UNIVERSAL > decreased" },
+        { address=0X3A50, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="< HP 1P - UNIVERSAL > increased" },
+        { address=0X3E50, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="< HP CPU - UNIVERSAL > ( 1st ) decreased" },
+        { address=0X3E50, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="< HP CPU - UNIVERSAL > ( 1st ) increased" },
+        { address=0X4061, type="u8", condition="eq", value=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="LP - HP" },
+        { address=0X4650, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="< CPU HP UNIVERSAL > ( 2st ) decreased" },
+        { address=0X4650, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="< CPU HP UNIVERSAL > ( 2st ) increased" },
+        { address=0X4840, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="FULL" },
+        { address=0X4840, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="SLOW" },
+        { address=0X4840, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="K.O" },
+        { address=0X4840, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="< HP - 1P > ( 1st )" },
+        { address=0X4842, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="FULL" },
+        { address=0X4842, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="SLOW" },
+        { address=0X4842, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="K.O" },
+        { address=0X4842, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="< HP - 1P > ( 2st )" },
+        { address=0X4844, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="FULL" },
+        { address=0X4844, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="SLOW" },
+        { address=0X4844, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="K.O" },
+        { address=0X4844, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="< HP - CPU > ( 1st )" },
+        { address=0X4846, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="FULL" },
+        { address=0X4846, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="SLOW" },
+        { address=0X4846, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="K.O" },
+        { address=0X4846, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="< HP - CPU > ( 2st )" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3A94, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="< SCORE POINT > 16-BITS" },
+        { address=0X3A96, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="< SCORE POINT > 16-BITS" },
+        { address=0X3A97, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="< SCORE POINT > 32-BITS" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4880, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="APOCALYPSE BOSS" },
+        { address=0X4880, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="AKUMA BOSS" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFED4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="< GAME CONFIGURATION > ( TIME SPEED )" },
+      },
+    },
+  },
+}

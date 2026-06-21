@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Crash Nitro Kart",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "crash-nitro-kart",
+    file = "crash-nitro-kart.zip",
+    hashes = {
+      { hash = "11f5ac984ba7e950d88e4d21638e0a55", label = "Crash Nitro Kart (USA)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1775D2B, type="u8", condition="eq", value=0X07, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time trials" },
+        { address=0X1775D2B, type="u8", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lap time trials" },
+        { address=0X1775D2B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) gamemode active" },
+      },
+    },
+  },
+}

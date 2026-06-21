@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Silent Hill: Shattered Memories",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "silent-hill-shattered-memories",
+    file = "silent-hill-shattered-memories.zip",
+    hashes = {
+      { hash = "a55384c70c7cb4d76a68e03401fd50a7", label = "Silent Hill - Shattered Memories (USA) (En,Fr,Es)" },
+      { hash = "fb5fdd9ae4e1c004976c6f2fa7d07a4d", label = "Silent Hill - Shattered Memories (USA) (Ru)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X47B750, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X47B750, type="u32le", condition="eq", value=0X06, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X5A3570, type="u32le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5A3564, type="u32le", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Tone 01" },
+        { address=0X5A3564, type="u32le", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Tone 02" },
+        { address=0X5A3564, type="u32le", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Tone 03" },
+        { address=0X5A3564, type="u32le", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Tone 04" },
+        { address=0X5A3564, type="u32le", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Tone 05" },
+      },
+    },
+  },
+}

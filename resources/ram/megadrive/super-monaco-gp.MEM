@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Super Monaco GP",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "super-monaco-gp",
+    file = "super-monaco-gp.zip",
+    hashes = {
+      { hash = "0948aa1acc9f21a966b052a8ee385884", label = "Super Monaco GP (USA) (En,Ja).md" },
+      { hash = "868678804d33e96cd0bae20321c09a96", label = "Super Monaco GP (World) (En,Ja) (Pt) (Leo Luz).md" },
+      { hash = "ded2b235f625424f353c13c4d3a2cf89", label = "Super Monaco GP (World) (En,Ja).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFF12, type="u8", condition="eq", value=0XBA, action="CORPORATE_SCREEN", no_log=false, no_survey=false, desc="Sega Logo" },
+        { address=0XFF12, type="u8", condition="eq", value=0X32, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Title" },
+        { address=0XFF12, type="u8", condition="eq", value=0XE6, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X9142, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Championship / SMGP 1st Race" },
+      },
+    },
+  },
+}

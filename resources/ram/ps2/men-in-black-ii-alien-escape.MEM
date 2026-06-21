@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Men in Black II: Alien Escape",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "men-in-black-ii-alien-escape",
+    file = "men-in-black-ii-alien-escape.zip",
+    hashes = {
+      { hash = "9c48e6c5d7f16d70222d195d572c701e", label = "Men in Black II - Alien Escape (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7024C4, type="u16le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training level" },
+        { address=0X7024C4, type="u16le", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training level" },
+        { address=0X7024C4, type="u16le", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dockside" },
+        { address=0X7024C4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sublevel ID" },
+      },
+    },
+  },
+}

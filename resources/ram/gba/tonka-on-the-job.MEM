@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Tonka: On the Job",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tonka-on-the-job",
+    file = "tonka-on-the-job.zip",
+    hashes = {
+      { hash = "ee91c4582d9b0cc494fcb71173b43e17", label = "Tonka - On the Job (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X296C, type="u8", condition="eq", value=0X8, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demolition Time" },
+        { address=0X296C, type="u8", condition="eq", value=0X5A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X2A7C, type="u8", condition="eq", value=0X0, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X2A7C, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused (including the pause from the vehicle menu)" },
+        { address=0X3E1C, type="u16le", condition="eq", value=0X6AB0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X3E1C, type="u16le", condition="eq", value=0X6AC4, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (Big Mtn. Way unlocked)" },
+        { address=0X3E1C, type="u16le", condition="eq", value=0X69FC, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1210, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the Job Training" },
+        { address=0X1210, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="New Park City" },
+        { address=0X1210, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Old Town" },
+        { address=0X1210, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Petey's Gravel Pit" },
+        { address=0X1210, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Lazy 'T' Ranch" },
+        { address=0X1210, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Big Mountain Way" },
+        { address=0X1210, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Freeplay" },
+        { address=0X1210, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu" },
+        { address=0X1210, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone selected" },
+        { address=0X12B4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stars earnt in Clear The Way!" },
+        { address=0X1300, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total fuel tanks used in current level, stops at 99 tanks" },
+        { address=0X2C98, type="u8", condition="eq", value=0X0, action="LEVEL_NEW_GAME", no_log=false, no_survey=false, desc="New Game" },
+        { address=0X2C98, type="u8", condition="eq", value=0X1, action="LEVEL_CONTINUE", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X2C98, type="u8", condition="eq", value=0X0, action="LEVEL_START_JOBS", no_log=false, no_survey=false, desc="Start Jobs" },
+        { address=0X2C98, type="u8", condition="eq", value=0X1, action="LEVEL_FREEPLAY", no_log=false, no_survey=false, desc="Freeplay" },
+        { address=0X2C98, type="u8", condition="eq", value=0X2, action="LEVEL_OPTIONS", no_log=false, no_survey=false, desc="Options" },
+        { address=0X2C98, type="u8", condition="eq", value=0X0, action="LEVEL_SOUND_VOLUME", no_log=false, no_survey=false, desc="Sound Volume" },
+        { address=0X2C98, type="u8", condition="eq", value=0X1, action="LEVEL_ENGINE_VOLUME", no_log=false, no_survey=false, desc="Engine Volume" },
+        { address=0X2C98, type="u8", condition="eq", value=0X2, action="LEVEL_MUSIC_VOLUME", no_log=false, no_survey=false, desc="Music Volume" },
+      },
+      zone = {
+        { address=0X1214, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Level loaded in current zone. Doesn't unload when out of levels" },
+        { address=0X32C4, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Level selected in current zone" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2660, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current level's vehicle count. Always sets to 1 during menus increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3680, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of input history block. Byte 1 is face buttons, 2 is shoulder, 3 face, etc." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X12B9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stars earnt in Demolition Time" },
+        { address=0X2920, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Amount of time spent in a menu or level, pauses on dialogue, selecting a vehicle or on the winsc" },
+        { address=0X296C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Duplicate of 0x1214 but contains some extra addresses (notably the win screen)" },
+        { address=0X29F4, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Amount of time spent in a menu or level, resets when changing menu or going in/out of game or re" },
+      },
+    },
+  },
+}

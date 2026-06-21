@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Shenmue II",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action, Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "shenmue-ii",
+    file = "shenmue-ii.zip",
+    hashes = {
+      { hash = "6f126149eaa94212983d9b8e78ae5110", label = "Shenmue II (Europe) (En,Fr,De,Es) (Disc 4)" },
+      { hash = "bca93bbfb29988e6c3d4699aec145810", label = "Shenmue II (Europe) (En,Fr,De,Es) (Disc 3)" },
+      { hash = "c6e5fa0ac6ff28b33beeb3c6cb182dcc", label = "Shenmue II (Europe) (En,Fr,De,Es) (Disc 1)" },
+      { hash = "e14d3fda564b8f1efbe6a452996e4162", label = "Shenmue II (Europe) (En,Fr,De,Es) (Disc 2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2BDDF4, type="u32le", condition="eq", value=0X35313130, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="QTE Title" },
+        { address=0X2EE611, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Collection - Mini QTE Title" },
+        { address=0X2EEA89, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon's Triangle" },
+        { address=0X2F00E0, type="u8", condition="eq", value=0XF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="All 4 games unlocked" },
+        { address=0X2F00E0, type="u8", condition="eq", value=0X7, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Need to unlock Lucky Hit Museum" },
+        { address=0X2F00E0, type="u8", condition="eq", value=0XB, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Need to Slot Machine" },
+        { address=0X2F00E0, type="u8", condition="eq", value=0XD, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Need to unlock Excite QTE 2" },
+        { address=0X2F00E0, type="u8", condition="eq", value=0XE, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Need to unlock QTE Title" },
+      },
+      events = {
+        { address=0X2EEA82, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Mantis Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X262F94, type="u16le", condition="eq", value=0X3DC0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Before entering Man Mo Temple grounds" },
+        { address=0X262F94, type="u16le", condition="eq", value=0XC760, action="NEW_LEVEL", no_log=false, no_survey=false, desc="After entering Man Mo Temple grounds" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X35A578, type="u8", condition="eq", value=0X0B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dory Gordie" },
+        { address=0X523B18, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Big or Small die 1" },
+        { address=0X523B19, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Big or Small die 2" },
+        { address=0X523B1A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Big or Small die 3" },
+      },
+      health = {
+        { address=0X2BE368, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ryo Health decreased" },
+        { address=0X2BE368, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ryo Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7A7324, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="QTE Title Score" },
+        { address=0X7A7328, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="QTE Title Hi-Score" },
+        { address=0X7A732C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Excite QTE 2 Score" },
+        { address=0X7A73F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Darts/Neo Darts Score" },
+      },
+      collectibles = {
+        { address=0X2562C4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32 bit) Money - amount increased" },
+        { address=0X27D3D4, type="u16le", condition="eq", value=0X0000, action="MONEY_STATE", no_log=false, no_survey=false, desc="Waiting to ring bell" },
+        { address=0X27D3D4, type="u16le", condition="eq", value=0X6D5D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ren rings bell" },
+        { address=0X27D3D4, type="u16le", condition="eq", value=0X3F34, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ryo rings bell" },
+        { address=0X29835C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money UI Popup count increased" },
+        { address=0X2EE591, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Collection - Dural Gold QTY (8-bit) increased" },
+        { address=0X2EE84C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Right Coin increased" },
+        { address=0X2EE84D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory - Reverse Coin increased" },
+        { address=0X2EE84F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory - Big Gold Medal increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2BE5E6, type="u16le", condition="eq", value=0X3336, action="JUMPING", no_log=false, no_survey=false, desc="Jumped the fence with Ren" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2BDDF4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Maps/Scenes" },
+        { address=0X4FDDCC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Wiretap 3 (fast)" },
+        { address=0X6D6880, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Yellowhead Building Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Tales of Innocence [Subset - Library Completion]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "tales-of-innocence-subset-library-completion",
+    file = "tales-of-innocence-subset-library-completion.zip",
+    hashes = {
+      { hash = "26e2080e1959e138bfca1e2f3e8f4849", label = "Tales Of Innocence [Subset - Library Completion].nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1008EE, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seeking Ultimate Strength (level 30 on everyone)" },
+        { address=0X1008EE, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Path to Ultimate Strength (level 100 on everyone)" },
+        { address=0X1008EE, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yet Unattained Ultimate Strength (level 170 on everyone)" },
+        { address=0X1008EE, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ultimate Strength (level 230 on everyone)" },
+      },
+    },
+  },
+}

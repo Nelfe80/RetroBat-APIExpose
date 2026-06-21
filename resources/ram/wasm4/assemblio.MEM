@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Assemblio",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "assemblio",
+    file = "assemblio.zip",
+    hashes = {
+      { hash = "d0e3196980f2c30da6e3a80074274885", label = "Assemblio (World) (Proto) (Phillip Luhmann).wasm" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6F46, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal item's shape." },
+        { address=0X6F48, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of goal items required." },
+        { address=0X73A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level." },
+        { address=0X7CFC, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of goal items being collected per second." },
+        { address=0X7D00, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of goal items collected." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6F30, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of objects placed." },
+      },
+    },
+  },
+}

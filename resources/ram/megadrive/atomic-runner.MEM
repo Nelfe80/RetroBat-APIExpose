@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Atomic Runner",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "atomic-runner",
+    file = "atomic-runner.zip",
+    hashes = {
+      { hash = "6ddf32102f20c6f91b0d97bb5da5caad", label = "Atomic Runner (USA).md" },
+      { hash = "b953ab20d7bd508bd15d369339c67256", label = "Atomic Runner (Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFE0A, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="0" },
+        { address=0XFE0A, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="5" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC30C, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 | 02 = Stage 2 |" },
+        { address=0XC30C, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 | 06 = Stage 4 |" },
+        { address=0XC30C, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 | 0a = Stage 6 |" },
+        { address=0XC30C, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 |" },
+        { address=0XC30C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Identifier" },
+        { address=0XC310, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0XC310, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XDD0C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Red Power Up decreased" },
+        { address=0XDD0E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Blue Power Up decreased" },
+        { address=0XDD10, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yellow Power Up decreased" },
+        { address=0XDD12, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jump Power Up decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XDD0C, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First Power Up" },
+        { address=0XDD0C, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Second Power Up" },
+        { address=0XDD0E, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First Power Up" },
+        { address=0XDD0E, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Second Power Up" },
+        { address=0XDD10, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First Power Up" },
+        { address=0XDD10, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Second Power Up" },
+        { address=0XDD12, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First Power Up" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XDD14, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Light Ring" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDCF5, type="u8", condition="eq", value=0XFF, action="JUMPING", no_log=false, no_survey=false, desc="Jump Starts" },
+        { address=0XDCFA, type="u8", condition="eq", value=0X06, action="JUMPING", no_log=false, no_survey=false, desc="Player Jumping" },
+        { address=0XFE0E, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+  },
+}

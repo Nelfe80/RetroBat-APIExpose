@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Prince of Persia",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "prince-of-persia",
+    file = "prince-of-persia.zip",
+    hashes = {
+      { hash = "80034da43f35307291714ae2553d9ddf", label = "Prince of Persia (USA).gb" },
+    }
+  },
+
+  events = {
+  },
+}

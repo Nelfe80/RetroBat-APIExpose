@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Kirby no Omochabako | Kirby's Toy Box",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kirby-no-omochabako-kirbys-toy-box",
+    file = "kirby-no-omochabako-kirbys-toy-box.zip",
+    hashes = {
+      { hash = "061fcbe0fca04030f5d62938eb5604a6", label = "Kirby Ball Rally (Japan) (Standalone Fix).bs" },
+      { hash = "072166f9c1ff7300114c210f30e4cf8a", label = "Kirby no Omochabako - Cannon Ball (Japan).bs" },
+      { hash = "612cad0100b9a37693815542d501a193", label = "Kirby no Omochabako - Pinball (Japan).bs" },
+      { hash = "62ec01a92cbd02f4680fcb59c53d7ec2", label = "Kirby no Omochabako - Baseball (Japan) (2-9).bs" },
+      { hash = "6d6a1e5ef45b4344751f674d7af19a62", label = "Kirby no Omochabako - Guruguru Ball (Japan).bs" },
+      { hash = "7ca9979d1fc3e1cef697c757d4616c2a", label = "Kirby no Omochabako - Arrange Ball (Japan).bs" },
+      { hash = "81b0f5ef9e0d42656f7a874b9a7da0dc", label = "Kirby no Omochabako - Hoshi Kuzushi (Japan).bs" },
+      { hash = "c29e2ac4c326cf1d1f5c0c048d17a005", label = "Kirby no Omochabako - Pachinko (Japan).bs" },
+      { hash = "efdf6a8d32f885c39de2e45fcb2b315d", label = "Kirby Baseball (Japan) (Standalone Fix).bs" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0256, type="u16le", condition="eq", value=0X0000, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1BB9, type="u8", condition="eq", value=0X92, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Over text on screen and Title Screen" },
+        { address=0X1BB9, type="u8", condition="eq", value=0X92, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over text" },
+        { address=0X64F4, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X025C, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Round and Round Ball]" },
+      },
+      stage = {
+        { address=0X623A, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="He is on stage" },
+        { address=0X64F0, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8" },
+        { address=0X64F0, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X64F0, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X64F0, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X64F0, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X64F0, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X64F0, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X64F0, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6500, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="A small Kirby entered a score pocket or a little Kirby got eaten by the bigger Kirby" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X54D2, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks a bomb" },
+        { address=0X54D4, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks a bomb" },
+        { address=0X54D6, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks a bomb" },
+        { address=0X54D8, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks a bomb" },
+      },
+    },
+  },
+}

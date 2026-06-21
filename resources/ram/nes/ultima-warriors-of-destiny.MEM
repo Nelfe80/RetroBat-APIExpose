@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Ultima: Warriors of Destiny",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ultima-warriors-of-destiny",
+    file = "ultima-warriors-of-destiny.zip",
+    hashes = {
+      { hash = "65dd13bba2feeb90e13567be72f8795c", label = "Ultima - Warriors of Destiny (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0047, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x00 Title Screen" },
+        { address=0X0048, type="u16le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x11 Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6AEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Captain Johne (Underworld/Despise) available conversation bits:" },
+        { address=0X6BF0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b1 - Took Chain Mail from Graveyard in Underworld beneath Destard |" },
+        { address=0X6BF1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b1 - Took Morning Star from Graveyard in Underworld beneath Destard |" },
+        { address=0X6BF2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b7 - Took Gem Shard of Hatred from the Underworld below Dungeon Wrong |" },
+        { address=0X6BF3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b3 - Took Gem Shard of Falsehood from the Underworld below Dungeon Deceit |" },
+        { address=0X6BF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b1 - Took Magic Shield (NE) in Underworld," },
+        { address=0X6BF5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b1 - Took Magic Armour (SW) in Underworld," },
+        { address=0X6BF6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b1 - Took Magic Sword (SW) in Underworld," },
+        { address=0X6BF7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b7 - Took Magic Axe (SE) in Underworld" },
+        { address=0X6C0E, type="u8", condition="eq", value=0XB2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="NW Prison Level in Lb's Castle Thrown," },
+        { address=0X6C0F, type="u8", condition="eq", value=0XB2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SE Prison Lever in LB's Castle Thrown," },
+        { address=0X6C0F, type="u8", condition="eq", value=0XB4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SE Prison Cell in LB's Castle opened," },
+        { address=0X6C0F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b0: SW Prison Level in LB's Castle Thrown," },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X6A06, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Avatar Current HP decreased" },
+        { address=0X6A06, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Avatar Current HP increased" },
+        { address=0X6A0A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Avatar Max HP decreased" },
+        { address=0X6A0A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Avatar Max HP increased" },
+        { address=0X6BB7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b1 - Dispelled Bottom Energy Field in Deceit entrance (F1) | decreased" },
+        { address=0X6BB7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b1 - Dispelled Bottom Energy Field in Deceit entrance (F1) | increased" },
+        { address=0X6C24, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b1 - Dispelled South Energy Field in Moonglow's Herb Shop. decreased" },
+        { address=0X6C24, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b1 - Dispelled South Energy Field in Moonglow's Herb Shop. increased" },
+        { address=0X6FE8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="First Monster Current HP decreased" },
+        { address=0X6FE8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="First Monster Current HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6A70, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Red/Gold (Avatar)" },
+        { address=0X6A71, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Red/Gold (Avatar)" },
+        { address=0X6A72, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Red/Gold (Avatar)" },
+        { address=0X6A73, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Red/Gold (Avatar)" },
+        { address=0X6B6E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b5 - Took Gold Coins from F3 Wrong (E) | increased" },
+        { address=0X6B72, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b5 - Took Wood Shield from F3 Wrong (SW) | increased" },
+        { address=0X6B75, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1 - Took NW Gold Coins from F4 Destard (N) | increased" },
+        { address=0X6B76, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b3 - Took NE Gold Coins from F4 Destard (N) | increased" },
+        { address=0X6B7B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1 - Took Gold Coins from F2 Destard Center House | increased" },
+        { address=0X6B7D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1 - Took E Gold Coins from F1 Destard (NE) increased" },
+        { address=0X6B83, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1 - Took Gold Coins from F3 Destard (S) | increased" },
+        { address=0X6B94, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1 - Took Right Gold Coins from F1 Shame (NW) | increased" },
+        { address=0X6B9E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b5 - Took W Gold Coins in F2 Shame South Cavern | increased" },
+        { address=0X6BA1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b5 - Took Gold Coins from F3 Shame (SE) | increased" },
+        { address=0X6BA6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b3 - Took NE Gold Coins F2 Deceit (NW) | increased" },
+        { address=0X6BA7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1 - Took SW Gold Coins F2 Deceit (NW) increased" },
+        { address=0X6BC0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1 - Took Gold Coins from F2 Hythloth (C) | increased" },
+        { address=0X6BC9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b3 - Took Gold Coins F1 Covetous (NE) increased" },
+        { address=0X6C09, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b5 - Took Gold Coins from Lord British's Sandalwood Box Room | increased" },
+        { address=0X6C0B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1 - Took Gold Coins from Lord British's bedroom | increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6AD1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="'Shield of Truth' Healer (Moonglow) Status:" },
+        { address=0X6CB9, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="'Shield of Truth' Healer X Coord [High Byte] (When on screen) (Moonglow)" },
+        { address=0X6D2D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="'Shield of Truth' Healer Y Coord [High Byte] (When on screen) (Moonglow)" },
+        { address=0X6DA1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="'Shield of Truth' Healer X Coord [Low Byte] (When on screen) (Moonglow)" },
+        { address=0X6E15, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="'Shield of Truth' Healer Y Coord [Low Byte] (When on screen) (Moonglow)" },
+      },
+    },
+  },
+}

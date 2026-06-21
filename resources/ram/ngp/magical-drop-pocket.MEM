@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Magical Drop Pocket",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "magical-drop-pocket",
+    file = "magical-drop-pocket.zip",
+    hashes = {
+      { hash = "6acfef5fe57d592ea7321e0e440c4ecf", label = "Magical Drop Pocket (USA, Europe).ngc" },
+      { hash = "ae92cd3536577bd18f03f34b475c26d6", label = "Magical Drop Pocket (Japan).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1676, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0F4E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 1" },
+        { address=0X0F4F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 2" },
+        { address=0X0F50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 3" },
+        { address=0X0F51, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 4" },
+        { address=0X0F52, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 5" },
+        { address=0X0F53, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 6" },
+        { address=0X0F54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 7" },
+        { address=0X0F55, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 8" },
+        { address=0X0F56, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Row Level | Column 9" },
+        { address=0X0F8A, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Win" },
+        { address=0X0F8A, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Lose" },
+        { address=0X154A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Current Round | Challenge" },
+        { address=0X169C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Current Level | Story" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0E30, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1676, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death BGM" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0FB4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Score" },
+      },
+    },
+  },
+}

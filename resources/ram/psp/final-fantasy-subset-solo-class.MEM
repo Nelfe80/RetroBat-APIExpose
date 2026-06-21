@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Final Fantasy [Subset - Solo Class]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "final-fantasy-subset-solo-class",
+    file = "final-fantasy-subset-solo-class.zip",
+    hashes = {
+      { hash = "dfa098f5e2db7645830718281bdc8ed3", label = "Final Fantasy - 20th Anniversary Edition (Europe) (En,Ja).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD12EE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 1 Level" },
+        { address=0XD12F40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 2 Level" },
+        { address=0XD12F9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 3 Level" },
+        { address=0XD12FF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 4 Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD133B8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="145 - Death Gaze" },
+      },
+      health = {
+        { address=0XD12EEC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 Current HP decreased" },
+        { address=0XD12EEC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 Current HP increased" },
+        { address=0XD12EEE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 Max HP decreased" },
+        { address=0XD12EEE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 Max HP increased" },
+        { address=0XD12F48, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 2 Current HP decreased" },
+        { address=0XD12F48, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 2 Current HP increased" },
+        { address=0XD12F4A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 2 Max HP decreased" },
+        { address=0XD12F4A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 2 Max HP increased" },
+        { address=0XD12FA4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 Current HP decreased" },
+        { address=0XD12FA4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 Current HP increased" },
+        { address=0XD12FA6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 Max HP decreased" },
+        { address=0XD12FA6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 Max HP increased" },
+        { address=0XD13000, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 Current HP decreased" },
+        { address=0XD13000, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 Current HP increased" },
+        { address=0XD13002, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 Max HP decreased" },
+        { address=0XD13002, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 Max HP increased" },
+      },
+    },
+  },
+}

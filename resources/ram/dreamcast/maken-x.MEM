@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Maken X",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "maken-x",
+    file = "maken-x.zip",
+    hashes = {
+      { hash = "65ce9e83d854ee2e41c8e4db3c111fb7", label = "Maken X (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEF68, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over screen" },
+        { address=0X110654, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Game Intro and Main Menu (including Demo Mode)" },
+        { address=0X110654, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="once you start or load into the world map and beyond but stays 00 after you finish game, even on" },
+        { address=0X112788, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Main Menu and Demo Mode" },
+        { address=0X1E4340, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1E4348, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over screen" },
+        { address=0X1E43F0, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X1E43F1, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E42D8, type="u8", condition="eq", value=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="frozen controls" },
+        { address=0X1E42D8, type="u8", condition="eq", value=0X42, action="NEW_LEVEL", no_log=false, no_survey=false, desc="cutscene?" },
+        { address=0X1E42D8, type="u8", condition="eq", value=0X48, action="NEW_LEVEL", no_log=false, no_survey=false, desc="cutscene load?" },
+        { address=0X1E42D8, type="u8", condition="eq", value=0X50, action="NEW_LEVEL", no_log=false, no_survey=false, desc="frozen controls and turn right then switches to 0x40" },
+        { address=0X1E42D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[not level completion values]" },
+        { address=0X1E4368, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level and custscene fade in and fade out" },
+        { address=0X1E51E4, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="in game" },
+        { address=0X1E51E4, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="transition/load" },
+        { address=0X1E51E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Transition" },
+        { address=0X21C2DC, type="u8", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="seems to be only 0x06 during the 'stage clear' screen/animation" },
+        { address=0X21CAA0, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level not complete" },
+        { address=0X21CAA0, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete for" },
+      },
+      zone = {
+        { address=0XEF68, type="u8", condition="eq", value=0X09, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Loading into world map?" },
+        { address=0X1E4294, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="start/world map" },
+        { address=0X2497FA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="0x00 = Restart from world map button on gameover screen" },
+      },
+      stage = {
+        { address=0X21C218, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="actual level completion?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6C21F4, type="u16le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead - Hakke Andrey (in Kanazawa)" },
+      },
+      health = {
+        { address=0X1E4510, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0X1E4510, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+        { address=0X1E4514, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X1E4514, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0X34ECC5, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="0x00 < amount of damage dealt + taken (doesn't always start at 0)" },
+        { address=0X6C21F4, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="HP of some things:" },
+        { address=0X741DC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="{in the Forbidden City part 2) Geist Phase 2 HP decreased" },
+        { address=0X741DC0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="{in the Forbidden City part 2) Geist Phase 2 HP increased" },
+        { address=0X741DC1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="{in the Forbidden City part 2) Geist Phase 2 HP fractions decreased" },
+        { address=0X741DC1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="{in the Forbidden City part 2) Geist Phase 2 HP fractions increased" },
+        { address=0X741F74, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Forbidden City part 1 - Geist phase 1 HP fraction decreased" },
+        { address=0X741F74, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Forbidden City part 1 - Geist phase 1 HP fraction increased" },
+        { address=0X741F75, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Forbidden City part 1 - Geist phase 1 HP decreased" },
+        { address=0X741F75, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Forbidden City part 1 - Geist phase 1 HP increased" },
+        { address=0X7EB0EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="{in Kunlun) Fu Shou Lee HP in Kunlun fractions decreased" },
+        { address=0X7EB0EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="{in Kunlun) Fu Shou Lee HP in Kunlun fractions increased" },
+        { address=0X7EB0ED, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="{in Kunlun) Fu Shou Lee HP in Kunlun whole numbers decreased" },
+        { address=0X7EB0ED, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="{in Kunlun) Fu Shou Lee HP in Kunlun whole numbers increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X628CB0, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1E4478, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump height" },
+      },
+    },
+  },
+}

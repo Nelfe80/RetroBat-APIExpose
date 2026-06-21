@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Arena: Maze of Death",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "arena-maze-of-death",
+    file = "arena-maze-of-death.zip",
+    hashes = {
+      { hash = "ce3e5094025b10c3885ff1da53a46d2f", label = "Arena (USA, Europe).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X127A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Room" },
+        { address=0X1EC0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Music ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X128E, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Score (BCD) increased" },
+        { address=0X128E, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Score (BCD) decreased" },
+        { address=0X12F2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Lives increased" },
+        { address=0X12F2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Lives decreased" },
+      },
+      health = {
+        { address=0X129B, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0X129B, type="u8", condition="eq", value=0X128, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Decimal Value" },
+        { address=0X129B, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player HP" },
+        { address=0X1661, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 1 HP decreased" },
+        { address=0X1661, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 1 HP increased" },
+        { address=0X16A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 2 HP decreased" },
+        { address=0X16A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 2 HP increased" },
+        { address=0X16EF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 3 HP decreased" },
+        { address=0X16EF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 3 HP increased" },
+        { address=0X1736, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 4 HP decreased" },
+        { address=0X1736, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 4 HP increased" },
+        { address=0X177D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 5 HP decreased" },
+        { address=0X177D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 5 HP increased" },
+        { address=0X17C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 6 HP decreased" },
+        { address=0X17C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 6 HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X12B6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon in Inventory:" },
+        { address=0X12D7, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Button pressed" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1290, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 10k+" },
+      },
+      collectibles = {
+        { address=0X12AA, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Machine Gun Ammo" },
+        { address=0X12AC, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Photon Launcher Ammo" },
+        { address=0X12AE, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Lazer Rifle Ammo" },
+        { address=0X12B0, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ion Cannon Ammo" },
+        { address=0X12B2, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Flame Thrower Ammo" },
+        { address=0X12B4, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Grenade Ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0F00, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object placement on screen" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X12D1, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Knife Stab Timer" },
+        { address=0X12D2, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Shots Fired Timer" },
+      },
+    },
+  },
+}

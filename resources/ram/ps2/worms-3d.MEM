@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Worms 3D",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "worms-3d",
+    file = "worms-3d.zip",
+    hashes = {
+      { hash = "3daac996b35c48c3897bf63118cee521", label = "Worms 3D (Europe) (En,Fr,De,Es,It)" },
+      { hash = "60d8e03f442d0c4cec23eb73194c12ae", label = "Worms 3D (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X79EB40, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32 Bit] State Check | Title Screen Active" },
+      },
+    },
+  },
+}

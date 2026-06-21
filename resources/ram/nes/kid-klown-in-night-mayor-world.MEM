@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Kid Klown in Night Mayor World",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "kid-klown-in-night-mayor-world",
+    file = "kid-klown-in-night-mayor-world.zip",
+    hashes = {
+      { hash = "06f47a39696659d32a8b5a840484c39a", label = "Mickey Mouse III - Yume Fuusen (Japan) (Es) (v1.1) (Wave).nes" },
+      { hash = "2fbde4bccc6ea3efcab7335d79f5e3e0", label = "Kid Klown in Night Mayor World (USA) (Es) (v1.2) (Wave).nes" },
+      { hash = "41872d58e56169d08c8dec58cd78dc5c", label = "Mickey Mouse III - Yume Fuusen (Japan) (En) (v1.1) (USC).nes" },
+      { hash = "af30ce7dad8581c76582de1c85dac8d5", label = "Kid Klown in Night Mayor World (USA).nes" },
+      { hash = "bfa054299cdcc52bae42c4135052b7be", label = "Mickey Mouse III - Yume Fuusen (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X003C, type="u8", condition="eq", value=0X96, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Kid Klown in Night Mayor World" },
+      },
+    },
+  },
+}

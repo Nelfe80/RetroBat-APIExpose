@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Paperboy",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "paperboy",
+    file = "paperboy.zip",
+    hashes = {
+      { hash = "f185e7700fe58f34d1c2968074760cdc", label = "Paperboy (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC1E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Top of Audio/BGM Queue: 00e0=ingame. 1170=bonus round, 1a58=cancelsub, 1c02=perfectnewsub, 2564=" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC056, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score, Upper 4 digits, BCD" },
+        { address=0XC058, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score, Lower 4 digits, BCD" },
+        { address=0XC066, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score, Upper 4 digits, BCD BETTER" },
+        { address=0XC068, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score, Lower 4 digits, BCD BETTER" },
+      },
+    },
+  },
+}

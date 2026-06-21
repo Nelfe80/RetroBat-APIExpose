@@ -1,0 +1,105 @@
+return {
+  game = {
+    title = "Twinkle Star Sprites",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "twinkle-star-sprites",
+    file = "twinkle-star-sprites.zip",
+    hashes = {
+      { hash = "6f13e19b0d250d851595808b8215a755", label = "twinspri.7z <Twinkle Star Sprites>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8246, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X8246, type="u16le", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Gameplay (Including how to play and demo)" },
+        { address=0XBB07, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of continues" },
+        { address=0XFD8F, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Soft Dip Setup - toggle demo sound" },
+        { address=0XFD90, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Soft Dip Setup - toggle continue" },
+        { address=0XFDAE, type="u8", condition="eq", value=0X0201, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XFDAE, type="u8", condition="eq", value=0X0301, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen, credits inserted" },
+        { address=0XFDB6, type="u16le", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB6, type="u16le", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (High score initials entry)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBB0D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round started?" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3(default)" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5(max)" },
+        { address=0XFD8B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Soft Dip Setup - vs round" },
+        { address=0XFD8C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Soft Dip Setup - toggle level indicator" },
+      },
+      stage = {
+        { address=0XBA45, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Round active?" },
+        { address=0XBB01, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final stage" },
+        { address=0XBB01, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ending" },
+        { address=0XBB01, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XBB28, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 character" },
+        { address=0XBB29, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 character" },
+        { address=0XBB2A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 character" },
+        { address=0XBB2B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 character" },
+        { address=0XBB2C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 character" },
+        { address=0XBB2D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 character" },
+        { address=0XBB2F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 character" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBB05, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Attack" },
+        { address=0XC004, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0XC004, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0XD004, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives increased" },
+        { address=0XD004, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives decreased" },
+        { address=0XD289, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Death HP" },
+        { address=0XFD89, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="3(default)" },
+        { address=0XFD89, type="u8", condition="eq", value=0X63, action="LIVES_STATE", no_log=false, no_survey=false, desc="99(max)" },
+        { address=0XFD89, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Soft Dip Setup - lives on start increased" },
+        { address=0XFD89, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soft Dip Setup - lives on start decreased" },
+      },
+      health = {
+        { address=0XC015, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0XC015, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+        { address=0XD015, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health decreased" },
+        { address=0XD015, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC000, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit hex P1 score (big part)" },
+        { address=0XC002, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit hex P1 score (small part)" },
+        { address=0XD000, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit hex P2 score (big part)" },
+        { address=0XD002, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit hex P2 score (small part)" },
+      },
+      collectibles = {
+        { address=0X1F63, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 Coin bounces increased" },
+        { address=0XC203, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 Coin on screen increased" },
+        { address=0XC205, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Star" },
+        { address=0XC205, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0XD203, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 Coin on screen increased" },
+        { address=0XD207, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 $ Coin Value increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0B91, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="P2 Boss Health" },
+        { address=0X3F91, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="P1 Boss Health" },
+        { address=0XBB05, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Attack" },
+        { address=0XCC01, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="P1 Boss Active" },
+        { address=0XDC01, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="P2 Boss Active" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBBC0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Death timer (16-bit)" },
+        { address=0XC289, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Death HP" },
+      },
+    },
+  },
+}

@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Pepper II",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "pepper-ii",
+    file = "pepper-ii.zip",
+    hashes = {
+      { hash = "679f02b1d1a7d68af42735d67cbccaff", label = "Pepper II (USA, Europe).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0006, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="in title/transitioning between mazes" },
+        { address=0X0008, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="1=game over" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0080, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] score/10" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X023D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="invisible tracks time remaining" },
+        { address=0X0254, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="devil mode time remaining" },
+      },
+    },
+  },
+}

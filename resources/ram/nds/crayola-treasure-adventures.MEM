@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Crayola Treasure Adventures",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "crayola-treasure-adventures",
+    file = "crayola-treasure-adventures.zip",
+    hashes = {
+      { hash = "012329aa0b0cdb5b3880e5a200e8fc07", label = "Crayola Treasure Adventures (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "9783379f5073e47027c3bd3541ada182", label = "Crayola Treasure Adventures (USA).nds" },
+    }
+  },
+
+  events = {
+  },
+}

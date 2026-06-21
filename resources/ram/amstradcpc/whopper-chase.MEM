@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Whopper Chase",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "whopper-chase",
+    file = "whopper-chase.zip",
+    hashes = {
+      { hash = "58f010b056084735baab4f96c5659402", label = "Whopper Chase (1987)(Erbe Software)(es)[cr].dsk" },
+    }
+  },
+
+  events = {
+  },
+}

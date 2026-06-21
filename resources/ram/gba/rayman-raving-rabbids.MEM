@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Rayman: Raving Rabbids",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "rayman-raving-rabbids",
+    file = "rayman-raving-rabbids.zip",
+    hashes = {
+      { hash = "9630eae3565e47174448d3380850c7a9", label = "Rayman - Raving Rabbids (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06C1, type="u8", condition="eq", value=0X95, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over Screen has been reached once during a playthough, Will reset back to 94 if you go back" },
+        { address=0X06C4, type="u8", condition="eq", value=0XC1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is currently paused in Race Levels" },
+        { address=0X2320, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is currently paused in every level besides the Race Levels" },
+        { address=0X24D8, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen upon booting up the Game" },
+        { address=0X24D8, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen upon Exiting to the Main Menu after playing the Game at least once in both Time Att" },
+        { address=0X24F5, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game has booted up and Rayman is currently on the title screen" },
+        { address=0X440A, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="00=ingame 02=game in pause" },
+        { address=0X440B, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="00=ingame 02=game in pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2386, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels related" },
+        { address=0X2962, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Change Location in levels" },
+        { address=0X2978, type="u8", condition="eq", value=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Costume Selected in any Level + Tossing Keg" },
+        { address=0X3ADE, type="u8", condition="eq", value=0X0F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Punk Rayman crawling on the ground Animation" },
+        { address=0X80DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlock Levels" },
+        { address=0X10797, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels ID??(01 e5 is the hub)" },
+        { address=0X17494, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cake Race Level ID upon entering The Cake Race Level" },
+        { address=0X17495, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stomach Circuit Level ID upon entering the Stomach Circuit Level" },
+        { address=0X183D4, type="u8", condition="eq", value=0XA0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rayman has loaded into a Level" },
+        { address=0X1B20D, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Toy Chase Level ID upon entering The Toy Case Level" },
+        { address=0X20006, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Worlds ID?" },
+      },
+      zone = {
+        { address=0X23D4, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="01 = On any Hub World Map" },
+        { address=0X24D8, type="u8", condition="eq", value=0X0A, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Rayman has loaded into a World Map or Race Level" },
+        { address=0X7BA0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="WORLD 1 LUMS" },
+        { address=0X183D0, type="u8", condition="eq", value=0XD7, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Hub World" },
+        { address=0X183D4, type="u8", condition="eq", value=0X0D, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Rayman is on the Hub World Map of any Level" },
+        { address=0X183D4, type="u8", condition="eq", value=0X3F, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Rayman has loaded into the Portal Hub World" },
+      },
+      stage = {
+        { address=0X0636, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="CAGE STAGE 2?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4004, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-Bit) decreased" },
+        { address=0X430C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman Health. 20=full decreased" },
+        { address=0X430C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman Health. 20=full increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X4004, type="u8", condition="eq", value=0XF0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="The Blue Lum has been obtained and a timer for it has started to count down for how much time is" },
+        { address=0X4004, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="The Blum Lum Power Up has depleated" },
+        { address=0X183D0, type="u8", condition="eq", value=0XC9, action="TREASURE", no_log=false, no_survey=false, desc="Swallowed Treasures" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0067, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="World and Level Modifers.00=Toy Land 01=Forest World 02=Organic World.03 Sweets World 04=Dark Wo" },
+        { address=0X234C, type="u8", condition="eq", value=0XBE, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight Engaged When entering any Boss Fight" },
+        { address=0X234C, type="u8", condition="eq", value=0X4D, action="BOSS_HIT", no_log=false, no_survey=false, desc="On Foot when coming outta Boss Fight and tossed back to the Hub World and also = Any On Foot Lev" },
+        { address=0X24D8, type="u8", condition="eq", value=0X1D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rayman has loaded into the Portal Hub World or Normal on Foot and or Boss Level" },
+        { address=0X183C4, type="u8", condition="eq", value=0X1C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Any Boss Fight Engaged" },
+        { address=0X183D4, type="u8", condition="eq", value=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rayman has loaded into Any Boss Fight Arena and Any Boss Fight is now Engaged (Used for Rich Pre" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1C444, type="u8", condition="eq", value=0X03, action="JUMPING", no_log=false, no_survey=false, desc="Vehicle Jumped on a Jump-pad lanuching Rayman into the air" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X06A4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-Bit)" },
+        { address=0X24D8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(8-Bit)" },
+        { address=0X1C3FC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(8-Bit)" },
+        { address=0X1C421, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(8-bit)" },
+      },
+    },
+  },
+}

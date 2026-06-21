@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Pokémon Silver Version [Subset - Professor Oak Challenge]",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "pokemon-silver-version-subset-professor-oak-challenge",
+    file = "pokemon-silver-version-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "255d200e826a2a5f042c7e8d1f6e5146", label = "Pokemon - Silver Version [Subset - Professor Oak Challenge].gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD5FD, type="u8", condition="eq", value=0X9F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Ball" },
+        { address=0XD7C0, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground, Card Key" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD57A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins in Coin Case increased" },
+        { address=0XD5B8, type="u8", condition="eq", value=0XAE, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Berry" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDBFB, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=true, no_survey=false, desc="Jumpluff" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCA0E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Wild Pokemon Ball Shake Timer" },
+      },
+    },
+  },
+}

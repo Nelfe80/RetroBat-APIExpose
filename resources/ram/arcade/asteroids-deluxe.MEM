@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "astdelux",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "asteroids-deluxe",
+    file = "asteroids-deluxe.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X6F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X62, type="u24be", condition="change", action="SCORE_STATE", color="red", min=10, max=1000, no_log=false, no_survey=false, desc="Score delta 10-1000: Score delta 10-1000" },
+      },
+      collectibles = {
+        { address=0X8C, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

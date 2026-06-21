@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Real Bout Fatal Fury Special",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "real-bout-fatal-fury-special",
+    file = "real-bout-fatal-fury-special.zip",
+    hashes = {
+      { hash = "4d3658db57b228d271999c8336bdba99", label = "Real Bout Garou Densetsu Special ~ Real Bout Fatal Fury Special (Japan, USA) (En,Ja,Es,Pt)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE01F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Config - Level [8bit]" },
+      },
+      stage = {
+        { address=0X6A35, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage [8bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X048B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P Health [8bit] decreased" },
+        { address=0X048B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P Health [8bit] increased" },
+        { address=0X058B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P Health [8bit] decreased" },
+        { address=0X058B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P Health [8bit] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE00A, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1P Score [32bit BE]" },
+        { address=0XE00E, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2P Score [32bit BE]" },
+      },
+    },
+  },
+}

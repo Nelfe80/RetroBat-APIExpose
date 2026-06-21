@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Fisher-Price: Perfect Fit",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Education, Puzzle"
+  },
+
+  rom = {
+    name = "fisher-price-perfect-fit",
+    file = "fisher-price-perfect-fit.zip",
+    hashes = {
+      { hash = "1363f9ad05d018a05e5be8eb376cd6fd", label = "Fisher-Price - Perfect Fit (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X00F0, type="u8", condition="eq", value=0X57, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1 Puzzle 1" },
+        { address=0X00F0, type="u8", condition="eq", value=0X2E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1 Puzzle 2" },
+        { address=0X00F0, type="u8", condition="eq", value=0XEE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1 Puzzle 3" },
+        { address=0X00F0, type="u8", condition="eq", value=0X82, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 Puzzle 1" },
+        { address=0X00F0, type="u8", condition="eq", value=0X92, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 Puzzle 2" },
+        { address=0X00F0, type="u8", condition="eq", value=0X2A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 Puzzle 3" },
+        { address=0X00F0, type="u8", condition="eq", value=0X46, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3 Puzzle 1" },
+        { address=0X00F0, type="u8", condition="eq", value=0X21, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3 Puzzle 2" },
+        { address=0X00F0, type="u8", condition="eq", value=0X64, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3 Puzzle 3" },
+        { address=0X00F0, type="u8", condition="eq", value=0XE3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Pregame menus" },
+        { address=0X00F0, type="u8", condition="eq", value=0X81, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Opening scene" },
+        { address=0X00F0, type="u8", condition="eq", value=0XD3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Start Game" },
+        { address=0X00F0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0004, type="u8", condition="eq", value=0X54, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Out of time" },
+        { address=0X0004, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Which screen is currently being displayed" },
+        { address=0X0401, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Counter - Minutes digit (binary)" },
+        { address=0X0402, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time counter - 10's of seconds digit (binary)" },
+        { address=0X0403, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time counter - last digit display (binary)" },
+      },
+    },
+  },
+}

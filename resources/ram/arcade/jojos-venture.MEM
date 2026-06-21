@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "JoJo's Venture",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "jojos-venture",
+    file = "jojos-venture.zip",
+    hashes = {
+      { hash = "7510d498f23f5815d3376ea7bad64e29", label = "jojo.zip | JoJo's Venture / JoJo no Kimyou na Bouken (Euro 990128)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2EA97, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="On" },
+        { address=0X57411, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="On" },
+        { address=0X6B853, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2EA9E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X2EA9E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds" },
+        { address=0X2EA9E, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+        { address=0X2EA9E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1P Max Round" },
+        { address=0X30440, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power Level Player" },
+        { address=0X30443, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds won by player" },
+        { address=0X30467, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds won by enemy" },
+        { address=0X573FF, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X573FF, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds" },
+        { address=0X573FF, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+        { address=0X573FF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1P Max Round" },
+        { address=0X57424, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dipswitch - 2P Max Round" },
+        { address=0X5742F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X5742F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds" },
+        { address=0X5742F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+        { address=0X5742F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dipswitch - 1P Max Round" },
+        { address=0X5745F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X5745F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds" },
+        { address=0X5745F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+        { address=0X5745F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1P Max Round" },
+        { address=0X5748F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X5748F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds" },
+        { address=0X5748F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+        { address=0X5748F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1P Max Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3047C, type="u8", condition="eq", value=0X0D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death 13" },
+      },
+      health = {
+        { address=0X305AE, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X305AE, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player HP" },
+        { address=0X309B6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X309B6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X5742B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Dipswitch - Damage Level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X57425, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="4" },
+        { address=0X57425, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="8" },
+        { address=0X57429, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1 match" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5742A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dipswitch - Time Count Speed" },
+      },
+    },
+  },
+}

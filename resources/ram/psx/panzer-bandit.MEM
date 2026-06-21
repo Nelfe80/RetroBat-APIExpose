@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Panzer Bandit",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Beat 'em Up"
+  },
+
+  rom = {
+    name = "panzer-bandit",
+    file = "panzer-bandit.zip",
+    hashes = {
+      { hash = "32a6e44eb6a9adf355ff99725f29ba48", label = "Panzer Bandit (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA023A, type="u8", condition="eq", value=0X13, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Level Clear" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X83B98, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="VS Mode Rounds" },
+        { address=0XA0228, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last level" },
+        { address=0XA0228, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0XA023A, type="u8", condition="eq", value=0X11, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Section Clear" },
+        { address=0XA023A, type="u8", condition="eq", value=0X13, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Clear" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9FE44, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Extra Lives increased" },
+        { address=0X9FE44, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Extra Lives decreased" },
+      },
+      health = {
+        { address=0XA023A, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="End, whoever has the highest hp wins" },
+        { address=0X1DDDA0, type="u8", condition="eq", value=0XC0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1DDDA0, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player 1 HP" },
+        { address=0X1DDDA8, type="u8", condition="eq", value=0XC0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1DDDA8, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player 1 Energy" },
+        { address=0X1DE3E8, type="u8", condition="eq", value=0XC0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1DE3E8, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player 2/CPU HP" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X83B90, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="VS Mode Time Option" },
+        { address=0X1DDBDC, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Actual Combo Counter" },
+        { address=0X1DDC40, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo Counter" },
+      },
+    },
+  },
+}

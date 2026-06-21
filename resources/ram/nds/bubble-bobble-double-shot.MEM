@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Bubble Bobble Double Shot",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "bubble-bobble-double-shot",
+    file = "bubble-bobble-double-shot.zip",
+    hashes = {
+      { hash = "40447c98f02b31586d5822ab8843d95d", label = "Bubble Bobble - Double Shot (USA) (En,Fr,Es).nds" },
+      { hash = "713c6ed68430e398551af1017cfa9923", label = "Bubble Bobble - Double Shot (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X69700, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds [8bits]" },
+      },
+    },
+  },
+}

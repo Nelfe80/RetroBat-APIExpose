@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Mikie",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Maze"
+  },
+
+  rom = {
+    name = "mikie",
+    file = "mikie.zip",
+    hashes = {
+      { hash = "32b1328f6b8b6d10780084f7a8eb78e7", label = "mikie.7z <Mikie>" },
+      { hash = "e57589dc8180abbd4af46465fefbde8e", label = "mikiej.7z <Shinnyuushain Tooru-kun>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0220, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Player can't control (demo)." },
+        { address=0X0270, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0270, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Last life." },
+        { address=0X0270, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives. increased" },
+        { address=0X0270, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives. decreased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0291, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Locker Room cola." },
+        { address=0X0291, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dance Studio burger." },
+        { address=0X0291, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Restaurant cake." },
+        { address=0X0291, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Classroom Circus Charlie." },
+      },
+    },
+  },
+}

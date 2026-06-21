@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 M.I 54</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 Y.H 42</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 CJM 36</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 USA 30</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 S.Y 24</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 JCS 18</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 S.T 12</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HEH 6</text>
+		</text>
+	</view>
+</theme>

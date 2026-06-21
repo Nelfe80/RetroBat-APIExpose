@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Jungle Strike",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "jungle-strike",
+    file = "jungle-strike.zip",
+    hashes = {
+      { hash = "3164c16bab8088a7991857750edaecb6", label = "Jungle Strike (USA, Europe).md" },
+      { hash = "b4e4b75ee3689850886a0ea82c453587", label = "Jungle Strike (USA, Europe) (Ru) (NewGame+Pirates).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1084, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X1084, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X126D, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused = 80" },
+        { address=0X14EE, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused?" },
+        { address=0X163B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo 00;Playing 01" },
+        { address=0XFFD2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo = 00;FF playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1104, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Failed = 0e" },
+        { address=0X139E, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Washington D.C." },
+        { address=0X139E, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sub Attack" },
+        { address=0X139E, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training Ground" },
+        { address=0X139E, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Night Strike" },
+        { address=0X139E, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puloso City" },
+        { address=0X139E, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Snow Fortress" },
+        { address=0X139E, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="River Raid" },
+        { address=0X139E, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mountains" },
+        { address=0X139E, type="u8", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Return Home" },
+        { address=0X139E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 0-8" },
+      },
+      stage = {
+        { address=0XB3C0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Armour - Stage 2 - Apache" },
+        { address=0XB780, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Armour - Stage 2 - Hovercraft" },
+        { address=0XC266, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Armour - Stage 5" },
+        { address=0XC46C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hellfires - Stage 5" },
+        { address=0XC826, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Armour - Stage 5 - Bike" },
+        { address=0XC84E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hellfires - Stage 3" },
+        { address=0XF300, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Armour - Stage 5" },
+        { address=0XF869, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Armour - Stage 1" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X101C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting lives increased" },
+        { address=0X101C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting lives decreased" },
+        { address=0X10CE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIVES increased" },
+        { address=0X10CE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIVES decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X10D0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score UI - 16Bit: 0x0010d0 + 0x0010d2 in terms of digits." },
+        { address=0X10D2, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score UI - 16Bit: 0x0010d0 + 0x0010d2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X128A, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Timer;16Bit;0x001288 + 0x00128a" },
+        { address=0X128E, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Playing Timer 16bit 0-‭65535‬;Resets on death" },
+      },
+    },
+  },
+}

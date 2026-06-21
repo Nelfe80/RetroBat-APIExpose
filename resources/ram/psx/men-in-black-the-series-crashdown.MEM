@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Men in Black: The Series - Crashdown",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "men-in-black-the-series-crashdown",
+    file = "men-in-black-the-series-crashdown.zip",
+    hashes = {
+      { hash = "e7adcfc251952b1fafadc2c49e1c991e", label = "Men in Black - The Series - Crashdown (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA5824, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0XA5824, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XA5878, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XA5A99, type="u8", condition="bit_true", bit=1, mask=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="One shoot Game Over" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Return to game" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="View map" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart stage" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Mission objective 1" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="Mission objective 2" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X06, action="PAUSE_ON", no_log=false, no_survey=false, desc="Mission objective 3" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X07, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart stage - Yes" },
+        { address=0XA5B80, type="u8", condition="eq", value=0X08, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart stage - No" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA5A98, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All levels" },
+        { address=0XA5A98, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Secret level (The Horror Hotel)" },
+        { address=0XA5F6C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA5C50, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0XA5C18, type="u32le", condition="eq", value=0X96, action="HEALTH_STATE", no_log=false, no_survey=false, desc="50%" },
+        { address=0XA5C18, type="u32le", condition="eq", value=0XE1, action="HEALTH_STATE", no_log=false, no_survey=false, desc="75%" },
+        { address=0XA5C18, type="u32le", condition="eq", value=0X12C, action="HEALTH_STATE", no_log=false, no_survey=false, desc="100%" },
+        { address=0XA5C18, type="u32le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Yellow Bar / Godfather Health in Operation Stethoscope" },
+        { address=0XA5C50, type="u8", condition="eq", value=0X64, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full Health" },
+        { address=0XA5C50, type="u8", condition="eq", value=0XC8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full Health + Full Shield" },
+        { address=0XA5C50, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Invalid/Loading" },
+        { address=0XA5C50, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Agent Health" },
+        { address=0XA5C78, type="u8", condition="eq", value=0X4F, action="HEALTH_STATE", no_log=false, no_survey=false, desc="50 Health" },
+        { address=0XA5C78, type="u8", condition="eq", value=0X63, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Shield" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XA5A99, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="All weapons" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="J2 Standard Sidearm" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Noisy Cricket" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="S4 De-atomizer" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Carbonizer" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Neuralyzer" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ionic Tickler" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Awful Truth" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="JX Rocket Launcher" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ball Grenade" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mission needed gadget" },
+        { address=0XA5C58, type="u8", condition="eq", value=0X0B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Azurrian Pulse Rifle" },
+        { address=0XA6130, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Quantity" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA5A98, type="u8", condition="bit_true", bit=5, mask=0X20, action="AMMO_STATE", no_log=false, no_survey=false, desc="Infinite ammo" },
+        { address=0XA5C5C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current Ammo" },
+        { address=0X1C91E8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Noisy Cricket ammo during Going Underground increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA5C78, type="u8", condition="eq", value=0X59, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Ionic Tickler/Door Locked" },
+        { address=0XA5C78, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Try switching on the x-ray machine" },
+        { address=0XA5C78, type="u8", condition="eq", value=0XC7, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mission Objective Complete" },
+        { address=0XA5C94, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1" },
+        { address=0XA5C94, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="2" },
+        { address=0XA5C94, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="3" },
+      },
+    },
+  },
+}

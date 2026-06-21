@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Duke Nukem Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Action, Shooter, 1Ere Personne"
+  },
+
+  rom = {
+    name = "duke-nukem-advance",
+    file = "duke-nukem-advance.zip",
+    hashes = {
+      { hash = "54bc72ab1f56930ddb05c66f118d7608", label = "Duke Nukem Advance (Europe) (En,Fr,De,It).gba" },
+      { hash = "dfca43fb18b5ee86b3ecab2631862d6f", label = "Duke Nukem Advance (USA).gba" },
+      { hash = "f806d204d3fc819d794fb23d3483b475", label = "Duke Nukem Advance (USA) (Ru) (Pirate).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11C4, type="u32le", condition="eq", value=0X08030634, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X11C4, type="u32le", condition="eq", value=0X0803079C, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X11C4, type="u32le", condition="eq", value=0X08030724, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Game" },
+        { address=0X11C4, type="u32le", condition="eq", value=0X080337A8, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X11C4, type="u32le", condition="eq", value=0X0803397C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Credits (from Title Screen)" },
+        { address=0X11D0, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Option Selected in Pause Menu [32-Bit] (0-3)" },
+        { address=0X11D4, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Option Selected in Pause Menu [32-Bit] (0-3)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0EA8, type="u8", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Piece of Cake" },
+        { address=0X0EA8, type="u8", condition="eq", value=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Let's Rock" },
+        { address=0X0EA8, type="u8", condition="eq", value=0X2C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Come Get Some" },
+        { address=0X0EA8, type="u8", condition="eq", value=0X38, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Damn I'm Good" },
+        { address=0X0EA8, type="u8", condition="eq", value=0X34, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Piece of Cake" },
+        { address=0X0EA8, type="u8", condition="eq", value=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Let's Rock" },
+        { address=0X0EA8, type="u8", condition="eq", value=0X4C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Come Get Some" },
+        { address=0X0EA8, type="u8", condition="eq", value=0X58, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Damn I'm Good" },
+        { address=0X0EA8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Difficulty [8-Bit] (Actually a 32b Ptr into the Game Pak ROM, probably into a table that pts to" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1D708, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X0114, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (Display) decreased" },
+        { address=0X0114, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (Display) increased" },
+        { address=0X1D708, type="u8", condition="eq", value=0X64, action="HEALTH_STATE", no_log=false, no_survey=false, desc="100 (Starting)" },
+        { address=0X1D708, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health [8-Bit] 1-A" },
+        { address=0X289C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [8-Bit] (Mission 1-B) decreased" },
+        { address=0X289C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [8-Bit] (Mission 1-B) increased" },
+        { address=0X329E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [8-Bit] (Mission 1-C) decreased" },
+        { address=0X329E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [8-Bit] (Mission 1-C) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0EA1, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="On" },
+        { address=0X9B30, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mighty Foot" },
+        { address=0X9B30, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Freezethrower" },
+        { address=0X9B30, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shrinker" },
+        { address=0X9B30, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Desert Eagle" },
+        { address=0X9B30, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol" },
+        { address=0X9B30, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Golden Desert Eagle" },
+        { address=0X9B30, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hand" },
+        { address=0X9B30, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="MP5" },
+        { address=0X9B30, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pipe Bomb" },
+        { address=0X9B30, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pipe Bomb Detonator" },
+        { address=0X9B30, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="RPG" },
+        { address=0X9B30, type="u8", condition="eq", value=0X0B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shrinker" },
+        { address=0X9B30, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X9B30, type="u8", condition="eq", value=0X0D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lead Cannon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0110, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo (Display)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X010C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Stage Timer Seconds (Display)" },
+      },
+    },
+  },
+}

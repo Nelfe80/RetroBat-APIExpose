@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Harry Potter and the Order of the Phoenix",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "harry-potter-and-the-order-of-the-phoenix",
+    file = "harry-potter-and-the-order-of-the-phoenix.zip",
+    hashes = {
+      { hash = "b3579f2bb2de12ebb5442e922e01e6fe", label = "Harry Potter and the Order of the Phoenix (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da).nds" },
+    }
+  },
+
+  events = {
+  },
+}

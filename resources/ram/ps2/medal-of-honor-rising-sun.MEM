@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Medal of Honor: Rising Sun",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "medal-of-honor-rising-sun",
+    file = "medal-of-honor-rising-sun.zip",
+    hashes = {
+      { hash = "2b985b128cffed87f46744ae7d39d56c", label = "Medal of Honor - Rising Sun (Germany)" },
+      { hash = "75f24cb7f0169344d93b626ff0a137a3", label = "Medal of Honor - Rising Sun (Europe, Australia) (En,It,Nl,Sv,Da)" },
+      { hash = "ee0aac4bbfa585e607e043f450af1580", label = "Medal of Honor - Rising Sun (USA)" },
+      { hash = "f13f71c39dd8762f2219958be1255d48", label = "Medal of Honor - Rising Sun (Spain)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X132084, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 Deaths" },
+        { address=0X13209C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bot 1 Deaths" },
+        { address=0X1320B4, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bot 2 Deaths" },
+        { address=0X1320CC, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bot 3 Deaths" },
+        { address=0X1320E4, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bot 4 Deaths" },
+        { address=0X1320FC, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bot 5 Deaths" },
+        { address=0X132114, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bot 6 Deaths" },
+        { address=0X13212C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bot 7 Deaths" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X132021, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Multiplayer Weapon Set" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X13213C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Allied Team Score" },
+        { address=0X132140, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Axis Team Score" },
+      },
+      collectibles = {
+        { address=0X3C6964, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission (Only works on level select) increased" },
+        { address=0X4BC23C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Objective ID List: increased" },
+        { address=0X4BC23C, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Objective ID List: empty" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4BC240, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 1 ID" },
+        { address=0X4BC248, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 1 Complete" },
+        { address=0X4BC24C, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 1 Type" },
+        { address=0X4BC250, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 1 Viewable" },
+        { address=0X4BC254, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 2 ID" },
+        { address=0X4BC25C, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 2 Complete" },
+        { address=0X4BC260, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 2 Type" },
+        { address=0X4BC264, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 2 Viewable" },
+        { address=0X4BC268, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 3 ID" },
+        { address=0X4BC270, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 3 Complete" },
+        { address=0X4BC274, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 3 Type" },
+        { address=0X4BC278, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 3 Viewable" },
+        { address=0X4BC27C, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 4 ID" },
+        { address=0X4BC284, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 4 Complete" },
+        { address=0X4BC288, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 4 Type" },
+        { address=0X4BC28C, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 4 Viewable" },
+        { address=0X4BC290, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 5 ID" },
+        { address=0X4BC298, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 5 Complete" },
+        { address=0X4BC29C, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 5 Type" },
+        { address=0X4BC2A0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 5 Viewable" },
+        { address=0X4BC2A4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 6 ID" },
+        { address=0X4BC2AC, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 6 Complete" },
+        { address=0X4BC2B0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 6 Type" },
+        { address=0X4BC2B4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 6 Viewable" },
+        { address=0X4BC2B8, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 7 ID" },
+        { address=0X4BC2C0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 7 Complete" },
+        { address=0X4BC2C4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 7 Type" },
+        { address=0X4BC2C8, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 7 Viewable" },
+        { address=0X4BC2CC, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 8 ID" },
+        { address=0X4BC2D4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 8 Complete" },
+        { address=0X4BC2D8, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 8 Type" },
+        { address=0X4BC2DC, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 8 Viewable" },
+        { address=0X4BC2E0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 9 ID" },
+        { address=0X4BC2E8, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 9 Complete" },
+        { address=0X4BC2EC, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 9 Type" },
+        { address=0X4BC2F0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 9 Viewable" },
+        { address=0X4BC2F4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 10 ID" },
+        { address=0X4BC2FC, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 10 Complete" },
+        { address=0X4BC300, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 10 Type" },
+        { address=0X4BC304, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="- Objective 10 Viewable" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X359D90, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Multiplayer Match Timer" },
+      },
+    },
+  },
+}

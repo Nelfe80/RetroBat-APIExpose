@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Big Bird's Egg Catch",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Education, Puzzle"
+  },
+
+  rom = {
+    name = "big-birds-egg-catch",
+    file = "big-birds-egg-catch.zip",
+    hashes = {
+      { hash = "d22a401f0b20808196f538cc43786459", label = "Big Bird's Egg Catch (USA) (Joystick Patch).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006C, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/In-Game (Player 2)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0022, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X000E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives in Difficulty 7+ (P1) increased" },
+        { address=0X000E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives in Difficulty 7+ (P1) decreased" },
+        { address=0X000F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives in Difficulty 7+ (P2) increased" },
+        { address=0X000F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives in Difficulty 7+ (P2) decreased" },
+      },
+    },
+  },
+}

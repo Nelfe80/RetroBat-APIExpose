@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Wipeout 2097",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "wipeout-2097",
+    file = "wipeout-2097.zip",
+    hashes = {
+      { hash = "5e4c334d68bf4c2b5d79311c3df7f222", label = "WipEout 2097 (Europe)" },
+      { hash = "611479cd0e25800874e3b01d0e0efa2d", label = "Wipeout XL (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X93FA4, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Game/Demo" },
+        { address=0X93FBE, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Main menu/attract loop" },
+        { address=0X9422E, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused / Loading" },
+        { address=0X9422E, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused / Menu" },
+        { address=0X94AD0, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Game/Demo" },
+        { address=0X94AEA, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Main menu/attract loop" },
+        { address=0X94C44, type="u8", condition="eq", value=0X63, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo/Title" },
+        { address=0X94D04, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Menu/In-game" },
+        { address=0X94D04, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Credits/Press Start" },
+        { address=0X94D5A, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused / Loading" },
+        { address=0X94D5A, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused / Menu" },
+        { address=0X94DA4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[USA] Challenge Mode: Continues remaining (0x00-0x03)" },
+        { address=0X95770, type="u8", condition="eq", value=0X63, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo/Title" },
+        { address=0X95830, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Menu/In-game" },
+        { address=0X95830, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Credits/Press Start" },
+        { address=0X958D0, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[Europe] Challenge Mode: Continues remaining (0x00-0x03)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X94529, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Active" },
+        { address=0X94529, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[USA] Infinite Energy cheat active" },
+        { address=0X94A0C, type="u8", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="Player Eliminated (due to time or damage)" },
+        { address=0X95055, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Active" },
+        { address=0X95055, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[Europe] Infinite Energy cheat active" },
+        { address=0X95538, type="u8", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="Player Eliminated (due to time or damage)" },
+        { address=0X9FD6C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[60 bytes] [USA] Accumulated damage per ship" },
+        { address=0XA0898, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[60 bytes] [Europe] Accumulated damage per ship" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X94528, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X95054, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X1FE498, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X93FA8, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X93FA9, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X93FAA, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X93FAB, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X93FAC, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X93FAD, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X93FAE, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X93FAF, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94AD4, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94AD5, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94AD6, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94AD7, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94AD8, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94AD9, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94ADA, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94ADB, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9452B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[USA] Infinite Time cheat active" },
+        { address=0X94A0C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[USA] Race End Result" },
+        { address=0X94C44, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[USA] Game Mode" },
+        { address=0X95057, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Europe] Infinite Time cheat active" },
+        { address=0X95538, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Europe] Race End Result" },
+        { address=0X95770, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Europe] Game Mode" },
+      },
+    },
+  },
+}

@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Donkey Kong Country Returns [Subset - Shiny Gold Medals]",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "donkey-kong-country-returns-subset-shiny-gold-medals",
+    file = "donkey-kong-country-returns-subset-shiny-gold-medals.zip",
+    hashes = {
+      { hash = "0426ddd47181312e81b2cc8e1f96d64d", label = "Donkey Kong Country Returns [Subset - Shiny Gold Medals]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5A8620, type="u32be", condition="eq", value=0X00, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In level" },
+        { address=0X5A8620, type="u32be", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Quitting from game over (briefly)" },
+        { address=0X5A8620, type="u32be", condition="eq", value=0X03, action="GAME_PLAYING", no_log=false, no_survey=false, desc="World map (After quitting from a level)" },
+        { address=0X5A8620, type="u32be", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Startup / Title screen" },
+        { address=0X5A9AE0, type="u32be", condition="eq", value=0X00, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In level normally, Time Attack after a retry" },
+        { address=0X5A9AE0, type="u32be", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Quitting from game over (briefly)" },
+        { address=0X5A9AE0, type="u32be", condition="eq", value=0X03, action="GAME_PLAYING", no_log=false, no_survey=false, desc="World map (After quitting from a level)" },
+        { address=0X5A9AE0, type="u32be", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Startup / Title screen" },
+        { address=0X5AA660, type="u32be", condition="eq", value=0X00, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In level" },
+        { address=0X5AA660, type="u32be", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Quitting from game over (briefly)" },
+        { address=0X5AA660, type="u32be", condition="eq", value=0X03, action="GAME_PLAYING", no_log=false, no_survey=false, desc="World map (After quitting from a level)" },
+        { address=0X5AA660, type="u32be", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Startup / Title screen" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X5A8620, type="u32be", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World map" },
+        { address=0X5A9AE0, type="u32be", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World map" },
+        { address=0X5AA660, type="u32be", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World map" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Beach (2)" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Cave (4)" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Cliff (6)" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Factory (7)" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Forest (5)" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Jungle (1)" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X06, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ruins (3)" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X07, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Volcano (8)" },
+        { address=0X80A000, type="u32be", condition="eq", value=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Golden Temple (9)" },
+        { address=0X80A000, type="u32be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32-bit BE] (EU) World of current level, updates on entry / file select. Worlds are in alphabeti" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5A8620, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] (US 1.0) General game state" },
+        { address=0X5A9AE0, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] (EU) General game state" },
+        { address=0X5AA660, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] (US 1.1) General game state" },
+      },
+    },
+  },
+}

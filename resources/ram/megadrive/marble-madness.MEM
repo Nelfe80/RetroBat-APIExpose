@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Marble Madness",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "marble-madness",
+    file = "marble-madness.zip",
+    hashes = {
+      { hash = "ab99c73cffd808ddd93c43e2f52cc92d", label = "Marble Madness (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB0D0, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="ff: game over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XB3FA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XBA81, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="black ball in stage 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB13E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of deaths" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XDD8E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: 16 bits" },
+      },
+    },
+  },
+}

@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Konami Wai Wai World",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "konami-wai-wai-world",
+    file = "konami-wai-wai-world.zip",
+    hashes = {
+      { hash = "36fef6b929d7c0d2c87e8fea3bc41784", label = "Wai Wai World (Japan) (En) (v3.0) (Demiforce).nes" },
+      { hash = "587d76251921e32deadcf1c0d3c18ad2", label = "Wai Wai World (Japan) (En) (v3.0) (Demiforce) (ScrollFix).nes" },
+      { hash = "5e3000f49a0161577ae253d2c0348497", label = "Wai Wai World (Japan) (En) (v1.0) (Zynk Oxhyde).nes" },
+      { hash = "f1ade0b4c5ef48e27d1e4256e8521709", label = "Konami Wai Wai World (Japan).nes" },
+    }
+  },
+
+  events = {
+  },
+}

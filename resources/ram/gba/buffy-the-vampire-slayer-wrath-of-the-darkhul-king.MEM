@@ -1,0 +1,115 @@
+return {
+  game = {
+    title = "Buffy the Vampire Slayer: Wrath of the Darkhul King",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "buffy-the-vampire-slayer-wrath-of-the-darkhul-king",
+    file = "buffy-the-vampire-slayer-wrath-of-the-darkhul-king.zip",
+    hashes = {
+      { hash = "ca775010545c69bb28ec6635fa48cefd", label = "Buffy contre les Vampires - La Colere de Darkhul (France).gba" },
+      { hash = "e8fe8458edbf341e9d7eba0cbec95d46", label = "Buffy the Vampire Slayer - Wrath of the Darkhul King (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1264, type="u8", condition="eq", value=0X11, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X4B30, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="9 of every Weapons" },
+        { address=0X4B30, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Invincible" },
+        { address=0X4B30, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Infinite Lives" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X14D2, type="u8", condition="eq", value=0X60, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground" },
+        { address=0X14D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Height in level" },
+      },
+      stage = {
+        { address=0X1264, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage" },
+        { address=0X1264, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+        { address=0X1278, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Stage Stage 4" },
+        { address=0X127C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Substage-" },
+        { address=0X14E0, type="u8", condition="eq", value=0X1D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X14E0, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14E0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 1" },
+        { address=0X14E4, type="u8", condition="eq", value=0X1E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X14E4, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14E4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 9" },
+        { address=0X14E8, type="u8", condition="eq", value=0X1B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X14E8, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14E8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 10" },
+        { address=0X14EC, type="u8", condition="eq", value=0X1D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X14EC, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14EC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 11" },
+        { address=0X14F0, type="u8", condition="eq", value=0X1D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X14F0, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14F0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 12" },
+        { address=0X14F4, type="u8", condition="eq", value=0X1B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X14F4, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14F4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 3" },
+        { address=0X14F8, type="u8", condition="eq", value=0X1E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X14F8, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14F8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 4" },
+        { address=0X14FC, type="u8", condition="eq", value=0X1C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X14FC, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14FC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 5" },
+        { address=0X1500, type="u8", condition="eq", value=0X1B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X1500, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1500, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 2" },
+        { address=0X1504, type="u8", condition="eq", value=0X1B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X1504, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1504, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 6" },
+        { address=0X1508, type="u8", condition="eq", value=0X1E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X1508, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1508, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 7" },
+        { address=0X150C, type="u8", condition="eq", value=0X1B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Spawned" },
+        { address=0X150C, type="u8", condition="eq", value=0XFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X150C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Vamp 8" },
+        { address=0X2A0F, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal - Resets to 00 when spawns in" },
+        { address=0X2A0F, type="u8", condition="eq", value=0X27, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(for 4 seconds) On ground, stake-able," },
+        { address=0X2A0F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vampire State (First Vamp Stage1?)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X01D0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1up Collected = 53 increased" },
+        { address=0X01D0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1up Collected = 53 decreased" },
+        { address=0X1268, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - 2 at Start increased" },
+        { address=0X1268, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - 2 at Start decreased" },
+        { address=0X16A4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="fe - Collected 1up in 2-2 and 11-1, but is 1b or 26 when it is not picked up - loads when buffy" },
+        { address=0X16A4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="fe - Collected 1up in 2-2 and 11-1, but is 1b or 26 when it is not picked up - loads when buffy" },
+        { address=0X16EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="fe- 4 bonus 1up 2 collected increased" },
+        { address=0X16EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="fe- 4 bonus 1up 2 collected decreased" },
+        { address=0X1704, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="fe- 4bonus- 1up 1 collected increased" },
+        { address=0X1704, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="fe- 4bonus- 1up 1 collected decreased" },
+        { address=0X1780, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="11 - 1d, becomes bd on 1up pickup increased" },
+        { address=0X1780, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="11 - 1d, becomes bd on 1up pickup decreased" },
+        { address=0X2B5E, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stage 16 Door HP before 1up increased" },
+        { address=0X2B5E, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 16 Door HP before 1up decreased" },
+      },
+      health = {
+        { address=0X1D72, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Buffy's Health decreased" },
+        { address=0X1DB6, type="u8", condition="eq", value=0X14, action="HIT", no_log=false, no_survey=false, desc="Hit by damage" },
+        { address=0X2A1A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Vamp health? decreased" },
+        { address=0X2A1A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Vamp health? increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1D72, type="u8", condition="eq", value=0X5F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Max at Start" },
+        { address=0X1D72, type="u8", condition="eq", value=0X6F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Max after Stage 8 Book Powerup" },
+        { address=0X1D72, type="u8", condition="eq", value=0X7F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Max after Talisman Powerup" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X12E4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Melee attacks - Normal and Crouch Variations (No jump variations)" },
+      },
+    },
+  },
+}

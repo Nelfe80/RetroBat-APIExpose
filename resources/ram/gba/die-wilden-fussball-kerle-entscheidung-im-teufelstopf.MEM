@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Die Wilden Fussball-Kerle: Entscheidung im Teufelstopf",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "die-wilden-fussball-kerle-entscheidung-im-teufelstopf",
+    file = "die-wilden-fussball-kerle-entscheidung-im-teufelstopf.zip",
+    hashes = {
+      { hash = "d7d3e3edd9c161bd0094a17124142ead", label = "Wilden Fussball-Kerle, Die - Entscheidung im Teufelstopf (Germany).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XEB94, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (32bit) increased" },
+        { address=0XEB94, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (32bit) decreased" },
+        { address=0X2F564, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Inventory - Fernbedienung (Remote Control)" },
+      },
+      health = {
+        { address=0XEBD4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (32bit) decreased" },
+        { address=0XEBD4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (32bit) increased" },
+      },
+    },
+  },
+}

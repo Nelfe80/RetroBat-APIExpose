@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Akalabeth: World of Doom",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "akalabeth-world-of-doom",
+    file = "akalabeth-world-of-doom.zip",
+    hashes = {
+      { hash = "001d722ff7618f70700eaa8989afbcca", label = "Akalabeth.woz" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Gourmet Chef: Cook Your Way to Fame",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "gourmet-chef-cook-your-way-to-fame",
+    file = "gourmet-chef-cook-your-way-to-fame.zip",
+    hashes = {
+      { hash = "bae02d119090017be7c77bd06b4a7b5f", label = "Gourmet Chef - Cook Your Way to Fame (USA) (En,Fr,Es).nds" },
+    }
+  },
+
+  events = {
+  },
+}

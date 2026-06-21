@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ultracore",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "ultracore",
+    file = "ultracore.zip",
+    hashes = {
+      { hash = "9cfa000f071866f439c7acdcf0149fea", label = "Ultracore (USA, Europe) (Switch, PS Vita) (Aftermarket) (Unl).md" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Mushroom Men: The Spore Wars",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "mushroom-men-the-spore-wars",
+    file = "mushroom-men-the-spore-wars.zip",
+    hashes = {
+      { hash = "0eac5fca60477d218d4d245aa72c4101", label = "Mushroom Men - The Spore Wars (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB65654, type="u32be", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9AAFEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII] [18 bytes] Level ID" },
+        { address=0XB59660, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Catapult - Current level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB597C0, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Pachinko - Balls remaining increased" },
+        { address=0XB597C0, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Pachinko - Balls remaining decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB58C00, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Credits - Current score" },
+        { address=0XB58F60, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] The Kudzu Request - Egg Jump - Current score" },
+        { address=0XB593F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Turret Time 2 - Current score" },
+        { address=0XB59664, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Catapult - Player 1 Current score" },
+        { address=0XB59668, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Catapult - Player 2 Current score" },
+        { address=0XB5966C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Catapult - High score" },
+        { address=0XB597BC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Pachinko - Current score" },
+        { address=0XB597C8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Pachinko - Score gained on most recent ball" },
+        { address=0XB597CC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Pachinko - High score" },
+        { address=0XB59818, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Memory - Current score" },
+        { address=0XB59828, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Memory - Easy High score" },
+        { address=0XB5982C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Memory - Medium High score" },
+        { address=0XB59830, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Memory - Hard High score" },
+        { address=0XB598F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Morel Mine Car - Current score" },
+        { address=0XB5990C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Morel Mine Car - Easy High score" },
+        { address=0XB59910, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Morel Mine Car - Medium High score" },
+        { address=0XB59914, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Morel Mine Car - Hard High score" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XB59364, type="u32be", condition="eq", value=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Spore Jump" },
+        { address=0XB593DC, type="u32be", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Easy" },
+        { address=0XB593DC, type="u32be", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Medium" },
+        { address=0XB593DC, type="u32be", condition="eq", value=0X03, action="JUMPING", no_log=false, no_survey=false, desc="Hard" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1044D628, type="u32be", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[32-bit BE] Global checkpoint/savepoint" },
+        { address=0X1044D66A, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint in current level. Goes back to 0 when level is completed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB5C0F0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Turret Time - HP remaining" },
+      },
+    },
+  },
+}

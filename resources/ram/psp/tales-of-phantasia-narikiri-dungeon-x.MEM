@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Tales of Phantasia: Narikiri Dungeon X",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tales-of-phantasia-narikiri-dungeon-x",
+    file = "tales-of-phantasia-narikiri-dungeon-x.zip",
+    hashes = {
+      { hash = "4f7bbfafa9b1b767bb4d208490b54bca", label = "Tales of Phantasia - Narikiri Dungeon X (Japan) (En) (v0.0.4) (lifebottle).iso" },
+      { hash = "0499523aabe569aa737e07c4c61eecec", label = "Tales of Phantasia - Narikiri Dungeon X (ToPX En) (v1.0) (Life Bottle Productions).iso" },
+    }
+  },
+
+  events = {
+  },
+}

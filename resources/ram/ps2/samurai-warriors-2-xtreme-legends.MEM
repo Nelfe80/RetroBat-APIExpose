@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Samurai Warriors 2: Xtreme Legends",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "samurai-warriors-2-xtreme-legends",
+    file = "samurai-warriors-2-xtreme-legends.zip",
+    hashes = {
+      { hash = "9c24fd84fd34f3c1b286be7f811e1a10", label = "Samurai Warriors 2 (USA)" },
+      { hash = "754c8c52d0725a9efaacfd1e4bda7059", label = "Samurai Warriors 2 - Xtreme Legends (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X398318, type="u8", condition="eq", value=0X0F, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4E0FFA, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared + Dream Stage completed" },
+      },
+      stage = {
+        { address=0X4E23F6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SW2 XL - Toshiie Maeda's Unlocked Story Stages" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4DF764, type="u8", condition="bit_true", bit=4, mask=0X10, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+  },
+}

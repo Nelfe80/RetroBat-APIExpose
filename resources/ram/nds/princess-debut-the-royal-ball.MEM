@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Princess Debut: The Royal Ball",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "princess-debut-the-royal-ball",
+    file = "princess-debut-the-royal-ball.zip",
+    hashes = {
+      { hash = "291e93170368d1828bea163f71842aa4", label = "Princess Debut - The Royal Ball (Europe) (En,Fr,De).nds" },
+      { hash = "327839b5adf8548fef129db2d0b23ff4", label = "Princess Debut (USA).nds" },
+    }
+  },
+
+  events = {
+  },
+}

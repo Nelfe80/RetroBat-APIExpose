@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Winnie the Pooh: Kindergarten",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "winnie-the-pooh-kindergarten",
+    file = "winnie-the-pooh-kindergarten.zip",
+    hashes = {
+      { hash = "197bbb08f539b6312fb0786693c8681a", label = "Disney's Winnie the Pooh - Kindergarten (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

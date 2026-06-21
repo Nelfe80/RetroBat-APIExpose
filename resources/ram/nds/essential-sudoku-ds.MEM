@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Essential Sudoku DS",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "essential-sudoku-ds",
+    file = "essential-sudoku-ds.zip",
+    hashes = {
+      { hash = "4fd526387c960ad913c345b6fb2360c3", label = "Essential Sudoku DS (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

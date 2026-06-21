@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Breaker's",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "breakers",
+    file = "breakers.zip",
+    hashes = {
+      { hash = "ed337bd2fda55c3df53b9950a7259872", label = "Breakers (Japan) (En,Ja)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X70E9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+        { address=0X71A1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Won" },
+        { address=0X7711, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Lost" },
+      },
+      stage = {
+        { address=0X70E3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X737B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Energy decreased" },
+        { address=0X737B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Energy increased" },
+        { address=0X78EB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Energy decreased" },
+        { address=0X78EB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Energy increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7C6D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

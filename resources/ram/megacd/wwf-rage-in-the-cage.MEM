@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "WWF Rage In The Cage",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-rage-in-the-cage",
+    file = "wwf-rage-in-the-cage.zip",
+    hashes = {
+      { hash = "5ff329e7567cd630306a5b0598abdad4", label = "WWF - Rage in the Cage (USA)" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0XBED2, type="u24be", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Big Boss Man" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Iron Man",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "iron-man",
+    file = "iron-man.zip",
+    hashes = {
+      { hash = "9bf6a037e7493667d11019b024770e4b", label = "Iron Man (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Etrian Odyssey II: Heroes of Lagaard",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "etrian-odyssey-ii-heroes-of-lagaard",
+    file = "etrian-odyssey-ii-heroes-of-lagaard.zip",
+    hashes = {
+      { hash = "ff30e18c02471f1a1f86ac5334ff8d6b", label = "Etrian Odyssey II - Heroes of Lagaard (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1D4D45, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Gear: Demon Axe" },
+        { address=0X1D4E39, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Gear: Demon Mail" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1D4F1A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gear: Round Helm" },
+        { address=0X1D4F78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gear: Pale Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1D4DB8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gear: Dead Whip" },
+        { address=0X1D4E24, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gear: Cotardie" },
+        { address=0X1D5026, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Gear: Life Belt increased" },
+        { address=0X1D5026, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gear: Life Belt decreased" },
+        { address=0X1D52F0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item: Death Stem" },
+        { address=0X1D5301, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Item: Life Honey increased" },
+        { address=0X1D5301, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item: Life Honey decreased" },
+        { address=0X1D5349, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy: Deathman" },
+        { address=0X1D5A66, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Quest: Art imitating life increased" },
+        { address=0X1D5A66, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Quest: Art imitating life decreased" },
+        { address=0X1D5AB6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Quest: A life in the balance increased" },
+        { address=0X1D5AB6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Quest: A life in the balance decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1D5B60, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 01F" },
+        { address=0X1D5B62, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 02F" },
+        { address=0X1D5B63, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 02F, Page 2" },
+        { address=0X1D5B6B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 06F, Page 2" },
+        { address=0X1D5B73, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 10F, Page 2" },
+        { address=0X1D5B78, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 13F" },
+        { address=0X1D5B7A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 14F" },
+        { address=0X1D5B7C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 15F" },
+        { address=0X1D5B7E, type="u16le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 16F" },
+        { address=0X1D5B80, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 17F" },
+        { address=0X1D5B81, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 17F, Page 2:" },
+        { address=0X1D5B82, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 18F" },
+        { address=0X1D5B84, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 19F" },
+        { address=0X1D5B86, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 20F" },
+        { address=0X1D5B88, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 21F" },
+        { address=0X1D5B8A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 22F" },
+        { address=0X1D5B8C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 23F" },
+        { address=0X1D5B8E, type="u24le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 24F" },
+        { address=0X1D5B90, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 25F" },
+        { address=0X1D5B92, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 26F" },
+        { address=0X1D5B94, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 27F" },
+        { address=0X1D5B96, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 28F" },
+        { address=0X1D5B98, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 29F" },
+        { address=0X1D5B9A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 30F" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1D4D5A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Gold Wand increased" },
+        { address=0X1D4DD7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Gold Gun increased" },
+        { address=0X1D4E21, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Ring Mail increased" },
+        { address=0X1D4E2A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Gold Shirt increased" },
+        { address=0X1D4E77, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Gold Beads increased" },
+        { address=0X1D5010, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Venom Ring increased" },
+        { address=0X1D5015, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Curse Ring increased" },
+        { address=0X1D5017, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Stone Ring increased" },
+        { address=0X1D502D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Power Ring increased" },
+        { address=0X1D502E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Brawn Ring increased" },
+        { address=0X1D5035, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gear: Raise Ring increased" },
+        { address=0X1D5167, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Gold Crest increased" },
+        { address=0X1D5174, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Gold Quill increased" },
+        { address=0X1D5175, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Gold Claw increased" },
+        { address=0X1D518A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Gold Shell increased" },
+        { address=0X1D518B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Gold Arm increased" },
+        { address=0X1D51A0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item: Gold Spore increased" },
+        { address=0X1D532A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Enemy: Gold Gel increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF0688, type="u8", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+      },
+    },
+  },
+}

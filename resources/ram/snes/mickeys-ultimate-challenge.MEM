@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Mickey's Ultimate Challenge",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "mickeys-ultimate-challenge",
+    file = "mickeys-ultimate-challenge.zip",
+    hashes = {
+      { hash = "37aa5231c5576678b244fe913254f518", label = "Mickey's Ultimate Challenge (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X10D0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background music?" },
+      },
+      stage = {
+        { address=0X1068, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage ID/section?" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1573, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="goes to 0 for one or two frames when clearing memory board increased" },
+      },
+    },
+  },
+}

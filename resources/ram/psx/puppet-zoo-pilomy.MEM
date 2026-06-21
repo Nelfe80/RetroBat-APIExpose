@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Puppet Zoo Pilomy",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "puppet-zoo-pilomy",
+    file = "puppet-zoo-pilomy.zip",
+    hashes = {
+      { hash = "f8bfe2c0a1c3e351897224e7759e91ef", label = "Puppet Zoo Pilomy (Japan) (En,Ja)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FFF38, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen current menu?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDB77C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of worlds unlocked (default = 4) [16bit]" },
+      },
+      zone = {
+        { address=0XDBC5C, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Driving - World [16bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XDB5C1, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Parts Amount - Mammoth - Body" },
+        { address=0XDB5C2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Parts Amount - Mammoth - Head" },
+        { address=0XDB5C3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Parts Amount - Mammoth - Front Leg" },
+        { address=0XDB5C4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Parts Amount - Mammoth - Back Leg" },
+        { address=0XDB5C5, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Parts Amount - Mammoth - Tail" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD6D26, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="World Time (controlled by sun in House) [16bit]" },
+        { address=0X1FFF48, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="title screen timer?" },
+      },
+    },
+  },
+}

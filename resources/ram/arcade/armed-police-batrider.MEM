@@ -1,0 +1,135 @@
+return {
+  game = {
+    title = "Armed Police Batrider",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "armed-police-batrider",
+    file = "armed-police-batrider.zip",
+    hashes = {
+      { hash = "1939e0f60025e785603a67ecaaf6bbf5", label = "batrideru.7z <Armed Police Batrider (U.S.A.) (Fri Feb 13 1998)>" },
+      { hash = "505c773011e86f9ea0457a7535315f53", label = "batridert.7z <Armed Police Batrider - A Version (Taiwan) (Mon Dec 22 1997)>" },
+      { hash = "7291ce74caf8d34992526f8cb1d7f03f", label = "batriderja.7z <Armed Police Batrider - A Version (Japan) (Mon Dec 22 1997)>" },
+      { hash = "78b4c3a2e9424dca3dee508ee76ab887", label = "batriderc.7z <Armed Police Batrider (China) (Fri Feb 13 1998)>" },
+      { hash = "c16c71256b343652c89403dbb5a5a62d", label = "batriderhk.7z <Armed Police Batrider - A Version (Hong Kong) (Mon Dec 22 1997)>" },
+      { hash = "c3b5a6f133c69a84d98f910dc783f0d0", label = "batriderj.7z <Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)>" },
+      { hash = "c7617e20a706c3c98425c4576b930920", label = "batriderk.7z <Armed Police Batrider (Korea) (Fri Feb 13 1998)>" },
+      { hash = "eb274c0fd025893e5120eb8a8a257727", label = "batrider.7z <Armed Police Batrider (Europe) (Fri Feb 13 1998)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2401, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[8-Bits] Credits Available" },
+        { address=0X156A2, type="u8", condition="eq", value=0XFF, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Game Over" },
+        { address=0X16A20, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[8-Bits] Credits Inserted" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3167, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Option Level" },
+        { address=0X3173, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shot Level" },
+        { address=0X15458, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Medal Level" },
+      },
+      stage = {
+        { address=0X156A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8-Bits] Stage Number" },
+        { address=0X156AB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8-Bits] Stage Location" },
+        { address=0X18A8D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Playing?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3074, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current ship in use. Abide by the same directives as the others. It doesnt mark a death state." },
+        { address=0X307C, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="First Ship in stock. Bit0 on means its dead." },
+        { address=0X307E, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Second Ship in stock. Bit0 on means its dead." },
+        { address=0X3080, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Third Ship in stock. Bit0 on means its dead." },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X204156, type="u32be", condition="change", action="TREASURE", color="white", min=5000, max=5000, no_log=false, no_survey=false, desc="Score delta 5000-5000: Score 5000" },
+        { address=0X204156, type="u32be", condition="change", action="TREASURE", color="white", min=6000, max=6000, no_log=false, no_survey=false, desc="Score delta 6000-6000: Score 6000" },
+        { address=0X204156, type="u32be", condition="change", action="TREASURE", color="white", min=7000, max=7000, no_log=false, no_survey=false, desc="Score delta 7000-7000: Score 7000" },
+        { address=0X204156, type="u32be", condition="change", action="TREASURE", color="white", min=8000, max=8000, no_log=false, no_survey=false, desc="Score delta 8000-8000: Score 8000" },
+        { address=0X204156, type="u32be", condition="change", action="TREASURE", color="white", min=9000, max=9000, no_log=false, no_survey=false, desc="Score delta 9000-9000: Score 9000" },
+        { address=0X204156, type="u32be", condition="change", action="TREASURE", color="white", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Score 10000" },
+        { address=0X204156, type="u32be", condition="change", action="TREASURE", min=1000000, max=1000000, no_log=false, no_survey=false, desc="Score delta 1000000-1000000: Extra life" },
+        { address=0X204156, type="u32be", condition="change", action="TREASURE", min=1500000, max=1500000, no_log=false, no_survey=false, desc="Score delta 1500000-1500000: Secret Extend Item" },
+        { address=0X3156, type="u16le", condition="change", action="TREASURE", color="white", min=5000, max=5000, no_log=false, no_survey=false, desc="Score delta 5000-5000: Score delta 5000-5000" },
+        { address=0X3156, type="u16le", condition="change", action="TREASURE", color="white", min=6000, max=6000, no_log=false, no_survey=false, desc="Score delta 6000-6000: Score delta 6000-6000" },
+        { address=0X3156, type="u16le", condition="change", action="TREASURE", color="white", min=7000, max=7000, no_log=false, no_survey=false, desc="Score delta 7000-7000: Score delta 7000-7000" },
+        { address=0X3156, type="u16le", condition="change", action="TREASURE", color="white", min=8000, max=8000, no_log=false, no_survey=false, desc="Score delta 8000-8000: Score delta 8000-8000" },
+        { address=0X3156, type="u16le", condition="change", action="TREASURE", color="white", min=9000, max=9000, no_log=false, no_survey=false, desc="Score delta 9000-9000: Score delta 9000-9000" },
+        { address=0X3156, type="u16le", condition="change", action="TREASURE", color="white", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Score delta 10000-10000" },
+        { address=0X3156, type="u16le", condition="change", action="TREASURE", min=1000000, max=1000000, no_log=false, no_survey=false, desc="Score delta 1000000-1000000: Extra life" },
+        { address=0X3156, type="u16le", condition="change", action="TREASURE", min=1500000, max=1500000, no_log=false, no_survey=false, desc="Score delta 1500000-1500000: Secret Extend Item" },
+      },
+      weapon = {
+        { address=0X204172, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: front fire power" },
+        { address=0X204166, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: option fire power" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=200, max=299, no_log=false, no_survey=false, desc="Score delta 200-299: Score 200" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=300, max=399, no_log=false, no_survey=false, desc="Score delta 300-399: Score 300" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=400, max=499, no_log=false, no_survey=false, desc="Score delta 400-499: Score 400" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=500, max=599, no_log=false, no_survey=false, desc="Score delta 500-599: Score 500" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=600, max=699, no_log=false, no_survey=false, desc="Score delta 600-699: Score 600" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=700, max=799, no_log=false, no_survey=false, desc="Score delta 700-799: Score 700" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=800, max=899, no_log=false, no_survey=false, desc="Score delta 800-899: Score 800" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=900, max=999, no_log=false, no_survey=false, desc="Score delta 900-999: Score 900" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Medals" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Score 2000" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=3000, max=3000, no_log=false, no_survey=false, desc="Score delta 3000-3000: Score 3000" },
+        { address=0X204156, type="u32be", condition="change", action="SCORE_STATE", color="white", min=4000, max=4000, no_log=false, no_survey=false, desc="Score delta 4000-4000: Score 4000" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x 65,535" },
+        { address=0X3158, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x 1" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=200, max=299, no_log=false, no_survey=false, desc="Score delta 200-299: Score delta 200-299" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=300, max=399, no_log=false, no_survey=false, desc="Score delta 300-399: Score delta 300-399" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=400, max=499, no_log=false, no_survey=false, desc="Score delta 400-499: Score delta 400-499" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=500, max=599, no_log=false, no_survey=false, desc="Score delta 500-599: Score delta 500-599" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=600, max=699, no_log=false, no_survey=false, desc="Score delta 600-699: Score delta 600-699" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=700, max=799, no_log=false, no_survey=false, desc="Score delta 700-799: Score delta 700-799" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=800, max=899, no_log=false, no_survey=false, desc="Score delta 800-899: Score delta 800-899" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=900, max=999, no_log=false, no_survey=false, desc="Score delta 900-999: Score delta 900-999" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Medals" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Score delta 2000-2000" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=3000, max=3000, no_log=false, no_survey=false, desc="Score delta 3000-3000: Score delta 3000-3000" },
+        { address=0X3156, type="u16le", condition="change", action="SCORE_STATE", color="white", min=4000, max=4000, no_log=false, no_survey=false, desc="Score delta 4000-4000: Score delta 4000-4000" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X204174, type="u16be", condition="decrease", action="BOMB_FIRED", no_log=false, no_survey=false, desc="bomb: bombs" },
+        { address=0X103DF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-Bits] Boss Behavior. Changes from pattern to pattern." },
+        { address=0X156A7, type="u8", condition="eq", value=0X6, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss;" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X169FF, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="OFF (Default)" },
+        { address=0X169FF, type="u8", condition="eq", value=0XFF, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="ON" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X204156, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=100, max=199, no_log=false, no_survey=false, desc="Score delta 100-199: Enemies" },
+        { address=0X169FB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dip Switch Start Rank (Difficulty)" },
+        { address=0X3156, type="u16le", condition="change", action="OBJECT_DESTROYED", color="white", min=100, max=199, no_log=false, no_survey=false, desc="Score delta 100-199: Enemies" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3163, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Continue Player Select Timer" },
+        { address=0X103CC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer before the boss leaves the stage. It decreases over time. The boss leaves once it reaches" },
+        { address=0X103E2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16-Bits] Timer on each boss pattern. It increases over time. It resets when the value of 0x0103" },
+        { address=0X169FA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dip Switch Timer Rank" },
+      },
+    },
+  },
+}

@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Momotarou Dengeki",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "momotarou-dengeki",
+    file = "momotarou-dengeki.zip",
+    hashes = {
+      { hash = "f31c556186b91cf161ecf60644fbecba", label = "Momotarou Dengeki (Japan).gb" },
+      { hash = "f7572c43cb8b4ddaef69e45f48051d47", label = "Momotarou Dengeki (Japan) (En) (v0.91) (The Spoony Bard).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDBF8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="1 if demo is playing, 0 otherwise" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC335, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Worlds unlocked" },
+        { address=0XC342, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XC7BE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Change to 60 to autocomplete level" },
+        { address=0XC7CF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemies defeated in level" },
+      },
+      zone = {
+        { address=0XC336, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Farthest level of last world unlocked" },
+        { address=0XC341, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World currently playing:" },
+      },
+      stage = {
+        { address=0XDA77, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 when in a bonus stage, 2 normally (unreliable)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC7AB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (Ones) (BCD) increased" },
+        { address=0XC7AB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (Ones) (BCD) decreased" },
+        { address=0XC7AC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (Tens) (BCD) increased" },
+        { address=0XC7AC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (Tens) (BCD) decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC7BB, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Suit" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC7AD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins (Ones) (BCD) increased" },
+        { address=0XC7AE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins (Tens) (BCD) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC5E5, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="0F when you defeat an enemy with a large peach, or when invincible" },
+        { address=0XC7C6, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="A0/A1 if you have invincibility" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC7DB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time remaining on Dengeki flight (counts up to 5)" },
+      },
+    },
+  },
+}

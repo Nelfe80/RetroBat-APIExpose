@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "The History Channel: Civil War - A Nation Divided",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-history-channel-civil-war-a-nation-divided",
+    file = "the-history-channel-civil-war-a-nation-divided.zip",
+    hashes = {
+      { hash = "9db26dcfe61eb50aa3028c4db96733e4", label = "History Channel, The - Civil War - A Nation Divided (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3DAEA8, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+        { address=0X569D58, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Done loading ('Press X to Continue') - doesn't occur when loading a save into a level" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3505DC, type="u8", condition="eq", value=0X8E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fredericksburg" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X5F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gettysburg" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X9A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chattanooga" },
+        { address=0X3505DC, type="u8", condition="eq", value=0XA2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fort Fisher" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X6B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selma" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X6D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Petersburg" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X72, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bull Run" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X6E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shiloh" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X65, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Antietam" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X82, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chancellorsville" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X84, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chickamauga" },
+        { address=0X3505DC, type="u8", condition="eq", value=0X8F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cold Harbor" },
+        { address=0X3505DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission ID - increases to value while loading into level" },
+        { address=0X569D58, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Currently loading in" },
+        { address=0X569D58, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pre-level loading screen" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3DAEF4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fredericksburg: Health Bonus decreased" },
+        { address=0X3DAEF4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fredericksburg: Health Bonus increased" },
+        { address=0X3DAF14, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gettysburg: Health Bonus decreased" },
+        { address=0X3DAF14, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gettysburg: Health Bonus increased" },
+        { address=0X3DAF34, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Chattanooga: Health Bonus decreased" },
+        { address=0X3DAF34, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Chattanooga: Health Bonus increased" },
+        { address=0X3DAF54, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fort Fisher: Health Bonus decreased" },
+        { address=0X3DAF54, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fort Fisher: Health Bonus increased" },
+        { address=0X3DAF74, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Selma: Health Bonus decreased" },
+        { address=0X3DAF74, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Selma: Health Bonus increased" },
+        { address=0X3DAF94, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Petersburg: Health Bonus decreased" },
+        { address=0X3DAF94, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Petersburg: Health Bonus increased" },
+        { address=0X3DAFB4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bull Run: Health Bonus decreased" },
+        { address=0X3DAFB4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bull Run: Health Bonus increased" },
+        { address=0X3DAFD4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shiloh: Health Bonus decreased" },
+        { address=0X3DAFD4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shiloh: Health Bonus increased" },
+        { address=0X3DAFF4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Antietam: Health Bonus decreased" },
+        { address=0X3DAFF4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Antietam: Health Bonus increased" },
+        { address=0X3DB014, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Chancellorsville: Health Bonus decreased" },
+        { address=0X3DB014, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Chancellorsville: Health Bonus increased" },
+        { address=0X3DB034, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Chickamauga: Health Bonus decreased" },
+        { address=0X3DB034, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Chickamauga: Health Bonus increased" },
+        { address=0X3DB054, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cold Harbor: Health Bonus decreased" },
+        { address=0X3DB054, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cold Harbor: Health Bonus increased" },
+        { address=0X3DBE34, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Overall Health Bonus decreased" },
+        { address=0X3DBE34, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Overall Health Bonus increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3DAF08, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Fredericksburg: Total Score" },
+        { address=0X3DAF28, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Gettysburg: Total Score" },
+        { address=0X3DAF48, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chattanooga: Total Score" },
+        { address=0X3DAF68, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Fort Fisher: Total Score" },
+        { address=0X3DAF88, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Selma: Total Score" },
+        { address=0X3DAFA8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Petersburg: Total Score" },
+        { address=0X3DAFC8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bull Run: Total Score" },
+        { address=0X3DAFE8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Shiloh: Total Score" },
+        { address=0X3DB008, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Antietam: Total Score" },
+        { address=0X3DB028, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chancellorsville: Total Score" },
+        { address=0X3DB048, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chickamauga: Total Score" },
+        { address=0X3DB068, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cold Harbor: Total Score" },
+        { address=0X3DBE48, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Overall Total Score" },
+      },
+    },
+  },
+}

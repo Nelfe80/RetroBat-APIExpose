@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Broken Sword: The Shadow of the Templars",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "broken-sword-the-shadow-of-the-templars",
+    file = "broken-sword-the-shadow-of-the-templars.zip",
+    hashes = {
+      { hash = "6342ae70849fc9be2bf7f6529ddceec9", label = "Broken Sword - The Shadow of the Templars (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6518C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Screen adress/ background" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6788E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01 is death" },
+        { address=0X12250A, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="16 when you die (mommy)" },
+      },
+    },
+  },
+}

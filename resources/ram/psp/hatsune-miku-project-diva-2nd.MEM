@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Hatsune Miku: Project DIVA 2nd",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hatsune-miku-project-diva-2nd",
+    file = "hatsune-miku-project-diva-2nd.zip",
+    hashes = {
+      { hash = "09e70a9df9df6419cddd6e3eb18333a5", label = "Hatsune Miku - Project Diva 2nd (Japan) (Es) (v1.01) (Wyrdgirn).iso" },
+      { hash = "1544af4091ab5fe86e2f2c272c702d95", label = "Hatsune Miku - Project Diva 2nd (Japan) (Es) (v1.01) (Wyrdgirn) (60FPS).iso" },
+      { hash = "6b6474a141609d0bcfd2d027b5fd1da1", label = "Hatsune Miku - Project Diva 2nd (Japan) (Okaidoku-ban) (En) (v0.82) (Wyrdgirn,R1K4RD) (60FPS).iso" },
+      { hash = "94e56b7e915f11b1f7d23707642a611d", label = "Hatsune Miku - Project Diva 2nd (Japan) (Okaidoku-ban) (En) (v0.82) (Wyrdgirn,R1K4RD).iso" },
+      { hash = "e03f3b45243c933ad586c12454c81e9a", label = "Hatsune Miku - Project Diva 2nd (Japan) (60FPS).iso" },
+      { hash = "ed335c1a8b0b3844d8d6300b3735b6d3", label = "Hatsune Miku - Project Diva 2nd (Japan) (Okaidokuban).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCA3B90, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On Title/load screen" },
+        { address=0XCE9868, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Player Titles start" },
+        { address=0XCE9874, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Bit2 - DIVA Room manager title" },
+      },
+      events = {
+        { address=0XCD230C, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(16Bit) World is Mine Max combo Easy" },
+        { address=0XCD5ABC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Romeo and Cinderella Max combo (Easy)" },
+        { address=0XCD5B54, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Romeo and Cinderella Max combo (Normal)" },
+        { address=0XCD5BEC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Romeo and Cinderella Max combo (Hard)" },
+        { address=0XCD5C84, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Romeo and Cinderella Max combo (Extreme)" },
+        { address=0XCE9807, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Help Item - Combo Support System" },
+        { address=0XCE9808, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Help Item - Combo Follow System" },
+        { address=0XCE9809, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Help Item - Combo Guard System" },
+        { address=0X1317814, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Current Song Combo (Indirect address)" },
+        { address=0X1317818, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Max Song Combo (Indirect address)" },
+        { address=0X131783C, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(32Bit) Combo Bonus (Indirect address)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCD5AC4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Romeo and Cinderella Cleared with Standard (Normal)" },
+        { address=0XCD5AC6, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Romeo and Cinderella Cleared with Great (Normal)" },
+        { address=0XCD5AC8, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Romeo and Cinderella Cleared with Excellent (Normal)" },
+        { address=0XCD5ACA, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16Bit) Romeo and Cinderella Cleared with Perfect (Normal)" },
+      },
+      zone = {
+        { address=0XCD2278, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(16Bit) World is Mine MissXTake Easy" },
+        { address=0XCD2290, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(16Bit) World is Mine failed Miku" },
+        { address=0XCD229C, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(16Bit) World is Mine Failed Rin" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X131780C, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(32Bit) Song Life (Indirect address) increased" },
+        { address=0X131780C, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(32Bit) Song Life (Indirect address) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCD2308, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) World is Mine Max score Easy" },
+        { address=0XCD5AB8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Romeo and Cinderella Max score (Easy)" },
+        { address=0XCD5B50, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Romeo and Cinderella Max score (Normal)" },
+        { address=0XCD5BE8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Romeo and Cinderella Max score (Hard)" },
+        { address=0XCD5C80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Romeo and Cinderella Max score (Extreme)" },
+        { address=0X13177DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Finished song score, use for submit LB [13 -> 14] (Indirect address)" },
+        { address=0X1317810, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Current score (Indirect address)" },
+        { address=0X131784C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32Bit) Chance time score (Indirect address)" },
+      },
+      collectibles = {
+        { address=0XCA3C10, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32Bit) Money / Diva Points increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCE990A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Chance time flag (HP won't decrease)" },
+      },
+    },
+  },
+}

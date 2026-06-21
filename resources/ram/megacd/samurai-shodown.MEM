@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Samurai Shodown",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "samurai-shodown",
+    file = "samurai-shodown.zip",
+    hashes = {
+      { hash = "88a45e257d08dd7eec466a1994bbb596", label = "Samurai Shodown (USA) (RE)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9434, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Fight Round" },
+        { address=0X947D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Bonus Level Remaining Manequin" },
+        { address=0XBD20, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Difficulty Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9F54, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Health Value 1 decreased" },
+        { address=0X9F54, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Health Value 1 increased" },
+        { address=0XA054, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Health Value 2 decreased" },
+        { address=0XA054, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Health Value 2 increased" },
+        { address=0XA154, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Health Value 3 decreased" },
+        { address=0XA154, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Health Value 3 increased" },
+        { address=0XB054, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Health Value 4 decreased" },
+        { address=0XB054, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Health Value 4 increased" },
+        { address=0XB154, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Health Value 5 decreased" },
+        { address=0XB154, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Health Value 5 increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X93B2, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Round Timer" },
+      },
+    },
+  },
+}

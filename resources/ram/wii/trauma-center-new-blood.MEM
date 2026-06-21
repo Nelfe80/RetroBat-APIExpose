@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Trauma Center: New Blood",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Life Simulation, Visual Novel"
+  },
+
+  rom = {
+    name = "trauma-center-new-blood",
+    file = "trauma-center-new-blood.zip",
+    hashes = {
+      { hash = "79d40c5206db6c4ae00b368f073fbfe9", label = "Trauma Center - New Blood (Europe, Australia) (En,Fr,De,Es,It)" },
+      { hash = "a5b7a3e88c87b5eef568eb04bc207273", label = "Trauma Center - New Blood (USA) (En,Ja)" },
+      { hash = "c8e6102754234e44cf75e6f6834a6632", label = "Caduceus - New Blood (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9CB433, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1-2 clear?" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8FAD98, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Operation 1-2 Easy score (Single) [US/JP]" },
+        { address=0X9CB3D8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Operation 1-1 Hard score [EU]" },
+        { address=0X9CB438, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Operation 1-2 Easy score (Single) [EU]" },
+        { address=0X9CB468, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Operation 1-2 Easy score (Co-Op) [EU]" },
+        { address=0X9CB498, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Operation 1-2 Normal score [EU]" },
+      },
+    },
+  },
+}

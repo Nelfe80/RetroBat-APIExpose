@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "The Godfather: The Game",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-godfather-the-game",
+    file = "the-godfather-the-game.zip",
+    hashes = {
+      { hash = "9588976bd2c315c303856c8dfc9ce1bf", label = "Godfather, The - The Game (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X14E1CAC, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0X14E1CAC, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Visible" },
+        { address=0X1AED0F8, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="1 Off" },
+        { address=0X1AED0F8, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="1 On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X14E8650, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0X14E8650, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shown" },
+        { address=0X14E8650, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="HUD : Respect Level up Text Visibility [bit0]" },
+        { address=0X14EB5F5, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First floor layer" },
+        { address=0X14EB5F5, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Second floor layer" },
+        { address=0X14EB5F5, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Third floor layer" },
+        { address=0X14EB5F5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MINIMAP : Layer level (8-bit)" },
+        { address=0X14EB5FA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MINIMAP : Zoom level (16-bit)" },
+        { address=0X1AED164, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MINIMAP : Zoom Level (32-bit)" },
+      },
+      zone = {
+        { address=0X14EB5F5, type="u8", condition="eq", value=0X1, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Open World Layer (streets)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1AED0F4, type="u16le", condition="eq", value=0X0010, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead/Mission failed" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X70863B, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X70863B, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X708640, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X708640, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X708643, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X708643, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X708644, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X708644, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X708649, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X708649, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X7B7438, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="HUD : Equiped Weapon name (128-bit ASCII)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X72D118, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="ASCII -> start of displayed money in-game increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X77F0D8, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="GUI : Number of active objectives (32-bit)" },
+      },
+    },
+  },
+}

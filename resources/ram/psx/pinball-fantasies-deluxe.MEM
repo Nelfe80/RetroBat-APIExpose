@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pinball Fantasies Deluxe",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "pinball-fantasies-deluxe",
+    file = "pinball-fantasies-deluxe.zip",
+    hashes = {
+      { hash = "d043eb9acc02ee096ed9dcc7e1577d1a", label = "Pinball Fantasies Deluxe (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

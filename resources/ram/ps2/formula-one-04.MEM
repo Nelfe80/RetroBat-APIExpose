@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Formula One 04",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "formula-one-04",
+    file = "formula-one-04.zip",
+    hashes = {
+      { hash = "5f9c423326981680d7afbe79391072a4", label = "Formula One 04 (Europe, Australia) (En,Fr,De,Es,It,Fi) (v2.02)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0XBF2D50, type="u16le", condition="eq", value=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Championship" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XBF2DB0, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit bitflag] Simulation Options - Rookie - Damage" },
+        { address=0XBF2DE0, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit bitflag] Simulation Options - Amateur - Damage" },
+        { address=0XBF2E10, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit bitflag] Simulation Options - Semi-Pro - Damage" },
+        { address=0XBF2E40, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit bitflag] Simulation Options - Professional - Damage (forced active)" },
+      },
+    },
+  },
+}

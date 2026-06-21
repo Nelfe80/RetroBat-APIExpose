@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Gundam 0079: The War for Earth",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "gundam-0079-the-war-for-earth",
+    file = "gundam-0079-the-war-for-earth.zip",
+    hashes = {
+      { hash = "5cf4158f59517d5aa1c3a0fd45446dc0", label = "Gundam 0079 - The War for Earth (Japan) (Disc 1)" },
+      { hash = "2d870eff8c59fa9ae9df7cf71f95203a", label = "Gundam 0079 - The War for Earth (Japan) (Disc 2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X81B90, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Menu Active" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X81AF8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Currently Equipped Weapon" },
+      },
+    },
+  },
+}

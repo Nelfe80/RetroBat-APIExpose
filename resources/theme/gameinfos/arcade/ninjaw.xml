@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Dagger</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Ninja Star</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Dagger</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Ninja Star</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 D.S 100000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 NIL 99500</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 RZF 99000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 NIG 98500</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 KUC 98000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 Y.W 97500</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 NAH 97000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 TLK 96500</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 LMT 96000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 TAN 95500</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 ZUV 95000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 BAE 94500</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 ADH 94000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 WGN 93500</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 JPB 93000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 PNF 92500</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 K.K 92000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 AMV 91500</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 TUM 91000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 BAS 90500</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 Y.N 90000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 E.N 89500</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 R.N 89000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 LON 88500</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 SSS 88000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 SKY 87500</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 TSC 87000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 LEP 86500</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 BOO 86000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 HYA 85500</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 B.K 85000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 A.U 84500</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 S.M 84000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 S.A 83500</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 UMG 83000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 VIA 82500</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 ARY 82000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 ORA 81500</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 PIB 81000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 CAU 80500</text>
+		</text>
+		<text name="hiscoreline41" extra="true">
+			<text>#41 DON 80000</text>
+		</text>
+		<text name="hiscoreline42" extra="true">
+			<text>#42 CNS 79500</text>
+		</text>
+		<text name="hiscoreline43" extra="true">
+			<text>#43 COH 79000</text>
+		</text>
+		<text name="hiscoreline44" extra="true">
+			<text>#44 CHI 78500</text>
+		</text>
+		<text name="hiscoreline45" extra="true">
+			<text>#45 CRT 78000</text>
+		</text>
+		<text name="hiscoreline46" extra="true">
+			<text>#46 CRS 77500</text>
+		</text>
+		<text name="hiscoreline47" extra="true">
+			<text>#47 TUU 77000</text>
+		</text>
+		<text name="hiscoreline48" extra="true">
+			<text>#48 AU. 76500</text>
+		</text>
+		<text name="hiscoreline49" extra="true">
+			<text>#49 CA. 76000</text>
+		</text>
+		<text name="hiscoreline50" extra="true">
+			<text>#50 PA. 75500</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

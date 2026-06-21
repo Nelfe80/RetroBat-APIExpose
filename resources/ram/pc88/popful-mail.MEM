@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Popful Mail",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "popful-mail",
+    file = "popful-mail.zip",
+    hashes = {
+      { hash = "b80b972d465f6bbd2203c38f94c9a841", label = "Popful Mail (Opening disk).d88" },
+      { hash = "fd7a73cdc55d65a8499901de55bb0d5b", label = "Popful Mail (Program disk).d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0XB019, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB09F, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X6804, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jump/Falling Indicator" },
+      },
+    },
+  },
+}

@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Cars",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cars",
+    file = "cars.zip",
+    hashes = {
+      { hash = "0e9df95d854d56a7bed63b79bab40bc1", label = "Cars (Europe) (Es,Pt).gba" },
+      { hash = "214047ac78c08eb59e256f54df9522f2", label = "Cars (USA, Europe).gba" },
+      { hash = "2dd75f1b7e8095ab41918fccdd64e1ae", label = "Cars (Japan).gba" },
+      { hash = "7031e05fea8257a2658683436b0e3db1", label = "Cars (Germany).gba" },
+      { hash = "94cda1aa3381f457186908ac3fe82f24", label = "Cars (Europe) (Fr,Nl).gba" },
+      { hash = "99581023cbb348a577d461e328646218", label = "Cars (Europe) (Sv,No,Da,Fi).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1DBFC, type="u8", condition="eq", value=0X11, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X1DBFC, type="u8", condition="eq", value=0X1A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1DB3A, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X1DB46, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X1DB52, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X1DB5E, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X1DB9A, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X1DBA6, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X1DBB2, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X1DBBE, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+  },
+}

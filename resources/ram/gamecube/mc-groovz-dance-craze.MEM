@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "MC Groovz Dance Craze",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "mc-groovz-dance-craze",
+    file = "mc-groovz-dance-craze.zip",
+    hashes = {
+      { hash = "fd55625417ed1f366fcbdefeff27a3e9", label = "MC Groovz Dance Craze (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

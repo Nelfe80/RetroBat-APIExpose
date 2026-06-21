@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Imagine: Babyz",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "imagine-babyz",
+    file = "imagine-babyz.zip",
+    hashes = {
+      { hash = "9cc41fae1b052d3baafa66a00366507e", label = "Imagine - Babies (Europe) (En,Fr,De,Es,It,Nl).nds" },
+      { hash = "8b7052f7ecaf2035abc927bfc1d5499d", label = "Imagine - Babyz (USA) (En,Fr,Es).nds" },
+    }
+  },
+
+  events = {
+  },
+}

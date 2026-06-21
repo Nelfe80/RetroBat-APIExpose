@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Mobile Suit Gundam Side Story I: Senritsu no Blue",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "mobile-suit-gundam-side-story-i-senritsu-no-blue",
+    file = "mobile-suit-gundam-side-story-i-senritsu-no-blue.zip",
+    hashes = {
+      { hash = "1abe35c6e2d27aa1c3036975ced809c7", label = "Mobile Suit Gundam Side Story I - Senritsu no Blue (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X118150, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Rank Stage 1" },
+        { address=0X118151, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Hit Rate Stage 1" },
+        { address=0X118160, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Rank Stage 2" },
+        { address=0X118161, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Hit Rate Stage 2" },
+        { address=0X118170, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Rank Stage 3" },
+        { address=0X118171, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Hit Rate Stage 3" },
+        { address=0X118180, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Rank Stage 4" },
+        { address=0X118181, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Hit Rate Stage 4" },
+        { address=0X118190, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Rank Stage 5" },
+        { address=0X118191, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Hit Rate Stage 5" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X118148, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Tactical Score Upper" },
+        { address=0X11814A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Tactical Score Lower" },
+        { address=0X11814C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Total Score Upper" },
+        { address=0X11814E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 1 Total Score Lower" },
+        { address=0X118158, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Tactical Score Upper" },
+        { address=0X11815A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Tactical Score Lower" },
+        { address=0X11815C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Total Score Upper" },
+        { address=0X11815E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 2 Total Score Lower" },
+        { address=0X118168, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Tactical Score Upper" },
+        { address=0X11816A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Tactical Score Lower" },
+        { address=0X11816C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Total Score Upper" },
+        { address=0X11816E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 3 Total Score Lower" },
+        { address=0X118178, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 4 Tactical Score Upper" },
+        { address=0X11817A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 4 Tactical Score Lower" },
+        { address=0X11817C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 4 Total Score Upper" },
+        { address=0X11817E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 4 Total Score Lower" },
+        { address=0X118188, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 5 Tactical Score Upper" },
+        { address=0X11818A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 5 Tactical Score Lower" },
+        { address=0X11818C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 5 Total Score Upper" },
+        { address=0X11818E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Stage 5 Total Score Lower" },
+        { address=0X153798, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Tactical Score Upper Part" },
+        { address=0X15379A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Tactical Score Lower Part" },
+        { address=0X1537A4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Total Score Upper Part" },
+        { address=0X1537A6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Total Score Lower Part" },
+      },
+      collectibles = {
+        { address=0X153CDD, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8 Bit] Hand Grenade Ammo" },
+      },
+    },
+  },
+}

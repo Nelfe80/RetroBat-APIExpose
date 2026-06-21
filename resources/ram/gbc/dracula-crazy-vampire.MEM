@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Dracula: Crazy Vampire",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "dracula-crazy-vampire",
+    file = "dracula-crazy-vampire.zip",
+    hashes = {
+      { hash = "192aec8dca7656463be56991f497cff3", label = "Dracula - Crazy Vampire (Europe) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCE2C, type="u8", condition="eq", value=0X2A, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XCE2C, type="u8", condition="eq", value=0XFC, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCB3F, type="u8", condition="eq", value=0X00, action="LEVEL_NO", no_log=false, no_survey=false, desc="No" },
+        { address=0XCB3F, type="u8", condition="eq", value=0X01, action="LEVEL_YES", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XCB3F, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XCE2C, type="u8", condition="eq", value=0X38, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear" },
+      },
+      stage = {
+        { address=0XCB40, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0XCB40, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0XCB40, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0XCB40, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0XCB40, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0XCB41, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0XCB41, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8" },
+        { address=0XCB41, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9" },
+        { address=0XCB41, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 10" },
+        { address=0XCB41, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 11" },
+        { address=0XCB41, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 12" },
+        { address=0XCB80, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0XCB80, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0XCB80, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0XCB80, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0XCB80, type="u8", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0XCE2C, type="u8", condition="eq", value=0XB7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cutscene during a stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCA41, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Check" },
+      },
+      health = {
+        { address=0XCB5D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XCB5D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XCB5F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sun Meter (if this is empty, you will start losing health) decreased" },
+        { address=0XCB5F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sun Meter (if this is empty, you will start losing health) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCB80, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 (Werewolf)" },
+        { address=0XCB80, type="u8", condition="eq", value=0X1C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 (Creature from the Black Lagoon)" },
+        { address=0XCB80, type="u8", condition="eq", value=0X24, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 (Mummy)" },
+        { address=0XCB80, type="u8", condition="eq", value=0X29, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 4 (Grand Inquisitor)" },
+        { address=0XCE2C, type="u8", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mummy Boss Fight" },
+      },
+    },
+  },
+}

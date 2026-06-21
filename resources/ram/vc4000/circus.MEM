@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Circus",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "circus",
+    file = "circus.zip",
+    hashes = {
+      { hash = "7f3916bb403c86b40f12847362ef3904", label = "Circus (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

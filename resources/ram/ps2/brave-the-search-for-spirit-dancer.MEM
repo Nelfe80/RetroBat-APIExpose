@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Brave: The Search for Spirit Dancer",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "brave-the-search-for-spirit-dancer",
+    file = "brave-the-search-for-spirit-dancer.zip",
+    hashes = {
+      { hash = "816f42bfa2f74f014a7b313a6df23900", label = "Brave - The Search for Spirit Dancer (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4BEEA4, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[PAL][Bit Flag {32-bit}] bit 0 => Is Subtitles On" },
+      },
+    },
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Phantasy Star Generation: 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "phantasy-star-generation-2",
+    file = "phantasy-star-generation-2.zip",
+    hashes = {
+      { hash = "6b01d614866b08498794fc6a625e3be7", label = "Phantasy Star Generation - 2 (Japan) (En) (Beta) (Kyence)" },
+      { hash = "6bb9d7baac0d486a028ab64584f4c7aa", label = "Sega Ages 2500 Series Vol. 17 - Phantasy Star Generation-2 (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X254904, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Start Game" },
+        { address=0X254904, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Continue Game" },
+        { address=0X254904, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Original Game" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Kingdom Hearts II: Final Mix [Subset - Level 1 Critical Mode]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "kingdom-hearts-ii-final-mix-subset-level-1-critical-mode",
+    file = "kingdom-hearts-ii-final-mix-subset-level-1-critical-mode.zip",
+    hashes = {
+      { hash = "93b1d189f27c9e162d69b619dadc2c8d", label = "Kingdom Hearts II - Final Remix [Subset - Level 1 Critical Mode]" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1D48FA4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Used for various gimmick bars in some boss fights. (float)" },
+      },
+    },
+  },
+}

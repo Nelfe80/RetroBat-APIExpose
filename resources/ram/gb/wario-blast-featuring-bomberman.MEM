@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Wario Blast: Featuring Bomberman!",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "wario-blast-featuring-bomberman",
+    file = "wario-blast-featuring-bomberman.zip",
+    hashes = {
+      { hash = "14fe7234ee4bcb14adf20c743f084a35", label = "Wario Blast Featuring Bomberman! (USA, Europe) (SGB Enhanced).gb" },
+      { hash = "2cad6ee6df3402aeb8f8ab7921517779", label = "Bomberman GB (Japan) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD95E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x01 - Music is Muted (Pause)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC0E9, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Win" },
+        { address=0XC0E9, type="u8", condition="eq", value=0XEE, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Draw" },
+        { address=0XC0E9, type="u8", condition="eq", value=0XF7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lose" },
+        { address=0XC0E9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round results:" },
+        { address=0XC3F5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round (0x00-0x02)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC572, type="u8", condition="eq", value=0X5A, action="SCORE_STATE", no_log=false, no_survey=false, desc="score screen" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC155, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Remaining" },
+      },
+    },
+  },
+}

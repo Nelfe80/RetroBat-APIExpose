@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Road Rash",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Racing"
+  },
+
+  rom = {
+    name = "road-rash",
+    file = "road-rash.zip",
+    hashes = {
+      { hash = "325575374d2db3755f83bba728990ebe", label = "Road Rash (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00D8, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="Pause (7f=Paused, 00=Unpaused)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0280, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X1FE7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Screen (1c=In race, 5e=Stage select, 65=Before race, 66=Qualified on level, 67=Race results, 73=" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X02BC, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Enemy Damage" },
+        { address=0X0ED8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player Damage" },
+        { address=0X0EF8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Bike Damage" },
+        { address=0X10D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=01) decreased" },
+        { address=0X10D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=01) increased" },
+        { address=0X11D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=02) decreased" },
+        { address=0X11D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=02) increased" },
+        { address=0X12D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=03) decreased" },
+        { address=0X12D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=03) increased" },
+        { address=0X13D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=04) decreased" },
+        { address=0X13D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=04) increased" },
+        { address=0X14D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=05) decreased" },
+        { address=0X14D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=05) increased" },
+        { address=0X15D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=06) decreased" },
+        { address=0X15D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=06) increased" },
+        { address=0X16D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=07) decreased" },
+        { address=0X16D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=07) increased" },
+        { address=0X17D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=08) decreased" },
+        { address=0X17D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=08) increased" },
+        { address=0X18D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=09) decreased" },
+        { address=0X18D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=09) increased" },
+        { address=0X19D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=0a) decreased" },
+        { address=0X19D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=0a) increased" },
+        { address=0X1AD8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=0b) decreased" },
+        { address=0X1AD8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=0b) increased" },
+        { address=0X1BD8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=0c) decreased" },
+        { address=0X1BD8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=0c) increased" },
+        { address=0X1CD8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=0d) decreased" },
+        { address=0X1CD8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=0d) increased" },
+        { address=0X1DD8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Racer Health (02bb=0e) decreased" },
+        { address=0X1DD8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Racer Health (02bb=0e) increased" },
+      },
+    },
+  },
+}

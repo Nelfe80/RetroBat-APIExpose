@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Illust Puzzle & Slide Puzzle",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-illust-puzzle-slide-puzzle",
+    file = "the-illust-puzzle-slide-puzzle.zip",
+    hashes = {
+      { hash = "ac727296271862f512a5b9aa8041f290", label = "Simple 1500 Series Vol. 37 - The Illust Puzzle & Slide Puzzle (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

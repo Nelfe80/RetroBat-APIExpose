@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Shanghai",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "shanghai",
+    file = "shanghai.zip",
+    hashes = {
+      { hash = "d11777331e12f55ae4bab2f6e0bda918", label = "Shanghai (USA).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9800, type="u32le", condition="eq", value=0X63636362, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X99E7, type="u32le", condition="eq", value=0XB1A17161, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="HAL laboratory logo (boot-up and end credits)" },
+        { address=0X9C05, type="u32le", condition="eq", value=0X180B121E, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Thank You (final screen of credits -- will persist thereafter)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC62F, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="can switch to this value during tile set change" },
+      },
+    },
+  },
+}

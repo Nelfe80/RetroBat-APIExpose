@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Plotting | Flipull: An Exciting Cube Game",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "plotting-flipull-an-exciting-cube-game",
+    file = "plotting-flipull-an-exciting-cube-game.zip",
+    hashes = {
+      { hash = "1e35c0e87b1f2aa1346b44c7cf010c31", label = "plotting.7z <Plotting (World set 1)>" },
+      { hash = "2691f02a239e9bf876c1b3beaad7d074", label = "plottingb.7z <Plotting (World set 3, earliest version)>" },
+      { hash = "4ef13b0bc2cf0ae1bd23ee3b73389cae", label = "plottingu.7z <Plotting (US)>" },
+      { hash = "bd052fb4b2e0904ff81540f9f681d9c6", label = "plottinga.7z <Plotting (World set 2, protected)>" },
+      { hash = "e0a2f312e41b23a459aaebc048509a84", label = "flipull.7z <Flipull (Japan)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8240, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [8bit]" },
+      },
+      events = {
+        { address=0X8629, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 Combo [8bit]" },
+        { address=0X8B29, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P2 Combo [8bit]" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X82BC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rank 1st - Stage [8bit]" },
+        { address=0X8608, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P1 Stage [8bit]" },
+        { address=0X8B08, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P2 Stage [8bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X82B0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score - Top of Screen [32bit BE]" },
+        { address=0X82B8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Rank 1st - Score [32bit BE]" },
+        { address=0X8600, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score [32bit BE]" },
+        { address=0X8B00, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score [32bit BE]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8214, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DipSwitch B [8bit]" },
+        { address=0X860E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P1 Remaining Blocks [8bit]" },
+        { address=0X860F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P1 Wild Blocks [8bit]" },
+        { address=0X8630, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P1 Trip of Block [8bit]" },
+        { address=0X8631, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P1 Block in Your hand [8bit]" },
+        { address=0X8670, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blocks Destroyed - Combo 1 [8bit]" },
+        { address=0X8671, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blocks Destroyed - Combo 2 [8bit]" },
+        { address=0X8672, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blocks Destroyed - Combo 3 [8bit]" },
+        { address=0X8673, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blocks Destroyed - Combo 4 [8bit]" },
+        { address=0X8674, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blocks Destroyed - Combo 5 [8bit]" },
+        { address=0X8B0E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P2 Remaining Block [8bit]" },
+        { address=0X8B0F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P2 Wild Blocks [8bit]" },
+        { address=0X8B31, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P2 Block in Your hand [8bit]" },
+        { address=0X9805, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DipSwitch - Sound Test [8bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X860B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P1 Time - Minutes [8bit]" },
+        { address=0X860C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P1 Time - Seconds [8bit]" },
+        { address=0X8B0B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P2 Time - Minutes [8bit]" },
+        { address=0X8B0C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P2 Time - Seconds [8bit]" },
+      },
+    },
+  },
+}

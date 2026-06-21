@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Virus LQP-79",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "virus-lqp-79",
+    file = "virus-lqp-79.zip",
+    hashes = {
+      { hash = "07fe9a67d03c1a78ac4595a4b2c1119f", label = "Virus LQP-79 (World) (2021-06-21) (No QR Code).hex" },
+      { hash = "aacc854ebb449e34c1c5c518c97c6b1e", label = "Virus LQP-79 (World) (Team A.R.G.) (Save Fix) (Vancleef).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0106, type="u8", condition="eq", value=0XD, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue game (normal)" },
+        { address=0X02E1, type="u8", condition="eq", value=0X9, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over screen" },
+        { address=0X02E1, type="u8", condition="eq", value=0XA, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X01AE, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL 1" },
+        { address=0X01AE, type="u8", condition="eq", value=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL 128" },
+        { address=0X01AE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="GAME : LEVEL ID (8-bit)" },
+        { address=0X02E1, type="u8", condition="eq", value=0X6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level completed screen" },
+        { address=0X02E1, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level info screen" },
+        { address=0X02E1, type="u8", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Map" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X02EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PLAYER : Current Health (8-bit) decreased" },
+        { address=0X02EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PLAYER : Current Health (8-bit) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X02EF, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="False" },
+        { address=0X02EF, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="True" },
+        { address=0X02F0, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Min" },
+        { address=0X02F0, type="u8", condition="eq", value=0X24, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max (trigger overheating boolean on 0x02ef" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01ED, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="GAME : Score (32-bit)" },
+      },
+    },
+  },
+}

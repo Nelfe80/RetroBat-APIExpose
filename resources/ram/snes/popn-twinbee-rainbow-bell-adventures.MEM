@@ -1,0 +1,117 @@
+return {
+  game = {
+    title = "Pop'n Twinbee: Rainbow Bell Adventures",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "popn-twinbee-rainbow-bell-adventures",
+    file = "popn-twinbee-rainbow-bell-adventures.zip",
+    hashes = {
+      { hash = "56e4efba2e8ffccf05e6697e640a569d", label = "TwinBee - Rainbow Bell Adventure (Japan) (En) (v1.01) (AGTP).sfc" },
+      { hash = "b965286de67b7116b8eb587457f9b649", label = "TwinBee - Rainbow Bell Adventure (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0044, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[1 byte] Full use unknown. Currently used to identify if a demo is active." },
+        { address=0X005A, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X005A, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X00C3, type="u8", condition="eq", value=0XFF, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0058, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[1 byte] Reponsive stage-clear indicator." },
+        { address=0X00A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X00B1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[1 byte] Stage clear? (by sulpemago)" },
+        { address=0X02FA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[1 byte] Whether the current stage has been cleared before." },
+        { address=0X1624, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle Mode - 1P Level" },
+        { address=0X1626, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle Mode - 2P Level" },
+      },
+      zone = {
+        { address=0X0A40, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[1 byte] Full use unknown. Usable to determine, with mixed precision, whether the player is on t" },
+      },
+      stage = {
+        { address=0X02C0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[1 word] Bells collected in stage (by SamuraiGoroh)" },
+        { address=0X02C2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[1 word] Total bells in stage (by SamuraiGoroh)" },
+        { address=0X12F2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[1 byte] In lab stages, the health level of enemy TankBee, 2 of 6" },
+        { address=0X1342, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[1 byte] In lab stages, the health level of enemy TankBee, 3 of 6" },
+        { address=0X1392, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[1 byte] In lab stages, the health level of enemy TankBee, 4 of 6" },
+        { address=0X13E2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[1 byte] In lab stages, the health level of enemy TankBee, 5 of 6" },
+        { address=0X1432, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[1 byte] In lab stages, the health level of enemy TankBee, 6 of 6" },
+        { address=0X153A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[1 byte] Whether this stage wraps around." },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X02EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] Current health of player 1 (by SamuraiGoroh and expanded by clymax) decreased" },
+        { address=0X02EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] Current health of player 1 (by SamuraiGoroh and expanded by clymax) increased" },
+        { address=0X02ED, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] Max health of player 1 (by SamuraiGoroh) decreased" },
+        { address=0X02ED, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] Max health of player 1 (by SamuraiGoroh) increased" },
+        { address=0X02EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] Current health of player 2 (by SamuraiGoroh and expanded by clymax) decreased" },
+        { address=0X02EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] Current health of player 2 (by SamuraiGoroh and expanded by clymax) increased" },
+        { address=0X02EF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[1 byte] Max health of player 2 (by SamuraiGoroh) decreased" },
+        { address=0X02EF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[1 byte] Max health of player 2 (by SamuraiGoroh) increased" },
+        { address=0X12AF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[byte] Health of enemy 1 of 6 decreased" },
+        { address=0X12AF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[byte] Health of enemy 1 of 6 increased" },
+        { address=0X12FF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[byte] Health of enemy 2 of 6 decreased" },
+        { address=0X12FF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[byte] Health of enemy 2 of 6 increased" },
+        { address=0X134F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[byte] Health of enemy 3 of 6 decreased" },
+        { address=0X134F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[byte] Health of enemy 3 of 6 increased" },
+        { address=0X139F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[byte] Health of enemy 4 of 6 decreased" },
+        { address=0X139F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[byte] Health of enemy 4 of 6 increased" },
+        { address=0X13EF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[byte] Health of enemy 5 of 6 decreased" },
+        { address=0X13EF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[byte] Health of enemy 5 of 6 increased" },
+        { address=0X143F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[byte] Health of enemy 6 of 6 decreased" },
+        { address=0X143F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[byte] Health of enemy 6 of 6 increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0D86, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[1 byte] If spawned item 1 of 4 is a sub-weapon and is being carried by a player, which player i" },
+        { address=0X0D87, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[1 byte] If spawned item 1 of 4 is a sub-weapon, whether the sub-weapon is being carried by a pl" },
+        { address=0X0DD6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[1 byte] If spawned item 2 of 4 is a sub-weapon and is being carried by a player, which player i" },
+        { address=0X0DD7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[1 byte] If spawned item 2 of 4 is a sub-weapon, whether the sub-weapon is being carried by a pl" },
+        { address=0X0E26, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[1 byte] If spawned item 3 of 4 is a sub-weapon and is being carried by a player, which player i" },
+        { address=0X0E27, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[1 byte] If spawned item 3 of 4 is a sub-weapon, whether the sub-weapon is being carried by a pl" },
+        { address=0X0E76, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[1 byte] If spawned item 4 of 4 is a sub-weapon and is being carried by a player, which player i" },
+        { address=0X0E77, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[1 byte] If spawned item 4 of 4 is a sub-weapon, whether the sub-weapon is being carried by a pl" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X007A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[1 byte] Whether the targert time for clearing the current stage is met increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X02C8, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="[1 byte] Responsive indicator for whether a boss has been defeated." },
+        { address=0X04E2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[1 byte] Health level for the following bosses." },
+        { address=0X0FE2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[1 byte] Animation-state indicator for the indestructible mini-boss" },
+        { address=0X1022, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[1 byte] Health level for the following boss." },
+        { address=0X12A2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[1 byte] Health level for the following bosses." },
+        { address=0X1482, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[1 byte] Health level for the following boss." },
+        { address=0X14D2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[1 byte] Health level for the following bosses." },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1988, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[word] Invincibility countdown for player 1" },
+        { address=0X198A, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[word] Invincibility countdown for player 2" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X20158, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[3 words] Save slot 1: whether each of the 44 doors has been entered. Each door is represented b" },
+        { address=0X201C8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[3 words] Save slot 2: whether each of the 44 doors has been entered. Each door is represented b" },
+        { address=0X20238, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[3 words] Save slot 3: whether each of the 44 doors has been entered. Each door is represented b" },
+        { address=0X202A8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[3 words] Save slot 4: whether each of the 44 doors has been entered. Each door is represented b" },
+      },
+    },
+  },
+}

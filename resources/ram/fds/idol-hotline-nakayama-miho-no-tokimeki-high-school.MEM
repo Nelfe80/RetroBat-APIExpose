@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Idol Hotline: Nakayama Miho no Tokimeki High School",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "idol-hotline-nakayama-miho-no-tokimeki-high-school",
+    file = "idol-hotline-nakayama-miho-no-tokimeki-high-school.zip",
+    hashes = {
+      { hash = "3ffda8ba02aa5ab3597516b761b942c0", label = "Idol Hotline - Nakayama Miho no Tokimeki High School (Japan) (DV 4) [b].fds" },
+      { hash = "8641f7afb326e29411d43e5e49c576a5", label = "Idol Hotline - Nakayama Miho no Tokimeki High School (Japan) (DV 10).fds" },
+      { hash = "d392d52df612cba3286ab81a28f9cce0", label = "Idol Hotline - Nakayama Miho no Tokimeki High School (Japan) (DV 6) [b].fds" },
+      { hash = "18282fbfe1ebdf7061dbb8a8846db636", label = "Idol Hotline - Nakayama Miho no Tokimeki High School (Japan) (En) (v1.0) (FCandChill).fds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6129, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Ground sprite object" },
+        { address=0X612A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Background color pallette ?" },
+        { address=0X8062, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Game Clear flags" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6126, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Left side Sprite object drawn" },
+        { address=0X6127, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Right side Sprite object drawn" },
+        { address=0X6128, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Middle Sprite object drawn" },
+        { address=0XAF00, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII Block] Seems to be a script caller" },
+      },
+    },
+  },
+}

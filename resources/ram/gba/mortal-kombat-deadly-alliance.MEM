@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Mortal Kombat: Deadly Alliance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-deadly-alliance",
+    file = "mortal-kombat-deadly-alliance.zip",
+    hashes = {
+      { hash = "8e066c35a484308421c3eebcc45ec329", label = "Mortal Kombat - Deadly Alliance (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FF0, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X1FF0, type="u8", condition="eq", value=0X19, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1FF0, type="u8", condition="eq", value=0X22, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Logo" },
+      },
+      events = {
+        { address=0X105A, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Hits Combo (1P) (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0FB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1's Rounds Won in a Match (8-bit)" },
+        { address=0X0FB5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Computer's Rounds Won in a Match (8-bit)" },
+        { address=0X1F08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds to Win" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0731, type="u8", condition="eq", value=0X6D, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full Health" },
+        { address=0X0731, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player 1's Health in Match (8-bit)" },
+        { address=0X0771, type="u8", condition="eq", value=0X6D, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full Health" },
+        { address=0X0771, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Computer's Health in Match (8-bit)" },
+        { address=0X105B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Combo (1P) (8-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7D6C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Test Your Might Objects (8-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0E6C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="In-Match Timer (8-bit)" },
+        { address=0X2048, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Timer" },
+        { address=0X7DA4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Test Your Might Timer (8-bit)" },
+        { address=0X7DC0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Test Your Sight (Times to shuffle the chalices) (8-bit)" },
+        { address=0X7DC4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Test Your Sight (On-Screen Times that the Chalices shuffle) (8-bit)" },
+        { address=0X7DC8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Test Your Sight Timer (8-bit)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Arkanoid Returns",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Ball & Paddle"
+  },
+
+  rom = {
+    name = "arkanoid-returns",
+    file = "arkanoid-returns.zip",
+    hashes = {
+      { hash = "2a2b0a4f1730a69c3f8eab7dd9520c10", label = "arkretrnu.7z <Arkanoid Returns (Ver 2.02A 1997/02/10)>" },
+      { hash = "43b6f5738f955823b291260b41040352", label = "arkretrnj.7z <Arkanoid Returns (Ver 2.02J 1997/02/10)>" },
+      { hash = "f7ec4f8f6364a61ed9c0097870cfe476", label = "arkretrn.7z <Arkanoid Returns (Ver 2.02O 1997/02/10)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0002, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="min" },
+        { address=0X0002, type="u8", condition="eq", value=0X09, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="max" },
+        { address=0X17AA, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="on (demo)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2078, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0X2078, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X2078, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="2" },
+        { address=0X2078, type="u8", condition="eq", value=0XFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="255" },
+        { address=0X2078, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives left: increased" },
+        { address=0X2078, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives left: decreased" },
+        { address=0X255B, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="off / dead" },
+      },
+      health = {
+        { address=0X0378, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Active Power-up: decreased" },
+        { address=0X0984, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="min" },
+        { address=0X0984, type="u8", condition="eq", value=0X3A, action="HEALTH_STATE", no_log=true, no_survey=false, desc="max" },
+        { address=0X0984, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Doh health (decreasing one hit at a time):" },
+        { address=0X22BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Exit doors: decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0378, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X0378, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Player 1UP (P)" },
+        { address=0X0378, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Break (B)" },
+        { address=0X0378, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Disrupt (D)" },
+        { address=0X0378, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Slow (S)" },
+        { address=0X0378, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Giga ball (G)" },
+        { address=0X0378, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Misile (M)" },
+        { address=0X0378, type="u8", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Safety Net (T)" },
+        { address=0X0378, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Expand (E)" },
+        { address=0X0378, type="u8", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Capture (C)" },
+        { address=0X0378, type="u8", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Laser (L)" },
+        { address=0X0378, type="u8", condition="eq", value=0XFF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="dead / no paddle" },
+        { address=0X22BA, type="u8", condition="eq", value=0XFF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="exit doors closed / power-up B not active" },
+        { address=0X22BA, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="leaving through the exit doors" },
+        { address=0X22BA, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="exit doors open" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1A56, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: (XXXX0000) Hex" },
+        { address=0X1A58, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: (0000XXXX) Hex" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X202E, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=true, no_survey=false, desc="min, jumps to next level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X202E, type="u8", condition="eq", value=0XFF, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="max" },
+        { address=0X1FFC2, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="nothing" },
+        { address=0X1FFC2, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="exact impact frame" },
+      },
+    },
+  },
+}

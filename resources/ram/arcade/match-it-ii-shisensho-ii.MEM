@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Match It II | Shisensho II",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Tabletop"
+  },
+
+  rom = {
+    name = "match-it-ii-shisensho-ii",
+    file = "match-it-ii-shisensho-ii.zip",
+    hashes = {
+      { hash = "3a6413016641772c22def80107da7183", label = "shisen2.7z <Shisensho II>" },
+      { hash = "d4dc77d3d5e86e75c8d92fb668e70eb1", label = "matchit2.7z <Match It II>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1082F, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[BCD] Credits" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Berenstain Bears Camping Adventure",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-berenstain-bears-camping-adventure",
+    file = "the-berenstain-bears-camping-adventure.zip",
+    hashes = {
+      { hash = "9c60d0a0dc49a0e9f076b7e6ed922c2f", label = "Berenstain Bears' Camping Adventure, The (USA).md" },
+    }
+  },
+
+  events = {
+  },
+}

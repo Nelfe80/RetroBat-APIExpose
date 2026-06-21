@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Spyro: Attack of the Rhynocs",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "spyro-attack-of-the-rhynocs",
+    file = "spyro-attack-of-the-rhynocs.zip",
+    hashes = {
+      { hash = "36e7d6e276c0e4f56984a2f8491b9364", label = "Spyro Adventure (Europe) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "4a15b07b4dc292e9003c377c55372287", label = "Spyro - Attack of the Rhynocs (USA).gba" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X2FED, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Banana Savannah Items (Bit0 Glove, Bit1 Grapes, Bit2 Chili, Bit3 Heart, Bit4 Manual, Bit5 Ring," },
+        { address=0X2FEF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Moneybag's Mansion Items (Bit0 Money Tree, Bit1 Painting, Bit2 Dynamo, Bit3 Heart, Bit4 Pickaxe," },
+        { address=0X2FF0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Cheetah Spot Spa Items (Bit0 Crowbar, Bit1 Flower, Bit2 Health Bar, Bit3 Heart, Bit4 Brochure, B" },
+        { address=0X2FF2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rhynocs 'N Clocks (and some Ripto Chateau) Items (Bit0 Banana Powder, Bit1 Antenna, Bit2 Medal," },
+        { address=0X2FF3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ripto's Chateau Items (Bit0 and 1 Warp and Heart, Bit2 Gold Dust, Bit3 Red Dust) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4775, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy/Collect 0/10 progress for current world (either quest progress or visual representation," },
+        { address=0X477A, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy/Collect 0/10 progress for current world (either quest progress or visual representation," },
+      },
+    },
+  },
+}

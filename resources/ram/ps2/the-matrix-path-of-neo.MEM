@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "The Matrix: Path of Neo",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-matrix-path-of-neo",
+    file = "the-matrix-path-of-neo.zip",
+    hashes = {
+      { hash = "bfce78d916a5f16fa2e9a774e5f85852", label = "Matrix, The - Path of Neo (Europe) (En,Fr,De,Es,It)" },
+      { hash = "b5a1b32cbc7da81521741bbfed0d817f", label = "Matrix, The - Path of Neo (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X464E60, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 bit] Level ID" },
+      },
+    },
+  },
+}

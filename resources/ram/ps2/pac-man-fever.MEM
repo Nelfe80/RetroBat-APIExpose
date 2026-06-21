@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Pac-Man Fever",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "pac-man-fever",
+    file = "pac-man-fever.zip",
+    hashes = {
+      { hash = "15ed2463d89377b8ad0231dd8b3d90b9", label = "Pac-Man Fever (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X254BB4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame Score - Player 1 [32bit]" },
+        { address=0X254BB8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame Score - Player 2 [32bit]" },
+        { address=0X254BBC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame Score - Player 3 [32bit]" },
+        { address=0X254BC0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame Score - Player 4 [32bit]" },
+      },
+    },
+  },
+}

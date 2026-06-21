@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Solomon's Key",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Strategy, Puzzle-Game"
+  },
+
+  rom = {
+    name = "solomons-key",
+    file = "solomons-key.zip",
+    hashes = {
+      { hash = "fbbf30b1260fc9f0b837e52fe3d6ae12", label = "Solomon's Key (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0078, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Player is in control of Dana (0 in title & demo)" },
+        { address=0X0078, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is paused" },
+        { address=0X0078, type="u8", condition="bit_true", bit=2, mask=0X04, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Game may be unpaused (cooldown)" },
+        { address=0X007C, type="u8", condition="bit_true", bit=1, mask=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="level is currently active (0 on level title screen)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0078, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Collected constellation icon in this level" },
+        { address=0X007C, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level has not been cleared yet (0 on 'thank you' screen)" },
+        { address=0X007C, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="princess rescued" },
+        { address=0X007C, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="solomon's key opened" },
+        { address=0X0B04, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="closed door, 6=key, 7=open door" },
+        { address=0X0B04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levelmap (changes require redraw)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X007C, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="player has died at least once in current level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0DCF, type="u16le", condition="eq", value=0X0DCF, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0dd6: y pos, 0x0dd9: x pos" },
+        { address=0X0DE3, type="u16le", condition="eq", value=0X0DE3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0dea: y pos, 0x0ded: x pos" },
+        { address=0X0DF7, type="u16le", condition="eq", value=0X0DF7, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0dfe: y pos, 0x0e01: x pos" },
+        { address=0X0E0B, type="u16le", condition="eq", value=0X0E0B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0e12: y pos, 0x0e15: x pos" },
+        { address=0X0E1F, type="u16le", condition="eq", value=0X0E1F, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0e26: y pos, 0x0e29: x pos" },
+        { address=0X0E33, type="u16le", condition="eq", value=0X0E33, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0e3a: y pos, 0x0e3d: x pos" },
+        { address=0X0E47, type="u16le", condition="eq", value=0X0E47, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0e4e: y pos, 0x0e51: x pos" },
+        { address=0X0E5B, type="u16le", condition="eq", value=0X0E5B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0e76: y pos, 0x0e79: x pos" },
+        { address=0X0E6F, type="u16le", condition="eq", value=0X0E6F, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0e62: y pos, 0x0e65: x pos" },
+        { address=0X0E83, type="u16le", condition="eq", value=0X0E83, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0e8a: y pos, 0x0e8d: x pos" },
+        { address=0X0E97, type="u16le", condition="eq", value=0X0E97, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0e9e: y pos, 0x0ea1: x pos" },
+        { address=0X0EAB, type="u16le", condition="eq", value=0X0EAB, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0eb2: y pos, 0x0eb5: x pos" },
+        { address=0X0EBF, type="u16le", condition="eq", value=0X0EBF, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0ec6: y pos, 0x0ec9: x pos" },
+        { address=0X0ED3, type="u16le", condition="eq", value=0X0ED3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0eda: y pos, 0x0edd: x pos" },
+        { address=0X0EE7, type="u16le", condition="eq", value=0X0EE7, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0eee: y pos, 0x0ef1: x pos" },
+        { address=0X0EFB, type="u16le", condition="eq", value=0X0EFB, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0f02: y pos, 0x0f05: x pos" },
+        { address=0X0F0F, type="u16le", condition="eq", value=0X0F0F, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="id (16 bit), 0x0f16: y pos, 0x0f19: x pos" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0078, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Page of time collected" },
+      },
+    },
+  },
+}

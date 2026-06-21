@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Star Trek: Starfleet Academy",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Flight Simulator"
+  },
+
+  rom = {
+    name = "star-trek-starfleet-academy",
+    file = "star-trek-starfleet-academy.zip",
+    hashes = {
+      { hash = "7d33a268efb97562a9b25e3a2cbc65fd", label = "Star Trek - Starfleet Academy - Starship Bridge Simulator (Europe).sfc" },
+      { hash = "ee04e40432b2e60068eac344e790eea7", label = "Star Trek - Starfleet Academy - Starship Bridge Simulator (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0F06, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skill Level:" },
+        { address=0X0F12, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Academy level? (00=Freshman, 18=Sophomore, 2b=Junior, 3e=Senior)" },
+        { address=0X0F1C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Campaign Levels (Mission) Resets at each level of class." },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X7C86, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shields" },
+        { address=0X7D86, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Enemy Shield" },
+      },
+    },
+  },
+}

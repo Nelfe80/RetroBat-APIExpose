@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Duke Nukem",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "duke-nukem",
+    file = "duke-nukem.zip",
+    hashes = {
+      { hash = "b2d3713267c9e21b3dae3cb5f437fccd", label = "Duke Nukem (USA) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X81A0, type="u8", condition="eq", value=0X22, action="PAUSE_ON", no_log=false, no_survey=false, desc="pause menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X81A0, type="u8", condition="eq", value=0X50, action="NEW_LEVEL", no_log=false, no_survey=false, desc="cheat level select screen" },
+        { address=0X1006C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level/screen ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCEC1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Currently available lives increased" },
+        { address=0XCEC1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Currently available lives decreased" },
+      },
+      health = {
+        { address=0XCB2A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0XCB2A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0XCBC9, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Double damage left" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X952C, type="u24le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[24-bit] Currently Selected Weapon" },
+        { address=0X955F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Currently Selected Weapon Slot" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCEBB, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] Current score" },
+      },
+      collectibles = {
+        { address=0XCB38, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Current selected weapon ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCEC2, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility cheat toggle" },
+      },
+    },
+  },
+}

@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "The Blues Brothers",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-blues-brothers",
+    file = "the-blues-brothers.zip",
+    hashes = {
+      { hash = "5818b4ddc461070dbd12207d95f341d5", label = "Blues Brothers, The (Europe).sfc" },
+      { hash = "80eba5229ad4118906fbe1404fde5af8", label = "Blues Brothers, The (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X16000, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X062E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X10120, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Also level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11C0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Joliet Jake muscle?" },
+        { address=0X17F0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="16bit" },
+      },
+    },
+  },
+}

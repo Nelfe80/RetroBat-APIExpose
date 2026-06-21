@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Ultimate Fighting Championship",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "ultimate-fighting-championship",
+    file = "ultimate-fighting-championship.zip",
+    hashes = {
+      { hash = "8268ae026f73e834f52ee8291bb125b8", label = "Ultimate Fighting Championship (USA).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC2CD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Rounds" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC2DE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Timer before KO" },
+      },
+    },
+  },
+}

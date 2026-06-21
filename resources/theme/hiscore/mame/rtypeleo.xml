@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 -· 157600</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 HIRO  128400</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 SAKOS 110700</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 U.W.F 98600</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 KOUTA 84200</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FUMIN 76300</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 T.K.O 64200</text>
+		</text>
+	</view>
+</theme>

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Pizza Pop!",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "pizza-pop",
+    file = "pizza-pop.zip",
+    hashes = {
+      { hash = "0ba3d131e367a44bb1a6ff416869d4f7", label = "Pizza Pop! (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0485, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0x01 = Stage Cleared" },
+        { address=0X0493, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0491, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives? increased" },
+        { address=0X0491, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives? decreased" },
+      },
+      health = {
+        { address=0X0704, type="u8", condition="eq", value=0X08, action="HIT", no_log=false, no_survey=false, desc="damaged (sitting)" },
+        { address=0X0704, type="u8", condition="eq", value=0X09, action="HIT", no_log=false, no_survey=false, desc="damaged (lying down)" },
+        { address=0X0704, type="u8", condition="eq", value=0X0A, action="HIT", no_log=false, no_survey=false, desc="damaged (in air)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0704, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="jumping" },
+      },
+    },
+  },
+}

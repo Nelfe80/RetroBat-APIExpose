@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Planet Laika",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "planet-laika",
+    file = "planet-laika.zip",
+    hashes = {
+      { hash = "252d60ba88d4df72efa3d64a7a5f6cc3", label = "Planet Laika (Japan) (En) (v1.3) (Cargodin)" },
+    }
+  },
+
+  events = {
+  },
+}

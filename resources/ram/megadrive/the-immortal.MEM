@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "The Immortal",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "the-immortal",
+    file = "the-immortal.zip",
+    hashes = {
+      { hash = "469c2c852005972bbcd2b51fdf9d1220", label = "Immortal, The (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0002, type="u16be", condition="eq", value=0X350, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage completed" },
+        { address=0X0002, type="u16be", condition="eq", value=0X4C4, action="GAME_OVER", no_log=false, no_survey=false, desc="Ending cutscene" },
+        { address=0X1073, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="0x01 - Game Over" },
+        { address=0X962F, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0xff = demo mode" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0DD5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of inventory itens in FF Stage" },
+        { address=0X0DDC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of itens [Stage 4]" },
+        { address=0X0DE4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of items [body Stage 1]" },
+        { address=0X0DE7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of items in the chest [Stage 1]" },
+        { address=0X0DEB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of items in the Orc [Stage 1]" },
+        { address=0X1071, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit -> Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X109B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0X109B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+      },
+      health = {
+        { address=0X0C4E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="character's HP on the map decreased" },
+        { address=0X0C4E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="character's HP on the map increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0A1A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money counter variable increased" },
+        { address=0X0DE3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money from the ground [Stage 1] increased" },
+        { address=0X10A6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Enemy HP during the battle increased" },
+        { address=0X10A9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Character HP during the battle increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Disney Princess",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "disney-princess",
+    file = "disney-princess.zip",
+    hashes = {
+      { hash = "1cd1d918e2730ac739bf2bcf14373382", label = "Disney Principesse (Italy).gba" },
+      { hash = "282f4032daee65c2cbf421ece93e4a41", label = "Disney Princesas (Spain).gba" },
+      { hash = "434af1b315a2a337313ac82c3de078ff", label = "Disney Princess (USA, Europe).gba" },
+      { hash = "bbb91114b96a3b57bf40b15edfc12187", label = "Disney Princesse (France).gba" },
+      { hash = "f575c8c844ae2ffad9adc7f91c886d54", label = "Disneys Prinzessinnen (Germany).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1780, type="u8", condition="eq", value=0X05, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1780, type="u8", condition="eq", value=0X8B, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1780, type="u8", condition="eq", value=0X83, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear" },
+      },
+      stage = {
+        { address=0X188C, type="u8", condition="change", action="STAGE_SELECT", no_log=false, no_survey=false, desc="Special Stage gems caught [resets each princess]" },
+        { address=0X1896, type="u8", condition="change", action="STAGE_SELECT", no_log=false, no_survey=false, desc="Special stage gems finished [bits]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X189A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health decreased" },
+        { address=0X189A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health increased" },
+        { address=0X189C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health decreased" },
+        { address=0X189C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health increased" },
+        { address=0X6234, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dance health decreased" },
+        { address=0X6234, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dance health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1780, type="u8", condition="eq", value=0X88, action="TREASURE", no_log=false, no_survey=false, desc="Treasures Screen" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1856, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin count increased" },
+        { address=0X1858, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Snow White 1 best coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X18A0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss health [queen]" },
+        { address=0X18A2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss max health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X187C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="On/Off Switches for Bramble Blockages in Sleeping Beauty Chapter 2 (bits 0, 1, 2, 3, 4, 5, 6)" },
+        { address=0X187E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="On/Off Switches for Bramble Blockages in Sleeping Beauty Chapter 2 (bits 0, 1, 4, 5)" },
+        { address=0X187F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="On/Off Switches for Bramble Blockages in Sleeping Beauty Chapter 2 (bits 2, 3, 4, 5, 6)" },
+        { address=0X1D0A9, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="bit7=graphic for 1st blue thorn blockage in Sleeping Beauty Chapter 2" },
+      },
+    },
+  },
+}

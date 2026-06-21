@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! 5D's Tag Force 5",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "yu-gi-oh-5ds-tag-force-5",
+    file = "yu-gi-oh-5ds-tag-force-5.zip",
+    hashes = {
+      { hash = "215aaf1d78d5df14978e7dfa7d875a1c", label = "Yu-Gi-Oh! 5D's - Tag Force 5 (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

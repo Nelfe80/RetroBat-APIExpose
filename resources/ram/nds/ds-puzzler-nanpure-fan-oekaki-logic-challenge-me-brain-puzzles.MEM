@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "DS Puzzler: Nanpure Fan & Oekaki Logic | Challenge Me: Brain Puzzles",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ds-puzzler-nanpure-fan-oekaki-logic-challenge-me-brain-puzzles",
+    file = "ds-puzzler-nanpure-fan-oekaki-logic-challenge-me-brain-puzzles.zip",
+    hashes = {
+      { hash = "02486977e11aef0b7d74f9f46c57ca2f", label = "DS Puzzler - Nanpure Fan & Oekaki Logic (Japan).nds" },
+      { hash = "9b098574087d4a4c75dc161572849459", label = "Challenge Me - Brain Puzzles (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

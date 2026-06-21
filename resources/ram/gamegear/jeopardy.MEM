@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Jeopardy!",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "jeopardy",
+    file = "jeopardy.zip",
+    hashes = {
+      { hash = "6e87d0107228ae1b5c582f8595992152", label = "Jeopardy! (USA).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X005D, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X005D, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0085, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24-Bit] Player 1 Money increased" },
+        { address=0X0089, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24-Bit] Player 2 Money increased" },
+      },
+    },
+  },
+}

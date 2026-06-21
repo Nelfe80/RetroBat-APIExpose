@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Rugrats: Search for Reptar",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rugrats-search-for-reptar",
+    file = "rugrats-search-for-reptar.zip",
+    hashes = {
+      { hash = "00b93b848effbecf9c519ffec3bdf0e3", label = "Nickelodeon Rugrats - Search for Reptar (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FE454, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Screen Selection" },
+        { address=0X1FF15E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Connected to pausing the game (8-bit) ff when paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC56A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocks Hard Levels when == 0x14 (8-bit)" },
+        { address=0XC56AC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed (8-bit) [Level Beat]" },
+        { address=0XC56AD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed (8-bit) [Level Beat]" },
+        { address=0XC56B0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed (8-bit) [Level Beat - Visual Only]" },
+        { address=0XC56B1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed (8-bit) [Level Beat - Visual Only]" },
+        { address=0XC56B8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed (8-bit) [Puzzle Piece Awarded]" },
+        { address=0XC56B9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed (8-bit) [Puzzle Piece Awarded]" },
+        { address=0XC56C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Hub" },
+        { address=0XC56C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Grandpa's Teeth" },
+        { address=0XC56CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Incident on Aisle 7" },
+        { address=0XC56D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Voyages of Cynthia" },
+        { address=0XC56D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Visitors From Outer Space" },
+        { address=0XC56D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars (8-bit) Level_Toy Palace" },
+        { address=0XC56E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Mysterious Mr Friend" },
+        { address=0XC56E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Chuckie's Glasses" },
+        { address=0XC56EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Circus Angelicus" },
+        { address=0XC56F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Let There Be Light" },
+        { address=0XC56F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars Bonus, Level_Cookie Race (Bits 4-7)" },
+        { address=0XC56FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Mirrorland" },
+        { address=0XC5700, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Training" },
+        { address=0XC5707, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars Bonus, Level_Gold Rush (Bits 4-7)" },
+        { address=0XC570B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars Bonus, Level_Egg Hunt (Bits 4-7)" },
+        { address=0XC5710, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_No More Cookies" },
+        { address=0XC5713, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars Bonus, Level_No More Cookies (Bits 5-7)" },
+        { address=0XC5714, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Touchdown Tommy" },
+        { address=0XC5717, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars Bonus, Level_Touchdown Tommy (Bits 5-7)" },
+        { address=0XC571C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 5 (Bit 0)" },
+        { address=0XC5723, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 3 Hole-in-one (Bit 7)" },
+        { address=0XC5727, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 1 Hole-in-one (Bit 7)" },
+        { address=0XC5728, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 7 (Bit 0)" },
+        { address=0XC572F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 9 Hole-in-one (Bit 7)" },
+        { address=0XC5733, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 2 Hole-in-one (Bit 7)" },
+        { address=0XC5734, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 4 (Bit 0)" },
+        { address=0XC573B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 6 Hole-in-one (Bit 7)" },
+        { address=0XC573C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 8-1 (Bits 0-7)" },
+        { address=0XC573D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reptar Bars, Level_Ice Cream Mt, Hole 8-2 (Bits 0-2)" },
+        { address=0XEE737, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Golden Egg Collected (Bit 1) Only in level Egg Hunt." },
+        { address=0XF3000, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Larry & Steve HP, Level_Incident on Aisle 7" },
+        { address=0XF43C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chuckie's Health (8-bit) Level: Grandpa's Teeth [varies]" },
+        { address=0XF5648, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goose HP, Level Grandpa's Teeth, Max fa Min 00" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XE2CEC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health (8-bit) Max ff decreased" },
+        { address=0XE2CEC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health (8-bit) Max ff increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC569A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Levels Beaten Counter (8-bit) excludes Bonuses & Extras increased" },
+        { address=0XE2CF1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Items (Coins in Gold Rush) (Eggs in Egg Hunt) (Balloons in Mirrorland) increased" },
+        { address=0XF2FC7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Nickel Collected (Bit 1) Only in level Gold Rush. increased" },
+        { address=0XFDA84, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Count, Level_Gold Rush (Visual?) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC3E99, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (8-bit) Pauses in menus & cutscenes" },
+        { address=0X1FF170, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Pause Screen, Reptar Bar Counter" },
+      },
+    },
+  },
+}

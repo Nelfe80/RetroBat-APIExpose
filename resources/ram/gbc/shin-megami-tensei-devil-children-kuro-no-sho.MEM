@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Shin Megami Tensei Devil Children: Kuro no Sho",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-devil-children-kuro-no-sho",
+    file = "shin-megami-tensei-devil-children-kuro-no-sho.zip",
+    hashes = {
+      { hash = "158691457cb7365cafbd0b7bb230fadf", label = "Shin Megami Tensei Devil Children - Kuro no Sho (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "f6c1fbb84d256db9d668c8c5a39c2caa", label = "Shin Megami Tensei Devil Children - Kuro no Sho (Japan) (En) (v1.2) (Specialagentape).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCC66, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8bits] Number of demons gotten" },
+        { address=0XCCB5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8bits] Number of demons in the party" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC350, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 (min)" },
+        { address=0XC350, type="u8", condition="eq", value=0X63, action="NEW_LEVEL", no_log=false, no_survey=false, desc="99 (max)" },
+        { address=0XC350, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bits] Kull level" },
+        { address=0XC38C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bits] Party 1 level" },
+        { address=0XCCB1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bits] Setsuna level" },
+        { address=0XCCC3, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice land" },
+        { address=0XCCC3, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Marble Land" },
+        { address=0XCCC3, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sand Land" },
+        { address=0XCCC3, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Forest Land" },
+        { address=0XCCC3, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire Land" },
+        { address=0XCCC3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 bits] Primary zone value" },
+        { address=0XCCC4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bits] Secondary zone value" },
+      },
+      zone = {
+        { address=0XCCC3, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Above World" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC355, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[24bits] Kull HP decreased" },
+        { address=0XC355, type="u24le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[24bits] Kull HP increased" },
+        { address=0XC38D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bits] Party 1 max HP decreased" },
+        { address=0XC38D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bits] Party 1 max HP increased" },
+        { address=0XCDF0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bits] Enemy 1 HP decreased" },
+        { address=0XCDF0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bits] Enemy 1 HP increased" },
+        { address=0XCE0D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bits] Enemy 2 HP decreased" },
+        { address=0XCE0D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bits] Enemy 2 HP increased" },
+        { address=0XCE2C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bits] Ennemy 3 HP decreased" },
+        { address=0XCE2C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bits] Ennemy 3 HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC2A6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bits] Current demon on focus (for recruitment during story) increased" },
+        { address=0XCCD7, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24bits] Money increased" },
+      },
+    },
+  },
+}

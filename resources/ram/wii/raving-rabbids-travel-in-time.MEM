@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Raving Rabbids: Travel in Time",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Board Game, Platform, Shooter"
+  },
+
+  rom = {
+    name = "raving-rabbids-travel-in-time",
+    file = "raving-rabbids-travel-in-time.zip",
+    hashes = {
+      { hash = "ffe7242d09eb8a4369b79c34c772e144", label = "Raving Rabbids - Travel in Time (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

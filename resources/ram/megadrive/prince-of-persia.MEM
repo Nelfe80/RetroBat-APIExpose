@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Prince of Persia",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "prince-of-persia",
+    file = "prince-of-persia.zip",
+    hashes = {
+      { hash = "a942e336b5d2e9f962b289fc08b890c6", label = "Prince of Persia (USA).md" },
+      { hash = "c26686b07c35bfe08603deffa6a7abce", label = "Prince of Persia (USA) (Ru) (Shedevr).md" },
+      { hash = "f38cc831257d5e922b7f3c6e4fcb30d0", label = "Prince of Persia (USA) (Ru).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0F44, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Intro/Demo Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0C86, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Guards in level" },
+        { address=0X0D06, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Guard dead on the ground = FFFF" },
+        { address=0X0F4A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete (01)" },
+        { address=0X3DDC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Potions in level" },
+        { address=0X3DDE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Potion" },
+        { address=0X3DE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Potion" },
+        { address=0X3DF2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Potion" },
+        { address=0X3DFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Potion" },
+        { address=0X3E06, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Potion" },
+        { address=0X3E10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Potion" },
+        { address=0X3E1A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Potion" },
+        { address=0X3E24, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Potion" },
+      },
+      stage = {
+        { address=0X0F48, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0D18, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy life increased" },
+        { address=0X0D18, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy life decreased" },
+        { address=0X1EB2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Maximum life increased" },
+        { address=0X1EB2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Maximum life decreased" },
+        { address=0X1EB4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current life increased" },
+        { address=0X1EB4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current life decreased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1EC0, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="jump up" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0D5E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Remaining" },
+      },
+    },
+  },
+}

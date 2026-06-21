@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Sega Ages: Memorial Selection Vol. 1",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "sega-ages-memorial-selection-vol-1",
+    file = "sega-ages-memorial-selection-vol-1.zip",
+    hashes = {
+      { hash = "7740a46c74bc0e401c3f4c3388e33452", label = "Sega Ages - Memorial Selection Vol. 1 (Japan)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X14B210, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Head-On Lives [8bit] increased" },
+        { address=0X14B210, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Head-On Lives [8bit] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X14B242, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Head-On Score" },
+      },
+    },
+  },
+}

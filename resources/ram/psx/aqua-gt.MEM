@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Aqua GT",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "aqua-gt",
+    file = "aqua-gt.zip",
+    hashes = {
+      { hash = "a4152d59ce500ea75d01b9b2da282463", label = "Aqua GT (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+  },
+}

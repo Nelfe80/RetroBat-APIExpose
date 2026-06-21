@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Virtual Hydlide",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "virtual-hydlide",
+    file = "virtual-hydlide.zip",
+    hashes = {
+      { hash = "6db17f6e1ee53342bb01343db35e2878", label = "Virtual Hydlide (USA) (P4H)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X104C56, type="u8", condition="eq", value=0X0, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X104C56, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="Load Save Slot #1" },
+        { address=0X104C56, type="u8", condition="eq", value=0X2, action="GAME_OVER", no_log=false, no_survey=false, desc="Load Save Slot #2" },
+        { address=0X104C56, type="u8", condition="eq", value=0X3, action="GAME_OVER", no_log=false, no_survey=false, desc="Load Save Slot #3" },
+        { address=0X10B052, type="u16le", condition="eq", value=0X0AE0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen*" },
+        { address=0X10B052, type="u16le", condition="eq", value=0XE5BC, action="GAME_OVER", no_log=false, no_survey=false, desc="Intro Cutscene/Game Over*" },
+        { address=0X19E11F, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen Active" },
+        { address=0X19E11F, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Now Loading" },
+        { address=0X19E563, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Not Game Over" },
+        { address=0X19E563, type="u8", condition="eq", value=0X1, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Load Game Countdown" },
+        { address=0X19E563, type="u8", condition="eq", value=0X2, action="GAME_OVER", no_log=false, no_survey=false, desc="Enter Name for Scoreboard" },
+        { address=0X19E563, type="u8", condition="eq", value=0X3, action="GAME_OVER", no_log=false, no_survey=false, desc="Show Hi-Score Rankings" },
+        { address=0X1A3D3C, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X105044, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #2]" },
+        { address=0X105045, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #1]" },
+        { address=0X105046, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #4]" },
+        { address=0X105047, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #3]" },
+        { address=0X105048, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #6]" },
+        { address=0X105049, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #5]" },
+        { address=0X10504A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #8]" },
+        { address=0X10504B, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #7]" },
+        { address=0X10504C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #10]" },
+        { address=0X10504D, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Name [Char #9]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X106118, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Vampire Dead / Secret Hallway" },
+        { address=0X106118, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mage Dead / Door Open" },
+      },
+      health = {
+        { address=0X154E22, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Vampire Mansion] Current Health [16 bit] decreased" },
+        { address=0X154E22, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Vampire Mansion] Current Health [16 bit] increased" },
+        { address=0X154E86, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Vampire Mansion] Vampire Health [16 bit] (Max 800) decreased" },
+        { address=0X154E86, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Vampire Mansion] Vampire Health [16 bit] (Max 800) increased" },
+        { address=0X15546A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Fortress of Varalys] Current Health [16 bit] decreased" },
+        { address=0X15546A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Fortress of Varalys] Current Health [16 bit] increased" },
+        { address=0X155EFA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Volcanic Cave] Current Health [16 bit] decreased" },
+        { address=0X155EFA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Volcanic Cave] Current Health [16 bit] increased" },
+        { address=0X158D26, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Field] Current Health [16 bit] decreased" },
+        { address=0X158D26, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Field] Current Health [16 bit] increased" },
+        { address=0X15946A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Lost Castle] Current Health [16 bit] decreased" },
+        { address=0X15946A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Lost Castle] Current Health [16 bit] increased" },
+        { address=0X15BE46, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Sealed Dungeon] Current Health [16 bit] decreased" },
+        { address=0X15BE46, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Sealed Dungeon] Current Health [16 bit] increased" },
+        { address=0X15BEAA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Sealed Dungeon] Evil Mage Health [16 bit] (Max 500) decreased" },
+        { address=0X15BEAA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Sealed Dungeon] Evil Mage Health [16 bit] (Max 500) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X10504E, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="unequipped" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0007, type="u8", condition="eq", value=0X1F, action="SCORE_STATE", no_log=false, no_survey=false, desc="Watching a Cutscene / Score Screen?" },
+        { address=0X10502C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score [32 bit, two 16-bit LE/BE mixed format]" },
+        { address=0X10A580, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score #1 Score [32 bit, two 16-bit LE/BE mixed format]" },
+        { address=0X10A584, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score #1 Leaderboard Name (32 bytes)" },
+        { address=0X10A5A4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score #1 World Name (10 bytes)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1554CE, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Fortress of Varalys] Bosses' Health [16 bit]" },
+        { address=0X155596, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Fortress of Varalys] Bosses' Health Alt [16 bit]" },
+        { address=0X1594CE, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Lost Castle] Eel Boss Health [16 bit] (Max 1000)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X105051, type="u8", condition="eq", value=0XFF, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="unequipped" },
+      },
+    },
+  },
+}

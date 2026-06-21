@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Zoop",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "zoop",
+    file = "zoop.zip",
+    hashes = {
+      { hash = "c4c9fe0959ee29953cf23c095981ca81", label = "Zoop (USA).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XAF3C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X987E, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 01" },
+        { address=0X987E, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 09" },
+        { address=0X987E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting Stage." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X95E8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 1/2." },
+        { address=0X95EA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 2/2." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9610, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block target." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X91C0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Stage." },
+      },
+    },
+  },
+}

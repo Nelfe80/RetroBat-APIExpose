@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Felony 11-79",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "felony-11-79",
+    file = "felony-11-79.zip",
+    hashes = {
+      { hash = "b32cb466d7def8fdb9ca1384864ff46f", label = "Felony 11-79 (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9A738, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="levels" },
+        { address=0X9AD24, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Toy Car collected in level 3" },
+        { address=0XB2086, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level flag" },
+        { address=0XB54E0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16bit) Top highway speed for level 2" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9AE08, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) Total amount of damage" },
+        { address=0X9AE64, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Car damage bar" },
+        { address=0X9AEF8, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) amount of damage submitted" },
+        { address=0XB5520, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) First Downtown damage leaderboard" },
+        { address=0XB5530, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) Second Downtown damage leaderboard" },
+        { address=0XB5540, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) Third Downtown damage leaderboard" },
+        { address=0XB5550, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) First Seaside damage leaderboard" },
+        { address=0XB5560, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) Second Seaside damage leaderboard" },
+        { address=0XB5570, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) Third Seaside damage leaderboard" },
+        { address=0XB5580, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) First Paris damage leaderboard" },
+        { address=0XB5590, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) Second Paris damage leaderboard" },
+        { address=0XB55A0, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(32bit) Third Paris damage leaderboard" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA3414, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32bit) Total time" },
+        { address=0XA3418, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32bit) Milliseconds for the total time" },
+        { address=0XB5ACC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32bit) Downtown time leaderboard" },
+        { address=0XB707E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16bit) Timer" },
+      },
+    },
+  },
+}

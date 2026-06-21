@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Frogger Beyond",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "frogger-beyond",
+    file = "frogger-beyond.zip",
+    hashes = {
+      { hash = "e0294bd28ea5dd0e516c124e01e133e6", label = "Frogger Beyond (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

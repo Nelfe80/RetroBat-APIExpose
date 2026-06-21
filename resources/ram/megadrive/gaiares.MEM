@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Gaiares",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "gaiares",
+    file = "gaiares.zip",
+    hashes = {
+      { hash = "3429d4f237a3280670164164c1db00a3", label = "Gaiares (Japan, USA) (Pt) (Orakio Rob G+Tradu Games).md" },
+      { hash = "47e140ae1e70984e6cd638e6e8f8485f", label = "Gaiares (Japan, USA) (En).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF594, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="1 - On" },
+      },
+    },
+  },
+}

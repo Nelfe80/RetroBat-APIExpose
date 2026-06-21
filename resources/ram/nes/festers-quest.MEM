@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Fester's Quest",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "festers-quest",
+    file = "festers-quest.zip",
+    hashes = {
+      { hash = "5de24cd5374ba0937bd8a8152eaa669d", label = "Fester's Quest (Europe).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X04E9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (8-bit) decreased" },
+        { address=0X04E9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (8-bit) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0162, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

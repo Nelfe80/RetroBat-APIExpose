@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Ridge Racer 2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ridge-racer-2",
+    file = "ridge-racer-2.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA523, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X08FB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Track" },
+      },
+    },
+  },
+}

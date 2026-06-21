@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "I Must Run!",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "i-must-run",
+    file = "i-must-run.zip",
+    hashes = {
+      { hash = "35974626b0bc51b84a80d3f3d5a0de5d", label = "I Must Run! (USA) (minis) (PSN)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA62750, type="u8", condition="eq", value=0X2, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0XA62750, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="not dead yet / In-game" },
+      },
+    },
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Nankuro",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nankuro",
+    file = "nankuro.zip",
+    hashes = {
+      { hash = "797d3e3495501aac94a2f8a1a9fb52a9", label = "SuperLite 1500 Series - NumCro (Japan)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XBDF48, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Puzzle Timer Active (Easy)" },
+        { address=0XBE748, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Puzzle Timer Active (Other Difficulties)" },
+      },
+    },
+  },
+}

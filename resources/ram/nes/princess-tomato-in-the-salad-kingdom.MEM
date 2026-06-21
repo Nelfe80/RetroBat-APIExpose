@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Princess Tomato in the Salad Kingdom",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "princess-tomato-in-the-salad-kingdom",
+    file = "princess-tomato-in-the-salad-kingdom.zip",
+    hashes = {
+      { hash = "cfe4582eea2204633c0cb4f0f11d84b8", label = "Princess Tomato in the Salad Kingdom (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

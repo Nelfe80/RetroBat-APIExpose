@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "Inazuma Eleven 2: Firestorm",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Sports"
+  },
+
+  rom = {
+    name = "inazuma-eleven-2-firestorm",
+    file = "inazuma-eleven-2-firestorm.zip",
+    hashes = {
+      { hash = "17f9b5d58694f5f91cd9b4be845fa9ef", label = "Inazuma Eleven 2 - Firestorm (Europe).nds" },
+      { hash = "403a456458909d96a13251eec5758408", label = "Inazuma Eleven 2 - Tempesta di Fuoco (Italy).nds" },
+      { hash = "aa919f904981e9906c855cc86f8a357b", label = "Inazuma Eleven 2 - Tormenta de Fuego (Spain).nds" },
+      { hash = "d2f26f7dea4c725957c07eb450c9f2a3", label = "Inazuma Eleven 2 - Tempete de Feu (France).nds" },
+      { hash = "5560ecddd3a67d03b0fd5c028e36cb68", label = "Inazuma Eleven 2 - Feuersturm (Germany).nds" },
+    }
+  },
+
+  events = {
+  },
+}

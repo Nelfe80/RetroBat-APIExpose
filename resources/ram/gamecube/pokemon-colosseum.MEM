@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Colosseum",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-colosseum",
+    file = "pokemon-colosseum.zip",
+    hashes = {
+      { hash = "d38a3d49467f2271f8106ba340fc5b56", label = "Pokemon Colosseum (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

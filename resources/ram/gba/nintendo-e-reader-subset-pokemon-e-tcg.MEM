@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Nintendo e-Reader [Subset - Pokémon-e TCG]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nintendo-e-reader-subset-pokemon-e-tcg",
+    file = "nintendo-e-reader-subset-pokemon-e-tcg.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X314D0, type="u16le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Scan - Game Title [16 Bytes; ASCII]" },
+      },
+      events = {
+        { address=0XCF1E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="{Rolling Voltorb} Rock Combo" },
+        { address=0XF4DB, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="{Punching Bags} Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9227, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{Flying Journey} World Travel Goal" },
+      },
+      zone = {
+        { address=0X9226, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="{Flying Journey} Current World Travels" },
+      },
+      stage = {
+        { address=0XAA67, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="{Watch Out!} Stage [16bit]" },
+        { address=0XAC8F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="{Ride the Tuft} Stage" },
+        { address=0XDCAB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="{Sneak and Snatch} Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9F85, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="{Night Flight} Lives increased" },
+        { address=0X9F85, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{Night Flight} Lives decreased" },
+        { address=0XC535, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="{Follow Hoothoot} Lives increased" },
+        { address=0XC535, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{Follow Hoothoot} Lives decreased" },
+      },
+      health = {
+        { address=0X2F80D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pokédex Viewer - HP decreased" },
+        { address=0X2F80D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pokédex Viewer - HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X811A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Flower Power} Highscore [16bit]" },
+        { address=0X8124, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Dream Eater} Highscore [16bit]" },
+        { address=0X8126, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Flower Power} Score [16bit]" },
+        { address=0X8130, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Dream Eater} Current Score [16bit]" },
+        { address=0X8154, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Follow Hoothoot} Score [16bit]" },
+        { address=0X8168, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Jumping Doduo} Highscore [16bit]" },
+        { address=0X8174, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Jumping Doduo} Score [16bit]" },
+        { address=0X81F9, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Harvest Time} Score [16bit]" },
+        { address=0X9214, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Ride the Tuft} Score [16bit]" },
+        { address=0X9F1A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Night Flight} Score [16bit]" },
+        { address=0XAF9F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Ditto Leapfrog} Score [16bit]" },
+        { address=0XB3F9, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Mighty Tyranitar} Highscore [16bit]" },
+        { address=0XB51E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Kingler's Day} Best Score [16bit]" },
+        { address=0XB52A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Kingler's Day} Points [16bit]" },
+        { address=0XB74D, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Rolling Voltorb} Highscore [16bit]" },
+        { address=0XB759, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Rolling Voltorb} Score [16bit]" },
+        { address=0XBFEF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Berry Tree} Score [16bit]" },
+        { address=0XC075, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Berry Tree} Highscore [16bit]" },
+        { address=0XC536, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Watch Out!} Score [16bit]" },
+        { address=0XC64B, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Sneak and Snatch} Highscore [16bit]" },
+        { address=0XC659, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Leek Game} Score [16bit]" },
+        { address=0XD1A0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Mighty Tyranitar} Score [16bit]" },
+        { address=0XDCA9, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Sneak and Snatch} Score [16bit]" },
+        { address=0XF4AA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Punching Bags} Highscore [16bit]" },
+        { address=0XF4D3, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Punching Bags} Score [16bit]" },
+        { address=0X1A314, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{Harvest Time} Highscore [16bit]" },
+      },
+      collectibles = {
+        { address=0X8D66, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{Coin Flipper 1} Total Throws [16bit] increased" },
+        { address=0X8D68, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{Coin Flipper 1} Total Heads [16bit] increased" },
+        { address=0X8EF6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{Coin Flipper 2} Total Throws [16bit] increased" },
+        { address=0X8EF8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{Coin Flipper 2} Total Heads [16bit] increased" },
+        { address=0X8EFA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{Coin Flipper 2} Heads in a Row increased" },
+        { address=0X8F04, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{Coin Flipper 2} Current Throw increased" },
+      },
+    },
+  },
+}

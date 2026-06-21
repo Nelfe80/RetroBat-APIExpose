@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Puzzle & Action: Tant-R",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-action-tant-r",
+    file = "puzzle-action-tant-r.zip",
+    hashes = {
+      { hash = "dcec1000aea3882b218b0cc0aed5a5d8", label = "Puzzle & Action - Tanto-R (Japan).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1215, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Remaning [8bit]" },
+        { address=0X123D, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="1 Second Remaining" },
+        { address=0X131C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused Check (Mini-Games) [8bit]" },
+        { address=0X133D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode Check [8bit]" },
+        { address=0X1850, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused (Car Chase) [8bit]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1212, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rakushou (Easiest)" },
+        { address=0X1212, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Futsuu (Normal)" },
+        { address=0X1212, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kibishii (Hard)" },
+        { address=0X1212, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level (8bit)" },
+        { address=0X1214, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Car Chase" },
+        { address=0X1214, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Indicator" },
+        { address=0X1E95, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mini-Game Cleared Check [Bit1]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1216, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life (Hearts Left) [8bit] increased" },
+        { address=0X1216, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life (Hearts Left) [8bit] decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X18D7, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Driving" },
+        { address=0X18D7, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Caught" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X18CF, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1218, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quota Counter (8bit)" },
+        { address=0X123D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Continue Timer [8bit]" },
+        { address=0X1247, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mini-Game Timer (8bit)" },
+        { address=0X1261, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Taken in Seconds for Mini-Game Completion [8bit]" },
+        { address=0X184B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Mini-Games - Stopwatch Timer - Seconds" },
+        { address=0X184D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Mini-Games - Stopwatch Timer - Milliseconds" },
+        { address=0X1CC7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sega Splash Screen Fade In/Out Timer [8bit]" },
+      },
+    },
+  },
+}

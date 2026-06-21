@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Meitantei Conan: Kigantou Hihou Densetsu",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "meitantei-conan-kigantou-hihou-densetsu",
+    file = "meitantei-conan-kigantou-hihou-densetsu.zip",
+    hashes = {
+      { hash = "09f6430f0847ec793ff95057fdacac1d", label = "Detective Conan - Legend of the Treasure of Strange Rock Island (Japan) (En) (v0.04) (mz).gbc" },
+      { hash = "f5325eaf1ecbf7cd6e1e561a3b5d77f7", label = "Meitantei Conan - Kigantou Hihou Densetsu (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XC6FE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sleuth Score" },
+      },
+    },
+  },
+}

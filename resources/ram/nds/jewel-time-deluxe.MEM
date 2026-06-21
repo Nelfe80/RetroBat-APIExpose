@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Jewel Time Deluxe",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "jewel-time-deluxe",
+    file = "jewel-time-deluxe.zip",
+    hashes = {
+      { hash = "d112abeaf357b6cc9b16551b6be29cbf", label = "Jewel Time Deluxe (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X35E5E8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32bit]" },
+      },
+    },
+  },
+}

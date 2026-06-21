@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "X-Men: Next Dimension",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "x-men-next-dimension",
+    file = "x-men-next-dimension.zip",
+    hashes = {
+      { hash = "c18d1255c27f2a5ab7bf1424d94eb54d", label = "X-Men - Next Dimension (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X276A14, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-Bit Boolean] Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2B1DA4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rounds Completed in Current Fight" },
+        { address=0X2E959C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1: Rounds Won" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X26EEF8, type="u32le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X26EEF8, type="u32le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X2E8F8C, type="u16le", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lady Deathstrike" },
+      },
+      health = {
+        { address=0X2E8FFC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X2E8FFC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X2EB98C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="CPU Health decreased" },
+        { address=0X2EB98C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="CPU Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2F156C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Survival High Score: Cyclops" },
+        { address=0X2F1570, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Survival High Score: Wolverine" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2B1B10, type="u32le", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight" },
+      },
+    },
+  },
+}

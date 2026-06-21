@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Kidou Senshi Gundam Part 1: Gundam Daichi ni Tatsu",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kidou-senshi-gundam-part-1-gundam-daichi-ni-tatsu",
+    file = "kidou-senshi-gundam-part-1-gundam-daichi-ni-tatsu.zip",
+    hashes = {
+      { hash = "f8e1ac1c9e92814602a1b516e9adcf0c", label = "Kidou Senshi Gundam Part 1 - Gundam Taichi ni Tatsu (Game disk).d88" },
+      { hash = "89c0682bcdf2c80a3cbb829d9a258960", label = "Kidou Senshi Gundam Part 1 - Gundam Taichi ni Tatsu (PCM disk).d88" },
+    }
+  },
+
+  events = {
+  },
+}

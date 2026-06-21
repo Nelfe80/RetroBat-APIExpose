@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Shaq-Fu",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "shaq-fu",
+    file = "shaq-fu.zip",
+    hashes = {
+      { hash = "9d4d9a346158fcda7221c853b13bd19d", label = "Shaq Fu (USA) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD052, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Won" },
+        { address=0XD053, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Lost" },
+        { address=0XD054, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round n????" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD08E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Player 1 decreased" },
+        { address=0XD08E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Player 1 increased" },
+        { address=0XD08F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Player 2 decreased" },
+        { address=0XD08F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Player 2 increased" },
+        { address=0XD0A6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Player 2 decreased" },
+        { address=0XD0A6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Player 2 increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD09A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Tenth" },
+      },
+    },
+  },
+}

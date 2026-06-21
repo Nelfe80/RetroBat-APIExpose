@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 WMS 511110</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 VID 223450</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 KID 223350</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 DRJ 222220</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 LED 218570</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 JRS 217500</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 KLR 216100</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 DJW 212000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 PGD 188900</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 JER 127550</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 ALI 102200</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 MLG 91960</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 NHD 91950</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 KJF 90990</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 MRS 86880</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 SSR 85770</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 UNA 84310</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 W R 83550</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 DON 82800</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 VIV 82800</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 GWW 81050</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 CRB 80550</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 MDR 75650</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 BAC 72560</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 JFB 70700</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 MPT 59600</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 SUE 55200</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 MOM 44800</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 DAD 44790</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 SFD 44780</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 AKD 44770</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 RKM 33300</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 CNS 32700</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 TIM 31200</text>
+		</text>
+	</view>
+</theme>

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Ford Racing 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "ford-racing-2",
+    file = "ford-racing-2.zip",
+    hashes = {
+      { hash = "010dd8d54a4b422f313b4f01be9c656b", label = "Ford Racing 2 (USA)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X36DD0C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Timer" },
+        { address=0X48E9F4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Time Trial Time" },
+      },
+    },
+  },
+}

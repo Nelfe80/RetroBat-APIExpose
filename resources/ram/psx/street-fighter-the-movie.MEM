@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Street Fighter: The Movie",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "street-fighter-the-movie",
+    file = "street-fighter-the-movie.zip",
+    hashes = {
+      { hash = "9bfaf58c8693edd1b39527035b0e2177", label = "Street Fighter - The Movie (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

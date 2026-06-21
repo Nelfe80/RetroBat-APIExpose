@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Jim Henson's Muppets",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "jim-hensons-muppets",
+    file = "jim-hensons-muppets.zip",
+    hashes = {
+      { hash = "3a70f79e33ed4ea546d0ba41a7f2ef25", label = "Jim Henson's Muppets (USA).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XDAAB, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed Stage 2 in Current Time Period" },
+        { address=0XDAAB, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed Stage 3 in Current Time Period" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDABC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0XDABC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+      health = {
+        { address=0XDAC1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health decreased" },
+        { address=0XDAC1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDAA9, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Current Time Period:" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Wall-E",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "wall-e",
+    file = "wall-e.zip",
+    hashes = {
+      { hash = "314d3a3dd01dd4abcb74d90637e33348", label = "Disney-Pixar WALL-E (USA).iso" },
+    }
+  },
+
+  events = {
+  },
+}

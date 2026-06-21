@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Garfield Labyrinth",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "garfield-labyrinth",
+    file = "garfield-labyrinth.zip",
+    hashes = {
+      { hash = "49bcb33470df757847eef5e170c9b6bd", label = "Garfield Labyrinth (Europe).gb" },
+      { hash = "744dc7e4b03d16b8b6dd35a697c77892", label = "Mickey Mouse IV - Mahou no Labyrinth (Japan).gb" },
+      { hash = "bbca91d6bc19cda45c706046b6e854e6", label = "Real Ghostbusters, The (USA).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC169, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="02 - When on Stage Clear screen" },
+      },
+      stage = {
+        { address=0XC6D0, type="u8", condition="eq", value=0X2B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="game end animation" },
+        { address=0XC6D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage value" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC33E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0XC33E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC406, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit7 0x0 -> 0x1 when clearing a stage increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC6D2, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="invincibility timer" },
+      },
+    },
+  },
+}

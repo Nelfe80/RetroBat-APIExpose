@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Doctor Who and the Mines of Terror",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Adventure, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "doctor-who-and-the-mines-of-terror",
+    file = "doctor-who-and-the-mines-of-terror.zip",
+    hashes = {
+      { hash = "53072d49672e0da90432f0983dbc6210", label = "Doctor Who and the Mines of Terror (1986)(Micro Power).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8283, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Highest Level (where flask and memory unit are)" },
+        { address=0X8283, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mine Surface Level (where packing case is)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X822C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Remaining increased" },
+        { address=0X822C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Remaining decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Sega Rally Championship",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "sega-rally-championship",
+    file = "sega-rally-championship.zip",
+    hashes = {
+      { hash = "0cd9e555b4f26953e3fc4550dde35d04", label = "Sega Rally Championship (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X30FD44, type="u16le", condition="eq", value=0X2, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode" },
+        { address=0X30FD50, type="u16le", condition="eq", value=0X3, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In-game (Championship) / Stage Select (Practice)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E04FD, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X1E04FD, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Short" },
+        { address=0X1E04FD, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Long" },
+        { address=0X1E04FD, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Longest" },
+        { address=0X1E04FD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round length" },
+      },
+      stage = {
+        { address=0X310338, type="u16le", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Desert" },
+        { address=0X310338, type="u16le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Forest" },
+        { address=0X310338, type="u16le", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mountains" },
+        { address=0X310338, type="u16le", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lakeside" },
+        { address=0X310338, type="u16le", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(In Game Select Screen)" },
+        { address=0X310338, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X30FD4C, type="u16le", condition="eq", value=0XB, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Out/Car Select" },
+        { address=0X30FD4C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ternary game state" },
+        { address=0X30FD70, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap Counter (0-based)" },
+      },
+    },
+  },
+}

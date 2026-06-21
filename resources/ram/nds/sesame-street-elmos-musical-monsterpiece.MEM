@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Sesame Street: Elmo's Musical Monsterpiece",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sesame-street-elmos-musical-monsterpiece",
+    file = "sesame-street-elmos-musical-monsterpiece.zip",
+    hashes = {
+      { hash = "6e28c96d93cf92e7378501c2282dae98", label = "Sesame Street - Elmo's Musical Monsterpiece (USA) (En,Es).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X24027C, type="u16le", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X24027C, type="u16le", condition="eq", value=0X13, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2400C2, type="u24le", condition="eq", value=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Ring Quack" },
+        { address=0X24027C, type="u16le", condition="eq", value=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Ring Quack" },
+        { address=0X24027C, type="u16le", condition="eq", value=0X32, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Ring Quack - Cutscene" },
+      },
+    },
+  },
+}

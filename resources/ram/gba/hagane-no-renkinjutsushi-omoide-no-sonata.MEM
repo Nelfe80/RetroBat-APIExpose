@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Hagane no Renkinjutsushi: Omoide no Sonata",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "hagane-no-renkinjutsushi-omoide-no-sonata",
+    file = "hagane-no-renkinjutsushi-omoide-no-sonata.zip",
+    hashes = {
+      { hash = "ad77704e57f00d568f0ce1809936ab62", label = "Hagane no Renkinjutsushi - Omoide no Soumeikyoku (Japan) (En) (v1.0) (Iredc).gba" },
+      { hash = "ef9c063ab316ca610dd5a6c5c35fca7f", label = "Hagane no Renkinjutsushi - Omoide no Sonata (Japan).gba" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X3958, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold (East City)" },
+        { address=0X395E, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold (Nelvo)" },
+        { address=0X395F, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold (Cruz Ruins)" },
+        { address=0X3963, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold (Central City)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3953, type="u8", condition="bit_true", bit=6, mask=0X40, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Alchemy unlock the door (Fagott's Mansion)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Pokémon Platinum Version",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-platinum-version",
+    file = "pokemon-platinum-version.zip",
+    hashes = {
+      { hash = "361e825aa24fc471a317c510130bf4c3", label = "Pokemon - Platinum Version (USA).nds" },
+      { hash = "4432098e35a63d0f2ff7bdbc7a848e3c", label = "Pokemon - Platinum Version (USA) (Rev 1).nds" },
+      { hash = "4aedcacb9789b4835b220d1c71a56c06", label = "Pokemon - Platinum Version (USA) (Rev 1) (Speedup, 30FPS).nds" },
+      { hash = "d26082d93e5d0a5b9bd12c7dd11f4ab2", label = "Pokemon - Platinum Version (USA) (Rev 1) (Speedup, Uncapped FPS).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1BEB04, type="u24le", condition="eq", value=0X495, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X27405F, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Flower Stage" },
+        { address=0X27405F, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Glass Stage" },
+        { address=0X27405F, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cube Stage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X27405F, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Pedestal" },
+      },
+    },
+  },
+}

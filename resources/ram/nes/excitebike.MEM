@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Excitebike",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports, Racing, Driving"
+  },
+
+  rom = {
+    name = "excitebike",
+    file = "excitebike.zip",
+    hashes = {
+      { hash = "16c66d6ee6827ff49e3a2efbf4b66c5a", label = "Excitebike (Europe).nes" },
+      { hash = "2bf3976d15ec25a756846465a16b064c", label = "Excitebike (Japan, USA) (En) (GameCube Edition).nes" },
+      { hash = "9b0727e0adb0a7b4f94e072b7cf28a5a", label = "Excitebike (Japan, USA) (En).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X03B1, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x01 - Game paused" },
+        { address=0X07F0, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0 at title / demo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0283, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Random decimal 64 for time trial" },
+      },
+    },
+  },
+}

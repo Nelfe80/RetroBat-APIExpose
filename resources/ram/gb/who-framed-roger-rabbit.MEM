@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Who Framed Roger Rabbit",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "who-framed-roger-rabbit",
+    file = "who-framed-roger-rabbit.zip",
+    hashes = {
+      { hash = "1d0889833ed086c6b11c1fc4d40f9f3a", label = "Who Framed Roger Rabbit (Spain).gb" },
+      { hash = "34310686415c87dfe69882a6ad3f548f", label = "Who Framed Roger Rabbit (Europe).gb" },
+      { hash = "692fc5a0b6a9893d6ea25326c55caae5", label = "Who Framed Roger Rabbit (USA).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC321, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="0x01=player ingame (briefly 0x00 when using continue)" },
+        { address=0XC702, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="0x01=player ingame (stable when using continue)" },
+        { address=0XC705, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End Credits" },
+        { address=0XC70B, type="u8", condition="eq", value=0X0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc=">1=>2" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XCF03, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Coordinates World - Vertical (16-bit)" },
+        { address=0XCF06, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Coordinates World - Horizontal (16-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCF0A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0XCF0A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD20A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+        { address=0XD30A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC62D, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Carrot: Harbor Outdoors 1a" },
+        { address=0XC62E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Carrot: Harbor Outdoors 1b" },
+        { address=0XC62F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Carrot: Harbor Outdoors 2" },
+        { address=0XC630, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Carrot: Harbor Outdoors 3" },
+      },
+    },
+  },
+}

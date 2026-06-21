@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "ADK World",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "adk-world",
+    file = "adk-world.zip",
+    hashes = {
+      { hash = "0fd821fdb242210f87e33f8ff921ef6d", label = "ADK World (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X009C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="mudman hut demo rolling" },
+        { address=0XD034, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits roll 'thank you msg'" },
+        { address=0XD410, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="adk quiz continues used" },
+        { address=0XD700, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo 1" },
+        { address=0XD700, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo 2" },
+        { address=0XD700, type="u8", condition="eq", value=0X02, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits roll" },
+        { address=0XD714, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits roll current name shown" },
+        { address=0XD717, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits roll amount of letters in current name" },
+        { address=0XD719, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits roll current name shown actual" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD404, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="last round" },
+        { address=0XD404, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="adk quiz round" },
+      },
+      stage = {
+        { address=0XD501, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="adk dome stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD402, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="adk quiz player life increased" },
+        { address=0XD402, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="adk quiz player life decreased" },
+        { address=0XD403, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="adk quiz cpu life increased" },
+        { address=0XD403, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="adk quiz cpu life decreased" },
+      },
+      health = {
+        { address=0XC041, type="u16be", condition="eq", value=0X8037, action="HEALTH_STATE", no_log=true, no_survey=false, desc="full health" },
+        { address=0XC041, type="u16be", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="19YY health" },
+        { address=0XC042, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="shooter game health decreased" },
+        { address=0XC042, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="shooter game health increased" },
+        { address=0XD522, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="adk dome player 1 health decreased" },
+        { address=0XD522, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="adk dome player 1 health increased" },
+        { address=0XD523, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="adk dome player 1 health ACTUAL HEALTH decreased" },
+        { address=0XD523, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="adk dome player 1 health ACTUAL HEALTH increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC061, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold" },
+        { address=0XC061, type="u8", condition="eq", value=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold plane" },
+        { address=0XC061, type="u8", condition="eq", value=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold" },
+        { address=0XC061, type="u8", condition="eq", value=0X90, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold eagle" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC055, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="19YY total bosses killed" },
+      },
+    },
+  },
+}

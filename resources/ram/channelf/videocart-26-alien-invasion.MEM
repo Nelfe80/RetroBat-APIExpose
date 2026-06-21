@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Videocart-26: Alien Invasion",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "videocart-26-alien-invasion",
+    file = "videocart-26-alien-invasion.zip",
+    hashes = {
+      { hash = "f7bf7d55a7660ffa80d08ad1ba903ff7", label = "Alien Invasion (USA).bin" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0020, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0021, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0022, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0023, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0024, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0028, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+    },
+  },
+}

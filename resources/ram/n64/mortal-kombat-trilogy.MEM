@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Mortal Kombat Trilogy",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-trilogy",
+    file = "mortal-kombat-trilogy.zip",
+    hashes = {
+      { hash = "3dcb15043063bd656a0223c519218cfb", label = "Mortal Kombat Trilogy (USA) (Rev 2).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X169926, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode" },
+        { address=0X169926, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over/Lost Treasures" },
+      },
+      events = {
+        { address=0X12F562, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 1, Combo Hits (for Vs.?)" },
+        { address=0X134302, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 1, Combo Hits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA4076, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cheat, 1 Round Matches: ON=01, OFF=00" },
+        { address=0X12DFD2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1, Brutality hits count, generally it's around 20~23, so use h15 (21 decimal)" },
+        { address=0X169926, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round End" },
+        { address=0X169926, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Intro" },
+        { address=0X1699BA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1, Number of Rounds Won" },
+        { address=0X169B44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game, Round Over: Yes=01. NO=00 (Fatality don't count)" },
+        { address=0X169C88, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2, Number of Round Won" },
+        { address=0X2575EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round started" },
+      },
+      stage = {
+        { address=0XA4136, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cheat, Stage Select: ON=01, OFF=00" },
+        { address=0XFA612, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cheat, Stage Select: ON=01, OFF=00" },
+        { address=0X14C32A, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage fatality," },
+        { address=0X15D656, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game, Stage ID: 00-1C" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X12F558, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 1, Damage% (for Vs.)" },
+        { address=0X1342F8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 1, Damage% -10 (arcade.)" },
+        { address=0X14C3BE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1, Moving Health: 00-A6 (Max) decreased" },
+        { address=0X14C3BE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1, Moving Health: 00-A6 (Max) increased" },
+        { address=0X14C3C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2, Moving Health: 00-A6 (Max) decreased" },
+        { address=0X14C3C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2, Moving Health: 00-A6 (Max) increased" },
+        { address=0X16998E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1, Instant Health: 00-A6 (Max) decreased" },
+        { address=0X16998E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1, Instant Health: 00-A6 (Max) increased" },
+        { address=0X169C62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2, Instant Health: 00-A6 (Max) decreased" },
+        { address=0X169C62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2, Instant Health: 00-A6 (Max) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA3FB6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Config, Timer: ON=00, OFF=01" },
+        { address=0XA4036, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Cheat, Fatality Time: ON=00, OFF=01" },
+        { address=0XFA600, type="u24be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game 16bit, Screen ID: Fatality Time=0256, Fatalitty=0248, Babylity=024A, Friendship=024C, Tower" },
+        { address=0X14C3D4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game, Time: X0" },
+        { address=0X14C3DA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game, Time: 0X" },
+        { address=0X294769, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game, Finisher Time: 00-05" },
+      },
+    },
+  },
+}

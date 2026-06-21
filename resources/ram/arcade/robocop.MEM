@@ -1,0 +1,109 @@
+return {
+  game = {
+    title = "RoboCop",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "robocop",
+    file = "robocop.zip",
+    hashes = {
+      { hash = "93b9f9e761f6aabbdc2f50a60c374880", label = "robocop.7z <Robocop (World revision 4)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0001, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="active player (0=P1, 1=P2)" },
+        { address=0X0001, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="P1 game" },
+        { address=0X0001, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="P2 game" },
+        { address=0X0001, type="u8", condition="bit_true", bit=3, mask=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X0001, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="bonus stage" },
+        { address=0X0DC4, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - Decimal - 8-bit" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3284, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round percentage" },
+        { address=0X34CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of hits in bonus round" },
+        { address=0X34CE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of targets spawned in bonus round" },
+        { address=0X34D2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hit Percentage at the end of bonus round (dec) 16bit" },
+        { address=0X81D6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="'S' of Stage Clear message (hud graphic)" },
+      },
+      stage = {
+        { address=0X0FDE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="ED-209 health Stage 1" },
+        { address=0X0FDF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x01 - Hostage Released" },
+        { address=0X3219, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bonus stages" },
+        { address=0X3219, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="endgame ranking (doesn't reset until new game)" },
+        { address=0X3219, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage active player:" },
+        { address=0X321C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X3229, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage not-active player (see 0x3219)" },
+        { address=0X322C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage not-active player (see 0x321c)" },
+        { address=0X3234, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression" },
+        { address=0X3238, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression | Coordinates 16-bit" },
+        { address=0X5832, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="releated to hostage sound?" },
+        { address=0X583E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="releated to hostage sound?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8590, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="'E' of ENEMY in boss lifebar (hud graphic) increased" },
+        { address=0X8590, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="'E' of ENEMY in boss lifebar (hud graphic) decreased" },
+        { address=0X859A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="start of boss lifebar (hud graphic) increased" },
+        { address=0X859A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="start of boss lifebar (hud graphic) decreased" },
+      },
+      health = {
+        { address=0X3218, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Active Player decreased" },
+        { address=0X3218, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Active Player increased" },
+        { address=0X321B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health - Active Player decreased" },
+        { address=0X321B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health - Active Player increased" },
+        { address=0X3228, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - Waiting Player decreased" },
+        { address=0X3228, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - Waiting Player increased" },
+        { address=0X322B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health - Waiting Player decreased" },
+        { address=0X322B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health - Waiting Player increased" },
+        { address=0X3242, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0X3242, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+        { address=0X3243, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X3243, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X3246, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon type" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3214, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16-bit" },
+        { address=0X3216, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16-bit" },
+        { address=0X3224, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16-bit xxxx0000" },
+        { address=0X3226, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16-bit 0000xxxx" },
+      },
+      collectibles = {
+        { address=0X3249, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Special Ammo Remaining" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X33D0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="0x01=boss fight active" },
+        { address=0X3578, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss hp" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0DD3, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=true, no_survey=false, desc="jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0FB6, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Stage Time - Seconds (Dec)" },
+        { address=0X0FB7, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Stage Time - Minutes (Dec)" },
+        { address=0X34D0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Bonus Stage Time (hex)" },
+        { address=0X3538, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="16-bit Demo Timer" },
+      },
+    },
+  },
+}

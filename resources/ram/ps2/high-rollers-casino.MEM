@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "High Rollers Casino",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "high-rollers-casino",
+    file = "high-rollers-casino.zip",
+    hashes = {
+      { hash = "d9dfa0de5e6b045f298f6fa541736acb", label = "High Rollers Casino (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

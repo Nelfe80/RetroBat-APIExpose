@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Germs: Nerawareta Machi",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "germs-nerawareta-machi",
+    file = "germs-nerawareta-machi.zip",
+    hashes = {
+      { hash = "c188c5db45a334dd5dca4121589ff4cf", label = "Germs - Nerawareta Machi (Japan)" },
+      { hash = "92abf5373aba1eeddd3e91a48bc984b3", label = "Germs - Nerawareta Machi (Japan) (Es) (v1.0) (Mr.Nobody)" },
+      { hash = "a045519b25be419d96eb17b6d4f113fe", label = "Germs - Nerawareta Machi (Japan) (En) (v1.2) (grundo1561)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1E039A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Building Status - Underground [16bit]" },
+        { address=0X1E042A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Email: Fujita - RE: About underground equipment" },
+        { address=0X1E0444, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Email: Suzuura - There is an abnormality in the coal mine underground" },
+        { address=0X1E0446, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Email: T. O. U. - About the city's underground water system" },
+        { address=0X1E0712, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level [16bit]" },
+        { address=0X1E0714, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="To Next Level [16bit]" },
+        { address=0X1E0724, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bare handed Level [16bit]" },
+        { address=0X1E0728, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Throwing Level [16bit]" },
+        { address=0X1E072C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Short Range Weapons Level [16bit]" },
+        { address=0X1E0730, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Long Range Weapons Level [16bit]" },
+        { address=0X1E0734, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Special Weapon Level [16bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1E0710, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP [16bit] decreased" },
+        { address=0X1E0710, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP [16bit] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XEB214, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="HUD - Weapon Name" },
+        { address=0XF3FC4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="HUD - Weapon Stats" },
+        { address=0X1E042C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Email: Fujita - A new weapon is complete!" },
+        { address=0X1E072E, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Short Range Weapons EXP [16bit]" },
+        { address=0X1E0732, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Long Range Weapons EXP [16bit]" },
+        { address=0X1E0736, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Special Weapon EXP [16bit]" },
+        { address=0X1E0772, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon Slot [16bit]" },
+      },
+    },
+  },
+}

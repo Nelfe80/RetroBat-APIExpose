@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ABC    10060</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 Z Z    5830</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 LEMBLM 0</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 RJG    0</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 BLEWET 0</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 CGW    0</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 KES    0</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 DAV    0</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9  LP    0</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 AMM    0</text>
+		</text>
+	</view>
+</theme>

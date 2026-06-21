@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "NBA Hang Time",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "nba-hang-time",
+    file = "nba-hang-time.zip",
+    hashes = {
+      { hash = "a2dddb13539df45f45ff4061cd6caacd", label = "NBA Hang Time (USA).md" },
+    }
+  },
+
+  events = {
+  },
+}

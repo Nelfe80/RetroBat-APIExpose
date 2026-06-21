@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "7 Wonders of the Ancient World",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "7-wonders-of-the-ancient-world",
+    file = "7-wonders-of-the-ancient-world.zip",
+    hashes = {
+      { hash = "e84d1b3e8338090735eae2aee1dce5dc", label = "7 Wonders of the Ancient World (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1E250C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="GAME : Level (32-bit)" },
+        { address=0X21FD50, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="GAME : Level (32-bit)" },
+      },
+      stage = {
+        { address=0X1E2508, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="GAME : Stage (32-bit)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1A6BBA8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="GAME : Score (32-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1A6B8C4, type="u32le", condition="eq", value=0X0, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1A6BB8C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GAME : Timer (float)" },
+      },
+    },
+  },
+}

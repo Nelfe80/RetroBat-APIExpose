@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Tengoku Yoitoko",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tengoku-yoitoko",
+    file = "tengoku-yoitoko.zip",
+    hashes = {
+      { hash = "783f58fa61bf122b78a9807c5ed35205", label = "Tengoku Yoitoko (Japan) (En) (v1.0.2) (MSX Translations).rom" },
+      { hash = "88e940bb5c15d201bf1779821c10d923", label = "Tengoku Yoitoko (Japan).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2020, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X2020, type="u8", condition="eq", value=0X2A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Shop Panda: Gourd (100), Demon's Sandals (100)" },
+        { address=0X2020, type="u8", condition="eq", value=0X63, action="DEMO_MODE", no_log=false, no_survey=false, desc="Winged Demon" },
+        { address=0X2020, type="u8", condition="eq", value=0X7C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Winged Demon" },
+        { address=0X2020, type="u8", condition="eq", value=0XAC, action="DEMO_MODE", no_log=false, no_survey=false, desc="Winged Demon" },
+        { address=0X2020, type="u8", condition="eq", value=0XC6, action="DEMO_MODE", no_log=false, no_survey=false, desc="Winged Demon" },
+        { address=0X202D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Has Water Demon's Bowl [8 bit] (0/1)" },
+        { address=0X2040, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Water Demon's Bowl" },
+        { address=0X2040, type="u8", condition="eq", value=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Sandals" },
+        { address=0X2084, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Has Demon Sandals [8 bit] (0/1)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2020, type="u8", condition="eq", value=0X3B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hidden Tower Death God" },
+        { address=0X2020, type="u8", condition="eq", value=0XC1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death God" },
+        { address=0X2183, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Indicator [8 bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2020, type="u8", condition="eq", value=0X15, action="MONEY_STATE", no_log=false, no_survey=false, desc="Town: Gold Heart Tower (0x42)" },
+        { address=0X2020, type="u8", condition="eq", value=0X42, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Tower Room 1" },
+        { address=0X2020, type="u8", condition="eq", value=0X43, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Tower Room 2" },
+        { address=0X2020, type="u8", condition="eq", value=0X44, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Tower Room 3" },
+        { address=0X2034, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Has Gold Heart Key [8 bit] (0/1) increased" },
+        { address=0X203E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold [16 bit BCD] increased" },
+        { address=0X2040, type="u8", condition="eq", value=0X0D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Heart Key" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2020, type="u8", condition="eq", value=0X27, action="BOSS_HIT", no_log=false, no_survey=false, desc="Clock Tower Castle Boss" },
+        { address=0X2020, type="u8", condition="eq", value=0X3E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Red Tower Boss" },
+        { address=0X2020, type="u8", condition="eq", value=0X41, action="BOSS_HIT", no_log=false, no_survey=false, desc="Silver Tower Boss" },
+        { address=0X2020, type="u8", condition="eq", value=0X45, action="BOSS_HIT", no_log=false, no_survey=false, desc="Gold Tower Boss" },
+        { address=0X2020, type="u8", condition="eq", value=0X6F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2029, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Has High Jump [8 bit] (0/1)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2020, type="u8", condition="eq", value=0X0A, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Town: Boarded Door (0x33)" },
+        { address=0X2020, type="u8", condition="eq", value=0X12, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Town: Hidden Door (0x38)" },
+        { address=0X2020, type="u8", condition="eq", value=0X34, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Boarded Door in Sky (locked unless Souls=3)" },
+        { address=0X2020, type="u8", condition="eq", value=0XD8, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Broom Lady, Door (0xda)" },
+        { address=0X2020, type="u8", condition="eq", value=0XE1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Broom Lady, Door (0x47)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Toy Story 3",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "toy-story-3",
+    file = "toy-story-3.zip",
+    hashes = {
+      { hash = "4b65c7b20f09656f452af17caed169c6", label = "Toy Story 3 (Europe) (En,Fr,De,Es,It,Nl) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+  },
+}

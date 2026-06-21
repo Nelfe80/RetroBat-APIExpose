@@ -1,0 +1,163 @@
+return {
+  game = {
+    title = "Wizards & Warriors III: Kuros... Visions of Power",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "wizards-warriors-iii-kuros-visions-of-power",
+    file = "wizards-warriors-iii-kuros-visions-of-power.zip",
+    hashes = {
+      { hash = "183133512b214efd6d085f987c7b2fa5", label = "Wizards & Warriors III - Kuros...Visions of Power (USA).nes" },
+      { hash = "29edebc9ed785d350158639e0c35aead", label = "Wizards & Warriors III - Kuros...Visions of Power (Europe).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0042, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="(8-bit) music track? 03 when paused" },
+        { address=0X01FF, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="paused val a8 = in game, ab=paused, f2 = 1 frame between pause and unpause," },
+        { address=0X0257, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="possibly better paused adr for rich presence 0c = paused, 00 = unpaused" },
+        { address=0X06A6, type="u8", condition="eq", value=0X3, action="DEMO_MODE", no_log=false, no_survey=false, desc="teal ground level two story/secret room near beehive 4: theives guild" },
+        { address=0X06A6, type="u8", condition="eq", value=0X5, action="DEMO_MODE", no_log=false, no_survey=false, desc="on at start 6: bronze statue house, 7: underworld entrance" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0098, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit O) Always counting up so long as player is on the ground" },
+        { address=0X00AF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) d6 in palace / f6 in inns, guilds, princesses / e6 piedup, underworld" },
+        { address=0X00E5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit O) 01 on ground 00 in air, against a left wall 21" },
+        { address=0X00E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit O) 01 on ground 00 in air" },
+        { address=0X00FA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) changes around on some transitions to introductions in opening cutscenes" },
+        { address=0X1058, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) color pallet of zone" },
+        { address=0X105A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) color pallet of zone" },
+        { address=0X1086, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level of class. val 00 is level1, val 01 is level 2, val 02 is level 3" },
+      },
+      zone = {
+        { address=0X0079, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(8-bit OW) x location (hori) part of the world the cam focuses on" },
+        { address=0X007B, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(8-bit OW) y (vert) part of the world the cam focuses on. see 0x79" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0088, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) player lives value increased" },
+        { address=0X0088, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) player lives value decreased" },
+        { address=0X00EB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) player life meter value increased" },
+        { address=0X00EB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) player life meter value decreased" },
+        { address=0X03E9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="dynamic :( (existance) lifebar of purp dude in the palace by the treaure increased" },
+        { address=0X03E9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="dynamic :( (existance) lifebar of purp dude in the palace by the treaure decreased" },
+        { address=0X03EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bird life bar found here and 0xc (one to the right) increased" },
+        { address=0X03EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bird life bar found here and 0xc (one to the right) decreased" },
+        { address=0X04A1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) boss life can also be held here. increased" },
+        { address=0X04A1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) boss life can also be held here. decreased" },
+        { address=0X04D1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) 44 as wiz 1 hit purp palace soldier" },
+        { address=0X04D7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="84 at bird death" },
+        { address=0X0661, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) evil life bar (for hud display) increased" },
+        { address=0X0661, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) evil life bar (for hud display) decreased" },
+        { address=0X0C9D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) evil life bar, same as 0x049d increased" },
+        { address=0X0C9D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) evil life bar, same as 0x049d decreased" },
+        { address=0X0C9E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) statue boss life meter increased" },
+        { address=0X0C9E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) statue boss life meter decreased" },
+        { address=0X0E61, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) statue boss lifebar hud increased" },
+        { address=0X0E61, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) statue boss lifebar hud decreased" },
+        { address=0X149D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) alt evil life bar, same as 0x0c9d increased" },
+        { address=0X149D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="*(8-bit W) alt evil life bar, same as 0x0c9d decreased" },
+      },
+      health = {
+        { address=0X0230, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="(16-bit) various changes on player interactions with the world, like giving and recieve damage," },
+        { address=0X0237, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="(8-bit) puts a value here based on certain interactions, like being damaged or collecting. The n" },
+        { address=0X034D, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="related to hurting some enemies." },
+        { address=0X049B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) dragon's health is stored here.. at least once. decreased" },
+        { address=0X049B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) dragon's health is stored here.. at least once. increased" },
+        { address=0X04DE, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="(8-bit) flashes to 80 then ff when starting the Thief 2 fight. Good for failure protection for d" },
+        { address=0X067D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit W) snake guardian tail length. See 0x049d hp on each section val 4 each. decreased" },
+        { address=0X067D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit W) snake guardian tail length. See 0x049d hp on each section val 4 each. increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0033, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(8-bit) goes to 9f when too full on treasure among other thing." },
+        { address=0X019A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(8-bit) Special Treasure 0 = val dc, ST 1 = e1" },
+        { address=0X02FB, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="this region somehow relates to collecting treasure." },
+        { address=0X03AD, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="flickers when treasure is collected" },
+        { address=0X03E5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(8-bit) goes to 1f when the dragon treasure is dropped. (this is the dragon treasure. goes to 09" },
+        { address=0X0DB5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(8-bit) here and nearby keeps a value for treasure such as 03, 06, 09 etc. 0x5,6,7 are for rooms" },
+      },
+      weapon = {
+        { address=0X008A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="*(8-bit OW) changes players weapon,1 longsword, 2 axe 3 shooting sword, 4 dagger, 5 crowbar, 6 m" },
+        { address=0X03D9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8-bit) val 20 when player's axe is flying, else 00. This address and the next three 8-bit adres" },
+        { address=0X0E5C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(8-bit) weapon slot" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00FC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="*(16-bit) 4ddc during cutscene, 3635 at score screen" },
+      },
+      collectibles = {
+        { address=0X0199, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) no trasure cc, 02 visited shop, 56 got thief statue br, multiple transitions to ac when" },
+        { address=0X0210, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) 00 by default, 1e when passing though doors / (unique vals for collecting different trea" },
+        { address=0X0211, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8bit) flashes through a couple or few numbers and then stops at various number when collecting" },
+        { address=0X0211, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="(8bit) flashes through a couple or few numbers and then stops at various number when collecting" },
+        { address=0X03E6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) at 11 during agreeing to marry a princess gem appears on the ground. increased" },
+        { address=0X049D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) boss 'evil' health meter (not all bosses) gold thief statue increased" },
+        { address=0X04DD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) during warrior guardian fights, counts initial message and number of jumps; silver statu" },
+        { address=0X05B6, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="1a crashes, 1b nothing, 1c some kind of fireball and touching causes crashes, 1d puts a spinning" },
+        { address=0X05B6, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="1a crashes, 1b nothing, 1c some kind of fireball and touching causes crashes, 1d puts a spinning" },
+        { address=0X064D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 binary in bits)(upper 4) 0000 with no treasure returned, 0001 (10 hex) talked to palace wise" },
+        { address=0X0662, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit W) money 10,000s place in hex. 1=65536 increased" },
+        { address=0X0663, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) money in hex 100 (aka 1=256, 2=512) increased" },
+        { address=0X0664, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) money 0-255 increased" },
+        { address=0X0665, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) money sprite number increased" },
+        { address=0X0666, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8-bit) money spirite number increased" },
+        { address=0X0E57, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="*(8-bit) inventory slot 1: 1 orb, 2 scepter, 3 coin, 4 chalice, 5 necklace, 6 crown, 7 yellow di" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0483, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) Bronze Warrior statue boss, switches from val 0d to 08 when loaded." },
+        { address=0X0484, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="*(8-bit) statue goes from 30 to 6 when bronze statue boss appears" },
+        { address=0X0487, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) Bronze Warrior statue boss, switches from val 0a to 08 when loaded." },
+        { address=0X049E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) statue boss health" },
+        { address=0X04B7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) related to knight statue boss attack animation" },
+        { address=0X04DC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) related to boss fights when taking hits and after" },
+        { address=0X0C86, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) becomes val 07 when boss loads" },
+        { address=0X0CB7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) demon boss will shoot fireballs for val here" },
+        { address=0X0CDB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) goes to 0c when boss is killed" },
+        { address=0X0CDE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) 80 then ff when boss is loaded" },
+        { address=0X14DC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) goes to 0c when boss is killed" },
+        { address=0X1CDC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8-bit) goes to 0c when boss is killed" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X008B, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="*(8-bit W) invincible for this timer" },
+      },
+      player = {
+        { address=0X0080, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(8-bit O) related to jumping" },
+        { address=0X0091, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(8-bit O) records player's jump height" },
+        { address=0X0440, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Lower4 O) player jumping/falling sprite" },
+        { address=0X05B7, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="34 up and right animation, 35 sprite and restricts player movement (can jump), stopped recording" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00EF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(8-bit) switch for agreeing or disagreeing to marry (Joanne) see also 0x0181" },
+        { address=0X0181, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(8-bit) at princess, 2nd options switch address. see 0x00ef" },
+        { address=0X0212, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8-bit) changes values on item collection and passing through doors" },
+        { address=0X0449, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8-bit) thief guild teleport door: when taken count up to 56 from 54, then back again. Stops at" },
+        { address=0X04CC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(8-bit) switches from val 00 val 20 when the worm fight starts" },
+        { address=0X0689, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(8-bit W) door locked? worm room?" },
+        { address=0X06A0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(binary bits) as with this line this is a door lock record. oj door on palace outside in the mid" },
+        { address=0X06A3, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="(binary bits) shows door entries, in the region of palace interior 1" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X04B1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) counts from 00 to 06 when wiz 1 bullet stops, or from 00 to 0a when bulet hits enemy. Al" },
+      },
+    },
+  },
+}

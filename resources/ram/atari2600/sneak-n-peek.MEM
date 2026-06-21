@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sneak 'n Peek",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Simulation, Puzzle-Game"
+  },
+
+  rom = {
+    name = "sneak-n-peek",
+    file = "sneak-n-peek.zip",
+    hashes = {
+      { hash = "9c6faa4ff7f2ae549bbcb14f582b70e4", label = "Sneak 'n Peek (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

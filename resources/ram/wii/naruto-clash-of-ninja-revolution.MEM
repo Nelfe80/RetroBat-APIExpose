@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Naruto: Clash of Ninja Revolution",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "naruto-clash-of-ninja-revolution",
+    file = "naruto-clash-of-ninja-revolution.zip",
+    hashes = {
+      { hash = "9f0fa30d5a6b5fa1a1d317cda0075c6d", label = "Naruto - Clash of Ninja Revolution (USA)" },
+      { hash = "30d5cca84dfc87b676720e775201e1f3", label = "Naruto - Clash of Ninja Revolution - European Version (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X264FD4, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32-bit BE] Ninja Info Card - Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X264CEC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Game Options - Rounds" },
+        { address=0X2AD9AC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{EU} [32-bit BE] Game Options - Rounds" },
+      },
+      stage = {
+        { address=0X264C68, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE] Current Battle Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X264850, type="u32be", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Player 1 - Handicap? (Higher = take less damage, default = 100)" },
+        { address=0X26487C, type="u32be", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Player 2 - Handicap? (Higher = take less damage, default = 100)" },
+        { address=0X2648A8, type="u32be", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Player 3 - Handicap? (Higher = take less damage, default = 100)" },
+        { address=0X2648D4, type="u32be", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Player 4 - Handicap? (Higher = take less damage, default = 100)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X264FE0, type="u32be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Ninja Info Card - Ranged Weapons Used" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X264C8C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Score" },
+        { address=0X2AD94C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{EU} [32-bit BE] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X264C90, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Time Attack Time" },
+        { address=0X264CF0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Game Options - Match Time" },
+        { address=0X264EF8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Ninja Info Card - Play Time" },
+        { address=0X264EFC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Ninja Info Card - Times Played" },
+        { address=0X264F08, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Naruto" },
+        { address=0X264F0C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Sasuke" },
+        { address=0X264F10, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Sakura" },
+        { address=0X264F14, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Lee" },
+        { address=0X264F18, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Shikamaru" },
+        { address=0X264F1C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Gaara" },
+        { address=0X264F20, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Temari" },
+        { address=0X264F28, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Kankuro" },
+        { address=0X264F30, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Kakashi" },
+        { address=0X264F34, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Guy" },
+        { address=0X264F38, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Jiraiya" },
+        { address=0X264F3C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Tsunade" },
+        { address=0X264F40, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Orochimaru" },
+        { address=0X264F44, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Itachi" },
+        { address=0X264F48, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Neji" },
+        { address=0X264F4C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Tenten" },
+        { address=0X264F50, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Hinata" },
+        { address=0X264F58, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Ino" },
+        { address=0X264F5C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Kisame" },
+        { address=0X264F60, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Times Used - Shino" },
+        { address=0X2AD950, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{EU} [32-bit BE] Ninja Info Card - Play Time" },
+        { address=0X2AD9B0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{EU} [32-bit BE] Game Options - Match Time" },
+        { address=0X2ADBB8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="{EU} [32-bit BE] Ninja Info Card - Play Time" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Picture Puzzle",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "picture-puzzle",
+    file = "picture-puzzle.zip",
+    hashes = {
+      { hash = "81d3c10271ad5b09032dd00321b41aa0", label = "Picture Puzzle (Europe).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X04AC, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X003F, type="u8", condition="eq", value=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="cleared" },
+        { address=0X035B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Puzzle 200 - Bit7=Cleared" },
+      },
+    },
+  },
+}

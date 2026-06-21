@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "The Game of Life",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-game-of-life",
+    file = "the-game-of-life.zip",
+    hashes = {
+      { hash = "26eaf6f79c4334d069ae0819309e5493", label = "Game of Life, The (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB0094, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA1000, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life's Little Games Revenge Target increased" },
+        { address=0XA1000, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life's Little Games Revenge Target decreased" },
+        { address=0XA1002, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life's Little Games Multiplyer increased" },
+        { address=0XA1002, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life's Little Games Multiplyer decreased" },
+        { address=0XA18B4, type="u16le", condition="eq", value=0X0, action="LIVES_STATE", no_log=false, no_survey=false, desc="P1" },
+        { address=0XA18B4, type="u16le", condition="eq", value=0XFFFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="No one" },
+        { address=0XA18B4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Tokens (16 bit array)(25) increased" },
+        { address=0XA18B4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Tokens (16 bit array)(25) decreased" },
+        { address=0X1FFBF8, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="Get a Life" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1FFBF8, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1FFBF8, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Skunk Money" },
+      },
+    },
+  },
+}

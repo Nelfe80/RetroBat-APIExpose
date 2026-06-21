@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Kim Possible: What's the Switch?",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kim-possible-whats-the-switch",
+    file = "kim-possible-whats-the-switch.zip",
+    hashes = {
+      { hash = "0ef2201440e305c9f137658a07cd9562", label = "Disney's Kim Possible - What's the Switch (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5FEB98, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Number of Kimmunicator Tokens in Level (32-bit)" },
+        { address=0X5FEBE8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Banana Tokens in Level - Kim (32-bit)" },
+        { address=0X5FEC38, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Banana Tokens in Level - Shego (32-bit)" },
+        { address=0X5FECD8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Special Mission Tokens In Level (32-bit)" },
+        { address=0X6FEDF4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Slot 1 - Last Level Unlocked (32-bit)" },
+        { address=0XD09998, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Save Slot - Last Level Unlocked (32-bit)" },
+        { address=0XD099BC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - Tokens Collected (32-bit)" },
+        { address=0XD099C4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 - Tokens Collected (32-bit)" },
+        { address=0XD099C8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 - Tokens Collected (32-bit)" },
+        { address=0XD099CC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 - Tokens Collected (32-bit)" },
+        { address=0XD099D0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6 - Tokens Collected (32-bit)" },
+        { address=0XD099D4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 - Tokens Collected (32-bit)" },
+        { address=0XD099DC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 9 - Tokens Collected (32-bit)" },
+        { address=0XD099E0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10 - Tokens Collected (32-bit)" },
+        { address=0XD099E4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 11 - Tokens Collected (32-bit)" },
+        { address=0XD40A38, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Previous Level ID (32-bit) [Same values as 0x00d40a34]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD07444, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives (32-bit) increased" },
+        { address=0XD07444, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives (32-bit) decreased" },
+        { address=0XD07458, type="u32le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead or in menus" },
+        { address=0XD0745C, type="u32le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead or in menus" },
+      },
+      health = {
+        { address=0XD07450, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health (32-bit) [Uneditable] decreased" },
+        { address=0XD07450, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health (32-bit) [Uneditable] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12D6D3C, type="u16le", condition="eq", value=0X17, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helicopter Boss [Evil Air]" },
+        { address=0X12DCE7C, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint ID (32-bit) [FR]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD080CC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level Timer [Seconds] (Float)" },
+      },
+    },
+  },
+}

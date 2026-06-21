@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Maui Mallard in Cold Shadow",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "maui-mallard-in-cold-shadow",
+    file = "maui-mallard-in-cold-shadow.zip",
+    hashes = {
+      { hash = "5ece56f9a92f4c243ae9311b9e1965f0", label = "Maui Mallard in Cold Shadow (USA).sfc" },
+      { hash = "9e87ec65114c37b4ad6362c80fc28b89", label = "[MSU-1] Maui Mallard in Cold Shadow (USA) (PepilloPEV).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0002, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0D71, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="[2 Byte] 0000=Unpause, 0xFFFF=Pause" },
+        { address=0X1D1A, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="*Title Menu - Option Selected" },
+        { address=0X1F4C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues 8-bit" },
+        { address=0X1F6C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Cheats - Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0002, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mojo Mansion" },
+        { address=0X0002, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Ninja Training Grounds" },
+        { address=0X0002, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Muddrake Mayhem" },
+        { address=0X0002, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sacrifice of Maui" },
+        { address=0X0002, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Test of Duckhood" },
+        { address=0X0002, type="u8", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Flying Duckman" },
+        { address=0X0002, type="u8", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Realm of the Dead" },
+        { address=0X0002, type="u8", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Mojo Stronghold" },
+        { address=0X0002, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID 8-bit" },
+        { address=0X0068, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[2 Byte] Background X coord?!" },
+        { address=0X1D1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit -> Level selected in Options Menu" },
+        { address=0X1F55, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Skip" },
+        { address=0X1F6E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Treasure Level ?" },
+      },
+      stage = {
+        { address=0X0002, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus (for other bonus change Stage: 1, 2, 3...)" },
+        { address=0X0004, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID 8-bit" },
+        { address=0X1F62, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage??" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0DD3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[2 Byte] Current Life Points increased" },
+        { address=0X0DD3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[2 Byte] Current Life Points decreased" },
+        { address=0X0DD4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total Life increased" },
+        { address=0X0DD4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total Life decreased" },
+        { address=0X0DD5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[2 Byte] Total Life Points increased" },
+        { address=0X0DD5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[2 Byte] Total Life Points decreased" },
+        { address=0X1B1D, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1B1F, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1B27, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1B29, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1B2D, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1E49, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1E4A, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X1F4A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[2 Byte] Lives increased" },
+        { address=0X1F4A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[2 Byte] Lives decreased" },
+        { address=0X1F55, type="u8", condition="eq", value=0X2, action="LIVES_STATE", no_log=false, no_survey=false, desc="Infinite Lives" },
+      },
+      health = {
+        { address=0X1F55, type="u8", condition="eq", value=0X6, action="HIT", no_log=false, no_survey=false, desc="No Damage in Water" },
+        { address=0X1F55, type="u8", condition="eq", value=0X7, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Infinite Health" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0DD9, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[2 Byte] Bug ammo" },
+        { address=0X0DDB, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[2 Byte] Bolt Bug ammo" },
+        { address=0X0DDD, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[2 Byte] Fire Bug ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0002, type="u8", condition="eq", value=0XB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1 - Boss" },
+        { address=0X0002, type="u8", condition="eq", value=0XC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 2 - Boss" },
+        { address=0X0002, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 5 - Boss" },
+        { address=0X0002, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 6 - Boss" },
+        { address=0X183A, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss 3 Defeated 8-bit" },
+        { address=0X1849, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Health 8-bit" },
+        { address=0X1852, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss 3 Dead" },
+        { address=0X1CF3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="8-bit -> Boss Health" },
+        { address=0X1D71, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Phases 8-bit" },
+        { address=0X1D73, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Health 8-bit" },
+        { address=0X1E45, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 Health 8-bit" },
+        { address=0X1E8D, type="u8", condition="eq", value=0X7, action="BOSS_HIT", no_log=false, no_survey=false, desc="Shuriken" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X002E, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[2 Byte] Invincibility (frames)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1DA1, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer to finish level 8-bit" },
+      },
+    },
+  },
+}

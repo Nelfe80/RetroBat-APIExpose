@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Banjo-Tooie [Subset - Multiplayer]",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Adventure, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "banjo-tooie-subset-multiplayer",
+    file = "banjo-tooie-subset-multiplayer.zip",
+    hashes = {
+      { hash = "cb5e422d0194a8b1ec56b801fb8145a6", label = "Banjo-Tooie (USA) [Subset - Multi].z64" },
+    }
+  },
+
+  events = {
+  },
+}

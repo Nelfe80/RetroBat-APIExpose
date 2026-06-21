@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Exile",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "exile",
+    file = "exile.zip",
+    hashes = {
+      { hash = "5fe9ab5d615e3351302f47180de27f5e", label = "Exile (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF10C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Bitflag going up on credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF220, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Current Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XF226, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Current HP decreased" },
+        { address=0XF226, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Current HP increased" },
+        { address=0XF228, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Maximum HP decreased" },
+        { address=0XF228, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Maximum HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF23E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] Gold increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF111, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Desert Boss" },
+        { address=0XF112, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ritual Book Statue Boss Beat" },
+        { address=0XF113, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit 0 = Glass Door Boss" },
+        { address=0XF116, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mirror boss defeated" },
+        { address=0XF7DC, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16bit] Might be enemy hp boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XF240, type="u8", condition="eq", value=0X0A, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Bat's Shield" },
+        { address=0XF240, type="u8", condition="eq", value=0X0B, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Sem's Shield" },
+        { address=0XF240, type="u8", condition="eq", value=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Sumpa's Shield" },
+      },
+    },
+  },
+}

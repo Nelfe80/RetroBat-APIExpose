@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Tetris 2 + Bombliss",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tetris-2-bombliss",
+    file = "tetris-2-bombliss.zip",
+    hashes = {
+      { hash = "f94c915a3d818b02075ad39ddf1575d4", label = "Tetris 2 + Bombliss (Japan) (Rev 1).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0A89, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puzzle Type - Puzzle Level" },
+        { address=0X184C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear [78]" },
+        { address=0X184F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear [0f]" },
+      },
+      stage = {
+        { address=0X00A6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bombliss Type - Stage Number" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00BB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block's X Axis" },
+        { address=0X00BD, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block's Y Axis" },
+        { address=0X00D9, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block's X Axis" },
+        { address=0X00DA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block's Y Axis" },
+        { address=0X00F6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bombliss Type - Blocks Remaining" },
+      },
+    },
+  },
+}

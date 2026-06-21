@@ -1,0 +1,141 @@
+return {
+  game = {
+    title = "Mutation Nation",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "mutation-nation",
+    file = "mutation-nation.zip",
+    hashes = {
+      { hash = "0ec42cc0f6f6041699fa0456d72295c4", label = "Mutation Nation (Japan) (En,Ja)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1061, type="u16be", condition="eq", value=0X20, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1061, type="u16be", condition="eq", value=0X21, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Cutscene, Cut Scene between Stage 5 and 6 (City background)" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+      events = {
+        { address=0X2003, type="u8", condition="eq", value=0X28, action="COMBO_HIT", no_log=false, no_survey=false, desc="Punch (Hook - Mid-combo)" },
+        { address=0X2003, type="u8", condition="eq", value=0X2C, action="COMBO_HIT", no_log=false, no_survey=false, desc="Punch (Uppercut - Combo Final Punch)" },
+        { address=0X2103, type="u8", condition="eq", value=0X28, action="COMBO_HIT", no_log=false, no_survey=false, desc="Punch (Hook - Mid-combo)" },
+        { address=0X2103, type="u8", condition="eq", value=0X2C, action="COMBO_HIT", no_log=false, no_survey=false, desc="Punch (Uppercut - Combo Final Punch)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFD8A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="MVS" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0XFD8A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[True Difficulty Level?]" },
+      },
+      stage = {
+        { address=0X2103, type="u8", condition="eq", value=0X4C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lying On Ground" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2200, type="u16be", condition="eq", value=0X134, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss/Mini-Boss Orb Death Explosion" },
+        { address=0X2200, type="u16be", condition="eq", value=0X138, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss/Mini-Boss Blob Death Explosion" },
+      },
+      health = {
+        { address=0X2019, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health (0x40 is max) decreased" },
+        { address=0X2019, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health (0x40 is max) increased" },
+        { address=0X2119, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health decreased" },
+        { address=0X2119, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health increased" },
+        { address=0X2219, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0X2219, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0X2259, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X2259, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X2299, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X2299, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0X22D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 HP decreased" },
+        { address=0X22D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X153E, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X153E, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="A" },
+        { address=0X153E, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="B" },
+        { address=0X153E, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="C" },
+        { address=0X153E, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="D" },
+        { address=0X153F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P1 Subweapon Stock" },
+        { address=0X1540, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X1540, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="A" },
+        { address=0X1540, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="B" },
+        { address=0X1540, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="C" },
+        { address=0X1540, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="D" },
+        { address=0X1541, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P2 Subweapon Stock" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00C2, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score [32-Bit BE BCD]" },
+        { address=0X00CC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score [32-Bit BE BCD]" },
+        { address=0X00D6, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HI Score [32-Bit BE BCD]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1061, type="u16be", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 1-1, Streets (Whip Arms Mini-boss) [A,B,B]" },
+        { address=0X1061, type="u16be", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 1-3, Museum Statuary Hall (Viking Boss, Phase 1)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 1-4, Museum Basement (Viking Boss, Phase 2)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 2-2, Dockside Warehouse (Shocky McStabby Hand Mini-boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 2-4, Disco (Four-Armed Dancer Boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 3-1, Highway Red Truck [A,C] (Rollerskater Mini-Boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 3-4, Inside Box Truck (Prison Cyborg Gadget Arms Boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X0F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 4-4, The Experiment (Three-Eyed Spider Mutant Boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 5-3, Sewer Exit (Brainy Guy Boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 6-1, Parking Garage [B] (Viking Boss, Prison Cyborg Gadget Arms Boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X16, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 6-2, Hotel Courtyard 2nd Floor [A] (Four-Armed Dancer Boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X1A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 6-4, Hotel Penthouse [A] (Brainy Guy Boss)" },
+        { address=0X1061, type="u16be", condition="eq", value=0X1C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Area 6-5, Rooftop (Final Boss)" },
+        { address=0X2200, type="u16be", condition="eq", value=0X9C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mr. Shoulders (Mini-boss)" },
+        { address=0X2200, type="u16be", condition="eq", value=0XA0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Whip Arms (Mini-boss)" },
+        { address=0X2200, type="u16be", condition="eq", value=0XA4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rollerskater (Mini-Boss)" },
+        { address=0X2200, type="u16be", condition="eq", value=0XA8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rollerskater (Mini-Boss, Skull exposed)" },
+        { address=0X2200, type="u16be", condition="eq", value=0XAC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Shocky McStabby Hands (Mini-Boss)" },
+        { address=0X2200, type="u16be", condition="eq", value=0XB0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Shocky McStabby Hands (Mini-Boss, Skull Exposed)" },
+        { address=0X2200, type="u16be", condition="eq", value=0XE4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Viking Boss (Phase 1)" },
+        { address=0X2200, type="u16be", condition="eq", value=0XE8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Viking Boss (Phase 2)" },
+        { address=0X2200, type="u16be", condition="eq", value=0XEC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Prison Cyborg Gadget Arms Boss" },
+        { address=0X2200, type="u16be", condition="eq", value=0XF0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Four-Armed Dancer Boss" },
+        { address=0X2200, type="u16be", condition="eq", value=0XF4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Three-Eyed Spider Mutant Boss" },
+        { address=0X2200, type="u16be", condition="eq", value=0XF8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Brainy Guy Boss" },
+        { address=0X2200, type="u16be", condition="eq", value=0XFC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mutated Scientist Final Boss" },
+        { address=0X2200, type="u16be", condition="eq", value=0X100, action="BOSS_HIT", no_log=false, no_survey=false, desc="Viking Boss (Phase 2, Form 2)" },
+        { address=0X2200, type="u16be", condition="eq", value=0X108, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hornet Minion (Dancer Boss)" },
+        { address=0X2200, type="u16be", condition="eq", value=0X114, action="BOSS_HIT", no_log=false, no_survey=false, desc="Three-Eyed Spider Mutant Boss (Skull exposed)" },
+        { address=0X2200, type="u16be", condition="eq", value=0X14C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Prison Cyborg Gadget Arms Boss (Skull Exposed)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2003, type="u8", condition="eq", value=0X1A, action="JUMPING", no_log=false, no_survey=false, desc="Jump Up" },
+        { address=0X2003, type="u8", condition="eq", value=0X40, action="JUMPING", no_log=false, no_survey=false, desc="Jump Kick (Combo - Final Kick)" },
+        { address=0X2003, type="u8", condition="eq", value=0X58, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Uppercut (Combo after Jump Kick)" },
+        { address=0X2103, type="u8", condition="eq", value=0X1A, action="JUMPING", no_log=false, no_survey=false, desc="Jump Up" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1061, type="u16be", condition="eq", value=0X18, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Area 6-3, Destroyed Hotel Floor [A] (Three-Eyed Spider Mutant Boss)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X108D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P1 Continue Timer (Seconds) - Single Player Only?" },
+        { address=0X1562, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Boss Timer (Seconds)" },
+      },
+    },
+  },
+}

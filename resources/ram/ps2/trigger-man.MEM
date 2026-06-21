@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Trigger Man",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "trigger-man",
+    file = "trigger-man.zip",
+    hashes = {
+      { hash = "62894d25dc7f7638b1724813d4341b47", label = "Trigger Man (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X277940, type="u32le", condition="eq", value=0X0000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X277940, type="u32le", condition="eq", value=0XFFFFFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player is dead" },
+        { address=0X277940, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current scene ('Level ID' can probably be ascertained by taking this / 100)" },
+      },
+    },
+  },
+}

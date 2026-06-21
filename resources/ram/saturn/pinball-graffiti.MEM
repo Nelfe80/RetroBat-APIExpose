@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pinball Graffiti",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "pinball-graffiti",
+    file = "pinball-graffiti.zip",
+    hashes = {
+      { hash = "663c58d6aa01e9f1f2de7e6c35c7fc60", label = "Pinball Graffiti (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

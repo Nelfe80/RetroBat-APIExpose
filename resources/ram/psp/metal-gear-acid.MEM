@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Metal Gear Acid",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "metal-gear-acid",
+    file = "metal-gear-acid.zip",
+    hashes = {
+      { hash = "4c04d31abcab754356998f8f13af6b55", label = "Metal Gear Ac!d (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X9D2948, type="u8", condition="eq", value=0XA, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (Multi)" },
+      },
+    },
+  },
+}

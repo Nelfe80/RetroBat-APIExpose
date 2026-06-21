@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "World Class Track Meet",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "world-class-track-meet",
+    file = "world-class-track-meet.zip",
+    hashes = {
+      { hash = "cc5b16e64da9048dc5b0a227de6d423b", label = "World Class Track Meet (USA) (Rev 1).nes" },
+      { hash = "fa5753cbd1579ece147009dbe3dbb8da", label = "World Class Track Meet (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="B7=Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X008D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tournament - Level" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X007D, type="u8", condition="eq", value=0XB0, action="JUMPING", no_log=true, no_survey=false, desc="player successfully submitted a score in a jump event" },
+        { address=0X008C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Mode: 0=100M, 1=110M Hurdles; *2=Long Jump, *3=Triple Jump" },
+        { address=0X0308, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Game Mode: 0=Tournament, 1=100M Dash, 2=Long Jump, 3=110M Hurdles, 4=Triple Jump, 5=The Olympics" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0471, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time registered: Seconds (Dec=Hex)" },
+        { address=0X0472, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time registered: Decimals (Dec=Hex)" },
+      },
+    },
+  },
+}

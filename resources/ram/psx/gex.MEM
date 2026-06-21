@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Gex",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "gex",
+    file = "gex.zip",
+    hashes = {
+      { hash = "69a540b2455f5d43702b86fb1afde5f2", label = "Gex (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X97B80, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode = 1" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X97174, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-ID (not all levels are in order)" },
+        { address=0XBCA2C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cemetary Level 2 COMPLETE" },
+        { address=0XBCA2C, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cemetary Level 1 Remote Collected" },
+        { address=0XBCA2D, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cemetary Level 3 COMPLETE" },
+        { address=0XBCA2D, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cemetary Level 2 Remote Collected" },
+        { address=0XBCA2E, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cemetary Level 4 COMPLETE" },
+        { address=0XBCA2F, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cemetary Level 1 COMPLETE" },
+        { address=0XBCA33, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Toon Stage 2 COMPLETE" },
+        { address=0XBCA35, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rock It Fully Complete" },
+        { address=0XBCA36, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="bit1=Toon Stage 1 COMPLETE" },
+        { address=0XBCA3B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="bit1=Jungle Level 1 COMPLETE" },
+        { address=0XBCA3C, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Jungle Level 2 COMPLETE" },
+        { address=0XBCA3C, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle Level 1 Remote Collected" },
+        { address=0XBCA41, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rez Level 1 COMPLETE" },
+        { address=0XBCA41, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rez Level 1 Open" },
+        { address=0XBCA42, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rez Level 2 COMPLETE" },
+        { address=0XBCA42, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rez Level 2 Remote Collected" },
+        { address=0XBCA48, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planet X Level 8 COMPLETE?" },
+        { address=0XBCA48, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Planet X Level 8 Remote Collected" },
+        { address=0XBCA49, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planet X Level 7 COMPLETE" },
+        { address=0XBCA49, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Planet X Level 7 Remote Collected" },
+        { address=0XBCA4A, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planet X Level 2 COMPLETE" },
+        { address=0XBCA4A, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Planet X Level 2 Remote Collected" },
+        { address=0XBCA4B, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planet X Level 3 COMPLETE" },
+        { address=0XBCA4B, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Planet X Level 3 Remote Collected" },
+        { address=0XBCA4F, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kungfu Level 3 COMPLETE" },
+        { address=0XBCA4F, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kungfu Level 3 Remote Collected" },
+        { address=0XBCA50, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kungfu Level 1 COMPLETE" },
+        { address=0XBCA50, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kungfu Level 1 Remote Collected" },
+        { address=0XBCA51, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kungfu Level 2 COMPLETE" },
+        { address=0XBCA51, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kungfu Level 2 Remote Collected" },
+        { address=0XBCA6A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="bit1=Planet X Level 1 COMPLETE" },
+        { address=0XBCAB4, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planet X Level 5 COMPLETE" },
+        { address=0XBCAB4, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Planet X Level 5 Remote Collected" },
+        { address=0XBCAB5, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planet X Level 6 COMPLETE" },
+        { address=0XBCAB5, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Planet X Level 6 Remote Collected" },
+        { address=0XBCAB6, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planet X Level 4 COMPLETE" },
+        { address=0XBCAB6, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Planet X Level 4 Remote Collected" },
+        { address=0XBCB10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Map ID" },
+      },
+      zone = {
+        { address=0XBA8BE, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="bit5=New Toonland World Remote Collected" },
+      },
+      stage = {
+        { address=0X974AC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Remote Collected on Stage" },
+        { address=0X974BC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Game Remote Piece Collected in Stage" },
+        { address=0XBCA33, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Toon Stage 1 Remote Collected" },
+        { address=0XBCA35, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jungle Remote Collected from POW" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9732C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X9732C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X97D44, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit0=Infinite Lives Cheat increased" },
+        { address=0X97D44, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit0=Infinite Lives Cheat decreased" },
+      },
+      health = {
+        { address=0X97328, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max-HP decreased" },
+        { address=0X97328, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max-HP increased" },
+        { address=0X97B1C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gex-HP decreased" },
+        { address=0X97B1C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gex-HP increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X970D8, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Possible Last Boss Defeat" },
+        { address=0XBCA32, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Cemetary Boss Defeated" },
+        { address=0XBCA32, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="New Toonland World Remote Collected" },
+        { address=0XBCA39, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Flatulator Boss Defeated" },
+        { address=0XBCA40, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Jungle Boss Defeated" },
+        { address=0XBCA40, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Jungle Level 2 Remote Collected" },
+        { address=0XBCA47, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Does not Activate on boss defeat" },
+        { address=0XBCA47, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rez Boss Level Remote Collected" },
+        { address=0XBCA55, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Kungfu Level Boss COMPLETE" },
+        { address=0XBCA55, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Kungfu Level Boss Remote Collected" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X97CE0, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="bit0=Invincibility Cheat" },
+      },
+      player = {
+        { address=0X97AD0, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="bit0=Super Jump Active" },
+      },
+    },
+  },
+}

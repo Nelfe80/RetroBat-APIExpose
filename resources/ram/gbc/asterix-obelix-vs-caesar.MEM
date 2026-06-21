@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Astérix & Obélix vs Caesar",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "asterix-obelix-vs-caesar",
+    file = "asterix-obelix-vs-caesar.zip",
+    hashes = {
+      { hash = "b7d6335b8d3a34b15ce0b631bb9731a2", label = "Asterix & Obelix Contre Cesar (Europe) (En,Fr,De,Es,Nl) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XC5F6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0XC5F6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+    },
+  },
+}

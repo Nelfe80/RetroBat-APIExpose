@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "MegaMania",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action, Shooter, Space Invaders Like"
+  },
+
+  rom = {
+    name = "megamania",
+    file = "megamania.zip",
+    hashes = {
+      { hash = "318a9d6dda791268df92d72679914ac3", label = "MegaMania - A Space Nightmare (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

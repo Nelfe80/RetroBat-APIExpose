@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Teenage Mutant Ninja Turtles: The Hyperstone Heist",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "teenage-mutant-ninja-turtles-the-hyperstone-heist",
+    file = "teenage-mutant-ninja-turtles-the-hyperstone-heist.zip",
+    hashes = {
+      { hash = "30ede62c8efe3e046e5409758b091eb6", label = "Teenage Mutant Ninja Turtles - The Hyperstone Heist (USA).md" },
+      { hash = "42240e0313fda6a10ac864718990d40d", label = "Teenage Mutant Ninja Turtles - The Hyperstone Heist (USA) (Ru).md" },
+      { hash = "5ff6046c2a265ddbad9f244ac393c584", label = "Teenage Mutant Ninja Turtles - The Hyperstone Heist (USA) (De) (v0.99).md" },
+      { hash = "8ceb57cd66031c30e86698975d99893d", label = "Teenage Mutant Hero Turtles - The Hyperstone Heist (Europe) (Ru) (NewGame).md" },
+      { hash = "8d30e09b0988709472e6750bfd1744ee", label = "Teenage Mutant Ninja Turtles - Return of the Shredder (Japan).md" },
+      { hash = "d55083fb5a014db1c8692e1545309fc7", label = "Teenage Mutant Hero Turtles - The Hyperstone Heist (Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC026, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continues remaining" },
+        { address=0XC07B, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Turned On" },
+        { address=0XFB00, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFB14, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level, 00, 01, 02=hard" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC038, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 lives remaining increased" },
+        { address=0XC038, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 lives remaining decreased" },
+        { address=0XC03A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives left increased" },
+        { address=0XC03A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives left decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC034, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score [16-bit bCD]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC758, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss health" },
+        { address=0XC768, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="FF- Boss Defeated?" },
+      },
+    },
+  },
+}

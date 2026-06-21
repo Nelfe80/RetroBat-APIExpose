@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "~Demo~ WarioWare, Inc.: Trial Version",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Casual Game"
+  },
+
+  rom = {
+    name = "demo-warioware-inc-trial-version",
+    file = "demo-warioware-inc-trial-version.zip",
+    hashes = {
+      { hash = "39891f6dc6233821d27e3319095de733", label = "WarioWare, Inc. - Trial Version (USA).gba" },
+      { hash = "7a856c8add82abb0e70e33d5d67411de", label = "Made in Wario (Japan) (Trial).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0C04, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles over Wario's Face" },
+        { address=0X0C04, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="No titles over Wario's Face" },
+        { address=0X2D3C, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Dodge! / Light" },
+        { address=0X2D3C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stop Me! / 5 Seconds" },
+        { address=0X2D3C, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Catch! / Momentary..." },
+        { address=0X2D3C, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Flee! / Anywhere. Anytime." },
+        { address=0X2D3C, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attack! / The Fastest, The Shortest, The Most." },
+        { address=0X2D3C, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Collect! / Warioware, Inc. Collect" },
+        { address=0X2D3C, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Grab! / Games Total" },
+        { address=0X46418, type="u8", condition="eq", value=0XB0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2C35, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="4 Lives" },
+        { address=0X2C35, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 Lives" },
+        { address=0X2C35, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0X2C35, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Life" },
+        { address=0X2C35, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X2C35, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2C3C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16Bit] High Score" },
+      },
+    },
+  },
+}

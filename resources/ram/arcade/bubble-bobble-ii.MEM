@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "bublbob2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "bubble-bobble-ii",
+    file = "bubble-bobble-ii.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X408272, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", color="orange", min=10, max=50, no_log=false, no_survey=false, desc="Score delta 10-50: Score 10" },
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=60, max=100, no_log=false, no_survey=false, desc="Score delta 60-100: Score 60" },
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", color="cyan", min=150, max=350, no_log=false, no_survey=false, desc="Score delta 150-350: Score 150" },
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", min=400, max=600, no_log=false, no_survey=false, desc="Score delta 400-600: Score 400" },
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", color="orange", min=650, max=850, no_log=false, no_survey=false, desc="Score delta 650-850: Score 650" },
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=900, max=1000, no_log=false, no_survey=false, desc="Score delta 900-1000: Score 900" },
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=2000, max=4000, no_log=false, no_survey=false, desc="Score delta 2000-4000: Score 2000" },
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=5000, max=8000, no_log=false, no_survey=false, desc="Score delta 5000-8000: Score 5000" },
+        { address=0X408230, type="u32be", condition="change", action="SCORE_STATE", color="white", min=9000, max=10000, no_log=false, no_survey=false, desc="Score delta 9000-10000: Score 9000" },
+      },
+    },
+  },
+}

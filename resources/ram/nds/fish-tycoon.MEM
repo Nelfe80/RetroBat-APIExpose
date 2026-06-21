@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Fish Tycoon",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Construction and Management Simulation"
+  },
+
+  rom = {
+    name = "fish-tycoon",
+    file = "fish-tycoon.zip",
+    hashes = {
+      { hash = "3a60694d30437c7b8a5a6e6317b78892", label = "Fish Tycoon (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "8a7084bc7b974d063eaa264c296d338f", label = "Fish Tycoon (USA).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X124D98, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 BIT] Player 1 Stat Lifetime Spent increased" },
+        { address=0X124D98, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 BIT] Player 1 Stat Lifetime Spent decreased" },
+      },
+      health = {
+        { address=0X124D7C, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Orange Snooper (Health)" },
+      },
+    },
+  },
+}

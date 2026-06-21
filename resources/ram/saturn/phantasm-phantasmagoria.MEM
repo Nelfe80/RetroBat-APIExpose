@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "PhantasM | Phantasmagoria",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "phantasm-phantasmagoria",
+    file = "phantasm-phantasmagoria.zip",
+    hashes = {
+      { hash = "07caf2103ec388ec73f357da334af792", label = "PhantasM (Japan) (Disc 3) (2M)" },
+      { hash = "0b82f7b006e3e7445b9b0e66bb8dd95e", label = "PhantasM (Japan) (Disc 6) (4M)" },
+      { hash = "3297d48805a537c650a730dac4efe226", label = "PhantasM (Japan) (Disc 7)" },
+      { hash = "412155f4b2e2082c3689e4592aa1b31a", label = "PhantasM (Japan) (Disc 1)" },
+      { hash = "56dc87ca496716a49a000d3f8bffc54e", label = "PhantasM (Japan) (Disc 2)" },
+      { hash = "c7c9db8d18fcbb61a243aa94377deb67", label = "PhantasM (Japan) (Disc 5)" },
+      { hash = "c81cfc7cb47ea47dc7c7e926f02545e1", label = "PhantasM (Japan) (Disc 4)" },
+      { hash = "fbabc98009cf9e8b2fde37a5e19ad9c4", label = "PhantasM (Japan) (Disc 8)" },
+    }
+  },
+
+  events = {
+  },
+}

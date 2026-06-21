@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Drill</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Drill</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 MAZ 30000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 YOS 27000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 OIS 25000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 NKT 24000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 NAG 22000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 KNK 20000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 MAK 19000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 AYA 18000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 CNA 15000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 HAS 13000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 KSA 12000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 HRA 10000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 MIK 9000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 KVK 8000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 KTO 7000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 KUN 5000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 ASA 4000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 FRU 3000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 MNM 2000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 KNO 1000</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#1 MAZ 110000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#2 YOS 85000</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#3 OIS 78000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#4 NKT 63000</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#5 NAG 55000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#6 KNK 49000</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#7 MAK 47000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#8 AYA 43000</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#9 CNA 39000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#10 HAS 33000</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#11 KSA 31000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#12 HRA 26000</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#13 MIK 23000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#14 KVK 18000</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#15 KTO 15000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#16 KUN 11000</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#17 ASA 7000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#18 FRU 5000</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#19 MNM 2000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#20 KNO 1000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

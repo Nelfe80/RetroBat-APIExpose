@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Rockman 5: Blues no Wana!?",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rockman-5-blues-no-wana",
+    file = "rockman-5-blues-no-wana.zip",
+    hashes = {
+      { hash = "d2a95355ede1f0b1129134bbf204bd49", label = "Rockman 5 - Blues no Wana! (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X56FB8, type="u8", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Intro (only for the title screen)" },
+        { address=0X56FB8, type="u8", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Start (only for a few seconds while loading the demo)" },
+        { address=0X56FB8, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Intro Cards & Title Screen" },
+        { address=0X57084, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen & Main Menu (Complete Works)" },
+        { address=0X5A1F6, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XFC4B8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag (0x01 - paused, 0x00 - not paused)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X56FC6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Screen ID" },
+        { address=0X2002A7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fortress Stages Beaten Flags" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X58340, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max Lives Count (0x01, 0x03, 0x05, 0x09) increased" },
+        { address=0X58340, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max Lives Count (0x01, 0x03, 0x05, 0x09) decreased" },
+        { address=0XFB60D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Flag (for both Mega Man & bosses)" },
+        { address=0X200295, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie Item Flag (0x01 - obtained, 0x00 - not obtained)" },
+        { address=0X2002F7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Count (0x00-0x09) increased" },
+        { address=0X2002F7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Count (0x00-0x09) decreased" },
+      },
+      health = {
+        { address=0X58448, type="u8", condition="eq", value=0X0A, action="HEALTH_STATE", no_log=true, no_survey=false, desc="HP/AT Info Unlocked" },
+        { address=0X2002E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mega Man's HP (0x80-0x9c) decreased" },
+        { address=0X2002E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mega Man's HP (0x80-0x9c) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2002E9, type="u8", condition="eq", value=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Empty" },
+        { address=0X2002E9, type="u8", condition="eq", value=0X9C, action="AMMO_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X2002EA, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Gyro Attack" },
+        { address=0X2002EB, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Crystal Eye" },
+        { address=0X2002EC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Napalm Bomb" },
+        { address=0X2002ED, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Super Arrow" },
+        { address=0X2002EE, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Power Stone" },
+        { address=0X2002F0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Charge Kick" },
+        { address=0X2002F1, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Star Crash" },
+        { address=0X2002F2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Rush Coil" },
+        { address=0X2002F3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Rush Jet" },
+        { address=0X2002F4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Weapon Ammo - Beat" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5A640, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP (0x00-0x1c)" },
+        { address=0X2002A3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Bitflags] Boss Rush Beaten Flags" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X5A7A0, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Mega Man's Invincibility Timer (0x00-0x3c)" },
+      },
+    },
+  },
+}

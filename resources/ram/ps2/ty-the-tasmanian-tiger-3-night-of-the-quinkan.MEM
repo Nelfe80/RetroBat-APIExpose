@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Ty the Tasmanian Tiger 3: Night of the Quinkan",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ty-the-tasmanian-tiger-3-night-of-the-quinkan",
+    file = "ty-the-tasmanian-tiger-3-night-of-the-quinkan.zip",
+    hashes = {
+      { hash = "c6a20fba598af78088f326b8f18cfabc", label = "TY the Tasmanian Tiger - Night of the Quinkan (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X74D0E4, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Play" },
+        { address=0X74D0E4, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XAFE890, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Mission Complete: Demolition Derby" },
+        { address=0XB20802, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demolition Derby, Earth Stone" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB20680, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Dingo Marsh" },
+        { address=0XB20702, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Dingo Marsh" },
+        { address=0XB20741, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Dingo Marsh" },
+        { address=0XB20780, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Dingo Marsh Steve" },
+        { address=0XB20800, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Dingo Marsh, Earth Stone" },
+        { address=0XB20800, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Dingo Marhs, Water Stone from Steve" },
+        { address=0XB20800, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Dingo Marsh, Mega Stone" },
+        { address=0XB20807, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Dingo Marsh, Water Stone from Turkey" },
+      },
+      health = {
+        { address=0X696534, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ty's Max Health decreased" },
+        { address=0X696534, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ty's Max Health increased" },
+        { address=0X69653C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ty's Health decreased" },
+        { address=0X69653C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ty's Health increased" },
+        { address=0X1367080, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hexaquin HP decreased" },
+        { address=0X1367080, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hexaquin HP increased" },
+        { address=0X13DA680, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dragonquin HP decreased" },
+        { address=0X13DA680, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dragonquin HP increased" },
+        { address=0X18DAD00, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Quinking HP decreased" },
+        { address=0X18DAD00, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Quinking HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAFC628, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Naomi's Bunyip Weapons]" },
+        { address=0XAFC684, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Naomi's Bunyip Weapons]" },
+        { address=0XAFC6E0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Naomi's Bunyip Weapons]" },
+        { address=0XAFC73C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Naomi's Bunyip Weapons]" },
+        { address=0XAFC798, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Naomi's Bunyip Weapons]" },
+        { address=0XAFC7F4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Naomi's Bunyip Weapons]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X76E56C, type="u8", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Chassis" },
+        { address=0XAFACA4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Chassis Unlocked (20,000 Opals) increased" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB200A0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Fire Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB200C0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Water Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB200E0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Air Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB20100, action="MONEY_STATE", no_log=false, no_survey=false, desc="Earth Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB20120, action="MONEY_STATE", no_log=false, no_survey=false, desc="Chrono Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB20140, action="MONEY_STATE", no_log=false, no_survey=false, desc="Lash Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB20160, action="MONEY_STATE", no_log=false, no_survey=false, desc="Warp Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB20180, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ultra Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB201A0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mega Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB201C0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Multi Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB201E0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Zoom Stone" },
+        { address=0XB204D0, type="u32le", condition="eq", value=0XB20200, action="MONEY_STATE", no_log=false, no_survey=false, desc="Magnet Stone" },
+        { address=0XB204F8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Chassis Rang Info ID (06) increased" },
+        { address=0XB2050C, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Fire Properties" },
+        { address=0XB2050C, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Water Properties" },
+        { address=0XB2050C, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Air Properties" },
+        { address=0XB2050C, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Earth Stone" },
+        { address=0XB2050D, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ultra Properties" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB024F4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission Complete: Go find Boss Cass" },
+      },
+    },
+  },
+}

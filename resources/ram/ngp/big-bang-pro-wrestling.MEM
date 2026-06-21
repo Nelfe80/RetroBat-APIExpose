@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Big Bang Pro Wrestling",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "big-bang-pro-wrestling",
+    file = "big-bang-pro-wrestling.zip",
+    hashes = {
+      { hash = "184dc284995dc20ddce599426b9cac7d", label = "Big Bang Pro Wrestling (Japan) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0ACC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] P2 Health decreased" },
+        { address=0X0ACC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] P2 Health increased" },
+        { address=0X0B56, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] P1 HP decreased" },
+        { address=0X0B56, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] P1 HP increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0BCC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Countdown timer for continue" },
+      },
+    },
+  },
+}

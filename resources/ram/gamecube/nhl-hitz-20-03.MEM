@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "NHL Hitz 20-03",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "nhl-hitz-20-03",
+    file = "nhl-hitz-20-03.zip",
+    hashes = {
+      { hash = "25c68e9cd9723116dd06acbb3358cbd9", label = "NHL Hitz 2003 (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X606E1D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Franchise - Current Game - Team Stats - Away Goals" },
+      },
+      zone = {
+        { address=0X7D7AC1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[128bit ASCII] Franchise mode, looking at world map for stages - Task 3 text (Dynamic)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X606E20, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Franchise - Current Game - Team Stats Away - Successful 1 Timers" },
+        { address=0X606E21, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Franchise - Current Game - Team Stats Away - 1 Timers Attempts" },
+      },
+    },
+  },
+}

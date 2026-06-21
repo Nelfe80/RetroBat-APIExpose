@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Warriors Orochi",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "warriors-orochi",
+    file = "warriors-orochi.zip",
+    hashes = {
+      { hash = "49ebed909c63c4ba37d51e040bd0fec7", label = "Warriors Orochi (Germany) (En,De).iso" },
+      { hash = "cc389dbf9f7ca09edeb30c063deff5bd", label = "Warriors Orochi (Europe).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X18A43D7, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Abilities - Inventory/Levels" },
+        { address=0X18A43F4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu - Background Image [16Bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X18A46E6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gameplay - Slot 1 Character HP [16Bit] decreased" },
+        { address=0X18A46E6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gameplay - Slot 1 Character HP [16Bit] increased" },
+        { address=0X18A470E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gameplay - Slot 2 Character HP [16Bit] decreased" },
+        { address=0X18A470E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gameplay - Slot 2 Character HP [16Bit] increased" },
+        { address=0X18A4736, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gameplay - Slot 3 Character HP [16Bit] decreased" },
+        { address=0X18A4736, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gameplay - Slot 3 Character HP [16Bit] increased" },
+      },
+    },
+  },
+}

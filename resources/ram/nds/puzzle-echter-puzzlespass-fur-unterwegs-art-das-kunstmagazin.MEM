@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle - Echter Puzzlespass für Unterwegs: art - Das Kunstmagazin",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-echter-puzzlespass-fur-unterwegs-art-das-kunstmagazin",
+    file = "puzzle-echter-puzzlespass-fur-unterwegs-art-das-kunstmagazin.zip",
+    hashes = {
+      { hash = "7b5b3408819a25960c85285b1f86e2bb", label = "Art Puzzle - Das Kunstmagazin - Echter Puzzlespass fuer Unterwegs (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

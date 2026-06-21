@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Nontan to Issho: Kurukuru Puzzle",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "nontan-to-issho-kurukuru-puzzle",
+    file = "nontan-to-issho-kurukuru-puzzle.zip",
+    hashes = {
+      { hash = "abd1b7abfdb05162688e5abd2879a9f3", label = "Nontan to Issho - Kurukuru Puzzle (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X049C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag" },
+        { address=0X049E, type="u8", condition="neq", value=0X0, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In-Level State Flag active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0043, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Per-level frame countdown" },
+        { address=0X04A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Setup Flag" },
+        { address=0X04B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background flag" },
+        { address=0X05DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected Level" },
+        { address=0X1828, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X184E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of rows being cleared by two or more character panels" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X060B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="5 Level cutscene counter" },
+      },
+    },
+  },
+}

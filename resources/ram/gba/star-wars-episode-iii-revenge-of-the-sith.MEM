@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Star Wars - Episode III: Revenge of the Sith",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "star-wars-episode-iii-revenge-of-the-sith",
+    file = "star-wars-episode-iii-revenge-of-the-sith.zip",
+    hashes = {
+      { hash = "6c44b49d69e6c0576197742f20250c40", label = "Star Wars - Episode III - Revenge of the Sith (USA) (En,Fr,Es).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X76E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total force moves used in current level" },
+        { address=0X76E5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total reflects in current level" },
+        { address=0X76E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Fury skills used in current level" },
+        { address=0X77AC, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X77AC, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Beat" },
+      },
+      stage = {
+        { address=0X2AA8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level Select Stage: (Hex)" },
+        { address=0X41B4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In Stage: 01, else 00" },
+        { address=0X7789, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage: (Hex)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X77B2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Anakin Lives increased" },
+        { address=0X77B2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Anakin Lives decreased" },
+        { address=0X77B3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Obi-Wan Lives increased" },
+        { address=0X77B3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Obi-Wan Lives decreased" },
+      },
+      health = {
+        { address=0X4A54, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bodyguard 2 HP decreased" },
+        { address=0X4A54, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bodyguard 2 HP increased" },
+        { address=0X4B44, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="BodyGuard 1 HP decreased" },
+        { address=0X4B44, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="BodyGuard 1 HP increased" },
+        { address=0X77AE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Anakin's HP: Hex decreased" },
+        { address=0X77AE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Anakin's HP: Hex increased" },
+        { address=0X77AF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Obi Wan's health value (3d is default)(Hex) decreased" },
+        { address=0X77AF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Obi Wan's health value (3d is default)(Hex) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4C43, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP: Mace Windu (starts at 33)(Hex)" },
+        { address=0X4D0B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP: Grievous (starts at 33)(Hex)" },
+        { address=0X4D3F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP: Obi Wan / Anakin (starts at 33)(Hex)" },
+        { address=0X4D9B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP: Count Dooku (starts at 33)(Hex)" },
+        { address=0X4E0F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP: Cin Drallig (starts at 33)(Hex)" },
+        { address=0X4FC7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP: Bodyguard (starts at 33)(Hex)" },
+        { address=0X7790, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP: (16 bit)(Hex)" },
+      },
+    },
+  },
+}

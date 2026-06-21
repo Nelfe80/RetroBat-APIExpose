@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Dragon Crystal",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-crystal",
+    file = "dragon-crystal.zip",
+    hashes = {
+      { hash = "8431baccd169025f79c9cbc44e31622d", label = "Dragon Crystal (USA, Europe).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X063E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of continues used: Hex" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X001C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sprite animation. 01 also signifies the menu screen in the overworld." },
+        { address=0X061F, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level - Hex" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X003C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Critical health animation 1/2 decreased" },
+        { address=0X003C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Critical health animation 1/2 increased" },
+        { address=0X003D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Critical health animation 2/2 decreased" },
+        { address=0X003D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Critical health animation 2/2 increased" },
+        { address=0X00AF, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Dealth/Recieved 000X : Dec" },
+        { address=0X00B0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Dealth/Recieved 00X0 : Dec" },
+        { address=0X00B1, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Dealth/Recieved 0X00 : Dec" },
+        { address=0X0621, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP: Hex 16-bit decreased" },
+        { address=0X0621, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP: Hex 16-bit increased" },
+        { address=0X0623, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP: Hex 16-bit decreased" },
+        { address=0X0623, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP: Hex 16-bit increased" },
+        { address=0X063A, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Dealt: Hex" },
+        { address=0X07F5, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage dealt/received" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0617, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon HIT: Hex" },
+        { address=0X0618, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon PW: Hex" },
+        { address=0X0C00, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon 1 - Japan" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0014, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Addresses 14 and 15 keep track of multiple values: gold count (via pickups), health (damage take" },
+        { address=0X0014, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Addresses 14 and 15 keep track of multiple values: gold count (via pickups), health (damage take" },
+        { address=0X0015, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Addresses 14 and 15 keep track of multiple values: gold count (via pickups), health (damage take" },
+        { address=0X0015, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Addresses 14 and 15 keep track of multiple values: gold count (via pickups), health (damage take" },
+        { address=0X062B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold: Dec increased" },
+        { address=0X062C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold: Dec - 16-bit increased" },
+        { address=0X0928, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Slot 1: Hex increased" },
+        { address=0X0929, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Slot 2: Hex increased" },
+        { address=0X092A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Slot 3: Hex increased" },
+        { address=0X092B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Slot 4: Hex increased" },
+        { address=0X092C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Slot 5: Hex increased" },
+        { address=0X092D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Slot 6: Hex increased" },
+        { address=0X092E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Slot 7: Hex increased" },
+        { address=0X092F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Slot 8: Hex increased" },
+        { address=0X0930, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Equipped: 00-No, 01-Yes increased" },
+        { address=0X0C28, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring 1 - Japan increased" },
+        { address=0X0C30, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring equipped: 01 - Japan increased" },
+        { address=0X1DC4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Used for pausing during win credits - 07 increased" },
+      },
+    },
+  },
+}

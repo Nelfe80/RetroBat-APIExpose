@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Crash: Mind Over Mutant",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "crash-mind-over-mutant",
+    file = "crash-mind-over-mutant.zip",
+    hashes = {
+      { hash = "75396fe55bcea74a5bb59e75de722185", label = "Crash - Mind over Mutant (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X225C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="01. No Place Like Wumpa" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X225D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="02. Freezer Burn" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X225E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="03. N is for Evil" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X225F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="04. Hot Stuff" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2260, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="05. Don't Recycle!" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2261, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="06. The Dark Side" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2262, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="07. Crash Grab" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2263, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="08. Can U Dig It?" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2264, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="09. A Wumpa A Day..." },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X229B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="10. Duplex Crash" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X229C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="12. Big Shooter" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X229D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="13. Cold Feat" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X229E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="14. Easy Does It" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X229F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="15. It Takes Two to Tango" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22A0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="16. Over Easy" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22A1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="17. Would You Like Fries with That?" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22A2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="18. Break Them to it Gently" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22A3, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="19. Chuck is that You?" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22A4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="20. Mutant Recycle" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22DB, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="21. Multi-Tasking" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22DC, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="22. Stone Cold Crash" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22E0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="23. Spike the Punch" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X22E2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="24. Follow Your Nose" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X231C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="25. Whack a Nerd" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X231D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="26. Fashion Fury" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X231E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="27. OO OO AH AH" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X231F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="28. Shadow Boxing" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2320, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="29. Slap on the Wrist" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2321, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="30. Snow Blows" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2322, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="31. Rumble in the Jungle" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2323, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="32. Stand in the Sand" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2324, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="33. Kick in the Junkyard" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X235B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="34. Lark in the Dark" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X235C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="35. Girl Power" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X235D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="36. Crunched" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X235E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="37. Neo is Getting Angry" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X235F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="38. Crash King" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2360, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="39. Ice on the Cake" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2361, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="40. Shell Shocked" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2362, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="41. T to the K" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X2364, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="42. Roll it Up" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X239B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="43. Stick it to Them" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X239C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="44. Shoot the Works" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X239D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="45. Goo Squared" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X239F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="46. Night Fright" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X23A1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="47. P Stinking U" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X23A4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="11. A Combo to Go" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X23DB, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="49. The Glass is Half Full" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X23DC, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="48. Two Bits" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X23DD, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="50. And a Hair Cut" },
+        { address=0X1A7ADD4, type="u16le", condition="eq", value=0X23DE, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Superstar" },
+        { address=0X1B2E158, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Active Check" },
+      },
+      events = {
+        { address=0X1B47DD0, type="u16le", condition="eq", value=0X05, action="COMBO_HIT", no_log=false, no_survey=false, desc="A Combo to Go" },
+        { address=0X1B47DD1, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] Optional Mission Progress | 11. A Combo to Go" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X7168E0, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Cheat Active | Enemies Leave behind Quad Damage" },
+        { address=0X73BD68, type="u32le", condition="eq", value=0X14, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Upgrade" },
+        { address=0X1E3E694, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit Float] Crash Health decreased" },
+        { address=0X1E3E694, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit Float] Crash Health increased" },
+        { address=0X1E3E6A4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit Float] Initial Crash Health upon Repawn decreased" },
+        { address=0X1E3E6A4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit Float] Initial Crash Health upon Repawn increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B47CD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Highest Multiplier Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X73BCD8, type="u32le", condition="eq", value=0X09, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Midway Pack" },
+      },
+    },
+  },
+}

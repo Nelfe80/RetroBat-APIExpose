@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Ratchet: Deadlocked",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform, Shooter"
+  },
+
+  rom = {
+    name = "ratchet-deadlocked",
+    file = "ratchet-deadlocked.zip",
+    hashes = {
+      { hash = "cc1ef0856c25bbd31a5bad7d2c07aca3", label = "Ratchet - Deadlocked (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X171BB4, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="No Fly Zone" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X171BA9, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Again" },
+        { address=0X171BC0, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Medieval Power" },
+        { address=0X171BCC, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead On" },
+        { address=0X171BD1, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Drop Dead" },
+        { address=0X171BD9, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Last" },
+        { address=0X171BDC, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Is Near" },
+      },
+      health = {
+        { address=0X171BBC, type="u8", condition="bit_true", bit=3, mask=0X08, action="HIT", no_log=false, no_survey=false, desc="That's Gotta Hurt" },
+        { address=0X171BC0, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Healthy" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X21DE20, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shellshock (Purchase all of Ratchet's weapons and all omega mods)" },
+        { address=0X21DE20, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Reactor (Purchase the Mega upgrade of each weapon)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X21DE20, type="u8", condition="bit_true", bit=3, mask=0X08, action="SCORE_STATE", no_log=false, no_survey=false, desc="Ace Hardlight (Obtain 400,000 dread points)" },
+        { address=0X21DE20, type="u8", condition="bit_true", bit=4, mask=0X10, action="SCORE_STATE", no_log=false, no_survey=false, desc="Gleemon Vox (Acquire all skill points)" },
+      },
+      collectibles = {
+        { address=0X171BC1, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring My Bell" },
+        { address=0X171BDD, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Show me the Money" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X171B59, type="u8", condition="bit_true", bit=2, mask=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Starshield" },
+      },
+    },
+  },
+}

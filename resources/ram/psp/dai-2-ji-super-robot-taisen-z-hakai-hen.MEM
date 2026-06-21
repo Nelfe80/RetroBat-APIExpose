@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Dai-2-Ji Super Robot Taisen Z Hakai-hen",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dai-2-ji-super-robot-taisen-z-hakai-hen",
+    file = "dai-2-ji-super-robot-taisen-z-hakai-hen.zip",
+    hashes = {
+      { hash = "4c96a46fd1eeb5e79551cfcfd9953756", label = "Dai-2-Ji Super Robot Taisen Z Hakai-hen (Japan) (En) (20121116) (SRWFanHobByt3).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XD5B83F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8 Bit] SR Points Counter" },
+      },
+      collectibles = {
+        { address=0XD5B788, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Money increased" },
+      },
+    },
+  },
+}

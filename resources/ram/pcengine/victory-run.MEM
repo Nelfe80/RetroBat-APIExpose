@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Victory Run",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "victory-run",
+    file = "victory-run.zip",
+    hashes = {
+      { hash = "bc4361c967514ef29293778ad748a6b7", label = "Victory Run (USA).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01FF, type="u8", condition="eq", value=0X88, action="GAME_OVER", no_log=false, no_survey=false, desc="GAME OVER" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1503, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer is Negative" },
+        { address=0X1503, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="0x00 = Timer is Positive;" },
+      },
+    },
+  },
+}

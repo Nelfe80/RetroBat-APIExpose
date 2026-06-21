@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "An American Tail",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "an-american-tail",
+    file = "an-american-tail.zip",
+    hashes = {
+      { hash = "cfc6ee233fc522a3f34a61b7104cf5eb", label = "American Tail, An (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi)" },
+    }
+  },
+
+  events = {
+  },
+}

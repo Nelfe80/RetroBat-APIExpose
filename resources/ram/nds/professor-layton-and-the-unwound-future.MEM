@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Professor Layton and the Unwound Future",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "professor-layton-and-the-unwound-future",
+    file = "professor-layton-and-the-unwound-future.zip",
+    hashes = {
+      { hash = "05468925e9cd2423a05fcc0d3891105e", label = "Professor Layton und die Verlorene Zukunft (Germany).nds" },
+      { hash = "44ea6af95d182b0ebcb7db8e4587d4fb", label = "Professor Layton en de Verloren Toekomst (Netherlands).nds" },
+      { hash = "a927df1d6fd962d8e115de982486f955", label = "Professor Layton and the Lost Future (Europe, Australia).nds" },
+      { hash = "ca816da2afd8c1c885a8c3c373f1f761", label = "Professor Layton e il Futuro Perduto, Il (Italy).nds" },
+      { hash = "f28bde56e92db8e033febeda8508819d", label = "Profesor Layton y el Futuro Perdido, El (Spain).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XFE764, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X2FD4DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Looks like current Overworld Dialog" },
+        { address=0X2FEC40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Parrot Minigame Level" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XFE728, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Hint Coins (16bit) increased" },
+        { address=0XFE72A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Hint Coins (16bit) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFE49C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit2=Hidden Door open" },
+      },
+    },
+  },
+}

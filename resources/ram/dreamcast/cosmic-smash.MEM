@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Cosmic Smash",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "cosmic-smash",
+    file = "cosmic-smash.zip",
+    hashes = {
+      { hash = "c7978ab185ae13d6d1e22d48089e9807", label = "Cosmic Smash (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X262ED4, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X262ED4, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XECDC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="02 = In-Level" },
+        { address=0X162F78, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Levels Completed" },
+        { address=0X16E79C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Levels Reached?" },
+        { address=0X264B00, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Stages Finish w/ Trick Shot" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X162F80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X168CB4, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks remaining?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X162FCC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Bonus" },
+        { address=0X20D2EA, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bonus Time" },
+      },
+    },
+  },
+}

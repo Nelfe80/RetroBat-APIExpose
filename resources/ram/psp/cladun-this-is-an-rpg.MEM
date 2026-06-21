@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cladun: This Is An RPG",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cladun-this-is-an-rpg",
+    file = "cladun-this-is-an-rpg.zip",
+    hashes = {
+      { hash = "b2a1152db94234f2aaf6bdc05c3c52f5", label = "Cladun - This is an RPG! (USA) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

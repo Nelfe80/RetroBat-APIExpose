@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Orius",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "orius",
+    file = "orius.zip",
+    hashes = {
+      { hash = "b05956715f2900dec8d40cf321aac210", label = "xexex.7z <Xexex (ver EAA)>" },
+      { hash = "773b5780c2f4fe4d5252d21c2dab791a", label = "xexexa.7z <Xexex (ver AAA)>" },
+      { hash = "ddd55aaef4322097691abf1e32feaa9b", label = "orius.7z <Orius (ver UAA)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01EB, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [8bit BCD]" },
+        { address=0X2401, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Some about DEMO? [8bit]" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X2018, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage [8bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X224C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP [8bit] decreased" },
+        { address=0X224C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP [8bit] increased" },
+        { address=0X264C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP [8bit] decreased" },
+        { address=0X264C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP [8bit] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0056, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score HI (XX) (XX 0000 0) [16bit]" },
+        { address=0X0058, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score HI (00) (00 XXXX 0) [16bit]" },
+        { address=0X1190, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Bonus Score [16bit BCD]" },
+        { address=0X1192, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Bonus Score [16bit BCD]" },
+        { address=0X2002, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P1 (XX) (XX 0000 0) [16bit]" },
+        { address=0X2004, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P1 (00) (00 XXXX 0) [16bit]" },
+        { address=0X2402, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P2 (XX) (XX 0000 0) [16bit]" },
+        { address=0X2404, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P2 (00) (00 XXXX 0) [16bit]" },
+        { address=0X5000, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Rank 1 (XX) (XX 0000 0) [16bit]" },
+        { address=0X5002, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Rank 1 (00) (00 XXXX 0) [16bit]" },
+      },
+      collectibles = {
+        { address=0X0511, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="DipSwitch - Coin Options 2 [8bit] increased" },
+        { address=0X0512, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="DipSwitch - Coin Options 1 [8bit] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0510, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DipSwitch - Game Options 1 [8bit]" },
+        { address=0X0513, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DipSwitch - Game Options 2 [8bit]" },
+        { address=0X23D5, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DipSwitch - Sound Check [8bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0063, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Over - Continue Counter [8bit BCD]" },
+        { address=0X23BE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Title Counter to Demo [8bit]" },
+      },
+    },
+  },
+}

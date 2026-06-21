@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Dragon Ball Z: The Legacy of Goku",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-ball-z-the-legacy-of-goku",
+    file = "dragon-ball-z-the-legacy-of-goku.zip",
+    hashes = {
+      { hash = "3100fc5a4427a7b0cc20b861134e60f2", label = "Dragon Ball Z - The Legacy of Goku (USA).gba" },
+      { hash = "8246b72cb4b6872724836776c123cb55", label = "Dragon Ball Z - The Legacy of Goku (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X004C, type="u8", condition="eq", value=0XA, action="LIVES_STATE", no_log=false, no_survey=false, desc="entrance to afterlife" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0C14, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Inactive" },
+        { address=0X0C14, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Active" },
+        { address=0X0C18, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Inactive" },
+        { address=0X0C18, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+  },
+}

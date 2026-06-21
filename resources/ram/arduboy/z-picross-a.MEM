@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "~Z~ Picross_a",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-picross-a",
+    file = "z-picross-a.zip",
+    hashes = {
+      { hash = "d44dfa26a30c4238271e480177cd0297", label = "Picross a (World).hex" },
+    }
+  },
+
+  events = {
+  },
+}

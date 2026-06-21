@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "My Virtual Tutor: Reading - Kindergarten to 1st Grade",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "my-virtual-tutor-reading-kindergarten-to-1st-grade",
+    file = "my-virtual-tutor-reading-kindergarten-to-1st-grade.zip",
+    hashes = {
+      { hash = "187df26f393b7952bebb39e5138ab604", label = "My Virtual Tutor - Reading - K to 1st Grade (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X980E6, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 1" },
+        { address=0X980E6, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 2" },
+        { address=0X980E6, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 3" },
+        { address=0X980E6, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 4" },
+        { address=0X980E6, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 5" },
+        { address=0X980E6, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 6" },
+        { address=0X980E6, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 7" },
+        { address=0X980E6, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 8" },
+        { address=0X980E7, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 9" },
+        { address=0X980E7, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 10" },
+        { address=0X980E7, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 11" },
+        { address=0X980E7, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 12" },
+        { address=0X980E7, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 13" },
+        { address=0X980E7, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 14" },
+        { address=0X980E7, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 15" },
+        { address=0X980E7, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 16" },
+        { address=0X980E8, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 17" },
+        { address=0X980E8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 18" },
+        { address=0X980E8, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 19" },
+        { address=0X980E8, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quiz Level 20" },
+      },
+      stage = {
+        { address=0XBF174, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32bit] Active Quiz Level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X98099, type="u8", condition="bit_true", bit=0, mask=0X01, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Read To Me option unlocked" },
+        { address=0X98099, type="u8", condition="bit_true", bit=1, mask=0X02, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Explore option unlocked" },
+        { address=0X98099, type="u8", condition="bit_true", bit=2, mask=0X04, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater I Can Read option unlocked" },
+        { address=0X98099, type="u8", condition="bit_true", bit=3, mask=0X08, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Paint option unlocked" },
+        { address=0X98139, type="u8", condition="bit_true", bit=0, mask=0X01, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Read To Me option unlocked" },
+        { address=0X98139, type="u8", condition="bit_true", bit=1, mask=0X02, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Explore option unlocked" },
+        { address=0X98139, type="u8", condition="bit_true", bit=2, mask=0X04, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater I Can Read option unlocked" },
+        { address=0X98139, type="u8", condition="bit_true", bit=3, mask=0X08, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Paint option unlocked" },
+        { address=0X981D9, type="u8", condition="bit_true", bit=0, mask=0X01, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Read To Me option unlocked" },
+        { address=0X981D9, type="u8", condition="bit_true", bit=1, mask=0X02, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Explore option unlocked" },
+        { address=0X981D9, type="u8", condition="bit_true", bit=2, mask=0X04, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater I Can Read option unlocked" },
+        { address=0X981D9, type="u8", condition="bit_true", bit=3, mask=0X08, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Underwater Paint option unlocked" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA1A7C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Time Remaining Until Next Opening Screen Shows Up" },
+      },
+    },
+  },
+}

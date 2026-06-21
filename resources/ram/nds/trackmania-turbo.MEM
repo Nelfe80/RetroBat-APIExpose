@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "TrackMania Turbo",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing, Arcade"
+  },
+
+  rom = {
+    name = "trackmania-turbo",
+    file = "trackmania-turbo.zip",
+    hashes = {
+      { hash = "4526abf8b3344ec64a05879d49c67936", label = "TrackMania Turbo (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F0508, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Resume" },
+        { address=0X1F0508, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0X1F0508, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Skip Track" },
+        { address=0X1F0508, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit" },
+        { address=0X1F05A8, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="In the pause menu" },
+        { address=0X1F05A8, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not in the pause menu" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1F2180, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X278064, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Track 1 Gold Time increased" },
+        { address=0X278088, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Track 2 Gold Time increased" },
+        { address=0X2780AC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Track 3 Gold Time increased" },
+        { address=0X2780D0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Track 4 Gold Time increased" },
+        { address=0X2780F4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Track 5 Gold Time increased" },
+        { address=0X27870C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Puzzle 1 Gold Time increased" },
+        { address=0X278730, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Puzzle 2 Gold Time increased" },
+        { address=0X278754, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Puzzle 3 Gold Time increased" },
+        { address=0X278779, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Puzzle 4 Gold Time increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X27BA7E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[45-byte] Stadium Blocks File 1" },
+        { address=0X27BABE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[40-byte] Island Blocks File 1" },
+        { address=0X27BAFE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[30-byte] Snow Blocks File 1" },
+        { address=0X27BB3E, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-byte] Coast Blocks File 1" },
+        { address=0X27C8BE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[45-byte] Stadium Blocks File 2" },
+        { address=0X27C8FE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[40-byte] Island Blocks File 2" },
+        { address=0X27C93E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[30-byte] Snow Blocks File 2" },
+        { address=0X27C97E, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-byte] Coast Blocks File 2" },
+        { address=0X27E16E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[45-byte] Stadium Blocks File 3" },
+        { address=0X27E1AE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[40-byte] Island Blocks File 3" },
+        { address=0X27E1EE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[30-byte] Snow Blocks File 3" },
+        { address=0X27E22E, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-byte] Coast Blocks File 3" },
+      },
+    },
+  },
+}

@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Hot Wheels: World Race",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "hot-wheels-world-race",
+    file = "hot-wheels-world-race.zip",
+    hashes = {
+      { hash = "87a346b118f9a640e6e486ce52324b67", label = "Hot Wheels - World Race (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X800710, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32-Bit - Options - Sound Level" },
+        { address=0X800714, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32-Bit - Options - Music Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEC3338, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Float - 3rd Challenge - Timer" },
+        { address=0XEC9E38, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Float - 5th Challenge - Timer" },
+        { address=0XECD2D8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Float - 1st Challenge - Timer" },
+        { address=0XEDE548, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Float - 2nd Challenge - Timer" },
+      },
+    },
+  },
+}

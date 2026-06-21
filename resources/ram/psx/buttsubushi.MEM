@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Buttsubushi",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "buttsubushi",
+    file = "buttsubushi.zip",
+    hashes = {
+      { hash = "2649557b233d5f700d09f61429e51419", label = "Buttsubushi (Japan)" },
+      { hash = "0b5976144c574c7a53d0ec21d313b805", label = "Buttsubushi (Europe, Australia)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDF8C0, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[JP] Continue bar fill" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDF439, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[JP] Com level" },
+        { address=0XE2F90, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (1-8) [bitflags]" },
+        { address=0XE2F91, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (9-16) [bitflags]" },
+        { address=0XE2F92, type="u24le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (17-24) [bitflags]" },
+        { address=0XE2F93, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (25-32) [bitflags]" },
+        { address=0XE2F94, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (33-40) [bitflags]" },
+        { address=0XE2F95, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (41-48) [bitflags]" },
+        { address=0XE2F96, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (49-56) [bitflags]" },
+        { address=0XE2F97, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (57-64) [bitflags]" },
+        { address=0XE2F98, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (65-72) [bitflags]" },
+        { address=0XE2F99, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (73-80) [bitflags]" },
+        { address=0XE2F9A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (81-88) [bitflags]" },
+        { address=0XE2F9B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (89-96) [bitflags]" },
+        { address=0XE2F9C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[JP] Puzzle mode stages cleared (97-100) [bitflags]" },
+        { address=0XE40C1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[EU] Com level" },
+        { address=0XE7C20, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (1-8) [bitflags]" },
+        { address=0XE7C21, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (9-16) [bitflags]" },
+        { address=0XE7C22, type="u24le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (17-24) [bitflags]" },
+        { address=0XE7C23, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (25-32) [bitflags]" },
+        { address=0XE7C24, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (33-40) [bitflags]" },
+        { address=0XE7C25, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (41-48) [bitflags]" },
+        { address=0XE7C26, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (49-56) [bitflags]" },
+        { address=0XE7C27, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (57-64) [bitflags]" },
+        { address=0XE7C28, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (65-72) [bitflags]" },
+        { address=0XE7C29, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (73-80) [bitflags]" },
+        { address=0XE7C2A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (81-88) [bitflags]" },
+        { address=0XE7C2B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (89-96) [bitflags]" },
+        { address=0XE7C2C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[EU] Puzzle mode stages cleared (97-100) [bitflags]" },
+      },
+      stage = {
+        { address=0XE2FC, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tile" },
+        { address=0XE2FC, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Grassland" },
+        { address=0XE2FC, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gion" },
+        { address=0XE2FC, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lab" },
+        { address=0XE2FC, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ocean" },
+        { address=0XE2FC, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Safety First" },
+        { address=0XE2FC, type="u8", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jail" },
+        { address=0XE2FC, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Intersection" },
+        { address=0XE2FC, type="u8", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Building" },
+        { address=0XE2FC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[EU] VS mode stage selected (menu only)" },
+        { address=0XDDEE0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[JP] 3 if in-game on any stage, 1 otherwise" },
+        { address=0XDF450, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[JP] Current stage in 1P/VS mode (in-game)" },
+        { address=0XDF884, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[JP] Current stage in puzzle mode" },
+        { address=0XE2B4C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[EU] 3 if in-game on any stage, 1 otherwise" },
+        { address=0XE40D8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[EU] Current stage in 1P/VS mode (in-game)" },
+        { address=0XE450C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[EU] Puzzle mode stage selected" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF2EC6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[JP] FF if you died in 1P mode, 0 otherwise" },
+        { address=0XF7B56, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[EU] FF if you died in 1P mode, 0 otherwise" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X108C74, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[JP] Max blocks you can spawn" },
+        { address=0X108C78, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[JP] Max switches you can spawn" },
+        { address=0X10D904, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[EU] Max blocks you can spawn" },
+        { address=0X10D908, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[EU] Max switches you can spawn" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDF7F0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[JP] Updates level timer" },
+        { address=0XDF7F4, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[JP] Level timer" },
+        { address=0XDF8BC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[JP] Updates continue timer" },
+        { address=0XDF8BE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[JP] Continue timer" },
+        { address=0XE4478, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[EU] Updates level timer" },
+        { address=0XE447C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[EU] Level timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Taiko no Tatsujin: Waku Waku Anime Matsuri",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "taiko-no-tatsujin-waku-waku-anime-matsuri",
+    file = "taiko-no-tatsujin-waku-waku-anime-matsuri.zip",
+    hashes = {
+      { hash = "ae962d418284e3cc13b379103b76d9ec", label = "Taiko no Tatsujin - Waku Waku Anime Matsuri (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4A6A3C, type="u32le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Taiko no Tatsujin" },
+        { address=0X4A6A48, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32 Bit] P2 Arcade Title" },
+        { address=0X4D8404, type="u32le", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Tutorial" },
+        { address=0X4D8404, type="u32le", condition="eq", value=0X09, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+      events = {
+        { address=0X4A69FC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P1 Result - Max Combo" },
+        { address=0X4A6A18, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P2 Result - Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4678C0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Survival Cutscene End (Survival Clear!)" },
+        { address=0X484474, type="u32le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Silver (Cleared)" },
+        { address=0X485458, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Arcade - Amount of Kantan Clears" },
+        { address=0X48545C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Arcade - Amount of Futsuu Clears" },
+        { address=0X485460, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Arcade - Amount of Muzukashi Clears" },
+        { address=0X485464, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Arcade - Amount of Oni Clears" },
+        { address=0X4854A0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Current Survival Round" },
+        { address=0X48556C, type="u32le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Unlocks when the first course is cleared" },
+        { address=0X485570, type="u32le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Unlocks when the second course is cleared" },
+        { address=0X485574, type="u32le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Unlocks when the third course is cleared" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X484ABC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Current Round on any mode" },
+        { address=0X484C54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Arcade/Survival - First Song Score" },
+        { address=0X484C58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Arcade - Second Song Score" },
+        { address=0X484C5C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Survival - Third Song Score" },
+        { address=0X484C60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Survival - Fourth Song Score" },
+        { address=0X484C64, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Survival - Fifth Song Score" },
+        { address=0X484C68, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Survival - Sixth Song Score" },
+        { address=0X484C6C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Survival - Last Song Score" },
+        { address=0X484DE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Arcade/Survival - First Song Score" },
+        { address=0X484DE8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Arcade/Survival - Second Song Score" },
+        { address=0X484DEC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Survival - Third Song Score" },
+        { address=0X484DF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Survival - Fourth Song Score" },
+        { address=0X484DF4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Survival - Fifth Song Score" },
+        { address=0X484DF8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Survival - Sixth Song Score" },
+        { address=0X484DFC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Survival - Last Song Score" },
+        { address=0X4A6A04, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Result Score" },
+        { address=0X4A6A20, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Result Score" },
+      },
+      collectibles = {
+        { address=0X484474, type="u32le", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold (FC)" },
+        { address=0X48557C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Screen - Getting gold on all songs on Kantan Difficulty increased" },
+        { address=0X485584, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Screen - Getting gold on all songs on Futsuu Difficulty increased" },
+        { address=0X48558C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Screen - Getting gold on all songs on Muzukashi Difficulty increased" },
+        { address=0X485594, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Screen - Getting gold on all songs on Oni Difficulty increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Army Men Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "army-men-advance",
+    file = "army-men-advance.zip",
+    hashes = {
+      { hash = "30ff69a44658fcf2cc381736403e74ef", label = "Army Men Advance (USA, Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "4b4928fd4c2c481e8cf7022f93d8dd8f", label = "Army Men Advance (USA, Europe) (Pt) (Evil Darkness).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3650, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<8-bit> Level (00= Level 1)" },
+        { address=0X4C70, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 9 first mole health" },
+        { address=0X4C98, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 8 third mole health" },
+        { address=0X4CC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 9 second mole health" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X47A6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="<8-bit> Health (counts up by 01 per hit from 00; death at 12)" },
+      },
+      health = {
+        { address=0X18B0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Character damage voices" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X533C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="(32bit) timer for levels 6 and 8" },
+      },
+    },
+  },
+}

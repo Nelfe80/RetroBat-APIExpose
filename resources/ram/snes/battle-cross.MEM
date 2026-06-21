@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Battle Cross",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "battle-cross",
+    file = "battle-cross.zip",
+    hashes = {
+      { hash = "f0c2849e45efdf55ad078d78de427c42", label = "Battle Cross (Japan).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

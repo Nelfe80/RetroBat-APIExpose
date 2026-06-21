@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Unholy War",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-unholy-war",
+    file = "the-unholy-war.zip",
+    hashes = {
+      { hash = "5697e48f4151ec84a84a324fa59cdbb3", label = "Unholy War, The (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

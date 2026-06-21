@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Alter Ego: Male",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "alter-ego-male",
+    file = "alter-ego-male.zip",
+    hashes = {
+      { hash = "49c31d9b6542ba3e025fdb7197cdc03a", label = "Alter Ego (male) (4am crack) disk 1B.dsk" },
+      { hash = "9e967cde654ee627f431658048d844e1", label = "Alter Ego (male) (4am crack) disk 3B.dsk" },
+      { hash = "8c30cd9b48b49863ccdda85cea9f73fb", label = "Alter Ego - male version - disk 1A.woz" },
+      { hash = "faec441cc40c485b5be0cb5adf7f335c", label = "Alter Ego - male version - disk 1B.woz" },
+      { hash = "428a254ff86bd495ded5819370dc6286", label = "Alter Ego - male version - disk 3B.woz" },
+      { hash = "2967945ecf33ad85f8e26a73ea5d81bf", label = "Alter Ego - male version - disk 3A.woz" },
+      { hash = "005467cc6c92cd8b7d827b3b0f52e264", label = "Alter Ego - male version - disk 2B.woz" },
+      { hash = "18c8276490c206a7be4c701387721fa1", label = "Alter Ego - male version - disk 2A.woz" },
+      { hash = "27f26126d917bafd5691a7a233f20512", label = "Alter Ego (male) (4am crack) disk 1A.dsk" },
+      { hash = "8a7a06f0d5114dae9ab39a79f9ecc433", label = "Alter Ego (male) (4am crack) disk 2A.dsk" },
+      { hash = "34f00b2e41ebe058936e0aff3700b550", label = "Alter Ego (male) (4am crack) disk 2B.dsk" },
+      { hash = "fab4ff8ea2557290d59d28dc99111784", label = "Alter Ego (male) (4am crack) disk 3A.dsk" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X8183, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[MBF32] Money increased" },
+        { address=0X8201, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[MBF32] Money increased" },
+      },
+    },
+  },
+}

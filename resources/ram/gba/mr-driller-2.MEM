@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Mr. Driller 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle-Game, Strategy"
+  },
+
+  rom = {
+    name = "mr-driller-2",
+    file = "mr-driller-2.zip",
+    hashes = {
+      { hash = "65a9d554b74e8fbf06f3807e9d103bb8", label = "Mr. Driller 2 (Europe).gba" },
+      { hash = "d7118be078b9a61284a99d3f1f7e972f", label = "Mr. Driller 2 (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5020, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused? [0/1]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1151, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1151, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X4B6F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Cheat code for 10 lives [0/1] increased" },
+        { address=0X4B6F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cheat code for 10 lives [0/1] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4AFC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission Mode Score" },
+        { address=0X88DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Driller Easy High Score" },
+        { address=0X88E8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Driller Normal High Score" },
+        { address=0X88F4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Driller Hard High Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8BA4, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Total Blocks Broken" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4B31, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer [32-bit] [value is stored as number of seconds * 100, so 59.26 seconds would be 5926, or 1" },
+        { address=0X8820, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course [0 = A, 1 = B, 2 = C, 3 = D, 4 = E, 5 = F, 6 = G, 7 = H, 8 = I, 9 = J, 10 = E" },
+        { address=0X8919, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course A Best Time" },
+        { address=0X8929, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course B Best Time" },
+        { address=0X8939, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course C Best Time" },
+        { address=0X8949, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course D Best Time" },
+        { address=0X8959, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course E Best Time" },
+        { address=0X8969, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course F Best Time" },
+        { address=0X8979, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course G Best Time" },
+        { address=0X23120, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mode? [0 = Mission Driller, 1 = Endless Driller, 2 = Time Attack Driller]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Breaker's",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "breakers",
+    file = "breakers.zip",
+    hashes = {
+      { hash = "4af3f971f26f1e78fa672da2312bb861", label = "breakers.7z <Breakers>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F38, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo / How to play" },
+        { address=0X1F38, type="u16le", condition="eq", value=0X16, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen after insert coin" },
+        { address=0X1F38, type="u16le", condition="eq", value=0XBC, action="GAME_OVER", no_log=false, no_survey=false, desc="Gameplay / Ending" },
+        { address=0XFD8B, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="ON" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X715E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 Rounds" },
+        { address=0X715E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X715E, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 Rounds" },
+        { address=0X715E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won" },
+        { address=0X7344, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X7344, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X7344, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3]" },
+        { address=0X76BE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Rounds Won" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 (default)" },
+        { address=0XFD8A, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8" },
+        { address=0XFD8A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Soft Dip Level" },
+        { address=0XFD8E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0XFD8E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds (default)" },
+        { address=0XFD8E, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+        { address=0XFD8F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0XFD8F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds (default)" },
+        { address=0XFD8F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+      },
+      stage = {
+        { address=0X1F38, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character select screen / Round transition / Ranking screen" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X7333, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP: 1E = Full (True Address) decreased" },
+        { address=0X7333, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP: 1E = Full (True Address) increased" },
+        { address=0X7334, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Empty]" },
+        { address=0X7334, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 Health" },
+        { address=0X7893, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P HP: 1E = Full (True Adress) decreased" },
+        { address=0X7893, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P HP: 1E = Full (True Adress) increased" },
+        { address=0X7894, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Empty]" },
+        { address=0X7894, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 Health" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7158, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (16 bit)" },
+        { address=0X715A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (16 bit)" },
+      },
+    },
+  },
+}

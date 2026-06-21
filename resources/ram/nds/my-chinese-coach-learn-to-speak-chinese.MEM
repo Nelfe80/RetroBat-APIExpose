@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "My Chinese Coach: Learn to Speak Chinese",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "my-chinese-coach-learn-to-speak-chinese",
+    file = "my-chinese-coach-learn-to-speak-chinese.zip",
+    hashes = {
+      { hash = "850a18374845886980b148ea6e19c257", label = "My Chinese Coach - Learn to Speak Chinese (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X192CE4, type="u16le", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Options (Can Use to Block Cheats)" },
+      },
+    },
+  },
+}

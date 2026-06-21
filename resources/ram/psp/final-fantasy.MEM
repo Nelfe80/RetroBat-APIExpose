@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Final Fantasy",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "final-fantasy",
+    file = "final-fantasy.zip",
+    hashes = {
+      { hash = "f78e6368f595fd0bcbef19b1750af666", label = "Final Fantasy - 20th Anniversary Edition (USA) (En,Ja) (FW6.00).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD12366, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="032 - Piscodemon" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD11EE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 1 Level" },
+        { address=0XD11F40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 2 Level" },
+        { address=0XD11F9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 3 Level" },
+        { address=0XD11FF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 4 Level" },
+        { address=0XD12406, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="184 - Undergrounder" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD122FE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="121 - Death Eye" },
+        { address=0XD12358, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="115 - Soldier" },
+        { address=0XD12378, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="112 - Death Knight" },
+        { address=0XD123B8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="145 - Death Gaze" },
+        { address=0XD123D2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="158 - Death Manticore" },
+        { address=0XD12408, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="185 - Death Elemental" },
+        { address=0XD12416, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="192 - Skuldier" },
+      },
+      health = {
+        { address=0XD11EEC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 Current HP decreased" },
+        { address=0XD11EEC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 Current HP increased" },
+        { address=0XD11EEE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 Max HP decreased" },
+        { address=0XD11EEE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 Max HP increased" },
+        { address=0XD11F48, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 2 Current HP decreased" },
+        { address=0XD11F48, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 2 Current HP increased" },
+        { address=0XD11FA4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 Current HP decreased" },
+        { address=0XD11FA4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 Current HP increased" },
+        { address=0XD12000, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 Current HP decreased" },
+        { address=0XD12000, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 Current HP increased" },
+        { address=0XD2BF6C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Current HP decreased" },
+        { address=0XD2BF6C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Current HP increased" },
+        { address=0XD2BF6E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Max HP decreased" },
+        { address=0XD2BF6E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XD114ED, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114EE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114EF, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114F0, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114F2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114F3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114F4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114F5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114F6, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114F7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114F8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114FA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114FB, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114FC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114FD, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114FE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD114FF, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD11500, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD11501, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD11503, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD11504, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD11505, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD11507, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+        { address=0XD1150B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasures]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD114EC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Treasures] increased" },
+        { address=0XD114F1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Treasures] increased" },
+        { address=0XD11502, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Treasures] increased" },
+        { address=0XD11506, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Treasures] increased" },
+        { address=0XD11508, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Treasures] increased" },
+        { address=0XD11509, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Treasures] increased" },
+        { address=0XD1150A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Treasures] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD1236A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="012 - Garland (Boss)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "John Romero's Daikatana",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "john-romeros-daikatana",
+    file = "john-romeros-daikatana.zip",
+    hashes = {
+      { hash = "5b4c268422469f50b94779e655f2b798", label = "John Romero's Daikatana (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1C9988, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level select cheat" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X20A966, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X20A966, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1C99B0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="All Weapons cheat" },
+        { address=0X20A8F4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons" },
+        { address=0X20A8F5, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Trident (E2)" },
+        { address=0X20A8F5, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sunflar (E2)" },
+        { address=0X20A8F5, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bolter (E3)" },
+        { address=0X20A8F5, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ballista (E3)" },
+        { address=0X20A8F5, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Starvos's Fire (E3)" },
+        { address=0X20A8F5, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Wyndrax's Wisp (E3)" },
+        { address=0X20A8F6, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Naharre's Nightmare (E3)" },
+        { address=0X20A8F6, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Glock2020 (E4)" },
+        { address=0X20A8F6, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Kineticore (E4)" },
+        { address=0X20A8F6, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Meta Maser (E4)" },
+        { address=0X20A8F6, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Novabeam (E4)" },
+        { address=0X20A8F6, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rip Gun (E4)" },
+        { address=0X20A8F6, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slugger (E4)" },
+        { address=0X20A9EB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Auto Weapon Mode" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X20A9B7, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo" },
+        { address=0X20A9CE, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin" },
+      },
+    },
+  },
+}

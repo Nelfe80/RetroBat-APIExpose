@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Toy Story Racer",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "toy-story-racer",
+    file = "toy-story-racer.zip",
+    hashes = {
+      { hash = "01a67ed2dc935044ba69eda42bddebf3", label = "Toy Story Racer (USA, Europe).gbc" },
+      { hash = "3e3c0ff63a8f5de3c13a60b82cea89d9", label = "Toy Story Racer (Europe) (En,Fr,De).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC6D6, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0XC6D6, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC69F, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Showdown - Use to track progress" },
+        { address=0XC69F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Tournament - Current Stage/Level Progression" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC6BF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Powerup - Flip Controls decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC6BF, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off" },
+        { address=0XC6BF, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC6D6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Timer Paused?" },
+        { address=0XC719, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Party Time" },
+        { address=0XC719, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

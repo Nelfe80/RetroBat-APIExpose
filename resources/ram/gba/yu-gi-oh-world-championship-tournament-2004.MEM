@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! World Championship Tournament 2004",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-world-championship-tournament-2004",
+    file = "yu-gi-oh-world-championship-tournament-2004.zip",
+    hashes = {
+      { hash = "6f0f891c1d8e8dcda39eea116f2bd957", label = "Yu-Gi-Oh! - World Championship Tournament 2004 (Europe) (En,Ja,Fr,De,Es,It).gba" },
+      { hash = "8517049ce498d84530c953d6a8b3112e", label = "Yu-Gi-Oh! - World Championship Tournament 2004 (USA) (En,Ja,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X23FB4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="players life points increased" },
+        { address=0X23FB4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="players life points decreased" },
+        { address=0X25378, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="opp life points increased" },
+        { address=0X25378, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="opp life points decreased" },
+        { address=0X25379, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="opp life 255 increased" },
+        { address=0X25379, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="opp life 255 decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "EZ-Talk: Shokyuu Hen 3 - Jay no English Adventure",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ez-talk-shokyuu-hen-3-jay-no-english-adventure",
+    file = "ez-talk-shokyuu-hen-3-jay-no-english-adventure.zip",
+    hashes = {
+      { hash = "a581264601cbd608bd19922de4dc871e", label = "EZ-Talk - Shokyuu Hen 3 (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

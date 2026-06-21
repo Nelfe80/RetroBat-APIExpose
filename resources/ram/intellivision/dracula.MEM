@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Dracula",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "dracula",
+    file = "dracula.zip",
+    hashes = {
+      { hash = "a52574877a018ef1ec10e0ff3038fbb9", label = "Dracula (USA, Europe).int" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0710, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal Kills Left" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X06D8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game State (0 = Playing, 5 = New Game/Dead)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0C58, type="u16le", condition="eq", value=0X1388, action="SCORE_STATE", no_log=false, no_survey=false, desc="5000" },
+        { address=0X0C58, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit[ Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Ace Combat 3: Electrosphere",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "ace-combat-3-electrosphere",
+    file = "ace-combat-3-electrosphere.zip",
+    hashes = {
+      { hash = "34c17c453e473a495aba0ced0cb75c21", label = "Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 2) (Rev 1)" },
+      { hash = "63e54a7f2936767384f873ca2cf351b6", label = "Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 1) (Rev 1)" },
+      { hash = "fc31f6f6b9020bba349f4784dd6f23ca", label = "Ace Combat 3 - Electrosphere (Japan, Asia) (Es) (v1.1) (Tio Victor) (Disc 1)" },
+      { hash = "49f712c75256b40d0e4a6dd2b6575724", label = "Ace Combat 3 - Electrosphere (Japan, Asia) (Es) (v1.1) (Tio Victor) (Disc 2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF2D3, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="0x00 - Unpaused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC0304, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player's total death count [32-bit] signed" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBF690, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Amount of waypoints your plane marked on debriefing" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC0120, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mission 0x01 - Targets destroyed [32-bit] signed" },
+        { address=0XC0300, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Total targets destroyed [32-bit] signed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBFC96, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mission 0x01 - Clear time [16-bit] (Easy ???)" },
+        { address=0XBFD0E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mission 0x01 - Clear time [16-bit] (Normal ???)" },
+        { address=0XBFD86, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mission 0x01 - Clear time [16-bit] (Hard ???)" },
+        { address=0XBFE76, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mission 0x01 - Clear time [16-bit] (File no. 1 ???)" },
+      },
+    },
+  },
+}

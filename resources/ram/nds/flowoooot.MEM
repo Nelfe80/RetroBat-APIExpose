@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "FloWooooT",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "flowoooot",
+    file = "flowoooot.zip",
+    hashes = {
+      { hash = "6795054a36bdba810103afd241e49985", label = "FloWooooT (Japan) (Nintendo Game Seminar 2010).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X204452, type="u8", condition="eq", value=0X31, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Level 1/Credits" },
+        { address=0X204452, type="u8", condition="eq", value=0X7A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen/Loading Area 1" },
+        { address=0X275B02, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Intro" },
+        { address=0X275B02, type="u8", condition="eq", value=0X61, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X289AD8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Flag - In pause menu (makes menu buttons pressable)" },
+        { address=0X28BFFC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Flag - 'PAUSE' message is visible" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X204452, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Info screen" },
+        { address=0X204452, type="u8", condition="eq", value=0X2E, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level complete" },
+        { address=0X204452, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2/Loading Area 2" },
+        { address=0X204452, type="u8", condition="eq", value=0X33, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3/Loading Area 3" },
+        { address=0X204452, type="u8", condition="eq", value=0X34, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loading Area 4" },
+        { address=0X204452, type="u8", condition="eq", value=0X45, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level select" },
+        { address=0X204452, type="u8", condition="eq", value=0X63, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cutscene dialogue" },
+        { address=0X204452, type="u8", condition="eq", value=0X69, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Final screen" },
+        { address=0X204452, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Screen state" },
+        { address=0X20C578, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flag - 'GAME CLEAR' message is visible" },
+        { address=0X211F94, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level result" },
+        { address=0X275B02, type="u8", condition="eq", value=0X31, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X275B02, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X275B02, type="u8", condition="eq", value=0X33, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X275B02, type="u8", condition="eq", value=0X45, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level select" },
+        { address=0X275B02, type="u8", condition="eq", value=0X63, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cutscene" },
+        { address=0X275B02, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level played" },
+        { address=0X28BDA3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flag - Player is in level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X20504C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 1-1" },
+        { address=0X205050, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 1-2" },
+        { address=0X205054, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 1-3" },
+        { address=0X205058, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 2-1" },
+        { address=0X20505C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 2-2" },
+        { address=0X205060, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 2-3" },
+        { address=0X205064, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 3-1" },
+        { address=0X205068, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 3-2" },
+        { address=0X20506C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 3-3" },
+        { address=0X205070, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 4-1" },
+        { address=0X205074, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 4-2" },
+        { address=0X205078, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score 4-3" },
+      },
+      collectibles = {
+        { address=0X20F474, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of dead jellyfish during level increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X210450, type="u8", condition="eq", value=0X02, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible" },
+      },
+    },
+  },
+}

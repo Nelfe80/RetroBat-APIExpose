@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Devilish: The Next Possession",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "devilish-the-next-possession",
+    file = "devilish-the-next-possession.zip",
+    hashes = {
+      { hash = "6fa7cd092a175c9040b318d289ffff93", label = "Devilish - The Next Possession (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9968, type="u16be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="GAME : Pause boolean" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X984E, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="GAME : Stage Clear flag" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE700, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="PLAYER : Score 2/2" },
+        { address=0XE702, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="PLAYER : Score 1/2" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC200, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="GAME : Boss HP" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X982A, type="u16be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="GAME : Stage ID" },
+        { address=0XE1CA, type="u16be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="PLAYER : Blue power-up Timer" },
+        { address=0XE1CC, type="u16be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="PLAYER : Red power-up Timer" },
+        { address=0XE1D2, type="u16be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="PLAYER : Short Block Timer" },
+        { address=0XE714, type="u16be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="PLAYER : Yellow Power-up Timer" },
+      },
+    },
+  },
+}

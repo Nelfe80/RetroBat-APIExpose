@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Thexder",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "thexder",
+    file = "thexder.zip",
+    hashes = {
+      { hash = "da5ab2d850eb161477e4ceb2507a269f", label = "Thexder (Japan).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X00D8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life bar increased" },
+        { address=0X00D8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life bar decreased" },
+        { address=0X00DA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life bar increased" },
+        { address=0X00DA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life bar decreased" },
+      },
+    },
+  },
+}

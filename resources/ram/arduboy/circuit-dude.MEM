@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Circuit Dude",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "circuit-dude",
+    file = "circuit-dude.zip",
+    hashes = {
+      { hash = "3d1c0410a1236b94dada9f9b4eae41e7", label = "Circuit Dude (World) (v3.2).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X021C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of levels unlocked (BCD)" },
+        { address=0X021D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level completion" },
+        { address=0X0220, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last level played" },
+        { address=0X0221, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level selected" },
+      },
+    },
+  },
+}

@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Bishoujo Senshi Sailor Moon Super S: Fuwa Fuwa Panic",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "bishoujo-senshi-sailor-moon-super-s-fuwa-fuwa-panic",
+    file = "bishoujo-senshi-sailor-moon-super-s-fuwa-fuwa-panic.zip",
+    hashes = {
+      { hash = "1f6b2ff721f8f0d92736d704f922ba37", label = "Bishoujo Senshi Sailor Moon SuperS - Fuwafuwa Panic (Japan).sfc" },
+      { hash = "2e676b7b8f3e6be5f328f460ea25b679", label = "Bishoujo Senshi Sailormoon Super S - Fuwa Fuwa Panic (Japan) (En) (v1.01) (Dynamic Designs).sfc" },
+      { hash = "fe5bbd498a173153d5526c5b33979373", label = "Bishoujo Senshi Sailormoon Super S - Fuwa Fuwa Panic (Japan) (En) (v1.01).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0041, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Mode starting" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0041, type="u8", condition="eq", value=0X0D, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage cleared" },
+        { address=0X03BC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="round won heart tracker" },
+        { address=0X15AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skill level" },
+        { address=0X15E3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="3-d when round ends" },
+        { address=0X16F21, type="u8", condition="eq", value=0X3C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear mode" },
+      },
+      stage = {
+        { address=0X1607, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage number" },
+        { address=0X3098, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lower 4 is first digit of stage number" },
+        { address=0X309A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lower 4 is second digit of stage number" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X160A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer in puzzle mode" },
+        { address=0X1627, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="player 1's counter" },
+        { address=0X1629, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="player two's counter" },
+        { address=0X1DE1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="for some reason counts how many times you move your cursor?" },
+      },
+    },
+  },
+}

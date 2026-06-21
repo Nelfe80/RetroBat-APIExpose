@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Scooby-Doo! Night of 100 Frights",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "scooby-doo-night-of-100-frights",
+    file = "scooby-doo-night-of-100-frights.zip",
+    hashes = {
+      { hash = "1dc4fbe1b94268e466920602747267d8", label = "Scooby-Doo! Night of 100 Frights (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X358270, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits cheat used" },
+        { address=0X362E70, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="bit 4 flipped means game is paused. cheats can only be activated while the game is paused - ther" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2B322C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="gusts abound underground warp gate" },
+        { address=0X35797C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="snack gate to Mastermind Unmasked(01 when cleared)" },
+        { address=0X36536C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="total scooby snacks collected in Gusts Abound Underground" },
+      },
+      stage = {
+        { address=0X2978A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage data storage starts here" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3632E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0X3632E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+        { address=0X814080, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="black knight ghost hp decreased" },
+        { address=0X814080, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="black knight ghost hp increased" },
+        { address=0X896A90, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="green ghost hp decreased" },
+        { address=0X896A90, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="green ghost hp increased" },
+        { address=0X8A0610, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="redbeard hp decreased" },
+        { address=0X8A0610, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="redbeard hp increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XBFBA50, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="powerup cheat location 1" },
+        { address=0XBFBC90, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="powerup cheat location 3" },
+        { address=0XEDAB30, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="powerup cheat location 2" },
+      },
+    },
+  },
+}

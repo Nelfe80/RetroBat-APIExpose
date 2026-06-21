@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Slap Happy Rhythm Busters",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "slap-happy-rhythm-busters",
+    file = "slap-happy-rhythm-busters.zip",
+    hashes = {
+      { hash = "c2c2a1f9b8e4057d88da1ba0ce7cddb2", label = "Slap Happy Rhythm Busters (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7A172, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Difficulty Level" },
+        { address=0X85052, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X850B0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P1 Life increased" },
+        { address=0X850B0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P1 Life decreased" },
+        { address=0X850B2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P1 Red Life > Life that can recover after a hit increased" },
+        { address=0X850B2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P1 Red Life > Life that can recover after a hit decreased" },
+        { address=0X850E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P2 Life increased" },
+        { address=0X850E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P2 Life decreased" },
+        { address=0X850E2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P1 Red Life > Life that can recover after a hit increased" },
+        { address=0X850E2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P1 Red Life > Life that can recover after a hit decreased" },
+      },
+      health = {
+        { address=0X7A176, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Damage Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7A17E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Time Limit" },
+        { address=0X8501A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Round Timer" },
+      },
+    },
+  },
+}

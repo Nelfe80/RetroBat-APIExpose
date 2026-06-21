@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "SimCity",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Simulation, Construction & Management"
+  },
+
+  rom = {
+    name = "simcity",
+    file = "simcity.zip",
+    hashes = {
+      { hash = "23715fc7ef700b3999384d5be20f4db5", label = "SimCity (USA).sfc" },
+      { hash = "2f1c1a70f2268b4c37e2a095a9be0058", label = "SimCity (France).sfc" },
+      { hash = "4832fba3682437ea96bce0af5c08930d", label = "SimCity (USA) (MSU-1) (CarFlightGames,FullGameZone,PepilloPEV).sfc" },
+      { hash = "7190c6764031e2e8a208d47bd0e25caa", label = "Sim City (Europe) (Pt).sfc" },
+      { hash = "d0142f63a3dee58f97c21d939b6dbd60", label = "SimCity (Germany).sfc" },
+      { hash = "fbb0966e5f977af9e3f475c3da667526", label = "SimCity (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0B57, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level: 0 = easy, 1 = medium, 2 = hard" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0B9D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (Low byte) increased" },
+        { address=0X0B9E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (medium byte) increased" },
+        { address=0X0B9F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (high byte) increased" },
+      },
+    },
+  },
+}

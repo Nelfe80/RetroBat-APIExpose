@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Telegraph: Sudoku & Kakuro",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "telegraph-sudoku-kakuro",
+    file = "telegraph-sudoku-kakuro.zip",
+    hashes = {
+      { hash = "ab44049bf469927de06bc41691ca6a1e", label = "Telegraph Sudoku & Kakuro (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

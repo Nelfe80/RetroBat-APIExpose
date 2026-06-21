@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Marble Madness",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "marble-madness",
+    file = "marble-madness.zip",
+    hashes = {
+      { hash = "f489b8eb7dc88a39842f20a7f7165e5b", label = "Marble Madness (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCB52, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="In Level" },
+        { address=0XCB52, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="In Goal" },
+        { address=0XCB52, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Load Next Level" },
+      },
+      stage = {
+        { address=0XCBC6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage id" },
+      },
+    },
+  },
+}

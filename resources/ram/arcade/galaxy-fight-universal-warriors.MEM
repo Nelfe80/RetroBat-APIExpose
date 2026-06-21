@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Galaxy Fight: Universal Warriors",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "galaxy-fight-universal-warriors",
+    file = "galaxy-fight-universal-warriors.zip",
+    hashes = {
+      { hash = "abb7d5e98313243a659518c407f0c59a", label = "galaxyfg.7z <Galaxy Fight - Universal Warriors>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X519B, type="u8", condition="eq", value=0X1A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X519B, type="u8", condition="eq", value=0X1E, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X5C2D, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X5C2D, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XFD8D, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Without" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X107E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Won [8 bits] // value flickers when round is won... but usable. Make sure to not use" },
+        { address=0X5C22, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Round - Finished [Bit0]" },
+        { address=0X5C26, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round - Started [Bit0]" },
+        { address=0X5C28, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-7 or Level-8" },
+        { address=0X5C2A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Match - Current Round [8 bits]" },
+      },
+      stage = {
+        { address=0X5C1E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game - Stage [8 bits]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X103C, type="u16le", condition="eq", value=0XFFF0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X103C, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 - HP [16 bits]" },
+        { address=0X1124, type="u16le", condition="eq", value=0X2D, action="HEALTH_STATE", no_log=true, no_survey=false, desc="HP" },
+        { address=0X1124, type="u16le", condition="eq", value=0X30, action="HEALTH_STATE", no_log=true, no_survey=false, desc="cr. HP" },
+        { address=0X1152, type="u16le", condition="eq", value=0XFFF0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X1152, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 - HP [16 bits]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1048, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score (upper, multiply by 65536) [16 bits]" },
+        { address=0X104A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score (lower) [16 bits]" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1124, type="u16le", condition="eq", value=0X54, action="JUMPING", no_log=true, no_survey=false, desc="Any jumping attack" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X51B0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round - Timer (read only) [8 bits]" },
+      },
+    },
+  },
+}

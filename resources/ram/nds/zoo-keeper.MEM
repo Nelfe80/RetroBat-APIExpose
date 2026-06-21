@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Zoo Keeper",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "zoo-keeper",
+    file = "zoo-keeper.zip",
+    hashes = {
+      { hash = "03fa9fd137ef29e962274f3f0bb755b7", label = "Zoo Keeper (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X74A3D, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Maximum" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6A1F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last level" },
+        { address=0X74824, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level - Quest" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X747C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Most recent score, excluding quest" },
+        { address=0X747CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Most recent quest score" },
+        { address=0X74838, type="u32le", condition="eq", value=0X00124F80, action="SCORE_STATE", no_log=false, no_survey=false, desc="Base score" },
+        { address=0X74838, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Normal Mode Rank 1 Score" },
+        { address=0X748B0, type="u32le", condition="eq", value=0X001B7740, action="SCORE_STATE", no_log=false, no_survey=false, desc="Base score" },
+        { address=0X748B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tokoton Mode Rank 1 Score" },
+        { address=0X74928, type="u32le", condition="eq", value=0X000927C0, action="SCORE_STATE", no_log=false, no_survey=false, desc="Base score" },
+        { address=0X74928, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Time Attack Mode Rank 1 Score" },
+        { address=0X749A0, type="u16le", condition="eq", value=0X00002710, action="SCORE_STATE", no_log=false, no_survey=false, desc="Base score" },
+        { address=0X749A0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Quest Mode Rank 1 Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X74A30, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X74A30, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Most recent mode played" },
+      },
+    },
+  },
+}

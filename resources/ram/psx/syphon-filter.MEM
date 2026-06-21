@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Syphon Filter",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Stealth"
+  },
+
+  rom = {
+    name = "syphon-filter",
+    file = "syphon-filter.zip",
+    hashes = {
+      { hash = "b23c85c9182355e2efbf0b3e71087662", label = "Syphon Filter (USA) (Demo)" },
+      { hash = "ce2451640470892d27cb2fb6abf8d302", label = "Syphon Filter (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10DA94, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X1163D0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu" },
+        { address=0X116820, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Menu Selection" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1AC270, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Expo Reception health decreased" },
+        { address=0X1AC270, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Expo Reception health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X115FB8, type="u16le", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Colt45" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="G18" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Combat shotgun" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pk 102" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M16" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Biz 02" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X0B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="HK 05" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Night rifle" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M79" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X13, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X14, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gas" },
+        { address=0X115FB8, type="u16le", condition="eq", value=0X18, action="WEAPON_STATE", no_log=false, no_survey=false, desc="C4" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X12F0DA, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="EIZ 2 Ammo" },
+        { address=0X12F0DE, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Hk5 Ammo" },
+        { address=0X12F0F2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="M79 Ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X69FB0, type="u16le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility 16bits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1163B1, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[8 Bit] Current Checkpoint" },
+        { address=0X121930, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mission objectives bitt flags" },
+      },
+    },
+  },
+}

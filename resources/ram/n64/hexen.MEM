@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Hexen",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter, 1ere Personne"
+  },
+
+  rom = {
+    name = "hexen",
+    file = "hexen.zip",
+    hashes = {
+      { hash = "eb98f1b8c6898af7417f6882946da9b3", label = "Hexen (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X136770, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Number of options in Pause menu (04=normal 05=cheats option enabled)" },
+        { address=0X13DA30, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Dialogue related? Use 0x13e10a=00 for demo protection instead!" },
+        { address=0X13DA76, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X13E10A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="8-bit Hell-to-Find Demo Mode Value" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X136E8C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Players menu option (if it is 01 deathmatch doesn't work, 01 for singleplayer, 02-04 for coop or" },
+        { address=0X136E92, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathmatch (00=off)" },
+        { address=0X136EA6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathmatch monsters (00 = on, 01 = off)" },
+        { address=0X136EAA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathmatch respawn (00 = off, 01 = on)" },
+        { address=0X136EAC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathmatch level" },
+      },
+      health = {
+        { address=0X35DD34, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X35DD34, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X36B674, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X36B674, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X384154, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X384154, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X13DB72, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon current" },
+        { address=0X13DB74, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon2" },
+        { address=0X13DB76, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon1" },
+        { address=0X13DB78, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon3" },
+        { address=0X13DB7A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon4" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X136EB0, type="u32be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Deathmatch time limit (32 bit), ingame settings have 0x136eb2 and 0x136eb3 at 00, but they do ad" },
+      },
+    },
+  },
+}

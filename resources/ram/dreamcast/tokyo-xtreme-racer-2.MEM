@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "Tokyo Xtreme Racer 2",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "tokyo-xtreme-racer-2",
+    file = "tokyo-xtreme-racer-2.zip",
+    hashes = {
+      { hash = "47726dcdcc53d30802fc498677aff352", label = "Tokyo Xtreme Racer 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1ADF01, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="No.025 Tom Ruiz (Speed Demon) - SS Limited" },
+        { address=0X1ADF04, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="No.055 Andy Lee (Speed Demon) - Max Racing" },
+        { address=0X1ADF27, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="No.333 Bryan Adelman (Raging Demon)" },
+        { address=0X1D2914, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Demo Play" },
+        { address=0X50D662, type="u16le", condition="eq", value=0X384, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1ADF10, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="No.150 Greg Burns Top Level Leader" },
+        { address=0X1ADF26, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="No.326 Randal Willy (Safe Zone)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1ADF06, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="No.066 Mike Ohara (Ladies Man) - Elegant Wild" },
+        { address=0X1ADF24, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="No.311 Eddie Swift (Steel Heart)" },
+        { address=0X1ADF2A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="No.360 Doug Stevens (Mad Dieter)" },
+        { address=0X1ADF2B, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="No.362 Ted Frnaks (Stalking Death)" },
+      },
+      health = {
+        { address=0X1ADF2A, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="No.357 Henry Nadler (Healthy Henry)" },
+        { address=0X1ED6A4, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[TEMP1] [24-Bits] Car Health decreased" },
+        { address=0X1ED6A4, type="u24le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[TEMP1] [24-Bits] Car Health increased" },
+        { address=0XDDAC7C, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[TEMP1] [24-Bits] Displayed Car Health decreased" },
+        { address=0XDDAC7C, type="u24le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[TEMP1] [24-Bits] Displayed Car Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1ADF15, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="No.185 Lee Stark Rings Leader" },
+        { address=0X1ADF2A, type="u8", condition="bit_true", bit=3, mask=0X08, action="AMMO_STATE", no_log=true, no_survey=false, desc="No.356 Ike Hammond (Engine Ear)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1ADF23, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.299 Jimmy Jones (Jackknife Jones)" },
+        { address=0X1ADF23, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.300 Tommy Adkins (Road Master)" },
+        { address=0X1ADF23, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.301 Bob Hersh (Lucifer)" },
+        { address=0X1ADF23, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.302 Rudy Lucas (Lethal Weapon)" },
+        { address=0X1ADF23, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.303 Simon Pickens (Maximizer)" },
+        { address=0X1ADF23, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.304 Dennis Kay (Mystic Racer)" },
+        { address=0X1ADF24, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.305 Elizabeth Sherwin (Midnight Rose)" },
+        { address=0X1ADF24, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.306 Kent Templeton (Pressure Cooker)" },
+        { address=0X1ADF24, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.307 Howie Lewis (Comeback King)" },
+        { address=0X1ADF24, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.308 Earl Hall (White Knight)" },
+        { address=0X1ADF24, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.309 Bruce Hale (Super Nova)" },
+        { address=0X1ADF24, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.310 Janes May (Speed Angel)" },
+        { address=0X1ADF24, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.312 Mike Finnigan (Hard Riff)" },
+        { address=0X1ADF25, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.313 Eddy Valdez (Hot Dog)" },
+        { address=0X1ADF25, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.314 James Sweet (Phantom Racer)" },
+        { address=0X1ADF25, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.315 Wendy Wheeler (Shawod Eye)" },
+        { address=0X1ADF25, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.316 Steven Bush (Happy Pirate)" },
+        { address=0X1ADF25, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.317 Hugh Gimore (Hurricane Hugh)" },
+        { address=0X1ADF25, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.318 Tony Williams (Road Rebel)" },
+        { address=0X1ADF25, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.319 Jack Hwang (Mod Man)" },
+        { address=0X1ADF25, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.320 Skip Gibson (Red Devil)" },
+        { address=0X1ADF26, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.321 Missy White (Full Moon Eve) - Zone Boss" },
+        { address=0X1ADF26, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.322 David Hicks (Purple Comet) - Big Boss" },
+        { address=0X1ADF26, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.323 Otto Horne (White Phantom) - Big Boss" },
+        { address=0X1ADF26, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="No.324 ??? - Last Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1ADF00, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="No.021 Tony Parcelli (4-Door) - SS Limited" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1BFC58, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16-Bits] Quick Race Round Counter" },
+        { address=0X1D2910, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Mode" },
+        { address=0X1D2910, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Mode:" },
+        { address=0X1D2914, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quick Mode / Time Attack Car Select" },
+        { address=0X1D2914, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quick Mode / Time Attack Garage" },
+        { address=0X1D2914, type="u8", condition="eq", value=0X06, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quick Mode / Time Attack Select Class" },
+        { address=0X1D2914, type="u8", condition="eq", value=0X1B, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course Select" },
+        { address=0X1D2914, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Screen ID:" },
+        { address=0X50D660, type="u16le", condition="eq", value=0X0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="No Count" },
+        { address=0X50D660, type="u16le", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Count" },
+        { address=0X50D660, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16-Bits] Timer Flag" },
+        { address=0X50D662, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16-Bits] General Purpose Timer" },
+        { address=0XFF54E4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-Bits] Best Time Lap" },
+      },
+    },
+  },
+}

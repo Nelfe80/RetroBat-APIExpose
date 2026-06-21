@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Shark! Shark!",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "shark-shark",
+    file = "shark-shark.zip",
+    hashes = {
+      { hash = "9f85b961e6c40c2c786026f460ae02fa", label = "Shark! Shark! (USA, Europe).int" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0A28, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over =013f" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0610, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0610, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0D94, type="u8", condition="eq", value=0X73, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dark green (dead)" },
+        { address=0X0DC8, type="u8", condition="eq", value=0XF0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead?" },
+        { address=0X0DE8, type="u8", condition="eq", value=0XF0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead?" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0D10, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score (hex)" },
+        { address=0X0D30, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score [Dec] Thousands" },
+      },
+    },
+  },
+}

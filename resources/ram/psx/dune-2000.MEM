@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Dune 2000",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "dune-2000",
+    file = "dune-2000.zip",
+    hashes = {
+      { hash = "f62eb31e90d32adaf50baff527ec7a82", label = "Dune 2000 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE2F4, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE0640, type="u8", condition="eq", value=0X18, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Hand Missile [Harkonnen] ( Auto Builds with the Palace built )" },
+        { address=0XE0640, type="u8", condition="eq", value=0X1B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Grebadier" },
+      },
+    },
+  },
+}

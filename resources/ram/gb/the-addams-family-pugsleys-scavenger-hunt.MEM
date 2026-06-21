@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "The Addams Family: Pugsley's Scavenger Hunt",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-addams-family-pugsleys-scavenger-hunt",
+    file = "the-addams-family-pugsleys-scavenger-hunt.zip",
+    hashes = {
+      { hash = "57726c28dc09949029a154f63b891dd0", label = "Addams Family, The - Pugsley's Scavenger Hunt (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC215, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="room number - only changes at pause screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC19A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="number of lives increased" },
+        { address=0XC19A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="number of lives decreased" },
+      },
+      health = {
+        { address=0XC196, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0XC196, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+        { address=0XC1A5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0XC1A5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC198, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC141, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Gomez Boss" },
+        { address=0XC141, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Morticia Boss" },
+        { address=0XC141, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Fester Boss" },
+        { address=0XC141, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Wednesday Boss" },
+        { address=0XC141, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Granny Boss" },
+        { address=0XC141, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Spider Boss (Optional)" },
+        { address=0XC17C, type="u8", condition="eq", value=0X1D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Gomez Boss Room" },
+        { address=0XC17C, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Morticia Boss Room" },
+        { address=0XC17C, type="u8", condition="eq", value=0X1F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fester Boss Room" },
+        { address=0XC17C, type="u8", condition="eq", value=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Wednesday Boss Room" },
+        { address=0XC17C, type="u8", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="Granny Boss Room" },
+        { address=0XC17C, type="u8", condition="eq", value=0X22, action="BOSS_HIT", no_log=false, no_survey=false, desc="Spider Boss Room" },
+        { address=0XC1C1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC1B4, type="u16le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Timer for Armor Buff (Invincibility)" },
+      },
+    },
+  },
+}

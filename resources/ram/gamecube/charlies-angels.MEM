@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Charlie's Angels",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "charlies-angels",
+    file = "charlies-angels.zip",
+    hashes = {
+      { hash = "e1b226bff48d0f2679189c85051c0c57", label = "Charlie's Angels (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Marina 1" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Marina 2" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alaska 1" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alaska 2" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hacienda 1" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hacienda 2" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scottish Castle 1" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scottish Castle 2" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Forbidden City 1" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Forbidden City 2" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grand Canyon 1" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grand Canyon 2" },
+        { address=0X1F65E0, type="u32be", condition="eq", value=0X28, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission Complete" },
+        { address=0X1F65E0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Objective ID [32-Bit BE]" },
+        { address=0X1F662A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flash Drive Collected on Current Level (01)" },
+        { address=0X1F662B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Film Reel Collected on Current Level (01)" },
+        { address=0X206893, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Data 1 - Level Progress" },
+        { address=0X2068D3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Data 2 - Level Progress" },
+        { address=0X206913, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Data 3 - Level Progress" },
+        { address=0X206953, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Data 4 - Level Progress" },
+        { address=0X206993, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save Data 5 - Level Progress" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1F6608, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [32-Bit BE] increased" },
+        { address=0X1F6608, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [32-Bit BE] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1F6600, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32-Bit BE]" },
+      },
+    },
+  },
+}

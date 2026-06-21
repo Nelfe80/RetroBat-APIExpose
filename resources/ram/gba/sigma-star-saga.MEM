@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Sigma Star Saga",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "sigma-star-saga",
+    file = "sigma-star-saga.zip",
+    hashes = {
+      { hash = "29b048b4b36b3fda168850003f2ee844", label = "Sigma Star Saga (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7690, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Post Credits Image Toggle (from 0x7690 to 0x7699)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X702C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level (0x00 is Lv 1)" },
+        { address=0X7054, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Count" },
+        { address=0X7730, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear Flag" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X02E1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ship Health decreased" },
+        { address=0X02E1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ship Health increased" },
+        { address=0X27B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Recker Health decreased" },
+        { address=0X27B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Recker Health increased" },
+        { address=0X3354, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Flesh Overlord Health decreased" },
+        { address=0X3354, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Flesh Overlord Health increased" },
+        { address=0X6FF8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Display Health? decreased" },
+        { address=0X6FF8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Display Health? increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0720, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Cannon Weapon" },
+        { address=0X0724, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Bullet Weapon" },
+        { address=0X0728, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Impact Weapon" },
+        { address=0X773C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bullet Weapon 1-8" },
+        { address=0X773D, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bullet Weapon 9-16" },
+        { address=0X773E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bullet Weapon 17-20" },
+        { address=0X7744, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cannon Weapon 1-8" },
+        { address=0X7745, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cannon Weapon 9-16" },
+        { address=0X7746, type="u24le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cannon Weapon 17-24" },
+        { address=0X7747, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cannon Weapon 25-28" },
+        { address=0X7748, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Impact Weapon 1-8" },
+        { address=0X7749, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Impact Weapon 9-16" },
+        { address=0X774A, type="u24le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Impact Weapon 17-24" },
+        { address=0X774B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Impact Weapon 25-28" },
+        { address=0X774C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon in menu" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X02D8, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Ship Vulnerability (FFFF for invincible ship)" },
+      },
+    },
+  },
+}

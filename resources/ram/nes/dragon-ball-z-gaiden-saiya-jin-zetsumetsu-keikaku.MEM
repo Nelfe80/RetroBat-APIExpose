@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Dragon Ball Z Gaiden: Saiya Jin Zetsumetsu Keikaku",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "dragon-ball-z-gaiden-saiya-jin-zetsumetsu-keikaku",
+    file = "dragon-ball-z-gaiden-saiya-jin-zetsumetsu-keikaku.zip",
+    hashes = {
+      { hash = "a0fffec6c04845233b92524f6ab396b8", label = "Dragon Ball Z Gaiden - Saiya Jin Zetsumetsu Keikaku (Japan).nes" },
+      { hash = "918d86faa01eaf98e7a5da8e4b85c33f", label = "Dragon Ball Z Gaiden - Saiya Jin Zetsumetsu Keikaku (Japan) (En) (v1.0) (Twilight Translations).nes" },
+    }
+  },
+
+  events = {
+  },
+}

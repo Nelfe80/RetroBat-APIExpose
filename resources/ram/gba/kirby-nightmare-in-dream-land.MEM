@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Kirby: Nightmare in Dream Land",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Platform"
+  },
+
+  rom = {
+    name = "kirby-nightmare-in-dream-land",
+    file = "kirby-nightmare-in-dream-land.zip",
+    hashes = {
+      { hash = "35ae64b0f27e60107c14ab956f6cdf70", label = "Kirby - Nightmare in Dream Land (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2833, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1f = Game is paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1F20, type="u8", condition="eq", value=0X30, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8- Fountain of Dreams" },
+        { address=0X1F20, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Code" },
+        { address=0X1F34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="01=selecting level... must not be 1 for achiev" },
+        { address=0X2400, type="u24le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[48 bytes] Stage complete data" },
+        { address=0X2444, type="u16le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In the Overworld" },
+        { address=0X2444, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Flag" },
+        { address=0X2468, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Section" },
+        { address=0X280A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="01 = Is touching the ground" },
+        { address=0XE168, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sub-Game Difficulty Level" },
+      },
+      zone = {
+        { address=0X1F20, type="u8", condition="eq", value=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="when on world map" },
+        { address=0X23B8, type="u32le", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1" },
+        { address=0X23B8, type="u32le", condition="eq", value=0X6, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 7" },
+        { address=0X23B8, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+        { address=0X23EC, type="u16le", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1" },
+        { address=0X23EC, type="u16le", condition="eq", value=0X6, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 7" },
+      },
+      stage = {
+        { address=0X2444, type="u16le", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In a stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1F08, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Count increased" },
+        { address=0X1F08, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Count decreased" },
+        { address=0X2808, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XD588, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XEA02, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss Lifebar increased" },
+        { address=0XEA02, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss Lifebar decreased" },
+        { address=0XEA04, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss Lifebar increased" },
+        { address=0XEA04, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss Lifebar decreased" },
+        { address=0XFD48, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives? increased" },
+        { address=0XFD48, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives? decreased" },
+        { address=0X13028, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="01 = Boss Lifebar appears increased" },
+        { address=0X13028, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01 = Boss Lifebar appears decreased" },
+      },
+      health = {
+        { address=0X2368, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Enemy Health decreased" },
+        { address=0X2368, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Enemy Health increased" },
+        { address=0X2808, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0X2808, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Bit3-5=Kirby Health. Loads from 0xd588 on transitions" },
+        { address=0XD580, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP. Adjusting while loading will set the max hp decreased" },
+        { address=0XD580, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP. Adjusting while loading will set the max hp increased" },
+        { address=0XD588, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0XD588, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Current HP (Bit3-5)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X13048, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[Quick Draw] Ammount of Opponents Defeated" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0490, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss active" },
+        { address=0X0490, type="u8", condition="eq", value=0X1, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss defeated" },
+        { address=0X238C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="endurance boss fight?" },
+        { address=0X23EC, type="u16le", condition="eq", value=0X4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Door 5 (Boss in World 1)" },
+        { address=0X23EC, type="u16le", condition="eq", value=0X5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Door 6 (Boss in World 2)" },
+        { address=0X23EC, type="u16le", condition="eq", value=0X6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss in World 3-7" },
+        { address=0X3A08, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0XE030, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="01 = Playing Boss Endurace / Meta Knightmare" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X23EC, type="u16le", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door 1" },
+        { address=0X23EC, type="u16le", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door 2" },
+        { address=0X23EC, type="u16le", condition="eq", value=0X2, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door 3" },
+        { address=0X23EC, type="u16le", condition="eq", value=0X3, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door 4" },
+      },
+    },
+  },
+}

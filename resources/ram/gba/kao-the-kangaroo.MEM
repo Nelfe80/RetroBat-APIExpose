@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Kao the Kangaroo",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "kao-the-kangaroo",
+    file = "kao-the-kangaroo.zip",
+    hashes = {
+      { hash = "c6926d0bbbdbed3372e6fc01c81cd52b", label = "Kao the Kangaroo (USA) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "f9d25044142e0492f09c5e60a8da0509", label = "Kao the Kangaroo (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2B65, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Gameplay - Paused Indicator" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Scrolling" },
+        { address=0X1C44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Graphics - Render level with player." },
+        { address=0X2B38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gameplay - Campaign Level Slected" },
+        { address=0X3724, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gameplay - Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1800, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Gameplay - Number of Lives increased" },
+        { address=0X1800, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gameplay - Number of Lives decreased" },
+        { address=0X24B1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gameplay - Deadly Waterfalls Unlocked" },
+        { address=0X3731, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gameplay - Deadly Waterfalls Complete" },
+      },
+      health = {
+        { address=0X1C60, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gameplay - Kao Health decreased" },
+        { address=0X1C60, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gameplay - Kao Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X18AC, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Tornado Powerup" },
+        { address=0X1C64, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Freeze Powerup Applied" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X184C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gameplay - Coin Count increased" },
+        { address=0X4F74, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="LevelData - Entity Array Element 29 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X35D0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gameplay - Boss health" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2998, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Number of Keys Found Jungle" },
+        { address=0X2999, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Number of Keys Found Alpine" },
+        { address=0X299A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Number of Keys Found Desert" },
+        { address=0X3864, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Bonus Level timer Counter" },
+      },
+    },
+  },
+}

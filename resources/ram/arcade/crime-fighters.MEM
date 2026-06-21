@@ -1,0 +1,139 @@
+return {
+  game = {
+    title = "Crime Fighters",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "crime-fighters",
+    file = "crime-fighters.zip",
+    hashes = {
+      { hash = "c96de43110853196af9ac9aa66e39e96", label = "crimfghtj.7z <Crime Fighters (Japan 2 Players)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X043F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Game [8bit]" },
+        { address=0X04A1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="DipSwitch - Demo Sound [Bit7]" },
+        { address=0X0523, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over [8bit]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0409, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Type of Clear Game [8bit]" },
+        { address=0X043D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Stage Trigger [8bit]" },
+      },
+      stage = {
+        { address=0X04D4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number [8bit]" },
+        { address=0X0540, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Actual [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0602, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="DipSwitch - Lives [8bit] increased" },
+        { address=0X0602, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="DipSwitch - Lives [8bit] decreased" },
+        { address=0X0700, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="E1 Life [8bit] increased" },
+        { address=0X0700, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="E1 Life [8bit] decreased" },
+        { address=0X0740, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="E2 Life [8bit] increased" },
+        { address=0X0740, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="E2 Life [8bit] decreased" },
+        { address=0X0780, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="E3 Life [8bit] increased" },
+        { address=0X0780, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="E3 Life [8bit] decreased" },
+        { address=0X07C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="E4 Life [8bit] increased" },
+        { address=0X07C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="E4 Life [8bit] decreased" },
+        { address=0X0800, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="E5 Life [8bit] increased" },
+        { address=0X0800, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="E5 Life [8bit] decreased" },
+        { address=0X0840, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="E6 Life [8bit] increased" },
+        { address=0X0840, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="E6 Life [8bit] decreased" },
+        { address=0X0880, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="E7 Life [8bit] increased" },
+        { address=0X0880, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="E7 Life [8bit] decreased" },
+        { address=0X08C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Boss Life [8bit] increased" },
+        { address=0X08C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss Life [8bit] decreased" },
+        { address=0X0900, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Life [8bit] increased" },
+        { address=0X0900, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Life [8bit] decreased" },
+        { address=0X0940, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Life [8bit] increased" },
+        { address=0X0940, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Life [8bit] decreased" },
+        { address=0X0980, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P3 Life [8bit] increased" },
+        { address=0X0980, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P3 Life [8bit] decreased" },
+        { address=0X09C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P4 Life [8bit] increased" },
+        { address=0X09C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P4 Life [8bit] decreased" },
+        { address=0X0A00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Item 1 Life [8bit] increased" },
+        { address=0X0A00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item 1 Life [8bit] decreased" },
+        { address=0X0A40, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Item 2 Life [8bit] increased" },
+        { address=0X0A40, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item 2 Life [8bit] decreased" },
+        { address=0X0A80, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Item 3 Life [8bit] increased" },
+        { address=0X0A80, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item 3 Life [8bit] decreased" },
+        { address=0X0AC0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Item 4 Life [8bit] increased" },
+        { address=0X0AC0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item 4 Life [8bit] decreased" },
+        { address=0X0B00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Item 5 Life [8bit] increased" },
+        { address=0X0B00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item 5 Life [8bit] decreased" },
+        { address=0X0B40, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Item 6 Life [8bit] increased" },
+        { address=0X0B40, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item 6 Life [8bit] decreased" },
+      },
+      health = {
+        { address=0X0562, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health [16bit BE] decreased" },
+        { address=0X0562, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health [16bit BE] increased" },
+        { address=0X0564, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health [16bit BE] decreased" },
+        { address=0X0564, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health [16bit BE] increased" },
+        { address=0X0566, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P3 Health [16bit BE] decreased" },
+        { address=0X0566, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P3 Health [16bit BE] increased" },
+        { address=0X0568, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P4 Health [16bit BE] decreased" },
+        { address=0X0568, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P4 Health [16bit BE] increased" },
+        { address=0X0720, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="E1 HP [8bit] decreased" },
+        { address=0X0720, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="E1 HP [8bit] increased" },
+        { address=0X0760, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="E2 HP [8bit] decreased" },
+        { address=0X0760, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="E2 HP [8bit] increased" },
+        { address=0X07A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="E3 HP [8bit] decreased" },
+        { address=0X07A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="E3 HP [8bit] increased" },
+        { address=0X07E0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="E4 HP [8bit] decreased" },
+        { address=0X07E0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="E4 HP [8bit] increased" },
+        { address=0X0820, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="E5 HP [8bit] decreased" },
+        { address=0X0820, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="E5 HP [8bit] increased" },
+        { address=0X0860, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="E6 HP [8bit] decreased" },
+        { address=0X0860, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="E6 HP [8bit] increased" },
+        { address=0X08A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="E7 HP [8bit] decreased" },
+        { address=0X08A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="E7 HP [8bit] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0918, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P1 Holding Weapon [8bit]" },
+        { address=0X0958, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P2 Holding Weapon [8bit]" },
+        { address=0X0998, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P3 Holding Weapon [8bit]" },
+        { address=0X09D8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P4 Holding Weapon [8bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X055A, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score [16bit BE]" },
+        { address=0X055C, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score [16bit BE]" },
+        { address=0X055E, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P3 Score [16bit BE]" },
+        { address=0X0560, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P4 Score [16bit BE]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X08C2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss State [8bit]" },
+        { address=0X08F3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Type [8bit]" },
+        { address=0X1871, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Rank Boss Dance Cooldown [8bit]" },
+        { address=0X1875, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Rank Boss Dance Trigger [8bit]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X04A2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DipSwitch - Service Mode [Bit2]" },
+        { address=0X0515, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DipSwitch - Difficulty [8bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0400, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Credits [8bit]" },
+        { address=0X052F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Boss Battle Register [8bit]" },
+        { address=0X08E0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Boss HP [8bit]" },
+      },
+    },
+  },
+}

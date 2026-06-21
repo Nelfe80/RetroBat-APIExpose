@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Night Trap",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "night-trap",
+    file = "night-trap.zip",
+    hashes = {
+      { hash = "3110d9f656697adb3cbf5f1cb0d77e6f", label = "Night Trap (USA) (Disc 1)+(Disc 2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA040, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Playing" },
+        { address=0XA040, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XA040, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA8C0, type="u16be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Timer - Minutes - Hex" },
+        { address=0XA8C2, type="u16be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Timer - Seconds - Hex" },
+      },
+    },
+  },
+}

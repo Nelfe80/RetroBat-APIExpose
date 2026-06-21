@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Worms",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "worms",
+    file = "worms.zip",
+    hashes = {
+      { hash = "4f08efbfeb501eb92441f7ff9e173cf6", label = "Worms (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6AED8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game options: Rounds to win the match" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X6AF04, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Bazooka" },
+        { address=0X6AF08, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon options: Homing Missile" },
+        { address=0X6AF0C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Grenade" },
+        { address=0X6AF10, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Cluster Grenade" },
+        { address=0X6AF14, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Shotgun" },
+        { address=0X6AF18, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Uzi" },
+        { address=0X6AF1C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Fire Punch" },
+        { address=0X6AF20, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Dragonball" },
+        { address=0X6AF24, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Dynamite" },
+        { address=0X6AF28, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Mines" },
+        { address=0X6AF2C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Airstrike" },
+        { address=0X6AF30, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Teleport" },
+        { address=0X6AF34, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Blowtorch" },
+        { address=0X6AF38, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Drill" },
+        { address=0X6AF3C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Ninja Rope" },
+        { address=0X6AF40, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Bungee" },
+        { address=0X6AF44, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Girders" },
+        { address=0X6AF48, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Options: Kamikaze" },
+        { address=0X79FF0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon selection" },
+        { address=0X7A000, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon selected" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6AED4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Game options: Round time displayed" },
+        { address=0X6AEDC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Game Options: Round time in minutes" },
+      },
+    },
+  },
+}

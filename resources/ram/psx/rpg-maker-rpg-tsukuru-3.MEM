@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "RPG Maker | RPG Tsukuru 3",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "rpg-maker-rpg-tsukuru-3",
+    file = "rpg-maker-rpg-tsukuru-3.zip",
+    hashes = {
+      { hash = "45a83231e430d322957b80ca75929752", label = "RPG Maker (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAE920, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="32-bit Show Title Screen Flag" },
+        { address=0X1E8763, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="8-bit Goblin Demo Settings Options Values BitFlags" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9851A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit AnimeMaker Editor Background Red Slider" },
+        { address=0X9854A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit AnimeMaker Editor Background Green Slider" },
+        { address=0X9857A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit AnimeMaker Editor Background Blue Slider" },
+        { address=0XE97D5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goblin Mini Game BG Color Amount of Red to Add To Background Hex Color" },
+        { address=0XE97D6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goblin Mini Game BG Color Amount of Green to Add To Background Hex Color" },
+        { address=0XE97D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goblin Mini Game BG Color Amount of Blue to Add To Background Hex Color" },
+      },
+    },
+  },
+}

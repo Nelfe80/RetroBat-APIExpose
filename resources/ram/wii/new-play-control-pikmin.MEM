@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "New Play Control! Pikmin",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "new-play-control-pikmin",
+    file = "new-play-control-pikmin.zip",
+    hashes = {
+      { hash = "80154db801b64f5c5451cd0c89f5a9a5", label = "Pikmin (USA) (En,Fr,Es)" },
+      { hash = "8ad2f25fa2fa4522e484274f19d8a0c2", label = "Pikmin (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X46058C, type="u32be", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+  },
+}

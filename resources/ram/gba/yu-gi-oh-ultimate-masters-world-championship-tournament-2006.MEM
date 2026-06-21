@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Ultimate Masters: World Championship Tournament 2006",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-ultimate-masters-world-championship-tournament-2006",
+    file = "yu-gi-oh-ultimate-masters-world-championship-tournament-2006.zip",
+    hashes = {
+      { hash = "020411d3b08f5639eb8cb878283f84bf", label = "Yu-Gi-Oh! - Ultimate Masters Edition - World Championship Tournament 2006 (Europe) (En,Ja,Fr,De,Es,It).gba" },
+      { hash = "b8a7c976b28172995fe9e465d654297a", label = "Yu-Gi-Oh! - Ultimate Masters - World Championship Tournament 2006 (USA) (En,Ja,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XECC8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Limited Duel 01 (Level 4 Monsters) info" },
+        { address=0XECCC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Limited Duel 02 (Levels 1-4 Monsters) info" },
+        { address=0XECFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Limited Duel 14 (Only Level 4+ monsters) info" },
+        { address=0X24538, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of Card in Player's Center Monster Card Zone [12-bit]" },
+        { address=0X2454C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in player's center-right Monster Card Zone [12-bit]" },
+        { address=0X24574, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in player's leftmost Spell/Trap Card Zone [12-bit; ignore 1st digit]" },
+        { address=0X24588, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in player's center-left Spell/Trap Card Zone [12-bit]" },
+        { address=0X2459C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in player's center Spell/Trap Card Zone [12-bit]" },
+        { address=0X245B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in player's center-right Spell/Trap Card Zone [12-bit]" },
+        { address=0X245C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in player's rightmost Spell/Trap Card Zone [12-bit]" },
+        { address=0X24D78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in opponent's rightmost Monster Card Zone [12-bit; ignore 1st digit]" },
+        { address=0X24D8C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in opponent's center-right Monster Card Zone [12-bit]" },
+        { address=0X24DA0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in opponent's center Monster Card Zone [12-bit]" },
+        { address=0X24DB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in opponent's center-left Monster Card Zone [12-bit]" },
+        { address=0X24DC8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in opponent's leftmost Monster Card Zone [12-bit]" },
+        { address=0X24E04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ID of card in opponent's center Spell/Trap Card Zone [12-bit]" },
+      },
+      zone = {
+        { address=0XEEA8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Wins against Goldd, Wu-Lord of Dark World (8-bit+Lower 4 of next byte)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEC70, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Duel Puzzle 14 (Fight to the Death) info" },
+        { address=0X244E0, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player's Life Points increased" },
+        { address=0X244E0, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player's Life Points decreased" },
+        { address=0X24D48, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Opponent's Life Points increased" },
+        { address=0X24D48, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Opponent's Life Points decreased" },
+      },
+      health = {
+        { address=0X5ABA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of cards collected from the 17th store booster (Elemental Energy) decreased" },
+        { address=0X5ABA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of cards collected from the 17th store booster (Elemental Energy) increased" },
+        { address=0X5DFA, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Number of cards collected from the 43rd store booster (Direct Damage Collection)" },
+        { address=0XED6C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Theme Duel 01 (Battle damage) info" },
+        { address=0XED70, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Theme Duel 02 (Deflected damage) info" },
+        { address=0XEDD8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Theme Duel 28 (Direct damage) info" },
+        { address=0XEDF4, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Theme Duel 35 (Huge damage in 1 turn) info" },
+        { address=0XEE10, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Theme Duel 42 (Serious damage) info" },
+        { address=0XEE1C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Theme Duel 45 (Big damage at once) info" },
+        { address=0X231C0, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16 bit]Total damage inflicted in battle." },
+        { address=0X2B3D8, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Total damage inflicted in battle. This is the first row in the duel results." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5E3A, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Number of cards collected from the 45th store booster (Monster Destroy Collection)" },
+        { address=0XEDDC, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Theme Duel 29 (Destroy monsters in battle) info" },
+        { address=0XEE28, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Theme Duel 48 (Destroy monsters with Effects)" },
+      },
+    },
+  },
+}

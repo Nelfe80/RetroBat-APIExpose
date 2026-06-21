@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 AAA 500000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 BBB 450000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 CCC 400000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 DDD 350000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 EEE 300000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FFF 250000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 GGG 200000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HHH 150000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 III 100000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 JJJ 50000</text>
+		</text>
+	</view>
+</theme>

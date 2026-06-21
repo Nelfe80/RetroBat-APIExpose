@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Ushio to Tora: Shinen no Daiyou",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ushio-to-tora-shinen-no-daiyou",
+    file = "ushio-to-tora-shinen-no-daiyou.zip",
+    hashes = {
+      { hash = "822ab715bb4ac141458209e06e00fc43", label = "Ushio & Tora - Great Demon of the Abyss (Japan) (En) (v1.0) (BlackPaladin).nes" },
+      { hash = "99552570212d49ef461037d1a5d46411", label = "Ushio to Tora - Shinen no Taiyou (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00AA, type="u16le", condition="eq", value=0X0000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Prologue Overworld [Left Screen]" },
+        { address=0X00AA, type="u16le", condition="eq", value=0X082B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Prologue Overworld [Right Screen]" },
+        { address=0X07E5, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X07E5, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dungeon/Underground" },
+        { address=0X600C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ushio level" },
+        { address=0X600E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tora level" },
+        { address=0X6010, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hyou level" },
+        { address=0X6012, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raishin level" },
+        { address=0X6014, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kagari level" },
+        { address=0X6016, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Izuna level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X6018, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ushio HP decreased" },
+        { address=0X6018, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ushio HP increased" },
+        { address=0X601A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tora HP decreased" },
+        { address=0X601A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tora HP increased" },
+        { address=0X601C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hyou HP decreased" },
+        { address=0X601C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hyou HP increased" },
+        { address=0X601E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Raishin HP decreased" },
+        { address=0X601E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Raishin HP increased" },
+        { address=0X6020, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kagari HP decreased" },
+        { address=0X6020, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kagari HP increased" },
+        { address=0X6022, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Izuna HP decreased" },
+        { address=0X6022, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Izuna HP increased" },
+        { address=0X6030, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ushio Max HP decreased" },
+        { address=0X6030, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ushio Max HP increased" },
+      },
+    },
+  },
+}

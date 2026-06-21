@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Initial D: Street Stage",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "initial-d-street-stage",
+    file = "initial-d-street-stage.zip",
+    hashes = {
+      { hash = "2fde5d6366cd497d8445a7823cfd90bf", label = "Initial D - Street Stage (Japan).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD58C20, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In Title Screen Flag" },
+        { address=0XDB8F38, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag" },
+      },
+    },
+  },
+}

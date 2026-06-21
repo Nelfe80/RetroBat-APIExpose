@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Fallout",
+    system = "dos",
+    system_name = "DOS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fallout",
+    file = "fallout.zip",
+    hashes = {
+      { hash = "ad53d229543baf0765be9c9f478f1e84", label = "Fallout (1997) (Interplay) (v1.3.5 Bugfix by TeamX)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5AB568, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Preferences - Subtitles" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5AB5A8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Preferences - Violence Level" },
+      },
+      stage = {
+        { address=0X5AECA4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Selected Character Stat - Current Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X452744, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Current Armor Stats - Laser Damage Resistance" },
+        { address=0X452748, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Current Armor Stats - Fire Damage Resistance" },
+        { address=0X45274C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Current Armor Stats - Plasma Damage Resistance" },
+        { address=0X452758, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Current Armor Stats - Explode Damage Resistance" },
+        { address=0X4B8128, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Character - Skill Percentage - Energy Weapons decreased" },
+        { address=0X4B8128, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Character - Skill Percentage - Energy Weapons increased" },
+        { address=0X852FF8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player character - Current Health decreased" },
+        { address=0X852FF8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player character - Current Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4B8130, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player Character - Skill Percentage - Melee Weapons" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X45268C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Selected Character Stat - Max Hit Points" },
+        { address=0X452690, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Selected Character Stat - Action Points" },
+      },
+      collectibles = {
+        { address=0XF12834, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Current Ammo (might change per gun)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4B8164, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Player Character - Skill Percentage - Outdoorsman" },
+      },
+    },
+  },
+}

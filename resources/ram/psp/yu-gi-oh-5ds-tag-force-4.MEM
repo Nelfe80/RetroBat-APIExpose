@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! 5D's Tag Force 4",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "yu-gi-oh-5ds-tag-force-4",
+    file = "yu-gi-oh-5ds-tag-force-4.zip",
+    hashes = {
+      { hash = "b304665409063741e84b79864ff11419", label = "Yu-Gi-Oh! 5D's - Tag Force 4 (Europe) (En,Fr,De,Es,It).iso" },
+      { hash = "d265ac44bcc341dd4d6f2f8bf5422475", label = "Yu-Gi-Oh! 5D's - Tag Force 4 (USA) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XB00D9C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="--- High Score ---" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Ape Quest",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ape-quest",
+    file = "ape-quest.zip",
+    hashes = {
+      { hash = "7f91ba17b2ef1781777e69d3fe7a960a", label = "Ape Quest (USA) (Demo) (PSP) (PSN).iso" },
+      { hash = "a580f4705669b453d8f43223194fbf92", label = "Ape Quest (Europe) (Demo) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

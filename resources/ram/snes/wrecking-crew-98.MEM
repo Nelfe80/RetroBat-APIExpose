@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Wrecking Crew '98",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "wrecking-crew-98",
+    file = "wrecking-crew-98.zip",
+    hashes = {
+      { hash = "00f641f6a633517bf624e713f5dda73d", label = "Wrecking Crew '98 (Japan) (En) (2.0) (ShadowOne333).sfc" },
+      { hash = "94b140bf2aa47d0a8e1663abd4b256d6", label = "Wrecking Crew '98 (Japan).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

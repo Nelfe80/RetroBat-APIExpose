@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "StarPilot W",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "starpilot-w",
+    file = "starpilot-w.zip",
+    hashes = {
+      { hash = "335808621244e3519259d656c6531e08", label = "StarPilot W (World) (Spaceman1701).wasm" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X95AA, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X942D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ship Health decreased" },
+        { address=0X942D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ship Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9584, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X93AC, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Gates Left (0 = Destroy, 1 >= Avoid)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Disney Princess: Enchanted Journey",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "disney-princess-enchanted-journey",
+    file = "disney-princess-enchanted-journey.zip",
+    hashes = {
+      { hash = "fabe8523b1894732c267ba16ffee41c4", label = "Disney Princess - Enchanted Journey (USA)" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0X94140C, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="BEAST - All Chapters Complete/Final Boss Unlocked" },
+      },
+    },
+  },
+}

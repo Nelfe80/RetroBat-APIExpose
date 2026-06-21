@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Vector TD",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "vector-td",
+    file = "vector-td.zip",
+    hashes = {
+      { hash = "9db5430b8800edb5fb7c094728e562db", label = "Vector TD (Europe) (minis) (PSN).iso" },
+      { hash = "dabbf9ed06f8791919a13599f3971b9c", label = "Vector TD (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF3994C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Current Level Wave" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF39948, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 Bit] Total Lives increased" },
+        { address=0XF39948, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] Total Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XF39940, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Total Score" },
+      },
+    },
+  },
+}

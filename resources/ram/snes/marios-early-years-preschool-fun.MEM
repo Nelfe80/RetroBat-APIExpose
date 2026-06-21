@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Mario's Early Years: Preschool Fun",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "marios-early-years-preschool-fun",
+    file = "marios-early-years-preschool-fun.zip",
+    hashes = {
+      { hash = "32b01a3af01aaaf7c65ba5d193e00050", label = "Mario's Early Years - Preschool Fun (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X1D0D, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+        { address=0X1EF4, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="=01 normal world exit transition" },
+        { address=0X406C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="could be =01 for world map" },
+        { address=0X407C, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Counting World - Current Count" },
+        { address=0X407E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="counting world what thing clicked on" },
+        { address=0X4098, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="=01 counting world exit transition" },
+        { address=0X409A, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Body World - Current Interaction" },
+        { address=0X409C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="=01 body world exit transition" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0CE6, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Mario animation? =02 jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4078, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="01=pause timer active" },
+        { address=0X407A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="16bit pause timer" },
+      },
+    },
+  },
+}

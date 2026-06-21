@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Super Thunder Blade",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Shoot'em Up"
+  },
+
+  rom = {
+    name = "super-thunder-blade",
+    file = "super-thunder-blade.zip",
+    hashes = {
+      { hash = "04da37f2a95340243bff72c82d4c7b73", label = "Super Thunder Blade (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF801, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Options" },
+        { address=0XF801, type="u8", condition="eq", value=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Loading Demo" },
+        { address=0XF801, type="u8", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="Results Screen (like game over)" },
+        { address=0XF964, type="u16be", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On title, type UDLRRLDU - this activates the cheat." },
+        { address=0XFE80, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF916, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress through the level, upper16" },
+        { address=0XF918, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Progress through the level, lower16" },
+        { address=0XFA01, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear (also used on other screens, so use additional checks)" },
+      },
+      stage = {
+        { address=0XFE92, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage, 00=Stage 1 etc" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF82B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives increased" },
+        { address=0XF82B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFE00, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Upper Half" },
+        { address=0XFE02, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Lower Half" },
+        { address=0XFE04, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Upper Half" },
+        { address=0XFE06, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Lower Half" },
+        { address=0XFFFC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Set to ASCII 'init' on Reset, used to detect hard/soft reset (i.e. attempt to prevent wiping hig" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF94A, type="u16be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time Taken to Clear Stage" },
+        { address=0XF966, type="u16be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Cheat - on title, press A a number of times to set a level" },
+      },
+    },
+  },
+}

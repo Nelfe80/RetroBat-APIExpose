@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "The Wizard of Oz",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-wizard-of-oz",
+    file = "the-wizard-of-oz.zip",
+    hashes = {
+      { hash = "73c4587d0a3d6521f098e2c6feb2370b", label = "The Wizard of Oz disk A.woz" },
+      { hash = "2a300b2238167a5e616690046f6216c3", label = "The Wizard of Oz disk B.woz" },
+      { hash = "af4c28edaac7efa7d866c49ec7f96421", label = "The Wizard of Oz disk C.woz" },
+      { hash = "1e98b45543bfa45cd8b4dbd96c3323a8", label = "The Wizard of Oz disk D.woz" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA835, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title and intro" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA835, type="u8", condition="eq", value=0X0E, action="TREASURE", no_log=false, no_survey=false, desc="Emerald City Gates" },
+        { address=0XA835, type="u8", condition="eq", value=0X0F, action="TREASURE", no_log=false, no_survey=false, desc="Inside Emerald City" },
+        { address=0XA835, type="u8", condition="eq", value=0X12, action="TREASURE", no_log=false, no_survey=false, desc="Western Gates of Emerald City" },
+        { address=0XA835, type="u8", condition="eq", value=0X2A, action="TREASURE", no_log=false, no_survey=false, desc="Emerald City Gates" },
+        { address=0XA835, type="u8", condition="eq", value=0X2B, action="TREASURE", no_log=false, no_survey=false, desc="Emerald City" },
+      },
+    },
+  },
+}

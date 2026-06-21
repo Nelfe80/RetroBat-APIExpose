@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Shining Force Gaiden: Ensei Jaishin no Kuni e",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shining-force-gaiden-ensei-jaishin-no-kuni-e",
+    file = "shining-force-gaiden-ensei-jaishin-no-kuni-e.zip",
+    hashes = {
+      { hash = "f96d7da86e4f63d66175b1903f976b2c", label = "Shining Force Gaiden - Ensei, Jashin no Kuni e (Japan) (Debug Patch) (Bartis1989).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X01F1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (Text)" },
+        { address=0X1EFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="using this value to identify you're in level (value is different when in camp)" },
+        { address=0X1EFD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="using this value to identify you're in level (value is different when in camp)" },
+        { address=0X2083, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit[ Shig's Level" },
+        { address=0X20FB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clay's Level" },
+      },
+      stage = {
+        { address=0X0C0D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 2" },
+        { address=0X0C2C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8 QA" },
+        { address=0X0C3D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 QA" },
+        { address=0X0C4D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8 QA" },
+        { address=0X0C52, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 19 Chest" },
+        { address=0X0C8B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 8" },
+        { address=0X0C8E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 4" },
+        { address=0X0CA6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 7" },
+        { address=0X0CAE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 7" },
+        { address=0X0CC1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 13 Chest" },
+        { address=0X0CC2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 QA" },
+        { address=0X0CDB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 6" },
+        { address=0X0CDC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 6" },
+        { address=0X0CE5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 Chest" },
+        { address=0X0CF8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 4" },
+        { address=0X0CFB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 6" },
+        { address=0X0CFC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 6" },
+        { address=0X0D16, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 13 Chest" },
+        { address=0X0D3C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 Chest" },
+        { address=0X0D4E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 4" },
+        { address=0X0D86, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 7" },
+        { address=0X0D90, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 7" },
+        { address=0X0DBB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 Chest" },
+        { address=0X0DC3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 Chest" },
+        { address=0X0E41, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 15 Chest" },
+        { address=0X0E80, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 QA" },
+        { address=0X0E85, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 7" },
+        { address=0X0E8E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map Stage 7" },
+        { address=0X0EC2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 13 Chest" },
+        { address=0X0F25, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 Chest" },
+        { address=0X0FE0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 QA Check" },
+      },
+    },
+  },
+}

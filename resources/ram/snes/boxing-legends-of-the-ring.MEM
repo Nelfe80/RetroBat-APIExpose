@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Boxing Legends of the Ring",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "boxing-legends-of-the-ring",
+    file = "boxing-legends-of-the-ring.zip",
+    hashes = {
+      { hash = "26b891c2de994abd162a1daf1077ab64", label = "Boxing Legends of the Ring (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0626, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="opponent total punches in a round" },
+        { address=0X0628, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="player thrown punches in a round" },
+        { address=0X062A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="opponent punches connected round" },
+        { address=0X062C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="player connected punches round" },
+        { address=0X06BA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 = round 1. 1 = round 2 etc" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0A70, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="opponent health decreased" },
+        { address=0X0A70, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="opponent health increased" },
+        { address=0X0A74, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health decreased" },
+        { address=0X0A74, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X068A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="time minutes?" },
+      },
+    },
+  },
+}

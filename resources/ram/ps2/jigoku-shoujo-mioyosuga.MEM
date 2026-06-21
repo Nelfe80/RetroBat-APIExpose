@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Jigoku Shoujo Mioyosuga",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "jigoku-shoujo-mioyosuga",
+    file = "jigoku-shoujo-mioyosuga.zip",
+    hashes = {
+      { hash = "e399870649ac1bdcf2fa635a7a8931a3", label = "Jigoku Shoujo Mioyosuga (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Getter Love!! Cho Renai Party Game",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Simulation"
+  },
+
+  rom = {
+    name = "getter-love-cho-renai-party-game",
+    file = "getter-love-cho-renai-party-game.zip",
+    hashes = {
+      { hash = "5270d98f9e67dc7ef354ece109c2a18f", label = "Getter Love!! - Cho Renai Party Game Tanjou (Japan).z64" },
+      { hash = "4677619c31c5dfda8448308c558f480d", label = "Getter Love!! - Cho Renai Party Game Tanjou (Japan) (En) (v1.03) (ozidual).z64" },
+      { hash = "0ac7a16f8afcc03031835c89d095d7b9", label = "Getter Love!! - Cho Renai Party Game Tanjou (Japan) (En) (v1.01) (ozidual).z64" },
+      { hash = "e2fe94804e7127eb6b78e25e8a775060", label = "Getter Love!! - Cho Renai Party Game Tanjou (Japan) (En) (v1.03 - Controller Pak E) (ozidual).z64" },
+    }
+  },
+
+  events = {
+  },
+}

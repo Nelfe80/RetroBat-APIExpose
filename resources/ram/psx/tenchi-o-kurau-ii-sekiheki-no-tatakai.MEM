@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Tenchi o Kurau II: Sekiheki no Tatakai",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "tenchi-o-kurau-ii-sekiheki-no-tatakai",
+    file = "tenchi-o-kurau-ii-sekiheki-no-tatakai.zip",
+    hashes = {
+      { hash = "a061d391925cf7b74277b89cc0a2e136", label = "Tenchi o Kurau II - Sekiheki no Tatakai (Japan)" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X1F3F44, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="0xff = Power-up Special Move Cheat Enabled" },
+      },
+    },
+  },
+}

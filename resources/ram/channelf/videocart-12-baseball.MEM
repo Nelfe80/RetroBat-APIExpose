@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-12: Baseball",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "videocart-12-baseball",
+    file = "videocart-12-baseball.zip",
+    hashes = {
+      { hash = "4fa83f734c139963aa02bdbb7a52e500", label = "Baseball (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

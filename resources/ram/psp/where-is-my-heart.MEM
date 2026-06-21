@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Where is my Heart?",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "where-is-my-heart",
+    file = "where-is-my-heart.zip",
+    hashes = {
+      { hash = "bb2ac0c83c6e909fa58ff4c8999cc80b", label = "Where is my Heart (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB160D4, type="u32le", condition="eq", value=0X0000001A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XE80B8A, type="u16le", condition="eq", value=0X0004, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="CREDITS" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X9E6538, type="u32le", condition="eq", value=0X00000000, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Not Rotating" },
+        { address=0X9E6538, type="u32le", condition="eq", value=0X00000001, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Rotating" },
+        { address=0X9E6538, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Orange Rotating World" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XB17F18, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Brown Power Up Status decreased" },
+        { address=0XB1F0F8, type="u16le", condition="eq", value=0X00000005, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0XB23D78, type="u16le", condition="eq", value=0X00000005, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0XE679C8, type="u16le", condition="eq", value=0X00000005, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0XE67EC8, type="u16le", condition="eq", value=0X00000005, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0XE7B9C8, type="u16le", condition="eq", value=0X00000005, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000000, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Idle" },
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000001, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Moving Left Or Right" },
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000002, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Jumping Up" },
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000003, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Falling Down" },
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000004, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Landing" },
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000005, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000006, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Entering Tree" },
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000007, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Inside Tree" },
+        { address=0XB17F18, type="u16le", condition="eq", value=0X00000008, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Normal Mode (refer to 0xe679c8)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB16048, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XB17F71, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=true, no_survey=false, desc="Not Double Jumping" },
+        { address=0XB17F71, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=true, no_survey=false, desc="Double Jumping" },
+        { address=0XB17F80, type="u16le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Double Jump Count" },
+        { address=0XB1F0F8, type="u16le", condition="eq", value=0X00000002, action="JUMPING", no_log=true, no_survey=false, desc="Jumping Up" },
+        { address=0XB23D78, type="u16le", condition="eq", value=0X00000002, action="JUMPING", no_log=true, no_survey=false, desc="Jumping Up" },
+        { address=0XE679C8, type="u16le", condition="eq", value=0X00000002, action="JUMPING", no_log=true, no_survey=false, desc="Jumping Up" },
+        { address=0XE67EC8, type="u16le", condition="eq", value=0X00000002, action="JUMPING", no_log=true, no_survey=false, desc="Jumping Up" },
+        { address=0XE7B9C8, type="u16le", condition="eq", value=0X00000002, action="JUMPING", no_log=true, no_survey=false, desc="Jumping Up" },
+      },
+    },
+  },
+}

@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Metal Max",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "metal-max",
+    file = "metal-max.zip",
+    hashes = {
+      { hash = "4f07251e1b63ab895893a887d5ab224f", label = "Metal Max (Japan) (En) (v1.0) (TheMajinZenki).nes" },
+      { hash = "f458676f51302d6aab2f7a3adce97d6a", label = "Metal Max (Japan).nes" },
+      { hash = "fd6f579a0fd79653241753f53a435368", label = "Metal Max (Japan) (Zh) (v1.0) (Unknown).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X647F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mechanic / Kenta Level" },
+        { address=0X6480, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Solider / Sakura Level" },
+        { address=0X667F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Guorilla" },
+        { address=0X6680, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating El Piranha" },
+        { address=0X6681, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Mad Muscle" },
+        { address=0X6682, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Mammoth Tank" },
+        { address=0X6683, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Mr. Kamikaze" },
+        { address=0X6684, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Centipedron" },
+        { address=0X6685, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Gomez" },
+        { address=0X6686, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Dust Franken" },
+        { address=0X6687, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Guorilla Chief" },
+        { address=0X6688, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Rommel's Ghost" },
+        { address=0X6689, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hunter's Level on Defeating Bad Valdez" },
+      },
+      stage = {
+        { address=0X647E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Character Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6766, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier Vehicle ID" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0443, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ruby Lens Traded for Wedding Ring" },
+        { address=0X044B, type="u8", condition="bit_true", bit=3, mask=0X08, action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammoth Tank Defeated" },
+        { address=0X044D, type="u8", condition="bit_true", bit=3, mask=0X08, action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammoth Tank Bounty Accepted" },
+        { address=0X0465, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Golden Bar Corona Building" },
+        { address=0X0465, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gas Mask Corona Building" },
+        { address=0X046B, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Uzi MachineGun Found" },
+        { address=0X046B, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="4700+ gold found near Rocco" },
+        { address=0X046B, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="v48 Kong Engine south of tank ferry" },
+        { address=0X645D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money, up to 255 increased" },
+        { address=0X645E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money x256 increased" },
+        { address=0X645F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money x65536 increased" },
+        { address=0X6690, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Chime increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0441, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Temporary Room-based Bit-switches - tie these to Room-IDs to use them correctly. This is current" },
+        { address=0X0444, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cave Door" },
+        { address=0X668A, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Cybernetic Creatures Destroyed" },
+        { address=0X668C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bionic Creatures Destroyed" },
+        { address=0X668E, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Tanks Destroyed" },
+      },
+    },
+  },
+}

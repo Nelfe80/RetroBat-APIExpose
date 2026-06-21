@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Cybernator",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "cybernator",
+    file = "cybernator.zip",
+    hashes = {
+      { hash = "8376c1bfac08f6fbbf99f26abaee6da0", label = "Cybernator (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01FA, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of continues left" },
+        { address=0X01FC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Set to 01 when paused" },
+        { address=0X0200, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Possible demo flag" },
+        { address=0X1D66, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Bit0 = Continue screen?" },
+        { address=0X1DA2, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="The number of the countdown on the continue screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0066, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The next 5 addresses represent the level of each weapon; if it is zero, then the weapon is not i" },
+        { address=0X0070, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The next 5 addresses represent the number of power chips required to get that weapon to the next" },
+      },
+      stage = {
+        { address=0X421A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage flags! :D" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X007C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="This is the tunneler's health, which gets updated when you enter this stage, when it tunnels and" },
+        { address=0X1578, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy health (enemies don't die until this value goes under 0)" },
+        { address=0X15B2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Slot for Granbia's health. An enemy's death is dependent on one of the bits." },
+      },
+      health = {
+        { address=0X01E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Value used for displaying health bar decreased" },
+        { address=0X01E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Value used for displaying health bar increased" },
+        { address=0X169A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Beldark's head's health when it has a hitbox? decreased" },
+        { address=0X169A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Beldark's head's health when it has a hitbox? increased" },
+        { address=0X16BC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sprite slot for Beldark's head's health in the final fight (but only while his head doesn't have" },
+        { address=0X16BC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sprite slot for Beldark's head's health in the final fight (but only while his head doesn't have" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X14C0, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Appears to be the assault suit's current 'state'. Useful for arbitrary achievements! (Actually p" },
+        { address=0X14C1, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bit0: Checks if the assault suit is on the ground" },
+        { address=0X14CA, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Assault suit's health" },
+        { address=0X14CF, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="This appears to be the assault suit's orientation" },
+        { address=0X19E6, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Number of kills you need for the next powerup drop" },
+        { address=0X41E6, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Your assault suit's health is stored here between area transitions" },
+      },
+      weapon = {
+        { address=0X01F0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Selected weapon" },
+        { address=0X1984, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Cooldown between shots for most weapons" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01F2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="This and the next 16-bit address seem to represent the score counter" },
+      },
+      collectibles = {
+        { address=0X005C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Next 5 addresses indicate how much 'ammo' is in each weapon (Vulcan, Laser, Missile, Punch, Napa" },
+        { address=0X01EA, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo for currently selected weapon" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X15EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Health value for Boss 1? (Also for the engines on Arc Nova)" },
+        { address=0X173F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2's ID? The game resets if you try to change it" },
+        { address=0X1748, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Related to Boss 2's health" },
+        { address=0X1772, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="There's NO WAY this is a good indicator of which healthbar Boss 2 is on" },
+        { address=0X1BC6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1's height?" },
+        { address=0X4296, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage flag used for the appearance of the miniboss in Mission 5?" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1960, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility frames after being hit" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X195A, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="This byte is set to 01 when you're standing on a vertical door in Arc Nova?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X19B8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Seems like a timer for how long you've been in the current 'stage'; wraps around after reaching" },
+        { address=0X19C6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Very promising 'stage' counter. On the final boss, this value will be 0011; if you successfully" },
+        { address=0X1D9A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="This is a counter for how long the 'Game Over' appears before fading into black (16-bit)" },
+        { address=0X1DA0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="'Game Over' byte: This is set to 00 when the continue screen pops up;" },
+      },
+    },
+  },
+}

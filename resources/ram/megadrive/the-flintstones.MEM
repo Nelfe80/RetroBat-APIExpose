@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "The Flintstones",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-flintstones",
+    file = "the-flintstones.zip",
+    hashes = {
+      { hash = "2e083a43e387675cc817282da565dd55", label = "Flintstones, The (USA) (Taito) (Pt) (EmuROMS).md" },
+      { hash = "60ea3535c8a939d26ded83bde0f4809d", label = "Flintstones, The (USA) (Taito).md" },
+      { hash = "e95d51aa0d45be974c59aa4b16c09d84", label = "Flintstones, The (USA) (Taito) (Ru) (Shedevr).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0024, type="u16be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode (16-Bit) (2920)" },
+        { address=0X002E, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen = 04" },
+        { address=0X0168, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode?" },
+        { address=0XF062, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over = ee?" },
+        { address=0XF51F, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over = 01?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X014E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X2F1B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Cheat = 02" },
+        { address=0XEAA1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Section, minus one" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0154, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives increased" },
+        { address=0X0154, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives decreased" },
+        { address=0X0162, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit 0 - Infinite Lives Cheat Active increased" },
+        { address=0X0162, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 0 - Infinite Lives Cheat Active decreased" },
+        { address=0X2F37, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="0x22 - Infinite lives increased" },
+        { address=0X2F37, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x22 - Infinite lives decreased" },
+      },
+      health = {
+        { address=0X0156, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0X0156, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+        { address=0X2F01, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health - 0c = Max - Odd = half heart decreased" },
+        { address=0X2F01, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health - 0c = Max - Odd = half heart increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0152, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 16 bit - Hex" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0804, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Six Health - 3c - Normal - 5a - Hard" },
+        { address=0X0884, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="First Boss Health - Other Possible" },
+        { address=0X0904, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="First Boss Health" },
+        { address=0X0984, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Five Health" },
+        { address=0X0A84, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Second Boss Health - Other Possible - 32" },
+        { address=0X0B04, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Second Boss Health" },
+        { address=0X0F04, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Fourth Stage Boss Health - 32" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0160, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Bit 0 - Invincibility Cheat Active" },
+      },
+    },
+  },
+}

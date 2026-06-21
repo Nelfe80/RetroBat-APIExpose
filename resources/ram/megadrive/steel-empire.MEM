@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Steel Empire",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "steel-empire",
+    file = "steel-empire.zip",
+    hashes = {
+      { hash = "9105a05e3e2e0ae261789fdafca676a2", label = "Steel Empire (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBEEC, type="u24be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="00 - Demo" },
+        { address=0XCA76, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0XCB5E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XCC46, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo 4" },
+        { address=0XCC4A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo 3 *erro*" },
+        { address=0XCC4E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo stage 3" },
+        { address=0XCC67, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo 2" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCB4A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ship Level" },
+        { address=0XCB54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ex Level" },
+        { address=0XE116, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level section" },
+      },
+      stage = {
+        { address=0XE072, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Save code Stage 5" },
+        { address=0XE07A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+        { address=0XE1A2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 - when stage select cheat is enabled" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCB50, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XCB50, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XCC64, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power Up" },
+      },
+      weapon = {
+        { address=0XE3EE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="0xffff = Weapon power cheat" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCC58, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score BCD" },
+        { address=0XCC5A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Score BCD" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XBD86, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health" },
+      },
+    },
+  },
+}

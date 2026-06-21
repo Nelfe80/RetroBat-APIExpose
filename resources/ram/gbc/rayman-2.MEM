@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Rayman 2",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "rayman-2",
+    file = "rayman-2.zip",
+    hashes = {
+      { hash = "feb32471ea029a55d7bdea7e0bdc6961", label = "Rayman 2 (USA) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC2D9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Ticks (in-game, when not paused)" },
+        { address=0XC802, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause [8-Bit]:" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC538, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished Level [8-Bit]:" },
+        { address=0XC62F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Type" },
+        { address=0XC7AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level IDs when in Post-Game Map [8-Bit]:" },
+        { address=0XC7B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Bonus Level Record Centiseconds" },
+        { address=0XC7B7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Bonus Level Record Seconds" },
+      },
+      stage = {
+        { address=0XC62D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Centiseconds Remaining in a Bonus Stage in Binary-Coded-Decimal" },
+        { address=0XC62E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Seconds Remaining in a Bonus Stage in Binary-Coded-Decimal" },
+        { address=0XC656, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Globox Babies in a Bonus Stage [8-Bit]:" },
+        { address=0XC6B5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Stage Beat / Progress [8-Bit]:" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC659, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Counter increased" },
+        { address=0XC659, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Counter decreased" },
+      },
+      health = {
+        { address=0XC658, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayman Health decreased" },
+        { address=0XC658, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayman Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X110DC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Health of the boss of Tomb of the Ancients" },
+        { address=0X111CA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Health of the boss of The Precipice" },
+      },
+    },
+  },
+}

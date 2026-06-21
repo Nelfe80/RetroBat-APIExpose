@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Pirates of the Caribbean: At World's End",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pirates-of-the-caribbean-at-worlds-end",
+    file = "pirates-of-the-caribbean-at-worlds-end.zip",
+    hashes = {
+      { hash = "3912d769d8c8e2932752afd3a2b6564b", label = "Disney Pirates of the Caribbean - At World's End (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X391BC0, type="u16le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X391BC0, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Failed" },
+        { address=0X391BC0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - Jackanism (32-bit)" },
+        { address=0X3CDAAC, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sorround" },
+      },
+    },
+  },
+}

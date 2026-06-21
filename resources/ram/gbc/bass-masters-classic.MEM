@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Bass Masters Classic",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "bass-masters-classic",
+    file = "bass-masters-classic.zip",
+    hashes = {
+      { hash = "3bfa6eca3e26c8b4ee8e31ac7064085a", label = "Bass Masters Classic (USA, Europe) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCC1C, type="u8", condition="eq", value=0X31, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XCC1C, type="u8", condition="eq", value=0X32, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Opening Titles" },
+        { address=0XCC1D, type="u8", condition="eq", value=0X26, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

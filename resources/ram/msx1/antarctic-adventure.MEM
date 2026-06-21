@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Antarctic Adventure",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "antarctic-adventure",
+    file = "antarctic-adventure.zip",
+    hashes = {
+      { hash = "52f1cbeedbf24ebf04aab1ef11098941", label = "Kekkyoku Nankyoku Dai Bouken (Japan) (Joystick Patch) (v1.0) (gdx).rom" },
+      { hash = "97ee96f00fac07a5d70a3801d8a9805a", label = "Kekkyoku Nankyoku Dai Bouken (Japan) (Wii U Virtual Console).rom" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2002, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="No control (demo)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X20E1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X20E5, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16-bit LE BCD] Distance to goal" },
+      },
+      stage = {
+        { address=0X20E0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8-bit BCD] Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2040, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit LE BCD] Highscore" },
+        { address=0X2043, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit LE BCD] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2000, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Game state" },
+      },
+    },
+  },
+}

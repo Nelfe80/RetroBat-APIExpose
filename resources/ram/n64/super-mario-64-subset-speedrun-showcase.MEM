@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Super Mario 64 [Subset - Speedrun Showcase]",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "super-mario-64-subset-speedrun-showcase",
+    file = "super-mario-64-subset-speedrun-showcase.zip",
+    hashes = {
+      { hash = "039c3361ae8556e3151cb49b2ed18114", label = "Super Mario 64 [Subset - Speedrun Showcase].z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF0892, type="u16be", condition="eq", value=0X16, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="File Select" },
+      },
+    },
+  },
+}

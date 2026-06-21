@@ -1,0 +1,119 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Budokai Tenkaichi 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-ball-z-budokai-tenkaichi-3",
+    file = "dragon-ball-z-budokai-tenkaichi-3.zip",
+    hashes = {
+      { hash = "18df2548cc72b98287170b19f73c502b", label = "Dragon Ball Z - Budokai Tenkaichi 3 (USA) (En,Ja)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6B9951, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Mission 12 - Hero and Demon - Rank" },
+        { address=0X6B99E1, type="u24le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Mission 24 - Demon Invasion - Rank" },
+        { address=0X6B9CA5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Mission 83 - Demon Leader - Rank" },
+        { address=0X6BC534, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Seal" },
+      },
+      events = {
+        { address=0X6BC572, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Master" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6AF210, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] current tournament level" },
+        { address=0X6AF7CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (Stars) [Sim Dragon]" },
+        { address=0X6B9A4D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 33 - Underworld's Hooligan - Rank" },
+        { address=0X6B9BF1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mission 68 - Baby-Level Circle - Rank" },
+        { address=0X6BA278, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle Settings - COM Level" },
+        { address=0X18710B8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ki Level P1" },
+        { address=0X18710BC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Ki Level P1" },
+        { address=0X18726B8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ki Level Enemy" },
+        { address=0X18726BC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Ki Level Enemy" },
+      },
+      zone = {
+        { address=0X6AF204, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8bit] Dragon World Tour" },
+        { address=0X6B98FC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mission 5 - Defender of the World - Completion Flag" },
+        { address=0X6B98FD, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mission 5 - Defender of the World - Rank" },
+        { address=0X6BA048, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8bit] Dragon World Tour tournaments unlocked" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6B9AAD, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 41 - Death and Rebirth - Rank" },
+        { address=0X6B9D11, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Mission 92 - Flawless Lifeform - Rank increased" },
+        { address=0X6B9D11, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 92 - Flawless Lifeform - Rank decreased" },
+        { address=0X6BC53E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Eternal Life increased" },
+        { address=0X6BC53E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eternal Life decreased" },
+      },
+      health = {
+        { address=0X6AF7D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sim Dragon Health decreased" },
+        { address=0X6AF7D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sim Dragon Health increased" },
+        { address=0X6BC553, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Latent Energy! decreased" },
+        { address=0X6BC553, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Latent Energy! increased" },
+        { address=0X18710A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Character 1 HP decreased" },
+        { address=0X18710A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Character 1 HP increased" },
+        { address=0X18710A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health P1 decreased" },
+        { address=0X18710A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health P1 increased" },
+        { address=0X1871148, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Character 2 HP decreased" },
+        { address=0X1871148, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Character 2 HP increased" },
+        { address=0X18711EC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Character 3 HP decreased" },
+        { address=0X18711EC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Character 3 HP increased" },
+        { address=0X1871290, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Character 4 HP decreased" },
+        { address=0X1871290, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Character 4 HP increased" },
+        { address=0X1871334, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Character 5 HP decreased" },
+        { address=0X1871334, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Character 5 HP increased" },
+        { address=0X18726A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Character 1 HP decreased" },
+        { address=0X18726A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Character 1 HP increased" },
+        { address=0X18726A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Max Health decreased" },
+        { address=0X18726A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Max Health increased" },
+        { address=0X1872748, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Character 2 HP decreased" },
+        { address=0X1872748, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Character 2 HP increased" },
+        { address=0X18727EC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Character 3 HP decreased" },
+        { address=0X18727EC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Character 3 HP increased" },
+        { address=0X1872890, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Character 4 HP decreased" },
+        { address=0X1872890, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Character 4 HP increased" },
+        { address=0X1872934, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Character 5 HP decreased" },
+        { address=0X1872934, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Character 5 HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6B9AA1, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Mission 40 - Dragon Treasure Warrior - Rank" },
+        { address=0X6BC50E, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ki Power Up 1" },
+        { address=0X6BC50F, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ki Power Up 2" },
+        { address=0X6BC510, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ki Power Up 3" },
+        { address=0X6BC516, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ki Power Up 2 & Super Down 1" },
+        { address=0X6BC51A, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ki Power Up 3 & Defense Down 1" },
+        { address=0X6BC51E, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power Up 3 & Super Down 2" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6AF7DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sim Dragon Score" },
+        { address=0X6B98D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 1 - Score x100" },
+        { address=0X6B98E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 2 - Score x100" },
+        { address=0X6B98EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 3 - Score x100" },
+        { address=0X6B9D80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Survival - Bardock War - Score x100" },
+        { address=0X6B9D8C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Survival - Dragon Classic - Score x100" },
+        { address=0X6B9D98, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Survival - All-Star - Score x100" },
+      },
+      collectibles = {
+        { address=0X6B9C5D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mission 77 - Gathering of Demons - Rank increased" },
+        { address=0X6BC575, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Broly's Ring increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6BA04C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Dragon World Tour Time" },
+      },
+    },
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Revolution X",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Gun"
+  },
+
+  rom = {
+    name = "revolution-x",
+    file = "revolution-x.zip",
+    hashes = {
+      { hash = "08a2bbb8b4eb45a2d887ce4b76fd0117", label = "revx.7z <Revolution X (rev 1.0 6/16/94)>" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X18E60A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X18E60A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+      },
+    },
+  },
+}

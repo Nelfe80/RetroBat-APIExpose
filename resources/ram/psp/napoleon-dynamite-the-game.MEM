@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Napoleon Dynamite: The Game",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "napoleon-dynamite-the-game",
+    file = "napoleon-dynamite-the-game.zip",
+    hashes = {
+      { hash = "3f8c97ab4253de1e96c874a598dbb882", label = "Napoleon Dynamite - The Game (USA).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X1A0EFC0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="BMX Bike Jumping high score (Normal)" },
+        { address=0X1A0EFE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bow Hunting Skills high score (Normal)" },
+        { address=0X1A0F008, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bumper Bowling high score (Normal)" },
+        { address=0X1A0F02C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cake Building high score (Normal)" },
+        { address=0X1A0F050, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chicken Egg Collection high score (Normal)" },
+        { address=0X1A0F074, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Computer Hacking Skills Highscore (Normal)" },
+        { address=0X1A0F078, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Computer Hacking Skills high score (Hard)" },
+        { address=0X1A0F098, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Dance At Home Highscore (Normal)" },
+        { address=0X1A0F09C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dance At Home high score (Hard)" },
+        { address=0X1A0F0BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dance In Town high score (Normal)" },
+        { address=0X1A0F0E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dance In Country high score (Normal)" },
+        { address=0X1A0F104, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Dance Practice Highscore (Normal)" },
+        { address=0X1A0F128, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dance Competition high score (Normal)" },
+        { address=0X1A0F14C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dodgeball high score (Normal)" },
+        { address=0X1A0F170, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Feed Tina Highscore (Normal)" },
+        { address=0X1A0F174, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Feed Tina high score (Hard)" },
+        { address=0X1A0F194, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Football Toss Highscore (Normal)" },
+        { address=0X1A0F198, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Football Toss high score (Hard)" },
+        { address=0X1A0F1B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Happy Hands high score (Normal)" },
+        { address=0X1A0F1DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pull Kip high score (Normal)" },
+        { address=0X1A0F200, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Lowrider Drive high score (Normal)" },
+        { address=0X1A0F224, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Ninja Fight high score (Normal)" },
+        { address=0X1A0F248, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Pegasus Flight Highscore (Normal)" },
+        { address=0X1A0F24C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pegasus Flight high score (Hard)" },
+        { address=0X1A0F26C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stallion Riding high score (Normal)" },
+        { address=0X1A0F290, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pinata Smash high score (Normal)" },
+        { address=0X1A0F2D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Rex Kwon Do high score (Normal)" },
+        { address=0X1A0F2FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Saving Nessie high score (Normal)" },
+        { address=0X1A0F320, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Singing high score (Normal)" },
+        { address=0X1A0F344, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tetherball high score (Normal)" },
+        { address=0X1A0F348, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tetherball high score (Hard)" },
+        { address=0X1A0F368, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Time Machine Highscore (Normal)" },
+        { address=0X1A0F36C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Time Machine high score (Hard)" },
+        { address=0X1A0F38C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Toy Drag Highscore (Normal)" },
+        { address=0X1A0F390, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Toy Drag high score (Hard)" },
+        { address=0X1A0F3B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Trampoline Jump high score (Normal)" },
+        { address=0X1A0F3D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Water Balloon Toss high score (Normal)" },
+        { address=0X1A0F3F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Wolverine Hunt Highscore (Normal)" },
+      },
+      collectibles = {
+        { address=0X1A0EB40, type="u8", condition="bit_true", bit=2, mask=0X04, action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold watch" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1A0EFB0, type="u16le", condition="eq", value=0X0000, action="JUMPING", no_log=true, no_survey=false, desc="Locked" },
+        { address=0X1A0F3A0, type="u16le", condition="eq", value=0X0000, action="JUMPING", no_log=true, no_survey=false, desc="Locked" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1A0F362, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Machine Hard difficulty unlocked in Notebook" },
+        { address=0X1C7F7F4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="pinata smash round timer" },
+        { address=0X1CABFB4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="computer hacking round 1 minigame timer [float]" },
+      },
+    },
+  },
+}

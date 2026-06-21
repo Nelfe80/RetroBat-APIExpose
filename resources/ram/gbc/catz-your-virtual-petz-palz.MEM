@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Catz: Your Virtual Petz Palz",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "catz-your-virtual-petz-palz",
+    file = "catz-your-virtual-petz-palz.zip",
+    hashes = {
+      { hash = "695e4a82d1a97859365e3b5d5ba28e8c", label = "Catz (USA).gbc" },
+      { hash = "349aebf94c9ae3e1dce9d2a01894bae8", label = "Catz (Europe).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC138, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Background - Background ID [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA04B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Sadie [8bit]" },
+      },
+    },
+  },
+}

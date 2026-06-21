@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Sonic Eraser",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "sonic-eraser",
+    file = "sonic-eraser.zip",
+    hashes = {
+      { hash = "ff65f5666f84f0b2d9d6b535188bcd14", label = "Sonic Eraser (Japan) (SegaNet).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC00A, type="u16be", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC00A, type="u16be", condition="eq", value=0X50, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Round mode" },
+        { address=0XC03C, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+        { address=0XC710, type="u8", condition="eq", value=0X28, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last round" },
+        { address=0XC710, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round current round" },
+        { address=0XC71C, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Minutes left in Round mode" },
+        { address=0XC71E, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seconds left in Round mode" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC022, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Additionnal score (*10000)" },
+        { address=0XC024, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC002, type="u16be", condition="eq", value=0X87, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Top of the screen" },
+        { address=0XC002, type="u16be", condition="eq", value=0X157, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bottom of the screen" },
+        { address=0XC002, type="u16be", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="No block currently controlled" },
+        { address=0XC006, type="u16be", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Outside game" },
+        { address=0XC01A, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Number of pieces destroyed in the current round. Sets the current level in 0xc016 when it change" },
+        { address=0XC03C, type="u8", condition="eq", value=0X3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block" },
+      },
+    },
+  },
+}

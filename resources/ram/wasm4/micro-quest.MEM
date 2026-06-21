@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Micro Quest",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "micro-quest",
+    file = "micro-quest.zip",
+    hashes = {
+      { hash = "7cf7b7c52ab8569eb45081543a0eb1bf", label = "Micro Quest (World) (Andre L. Alvares).wasm" },
+      { hash = "ad66774bf7a514895bd7802810c7b605", label = "Micro Quest (World) (v1.0.1) (Andre L. Alvares).wasm" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X5AA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X5AA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+        { address=0X5AB9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="slime 1 HP decreased" },
+        { address=0X5AB9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="slime 1 HP increased" },
+        { address=0X5ACB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="slime 2 HP decreased" },
+        { address=0X5ACB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="slime 2 HP increased" },
+        { address=0X5ADD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="slime 3 HP decreased" },
+        { address=0X5ADD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="slime 3 HP increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "New Rally-X",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "new-rally-x",
+    file = "new-rally-x.zip",
+    hashes = {
+      { hash = "cf6dc67d32868c0dca89c2bcd94d912d", label = "New Rally-X.d88" },
+    }
+  },
+
+  events = {
+  },
+}

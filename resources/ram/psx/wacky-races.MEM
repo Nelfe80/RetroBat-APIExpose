@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Wacky Races",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "wacky-races",
+    file = "wacky-races.zip",
+    hashes = {
+      { hash = "d07879a3b0aa29d8ee9b574226bb04f3", label = "Wacky Races (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+  },
+}

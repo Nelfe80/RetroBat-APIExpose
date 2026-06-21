@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Call of Duty: World at War",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure, Shooter"
+  },
+
+  rom = {
+    name = "call-of-duty-world-at-war",
+    file = "call-of-duty-world-at-war.zip",
+    hashes = {
+      { hash = "4b18bf47746f362ae39c4339b5bbc653", label = "Call of Duty - World at War (USA).nds" },
+    }
+  },
+
+  events = {
+  },
+}

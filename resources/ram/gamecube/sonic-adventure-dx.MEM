@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "Sonic Adventure DX",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sonic-adventure-dx",
+    file = "sonic-adventure-dx.zip",
+    hashes = {
+      { hash = "90f666f636fff92b2e609462edbb29b5", label = "Sonic Adventure DX - Director's Cut (USA) (En,Ja,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X565B19, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag (8-bit)" },
+        { address=0X73DDEB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode (8-bit)" },
+        { address=0X74A7A9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu selection (8-bit)" },
+        { address=0X74C7B0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode (8-bit)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X74A7E8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage X-Rotation (Float BE)" },
+        { address=0X74A7EC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Y-Rotation (Float BE)" },
+        { address=0X74A7F0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Z-Rotation (Float BE)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X74C7AD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) increased" },
+        { address=0X74C7AD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) decreased" },
+      },
+      health = {
+        { address=0X8429CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy max Health HUD (Float BE) decreased" },
+        { address=0X8429CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy max Health HUD (Float BE) increased" },
+        { address=0X8429D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy current Health HUD Bar (Float BE) decreased" },
+        { address=0X8429D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy current Health HUD Bar (Float BE) increased" },
+        { address=0X8429D4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy current Health HUD (Float BE) decreased" },
+        { address=0X8429D4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy current Health HUD (Float BE) increased" },
+        { address=0X1127CA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sky Chase Health (Float BE) decreased" },
+        { address=0X1127CA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sky Chase Health (Float BE) increased" },
+        { address=0X1128EE0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sky Chase - Plane current Health HUD (Float BE) decreased" },
+        { address=0X1128EE0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sky Chase - Plane current Health HUD (Float BE) increased" },
+        { address=0X1128EE8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sky Chase - Plane max Health HUD (Float BE) decreased" },
+        { address=0X1128EE8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sky Chase - Plane max Health HUD (Float BE) increased" },
+        { address=0X1128EEC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sky Chase - Plane current Health HUD Bar (Float BE) decreased" },
+        { address=0X1128EEC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sky Chase - Plane current Health HUD Bar (Float BE) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X74C798, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Enemy Score (32-bit BE)" },
+        { address=0X74C79C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Score (32-bit BE)" },
+      },
+      collectibles = {
+        { address=0X74C7A8, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings (16-bit BE) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X79C039, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Act (8-bit)" },
+        { address=0X79C044, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint X coords (Float BE)" },
+        { address=0X79C048, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Y coords (Float BE)" },
+        { address=0X79C04C, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Z coords (Float BE)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X74C750, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Boss Rush - 1st Boss Time (12 Bytes)" },
+        { address=0X74C75C, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Boss Rush - 2nd Boss Time (12 Bytes)" },
+        { address=0X74C768, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Boss Rush - 3rd Boss Time (12 Bytes)" },
+        { address=0X74C774, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Boss Rush - 4th Boss Time (12 Bytes)" },
+        { address=0X74C780, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Boss Rush - 5th Boss Time (12 Bytes)" },
+        { address=0X79C03A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Checkpoint Time - Minutes (8-bit)" },
+        { address=0X79C03B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Checkpoint Time - Seconds (8-bit)" },
+        { address=0X79C03C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Checkpoint Time - Miliseconds (8-bit)" },
+        { address=0X7A85F6, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Sonic 1st Boss Rush Time (3 Bytes)" },
+        { address=0X7A85F9, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Sonic 2nd Boss Rush Time (3 Bytes)" },
+        { address=0X7A85FC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Sonic 3rd Boss Rush Time (3 Bytes)" },
+        { address=0X7A85FF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Tails 1st Boss Rush Time (3 Bytes)" },
+        { address=0X7A8602, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Tails 2nd Boss Rush Time (3 Bytes)" },
+        { address=0X7A8605, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Tails 3rd Boss Rush Time (3 Bytes)" },
+        { address=0X7A8608, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Knuckles 1st Boss Rush Time (3 Bytes)" },
+        { address=0X7A860B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Knuckles 2nd Boss Rush Time (3 Bytes)" },
+        { address=0X7A860E, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Knuckles 3rd Boss Rush Time (3 Bytes)" },
+        { address=0X7A8611, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Amy 1st Boss Rush Time (3 Bytes)" },
+        { address=0X7A8614, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Amy 2nd Boss Rush Time (3 Bytes)" },
+        { address=0X7A8617, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Amy 3rd Boss Rush Time (3 Bytes)" },
+        { address=0X7A861A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Gamma 1st Boss Rush Time (3 Bytes)" },
+        { address=0X7A861D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Gamma 2nd Boss Rush Time (3 Bytes)" },
+        { address=0X7A8620, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Gamma 3rd Boss Rush Time (3 Bytes)" },
+        { address=0X7A8623, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Big 1st Boss Rush Time (3 Bytes)" },
+        { address=0X7A8626, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Big 2nd Boss Rush Time (3 Bytes)" },
+        { address=0X7A8629, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Big 3rd Boss Rush Time (3 Bytes)" },
+        { address=0X7A894F, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Metal Sonic 1st Boss Rush Time (3 Bytes)" },
+        { address=0X7A8952, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Metal Sonic 2nd Boss Rush Time (3 Bytes)" },
+        { address=0X7A8955, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="File 1 - Metal Sonic 3rd Boss Rush Time (3 Bytes)" },
+      },
+    },
+  },
+}

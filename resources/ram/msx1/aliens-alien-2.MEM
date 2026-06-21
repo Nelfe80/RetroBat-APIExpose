@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Aliens: Alien 2",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "aliens-alien-2",
+    file = "aliens-alien-2.zip",
+    hashes = {
+      { hash = "3dbb75d222dc216c72a8a046e400f2e6", label = "Aliens - Alien 2 (Japan).rom" },
+      { hash = "f3e7f81c0228fdcbb6d55623a8af6969", label = "Aliens - Alien 2 (Japan) (Alt).rom" },
+      { hash = "fec81b03474e475329e887e9f37877a5", label = "Aliens - Alien 2 (Japan) (Alt 2).rom" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0766, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Next Zone through Door" },
+        { address=0X258A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Zone ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2247, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Health Value decreased" },
+        { address=0X2247, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Health Value increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2241, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Subweapon ID" },
+        { address=0X2242, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon ID" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2700, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Score" },
+        { address=0X2701, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24 Bit] Score Value" },
+      },
+      collectibles = {
+        { address=0X228E, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon Ammo Count" },
+        { address=0X228F, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8 Bit] Subweapon Ammo Count" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2604, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8 Bit] Boss Health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2246, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[8 Bit] Power-up Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0760, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[Data Block] Start of Door Data" },
+      },
+    },
+  },
+}

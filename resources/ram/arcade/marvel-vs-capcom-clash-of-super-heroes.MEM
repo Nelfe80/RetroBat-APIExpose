@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Marvel vs. Capcom: Clash of Super Heroes",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "marvel-vs-capcom-clash-of-super-heroes",
+    file = "marvel-vs-capcom-clash-of-super-heroes.zip",
+    hashes = {
+      { hash = "7280b613c4597b4a4bbbae6f634bb886", label = "mvsc.7z <Marvel vs Capcom - clash of super heroes (980123 Euro)>" },
+      { hash = "79374b32fb5e0f45c6fb40af7138bdbc", label = "mvscu.7z <Marvel vs Capcom - clash of super heroes (980123 USA)>" },
+      { hash = "b81c3fcde2756cee6d7c0463c6c9ab8c", label = "mvsca.7z <Marvel vs Capcom - clash of super heroes (980123 Asia)>" },
+      { hash = "fb8d9c9f10142fb2a89c607ec8ebcd21", label = "mvscj.zip" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X32B1, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Demo" },
+        { address=0X32B1, type="u8", condition="eq", value=0X08, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X32B1, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X4101, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+      events = {
+        { address=0X30E5, type="u8", condition="eq", value=0X14, action="COMBO_HIT", no_log=false, no_survey=false, desc="Zangief: Final Atomic Buster" },
+        { address=0X30E5, type="u8", condition="eq", value=0X1A, action="COMBO_HIT", no_log=false, no_survey=false, desc="Zangief: Ultra Final Atomic Buster" },
+        { address=0X3125, type="u8", condition="eq", value=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="Ground Combo" },
+        { address=0X4444, type="u8", condition="eq", value=0XFF, action="COMBO_HIT", no_log=false, no_survey=false, desc="Hyper Combo background is activated" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4004, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Win" },
+        { address=0X4004, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Win" },
+        { address=0X400E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fighting" },
+        { address=0X400E, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round End" },
+        { address=0X400E, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Start" },
+        { address=0X400E, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Started" },
+        { address=0X400E, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Presentation and Win Pose" },
+        { address=0X400E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Match - Round State [8 bits]" },
+        { address=0X4445, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Crossover Background" },
+      },
+      stage = {
+        { address=0X4112, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Honda's Bath House" },
+        { address=0X4112, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Live House of the Dark Realm" },
+        { address=0X4112, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Neo ST.Peterburg" },
+        { address=0X4112, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dr. Wily Military Base" },
+        { address=0X4112, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Head Quarters of Evil" },
+        { address=0X4112, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Avengers Head Quarters" },
+        { address=0X4112, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Blue Arena of the Moon" },
+        { address=0X4112, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rooftop of the Daily Bugle" },
+        { address=0X4112, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Cliff of Desolation" },
+        { address=0X4112, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Onslaugh is Born" },
+        { address=0X4112, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game - Stages [8 bits]" },
+        { address=0X4144, type="u32le", condition="eq", value=0X00020002, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Stage Showcase" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFFE6, type="u16le", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Bite (Cross-Over)" },
+        { address=0XFFFE, type="u24le", condition="eq", value=0X18, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unknown Soldier" },
+      },
+      health = {
+        { address=0X2CA6, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Low" },
+        { address=0X2CA6, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X2CA6, type="u8", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="High" },
+        { address=0X2CA6, type="u8", condition="eq", value=0X03, action="HIT", no_log=false, no_survey=false, desc="Maximum" },
+        { address=0XF95F, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Low" },
+        { address=0XF95F, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Normal" },
+        { address=0XF95F, type="u8", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="High" },
+        { address=0XF95F, type="u8", condition="eq", value=0X03, action="HIT", no_log=false, no_survey=false, desc="Maximum" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XFFE6, type="u16le", condition="eq", value=0X06, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon X (Hyper-Move)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2C9F, type="u8", condition="eq", value=0X12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Free Play" },
+        { address=0XFFFF, type="u24le", condition="eq", value=0X28, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold War Machine" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XFFE6, type="u16le", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Slash" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X32B1, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="In-Game" },
+        { address=0XFFE6, type="u16le", condition="eq", value=0X0C, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="War Destroyer (Hyper-Move)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2CA7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Settings - Time (Diagnostic Input) [8 bits]" },
+        { address=0XF95C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Settings - Timer Speed [8 bits]" },
+        { address=0XFFE6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sheet - Move IDs" },
+      },
+    },
+  },
+}

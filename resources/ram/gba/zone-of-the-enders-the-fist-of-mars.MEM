@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Zone of the Enders: The Fist of Mars",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "zone-of-the-enders-the-fist-of-mars",
+    file = "zone-of-the-enders-the-fist-of-mars.zip",
+    hashes = {
+      { hash = "55b8193f7a2e96d6af029e2411fe22cb", label = "Zone of the Enders - The Fist of Mars (Europe) (En,Fr,De).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2155, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Cage Level" },
+        { address=0X216E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Testament OF Level" },
+        { address=0X2275, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Yukito's Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X17E0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Cage Max HP decreased" },
+        { address=0X17E0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Cage Max HP increased" },
+        { address=0X17F4, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Mech Max HP, used for damageless last boss check 1" },
+        { address=0X2138, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Enemy 1 HP Value decreased" },
+        { address=0X2138, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Enemy 1 HP Value increased" },
+        { address=0X213A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Enemy 1 Energy decreased" },
+        { address=0X213A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Enemy 1 Energy increased" },
+        { address=0X215C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Testament HP decreased" },
+        { address=0X215C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Testament HP increased" },
+        { address=0X215E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Testament Energy decreased" },
+        { address=0X215E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Testament Energy increased" },
+        { address=0X21FE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Dreizehn HP/Shell upgrade decreased" },
+        { address=0X21FE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Dreizehn HP/Shell upgrade increased" },
+        { address=0X22E8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 1 HP decreased" },
+        { address=0X22E8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 1 HP increased" },
+        { address=0X230C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 2 HP decreased" },
+        { address=0X230C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 2 HP increased" },
+        { address=0X2330, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 3 HP decreased" },
+        { address=0X2330, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 3 HP increased" },
+        { address=0X2354, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 4 HP decreased" },
+        { address=0X2354, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 4 HP increased" },
+        { address=0X2378, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 5 HP decreased" },
+        { address=0X2378, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Chp 7 Civilian 5 HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1D45, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit - Bitflag] OF Weapons Server Update Flags" },
+        { address=0X1D46, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit - Bitflag] Durandal II Weapons Server Update Flags" },
+        { address=0X21FF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Dreizhen Weapon Upgrade 1" },
+        { address=0X2200, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Dreizhen Weapon Upgrade 2" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X17C0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Nerokerubina Stats Block, ends at 0x0017d2" },
+        { address=0X17E8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Vjaya Stats Block, ends at 0x0017fa" },
+        { address=0X17FC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Enemy 3 Stats Block, ends at 0x00180e" },
+        { address=0X1824, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Razma Stats Block" },
+        { address=0X1838, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Edge Stats Block, ends at 0x00184a" },
+        { address=0X1860, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Durandal II Stats Block, ends at 0x001872" },
+        { address=0X1874, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Yukito Stats Block" },
+        { address=0X1888, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Semyl Stats Block, ends at 0x00189a" },
+        { address=0X189C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[148 Bit] Phil Stats Block, ends at 0x0018ae" },
+        { address=0X1DD4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[Memory Block] Start of 8-Bits block of Ammunition Indicator" },
+        { address=0X219C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[260 Bit] Orcrist Stats Block" },
+        { address=0X2D800, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[Memory Block] Textbox Data" },
+      },
+    },
+  },
+}

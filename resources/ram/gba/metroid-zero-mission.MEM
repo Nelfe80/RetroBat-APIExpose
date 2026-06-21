@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Metroid: Zero Mission",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "metroid-zero-mission",
+    file = "metroid-zero-mission.zip",
+    hashes = {
+      { hash = "07930e72d4824bd63827a1a823cc8829", label = "Metroid - Zero Mission (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "650140ccae6e1ab7af44c74986002375", label = "Metroid - Zero Mission (Japan).gba" },
+      { hash = "b83495cfac1fe94821912beeaa1c8212", label = "Metroid - Zero Mission (USA) (Pt) (v1.0) (Solid One).gba" },
+      { hash = "ebbce58109988b6da61ebb06c7a432d5", label = "Metroid - Zero Mission (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0C70, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Reset, 1=IntroCutscene, 2=Title, B=Demo" },
+        { address=0X0C70, type="u8", condition="eq", value=0X3, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="FileSelectandOptions, 6=GameOver, 8=CreditsAndResults, 7=EndGameCutscene and OriginalMetroid" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X13D5, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On Ground, 2=In Air" },
+        { address=0X13D7, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="NotTurningAround" },
+        { address=0X13D7, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="TurningAround" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0278, type="u8", condition="eq", value=0X43, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Spawning" },
+      },
+      health = {
+        { address=0X01D1, type="u8", condition="eq", value=0X20, action="HIT", no_log=false, no_survey=false, desc="Dead, 6=SelfDestruct, 5=HardModeDamage(?), 4=DamageAllSides" },
+        { address=0X05B0, type="u16le", condition="eq", value=0X190, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max" },
+        { address=0X05B0, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mother Brain glass health - 16bit" },
+        { address=0X1541, type="u8", condition="eq", value=0X0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="False" },
+        { address=0X1541, type="u8", condition="eq", value=0X1, action="HEALTH_STATE", no_log=false, no_survey=false, desc="True" },
+        { address=0X1541, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Low Health Beep" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1542, type="u8", condition="eq", value=0X3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Combination of 1 and 2" },
+        { address=0X0001, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="for unknown items enabled" },
+        { address=0X30017CC, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 1 Vertical Position" },
+        { address=0X30017CE, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 1 Horizontal Position" },
+        { address=0X30017D4, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 1 Animation Counter" },
+        { address=0X30017D5, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 1 Animation" },
+        { address=0X30017D6, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 1 ID" },
+        { address=0X30017DC, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 2 Vertical Position" },
+        { address=0X30017DE, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 2 Horizontal Position" },
+        { address=0X30017E4, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 2 Animation Counter" },
+        { address=0X30017E5, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 2 Animation" },
+        { address=0X30017E6, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 2 ID" },
+        { address=0X30017EC, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 3 Vertical Position" },
+        { address=0X30017EE, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 3 Horizontal Position" },
+        { address=0X30017F4, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 3 Animation Counter" },
+        { address=0X30017F5, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 3 Animation" },
+        { address=0X30017F6, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 3 ID" },
+        { address=0X300180C, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 4 Vertical Position" },
+        { address=0X300180E, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 4 Horizontal Position" },
+        { address=0X3001814, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 4 Animation Counter" },
+        { address=0X3001815, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 4 Animation" },
+        { address=0X3001816, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Map/Menu Item 4 ID" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X153E, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="SpeedBooster, bit2=SpaceJump, bit3=ScrewAttack, bit4=VariaSuit" },
+        { address=0X153E, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="GravitySuit, bit6=MorphBall, bit7=PowerGrip" },
+        { address=0X153F, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="SpeedBooster, bit2=SpaceJump, bit3=ScrewAttack, bit4=VariaSuit" },
+        { address=0X153F, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="GravitySuit, bit6=MorphBall, bit7=PowerGrip" },
+        { address=0X3FE01, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="UseChozoStatueLowRightNorfairForNavigationAfterHiJumpBoots" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0004, type="u8", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mono" },
+        { address=0X0004, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Stereo" },
+        { address=0X0020, type="u8", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Kanji, 1=Hiragana Katakana" },
+        { address=0X0020, type="u8", condition="eq", value=0X2, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="None, 3=English" },
+        { address=0X0024, type="u8", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Normal Map Screen" },
+        { address=0X002D, type="u8", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Normal doors" },
+        { address=0X002D, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Doors used in Chozodia" },
+        { address=0X0057, type="u8", condition="eq", value=0X14, action="DOOR_OPENED", no_log=false, no_survey=false, desc="DoorClosingSound, 51=ElevatorSound,Samus'AwakeningScene" },
+        { address=0X0057, type="u8", condition="eq", value=0X52, action="DOOR_OPENED", no_log=false, no_survey=false, desc="NoSoundRoomPopUp, 54=DoorClosingSoundRoomPopUp" },
+        { address=0X1416, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Missiles, 2=SuperMissiles, 4=PowerBombs" },
+        { address=0X1417, type="u8", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Missiles" },
+        { address=0X1417, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="SuperMissiles" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0024, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Completed Game Map switch" },
+      },
+    },
+  },
+}

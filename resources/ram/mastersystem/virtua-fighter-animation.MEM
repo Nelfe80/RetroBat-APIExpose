@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Virtua Fighter Animation",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "virtua-fighter-animation",
+    file = "virtua-fighter-animation.zip",
+    hashes = {
+      { hash = "fdc90edb44d2a2236ab9c29d2f073d3c", label = "Virtua Fighter Animation (Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0421, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Rounds Won" },
+        { address=0X0431, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU Rounds Won" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0422, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X0422, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X0423, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X0423, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X0432, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="CPU Health decreased" },
+        { address=0X0432, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="CPU Health increased" },
+        { address=0X0433, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="CPU Health decreased" },
+        { address=0X0433, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="CPU Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0428, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sometimes flashes on and off randomly?" },
+        { address=0X0800, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Character Selection ID" },
+      },
+    },
+  },
+}

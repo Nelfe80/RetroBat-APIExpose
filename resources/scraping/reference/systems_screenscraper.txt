@@ -1,0 +1,658 @@
+3DO Interactive Multiplayer|29
+3do|29
+3ds|17
+64dd|122
+a2600|26
+a2k1|94
+a5200|40
+a7800|41
+a800|43
+Aamber Pegasus|83
+aamber_pegasus|83
+acclaim|166
+ace4000|126
+Acorn Archimedes|84
+Acorn Atom|36
+Acorn Electron|85
+action_max|81
+actionmax|81
+adam|89
+adventure_vision|78
+advision|78
+ags|138
+alg|170
+alpha_denshi_co.|182
+amcoe|178
+american_laser_games|170
+amiga1000|111
+amiga1200|111
+amiga3000|111
+amiga4000|111
+amiga500p|64
+amiga500|64
+amiga600|64
+amiga_cd32_(hack)|139
+amiga_cd|134
+amigacd32|130,139
+amigacdtv|129
+amiga|64,111
+Amstrad CPC|65
+Amstrad GX4000|87
+amstradcpc|65
+Amstrad|65
+android|63
+another_arcade_emulator|35
+Apple IIGS|217
+Apple II|86
+Apple Mac OS|146
+apple2gs|217
+apple2|86
+arcade_classics|75
+arcade|75
+arcadia_2001|94
+arcadia|94
+archimedes|84
+archimede|84
+arduboy|263
+astrocade|44
+astrocde|44
+Atari 2600|26
+Atari 5200|40
+Atari 7800|41
+Atari 800|43
+Atari Jaguar CD|171
+Atari Jaguar|27
+Atari Lynx|28
+Atari ST-STE-TT-Falcon|42
+Atari ST|42
+atari2600|26
+atari5200|40
+atari7800|41
+atari800|43
+atari8bits|43
+atari_2600_supercharger|39
+atari_classics|160
+atari_xe|43
+atarijaguarcd|171
+atarijaguar|27
+atarilynx|28
+atarist|42
+atarixegs|43
+atari|26
+atlus|185
+atomiswave|53
+atom|36
+Bally Astrocade|44
+Bandai WonderSwan-Color|46
+banpresto|186
+BBC Microcomputer System|37
+bbc_micro|37
+bbcmicro|37
+bbc|37
+bk|93
+c128|66
+c16|73
+c20|73
+c64|66
+camplynx|88
+Camputers Lynx|88
+camputers_lynx|88
+cannonball|75
+Capcom Play System III|8
+Capcom Play System II|7
+Capcom Play System|6
+capcom_classics|151
+capcom_play_system_2|7
+capcom_play_system_3|8
+capcom_play_system|6
+Casio Loopy|98
+Casio PV-1000|74
+cave3rd|47
+cavestory|135
+cave|47
+cd-i|133
+cd32|130,139
+cdimono1|133
+cdi|133
+century_electronics|179
+cg2000|92
+chailove|138
+channel-f|80
+channel_f|80
+channelf|80
+chihiro|75
+CHIP-8|00
+cinematronics|192
+coco3|144
+coco|144
+Coleco ADAM|89
+colecovision|48
+coleco|183
+comad|177
+Commodore 64|66
+Commodore Amiga CD32|130,139
+Commodore Amiga|64,111
+Commodore C128|66
+Commodore C64|66
+Commodore CBM-II|66
+Commodore CDTV|129
+Commodore PET|66
+Commodore Plus 4|99
+Commodore VIC-20|73
+commodore|66
+consolearcade|75
+coregrafx|50,31
+cougar_boy|90
+cpc|65
+cplus4|99
+cps1|6
+cps2|7
+cps3|8
+creativision|241
+crvision|241
+cvision|241
+daphne|49,170,81,157,75
+data_east_classics|162
+desktop|138
+dinothawr|63
+doom|135
+dos|135,138
+Dragon 32-64|91
+dragon32|91
+dragon|91
+dreamcast|23
+ds|15
+dynax|173
+EACA EG2000 Colour Genie|92
+easyrpg|231
+ecv|67
+ecwolf|135
+eduke32|138
+eg2000_colour_genie|92
+eighthundred|43
+eighting_raizing|152
+electron|85
+Elektronika BK|93
+Emerson Arcadia 2001|94
+emulators|138
+enterprise|76
+Entex Adventure Vision|78
+ep128|76
+ep64|76
+Epoch Game Pocket Computer|95
+Epoch Super Cassette Vision|67
+Exelvision EXL 100|96
+exidy|165
+exl100|96
+exl_100|96
+Fairchild Channel F|80
+Fairchild ChannelF|80
+fairchild|80
+famicom|3
+family_computer|3
+famiri_konpyuta_disuku_shisutemu|106
+fba2012|75
+fba_libretro|75
+fba|75
+fbneo|75
+fc|3
+fds|106
+flash|63
+flipper|197
+fm-7|97
+fm7|97
+fmtmarty|253
+fmtowns|253
+fpinball|199
+Fujitsu FM-7|97
+Funtech Super Acan|100
+future_pinball|199
+gaelco|194
+gamate|266
+Game & Watch|52
+game.com|121
+game_master|103
+game_pocket_computer|95
+gameandwatch|52
+gamecom|121
+gamecube|13
+gamegear|21
+gamepock|95
+gb2players|9
+gba_e-reader|119
+gba|12
+gbc|10
+gb|9
+GCE Vectrex|102
+GCE-Vectrex|102
+gc|13
+genesis|1,203
+gg|21
+gmaster|103
+gp32|101
+gw|52
+gx4000|87
+Handheld Electronic - Game and Watch|52
+Hartung Game Master|103
+hbmame|75
+hikaru|75
+igs|176
+incredible_technologies|193
+intellivision|115
+irem_classics|148
+jaguar_cd|171
+jaguarcd|171
+jaguar|27
+jaleco|159
+Java J2ME|00
+jupace|126
+Jupiter Ace|126
+jupiter_ace|126
+kaneko|174
+konami_classics|158
+laserdisc|49,170,81,157
+lcdgames|75
+lindbergh|75
+linux|145
+loopy|98
+love2d|00
+Lowres NX|244
+Lowres NX|244
+lowresnx|244
+Lua Engine|00
+lutro|206
+lynx|28
+mac_os|146
+macintosh|146
+mac|146
+Magnavox Odyssey 2|104
+mame-advmame|75
+mame-libretro|75
+mame-mame4all|75
+mame2000|75
+mame2003|75
+mame|75
+mastersystem|2
+Mattel - Intellivision|115
+Mattel Intellivision|115
+mdcd|20
+md|1,203
+Mega Duck - Cougar Boy|90
+Mega Duck|90
+mega-cd|20
+mega-play|196
+mega-tech|195
+mega_duck|90
+megacdjp|20
+megacd|20
+Megadrive MSU|301
+megadrive-msu|301
+megadrive_-_sonic_the_hedgehog_2_hacks|203
+megadrive_32x|19
+megadrivejp|1,203
+megadrive|1,203
+megaduck|90
+mess|75
+MGT SAM Coupé|213
+Microsoft - MSX2|116
+Microsoft - MSX|113,118
+Microsoft MSX2+|117
+Microsoft MSX2|116
+Microsoft MSX|113,118
+Microsoft Xbox 360|33
+Microsoft Xbox One|34
+Microsoft Xbox|32
+midway_classics|150
+mikrosha|124
+mitchell|189
+mo5|140
+model2|54
+model3|55
+moonlight|135
+moto|141
+MS-DOS|135
+msx1|113
+msx2+|117
+msx2|116
+msx_r_turbo|118
+msxturbor|118
+msx|113,118
+ms|2
+mtx512|75
+mtx|75
+mugen|214
+multivision|109
+mv|00
+n-gage|30
+n3ds|17
+n64dd|122
+n64|14
+Namco System 22|156
+namco2x6|155,156
+namco3xx|155,156
+namco_classics|155
+namco_system_22|156
+naomi2|230
+naomigd|227
+naomi|56
+nds|15
+NEC - PC Engine CD|114
+NEC - TurboGrafx CD|114
+NEC PC Engine CD|114
+NEC PC Engine SuperGrafx|105
+NEC PC Engine-CD|114
+NEC PC Engine|31,50
+NEC PC-8000 - PC-8800 series|221
+NEC PC-FX|72
+NEC PC98|208
+NEC TurboGrafx-16|31,50
+neo-geo_cd|70
+neo-geo_mvs|68
+neocd|70
+neogeo64|142
+neogeocdjp|70
+neogeocd|70
+neogeomini|142
+neogeox|142
+neogeo|142
+nesmini|3
+nes|3
+ngage|30
+ngpc|82
+ngp|25
+nichibutsu|180
+Nintendo 3DS|17
+Nintendo 64DD|122
+Nintendo 64|14
+Nintendo DS|15
+Nintendo Entertainment System - Mario Hacks|278
+Nintendo Entertainment System|3
+Nintendo Famicom Disk System|106
+Nintendo Game Boy Advance|12
+Nintendo Game Boy Color|10
+Nintendo Game Boy|9
+Nintendo GameCube|13
+Nintendo N64|14
+Nintendo NES-Famicom|3
+Nintendo Pokemon Mini|211
+Nintendo Satellaview|107
+Nintendo SNES-SFC|4,210,202,108
+Nintendo Switch|225
+Nintendo Virtual Boy|11
+Nintendo Wii U|18
+Nintendo Wii|16
+nintendo_64dd|122
+nintendo_classics|161
+nintendo_power|110
+nmk|163
+Nokia N-Gage|30
+non_jeu|168
+np2pi|208
+o2em|104
+odyssey2|104
+odyssey|104
+onscripter|00
+openbor|214
+Oric Atmos|131
+oricatmos|131
+oric|131
+p2000t|287
+palm|219
+panasonic|29
+PC Engine SuperGrafx|105
+pc-fx|72
+pc88|221
+pc98|208
+pc_engine|31,50
+pc_win3.xx|136
+pc_win9x|137
+pc_windows|138
+pcarcade|75
+pce-cd|114
+pceightyeight|221
+pcenginecd|114
+pcengine|31,50
+pce|31,50
+pcfx|72
+pcninetyeight|208
+pcv2|237
+pc|135,136,137,138
+pecom_64|125
+pet|73
+Philips CD-i|133
+Philips CDi|133
+PICO-8|234
+pico8|234
+pico|234
+piece|00
+pinball_fx2|143
+pinball_fx3|201
+pinballfx2|143
+pinballfx3|201
+pinballfx|143
+pinball|197,199,143,201,198
+playchoice|184
+playstation_3|59
+playstation_minis|172
+plus4|99
+pokemini|211
+pokemonmini|211
+poke|211
+ports|135,138
+Port|290
+prboom|135
+ps1|57
+ps2|58
+ps3|59
+ps_vita|62
+psikyo|167
+pspminis|61
+psp|61
+psvita|62
+psxmini|57
+psx|57
+ps|57
+puzzlescript|00
+pv-1000|74
+pv1000|74
+quake|135
+Radio-86RK Mikrosha|124
+residualvm|123
+RPG Maker 2000 - 2003|00
+samcoupe|213
+sameduck|90
+Sammy Atomiswave|53
+sammy_classics|164
+satellaview|107
+saturnjp|22
+saturn|22
+scummvm|123
+scv|67
+sdlpop|135
+Sega 32X|19
+Sega Atomiswave Naomi|56
+Sega CD|20
+Sega Dreamcast|23
+Sega Game Gear|21
+Sega Genesis|1,203
+Sega Master System|2
+Sega Mega CD - Sega CD|20
+Sega Mega Drive - Genesis|1,203
+Sega Model 2|54
+Sega Model 3|55
+Sega Naomi 2|230
+Sega Naomi|56
+Sega Pico|250
+Sega Saturn|22
+Sega SG-1000|109
+Sega ST-V|69
+sega32xjp|19
+sega32xna|19
+sega32x|19
+sega_classics|147
+sega_st-v|69
+segacd|20
+segapico|250
+segasgone|109
+seibu_kaihatsu|190
+semicom|187
+seta|149
+sfc|4
+sg-1000|109
+sg1000|109
+sgb|127
+sgfx|105
+Sharp X1|220
+Sharp X68000|79
+sharpX1|220
+shmups|75
+Sinclair ZX 81|77
+Sinclair ZX Spectrum|76
+Sinclair ZX-81|77
+sinclair|76
+singe|49,170,81,157,75
+sms|2
+snes-hacks|202
+snes-msu1|210
+snes_-_super_mario_world_hacks|202
+snescd|210
+snesmini|4,210,202,108
+snesmsu1|210
+snesna|4,210,202,108
+snes|4,210,202,108
+SNK Neo Geo CD|70
+SNK Neo Geo MVS|68
+SNK Neo Geo Pocket - Color|82
+SNK Neo Geo Pocket Color|82
+SNK Neo Geo Pocket|25
+SNK Neo Geo|142
+snk_classics|154
+socrates|120
+solarus|223
+Sony Playstation 2|58
+Sony Playstation 3|59
+Sony Playstation 4|60
+Sony Playstation Portable|61
+Sony Playstation Vita|62
+Sony Playstation|57
+Sony PSP Minis|172
+Sony PSP|61
+spectravideo|218
+stv|69
+sufami_turbo|108
+sufami|108
+Super Nintendo Entertainment System - Mario Hacks|202
+Super Nintendo Entertainment System|4
+Super Nintendo MSU-1|210
+super_a'can|100
+super_cassette_vision|67
+super_game_boy_2|128
+super_game_boy|127
+supergrafx|105
+supervision|207
+supracan|100
+switch2|225
+switch|225
+Taito Type X|112
+taito_classics|157
+tanodragon|91
+technos|169
+tecmo|153
+teknoparrot|269,75
+Texas Instruments TI 99/4A|205
+Texas Instruments TI-83|205
+tg-cd|114
+tg16|31,50
+The 3DO Company - 3DO|29
+the_pinball_arcade|200
+theforceengine|138,135,136,137
+thirtytwox|19
+Thomson MO5|141
+Thomson TO7|141
+thomson|141
+threedo|29
+ti994a|205
+ti99|205
+TIC-80|205
+tic80|222
+tic|205
+tigerlcd|121
+tiger|121
+to7|141
+to8|141
+toaplan|191
+triforce|75
+TRS-80 Color Computer|144
+trs-80|144
+trs80coco|144
+turbografx-16|31,50
+turbografxcd|31,50
+turbografx|31,50
+tvc|00
+type-x|112
+typex|112
+tyrquake|135
+universal|188
+uzebox|216
+v.smile|120
+vb|11
+vectrex|102
+vg5000|261
+vg5k|261
+vgmplay|75
+vic-20|73
+vic20|73
+video_system_co.|175
+videopacplus|104
+videopac|104
+vircon32|272
+virtualboy|11
+visco|181
+visual_pinball|198
+vmac|00
+voxatron|275
+vpinball|198
+vsmile|120
+WASM-4|262
+wasm4|262
+Watara Supervision|207
+watara_supervision|207
+wiiu|18
+wii|16
+Windows 3.X|136
+windows_installers|138
+windows|138,135,136,137
+wolf|00
+WonderSwan Color|46
+wonderswancolor|46
+wonderswan|45
+WoW Action Max|81
+wswanc|46
+wswan|45
+ws|46
+x1|220
+x360|33
+x68000|79
+xash3d_fwgs|135
+xbla|32,33,34
+xbox360|33
+xbox|32
+xegs|43
+xone|220
+zinc|75
+zx81|77
+zxeightyone|77
+zxnext|76
+zxspectrum|76
+zxs|76
+amazon|138,135,136,137
+eagames|138,135,136,137
+epic|138,135,136,137
+gog|138,135,136,137
+steam|138,135,136,137
+pdark|14
+pinballm|138
+reminiscence|138,135,136,137
+zaccariapinball|138
+3dsen|3
+msu-md|301

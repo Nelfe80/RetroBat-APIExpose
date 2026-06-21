@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Pony Friends 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "pony-friends-2",
+    file = "pony-friends-2.zip",
+    hashes = {
+      { hash = "a280fe2165915f18be51ec7b6796a98c", label = "Pony Friends 2 (USA) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X123990, type="u16le", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X38287C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Round Medal" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X38346E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Achievement Status | Spice Of Life increased" },
+        { address=0X38346E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Achievement Status | Spice Of Life decreased" },
+      },
+      health = {
+        { address=0X38280C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Mane Clip decreased" },
+        { address=0X38280C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Mane Clip increased" },
+        { address=0X38282C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Mane Clip decreased" },
+        { address=0X38282C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Mane Clip increased" },
+        { address=0X3828CC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Blanket decreased" },
+        { address=0X3828CC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Blanket increased" },
+        { address=0X3828D4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Blanket decreased" },
+        { address=0X3828D4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Blanket increased" },
+        { address=0X38291C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Saddle decreased" },
+        { address=0X38291C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Saddle increased" },
+        { address=0X382954, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Saddle decreased" },
+        { address=0X382954, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Saddle increased" },
+        { address=0X38296C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Bridle decreased" },
+        { address=0X38296C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Bridle increased" },
+        { address=0X3829A4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Bridle decreased" },
+        { address=0X3829A4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Bridle increased" },
+        { address=0X3829BC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Horseshoes decreased" },
+        { address=0X3829BC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Horseshoes increased" },
+        { address=0X3829F4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Horseshoes decreased" },
+        { address=0X3829F4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Horseshoes increased" },
+        { address=0X382A6C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Quartermark decreased" },
+        { address=0X382A6C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Health Quartermark increased" },
+        { address=0X382A74, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Quartermark decreased" },
+        { address=0X382A74, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Accessory Status | Energy Quartermark increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X38343B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Jewel - Emerald" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3833CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Best Score | Trick Challenge 1" },
+        { address=0X3833D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Best Score | Trick Challenge 2" },
+        { address=0X3833D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Best Score | Trick Challenge 3" },
+        { address=0X3834A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="License Points (32bit)" },
+        { address=0X383514, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Braiding High Score | Banded Braid" },
+        { address=0X383518, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Braiding High Score | Diamond Braid" },
+        { address=0X38351C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Braiding High Score | Running Braid" },
+      },
+      collectibles = {
+        { address=0X382804, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (32bit) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X382B64, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] To-Do List Check | Objective 1" },
+        { address=0X382B70, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] To-Do List Check | Objective 2" },
+        { address=0X382B7C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] To-Do List Check | Objective 3" },
+      },
+    },
+  },
+}

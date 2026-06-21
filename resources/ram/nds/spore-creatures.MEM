@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Spore Creatures",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "spore-creatures",
+    file = "spore-creatures.zip",
+    hashes = {
+      { hash = "bbc8100a045196bf6e65c25e52e88326", label = "Spore Creatures (USA) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE13D9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Pause Flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1FC194, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Amount of Goal Badges Earned" },
+        { address=0X1FC198, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Max Goal Badges to be earned" },
+      },
+      zone = {
+        { address=0X1FC1E4, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Badges - World Badge Master - Current Amount" },
+        { address=0X1FC1E8, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Badges - World Badge Master - Max Amount" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1FC6CA, type="u8", condition="bit_true", bit=7, mask=0X80, action="SCORE_STATE", no_log=false, no_survey=false, desc="Ignore Body Points" },
+        { address=0X1FC6DA, type="u8", condition="bit_true", bit=7, mask=0X80, action="SCORE_STATE", no_log=false, no_survey=false, desc="Ignore Body Points" },
+        { address=0X1FC6E0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Badge Points" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1FC6DB, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1FC48C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Badges - Oh the Sporemanity! (Destroy Flubit)" },
+      },
+    },
+  },
+}

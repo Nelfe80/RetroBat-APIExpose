@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Ceiling Zero",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ceiling-zero",
+    file = "ceiling-zero.zip",
+    hashes = {
+      { hash = "d58a501d06db3f852884aafda9f55a41", label = "Ceiling Zero.woz" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0054, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0069, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score - BCD" },
+      },
+    },
+  },
+}

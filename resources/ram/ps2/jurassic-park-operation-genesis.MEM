@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Jurassic Park: Operation Genesis",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Education, Life Simulation, Strategy"
+  },
+
+  rom = {
+    name = "jurassic-park-operation-genesis",
+    file = "jurassic-park-operation-genesis.zip",
+    hashes = {
+      { hash = "41479d9d50e61f77d809a3aa6ef7cdd5", label = "Jurassic Park - Operation Genesis (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X85935C, type="u32le", condition="eq", value=0X27, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+      },
+      zone = {
+        { address=0X85935C, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32bit] Exercise The Lost World Flag" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X859368, type="u32le", condition="eq", value=0XAB, action="SCORE_STATE", no_log=false, no_survey=false, desc="Finished" },
+        { address=0X859368, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Mission A Picture's Worth 100 Points Flag" },
+      },
+      collectibles = {
+        { address=0X859380, type="u32le", condition="eq", value=0X22B, action="AMMO_STATE", no_log=true, no_survey=false, desc="Finished" },
+      },
+    },
+  },
+}

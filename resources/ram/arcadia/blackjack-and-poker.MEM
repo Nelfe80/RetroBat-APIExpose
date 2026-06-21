@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Blackjack and Poker",
+    system = "arcadia",
+    system_name = "Arcadia 2001",
+    genre = "Gambling"
+  },
+
+  rom = {
+    name = "blackjack-and-poker",
+    file = "blackjack-and-poker.zip",
+    hashes = {
+      { hash = "7391a9bd972e5eeaaeeeca76879abda4", label = "Blackjack and Poker (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

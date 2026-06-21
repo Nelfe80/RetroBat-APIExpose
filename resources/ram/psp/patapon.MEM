@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Patapon",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "patapon",
+    file = "patapon.zip",
+    hashes = {
+      { hash = "455f09f185068567a2b87978d6623909", label = "Patapon (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD56859, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission Complete - Going past the goal post [Bit0]" },
+      },
+      zone = {
+        { address=0XD52054, type="u8", condition="eq", value=0X2D, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World of Ooze" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD56BC4, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BC8, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BCC, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BD0, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BD4, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BD8, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BDC, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BE0, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BE4, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BE8, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD56BEC, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Level 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD39B98, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wood Shield - Quantity" },
+        { address=0XD39B99, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wood Shield - New Item [Bit0]" },
+        { address=0XD39B9A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wood Shield - Visibility [Bit0]" },
+        { address=0XD39B9B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wood Shield - Altar Location" },
+        { address=0XD39B9C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield - Quantity" },
+        { address=0XD39B9D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield - New Item [Bit0]" },
+        { address=0XD39B9E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield - Visibility [Bit0]" },
+        { address=0XD39B9F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Iron Shield - Altar Location" },
+        { address=0XD39BA0, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Steel Shield - Quantity" },
+        { address=0XD39BA1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Steel Shield - New Item [Bit0]" },
+        { address=0XD39BA2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Steel Shield - Visibility [Bit0]" },
+        { address=0XD39BA3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Steel Shield - Altar Location" },
+        { address=0XD39BA4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Shield - Quantity" },
+        { address=0XD39BA5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Shield - New Item [Bit0]" },
+        { address=0XD39BA6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Shield - Visibility [Bit0]" },
+        { address=0XD39BA7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ice Shield - Altar Location" },
+        { address=0XD39BA8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ultra Heavy Shield - Quantity" },
+        { address=0XD39BA9, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ultra Heavy Shield - New Item [Bit0]" },
+        { address=0XD39BAA, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ultra Heavy Shield - Visibility [Bit0]" },
+        { address=0XD39BAB, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ultra Heavy Shield - Altar Location" },
+        { address=0XD39BAC, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ancient Shield - Quantity" },
+        { address=0XD39BAD, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ancient Shield - New Item [Bit0]" },
+        { address=0XD39BAE, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ancient Shield - Visibility [Bit0]" },
+        { address=0XD39BAF, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ancient Shield - Altar Location" },
+        { address=0XD39BB0, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Giant Shield 'Octagon' - Quantity" },
+        { address=0XD39BB1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Giant Shield 'Octagon' - New Item [Bit0]" },
+        { address=0XD39BB2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Giant Shield 'Octagon' - Visibility [Bit0]" },
+        { address=0XD39BB3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Giant Shield 'Octagon' - Altar Location" },
+        { address=0XD39BB4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Divine Shield - Quantity" },
+        { address=0XD39BB5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Divine Shield - New Item [Bit0]" },
+        { address=0XD39BB6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Divine Shield - Visibility [Bit0]" },
+        { address=0XD39BB7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Divine Shield - Altar Location" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD39A38, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Sign - Quantity" },
+        { address=0XD39A39, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Sign - New Item [Bit0]" },
+        { address=0XD39A3A, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Sign - Visibility [Bit0]" },
+        { address=0XD39A3B, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Sign - Altar Location" },
+        { address=0XD52054, type="u8", condition="eq", value=0X14, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door of Promise" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15BE134, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Prologue - Combo Counter" },
+        { address=0X1675494, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Epilogue - Combo Counter" },
+        { address=0X1680144, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Prologue Clear Time - Hours" },
+        { address=0X1680148, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Prologue Clear Time - Minutes" },
+        { address=0X168014C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Prologue Clear Time - Seconds" },
+      },
+    },
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "The Ninja Kids",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "the-ninja-kids",
+    file = "the-ninja-kids.zip",
+    hashes = {
+      { hash = "b80055109380d6cd70e75b0e9cc17897", label = "ninjak.7z <The Ninja Kids (World)>" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X1100, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] 1P Score xxxx0000" },
+        { address=0X1102, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] 1P Score 0000xxxx" },
+      },
+    },
+  },
+}

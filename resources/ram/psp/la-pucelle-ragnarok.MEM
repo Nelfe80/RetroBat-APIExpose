@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "La Pucelle: Ragnarok",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "la-pucelle-ragnarok",
+    file = "la-pucelle-ragnarok.zip",
+    hashes = {
+      { hash = "d1790010e8169f65e1dd1f4527363f97", label = "Pucelle, La - Ragnarok (Japan) (En) (v1.0.1) (ChepChep).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X97C5E0, type="u8", condition="eq", value=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Overlord" },
+        { address=0X97C5E0, type="u8", condition="eq", value=0X12, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X9D2822, type="u16le", condition="eq", value=0X0000, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+      stage = {
+        { address=0X9D2622, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Monster Defeated [Unnamed Stage at the Forest]" },
+        { address=0X9D2622, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Monster Saved [Unnamed Stage at the Forest]" },
+        { address=0X9D27AB, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Monster Defeated [Unnamed Stage at the Harbor] [Special]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9D25FE, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Entered Hall of the Dead First Time [Devil's Stomach]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9D260A, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chapter 2 Boss Trigger [Summit]" },
+        { address=0X9D2617, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chapter 3 Boss Trigger [Shrine of the Beast]" },
+      },
+    },
+  },
+}

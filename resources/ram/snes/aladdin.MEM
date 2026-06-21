@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Aladdin",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "aladdin",
+    file = "aladdin.zip",
+    hashes = {
+      { hash = "1183ee757a8654b1e5382722eeedc7b9", label = "Aladdin (USA) (Es) (v1.0) (Gogito).sfc" },
+      { hash = "4d426a7ed36cd7ef896e31cdd48ed24e", label = "Aladdin (Europe).sfc" },
+      { hash = "603bc3c8d523db5d58f4f536962e7312", label = "Aladdin (USA) (MSU-1) (Film OST) (PepilloPev,Kurrono) (v1.0b1-2018-01-19).sfc" },
+      { hash = "61a86aee5792eaf64a04bcb30257d985", label = "Aladdin (France).sfc" },
+      { hash = "6b09f8c51e5c989d950f9510f1f73224", label = "Aladdin (Spain).sfc" },
+      { hash = "720bf027b3cf93d58bafcfd8e86ec6c1", label = "Aladdin (USA) (Fr) (v1.0) (Dream).sfc" },
+      { hash = "8e00910312b30663768d907114d301c2", label = "Aladdin (USA).sfc" },
+      { hash = "9852918c1da7b69fa111f79b4381052c", label = "Aladdin (USA) (MSU-1) (Film OST) (v1.1-2018-02-01) (PepilloPEV,Kurrono).sfc" },
+      { hash = "b432e0af61a58c934b702b18ce05650c", label = "Aladdin (USA) (Pt) (v1.0) (Nenhum).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X035B, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of Credits Remaining" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X03B9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background music" },
+      },
+      stage = {
+        { address=0X035D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="fase2 / Stage in chapter" },
+        { address=0X035E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="fase1/ Stage" },
+        { address=0X08DB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="on stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0364, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Extra Lives increased" },
+        { address=0X0364, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Extra Lives decreased" },
+      },
+      health = {
+        { address=0X0365, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="coracao quantidade/ Maximum Hp decreased" },
+        { address=0X0365, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="coracao quantidade/ Maximum Hp increased" },
+        { address=0X0367, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="coracao energia1/ Current HP decreased" },
+        { address=0X0367, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="coracao energia1/ Current HP increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0342, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer in Demo" },
+      },
+    },
+  },
+}

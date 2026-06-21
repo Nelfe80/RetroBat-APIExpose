@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Digital Pinball: Last Gladiators",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "digital-pinball-last-gladiators",
+    file = "digital-pinball-last-gladiators.zip",
+    hashes = {
+      { hash = "ced8b264bc53ae6554c523f540e097f5", label = "Last Gladiators - Digital Pinball (USA) (4S)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0010, type="u16le", condition="eq", value=0X4B41, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="High Scores/Title Screen" },
+        { address=0X00E2, type="u16le", condition="eq", value=0XEB8C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Hall of Fame/Opening Cinematic" },
+        { address=0X15942C, type="u8", condition="eq", value=0X56, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Enter Initials/Continue" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X13AB4D, type="u8", condition="eq", value=0X0B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathbringer" },
+        { address=0X13AB4F, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathbringer" },
+        { address=0X15942C, type="u8", condition="eq", value=0X50, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathbringer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X13AAFA, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit]" },
+        { address=0X171EB2, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit]" },
+      },
+    },
+  },
+}

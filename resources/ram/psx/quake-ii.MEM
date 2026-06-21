@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Quake II",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "quake-ii",
+    file = "quake-ii.zip",
+    hashes = {
+      { hash = "0f2c4f78ddca3fc6990069121cfd44d0", label = "Quake II (USA)" },
+      { hash = "5ba3d158d0753e503b16e693fea71af6", label = "Quake II (USA) (New Control Buttons Config) (v0.4) (Mr2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAEB24, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] Pause flag" },
+        { address=0XB2A1A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8bit] Menu/Demo 0x09" },
+        { address=0XB2D94, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8bit] 0x12 Title Load" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB2A78, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Level Check" },
+        { address=0XB2AB8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Loaded Level Sections" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCBDA0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health decreased" },
+        { address=0XCBDA0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health increased" },
+        { address=0X1FF1BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Grid Control Computer Health decreased" },
+        { address=0X1FF1BA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Grid Control Computer Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC7F36, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapon Equipped" },
+        { address=0XC7F38, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapons" },
+        { address=0XC7F39, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapons" },
+        { address=0XCC258, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32 bit] Weapon Animations" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB73D0, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[16bit] Weapon Ammo Icon" },
+        { address=0XC7F46, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Railgun Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCD8A0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss 1 Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCD5A0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Cell Block Prisoner Gunner Enemy" },
+        { address=0XD6E2F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Grid Control Switch" },
+        { address=0XD6E72, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[16 bit] Torture Chambers Door" },
+        { address=0XD6E8B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Inner Chamber Right Switch" },
+        { address=0XD6F43, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Prison Switch Right 2 (Guy)" },
+        { address=0XD6F86, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[16 bit] Strogg Outpost Door" },
+        { address=0XD6FE2, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Comm Center Blue Door" },
+        { address=0XD703E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Pumping Station 2 Door" },
+        { address=0XD7057, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Powerplant Switch" },
+        { address=0XD716B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Prison Switch Left 2 (Guy)" },
+        { address=0XD71C7, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Guard House Switch Left" },
+        { address=0XD7266, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Guard House Door" },
+        { address=0XD7393, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Pyramid Switch" },
+        { address=0XD7398, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Pumping Station 2 Switch" },
+        { address=0XD73EF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Toxic Waste Dump Switch" },
+        { address=0XD7503, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Prison Switch Left 1" },
+        { address=0XD7617, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Cell Block Switch 4 (Guy)" },
+        { address=0XD76B6, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[16 bit] Detention Center Door" },
+        { address=0XD783F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Cell Block 1 Switch (Guy)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "The Quest for the Rings",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-quest-for-the-rings",
+    file = "the-quest-for-the-rings.zip",
+    hashes = {
+      { hash = "0b105a40c8ff6ae7728006cf80c4ddb7", label = "Quest for the Rings (USA, Europe).bin" },
+      { hash = "331b299e3b041884bd59c3bad2d3f507", label = "La Quete des Anneaux (France).bin" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X0028, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 0x30=Collected Ring Flash increased" },
+        { address=0X005A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Player 2 Ring Count increased" },
+        { address=0X005B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Player 1 Ring Count increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fight Night",
+    system = "atari7800",
+    system_name = "Atari 7800",
+    genre = "Action, Sports, Boxe"
+  },
+
+  rom = {
+    name = "fight-night",
+    file = "fight-night.zip",
+    hashes = {
+      { hash = "07dbbfe612a0a28e283c01545e59f25e", label = "Fight Night (USA).a78" },
+    }
+  },
+
+  events = {
+  },
+}

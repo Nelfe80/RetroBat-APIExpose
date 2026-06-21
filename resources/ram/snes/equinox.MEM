@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "Equinox",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle-Game, Role-Playing, Adventure"
+  },
+
+  rom = {
+    name = "equinox",
+    file = "equinox.zip",
+    hashes = {
+      { hash = "2aef2ef396e58d2253614eee2a801b51", label = "Equinox (USA).sfc" },
+      { hash = "670b523fc13f30128fd27bb571fe5c77", label = "Solstice II (Japan).sfc" },
+      { hash = "cab818ef062547dd0c6fa679435809cc", label = "Equinox (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0EE3, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01=demo mode" },
+        { address=0X0EE5, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo active" },
+        { address=0X1FC8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Room in pause screen." },
+        { address=0X1FFC, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="16bit: Detects L/R inputs on the title screen, and activates infinite health/magic when set to 0" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2008, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rooms cleared of items" },
+        { address=0X2017, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rooms cleared of items" },
+        { address=0X2200, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X2201, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rooms Cleared" },
+        { address=0X2202, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X2203, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rooms cleared" },
+        { address=0X2204, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rooms cleared" },
+        { address=0X2205, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rooms cleared" },
+        { address=0X2206, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rooms cleared" },
+        { address=0X2207, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rooms Cleared" },
+        { address=0X2208, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X2209, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X220A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X220B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X220C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X220D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X220E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X220F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Room cleared" },
+        { address=0X28E9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flags for rooms being cleared of enemies start somewhere around here (and don't update until you" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2342, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="8-bit - available health slots decreased" },
+        { address=0X2342, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="8-bit - available health slots increased" },
+        { address=0X2343, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="8-bit - total health (each value is a half unit of health) decreased" },
+        { address=0X2343, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="8-bit - total health (each value is a half unit of health) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1FC8, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item pickups (one bit per item)" },
+      },
+      weapon = {
+        { address=0X0F03, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Knife" },
+        { address=0X0F03, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shuriken" },
+        { address=0X0F03, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Axe" },
+        { address=0X0F03, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Twin Knives" },
+        { address=0X0F03, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sword" },
+        { address=0X0F03, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Scimitar" },
+        { address=0X0F03, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mace" },
+        { address=0X0F03, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Twin Swords" },
+        { address=0X1F13, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons Found bitflags" },
+        { address=0X2355, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons used to kill trolls" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1F05, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[HEX] - Score" },
+        { address=0X1F06, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[HEX] - Score Overflow" },
+        { address=0X233A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (doesn't update until you leave the room)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1F69, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Main boss Health, set to 0xfe when exploding" },
+        { address=0X1F6A, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Set to ff upon boss defeat" },
+        { address=0X1F7B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Related to boss's movement pattern?" },
+        { address=0X2215, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit1 - Tori 02-15 (Revisit Boss Room)" },
+        { address=0X2346, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Each bit corresponds to whether or not you've seen a particular boss (in ascending order)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X10DE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Player object's slot starts here? (80 bytes per object?)" },
+        { address=0X2101, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Flashing Door Opened" },
+        { address=0X2102, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Key doors opened" },
+        { address=0X2103, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Key doors opened" },
+        { address=0X2106, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Flashing door opened" },
+        { address=0X2108, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Flashing Doors Opened" },
+        { address=0X210E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit0 - Door to Galadonia 01-07 open" },
+        { address=0X221E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit1 - Tori 02-1e (Bunch of doors, empty)" },
+        { address=0X27E2, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Doors opened? Opening the first white door triggered two values." },
+      },
+    },
+  },
+}

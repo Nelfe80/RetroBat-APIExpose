@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Hysteria Project",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hysteria-project",
+    file = "hysteria-project.zip",
+    hashes = {
+      { hash = "ff5952f8ef9a1f7567f59094d5878778", label = "Hysteria Project (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9109E4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Stories unlocked [32bit]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X90E780, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current Checkpoint [32bit]" },
+        { address=0X90E784, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Video ID of Checkpoint [32bit]" },
+      },
+    },
+  },
+}

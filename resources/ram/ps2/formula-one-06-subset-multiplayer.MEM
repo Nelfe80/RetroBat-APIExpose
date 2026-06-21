@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Formula One 06 [Subset - Multiplayer]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "formula-one-06-subset-multiplayer",
+    file = "formula-one-06-subset-multiplayer.zip",
+    hashes = {
+      { hash = "dc887349207b424d13c33e2e34a64f9a", label = "Formula One 06 [Subset - Multi]" },
+    }
+  },
+
+  events = {
+  },
+}

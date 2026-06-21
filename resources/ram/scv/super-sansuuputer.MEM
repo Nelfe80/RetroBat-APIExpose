@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Super Sansuuputer",
+    system = "scv",
+    system_name = "Super Cassette Vision",
+    genre = "Educational"
+  },
+
+  rom = {
+    name = "super-sansuuputer",
+    file = "super-sansuuputer.zip",
+    hashes = {
+      { hash = "05f2b3b1a5e450c8ead224c3ebf5b75f", label = "Sansupyuta (Japan) (En).bin" },
+    }
+  },
+
+  events = {
+  },
+}

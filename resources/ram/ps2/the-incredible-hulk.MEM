@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Incredible Hulk",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-incredible-hulk",
+    file = "the-incredible-hulk.zip",
+    hashes = {
+      { hash = "ef61d4a76c0c80150cfae11c99291a7e", label = "Incredible Hulk, The (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

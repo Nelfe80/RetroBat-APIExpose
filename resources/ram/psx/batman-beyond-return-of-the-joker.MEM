@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "Batman Beyond: Return of the Joker",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "batman-beyond-return-of-the-joker",
+    file = "batman-beyond-return-of-the-joker.zip",
+    hashes = {
+      { hash = "32f3635c9e3a56b05879fa8b202ec394", label = "Batman Beyond - Return of the Joker (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6CD68, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused in time trial" },
+        { address=0X6CD68, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue screen" },
+        { address=0X6CDE8, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="In Game, or hovering over options" },
+        { address=0X6CDE8, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Hovering over quit" },
+        { address=0X6CDE8, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Hovering over retry" },
+        { address=0X6CDE8, type="u8", condition="eq", value=0X03, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Hovering over resume" },
+        { address=0X88767, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo is not active" },
+        { address=0X88767, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo is active" },
+        { address=0X1FFEC3, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="not Paused" },
+        { address=0X1FFEC3, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6E548, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Playing time trial" },
+        { address=0X6E548, type="u8", condition="eq", value=0X70, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Time Trial is clear" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6D348, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X73D28, type="u16le", condition="eq", value=0X0000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead :P" },
+      },
+      health = {
+        { address=0X6D348, type="u8", condition="eq", value=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max" },
+        { address=0X6D348, type="u8", condition="eq", value=0X60, action="HEALTH_STATE", no_log=false, no_survey=false, desc="yellow health bar" },
+        { address=0X6D348, type="u8", condition="eq", value=0X50, action="HEALTH_STATE", no_log=false, no_survey=false, desc="orange health bar" },
+        { address=0X6D348, type="u8", condition="eq", value=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="red health bar" },
+        { address=0X6D348, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Bar" },
+        { address=0X73D28, type="u16le", condition="eq", value=0X0500, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max health" },
+        { address=0X73D28, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Batman's Health" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6E550, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="uninitialized state" },
+        { address=0X6E550, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="booting up game" },
+        { address=0X6E550, type="u8", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="playing the game" },
+        { address=0X6E550, type="u8", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="paused/dialogue/loading/cutscene/demo" },
+        { address=0X6E550, type="u8", condition="eq", value=0X88, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="suit/weapon selection" },
+        { address=0X78365, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Standard" },
+        { address=0X78365, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Offensive" },
+        { address=0X78365, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Defensive" },
+        { address=0X78365, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nimble" },
+      },
+      weapon = {
+        { address=0X78366, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Standard" },
+        { address=0X78366, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dark Knight Discus" },
+        { address=0X78366, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dark Knight Staff" },
+        { address=0X78366, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Magnetic Nun Chaku" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6CE0C, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miniboss" },
+        { address=0X74028, type="u16le", condition="eq", value=0X600, action="BOSS_HIT", no_log=false, no_survey=false, desc="Midboss's health" },
+        { address=0X74028, type="u16le", condition="eq", value=0X300, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bonk's health" },
+        { address=0X74028, type="u16le", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="either boss is dead but still on screen" },
+        { address=0X740E8, type="u16le", condition="eq", value=0X300, action="BOSS_HIT", no_log=false, no_survey=false, desc="Woof's max health" },
+        { address=0X740E8, type="u16le", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="boss is dead but still on screen" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6CE08, type="u8", condition="eq", value=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Left Door from Area #3" },
+        { address=0X6CE0C, type="u8", condition="eq", value=0X0C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Left Door from Area #3" },
+        { address=0X73E91, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Crate is broken in secret room #2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6CD68, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X6CF22, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial Mode" },
+        { address=0X6E548, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial Clear" },
+        { address=0X73E98, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+      },
+    },
+  },
+}

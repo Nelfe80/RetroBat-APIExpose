@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Mad Stalker: Full Metal Force",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mad-stalker-full-metal-force",
+    file = "mad-stalker-full-metal-force.zip",
+    hashes = {
+      { hash = "b12f6edd6d4bd0c0c6445af7293cf5c9", label = "Mad Stalker - FullMetalForce (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7420C, type="u8", condition="eq", value=0X08, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X7422C, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Yes" },
+      },
+      events = {
+        { address=0X1BA054, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 1 Actual Combos" },
+        { address=0X1BA0DC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 1 Combos" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X74208, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Part" },
+        { address=0X74234, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round end, whoever has the highest hp wins" },
+      },
+      stage = {
+        { address=0X7420C, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Stage" },
+        { address=0X7420C, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cutscene" },
+        { address=0X7420C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1BA250, type="u8", condition="eq", value=0XC0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0X1BA250, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player 1 HP" },
+        { address=0X1BA9A8, type="u8", condition="eq", value=0XC0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0X1BA9A8, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player 2/CPU HP" },
+      },
+    },
+  },
+}

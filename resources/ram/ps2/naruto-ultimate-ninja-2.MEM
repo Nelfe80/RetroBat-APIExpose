@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Naruto: Ultimate Ninja 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Fighting"
+  },
+
+  rom = {
+    name = "naruto-ultimate-ninja-2",
+    file = "naruto-ultimate-ninja-2.zip",
+    hashes = {
+      { hash = "3718a296a578f273a687c1630a26df52", label = "Naruto - Ultimate Ninja 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X45ADF8, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="{SLUS-21575} Title Screen Check [32bit]" },
+        { address=0XA857B4, type="u16le", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title movie" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XA84DA0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="{SLUS-21575} B - The Wind User's Stage - Successes [16bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA8577C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="{SLUS-21575} Energy Herb [16bit] decreased" },
+        { address=0XA8577C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="{SLUS-21575} Energy Herb [16bit] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA85796, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="{SLUS-21575} Might Suit [16bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA81A58, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{SLUS-21575} Money / Ryo [32bit] increased" },
+        { address=0XA84CFC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{SLUS-21575} B - Gold Carrier - Successes [16bit] increased" },
+      },
+    },
+  },
+}

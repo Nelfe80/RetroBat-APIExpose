@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Japan Pro Golf Tour 64 | Nippon Puro Gorufu Tsua 64 (64DD)",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "japan-pro-golf-tour-64-nippon-puro-gorufu-tsua-64",
+    file = "japan-pro-golf-tour-64-nippon-puro-gorufu-tsua-64.zip",
+    hashes = {
+      { hash = "9f797a9c704b5ebd04d6a2b036309af2", label = "Nihon Pro Golf Tour 64 (Japan) [b].ndd" },
+    }
+  },
+
+  events = {
+  },
+}

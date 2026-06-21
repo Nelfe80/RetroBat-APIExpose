@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pac-Man",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "pac-man",
+    file = "pac-man.zip",
+    hashes = {
+      { hash = "34b9e686aee6f418d431a2f9a5a5c0cb", label = "Pac-Man (1983) (Atarisoft).int" },
+    }
+  },
+
+  events = {
+  },
+}

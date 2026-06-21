@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "TappyLoop",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tappyloop",
+    file = "tappyloop.zip",
+    hashes = {
+      { hash = "36f3ef9ce098cb6a28b7e6789c059fce", label = "TappyLoop (World) (daves84).wasm" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X4518, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score [32bit]" },
+        { address=0X4548, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score [32bit]" },
+      },
+    },
+  },
+}

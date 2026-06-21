@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "G.G Series: All Breaker",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "g-g-series-all-breaker",
+    file = "g-g-series-all-breaker.zip",
+    hashes = {
+      { hash = "e9a94a993ec3de2c3e4a4df8381cfc30", label = "G.G Series - All Breaker (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X396922, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X4A694C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Max-Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X39692C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Lives increased" },
+        { address=0X39692C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2BF59C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+        { address=0X396AB4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Screen Transition Timer/Score Countdown Timer" },
+        { address=0X4A6948, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2BEADE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of Red Blocks Remaining" },
+      },
+    },
+  },
+}

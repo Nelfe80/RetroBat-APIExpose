@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Charlie and the Chocolate Factory",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "charlie-and-the-chocolate-factory",
+    file = "charlie-and-the-chocolate-factory.zip",
+    hashes = {
+      { hash = "e6c3bce6da9862e378fd93dc5d553ea9", label = "Charlie and the Chocolate Factory (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

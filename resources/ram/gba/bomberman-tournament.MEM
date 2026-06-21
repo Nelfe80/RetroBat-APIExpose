@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Bomberman Tournament",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "bomberman-tournament",
+    file = "bomberman-tournament.zip",
+    hashes = {
+      { hash = "79aef9bbe1378adfbd688cd66e11a7be", label = "Bomberman Tournament (USA, Europe).gba" },
+      { hash = "a6ec2db8299b370ac44abe0e3d4828b2", label = "Bomberman Tournament (USA, Europe) (Pt) (v1.2).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6325, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="battle mode rounds 04=5 rounds" },
+        { address=0X3D196, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<8-bit> Bomberman bomb level" },
+        { address=0X3D197, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<8-bit> Bomberman fire level" },
+      },
+      stage = {
+        { address=0X639C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="battle stage value?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X25E6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1p life? 10=alive increased" },
+        { address=0X25E6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1p life? 10=alive decreased" },
+        { address=0X263E, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="alive?" },
+        { address=0X2696, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="alive?" },
+        { address=0X26EE, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="alive?" },
+      },
+      health = {
+        { address=0X2CA3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> Enemy Health decreased" },
+        { address=0X2CA3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> Enemy Health increased" },
+        { address=0X2CFB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> Enemy Health (used for a second enemy only) decreased" },
+        { address=0X2CFB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> Enemy Health (used for a second enemy only) increased" },
+        { address=0X3D194, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> Bomberman current health decreased" },
+        { address=0X3D194, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> Bomberman current health increased" },
+        { address=0X3D195, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> Bomberman max health decreased" },
+        { address=0X3D195, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> Bomberman max health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6358, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="04=gold player icon increased" },
+        { address=0X3D198, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="<16-bit> Gold increased" },
+        { address=0X3D278, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Got Gold Shoes in menu" },
+        { address=0X3D278, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Got Gold Armor in menu" },
+        { address=0X3D296, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Returned ring" },
+        { address=0X3D2A5, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Shoes (PlasmaBase)" },
+        { address=0X3D2A6, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Armor (Golem Base)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3D27D, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="door near disinfectant" },
+        { address=0X3D298, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="defeated kid blocking west exit" },
+      },
+    },
+  },
+}

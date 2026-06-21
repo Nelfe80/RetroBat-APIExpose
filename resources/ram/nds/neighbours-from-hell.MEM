@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Neighbours from Hell",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "neighbours-from-hell",
+    file = "neighbours-from-hell.zip",
+    hashes = {
+      { hash = "56b54a43566683909bc63baca3f528f2", label = "Neighbours from Hell (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X2E55E8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of current lives increased" },
+        { address=0X2E55E8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of current lives decreased" },
+      },
+    },
+  },
+}

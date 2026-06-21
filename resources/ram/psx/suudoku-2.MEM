@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Suudoku 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Board Game, Puzzle"
+  },
+
+  rom = {
+    name = "suudoku-2",
+    file = "suudoku-2.zip",
+    hashes = {
+      { hash = "ac66e45e5d22bd1ae6b037141c270bf2", label = "SuperLite 1500 Series - Suudoku 2 (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X68370, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This determines are in the stage select screen" },
+      },
+    },
+  },
+}

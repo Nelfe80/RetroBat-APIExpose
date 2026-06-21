@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Shin Maou Golvellius",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shin-maou-golvellius",
+    file = "shin-maou-golvellius.zip",
+    hashes = {
+      { hash = "fa8c09c2922d58fb8741edd6ead69810", label = "Golvellius II (1988)(Compile)(JP)(Disk 2 of 3)(Game Disk).dsk" },
+      { hash = "5dba87d2635a4f0d0dea9b8fce7041ba", label = "Golvellius II (1988)(Compile)(JP)(Disk 1 of 3)(Opening Disk).dsk" },
+      { hash = "3d7e912a3a61765bf5c2c30d7973fe33", label = "Golvellius II (1988)(Compile)(JP)(Disk 3 of 3)(User Disk).dsk" },
+      { hash = "edb0e03541e35928691c39ca35c41fee", label = "Golvellius II (Japan) (En) (v1.0) (Woomb) (Disk 1) (Opening Disk).dsk" },
+      { hash = "e9e5ccceec749c25bac7ffb14543fa5e", label = "Golvellius II (Japan) (En) (v1.0) (Woomb) (Disk 2) (Game Disk).dsk" },
+      { hash = "120da73aa408d584352dfbf3813a417e", label = "Golvellius II (Japan) (En) (v1.0) (Woomb) (Disk 3) (User Disk).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0001, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Talking Cave/Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0001, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X0004, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Screen ID [8 bit] row-major" },
+        { address=0X0B80, type="u8", condition="eq", value=0X0, action="LEVEL_CASTLE_TOWN", no_log=false, no_survey=false, desc="Castle Town" },
+        { address=0X0B80, type="u8", condition="eq", value=0X1, action="LEVEL_DESPA_S_DELL", no_log=false, no_survey=false, desc="Despa's Dell" },
+        { address=0X0B80, type="u8", condition="eq", value=0X2, action="LEVEL_GROWTH_S_WOOD", no_log=false, no_survey=false, desc="Growth's Wood" },
+        { address=0X0B80, type="u8", condition="eq", value=0X3, action="LEVEL_SKELL_S_GRAVEYARD", no_log=false, no_survey=false, desc="Skell's Graveyard" },
+        { address=0X0B80, type="u8", condition="eq", value=0X4, action="LEVEL_DUSA_S_POND", no_log=false, no_survey=false, desc="Dusa's Pond" },
+        { address=0X0B80, type="u8", condition="eq", value=0X5, action="LEVEL_PHINX_ROCKS", no_log=false, no_survey=false, desc="Phinx' Rocks" },
+        { address=0X0B80, type="u8", condition="eq", value=0X6, action="LEVEL_LYCHI_S_FOREST", no_log=false, no_survey=false, desc="Lychi's Forest" },
+        { address=0X0B80, type="u8", condition="eq", value=0X7, action="LEVEL_LYCHI_S_LIMESTONE_CAVE", no_log=false, no_survey=false, desc="Lychi's Limestone Cave" },
+        { address=0X0B80, type="u8", condition="eq", value=0X8, action="LEVEL_DORAN_S_FOREST", no_log=false, no_survey=false, desc="Doran's Forest" },
+        { address=0X0B80, type="u8", condition="eq", value=0X9, action="LEVEL_DORAN_S_CAVERN", no_log=false, no_survey=false, desc="Doran's Cavern" },
+        { address=0X0B80, type="u8", condition="eq", value=0X10, action="LEVEL_GOLVELLIUS_S_VALLEY", no_log=false, no_survey=false, desc="Golvellius's Valley" },
+      },
+      zone = {
+        { address=0X0002, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Zone Width [8 bit]" },
+        { address=0X0003, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Zone Height [8 bit]" },
+        { address=0X0B80, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Zone [8 bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0B9D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Max [16 bit BCD] decreased" },
+        { address=0X0B9D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Max [16 bit BCD] increased" },
+        { address=0X0BA1, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [16 bit BCD] decreased" },
+        { address=0X0BA1, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [16 bit BCD] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0B09, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item - Brave Ring [8 bit] (0/1) increased" },
+        { address=0X0B0E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item - Vanish Ring [8 bit] (0/1) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0001, type="u8", condition="eq", value=0X5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Arena" },
+        { address=0X0BB1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Flags - Despa [8 bit]" },
+        { address=0X0BB2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 Flags - Growth [8 bit]" },
+        { address=0X0BB3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 Flags - Skell [8 bit]" },
+        { address=0X0BB4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 4 Flags - Dusa [8 bit]" },
+        { address=0X0BB5, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 5 Flags - Phinx [8 bit]" },
+        { address=0X0BB6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 6 Flags - Lychi [8 bit]" },
+        { address=0X0BB7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 7 Flags - Doran [8 bit]" },
+        { address=0X0BB8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Flags - Golvellius [8 bit]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0B07, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Item - Alzas Shield [8 bit] (0/1)" },
+        { address=0X0B08, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Item - Remedia Shield [8 bit] (0/1)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0BC6, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Event Flags - Laser Statues Destroyed in Golvellius' Valley [8 bit]" },
+      },
+    },
+  },
+}

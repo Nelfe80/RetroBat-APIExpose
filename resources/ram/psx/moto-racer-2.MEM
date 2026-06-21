@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Moto Racer 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "moto-racer-2",
+    file = "moto-racer-2.zip",
+    hashes = {
+      { hash = "3ff569b4c64e6c9d984b5ce10ee366d7", label = "Moto Racer 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF82C, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pausing" },
+        { address=0XD3EE8, type="u32le", condition="eq", value=0X09, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X123A4, type="u32le", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Trophy" },
+        { address=0X13074, type="u32le", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Trophy" },
+        { address=0X13D44, type="u32le", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Trophy" },
+        { address=0X14A14, type="u32le", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Trophy" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X11EB8, type="u32le", condition="eq", value=0X56AE18D6, action="JUMPING", no_log=true, no_survey=false, desc="Little Jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBF6A4, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P1 Lap 1 Lap Time" },
+        { address=0XBF6A8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P1 Lap 2 Lap Time" },
+        { address=0XBF6AC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P1 Lap 3 Lap Time" },
+        { address=0XBF6B0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P1 Lap 4 Lap Time" },
+        { address=0XBF6B4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P1 Lap 5 Lap Time" },
+        { address=0XBF6B8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P1 Lap 6 Lap Time" },
+        { address=0XBF6BC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P1 Lap 7 Lap Time" },
+        { address=0XBF6C0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P1 Lap 8 Lap Time" },
+        { address=0XBF6C4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P2 Lap 1 Lap Time" },
+        { address=0XBF6E4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P3 Lap 1 Lap Time" },
+        { address=0XBF704, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P4 Lap 1 Lap Time" },
+        { address=0XBF724, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P5 Lap 1 Lap Time" },
+        { address=0XBF744, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P6 Lap 1 Lap Time" },
+        { address=0XBF764, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P7 Lap 1 Lap Time" },
+        { address=0XBF784, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] P8 Lap 1 Lap Time" },
+        { address=0XD3EE8, type="u32le", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Free/Time Trial" },
+      },
+    },
+  },
+}

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "GON",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "gon",
+    file = "gon.zip",
+    hashes = {
+      { hash = "444e00e4dec0e5d15327e6dfced9218b", label = "Gon (Japan) (En).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X141C, type="u8", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="Warning life low" },
+      },
+      health = {
+        { address=0X141C, type="u8", condition="eq", value=0X04, action="HIT", no_log=false, no_survey=false, desc="Take damage" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X141C, type="u8", condition="eq", value=0X13, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0X141C, type="u8", condition="eq", value=0X14, action="JUMPING", no_log=false, no_survey=false, desc="Douple Jump" },
+        { address=0X141C, type="u8", condition="eq", value=0X15, action="JUMPING", no_log=false, no_survey=false, desc="Jump Jump Jump" },
+        { address=0X141C, type="u8", condition="eq", value=0X21, action="SWIMMING", no_log=false, no_survey=false, desc="Swim normal" },
+        { address=0X141C, type="u8", condition="eq", value=0XD6, action="JUMPING", no_log=false, no_survey=false, desc="Jump mode 7" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X141C, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="In the door" },
+      },
+    },
+  },
+}

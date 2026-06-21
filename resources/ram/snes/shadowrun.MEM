@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Shadowrun",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "shadowrun",
+    file = "shadowrun.zip",
+    hashes = {
+      { hash = "694be8df403ee59225c4b6b53c30fb7b", label = "Shadowrun (USA).sfc" },
+      { hash = "8f831f708e134c5f256d6ffcbd3fad6c", label = "Shadowrun (USA) (Mouse Support) (v1.0) (rainwarrior).sfc" },
+      { hash = "5c0746237abeacfa10088be8cd724257", label = "Shadowrun (Europe).sfc" },
+      { hash = "bb085908bf1937fa74e57f8f60c97a39", label = "Shadowrun (Europe) (Mouse Support) (v1.0) (rainwarrior).sfc" },
+      { hash = "060775afe9e8e847ff3bbad125e6a1ab", label = "Shadowrun (USA) (MSU-1) (v20210428).sfc" },
+      { hash = "4bb8081fe57c4485f60b88875141a91a", label = "Shadowrun (USA) (MSU-1) (v20210428) (Conn) (Mouse Support).sfc" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1D8A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Cortex Bomb Timer Flag [EU]" },
+        { address=0X1DA6, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Cortex Bomb Timer Flag [US]" },
+      },
+    },
+  },
+}

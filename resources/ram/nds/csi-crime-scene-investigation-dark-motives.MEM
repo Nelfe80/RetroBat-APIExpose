@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "CSI: Crime Scene Investigation - Dark Motives",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, point-and-click"
+  },
+
+  rom = {
+    name = "csi-crime-scene-investigation-dark-motives",
+    file = "csi-crime-scene-investigation-dark-motives.zip",
+    hashes = {
+      { hash = "3a0b49b5d21a1ad4e599f8a8e2173059", label = "CSI - Crime Scene Investigation - Dark Motives (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

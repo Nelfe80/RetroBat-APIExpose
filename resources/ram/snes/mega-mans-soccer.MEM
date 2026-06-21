@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Mega Man's Soccer",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "mega-mans-soccer",
+    file = "mega-mans-soccer.zip",
+    hashes = {
+      { hash = "9e886f686da276b00c4671967d396a79", label = "Mega Man Soccer (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0000, type="u16le", condition="eq", value=0X0030, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="goal" },
+        { address=0X00DA, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="quarter-finals" },
+        { address=0X00DA, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="semi-finals" },
+        { address=0X00DA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tournament rounds" },
+        { address=0X00DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEAGUE ROUNDS" },
+        { address=0X01E6, type="u8", condition="eq", value=0X88, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="p2 goal?" },
+        { address=0X094C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Team B - 7th Character - 1P Penalty goals" },
+        { address=0X094E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="CPU Penalty goals" },
+        { address=0X0A84, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="03 p1 goal" },
+        { address=0X0ABC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="P1 - Goals" },
+        { address=0X0ADC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="P2 - Goals" },
+        { address=0X138D, type="u8", condition="eq", value=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="P2 GOAL" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0030, type="u8", condition="eq", value=0X07, action="SCORE_STATE", no_log=false, no_survey=false, desc="scoreboard? lost?" },
+        { address=0X006B, type="u8", condition="eq", value=0X0E, action="SCORE_STATE", no_log=false, no_survey=false, desc="scoreboard?" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0A14, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bosses defeated amount" },
+        { address=0X0A20, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Fire Man" },
+        { address=0X0A20, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Cut Man" },
+        { address=0X0A20, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dust Man" },
+        { address=0X0A20, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Pharaoh Man" },
+        { address=0X0A20, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Needle Man" },
+        { address=0X0A20, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Elec Man" },
+        { address=0X0A20, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Wood Man" },
+        { address=0X0A20, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Skull Man" },
+        { address=0X0A21, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Enker" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0A18, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time (halves)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Fight Night Round 2",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "fight-night-round-2",
+    file = "fight-night-round-2.zip",
+    hashes = {
+      { hash = "48579216ac32483c07b469fd894fa1d7", label = "Fight Night Round 2 (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XAC5A60, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Player 1 HP decreased" },
+        { address=0XAC5A60, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Player 1 HP increased" },
+        { address=0XAD56A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Player 2 HP decreased" },
+        { address=0XAD56A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Player 2 HP increased" },
+      },
+    },
+  },
+}

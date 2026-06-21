@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Travel Epuru",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "travel-epuru",
+    file = "travel-epuru.zip",
+    hashes = {
+      { hash = "65ae6e2d2122b1465b6c0694e861a4fe", label = "Travel Eple (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0024, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="story mode stages" },
+        { address=0X008E, type="u8", condition="eq", value=0X9A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X008E, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="= stage2" },
+        { address=0X008E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="story mode stages" },
+        { address=0X0576, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="story mode stages" },
+        { address=0X0E42, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="story mode stages use with chapters" },
+        { address=0X1E82, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X1E82, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="story mode stages" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0305, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 1 health in story mode decreased" },
+        { address=0X0305, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 1 health in story mode increased" },
+        { address=0X0306, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 2 health in story mode decreased" },
+        { address=0X0306, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 2 health in story mode increased" },
+        { address=0X0307, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player one health in 2 player mode decreased" },
+        { address=0X0307, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player one health in 2 player mode increased" },
+        { address=0X0308, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player two health in 2 player mode decreased" },
+        { address=0X0308, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player two health in 2 player mode increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0E6A, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="grenade" },
+        { address=0X0E6A, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="black bomb" },
+        { address=0X0E6A, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="red bomb" },
+        { address=0X0E6A, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="nuke" },
+        { address=0X0E6A, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="club" },
+        { address=0X0E6A, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="pipe" },
+      },
+    },
+  },
+}

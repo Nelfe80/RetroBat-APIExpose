@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Pokémon Pearl Version",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-pearl-version",
+    file = "pokemon-pearl-version.zip",
+    hashes = {
+      { hash = "99569210410cb13f655fc2a18a2525b4", label = "Pokemon - Pearl Version (USA) (Rev 5).nds" },
+      { hash = "28293fc00a49b6b80442042da47cfa91", label = "Pokemon - Pearl Version (Europe) (Rev 5).nds" },
+      { hash = "70eff8816a2f4e8662acdf2bee883ac7", label = "Pokemon - Perl-Edition (Germany) (Rev 5).nds" },
+      { hash = "999e97bc569aa1ac3bc8980bd060e3fe", label = "Pokemon - Edicion Perla (Spain) (Rev 5).nds" },
+      { hash = "899e0c8ed9c9f8195e418a8b7ad072ff", label = "Pokemon - Versione Perla (Italy) (Rev 5).nds" },
+      { hash = "c8824fdcd12fd53947a6d37a1569a492", label = "Pokemon - Version Perle (France) (Rev 5).nds" },
+    }
+  },
+
+  events = {
+  },
+}

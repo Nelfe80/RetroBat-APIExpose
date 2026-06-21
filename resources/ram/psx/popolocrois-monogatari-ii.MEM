@@ -1,0 +1,132 @@
+return {
+  game = {
+    title = "PoPoLoCrois Monogatari II",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "popolocrois-monogatari-ii",
+    file = "popolocrois-monogatari-ii.zip",
+    hashes = {
+      { hash = "230aeb3fb7b75aa6e7b218698478a7e2", label = "PoPoLoCrois Monogatari II (Japan, Asia) (Disc 1)" },
+      { hash = "d138d9157baa7796ee76d08579640e27", label = "PoPoLoCrois Monogatari II (Japan, Asia) (Disc 3)" },
+      { hash = "e2bb6536d1b579028fda1f7014c83dff", label = "PoPoLoCrois Monogatari II (Japan, Asia) (Disc 2)" },
+      { hash = "14bd6b7ab938c8c09086b3904462a6d6", label = "PoPoLoCrois Monogatari II (Japan, Asia) (En) (v1.31) (Zenksren) (Disc 3)" },
+      { hash = "302233505e050119735593b24f347a1d", label = "PoPoLoCrois Monogatari II (Japan, Asia) (En) (v1.31) (Zenksren) (Disc 1)" },
+      { hash = "97527451570ee214de75dc00af0f1c76", label = "PoPoLoCrois Monogatari II (Japan, Asia) (En) (v1.31) (Zenksren) (Disc 2)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11AA69, type="u8", condition="eq", value=0X6A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Lesser Demon" },
+        { address=0X11B338, type="u8", condition="bit_true", bit=2, mask=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End game credits" },
+        { address=0X11B34D, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Lesser Demon apparition" },
+        { address=0X11B3C7, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Lesser Demon (Popolocrois)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XD1515, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD1571, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD15CD, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD1629, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD1685, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD16E1, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD1799, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD17F5, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD1851, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+        { address=0XD18AD, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level (Bit 0)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X11B3BC, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Living Dead" },
+        { address=0X11B3C0, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Trumpet" },
+      },
+      health = {
+        { address=0X11AA78, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0X11AA78, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0X11AAF0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X11AAF0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X11AB68, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X11AB68, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XD1515, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD1571, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD15CD, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD1629, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD1685, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD16E1, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD1799, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD17F5, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD1851, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+        { address=0XD18AD, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon slot" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE8660, type="u8", condition="eq", value=0X0A, action="SCORE_STATE", no_log=false, no_survey=false, desc="perfect score" },
+      },
+      collectibles = {
+        { address=0XD155E, type="u16le", condition="eq", value=0X000E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Sword" },
+        { address=0XD1562, type="u16le", condition="eq", value=0X0B19, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Shoes" },
+        { address=0XD1616, type="u16le", condition="eq", value=0X020B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Sword" },
+        { address=0XD1618, type="u16le", condition="eq", value=0X0914, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Bracelet" },
+        { address=0XD161A, type="u16le", condition="eq", value=0X0B19, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Shoes" },
+        { address=0XD16CE, type="u16le", condition="eq", value=0X040B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Bow" },
+        { address=0XD16D0, type="u16le", condition="eq", value=0X1A12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Empty" },
+        { address=0XD16D0, type="u16le", condition="eq", value=0X0A13, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ring" },
+        { address=0XD16D2, type="u16le", condition="eq", value=0X0B19, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Shoes" },
+        { address=0XD172A, type="u16le", condition="eq", value=0X1A12, action="MONEY_STATE", no_log=false, no_survey=false, desc="Empty" },
+        { address=0XD172A, type="u16le", condition="eq", value=0X0A13, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ring" },
+        { address=0XD172C, type="u16le", condition="eq", value=0X0B19, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Shoes" },
+        { address=0XD172E, type="u16le", condition="eq", value=0X0F02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Earrings" },
+        { address=0XD1730, type="u16le", condition="eq", value=0X0F02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Earrings" },
+        { address=0X114BE8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Amount of Gold increased" },
+        { address=0X114BEC, type="u16le", condition="eq", value=0X000E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Sword (Pietro)" },
+        { address=0X114BEC, type="u16le", condition="eq", value=0X020B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Sword (White Knight)" },
+        { address=0X114BEC, type="u16le", condition="eq", value=0X040B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Bow" },
+        { address=0X114BEC, type="u16le", condition="eq", value=0X0914, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Bracelet" },
+        { address=0X114BEC, type="u16le", condition="eq", value=0X0A13, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ring" },
+        { address=0X114BEC, type="u16le", condition="eq", value=0X0B19, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Shoes" },
+        { address=0X114BEC, type="u16le", condition="eq", value=0X0F02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Earrings" },
+        { address=0X114BEC, type="u16le", condition="eq", value=0X1001, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Hairpiece" },
+        { address=0X11B3C0, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammonite" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X11AA69, type="u8", condition="eq", value=0X85, action="BOSS_HIT", no_log=false, no_survey=false, desc="Monkee Boss" },
+        { address=0X11B3CB, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Monkee Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD92AE, type="u8", condition="eq", value=0X11, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wind Shield" },
+        { address=0XD92AE, type="u8", condition="eq", value=0X12, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Reflect Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD1514, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Pietro's block" },
+        { address=0XD1570, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Narcia's block" },
+        { address=0XD15CC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of White Knight's block" },
+        { address=0XD1628, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of GamiGami's block" },
+        { address=0XD1684, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Leona's block" },
+        { address=0XD16E0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Jilva's block" },
+        { address=0XD173C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Kimendouji's block" },
+        { address=0XD1798, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Gabo's block" },
+        { address=0XD17F4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Don's block" },
+        { address=0XD1850, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Gon's block" },
+        { address=0XD18AC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Kai's block" },
+      },
+    },
+  },
+}

@@ -1,0 +1,134 @@
+return {
+  game = {
+    title = "Brave Fencer Musashi",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "brave-fencer-musashi",
+    file = "brave-fencer-musashi.zip",
+    hashes = {
+      { hash = "0ca0763700988dc921b8c095648f45da", label = "Brave Fencer Musashi (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB99DE, type="u8", condition="eq", value=0X0B, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X78EA6, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0%" },
+        { address=0X78EA6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tired Level" },
+        { address=0X78EE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Body Current Level" },
+        { address=0X78EEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mind Current Level" },
+        { address=0X78EF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fusion Current Level" },
+        { address=0X78EFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lumina Current Level" },
+        { address=0XAE651, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Minku - Mine's Underground Lake" },
+        { address=0XAE654, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Treasure Chest - Powder - Vambee Nest" },
+        { address=0XAE654, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Treasure Chest - Cloth - Vambee Nest" },
+        { address=0XAE654, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Treasure Chest - 300 Drans - Vambee Nest" },
+        { address=0XAE654, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Treasure Chest - Old Pipe - Vambee Nest" },
+        { address=0XAE654, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Treasure Chest - Helmet - Vambee Nest" },
+        { address=0XAE654, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Treasure Chest - Used Boot - Mine" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBA1FD, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier Lardwick" },
+        { address=0XBA206, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier Hanky-Flanky" },
+        { address=0XBA21D, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Open" },
+        { address=0XBA21E, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Open" },
+        { address=0XBA221, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Open" },
+        { address=0XBA228, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Open" },
+        { address=0XBA239, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Open" },
+        { address=0XBA23A, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Open" },
+        { address=0XBA23B, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Open" },
+      },
+      health = {
+        { address=0X78EB2, type="u16le", condition="eq", value=0X96, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Initial" },
+        { address=0X78EB2, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="16-Bits Max HP" },
+        { address=0X78EB4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16-Bits Current HP decreased" },
+        { address=0X78EB4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16-Bits Current HP increased" },
+        { address=0XBA288, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lift HP decreased" },
+        { address=0XBA288, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lift HP increased" },
+        { address=0X120316, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="some enemies hp decreased" },
+        { address=0X120316, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="some enemies hp increased" },
+        { address=0X120422, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Leno Hp 2 decreased" },
+        { address=0X120422, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Leno Hp 2 increased" },
+        { address=0X120746, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Minku Mom HP decreased" },
+        { address=0X120746, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Minku Mom HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XAE651, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - AgedCoin (Steamwood Forest)" },
+        { address=0XAE651, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Minku - Mine" },
+        { address=0XAE651, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - 500 Drans - (Forest)" },
+        { address=0XAE651, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Minku - (mINE/FOREST)" },
+        { address=0XAE651, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Minku (Mine)" },
+        { address=0XAE651, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Minku (Mine)" },
+        { address=0XAE652, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Old Book (Twinpeak Mountain)" },
+        { address=0XAE652, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Dagger (Twinpeak Mountain)" },
+        { address=0XAE652, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Bracelet (Twinpeak Mountain)" },
+        { address=0XAE652, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Rock (Twinpeak Mountain)" },
+        { address=0XAE652, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - 200 Drans (Hell Valley)" },
+        { address=0XAE652, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Red Eye (Ice Palace)" },
+        { address=0XAE652, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Blue Eye (Ice Palace)" },
+        { address=0XAE655, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Glasses (Forest)" },
+        { address=0XAE655, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Red Cloth (Ice Palace)" },
+        { address=0XAE655, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Wh-Cloth (Ice Palace)" },
+        { address=0XAE655, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Bl-Cloth (Ice Palace)" },
+        { address=0XAE655, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Lrg Tool (Mine)" },
+        { address=0XAE655, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - Odd Bone (Mine)" },
+        { address=0XAE655, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - W-Gel (Soda Fountain)" },
+        { address=0XAE656, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - EX-Drink (Soda Fountain)" },
+        { address=0XAE656, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - C-Drink (Soda Fountain)" },
+        { address=0XAE656, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest - C-Drink (Soda Fountain)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBA214, type="u8", condition="bit_true", bit=0, mask=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Condutor Scores" },
+      },
+      collectibles = {
+        { address=0X78E8C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0X11F804, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money 2 increased" },
+        { address=0X127540, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Macho money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAE663, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Open the boss door (Ice Palace)" },
+        { address=0X1942D4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Steam Knight Boss Health Bar? [0x60 = max]" },
+        { address=0X1E4398, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Steam Knight Boss Health 2? [c0 = max]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XAE653, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Treasure Chest - Odd Hat - Vambee Nest" },
+        { address=0XAE653, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Treasure Chest - Old Sword - Vambee Nest" },
+        { address=0XAE653, type="u8", condition="bit_true", bit=2, mask=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Treasure Chest - Long Tube (Ice Palace)" },
+        { address=0XAE653, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Treasure Chest - Red Shoes (Ice Palace)" },
+        { address=0XAE653, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Treasure Chest - Green Eye (Ice Palace)" },
+        { address=0XAE653, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Treasure Chest - 500 Drans (Beach)" },
+        { address=0XAE653, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Treasure Chest - Old Shirt - Mine" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XAE65C, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken the wall 1" },
+        { address=0XAE65D, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bowling vambee 1" },
+        { address=0XAE65D, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken the wall 3" },
+        { address=0XAE65D, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken the wall 4" },
+        { address=0XAE65D, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken the wall 5" },
+        { address=0XAE65D, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken the wall 6" },
+        { address=0XAE65E, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy de fire totten" },
+      },
+    },
+  },
+}

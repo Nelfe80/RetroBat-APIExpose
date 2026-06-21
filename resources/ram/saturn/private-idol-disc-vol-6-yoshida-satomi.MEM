@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 6: Yoshida Satomi",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-6-yoshida-satomi",
+    file = "private-idol-disc-vol-6-yoshida-satomi.zip",
+    hashes = {
+      { hash = "14b381b194aae88bc50a69d98748d032", label = "Private Idol Disc Vol. 6 - Satomi Yoshida (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X12C8FD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X108DDE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Menu object thing for RP" },
+      },
+    },
+  },
+}

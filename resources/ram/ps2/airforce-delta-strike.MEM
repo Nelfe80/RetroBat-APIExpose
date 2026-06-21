@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Airforce Delta Strike",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "airforce-delta-strike",
+    file = "airforce-delta-strike.zip",
+    hashes = {
+      { hash = "dcfdf64dce845ef760a3010edc693acb", label = "AirForce Delta Strike (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

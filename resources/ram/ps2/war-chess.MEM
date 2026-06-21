@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "War Chess",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "war-chess",
+    file = "war-chess.zip",
+    hashes = {
+      { hash = "22fd7f0594714543154b4746297eb7f9", label = "War Chess (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

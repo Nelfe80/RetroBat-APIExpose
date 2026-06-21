@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Terracon",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "terracon",
+    file = "terracon.zip",
+    hashes = {
+      { hash = "c44fea04ef5b86f9960d8ee2170fb4ea", label = "Terracon (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10000, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Quit menu (8-bit)" },
+        { address=0X8A304, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="'Continue' item (8-bit)" },
+        { address=0XDD398, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause window (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDD06C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training level variable 1 (8-bit)" },
+        { address=0XDD168, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level number (8-bit)" },
+        { address=0XDD260, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select (8-bit)" },
+        { address=0XDD624, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blurry background (8-bit)" },
+        { address=0XDD674, type="u16le", condition="eq", value=0X4096, action="NEW_LEVEL", no_log=false, no_survey=false, desc="playing level" },
+        { address=0XDD674, type="u16le", condition="eq", value=0X6000, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="finished level" },
+        { address=0XDD674, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="On level indicator (16-bit)" },
+        { address=0XDD730, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Collected LCCs on the level (BitCount)" },
+        { address=0XDD926, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extra time (for levels with time)" },
+        { address=0XF0FD0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terraroids – Levels on Earth (16-bit)" },
+        { address=0XF1058, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terraroids – Levels on Venus (16-bit)" },
+        { address=0XF1270, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terraroids – Levels on Uranus (16-bit)" },
+        { address=0XF1300, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terraroids – Levels on Jupiter (16-bit)" },
+        { address=0XF1490, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Terraroids – Levels on Neptune (16-bit)" },
+        { address=0X1D0CED, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hidden message on level 24 (Part 1)" },
+        { address=0X1D0CEE, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hidden message on level 24 (Part 2)" },
+        { address=0X1FFB64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="RS left-right (level) (8-bit)" },
+        { address=0X1FFB65, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="RS down-up (level) (8-bit)" },
+        { address=0X1FFB66, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LS left-right (level) (8-bit)" },
+        { address=0X1FFB67, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LS down-up (level) (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDDB3A, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life storage 1x100 (16-bit) increased" },
+        { address=0XDDB3A, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life storage 1x100 (16-bit) decreased" },
+        { address=0XF0FCA, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Earth (16-bit) increased" },
+        { address=0XF0FCA, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Earth (16-bit) decreased" },
+        { address=0XF1052, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Venus (16-bit) increased" },
+        { address=0XF1052, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Venus (16-bit) decreased" },
+        { address=0XF126A, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Uranus (16-bit) increased" },
+        { address=0XF126A, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Uranus (16-bit) decreased" },
+        { address=0XF12FA, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Jupiter (16-bit) increased" },
+        { address=0XF12FA, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Jupiter (16-bit) decreased" },
+        { address=0XF148A, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Neptune (16-bit) increased" },
+        { address=0XF148A, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Terraroids – Lives on Neptune (16-bit) decreased" },
+      },
+      health = {
+        { address=0X1001C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Total genergy (instant) (16-bit) decreased" },
+        { address=0X1001C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Total genergy (instant) (16-bit) increased" },
+        { address=0X8A13C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Total genergy (floating) (16-bit) decreased" },
+        { address=0X8A13C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Total genergy (floating) (16-bit) increased" },
+        { address=0XDD0B0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Run fast + walk through cliffs + take no damage (8-bit)" },
+        { address=0XDDAB0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Blue Genergy (1 shot = 256) (16-bit) decreased" },
+        { address=0XDDAB0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Blue Genergy (1 shot = 256) (16-bit) increased" },
+        { address=0XDDAB1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Blue Genergy shots (8-bit) decreased" },
+        { address=0XDDAB1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Blue Genergy shots (8-bit) increased" },
+        { address=0XDDAB3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Red Genergy shots (8-bit) decreased" },
+        { address=0XDDAB3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Red Genergy shots (8-bit) increased" },
+        { address=0XDDAB5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yellow Genergy shots (8-bit) decreased" },
+        { address=0XDDAB5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yellow Genergy shots (8-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8A190, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Terraroids – Score (32-bit)" },
+        { address=0XDCFCA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pong – Max score (16-bit)" },
+        { address=0XDCFCC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pong – Current score (16-bit)" },
+        { address=0XDDB3C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Green Genergy health points (16-bit)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X8A07C, type="u16le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Terraroids – Shield (16-bit)" },
+        { address=0XDD926, type="u8", condition="eq", value=0X5, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0XDDB3E, type="u16le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Xed's invincibility frames (16-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XDD554, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="First memory block for secrets (BitCount)" },
+        { address=0XDD555, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Second memory block for secrets (BitCount)" },
+        { address=0XDD588, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Standing on object indicator: 0 – none, >0 – above object" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDD926, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="4th T.O.P.S. (8-bit)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Nice Cats",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "nice-cats",
+    file = "nice-cats.zip",
+    hashes = {
+      { hash = "e8a9d777e317bd28a65767f6185892a4", label = "Nice Cats (Europe) (En,Fr,De,Nl)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4C89C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X429B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Movie timer" },
+        { address=0X4CA30, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Puzzle Timer" },
+      },
+    },
+  },
+}

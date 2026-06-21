@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Virtual League Baseball",
+    system = "virtualboy",
+    system_name = "Virtual Boy",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "virtual-league-baseball",
+    file = "virtual-league-baseball.zip",
+    hashes = {
+      { hash = "2ba914c8aa16f2f9230b3c5b7e17e67b", label = "Virtual League Baseball (USA).vb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7788, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="On" },
+        { address=0X7788, type="u8", condition="eq", value=0X1, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off" },
+        { address=0X7794, type="u8", condition="eq", value=0X9, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X778C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit 0] Background music" },
+      },
+      zone = {
+        { address=0X7794, type="u8", condition="eq", value=0X5, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="First Opponent World League" },
+        { address=0X7794, type="u8", condition="eq", value=0X6, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Second Opponent World League" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4C0A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Away Team Score" },
+        { address=0X4C0C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Home Team Score" },
+        { address=0X4C20, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Visiting Score, 1st Inning" },
+        { address=0X4C22, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Home Score, 1st Inning" },
+        { address=0X4C24, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Visiting Score, 2nd Inning" },
+        { address=0X4C26, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Home Score, 2nd Inning" },
+        { address=0X4C28, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Visiting Score, 3rd Inning" },
+        { address=0X4C2A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Home Score, 3rd Inning" },
+        { address=0X4C40, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Visiting Score, 9th Inning" },
+        { address=0X4C42, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Home Score, 9th Inning" },
+      },
+    },
+  },
+}

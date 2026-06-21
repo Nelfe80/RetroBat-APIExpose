@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Turok: Evolution",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "turok-evolution",
+    file = "turok-evolution.zip",
+    hashes = {
+      { hash = "72b6bebe0cd522ef10af08c0513e786c", label = "Turok - Evolution (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X70D054, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Level title in uppercase [ASCII]" },
+        { address=0X70D058, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Level title characters 5 through 8 [ASCII]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X70C854, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level loading = 0x24" },
+        { address=0X70D454, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level description [ASCII]" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X73A74B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="All weapon cheat activated" },
+        { address=0X73A7BB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="All weapon cheat unlocked" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X73A753, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Unlimited ammo cheat activated" },
+        { address=0X73A7C3, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Unlimited ammo cheat unlocked" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X73A75B, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible cheat activated" },
+        { address=0X73A7CB, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible cheat unlocked" },
+      },
+    },
+  },
+}

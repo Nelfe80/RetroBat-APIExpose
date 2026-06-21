@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Putt-Putt's Funpack",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "putt-putts-funpack",
+    file = "putt-putts-funpack.zip",
+    hashes = {
+      { hash = "717b7b9724bdbf7ed993b6f09c70baa6", label = "Putt-Putt's Fun Pack (USA, Korea)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAF2D8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1 if game is paused, 0 otherwise" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XAECF4, type="u8", condition="eq", value=0X95, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Puzzle Blocks" },
+      },
+    },
+  },
+}

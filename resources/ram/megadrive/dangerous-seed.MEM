@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Dangerous Seed",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "dangerous-seed",
+    file = "dangerous-seed.zip",
+    hashes = {
+      { hash = "f7125fcd53073459a6b9b4e57ff71257", label = "Dangerous Seed (Japan).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF43C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+        { address=0XFEC2, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF40C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0XF40C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+      },
+      health = {
+        { address=0XF403, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ship A Health decreased" },
+        { address=0XF403, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ship A Health increased" },
+        { address=0XF405, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ship B Health decreased" },
+        { address=0XF405, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ship B Health increased" },
+        { address=0XF407, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ship F (?) Health decreased" },
+        { address=0XF407, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ship F (?) Health increased" },
+        { address=0XF430, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shield Powerup Activated decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XF430, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off" },
+        { address=0XF430, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFED6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (x655360)" },
+        { address=0XFED8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (x10)" },
+      },
+    },
+  },
+}

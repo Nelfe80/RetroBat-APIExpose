@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Contra: Legacy of War",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "contra-legacy-of-war",
+    file = "contra-legacy-of-war.zip",
+    hashes = {
+      { hash = "4873f397b1af672ecd5ef1b4d9ca6d56", label = "Contra - Legacy of War (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8B964, type="u16le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X8B964, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XDC784, type="u16le", condition="eq", value=0XFFFF, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="No more lives, on the continue screen" },
+        { address=0XDEC92, type="u16le", condition="eq", value=0X05, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="5 continues (default)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDC784, type="u16le", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="0 lives, you can still play" },
+        { address=0XDC784, type="u16le", condition="eq", value=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max lives (Easy difficulty)" },
+        { address=0XDC784, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 bit] Lives increased" },
+        { address=0XDC784, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 bit] Lives decreased" },
+      },
+      health = {
+        { address=0X8C9A0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shield powerup obtained? decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X8C9A0, type="u32le", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No" },
+        { address=0X8C9A0, type="u32le", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Yes" },
+      },
+      weapon = {
+        { address=0X8C952, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sparkling Laser (Tasha exclusive)" },
+        { address=0X8C952, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Homing Laser (Ray exclusive)" },
+        { address=0X8C952, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Machine Gun" },
+        { address=0X8C952, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spread Gun (Ray exclusive)" },
+        { address=0X8C952, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flamethrower" },
+        { address=0X8C952, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Homing Bullets (Bubba exclusive)" },
+        { address=0X8C952, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Seeking Laser (Tasha exclusive)" },
+        { address=0X8C952, type="u8", condition="eq", value=0X0E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Homing Missile (C.D.-288 exclusive)" },
+        { address=0X8C952, type="u8", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spread Grenade (C.D.-288 exclusive)" },
+        { address=0X8C952, type="u8", condition="eq", value=0X12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Straight Laser (Bubba exclusive)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XDC788, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8BA54, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time spent playing (pauses when paused and resets when you use a continue or play a different st" },
+      },
+    },
+  },
+}

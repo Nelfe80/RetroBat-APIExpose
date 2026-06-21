@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Bram Stoker's Dracula",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "bram-stokers-dracula",
+    file = "bram-stokers-dracula.zip",
+    hashes = {
+      { hash = "4cdf3056049a8876a4ded1d767e13554", label = "Bram Stoker's Dracula (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB9D8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0XB9E6, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC918, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCA68, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XCA68, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XCA67, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XCA67, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCA63, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+        { address=0XCA64, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss State" },
+      },
+    },
+  },
+}

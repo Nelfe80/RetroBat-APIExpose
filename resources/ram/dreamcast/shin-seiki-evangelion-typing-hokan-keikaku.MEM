@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Shin Seiki Evangelion: Typing Hokan Keikaku",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shin-seiki-evangelion-typing-hokan-keikaku",
+    file = "shin-seiki-evangelion-typing-hokan-keikaku.zip",
+    hashes = {
+      { hash = "37ffaf4e5e755f120b88bcefbe53f291", label = "Shin Seiki Evangelion - Typing Hokan Keikaku (Japan)" },
+      { hash = "740f7b62a860aa25cb078486fd1a8343", label = "Neon Genesis Evangelion - Typing Project Advanced (Japan) (En) (v1.0) (Derek Pascarella)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE7DB54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Levels] Offset by -1 (0xff when not in a level)" },
+        { address=0XE80990, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Lesson 7] Panels Cleared" },
+        { address=0XEC1C18, type="u8", condition="eq", value=0X1F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+      stage = {
+        { address=0XE7A3C4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Stages] Offset by -1" },
+      },
+    },
+  },
+}

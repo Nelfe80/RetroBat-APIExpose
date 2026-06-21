@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Big Brain Academy",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "big-brain-academy",
+    file = "big-brain-academy.zip",
+    hashes = {
+      { hash = "e0e7964ba8b9b1e98c6c99e4b2349d51", label = "Big Brain Academy (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X11105E, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X11105E, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X11105E, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Platinum" },
+        { address=0X11105E, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X11105E, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X11105E, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Platinum" },
+        { address=0X11105E, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X11105E, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X11105F, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Platinum" },
+      },
+    },
+  },
+}

@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Nightshade",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "nightshade",
+    file = "nightshade.zip",
+    hashes = {
+      { hash = "7d27ae0672c4a8a5a30767ed804b2eeb", label = "Nightshade (World) (Aftermarket) (Unl).nes" },
+      { hash = "9903087102a9bf59b0e33932d1098548", label = "Nightshade (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0262, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo - 01" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0508, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Health (Max = 64)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X04FF, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lord Muck Dead (2nd Fight)" },
+        { address=0X0501, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Goliath Dead (2nd Fight)" },
+        { address=0X0511, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ninja Mistress Dead (2nd Fight)" },
+        { address=0X051A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="King Rat Dead (2nd Fight)" },
+        { address=0X0544, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Egyptian book of the dead collected - FF" },
+      },
+      health = {
+        { address=0X02AE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Combat Opponent 2 Health decreased" },
+        { address=0X02AE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Combat Opponent 2 Health increased" },
+        { address=0X02AF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Combat Opponent 1 Health decreased" },
+        { address=0X02AF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Combat Opponent 1 Health increased" },
+        { address=0X02B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Combat Health (Max = 64) decreased" },
+        { address=0X02B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Combat Health (Max = 64) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X005D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Wandering the World - 01 increased" },
+        { address=0X0510, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0X0514, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gave money to bum in southeast park increased" },
+        { address=0X053F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin obtained from statue - FF increased" },
+        { address=0X0555, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Have money - FF increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X04E2, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Number of bosses defeated" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X04F5, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of objects domed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X052A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Number of times died" },
+      },
+    },
+  },
+}

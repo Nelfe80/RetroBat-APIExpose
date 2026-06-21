@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dogz",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "dogz",
+    file = "dogz.zip",
+    hashes = {
+      { hash = "4f9287492786f87a95c92d6d47d085b7", label = "Dogz (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

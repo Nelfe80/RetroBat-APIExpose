@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "TNA Impact! Total Nonstop Action Wrestling",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "tna-impact-total-nonstop-action-wrestling",
+    file = "tna-impact-total-nonstop-action-wrestling.zip",
+    hashes = {
+      { hash = "f34bf2fa2e955af03c1ce8425c55aa02", label = "TNA Impact! Total Nonstop Action Wrestling (USA)" },
+      { hash = "ff7bd8ee56f8ec3c6219a53b6c1af0e9", label = "TNA Impact! Total Nonstop Action Wrestling (SLUS-21787) [5A31AA5B]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X313BE4, type="u32le", condition="eq", value=0X25, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonic DJ" },
+      },
+    },
+  },
+}

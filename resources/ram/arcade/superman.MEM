@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Superman",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "superman",
+    file = "superman.zip",
+    hashes = {
+      { hash = "255811fcee48c4a9c11af093310e1200", label = "supermanj.7z <Superman (Japan)>" },
+      { hash = "730c885135a29ce7f7984aeb06dd408b", label = "supermanu.7z <Superman (US)>" },
+      { hash = "84d961568a65073a3bcf0eb216b2a576", label = "superman.7z <Superman (World)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C62, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits 8 Bits" },
+        { address=0X357C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+        { address=0X357C, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Cutscenes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0030, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Metropolis (Part 1)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0070, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Metropolis (Part 2)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X00C0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Metropolis (Part 3)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0120, action="NEW_LEVEL", no_log=false, no_survey=false, desc="San Francisco (Part 1)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0160, action="NEW_LEVEL", no_log=false, no_survey=false, desc="San Francisco (Part 2)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X01B0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="San Francisco (Part 3)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0210, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Las Vegas (Part 1)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0250, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Las Vegas (Part 2)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X02A0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Las Vegas (Part 3)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0300, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Washington D.C. (Part 1)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0340, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Washington D.C. (Part 2)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0390, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Washington D.C. (Part 3)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X03F0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spaceship (Part 1)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0440, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spaceship (Part 2)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X0480, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spaceship (Part 3)" },
+        { address=0X0CDA, type="u16le", condition="eq", value=0X04D0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spaceship (Final)" },
+        { address=0X0CDA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels 16 Bits" },
+        { address=0X2A3A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates X (Background) 16 Bits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X12B4, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X12B6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives 8 Bits increased" },
+        { address=0X12B6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives 8 Bits decreased" },
+      },
+      health = {
+        { address=0X12B4, type="u8", condition="eq", value=0X14, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full health" },
+        { address=0X12B4, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health 8 Bits" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1CEC, type="u16le", condition="eq", value=0X00FF, action="SCORE_STATE", no_log=false, no_survey=false, desc="25.500 points" },
+        { address=0X1CEC, type="u16le", condition="eq", value=0X0FFF, action="SCORE_STATE", no_log=false, no_survey=false, desc="409.500 points" },
+        { address=0X1CEC, type="u16le", condition="eq", value=0XFFFF, action="SCORE_STATE", no_log=false, no_survey=false, desc="6.553.500 points" },
+        { address=0X1CEC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P1 16 Bits" },
+      },
+    },
+  },
+}

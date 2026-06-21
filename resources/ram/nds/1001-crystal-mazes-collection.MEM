@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "1001 Crystal Mazes Collection",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "1001-crystal-mazes-collection",
+    file = "1001-crystal-mazes-collection.zip",
+    hashes = {
+      { hash = "e3573da3f2a082048c7b9cdbdd4c7456", label = "1001 Crystal Mazes Collection (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X181F0C, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen (First Boot)" },
+        { address=0X181F0C, type="u16le", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Note",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-note",
+    file = "the-note.zip",
+    hashes = {
+      { hash = "1d1746ca5524f0e5bc54026ef709dc8f", label = "Note, The (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X16ECE8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="=== Mansion ===" },
+      },
+    },
+  },
+}

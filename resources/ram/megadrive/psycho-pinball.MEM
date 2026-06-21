@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Psycho Pinball",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "psycho-pinball",
+    file = "psycho-pinball.zip",
+    hashes = {
+      { hash = "0eccde610ac934ce95cd5f10e11d0bc9", label = "Psycho Pinball (Europe) (En,Fr,De,Es,It).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X050A, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X051E, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="menu/game over" },
+        { address=0X051E, type="u8", condition="eq", value=0X89, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0522, type="u32be", condition="eq", value=0X3E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Wild West Table Death" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0522, type="u32be", condition="eq", value=0X3A, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Bonus" },
+        { address=0X0522, type="u32be", condition="eq", value=0X99, action="SCORE_STATE", no_log=false, no_survey=false, desc="Wild West 5.000.000 Score (21 in Black Jack)" },
+        { address=0X0522, type="u32be", condition="eq", value=0XFF, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+      collectibles = {
+        { address=0X0522, type="u32be", condition="eq", value=0X2E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Wild West Gold Rush" },
+        { address=0X0522, type="u32be", condition="eq", value=0X49, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rush Bonus?" },
+      },
+    },
+  },
+}

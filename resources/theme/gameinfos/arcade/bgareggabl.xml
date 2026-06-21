@@ -1,0 +1,100 @@
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		
+		
+		<!-- APIEXPOSE:HISCORE:BEGIN --><text name="hiscoreline1" extra="true">
+			<text>#1  1000000</text>
+		</text><text name="hiscoreline2" extra="true">
+			<text>#2  213504444</text>
+		</text><text name="hiscoreline3" extra="true">
+			<text>#3  1728983704</text>
+		</text><text name="hiscoreline4" extra="true">
+			<text>#4  4293676792</text>
+		</text><text name="hiscoreline5" extra="true">
+			<text>#5 KCS 1626220480</text>
+		</text><text name="hiscoreline6" extra="true">
+			<text>#6 TFA 500000</text>
+		</text><text name="hiscoreline7" extra="true">
+			<text>#7 JEN 400000</text>
+		</text><text name="hiscoreline8" extra="true">
+			<text>#8 SIN 300000</text>
+		</text><text name="hiscoreline9" extra="true">
+			<text>#9 POS 200000</text>
+		</text><text name="hiscoreline10" extra="true">
+			<text>#10 YOU 100000</text>
+		</text><text name="hiscoreline11" extra="true">
+			<text>#11  0</text>
+		</text><text name="hiscoreline12" extra="true">
+			<text>#12  0</text>
+		</text><text name="hiscoreline13" extra="true">
+			<text>#1 +++ 2000000</text>
+		</text><text name="hiscoreline14" extra="true">
+			<text>#2 +++ 1800000</text>
+		</text><text name="hiscoreline15" extra="true">
+			<text>#3 +++ 1600000</text>
+		</text><text name="hiscoreline16" extra="true">
+			<text>#4 +++ 1400000</text>
+		</text><text name="hiscoreline17" extra="true">
+			<text>#5 +++ 1200000</text>
+		</text><text name="hiscoreline18" extra="true">
+			<text>#6 +++ 1000000</text>
+		</text><text name="hiscoreline19" extra="true">
+			<text>#7 +++ 800000</text>
+		</text><text name="hiscoreline20" extra="true">
+			<text>#8 +++ 600000</text>
+		</text><text name="hiscoreline21" extra="true">
+			<text>#9 +++ 400000</text>
+		</text><text name="hiscoreline22" extra="true">
+			<text>#10 +++ 200000</text>
+		</text><text name="hiscoreline23" extra="true">
+			<text>#11  0</text>
+		</text><text name="hiscoreline24" extra="true">
+			<text>#12  0</text>
+		</text><text name="hiscoreline25" extra="true">
+			<text>#1 224 1366220</text>
+		</text><text name="hiscoreline26" extra="true">
+			<text>#2 *** 1000000</text>
+		</text><text name="hiscoreline27" extra="true">
+			<text>#3 *** 900000</text>
+		</text><text name="hiscoreline28" extra="true">
+			<text>#4 *** 800000</text>
+		</text><text name="hiscoreline29" extra="true">
+			<text>#5 *** 700000</text>
+		</text><text name="hiscoreline30" extra="true">
+			<text>#6 *** 600000</text>
+		</text><text name="hiscoreline31" extra="true">
+			<text>#7 *** 500000</text>
+		</text><text name="hiscoreline32" extra="true">
+			<text>#8 *** 400000</text>
+		</text><text name="hiscoreline33" extra="true">
+			<text>#9 *** 300000</text>
+		</text><text name="hiscoreline34" extra="true">
+			<text>#10 ?=: 290700</text>
+		</text><text name="hiscoreline35" extra="true">
+			<text>#11 *** 200000</text>
+		</text><text name="hiscoreline36" extra="true">
+			<text>#12 224 0</text>
+		</text><text name="hiscoreline37" extra="true">
+			<text>#1 ??? 5000000</text>
+		</text><text name="hiscoreline38" extra="true">
+			<text>#2 ??? 4500000</text>
+		</text><text name="hiscoreline39" extra="true">
+			<text>#3 ??? 4000000</text>
+		</text><text name="hiscoreline40" extra="true">
+			<text>#4 ??? 3500000</text>
+		</text><text name="hiscoreline41" extra="true">
+			<text>#5 ??? 3000000</text>
+		</text><text name="hiscoreline42" extra="true">
+			<text>#6 ??? 2500000</text>
+		</text><text name="hiscoreline43" extra="true">
+			<text>#7 ??? 2000000</text>
+		</text><text name="hiscoreline44" extra="true">
+			<text>#8 ??? 1500000</text>
+		</text><text name="hiscoreline45" extra="true">
+			<text>#9 ??? 1000000</text>
+		</text><text name="hiscoreline46" extra="true">
+			<text>#10 ??? 500000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END --></view>
+</theme>

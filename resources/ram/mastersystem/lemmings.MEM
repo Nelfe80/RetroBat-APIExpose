@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Lemmings",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "lemmings",
+    file = "lemmings.zip",
+    hashes = {
+      { hash = "b190f17a46ba9cc66676e7174209c24e", label = "Lemmings (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1AD0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1AE5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete Screen Flag" },
+        { address=0X1AE6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Info" },
+        { address=0X1B9D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Number (1-30) Same for All difficulties" },
+        { address=0X1BA7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Level Played Pass Flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1B75, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blockers" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1AD1, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer - Minutes" },
+        { address=0X1AD2, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer - Seconds (Tens)" },
+        { address=0X1AD3, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer - Seconds (Ones)" },
+        { address=0X1AD9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="In Game Timer (Runs through all 256 values of Hex)" },
+      },
+    },
+  },
+}

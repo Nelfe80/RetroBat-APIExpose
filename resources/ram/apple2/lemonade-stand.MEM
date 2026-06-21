@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lemonade Stand",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lemonade-stand",
+    file = "lemonade-stand.zip",
+    hashes = {
+      { hash = "6d11ec35cae44ebab4550e6a0edff8bd", label = "Lemonade Stand (1979)(Apple).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

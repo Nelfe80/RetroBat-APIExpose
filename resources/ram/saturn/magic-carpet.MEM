@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Magic Carpet",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "magic-carpet",
+    file = "magic-carpet.zip",
+    hashes = {
+      { hash = "fb668fe403eeef27cf9144f198315aa9", label = "Magic Carpet (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

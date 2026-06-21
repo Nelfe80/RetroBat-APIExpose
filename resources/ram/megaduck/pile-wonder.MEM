@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Pile Wonder",
+    system = "megaduck",
+    system_name = "Mega Duck",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "pile-wonder",
+    file = "pile-wonder.zip",
+    hashes = {
+      { hash = "41f5481a13c8e52aafe8266db52e622f", label = "Pile Wonder (World) (Alt).bin" },
+      { hash = "475ef85a3329c9c7f79db9ea3ac74bd9", label = "Pile Wonder (World).bin" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC002, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XC0DD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of steps taken per stage" },
+        { address=0XC0DE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of steps taken per stage x256" },
+      },
+    },
+  },
+}

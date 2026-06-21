@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Utchan Nanchan no Hono no Challenger: Denryuu Ira Ira Bou",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "utchan-nanchan-no-hono-no-challenger-denryuu-ira-ira-bou",
+    file = "utchan-nanchan-no-hono-no-challenger-denryuu-ira-ira-bou.zip",
+    hashes = {
+      { hash = "ffeb5c1a85babbbe60f2feba2b35c893", label = "Utchan Nanchan no Hono no Challenger - Denryuu Ira Ira Bou (Japan).z64" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1B48F8, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+  },
+}

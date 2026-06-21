@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 KTN 3000000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 NMR 2500000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 TNK 2000000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 WKB 1500000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 ICM 1000000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 YUI 10000000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 WHI 8000000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 NKS 6000000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 MTS 4000000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 YSN 2000000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 SMS 10000000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 NIY 9000000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 FRT 8000000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 MAO 7000000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 FRM 6000000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

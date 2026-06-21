@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "D",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "d",
+    file = "d.zip",
+    hashes = {
+      { hash = "720147c1d3aa03c5fe3efecf77c372ab", label = "D's Diner - The Director's Cut (Japan) (Disc A)" },
+      { hash = "b46eadddb8b8cc0fcda3f789a79752a4", label = "D (USA, Europe) (Disc 2)" },
+      { hash = "c1e60bff0c9128b88026ddc8e7188be4", label = "D (USA, Europe) (Disc 1)" },
+    }
+  },
+
+  events = {
+  },
+}

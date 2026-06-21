@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Legend of Illusion starring Mickey Mouse",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "legend-of-illusion-starring-mickey-mouse",
+    file = "legend-of-illusion-starring-mickey-mouse.zip",
+    hashes = {
+      { hash = "4a69a56a8efff7863feca11f1d6547e3", label = "Legend of Illusion Starring Mickey Mouse (Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0303, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sub Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0304, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0304, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0395, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Level increased" },
+        { address=0X0395, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Level decreased" },
+        { address=0X16C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Start of Tree of Life Objects increased" },
+        { address=0X16C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Start of Tree of Life Objects decreased" },
+      },
+      health = {
+        { address=0X0305, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0305, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X0564, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Evil Shadow Health (4 Max) decreased" },
+        { address=0X0564, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Evil Shadow Health (4 Max) increased" },
+        { address=0X0568, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sorcerer of Darkness/Red Dragon Health (9/8 Max) decreased" },
+        { address=0X0568, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sorcerer of Darkness/Red Dragon Health (9/8 Max) increased" },
+        { address=0X0574, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rainbow Caterpillar Health (4 Max) decreased" },
+        { address=0X0574, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rainbow Caterpillar Health (4 Max) increased" },
+        { address=0X0584, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lion Head Health (5 Max) decreased" },
+        { address=0X0584, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lion Head Health (5 Max) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0354, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Castle Goofstein - Treasure 6" },
+        { address=0X0357, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Castle Goofstein - Treasure 1" },
+        { address=0X035A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Forest - Treasure 3" },
+        { address=0X035D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Castle Goofstein - Treasure 2" },
+        { address=0X0360, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Castle Goofstein - Treasure 5" },
+        { address=0X0363, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Castle Goofstein - Treasure 3" },
+        { address=0X0366, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Castle Goofstein - Treasure 4" },
+        { address=0X0369, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Forest - Treasure 6" },
+        { address=0X036C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Forest - Treasure 7" },
+        { address=0X036F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Sunken Ruins - Treasure 9" },
+        { address=0X0372, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Crystal Forest - Treasure 4" },
+        { address=0X0CD8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Sunken Ruins Treasure 10" },
+        { address=0X0E5B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Garden of Illusion - Treasure 2" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0308, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points x 10" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0588, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health (12 Max)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X09D5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Over Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Puzzle Boy [Subset - Glitches for Pros]",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Puzzle-Game"
+  },
+
+  rom = {
+    name = "puzzle-boy-subset-glitches-for-pros",
+    file = "puzzle-boy-subset-glitches-for-pros.zip",
+    hashes = {
+      { hash = "e1c3ab1163b4ea5c86b75c8993b4d1ea", label = "Puzzle Boy (Japan) [Subset - Glitches for Pros].pce" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0056, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Check" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0031, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining: Minutes" },
+        { address=0X0032, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining: Seconds (x10)" },
+        { address=0X0033, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining: Seconds" },
+      },
+    },
+  },
+}

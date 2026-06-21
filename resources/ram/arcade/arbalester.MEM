@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "arbalest",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "arbalester",
+    file = "arbalester.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XF0198D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XF01990, type="u64be", condition="change", action="TREASURE", color="blue", min=10000, max=50000, no_log=false, no_survey=false, desc="Score delta 10000-50000: A bonus type range" },
+      },
+      weapon = {
+        { address=0XF01988, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: fire power" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XF01990, type="u64be", condition="change", action="SCORE_STATE", min=50, max=1000, no_log=false, no_survey=false, desc="Score delta 50-1000: Score delta 50-1000" },
+        { address=0XF01990, type="u64be", condition="change", action="SCORE_STATE", color="orange", min=1100, max=2000, no_log=false, no_survey=false, desc="Score delta 1100-2000: Score delta 1100-2000" },
+        { address=0XF01990, type="u64be", condition="change", action="SCORE_STATE", color="cyan", min=2100, max=5000, no_log=false, no_survey=false, desc="Score delta 2100-5000: Score delta 2100-5000" },
+        { address=0XF01990, type="u64be", condition="change", action="SCORE_STATE", color="green", min=5100, max=99000, no_log=false, no_survey=false, desc="Score delta 5100-99000: Score delta 5100-99000" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF0198E, type="u8", condition="decrease", action="BOMB_FIRED", no_log=false, no_survey=false, desc="bomb: bombs" },
+      },
+    },
+  },
+}

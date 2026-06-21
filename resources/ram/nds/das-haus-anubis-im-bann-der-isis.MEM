@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Das Haus Anubis: Im Bann der Isis",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "das-haus-anubis-im-bann-der-isis",
+    file = "das-haus-anubis-im-bann-der-isis.zip",
+    hashes = {
+      { hash = "d9e933d75b8c07cdbf075e682d3b19ad", label = "Haus Anubis, Das - Im Bann der Isis (Germany).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Noddy and the Birthday Party",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "noddy-and-the-birthday-party",
+    file = "noddy-and-the-birthday-party.zip",
+    hashes = {
+      { hash = "a67cb573673f041098f23f868a153019", label = "Noddy and the Birthday Party (Europe) (En,Fr,De,Es).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC6F8, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+        { address=0XC6F8, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Outside Level" },
+      },
+    },
+  },
+}

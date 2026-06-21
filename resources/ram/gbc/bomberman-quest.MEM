@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Bomberman Quest",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "bomberman-quest",
+    file = "bomberman-quest.zip",
+    hashes = {
+      { hash = "ad358f284c3303db01212016ed3944d5", label = "Bomberman Quest (USA) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "e6f36322946499f2f55b724c3db916cd", label = "Bomberman Quest (Europe) (En,Fr,De) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 S.FUJIWARA 25000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 B-?@A?.,*&amp; 23500</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 I.SHIKI    20000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 H.TSUTSUI  15000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 K.YOSHIDA  10000</text>
+		</text>
+	</view>
+</theme>

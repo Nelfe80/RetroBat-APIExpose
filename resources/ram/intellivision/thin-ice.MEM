@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Thin Ice",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "thin-ice",
+    file = "thin-ice.zip",
+    hashes = {
+      { hash = "a3434d8d4314b1eba3662ed9c9e7faaa", label = "Thin Ice (USA).int" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0608, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Round Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0824, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Number of Lives increased" },
+        { address=0X0824, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Number of Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X07E0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score (Tens)" },
+        { address=0X07E4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score Address * 256" },
+        { address=0X07F0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Score * 10000" },
+      },
+    },
+  },
+}

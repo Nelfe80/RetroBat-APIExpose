@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Toy Story 3",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "toy-story-3",
+    file = "toy-story-3.zip",
+    hashes = {
+      { hash = "27820462320aa611bc43d97ccfc5db49", label = "Disney-Pixar Toy Story 3 (USA) (En,Fr,Es).iso" },
+      { hash = "c4d2ce23c4159d8a4889486460ee1a1b", label = "Toy Story 3 (Russia) (PSP) (PSN).iso" },
+      { hash = "0309310218ef26f6b2a07b2c508d29a8", label = "Disney-Pixar Toy Story 3 (Europe) (En,Es) (v2.00).iso" },
+      { hash = "e31859cd0144debb1cfe547da7cbf088", label = "Disney-Pixar Toy Story 3 (Europe) (Fr,De,It,Nl).iso" },
+      { hash = "95f40dd151f9a34f301f393701212717", label = "Toy Story 3 (Europe) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XDD4E49, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level indicator EUR" },
+        { address=0XDD4F09, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level indicator EUR PSN" },
+        { address=0X115A2A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Trophy for Less than 50 Changes Alien Level (bit0)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDD4E2C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Buzz Life Indicator (8bit) increased" },
+        { address=0XDD4E2C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Buzz Life Indicator (8bit) decreased" },
+        { address=0X168BBF0, type="u32le", condition="eq", value=0XFFFFFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="In game" },
+        { address=0X168BBF0, type="u32le", condition="eq", value=0X00000001, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die" },
+        { address=0X168BBF0, type="u32le", condition="eq", value=0X00000002, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Respawning" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X114C180, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X114C1C4, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible Cheat Enabled" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X112C8D0, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Trophy for Destroying 30 Barrels (bit0)" },
+        { address=0X114B140, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Trophy for Switch off the Car Lights (bit0)" },
+        { address=0X1158100, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Trophy for Finding 8 Animal Blocks (bit0)" },
+      },
+    },
+  },
+}

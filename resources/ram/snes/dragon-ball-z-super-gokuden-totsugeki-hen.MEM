@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Super Gokuden Totsugeki Hen",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dragon-ball-z-super-gokuden-totsugeki-hen",
+    file = "dragon-ball-z-super-gokuden-totsugeki-hen.zip",
+    hashes = {
+      { hash = "fcd74483c21f2c9659790246207a3912", label = "Dragon Ball Z - Super Gokuu Den - Totsugeki Hen (Japan) (En) (v0.98 - Anime) (Kakkoii Translations).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0003, type="u16le", condition="eq", value=0X19A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over screen during battle" },
+        { address=0X000B, type="u8", condition="eq", value=0X09, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X000B, type="u8", condition="eq", value=0XB9, action="PAUSE_ON", no_log=false, no_survey=false, desc="A Little Pause..." },
+        { address=0X004D, type="u8", condition="eq", value=0X12, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over window" },
+        { address=0X0101, type="u8", condition="bit_true", bit=4, mask=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="Battle Paused" },
+        { address=0X0C03, type="u16le", condition="eq", value=0XFFFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Interrupted (game over, talking) or not in battle" },
+        { address=0X0DB5, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon King Piccolo arrives" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X004D, type="u8", condition="eq", value=0X44, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rival talking/Tutorial" },
+        { address=0X004D, type="u8", condition="eq", value=0X64, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Adviser talking" },
+        { address=0X004D, type="u8", condition="eq", value=0XB4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Nasty Guy talking" },
+        { address=0X004D, type="u8", condition="eq", value=0XD4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Servant talking" },
+        { address=0X004D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Battleground Windows" },
+        { address=0X0C92, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Events Cleared Percentage (Menu Stat)" },
+        { address=0X0DAA, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1st Round - Fight Giran" },
+        { address=0X0DB4, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1st Round - Fight Pamput" },
+      },
+      stage = {
+        { address=0X004D, type="u8", condition="eq", value=0X50, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Characters present in battle are talking (reliable if also dead) before/after/during" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0B7D, type="u8", condition="eq", value=0X15, action="LOSE_LIFE", no_log=false, no_survey=false, desc="RR Army Soldier" },
+        { address=0X0B7D, type="u8", condition="eq", value=0X19, action="LOSE_LIFE", no_log=false, no_survey=false, desc="RR Army Soldier" },
+        { address=0X0B86, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16bit] Goku Life increased" },
+        { address=0X0B86, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16bit] Goku Life decreased" },
+        { address=0X0B88, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16bit] Goku Power (cannot exceed Maximum Life) increased" },
+        { address=0X0B88, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16bit] Goku Power (cannot exceed Maximum Life) decreased" },
+        { address=0X0C97, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16bit] Life (Menu Stat) increased" },
+        { address=0X0C97, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16bit] Life (Menu Stat) decreased" },
+        { address=0X0DAD, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="#8 lives with village chief" },
+      },
+      health = {
+        { address=0X0B7F, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Opponent HP decreased" },
+        { address=0X0B7F, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Opponent HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0DAD, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Give money to the girl" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0CF7, type="u8", condition="eq", value=0X1E, action="JUMPING", no_log=true, no_survey=false, desc="Jump Kick" },
+        { address=0X0D9C, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=true, no_survey=false, desc="Jump Kick" },
+        { address=0X0D9D, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=true, no_survey=false, desc="Back Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0DAA, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Moon destroyed by Chun" },
+        { address=0X0DAF, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blue B-Party destroyed" },
+        { address=0X0DAF, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Henchmen destroyed by trap" },
+        { address=0X0DB4, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Yamcha foot is broken by Tien" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X000B, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Music ID" },
+        { address=0X0CFC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Neutral-X Skill (Defenses)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Ty the Tasmanian Tiger 2: Bush Rescue",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ty-the-tasmanian-tiger-2-bush-rescue",
+    file = "ty-the-tasmanian-tiger-2-bush-rescue.zip",
+    hashes = {
+      { hash = "0cd768bf0e978ae8bad59aa0777321fb", label = "TY the Tasmanian Tiger 2 - Bush Rescue (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XAA3CD8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Training Grounds (far east of map)" },
+        { address=0XAA3DD8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Training Grounds (Middle of Southern Rivers)" },
+        { address=0XAA47C0, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training Grounds Steve" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6D902C, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadlyrang" },
+        { address=0XAA25D8, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Deadly Stone Beetle of Rhinokarnook" },
+      },
+      health = {
+        { address=0X615844, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ty's Max Health (Use for hp upgrades) decreased" },
+        { address=0X615844, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ty's Max Health (Use for hp upgrades) increased" },
+        { address=0X61584C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ty Health decreased" },
+        { address=0X61584C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ty Health increased" },
+        { address=0XBE7450, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bunyip HP (Fluffy Fight) decreased" },
+        { address=0XBE7450, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bunyip HP (Fluffy Fight) increased" },
+        { address=0X109F190, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fluffy HP decreased" },
+        { address=0X109F190, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fluffy HP increased" },
+        { address=0X131A2A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Buster HP Slot 4 decreased" },
+        { address=0X131A2A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Buster HP Slot 4 increased" },
+        { address=0X131A502, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Buster HP decreased" },
+        { address=0X131A502, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Buster HP increased" },
+        { address=0X13D1150, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Patchy HP Slot 3 decreased" },
+        { address=0X13D1150, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Patchy HP Slot 3 increased" },
+        { address=0X1753A20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Buster HP Slot 3 decreased" },
+        { address=0X1753A20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Buster HP Slot 3 increased" },
+        { address=0X1A2F340, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Birrel and Squeaver HP? decreased" },
+        { address=0X1A2F340, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Birrel and Squeaver HP? increased" },
+        { address=0X1C44050, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Patchy HP Slot 2 decreased" },
+        { address=0X1C44050, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Patchy HP Slot 2 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAA39D8, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Cass Bust-Up" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XAA46C0, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="Never Never, Jump to Platform" },
+        { address=0XAA4701, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="Sulphur Rocks, Invisible Platform jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XAA46C3, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Sulphur Rocks, Behind Sawblade door" },
+        { address=0XAA46C5, type="u8", condition="bit_true", bit=6, mask=0X40, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Wobbygon Bay, Underwater near Race Island" },
+        { address=0XAA46C5, type="u8", condition="bit_true", bit=7, mask=0X80, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Wobbygon Bay, Underwater next to Pillar" },
+        { address=0XAA4703, type="u8", condition="bit_true", bit=5, mask=0X20, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Wobbygon Bay, Underwater south of boathouse" },
+        { address=0XAA4746, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="=Frill Neck Forest, Second Checkpoint" },
+        { address=0XAA4781, type="u8", condition="bit_true", bit=0, mask=0X01, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Wobbygon Bay, Underwater between two islands" },
+        { address=0XAA4783, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Faire Dinkum, Behind a Checkpoint" },
+        { address=0XAA4783, type="u8", condition="bit_true", bit=5, mask=0X20, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Wobbygon Bay, Underwater western most island" },
+      },
+    },
+  },
+}

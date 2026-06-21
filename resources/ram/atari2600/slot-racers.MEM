@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Slot Racers",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "slot-racers",
+    file = "slot-racers.zip",
+    hashes = {
+      { hash = "aed82052f7589df05a3f417bb4e45f0c", label = "Slot Racers ~ Maze (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Jump</text>
+			<color>${white}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Kick</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Jump</text>
+			<color>${white}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Kick</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 TAK 2592020</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ESH 2357330</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 I.I 1576170</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 SHI 1465910</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 ZA  1025920</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

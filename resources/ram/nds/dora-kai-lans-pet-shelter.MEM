@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dora & Kai-Lan's Pet Shelter",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "dora-kai-lans-pet-shelter",
+    file = "dora-kai-lans-pet-shelter.zip",
+    hashes = {
+      { hash = "f8dcf33ff03aaf783e41ea7844e3ef18", label = "Dora & Kai-Lan's Pet Shelter (Canada) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+  },
+}

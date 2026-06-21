@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "GG Portrait: Yuuki Akira",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "gg-portrait-yuuki-akira",
+    file = "gg-portrait-yuuki-akira.zip",
+    hashes = {
+      { hash = "82d3c23cf9617174aa47bed8e76438df", label = "GG Portrait - Yuuki Akira (Japan).gg" },
+    }
+  },
+
+  events = {
+  },
+}

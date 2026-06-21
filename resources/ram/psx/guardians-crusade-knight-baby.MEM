@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Guardian's Crusade | Knight & Baby",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "guardians-crusade-knight-baby",
+    file = "guardians-crusade-knight-baby.zip",
+    hashes = {
+      { hash = "9de4d4bb431120327fd23a2c68af13a7", label = "Guardian's Crusade (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C6BBF, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Cursor in Main Pause Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CD7A4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level - 16-Bit" },
+        { address=0X1CD7CC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Baby Level - 16-Bit" },
+        { address=0X1FFE40, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Experience to Next Level - 16-Bit" },
+        { address=0X1FFE80, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level - 16-Bit - Display" },
+        { address=0X1FFEA8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Experience to Next Level - 16-Bit - Display" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1CD79C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP - 16-Bit decreased" },
+        { address=0X1CD79C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP - 16-Bit increased" },
+        { address=0X1CD7A0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP - 16-Bit decreased" },
+        { address=0X1CD7A0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP - 16-Bit increased" },
+        { address=0X1CD7C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Baby Current Health - 16-Bit decreased" },
+        { address=0X1CD7C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Baby Current Health - 16-Bit increased" },
+        { address=0X1CEA06, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 - Max Health decreased" },
+        { address=0X1CEA06, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 - Max Health increased" },
+        { address=0X1CEA0A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 - Current Health decreased" },
+        { address=0X1CEA0A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 - Current Health increased" },
+        { address=0X1CEA32, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 - Max Health decreased" },
+        { address=0X1CEA32, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 - Max Health increased" },
+        { address=0X1CEA36, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 - Current Health decreased" },
+        { address=0X1CEA36, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 - Current Health increased" },
+        { address=0X1FFE84, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP - 16-Bit - Display decreased" },
+        { address=0X1FFE84, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP - 16-Bit - Display increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1CD7E0, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Baby Fed Weapon - 16-Bit" },
+      },
+    },
+  },
+}

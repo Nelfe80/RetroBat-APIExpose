@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "~Demo~ Need for Speed: Most Wanted",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "demo-need-for-speed-most-wanted",
+    file = "demo-need-for-speed-most-wanted.zip",
+    hashes = {
+      { hash = "655fef32c5df6e4a52c3d12110de71c7", label = "Need for Speed - Most Wanted (USA) (Demo)" },
+      { hash = "862a20e935be101ed492a793bd801b0d", label = "007 - From Russia with Love (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

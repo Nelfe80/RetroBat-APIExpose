@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Moses: Prince of Egypt",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "moses-prince-of-egypt",
+    file = "moses-prince-of-egypt.zip",
+    hashes = {
+      { hash = "1b5b7802b3640b41542bb390c29b194b", label = "Moses - Prince of Egypt (Europe) (En,Fr,De,Nl)" },
+    }
+  },
+
+  events = {
+  },
+}

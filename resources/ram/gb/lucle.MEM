@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Lucle",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "lucle",
+    file = "lucle.zip",
+    hashes = {
+      { hash = "e1d28ce25a61b4f623c3c8013ce55b89", label = "Lucle (Japan, Europe) (En).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0EB, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01=pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDE00, type="u8", condition="eq", value=0X2A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="result screen" },
+        { address=0XDF45, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="in control (world5)" },
+        { address=0XDF45, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="starting stage/reached goal" },
+        { address=0XDF45, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="03 = player in control (world1)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDE00, type="u8", condition="eq", value=0X2D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death" },
+      },
+      health = {
+        { address=0XC0E5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0XC0E5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC0BF, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 bit] Time value" },
+        { address=0XC0C5, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="timer x 10 seconds" },
+        { address=0XC0C6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer x 1 second" },
+        { address=0XC0CF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="8-bit -> Real Timer - Seconds - Trial Mode" },
+      },
+    },
+  },
+}

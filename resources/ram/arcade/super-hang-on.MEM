@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Super Hang-On",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Motorcycle"
+  },
+
+  rom = {
+    name = "super-hang-on",
+    file = "super-hang-on.zip",
+    hashes = {
+      { hash = "be733dc88691f0429997b797da49bc95", label = "shangon.7z <Super Hang-On (sitdown/upright, unprotected)>" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X8484, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score xxxx0000" },
+        { address=0X8486, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 0000xxxx" },
+        { address=0X8488, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HI Score xxxx0000" },
+        { address=0X848A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HI Score 0000xxxx" },
+      },
+    },
+  },
+}

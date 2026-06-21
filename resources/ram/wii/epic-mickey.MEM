@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Epic Mickey",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "epic-mickey",
+    file = "epic-mickey.zip",
+    hashes = {
+      { hash = "6b6f55150bdfc214423444d59b16ee1f", label = "Disney Epic Mickey (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11ACD37, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Movie #10 : Attract Mode" },
+        { address=0X10C49E40, type="u32be", condition="eq", value=0X2A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X10C49E40, type="u32be", condition="eq", value=0X8B, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10AAD0E1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII 35 bytes] Zone ID" },
+        { address=0X11326A3D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunnies Catched (Bunny Roundup I)" },
+        { address=0X11326A55, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bunny Roundup I (Quest Completed)" },
+        { address=0X11326A59, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunnies Roaming (Bunny Roundup I)" },
+        { address=0X11326A5D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunnies Catched (Bunny Roundup II)" },
+        { address=0X11326A75, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunnies Roaming (Bunny Roundup II)" },
+        { address=0X11326A79, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunnies Catched (Bunny Roundup III)" },
+        { address=0X11326A89, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunnies Roaming (Bunny Roundup III)" },
+        { address=0X11326A8D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunnies Catched (Bunny Roundup IV)" },
+        { address=0X11326A9D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bunnies Roaming (Bunny Roundup IV)" },
+        { address=0X11326E35, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quest Recieved" },
+        { address=0X11326E35, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Big Bad Pete (Bunny Roundup III)" },
+        { address=0X11326E69, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bunny Roundup IV (Quest Completed)" },
+      },
+      zone = {
+        { address=0X11ACD1C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World of Gremlins I" },
+        { address=0X11ACD29, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World of Gremlins II" },
+        { address=0X11325BD1, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Paint" },
+        { address=0X11325BD1, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Thinner" },
+        { address=0X11325BD1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Clock Tower Pump Machine in World of Gremlins" },
+        { address=0X11325C01, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pipes Fixed in World of Gremlins" },
+        { address=0X11325CD9, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="True" },
+        { address=0X11325CD9, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Turned the Valve in World of Gremlins" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X11ACD34, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Movie #7 : Brush Powerup" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X11ACDCD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Pins increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1131E71C, type="u32be", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="On the ground" },
+        { address=0X1131E71C, type="u32be", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="In the air" },
+        { address=0X1131E720, type="u32be", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="On the ground" },
+        { address=0X1131E720, type="u32be", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="In the air" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X11ACD50, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Movie #33 : Tomorrow City: Broken Rocket" },
+        { address=0X112D3EDD, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="True" },
+        { address=0X112D3EE1, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Eiffel Tower Destroyed Through Thinning #2" },
+        { address=0X11325A09, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="True" },
+        { address=0X11325C5D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Eiffel Tower Destroyed Through Thinning #3" },
+        { address=0X11325C79, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="True" },
+        { address=0X11326731, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Repaired the door with TVs" },
+        { address=0X11326731, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Thinned out / Befriended all the 10 Blotlings" },
+      },
+    },
+  },
+}

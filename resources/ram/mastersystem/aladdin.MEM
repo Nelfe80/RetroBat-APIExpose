@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Aladdin",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "aladdin",
+    file = "aladdin.zip",
+    hashes = {
+      { hash = "c4f138c72f100f6ff721ac05673c6fac", label = "Aladdin (Europe, Brazil, Korea) (Pt) (v1.0) (Imp4444).sms" },
+      { hash = "e3f60072028eb6f02c2b0558804aed83", label = "Aladdin (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0104, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="If not 00 means demo active" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X090D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Input (Stage Select)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0116, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Aladdin's HP decreased" },
+        { address=0X0116, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Aladdin's HP increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0467, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="FF = Invincibility Active" },
+      },
+    },
+  },
+}

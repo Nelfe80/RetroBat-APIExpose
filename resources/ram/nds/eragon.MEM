@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Eragon",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "eragon",
+    file = "eragon.zip",
+    hashes = {
+      { hash = "e0564f9889595a78169f9cbfa50b7af2", label = "Eragon (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

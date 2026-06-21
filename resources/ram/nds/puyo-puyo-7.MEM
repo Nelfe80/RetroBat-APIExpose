@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Puyo Puyo 7",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puyo-puyo-7",
+    file = "puyo-puyo-7.zip",
+    hashes = {
+      { hash = "41d166fe122f35c9f55f93ceaa5a6f2c", label = "Puyo Puyo 7 (Japan) (En) (v1.0) (PuyoNexus).nds" },
+      { hash = "924ab20f7e26c7a4b083514116afd56e", label = "Puyo Puyo 7 (Japan).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEFF5E, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XEFF5E, type="u8", condition="eq", value=0X20, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X135768, type="u32le", condition="eq", value=0XFFFFFFFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X1363D1, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Both" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X100680, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Endless Nazo Puyo - Cleared Tasks [16bit]" },
+        { address=0X15EA9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Endless - Level [8bit]" },
+        { address=0X15EAA8, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Endless - Boards Cleared [16bit]" },
+        { address=0X15EB34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Endless Fever Level [8bit]" },
+        { address=0X15EB40, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Endless Fever All Clear No. [16bit]" },
+      },
+      stage = {
+        { address=0XF2428, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 1 | Episode 2" },
+        { address=0XF2428, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 1 | Episode 3" },
+        { address=0XF2428, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 1 | Episode 4" },
+        { address=0XF2428, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 1 | Episode 5" },
+        { address=0XF2428, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 2 | Episode 6" },
+        { address=0XF2428, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 2 | Episode 7" },
+        { address=0XF2428, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 2 | Episode 8" },
+        { address=0XF2428, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 2 | Episode 9" },
+        { address=0XF2429, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 2 | Episode 10" },
+        { address=0XF2429, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3 | Episode 11" },
+        { address=0XF2429, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3 | Episode 12" },
+        { address=0XF2429, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3 | Episode 13" },
+        { address=0XF2429, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3 | Episode 14" },
+        { address=0XF2429, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3 | Episode 15" },
+        { address=0XF2429, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3 | Episode 16" },
+        { address=0XF2429, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3 | Episode 17" },
+        { address=0XF242A, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 4 | Episode 18" },
+        { address=0XF242A, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 4 | Episode 19" },
+        { address=0XF242A, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 5 | Episode 20" },
+        { address=0XF242A, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 5 | Episode 21" },
+        { address=0XF242A, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 6 | Episode 22 (Final Episode)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X15E8D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Puyo Puyo - Score [32bit]" },
+        { address=0X15E970, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Fever Score [32bit]" },
+        { address=0X15E9F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Deka Puyo Rush - Score [32bit]" },
+        { address=0X1634D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless VS Score (PPF) [32bit]" },
+        { address=0X1635E8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless VS (Daihenshin) Score [32bit]" },
+        { address=0X164590, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless VS Score (PP & PP2) [32bit]" },
+        { address=0X1686D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Story Mode - Score [32bit]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pooyan",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pooyan",
+    file = "pooyan.zip",
+    hashes = {
+      { hash = "2f4aa83a3de7b99c33fac3a773b09d37", label = "Pooyan.woz" },
+    }
+  },
+
+  events = {
+  },
+}

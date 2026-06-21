@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Willy Wombat",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "willy-wombat",
+    file = "willy-wombat.zip",
+    hashes = {
+      { hash = "06c8934f5e6b23429234d58748f8d17a", label = "Willy Wombat (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X16D3D0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gems Collected in Current Stage?" },
+      },
+    },
+  },
+}

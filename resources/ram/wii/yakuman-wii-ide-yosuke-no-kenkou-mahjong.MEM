@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Yakuman Wii: Ide Yosuke no Kenkou Mahjong",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "yakuman-wii-ide-yosuke-no-kenkou-mahjong",
+    file = "yakuman-wii-ide-yosuke-no-kenkou-mahjong.zip",
+    hashes = {
+      { hash = "55401620385834c5ae81f7101432548a", label = "Yakuman Wii - Ide Yosuke no Kenkou Mahjong (Japan) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

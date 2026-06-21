@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Cocoto Fishing Master",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "cocoto-fishing-master",
+    file = "cocoto-fishing-master.zip",
+    hashes = {
+      { hash = "baf971b2c9667420c5fe37042f2505c2", label = "Cocoto Fishing Master (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4D38DC, type="u16le", condition="eq", value=0X1, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="viewing" },
+        { address=0X4D38DC, type="u16le", condition="eq", value=0X2, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="complete" },
+        { address=0X50FE10, type="u32le", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="game is paused or a game is being saved/loaded" },
+        { address=0X527948, type="u16le", condition="eq", value=0X6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4D3828, type="u32le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="from overworld" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X527958, type="u16le", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="hermit turtle summoning boss bait animation 1" },
+        { address=0X527958, type="u16le", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="hermit turtle summoning boss bait animation 2" },
+        { address=0X527958, type="u16le", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="summoning boss" },
+        { address=0X527B0F, type="u8", condition="eq", value=0X3, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss bait" },
+        { address=0X527B16, type="u8", condition="eq", value=0XB0, action="BOSS_HIT", no_log=false, no_survey=false, desc="abyss" },
+        { address=0X527B16, type="u8", condition="eq", value=0XB1, action="BOSS_HIT", no_log=false, no_survey=false, desc="volcano" },
+        { address=0X527B16, type="u8", condition="eq", value=0XB2, action="BOSS_HIT", no_log=false, no_survey=false, desc="atlantis" },
+        { address=0X527B16, type="u8", condition="eq", value=0XB3, action="BOSS_HIT", no_log=false, no_survey=false, desc="jungle" },
+        { address=0X527B16, type="u8", condition="eq", value=0XB4, action="BOSS_HIT", no_log=false, no_survey=false, desc="heaven" },
+        { address=0X527B16, type="u8", condition="eq", value=0XB5, action="BOSS_HIT", no_log=false, no_survey=false, desc="geo bait assembled" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4D38E0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="end credits timer" },
+      },
+    },
+  },
+}

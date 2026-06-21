@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Evo's Space Adventures",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "evos-space-adventures",
+    file = "evos-space-adventures.zip",
+    hashes = {
+      { hash = "379813cb5db0d41747e52e0f2088c8dd", label = "Evo's Space Adventures (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5FF5C, type="u16le", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XE4FB0, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Check" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10004, type="u32le", condition="eq", value=0XFFFFFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+        { address=0X10009, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Have a Nice Day!" },
+        { address=0X1000A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Honeymoon Lagoon" },
+        { address=0X1000B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | The Battery Farm" },
+        { address=0X1000C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Fat Bear Mountain" },
+        { address=0X1000D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Rocky Hard Place" },
+        { address=0X1000E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Give a Dog a Bonus" },
+        { address=0X1000F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Snow Joke" },
+        { address=0X10010, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Ice n' Easy Does It" },
+        { address=0X10011, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Penguin Playpen" },
+        { address=0X10012, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Pinball Blizzard" },
+        { address=0X10013, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Hoppa Choppa" },
+        { address=0X10014, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Walrace 2000" },
+        { address=0X10015, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Jungle Japes" },
+        { address=0X10016, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Jungle Doldrums" },
+        { address=0X10017, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Swamp of Eternal Stench" },
+        { address=0X10018, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Weight for It!" },
+        { address=0X1001A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Fun in the Sun" },
+        { address=0X1001B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Sting in the Tail" },
+        { address=0X1001C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Borassic Park" },
+        { address=0X1001D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Whirlwind Tour" },
+        { address=0X1001E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Shifting Sands" },
+        { address=0X1001F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Punch Up Pyramid" },
+        { address=0X10020, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Fly, Evo, Fly!" },
+        { address=0X10072, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Total Secured Zones" },
+        { address=0X5FF5C, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select" },
+        { address=0XDDF28, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] In Level Check" },
+        { address=0XE415E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Frames Spent in Level" },
+        { address=0XE52B0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Grounded Control Check?" },
+        { address=0XE52EC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[BitCount] Briefing Goals Completed" },
+        { address=0XE7398, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Total Power Cells Collected in Level" },
+        { address=0X111168, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Current Round | Punch Up Pyramid" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X111194, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16 Bit] Lives | Fly, Evo, Fly! increased" },
+        { address=0X111194, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bit] Lives | Fly, Evo, Fly! decreased" },
+      },
+      health = {
+        { address=0XE5448, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Current Health decreased" },
+        { address=0XE5448, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Current Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X111180, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Player Checkpoints Hit | Walrace 2000" },
+        { address=0X111184, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] CPU 1 Checkpoints Hit | Walrace 2000" },
+        { address=0X111188, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] CPU 2 Checkpoints Hit | Walrace 2000" },
+        { address=0X111190, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Score | Fly, Evo, Fly!" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X10019, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[8 Bit] Level Status | Jungle Jumps" },
+        { address=0X10039, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[8 Bit] Souvenir Collected | Jungle Jumps" },
+        { address=0X10059, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[8 Bit] Total Power Cells | Jungle Jumps" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11119C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Round Timer | Punch Up Pyramid" },
+      },
+    },
+  },
+}

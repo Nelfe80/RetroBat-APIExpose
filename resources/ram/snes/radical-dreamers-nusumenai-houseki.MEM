@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Radical Dreamers: Nusumenai Houseki",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "radical-dreamers-nusumenai-houseki",
+    file = "radical-dreamers-nusumenai-houseki.zip",
+    hashes = {
+      { hash = "55c5baaedffcf4fd022361c531c72178", label = "Radical Dreamers - Nusume Nai Houseki (Japan) (2-24) (En) (v1.4) (Demiforce).sfc" },
+      { hash = "1489ae44423b19793dd6baf779b4884a", label = "Radical Dreamers - Nusume Nai Houseki (Japan) (2-24) (En) (v1.4) (Demiforce) (MSU-1) (Cubear).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0940, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Shadow Realm and the Goddess of Death" },
+      },
+      health = {
+        { address=0X0901, type="u8", condition="eq", value=0X78, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max Health" },
+        { address=0X0901, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Serge's Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0940, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=true, no_survey=false, desc="The Enigmatic Gigaweapon: Paradise X" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0996, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Text/Scene ID" },
+      },
+    },
+  },
+}

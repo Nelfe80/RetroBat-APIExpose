@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Wonder Boy in Monster World",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Role-Playing, Platform"
+  },
+
+  rom = {
+    name = "wonder-boy-in-monster-world",
+    file = "wonder-boy-in-monster-world.zip",
+    hashes = {
+      { hash = "945335637611a0951595fae0994f4303", label = "Wonder Boy in Monster World (USA, Europe).md" },
+      { hash = "bca76deb410bf8277a0f50225c0912aa", label = "Wonder Boy in Monster World (USA, Europe) (Pt) (L.T de Melo).md" },
+      { hash = "fc0671e09a03e6ca6481f34eb5e2114e", label = "Turma da Monica na Terra dos Monstros (Brazil).md" },
+      { hash = "b70b955663fcab099bc3ce4d4dd67777", label = "Wonder Boy in Monster World (USA, Europe) (It) (v1.04) (Di Somma Michele).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8108, type="u16be", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[16-Bits] Demo Check: Woks as frame countdown on title screen (stays as 0000 in demo, freezes wh" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X959F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Potion Level: 00=Medicine, 01=Potion, 02=Holy Water, 03=Hi Potion, FF=None" },
+      },
+      zone = {
+        { address=0X9668, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Segment ID" },
+        { address=0X9669, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA14B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0xff when any boss dies" },
+        { address=0XDA4D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Almighty Demon King Third Head life meter increased" },
+        { address=0XDA4D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Almighty Demon King Third Head life meter decreased" },
+      },
+      health = {
+        { address=0XDA00, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0XDA00, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0XDA83, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Enemy" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X95CB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="WEAPON: b0=Legend Sword, b1=Excalibur, b2=Knight Sword, b3=Gradius, b4=Battle Spear, b5=Trident," },
+        { address=0X95CF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Equipped: 00=Legend, 01=Excalibur, 02=Knight Sword, 03=Gradius, 04=Battle Spear, 05=Tride" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X95B4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Speed Points (stars)" },
+        { address=0X95B5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Attack Points (stars)" },
+        { address=0X95B7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Defense Points (stars)" },
+      },
+      collectibles = {
+        { address=0X9593, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item - Gold-Gem increased" },
+        { address=0X959E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Received increased" },
+        { address=0X962C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Gold (Byte 3 of 4, 0x00010000 to 0x00FF0000) increased" },
+        { address=0X962D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Gold (Byte 4 of 4, 0x01000000 to 0xFF000000) increased" },
+        { address=0X962E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Gold (Byte 1 of 4, 0x00 to 0xFF) increased" },
+        { address=0X962F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Gold (Byte 2 of 4, 0x0100 to 0xFF00) increased" },
+        { address=0X9996, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hidden Coins Token potentially increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XDA40, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss first head health" },
+        { address=0XDA44, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss current head health" },
+        { address=0XDA48, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss second head health" },
+        { address=0XDA4C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss first third health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X95BD, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Current Magic Units: Shield" },
+        { address=0X95C3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Max Magic Units: Shield" },
+        { address=0X95CD, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="SHIELD: b0=Legend, b1=Flame, b2=Knight, b3=Steel, b4=Hard, b5=Shell, b6=Wood, b7=*Pygmy" },
+        { address=0X95D1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield equipped: 00=Legend, 01=Flame, 02=Knight, 03=Steel, 04=Hard, 05=Shell, 06=Wood, 07=*Pygmy" },
+        { address=0X95E2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Magic Equipped - Slot 2 (right): 00=Fire Storm, 01=Quake, 02=Thunder, 03=Power, 04=Shield, 05=Re" },
+      },
+      player = {
+        { address=0XC900, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="jump height from 1000 to 2000" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9992, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Volcano Dungeon Door-bits" },
+      },
+    },
+  },
+}

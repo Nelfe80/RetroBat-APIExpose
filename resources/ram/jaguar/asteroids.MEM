@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Asteroids",
+    system = "jaguar",
+    system_name = "Atari Jaguar",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "asteroids",
+    file = "asteroids.zip",
+    hashes = {
+      { hash = "b6f644876b1ec7453f752918cb6d02de", label = "Asteroids (World) (Aftermarket) (Unl).rom" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X5CA8B, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE] [BCD] Score" },
+      },
+    },
+  },
+}

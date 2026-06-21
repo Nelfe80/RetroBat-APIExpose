@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "The Lion King: Simba's Mighty Adventure",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "the-lion-king-simbas-mighty-adventure",
+    file = "the-lion-king-simbas-mighty-adventure.zip",
+    hashes = {
+      { hash = "acaef33565188ae52caedf152b243253", label = "Disney's The Lion King - Simba's Mighty Adventure (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X74F3C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="--PAUSE GAME--" },
+        { address=0X75540, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="FLAG - DEMO GAME" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X74F8C, type="u8", condition="eq", value=0X0C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finish Level" },
+        { address=0X75498, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="In Game" },
+        { address=0X75498, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X79994, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X79995, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X79996, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X79997, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X79998, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X79999, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X7999A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X7999B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X7999C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X7999D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X7999E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X7999F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799A9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799AA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799AB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799AC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799AD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0X799AE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--BEST CLEARANCE--" },
+        { address=0XD4E04, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="CONTAGE FRUIT IN LEVEL FINISH" },
+      },
+      stage = {
+        { address=0X74F6C, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Pride Rock" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 - Graveyard" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 - Stampede" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 - Old Friends" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 - Return of the King" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 - Fire" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 - Climb" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8 - Outland Attack" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 - Rhino Chase" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bug Catching" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Matching Game" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Martial Arts" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Meerkat Bash" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Out Game" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X0E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 - Fight Scar" },
+        { address=0X74F6C, type="u8", condition="eq", value=0X0F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 9 - Fight Zira" },
+        { address=0X74F6C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="--STAGE LEVEL--" },
+        { address=0X74F8C, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Inciated Stage 0%" },
+        { address=0X74F8C, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Iniciated Stage 30%" },
+        { address=0X74F8C, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Inciated Stage 80%" },
+        { address=0X96CB0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="PROGRESS WITHIN STAGES" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X74FB4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="PLAYER - LIVES increased" },
+        { address=0X74FB4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="PLAYER - LIVES decreased" },
+      },
+      health = {
+        { address=0X74FB0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PLAYER - HP [16-Bits] decreased" },
+        { address=0X74FB0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PLAYER - HP [16-Bits] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD4DFC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="CONTAGE COIN IN LEVEL FINISH increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X755A8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="--HP HYENAS BOSS--" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X9ADE4, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+  },
+}

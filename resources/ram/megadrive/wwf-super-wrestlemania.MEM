@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "WWF Super WrestleMania",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-super-wrestlemania",
+    file = "wwf-super-wrestlemania.zip",
+    hashes = {
+      { hash = "fc412a1d0487cef78c5f9e0fe90faa2b", label = "WWF Super WrestleMania (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XB5DA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Energy display decreased" },
+        { address=0XB5DA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Energy display increased" },
+        { address=0XB5DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Energy display decreased" },
+        { address=0XB5DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Energy display increased" },
+        { address=0XB8FA, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Energy 16bit decreased" },
+        { address=0XB8FA, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Energy 16bit increased" },
+        { address=0XB8FC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Partner Energy 16bit decreased" },
+        { address=0XB8FC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Partner Energy 16bit increased" },
+        { address=0XB8FE, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Energy 16bit decreased" },
+        { address=0XB8FE, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Energy 16bit increased" },
+        { address=0XB900, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Partner Energy 16bit decreased" },
+        { address=0XB900, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Partner Energy 16bit increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB8D2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 in ring? increased" },
+        { address=0XB8D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 Partner in ring? increased" },
+        { address=0XB8D6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 Partner 2 in ring? increased" },
+        { address=0XB8D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 Partner 3 in ring? increased" },
+        { address=0XB8DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 in ring? increased" },
+        { address=0XB8DE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 Partner in ring? increased" },
+        { address=0XB8E0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 Partner 2 in ring? increased" },
+        { address=0XB8E2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 Partner 3 in ring? increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB5C4, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="also 16bit elapsed time?" },
+        { address=0XB5D8, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="16bit elapsed time" },
+        { address=0XB64E, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="16bit Total Time" },
+      },
+    },
+  },
+}

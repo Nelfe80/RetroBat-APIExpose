@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Kamen Rider Hibiki",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "kamen-rider-hibiki",
+    file = "kamen-rider-hibiki.zip",
+    hashes = {
+      { hash = "9648f1249823d163404bf7d325c01d61", label = "Kamen Rider Hibiki (Japan)" },
+      { hash = "8e35791a543e8adf4f94ef28b551fdaf", label = "Kamen Rider Hibiki - Taiko no Tatsujin Special Version (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

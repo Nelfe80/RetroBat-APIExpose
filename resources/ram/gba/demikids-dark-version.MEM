@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "DemiKids: Dark Version",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "demikids-dark-version",
+    file = "demikids-dark-version.zip",
+    hashes = {
+      { hash = "4a28daa8f0c619ad90ca97b3b941353d", label = "DemiKids - Dark Version (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1366, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonios" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1333, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mmmhp... bit5 decreased" },
+        { address=0X1333, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mmmhp... bit5 increased" },
+        { address=0X3E02C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 2 HP] [16-Bits] decreased" },
+        { address=0X3E02C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 2 HP] [16-Bits] increased" },
+      },
+    },
+  },
+}

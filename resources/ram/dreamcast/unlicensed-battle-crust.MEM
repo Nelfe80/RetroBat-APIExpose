@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "~Unlicensed~Battle Crust",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "unlicensed-battle-crust",
+    file = "unlicensed-battle-crust.zip",
+    hashes = {
+      { hash = "394adbb7175ae863d20d2956050b73cb", label = "Battle Crust (USA, Japan) (Unl)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4A2D9C, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues left" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4A2D8C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

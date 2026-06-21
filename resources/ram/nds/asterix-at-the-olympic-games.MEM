@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Astérix at the Olympic Games",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "asterix-at-the-olympic-games",
+    file = "asterix-at-the-olympic-games.zip",
+    hashes = {
+      { hash = "2b2bd2845b8c1507937ad31eb28ac7f8", label = "Asterix at the Olympic Games (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X1929DC, type="u24le", condition="eq", value=0X5, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold" },
+      },
+    },
+  },
+}

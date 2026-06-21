@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Fighters Megamix",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "fighters-megamix",
+    file = "fighters-megamix.zip",
+    hashes = {
+      { hash = "dad4e684cd0c37efd0929e42f505415d", label = "Fighters Megamix (USA) (RE)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18401A, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continues used (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X169844, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="current round no. (8-bit)" },
+        { address=0X1949C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="current round no. (8-bit)" },
+        { address=0X1E1008, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="player 1 rounds won" },
+        { address=0X1E100A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="current round no. better use (8-bit)" },
+        { address=0X1E100B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="player 2 rounds won" },
+      },
+      stage = {
+        { address=0X169845, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage no. (8-bit)" },
+        { address=0X183AB8, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bm's stage" },
+        { address=0X183AB8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="training stage option part 1 (8-bit)" },
+        { address=0X19FB65, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bm" },
+        { address=0X19FB65, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="training stage option part 2 (8-bit)" },
+        { address=0X1E1005, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="wins in a row or stages? (8-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X16552C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="p1 health (8-bit) decreased" },
+        { address=0X16552C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="p1 health (8-bit) increased" },
+        { address=0X194A02, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="p1 health (8-bit) decreased" },
+        { address=0X194A02, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="p1 health (8-bit) increased" },
+        { address=0X194A0A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="p2 health (com for single player) (8-bit) decreased" },
+        { address=0X194A0A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="p2 health (com for single player) (8-bit) increased" },
+        { address=0X19FB40, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="on" },
+        { address=0X19FB41, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="on" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X169845, type="u8", condition="eq", value=0XFF, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15C72B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="another timer" },
+        { address=0X169C1B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer of some sort (8-bit)" },
+        { address=0X195C44, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time limit" },
+        { address=0X19FB47, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="30secs - default" },
+        { address=0X19FB47, type="u8", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="no limit" },
+        { address=0X19FB47, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time limit (8-bit)" },
+      },
+    },
+  },
+}

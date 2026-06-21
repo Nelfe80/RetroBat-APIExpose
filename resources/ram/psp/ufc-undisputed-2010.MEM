@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "UFC Undisputed 2010",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ufc-undisputed-2010",
+    file = "ufc-undisputed-2010.zip",
+    hashes = {
+      { hash = "f9fc98c661cc0db0e7f2b6a58e11a8e7", label = "UFC Undisputed 2010 (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Doraemon 2: Nobita to Hikari no Shinden",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "doraemon-2-nobita-to-hikari-no-shinden",
+    file = "doraemon-2-nobita-to-hikari-no-shinden.zip",
+    hashes = {
+      { hash = "0580d96a71671c9e6972fdcf5897cc26", label = "Doraemon 2 - Nobita to Hikari no Shinden (Japan).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF8A75, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Music" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1035CC, type="u16be", condition="eq", value=0X03E8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1035CC, type="u16be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Current HP" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X103602, type="u16be", condition="eq", value=0X12, action="TREASURE", no_log=false, no_survey=false, desc="Emerald Lake" },
+        { address=0X103617, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Stone lab next to cliff in Emerald Lake" },
+        { address=0X103618, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="After grabbing Helion Crystal" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1035DD, type="u8", condition="bit_true", bit=1, mask=0X02, action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1035FF, type="u8", condition="eq", value=0X1D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Helion Ruins (Boss)" },
+        { address=0X103602, type="u16be", condition="eq", value=0X23, action="BOSS_HIT", no_log=false, no_survey=false, desc="Helion Ruins (when boss fight starts)" },
+        { address=0X10361A, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sub boss Helion Temple" },
+        { address=0X10361B, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mina and Pyun running away from Helion boss" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X10361A, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Activating the jump switch in Helion Temple" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X103616, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit6 = Helion Temple door opening" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF8A70, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Progression" },
+        { address=0X10B264, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Helion Ruins room" },
+      },
+    },
+  },
+}

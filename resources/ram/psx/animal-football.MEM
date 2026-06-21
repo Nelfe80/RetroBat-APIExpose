@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Animal Football",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "animal-football",
+    file = "animal-football.zip",
+    hashes = {
+      { hash = "f882f8b6a3cd866dcfc73a5b8ad68c2f", label = "Animal Football (Europe) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X4D818, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Movie Timer" },
+        { address=0X1F7DF0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Timer" },
+      },
+    },
+  },
+}

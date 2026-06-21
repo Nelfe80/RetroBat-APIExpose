@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Red Faction",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "red-faction",
+    file = "red-faction.zip",
+    hashes = {
+      { hash = "b5e46ca3a67689158914616afa25fd04", label = "Red Faction (USA) (v2.00)" },
+      { hash = "f61309df9dfa8e4e7672a1544b0aef1b", label = "Red Faction (USA) (v2.00) (60fps) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2AC0D8, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="not in control [in menus, pause screen, or loading]." },
+        { address=0X2AC540, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflag] pressed continue after game end flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2ABDFC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Zone Walls" },
+        { address=0X2ABE10, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Window & Stairs Zones?" },
+        { address=0X1EA58C8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] ASCII Level ID" },
+        { address=0X1EA58CC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] ASCII Level ID Alt" },
+      },
+      stage = {
+        { address=0X2ACDE0, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X2ACDE0, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X2ACDE0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32bit] Final Bomb Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB7CB38, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 bit] multiplayer player deaths" },
+        { address=0X1EC2D63, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="masako death flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2ABFDC, type="u32le", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2AC758, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[8bit] time limit in multiplayer" },
+      },
+    },
+  },
+}

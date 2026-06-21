@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Numblast",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "numblast",
+    file = "numblast.zip",
+    hashes = {
+      { hash = "368890e8f60f22b4ea69ff915d6d6c08", label = "Numblast (Europe) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

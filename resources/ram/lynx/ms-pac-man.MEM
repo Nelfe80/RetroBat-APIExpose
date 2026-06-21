@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Ms. Pac-Man",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ms-pac-man",
+    file = "ms-pac-man.zip",
+    hashes = {
+      { hash = "192b6b764a3a1c7831e0a785fa4b5453", label = "Ms. Pac-Man (World).lnx" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002B, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="start of demo 04 = start of menu" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X004E, type="u16le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="200 2=400 3=800 4=1600" },
+        { address=0X004E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Eatable Ghost Points" },
+      },
+    },
+  },
+}

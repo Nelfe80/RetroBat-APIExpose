@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Dance Dance Revolution: Disney's Rave",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dance-dance-revolution-disneys-rave",
+    file = "dance-dance-revolution-disneys-rave.zip",
+    hashes = {
+      { hash = "5a860f64dbe9d52d2245f8254e6f5445", label = "Dance Dance Revolution - Disney's Rave (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X83AE8, type="u16le", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Mode Select/Demo" },
+        { address=0X83AE8, type="u16le", condition="eq", value=0X12, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+      events = {
+        { address=0X83B94, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Combo" },
+        { address=0X856EC, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16 Bit] P2 Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10115, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Option - Game Level" },
+      },
+      stage = {
+        { address=0X10116, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Option - Max Stage" },
+        { address=0X722A0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage 2 Music ID" },
+        { address=0X722A5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage 3 Music ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1012C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Option - Diet Type" },
+      },
+    },
+  },
+}

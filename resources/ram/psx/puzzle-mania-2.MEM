@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle Mania 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-mania-2",
+    file = "puzzle-mania-2.zip",
+    hashes = {
+      { hash = "474a52fa720f888c5d4a245f2a368e10", label = "Puzzle Mania 2 (Japan) (Major Wave)" },
+    }
+  },
+
+  events = {
+  },
+}

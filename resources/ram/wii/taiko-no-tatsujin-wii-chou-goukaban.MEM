@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Taiko no Tatsujin Wii: Chou Goukaban",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "taiko-no-tatsujin-wii-chou-goukaban",
+    file = "taiko-no-tatsujin-wii-chou-goukaban.zip",
+    hashes = {
+      { hash = "df38f0a09b05bfc5456ddae794807a2f", label = "Taiko no Tatsujin Wii - Chou Goukaban (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

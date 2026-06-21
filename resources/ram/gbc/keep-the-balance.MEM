@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Keep the Balance",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "keep-the-balance",
+    file = "keep-the-balance.zip",
+    hashes = {
+      { hash = "d5161ed7380af488b22302691c9a33cd", label = "Keep the Balance (Europe) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

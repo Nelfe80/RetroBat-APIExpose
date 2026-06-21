@@ -1,0 +1,136 @@
+return {
+  game = {
+    title = "Shin Megami Tensei: Persona 3 Portable",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-persona-3-portable",
+    file = "shin-megami-tensei-persona-3-portable.zip",
+    hashes = {
+      { hash = "9c009f251fa110d6f91100600fea2be2", label = "Shin Megami Tensei - Persona 3 Portable (USA) (Es) (v1.0) (HxCannon).iso" },
+      { hash = "f56e60e76a5f53ac8fb18da480c86f4a", label = "Shin Megami Tensei - Persona 3 Portable (USA).iso" },
+      { hash = "f0d0a5ce764cca7e159e55188ac58833", label = "Shin Megami Tensei - Persona 3 Portable (USA) (Pt) (Beta v2.0) (Atlantis Team)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE63BF6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Main Char - Level" },
+        { address=0XE63C4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 1st Social Link - Event Level???" },
+        { address=0XE64C2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Main Char - Persona Level" },
+        { address=0XE684FA, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0XE684FB, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0XE684FB, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Maniac" },
+        { address=0XE684FB, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beginner" },
+        { address=0XE68578, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="possible top floor level you reached??" },
+        { address=0XE68C44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) Yukari - Level" },
+      },
+      zone = {
+        { address=0XE68454, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="0 - Defeat World Balance (236F)" },
+        { address=0XE688F5, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Balance attemp - 236F Guardian" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE63C48, type="u8", condition="eq", value=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Justice (Ken), 11=Justice, 12=Hanged, 13=Death" },
+        { address=0XE63C48, type="u8", condition="eq", value=0XB, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chariot(Track), c=Chariot(Kendo), d=Chariot(Swim), e=Hermit, f=Fortune(Photo), 10=Fortune(Art)," },
+        { address=0XE688E7, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Castle anaylzed" },
+        { address=0XE688E8, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Twins analyzed" },
+        { address=0XE688F1, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Seeker analyzed" },
+        { address=0XE688F3, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Dice analyzed" },
+      },
+      health = {
+        { address=0XE63BF8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Main Char - current HP decreased" },
+        { address=0XE63BF8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Main Char - current HP increased" },
+        { address=0XE68BC0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Yukari - current HP decreased" },
+        { address=0XE68BC0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Yukari - current HP increased" },
+        { address=0XE68F08, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Junpei - current HP decreased" },
+        { address=0XE68F08, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Junpei - current HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XE64308, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Santa Suit (Yukari)" },
+        { address=0XE64309, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Santa Suit (Aigis)" },
+        { address=0XE6430A, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Santa Suit (Mitsuro) - quantity" },
+      },
+      weapon = {
+        { address=0XE64080, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) Main Char - Weapon Slot" },
+        { address=0XE68870, type="u16le", condition="eq", value=0X114, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Snow Queen Whip, 18=Masakado's Katana" },
+        { address=0XE68870, type="u16le", condition="eq", value=0XB7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Quintessence Bow, 97=Pinaka, 57=Evil Gloves" },
+        { address=0XE68870, type="u16le", condition="eq", value=0XF5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Vajra, 76=Beelzebub's staff, d6=Metatronius" },
+        { address=0XE68C08, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) Yukari - Weapon Slot" },
+        { address=0XE68D20, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) Aigis - Weapon Slot" },
+        { address=0XE68E38, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) Mitsuru - weapon slot" },
+        { address=0XE68F50, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) Junpei - Weapon Slot" },
+        { address=0XE69180, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="(16 bit) Akihiko - Weapon Slot" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE64618, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Wealth Coin - amount increased" },
+        { address=0XE64619, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasure Coin - amount increased" },
+        { address=0XE68518, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit7=during combat mode. also used during demons fusions.Looks good for battery / save protectio" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE682AE, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit7=possible Takaya & Jin defeat - boss at 7th moon" },
+        { address=0XE682AF, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit2=Hanged Man boss defeated - 7th moon" },
+        { address=0XE682B2, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit1=Defeat Chidori boss [11/22]" },
+        { address=0XE68434, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Power Door" },
+        { address=0XE68434, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Magic Door" },
+        { address=0XE68434, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Resistance Door" },
+        { address=0XE68434, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Speed Door" },
+        { address=0XE68435, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeat Priestess" },
+        { address=0XE68435, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Empress & Emperor" },
+        { address=0XE68435, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Hierophant" },
+        { address=0XE68435, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Lovers" },
+        { address=0XE68435, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Chariot & Justice" },
+        { address=0XE68435, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Hermit" },
+        { address=0XE68435, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Fortune & Strength" },
+        { address=0XE68435, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Hanged Man" },
+        { address=0XE6846C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit3,4,7=Breaking Mirrors (after 3rd boss - Hiero)" },
+        { address=0XE688EA, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Insidious Maya analyzed (before 3rd boss)" },
+        { address=0XE688F0, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ice Raven analyzed (3rd boss)" },
+        { address=0XE688F3, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mind Dice analyzed (3rd boss)" },
+        { address=0XE688F4, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Justice Sword analyzed (before 3rd boss)" },
+        { address=0XE68900, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Empress boss (attempt to anylize) - reset" },
+        { address=0XE68900, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Emperor boss (attempt to anylize) - reset" },
+        { address=0XE68900, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hierophant (attempt to analyze)" },
+        { address=0XE68900, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Lovers (attempt to analyze)" },
+        { address=0XE68900, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chariot boss (attempt) - 6th moon" },
+        { address=0XE68900, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Justice boss (attempt) - 6th moon" },
+        { address=0XE68900, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hermit boss (attempt) - 7th moon" },
+        { address=0XE68901, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fortune boss (attempt to analyze) - 6th moon" },
+        { address=0XE68901, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Strength boss (attempt to analyze) - 6th moon" },
+        { address=0XE68901, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Takaya boss (attempt to analyze) - 7th moon" },
+        { address=0XE68901, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Jin boss (attempt to analyze) - 7th Moon" },
+        { address=0XE68901, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hanged Man boss (attempt) - 7th moon" },
+        { address=0XE68901, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Jin" },
+        { address=0XE68903, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Devious Maya (attempt) - hangedman boss fight" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XE642DB, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="Blue Swimwear (Akihiko) - quantity" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XE68436, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 - Margaret door vanish" },
+        { address=0XE68436, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 - Margaret defeated" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE6481A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Possible time of day" },
+        { address=0X1363AF4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32 bit) timer at Priestess Boss fight" },
+      },
+    },
+  },
+}

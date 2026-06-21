@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Beyblade G-Revolution",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "beyblade-g-revolution",
+    file = "beyblade-g-revolution.zip",
+    hashes = {
+      { hash = "2448dbe0ddd454ad9b9217e2f3c64787", label = "Beyblade G-Revolution (Europe) (En,De,Es,It).gba" },
+      { hash = "78c34b8026991ab7b0a4990e1af5d9b5", label = "Beyblade G-Revolution (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9274, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits ($$$) (32 bits) (signed int)" },
+        { address=0X9275, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits ($$$) (32 bits) (signed int)" },
+        { address=0X9276, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits ($$$) (32 bits) (signed int)" },
+        { address=0X9277, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits ($$$) (32 bits) (signed int)" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XA1FA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="id of map place in world map" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X06A4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="id of defense ring select increased" },
+        { address=0X92F1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="attack ring id (0x00 -> 0x4c) increased" },
+        { address=0X92F2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="attack ring id (0x00 -> 0x1f) increased" },
+        { address=0X128C8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="damage on enemy (only during battle) increased" },
+        { address=0X128C8, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="damage on enemy (only during battle) empty" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0504, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Amount of Interactable Objects on Map / Or active bitflags that turn off instead of on" },
+      },
+    },
+  },
+}

@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "World Court Tennis",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Sports, Tennis"
+  },
+
+  rom = {
+    name = "world-court-tennis",
+    file = "world-court-tennis.zip",
+    hashes = {
+      { hash = "994d61834e2ee91313b75618ce213971", label = "World Court Tennis (USA).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X04EC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="(not) Demo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X02C0, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Player is Top-Character(right score)" },
+        { address=0X02C0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="0x00=Player is Bottom-Character(left score);" },
+        { address=0X02D0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bottom-Character Points(this is not player, but whoever is currently on the bottom and you switc" },
+        { address=0X02D1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top-Character points (not always CPU)" },
+        { address=0X02E0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="total points played" },
+      },
+      collectibles = {
+        { address=0X0641, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money value? increased" },
+        { address=0X0642, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="16-bit Money x10 (so divide the on-screen decimal by 10 to get the actual hex amount) increased" },
+      },
+    },
+  },
+}

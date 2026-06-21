@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Mind Palace",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mind-palace",
+    file = "mind-palace.zip",
+    hashes = {
+      { hash = "c1a363f6942b40609f3758d64a87bedc", label = "Mind Palace (World) (grouter).wasm" },
+      { hash = "d93332689a224096050083e67d27d14d", label = "Mind Palace (World) (Rev 1) (grouter).wasm" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X391C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Old - Puzzle 2 - Pieces in Goals" },
+        { address=0X70A8, type="u8", condition="eq", value=0X67, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal" },
+        { address=0X7B60, type="u8", condition="eq", value=0X67, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X67F4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Old - Current Block X Pos" },
+        { address=0X67F8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Old - Current Block Z Pos" },
+      },
+    },
+  },
+}

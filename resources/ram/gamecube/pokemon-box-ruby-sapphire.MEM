@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Pokémon Box: Ruby & Sapphire",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-box-ruby-sapphire",
+    file = "pokemon-box-ruby-sapphire.zip",
+    hashes = {
+      { hash = "a6757d42640434fd9c3485a3bd6eacd8", label = "Pokemon Box - Ruby & Sapphire (Europe) (En,Fr,De,Es,It) (Rev 1)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XABD6E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(EUR) Pokemon Level [ASCII]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Astérix & Obélix XXL 2: Mission - Las Vegum",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "asterix-obelix-xxl-2-mission-las-vegum",
+    file = "asterix-obelix-xxl-2-mission-las-vegum.zip",
+    hashes = {
+      { hash = "ccca02696159a2360bdbdf151febbd95", label = "Asterix & Obelix XXL 2 (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

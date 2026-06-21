@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Eco-Creatures: Save the Forest",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "eco-creatures-save-the-forest",
+    file = "eco-creatures-save-the-forest.zip",
+    hashes = {
+      { hash = "b7b03d2bd2d2f020adabc4d9dd860fa7", label = "Eco-Creatures - Save the Forest (USA).nds" },
+    }
+  },
+
+  events = {
+  },
+}

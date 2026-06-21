@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Ys III: Wanderers from Ys",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ys-iii-wanderers-from-ys",
+    file = "ys-iii-wanderers-from-ys.zip",
+    hashes = {
+      { hash = "9a5ebae24f81f2384141826e4e4cc0d2", label = "Ys III - Wanderers from Ys (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X25F404, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause status" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X81C0C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Adol's Level (Max: 0x10)" },
+        { address=0X823648, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total EXP needed to reach the next level (Max: 0xffff)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X81C0C8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Adol's HP (Max: 0xff) decreased" },
+        { address=0X81C0C8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Adol's HP (Max: 0xff) increased" },
+        { address=0X81C148, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Item - Total Herb (Max 0x01); heals HP decreased" },
+        { address=0X81C148, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Item - Total Herb (Max 0x01); heals HP increased" },
+        { address=0X81C154, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Item - Total Amulet (Max 0x03); damages on-screen enemies" },
+        { address=0X81C190, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Event Item - Spirit's Necklace (Redmont City Shop / Galbaran's Island); revives user if HP is br" },
+        { address=0X81C190, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Event Item - Spirit's Necklace (Redmont City Shop / Galbaran's Island); revives user if HP is br" },
+        { address=0X823646, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Adol's Max HP (Max: 0xff) decreased" },
+        { address=0X823646, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Adol's Max HP (Max: 0xff) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X81C0CC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Gold (Max: 0xffff) increased" },
+        { address=0X81C0E0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring 'MP' (Max: 0xff) increased" },
+        { address=0X81C0E4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Currently equipped ring increased" },
+        { address=0X81C0F8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Power Ring; increase STR increased" },
+        { address=0X81C0FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Shield Ring; increase DEF increased" },
+        { address=0X81C100, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Timer Ring; slows down enemies increased" },
+        { address=0X81C104, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Heal Ring; heals HP over time increased" },
+        { address=0X81C108, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Protect Ring; blocks all incoming attacks increased" },
+        { address=0X81C14C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Item - Total Brosha Elixir (Max 0x03); fully restores Ring MP increased" },
+        { address=0X823674, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring MP consumption timer; counts up every frame to specified value per ring and flips back to 0" },
+        { address=0X8236B4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Screen ID; each level starts with a Screen ID of 0x00 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X25F410, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bosses Defeated Pt. 1" },
+        { address=0X25F411, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bosses Defeated Pt. 2" },
+        { address=0X816820, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 1st Place (Milliseconds)" },
+        { address=0X816830, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 2nd Place (Milliseconds)" },
+        { address=0X816840, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 3rd Place (Milliseconds)" },
+        { address=0X816850, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 4th Place (Milliseconds)" },
+        { address=0X816860, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 5th Place (Milliseconds)" },
+        { address=0X816870, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 6th Place (Milliseconds)" },
+        { address=0X816880, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 7th Place (Milliseconds)" },
+        { address=0X816890, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 8th Place (Milliseconds)" },
+        { address=0X8168A0, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 9th Place (Milliseconds)" },
+        { address=0X8168B0, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush Ranking - 10th Place (Milliseconds)" },
+        { address=0X81C2F3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy state; can be used for bosses except for Garland (castle)" },
+        { address=0X81C318, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP; 0xfe when fight starts" },
+        { address=0X81C383, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy state; can be used for Garland (castle); flips back to 0x00 after scene and before the bos" },
+        { address=0X81C3A8, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Garland (Castle) boss HP / Galbaran Main Body HP; 0xfe when fight starts" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X81C0EC, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Currently equipped shield" },
+        { address=0X81C120, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wood Shield (T1)" },
+        { address=0X81C124, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Small Shield (T2)" },
+        { address=0X81C128, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Large Shield (T3)" },
+        { address=0X81C12C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Kite Shield (T4)" },
+        { address=0X81C130, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Battle Shield (T5)" },
+        { address=0X823642, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Player invincibility frames remaining after being hit; starts at 0x78 and counts down once every" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X25F444, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door / Screen transition interacted with; teleports to shops from any screen if value is changed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X25F55C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Most recent Boss Rush clear time (Milliseconds)" },
+        { address=0X8236B0, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Current level" },
+      },
+    },
+  },
+}

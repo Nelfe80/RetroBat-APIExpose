@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Tabaluga",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "tabaluga",
+    file = "tabaluga.zip",
+    hashes = {
+      { hash = "89f251b40b2420ae1dde4d22ca01ed72", label = "Tabaluga (Germany) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC246, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tabaluga - Health [8bit] decreased" },
+        { address=0XC246, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tabaluga - Health [8bit] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD900, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Map - Tiles of Blocks on Screen" },
+        { address=0XDA00, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Map - Collision of Blocks on Screen" },
+        { address=0XDC00, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Map - Collision of Blocks on Screen" },
+        { address=0XDE00, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Map - Water Collision of Blocks on Screen" },
+      },
+    },
+  },
+}

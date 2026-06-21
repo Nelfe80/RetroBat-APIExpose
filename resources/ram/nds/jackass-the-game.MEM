@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Jackass: The Game",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, party"
+  },
+
+  rom = {
+    name = "jackass-the-game",
+    file = "jackass-the-game.zip",
+    hashes = {
+      { hash = "2c44ab083ac0f4ebadf2174624b59c44", label = "Jackass - The Game DS (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA3F08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 1 suits unlocked" },
+        { address=0XA3F0C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Suits collected in level 1" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA3F58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bit) Mission 1 total score" },
+        { address=0XA3F70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bit) Mission 2 total score" },
+        { address=0X190B30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32bit) total score on current mission" },
+      },
+      collectibles = {
+        { address=0XA4470, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Medals increased" },
+      },
+    },
+  },
+}

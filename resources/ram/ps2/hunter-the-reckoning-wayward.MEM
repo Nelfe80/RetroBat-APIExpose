@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Hunter: The Reckoning - Wayward",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "hunter-the-reckoning-wayward",
+    file = "hunter-the-reckoning-wayward.zip",
+    hashes = {
+      { hash = "d27ffca21ad0db2a65faf8dd2d70ffd7", label = "Hunter - The Reckoning - Wayward (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X16E25B0, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X171C4D8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="SMG Kills in Level" },
+        { address=0X171C5E8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Innocents Saved in Level" },
+        { address=0X171C5EC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Innocents in Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X16C8378, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Dealt with Melee" },
+        { address=0X16C837C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Dealt with Guns" },
+        { address=0X16C8380, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Dealt with SMG" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10996CC, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Revolver Ammo in Clip" },
+        { address=0X10996EC, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Total Revolver Ammo" },
+      },
+    },
+  },
+}

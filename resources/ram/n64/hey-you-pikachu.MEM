@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hey You, Pikachu!",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Fighting, Simulation"
+  },
+
+  rom = {
+    name = "hey-you-pikachu",
+    file = "hey-you-pikachu.zip",
+    hashes = {
+      { hash = "1280c78f286fc1c437a4905ee42c47f1", label = "Hey You, Pikachu! (USA).z64" },
+    }
+  },
+
+  events = {
+  },
+}

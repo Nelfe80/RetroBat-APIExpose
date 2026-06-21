@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Word Munchers",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "word-munchers",
+    file = "word-munchers.zip",
+    hashes = {
+      { hash = "1f02c711f1df715bb45f34cecb6f45f2", label = "MECC-A153 Word Munchers v1.4 (4am crack).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

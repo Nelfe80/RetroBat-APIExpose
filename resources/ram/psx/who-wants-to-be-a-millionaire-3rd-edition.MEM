@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Who Wants to Be a Millionaire: 3rd Edition",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "who-wants-to-be-a-millionaire-3rd-edition",
+    file = "who-wants-to-be-a-millionaire-3rd-edition.zip",
+    hashes = {
+      { hash = "f4285eb46f3cecccb60d1e84f1d84df9", label = "Who Wants to Be a Millionaire - 3rd Edition (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1FFECC, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Available" },
+        { address=0X1FFECC, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X1FFECC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="50/50 lifeline increased" },
+        { address=0X1FFECC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="50/50 lifeline decreased" },
+        { address=0X1FFECD, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Available" },
+        { address=0X1FFECD, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X1FFECD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Phone a friend lifeline increased" },
+        { address=0X1FFECD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Phone a friend lifeline decreased" },
+        { address=0X1FFECE, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Available" },
+        { address=0X1FFECE, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X1FFECE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ask the audience lifeline increased" },
+        { address=0X1FFECE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ask the audience lifeline decreased" },
+      },
+    },
+  },
+}

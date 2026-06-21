@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Tomcat: The F-14 Fighter Simulator",
+    system = "atari7800",
+    system_name = "Atari 7800",
+    genre = "Simulation, Action, Shooter, Avion"
+  },
+
+  rom = {
+    name = "tomcat-the-f-14-fighter-simulator",
+    file = "tomcat-the-f-14-fighter-simulator.zip",
+    hashes = {
+      { hash = "c3903ab01a51222a52197dbfe6538ecf", label = "Tomcat - The F-14 Fighter Simulator (USA).a78" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0X00E3, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="AIM7" },
+        { address=0X00E3, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="AIM9" },
+      },
+    },
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Critical Blow",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "critical-blow",
+    file = "critical-blow.zip",
+    hashes = {
+      { hash = "393f0d7f92c39d662dfc7ae3b94254b8", label = "Critical Blow (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X68C59, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="rounds in options" },
+        { address=0X7E6A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="player 2 rounds won icons" },
+        { address=0X7E6A1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="player 1 rounds won icons" },
+      },
+      stage = {
+        { address=0X7E6B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="current stage" },
+        { address=0X7E6B9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="current stage" },
+        { address=0X138E4C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="current stage" },
+        { address=0X138E50, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="current stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X11A0C8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 1 actual health decreased" },
+        { address=0X11A0C8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 1 actual health increased" },
+        { address=0X130E68, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 1 health bar sprite decreased" },
+        { address=0X130E68, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 1 health bar sprite increased" },
+        { address=0X131200, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 1 health bar sprite decreased" },
+        { address=0X131200, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 1 health bar sprite increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X68C5A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time in options" },
+      },
+    },
+  },
+}

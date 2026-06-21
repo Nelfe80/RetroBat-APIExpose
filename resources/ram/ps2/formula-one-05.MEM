@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Formula One 05",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "formula-one-05",
+    file = "formula-one-05.zip",
+    hashes = {
+      { hash = "869812b88160ac2a21a7e3824b12e973", label = "Formula One 05 (Europe, Australia) (En,Fr,De,Es,It,Pt,Fi)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0XA016D2, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Champ Three (510 Points)" },
+        { address=0XA016D2, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Champ Two (540 Points)" },
+        { address=0XA016D2, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Champ One (600 Points)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA016D0, type="u8", condition="bit_true", bit=0, mask=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Learner (0 Points)" },
+        { address=0XA016D0, type="u8", condition="bit_true", bit=1, mask=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Novice One (30 Points)" },
+        { address=0XA016D0, type="u8", condition="bit_true", bit=2, mask=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="Novice Two (60 Points)" },
+        { address=0XA016D0, type="u8", condition="bit_true", bit=3, mask=0X08, action="SCORE_STATE", no_log=false, no_survey=false, desc="Novice Three (90 Points)" },
+        { address=0XA016D0, type="u8", condition="bit_true", bit=4, mask=0X10, action="SCORE_STATE", no_log=false, no_survey=false, desc="Novice Four (120 Points)" },
+        { address=0XA016D0, type="u8", condition="bit_true", bit=5, mask=0X20, action="SCORE_STATE", no_log=false, no_survey=false, desc="Rookie One (150 Points)" },
+        { address=0XA016D0, type="u8", condition="bit_true", bit=6, mask=0X40, action="SCORE_STATE", no_log=false, no_survey=false, desc="Rookie Two (180 Points)" },
+        { address=0XA016D0, type="u8", condition="bit_true", bit=7, mask=0X80, action="SCORE_STATE", no_log=false, no_survey=false, desc="Rookie Three (210 Points)" },
+        { address=0XA016D1, type="u8", condition="bit_true", bit=0, mask=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Rookie Four (240 Points)" },
+        { address=0XA016D1, type="u8", condition="bit_true", bit=1, mask=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Rookie Five (270 Points)" },
+        { address=0XA016D1, type="u8", condition="bit_true", bit=2, mask=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="Semi Pro One (300 Points)" },
+        { address=0XA016D1, type="u8", condition="bit_true", bit=3, mask=0X08, action="SCORE_STATE", no_log=false, no_survey=false, desc="Semi Pro Two (330 Points)" },
+        { address=0XA016D1, type="u8", condition="bit_true", bit=4, mask=0X10, action="SCORE_STATE", no_log=false, no_survey=false, desc="Semi Pro Three (360 Points)" },
+        { address=0XA016D1, type="u8", condition="bit_true", bit=5, mask=0X20, action="SCORE_STATE", no_log=false, no_survey=false, desc="Semi Pro Four (390 Points)" },
+        { address=0XA016D1, type="u8", condition="bit_true", bit=6, mask=0X40, action="SCORE_STATE", no_log=false, no_survey=false, desc="Semi Pro Five (420 Points)" },
+        { address=0XA016D1, type="u8", condition="bit_true", bit=7, mask=0X80, action="SCORE_STATE", no_log=false, no_survey=false, desc="Pro One (450 Points)" },
+        { address=0XA016D2, type="u8", condition="bit_true", bit=0, mask=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Pro Two (480 Points)" },
+      },
+      collectibles = {
+        { address=0XA016D4, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Street Circuit/Paul Ricard (Get all Gold Times in Timed Test Session mode)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA016CC, type="u8", condition="bit_true", bit=1, mask=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lotus 25 (Get all Silver times in Timed Test Session mode)" },
+        { address=0XA016CC, type="u8", condition="bit_true", bit=2, mask=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Williams FW08 (Get all Bronze times in Timed Test Session mode)" },
+        { address=0XA01B98, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Time Trials - Lap Time | Indianapolis" },
+        { address=0XA01BB0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial - Medals | Indianapolis" },
+        { address=0XA01C00, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Time Trials - Lap Time | Magny Cours" },
+        { address=0XA01C18, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trials - Medal | Magny-Cours" },
+      },
+    },
+  },
+}

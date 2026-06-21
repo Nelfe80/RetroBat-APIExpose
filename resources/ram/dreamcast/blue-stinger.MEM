@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Blue Stinger",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Adventure, Fighting, Horror"
+  },
+
+  rom = {
+    name = "blue-stinger",
+    file = "blue-stinger.zip",
+    hashes = {
+      { hash = "427632e4280bca1410cae5a8f6556f42", label = "Blue Stinger (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X24FB9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ammo // Eliot // Handgun Rounds" },
+        { address=0X24FB9E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ammo // Eliot // Plasma Gun Rounds" },
+        { address=0X24FBA0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ammo // Eliot // Bazooka Rounds" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X24F9EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Item // Life Hook increased" },
+        { address=0X24F9EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Item // Life Hook decreased" },
+      },
+      health = {
+        { address=0X24F896, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health // Janine Current decreased" },
+        { address=0X24F896, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health // Janine Current increased" },
+        { address=0X24FBCC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health // Eliot Current decreased" },
+        { address=0X24FBCC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health // Eliot Current increased" },
+        { address=0X24FBCE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health // Dogs Current decreased" },
+        { address=0X24FBCE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health // Dogs Current increased" },
+        { address=0X24FBD0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health // Eliot Max decreased" },
+        { address=0X24FBD0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health // Eliot Max increased" },
+        { address=0X24FBD2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health // Dogs Max decreased" },
+        { address=0X24FBD2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health // Dogs Max increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X24F9C5, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item // Clean Suit" },
+        { address=0X24FA07, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item // Santa Suit" },
+      },
+      weapon = {
+        { address=0X24F991, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Handgun" },
+        { address=0X24F992, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Plasma Gun" },
+        { address=0X24F993, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Bazooka" },
+        { address=0X24F994, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Shotgun" },
+        { address=0X24F995, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Napalm Gun" },
+        { address=0X24F996, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Acid Gun" },
+        { address=0X24F997, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Laser Gun" },
+        { address=0X24F998, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Ray Gun" },
+        { address=0X24F999, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Stun Rod" },
+        { address=0X24F99A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Ray Sword" },
+        { address=0X24F99B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Emergency Axe" },
+        { address=0X24F99C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Dogs // Missile Launcher" },
+        { address=0X24F99D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Dogs // Gatling Gun" },
+        { address=0X24F99E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Dogs // Rail Gun" },
+        { address=0X24F9AB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Dogs // Karate T-shirt" },
+        { address=0X24F9AC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Dogs // Bowgun" },
+        { address=0X24F9AE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Dogs // Wrestling T-Shirt" },
+        { address=0X24F9AF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Dogs // Club" },
+        { address=0X24F9F4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Dogs // Sumo T-shirt" },
+        { address=0X24F9F5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Metal Bat" },
+        { address=0X24F9F6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Iron Fists" },
+        { address=0X24F9F7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon // Eliot // Power Mixer" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X24F99F, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Eliot // Handgun Magazines" },
+        { address=0X24F9A0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Eliot // Plasma Gun Magazines" },
+        { address=0X24F9A1, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Eliot // Bazooka Magazines" },
+        { address=0X24F9A2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Eliot // Shotgun Magazines" },
+        { address=0X24F9A3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Eliot // Napalm Gun Magazines" },
+        { address=0X24F9A4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Eliot // Acid Gun Magazines" },
+        { address=0X24F9A5, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Eliot // Acid Gun Magazines" },
+        { address=0X24F9A6, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Eliot // Ray Gun Magazines" },
+        { address=0X24F9A7, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Dogs // Missile Launcher Magazines" },
+        { address=0X24F9A8, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Dogs // Gatling Gun Magazines" },
+        { address=0X24F9A9, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Dogs // Rail Gun Magazines" },
+        { address=0X24F9AD, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Dogs // Bowgun Magazines" },
+        { address=0X24FBB6, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo // Dogs // Bowgun Arrows" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1F273C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy / Boss Health // Current #1" },
+        { address=0X1F27A8, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy / Boss Health // Current #2" },
+        { address=0X24FC6B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Flags // Game State // Power Plant Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X24FA05, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Item // Stairway Switch Key" },
+      },
+    },
+  },
+}

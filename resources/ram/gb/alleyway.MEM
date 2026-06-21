@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Alleyway",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "alleyway",
+    file = "alleyway.zip",
+    hashes = {
+      { hash = "138c5fea51e0c9b3ab9075370582717c", label = "Alleyway (World) (Fr) (v1.51) (Emulation).gb" },
+      { hash = "91128778a332495f77699eaf3a37fe30", label = "Alleyway (World).gb" },
+      { hash = "981087f288bac171e3ca183fbe2d273b", label = "Alleyway (World) (Ru) (Cool-Spot).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCA43, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo value - 00=in game, 01-demo value" },
+        { address=0XCA49, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="demo and title screen countdown" },
+        { address=0XFFA4, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Loading screen" },
+        { address=0XFFA4, type="u8", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In game" },
+        { address=0XFFA4, type="u8", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Ball in motion" },
+        { address=0XFFA4, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Expoding ball animation" },
+        { address=0XFFA4, type="u8", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Level complete" },
+        { address=0XFFA4, type="u8", condition="eq", value=0X09, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Mario" },
+        { address=0XFFA4, type="u8", condition="eq", value=0X0B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCA45, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (1f is max)" },
+        { address=0XCA46, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (display only)" },
+      },
+      stage = {
+        { address=0XCA47, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus stage number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCA44, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XCA44, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFFCA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [16-bit hex]" },
+        { address=0XFFCC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top Score [16-bit hex]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCA48, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Special stage timer" },
+      },
+    },
+  },
+}

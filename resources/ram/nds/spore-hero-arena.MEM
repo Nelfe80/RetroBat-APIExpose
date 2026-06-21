@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Spore Hero Arena",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "spore-hero-arena",
+    file = "spore-hero-arena.zip",
+    hashes = {
+      { hash = "5e7bdf64bb4a454494d0496fc261b7d0", label = "Spore Hero Arena (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X12474E, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="1 Take on the World (MP)" },
+        { address=0X124759, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="1 World Worrior (Online)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X124740, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Full-Bodied," },
+        { address=0X124740, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Full-Bodied," },
+        { address=0X203CCE, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X24C8FC, type="u16le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0X203CCE, type="u8", condition="eq", value=0X64, action="HEALTH_STATE", no_log=false, no_survey=false, desc="full" },
+        { address=0X203CCE, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health (8 bit)" },
+        { address=0X203CD0, type="u8", condition="eq", value=0X64, action="HEALTH_STATE", no_log=false, no_survey=false, desc="full" },
+        { address=0X203CD0, type="u8", condition="eq", value=0X0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="empty" },
+        { address=0X203CD0, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy (8 bit)" },
+        { address=0X24C8FC, type="u16le", condition="eq", value=0X1000, action="HEALTH_STATE", no_log=false, no_survey=false, desc="full" },
+        { address=0X24C8FC, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health (16bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X123CA0, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="In game seconds counter 8-Bit" },
+      },
+    },
+  },
+}

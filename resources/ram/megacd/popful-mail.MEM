@@ -1,0 +1,136 @@
+return {
+  game = {
+    title = "Popful Mail",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "popful-mail",
+    file = "popful-mail.zip",
+    hashes = {
+      { hash = "9e155928a45983bb845f800ba6908f96", label = "Popful Mail (USA) (RE)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XEBC6, type="u16be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Shield" },
+        { address=0XEBCF, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round SHield" },
+        { address=0XFF0A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Seconds" },
+        { address=0XFF0D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Minutes" },
+      },
+      stage = {
+        { address=0XEC1C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XECAF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages Unlocked" },
+        { address=0XECB2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bit0-2 Elves Woods Unlocked Stages" },
+        { address=0XECB3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bit0-2 Mines Unlocked Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEC9F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0xff - Door unlocks after Happy Flames of Death" },
+      },
+      health = {
+        { address=0XA056, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Active Player HP decreased" },
+        { address=0XA056, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Active Player HP increased" },
+        { address=0XA8D6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Overlord HP decreased" },
+        { address=0XA8D6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Overlord HP increased" },
+        { address=0XA956, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Nutscracker Machine HP decreased" },
+        { address=0XA956, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Nutscracker Machine HP increased" },
+        { address=0XAB56, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0XAB56, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0XABD6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0XABD6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0XEBC0, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mail - HP decreased" },
+        { address=0XEBC0, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mail - HP increased" },
+        { address=0XEBD0, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tatt - HP decreased" },
+        { address=0XEBD0, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tatt - HP increased" },
+        { address=0XEBE0, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gaw - HP decreased" },
+        { address=0XEBE0, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gaw - HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XEBC2, type="u16be", condition="eq", value=0X00, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Unarmed" },
+        { address=0XEBC2, type="u16be", condition="eq", value=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Short Sword" },
+        { address=0XEBC2, type="u16be", condition="eq", value=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Dagger" },
+        { address=0XEBC2, type="u16be", condition="eq", value=0X03, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Boomerang" },
+        { address=0XEBC2, type="u16be", condition="eq", value=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Flame Sword" },
+        { address=0XEBC2, type="u16be", condition="eq", value=0X05, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Aura Blade" },
+        { address=0XEBCD, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Short Sword" },
+        { address=0XEBCD, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Dagger" },
+        { address=0XEBCD, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Boomerang" },
+        { address=0XEBCD, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Flame Sword" },
+        { address=0XEBCD, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Aura Blade" },
+        { address=0XEBD2, type="u16be", condition="eq", value=0X00, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Unarmed" },
+        { address=0XEBD2, type="u16be", condition="eq", value=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Fire Cane" },
+        { address=0XEBD2, type="u16be", condition="eq", value=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Dyno Cane" },
+        { address=0XEBD2, type="u16be", condition="eq", value=0X03, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Electro Cane" },
+        { address=0XEBD2, type="u16be", condition="eq", value=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Star Cane" },
+        { address=0XEBD2, type="u16be", condition="eq", value=0X05, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Aura Cane" },
+        { address=0XEBDD, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Fire Cane" },
+        { address=0XEBDD, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Dyno Cane" },
+        { address=0XEBDD, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Electro Cane" },
+        { address=0XEBDD, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Star Cane" },
+        { address=0XEBDD, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Aura Cane" },
+        { address=0XEBE2, type="u16be", condition="eq", value=0X00, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Unarmed" },
+        { address=0XEBE2, type="u16be", condition="eq", value=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Fire Ball" },
+        { address=0XEBE2, type="u16be", condition="eq", value=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Tail Attack" },
+        { address=0XEBE2, type="u16be", condition="eq", value=0X03, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Iron Claw" },
+        { address=0XEBE2, type="u16be", condition="eq", value=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Fire Breath" },
+        { address=0XEBE2, type="u16be", condition="eq", value=0X05, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Aura Beam" },
+        { address=0XEBED, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Fire Ball" },
+        { address=0XEBED, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Tail Attack" },
+        { address=0XEBED, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Iron Claw" },
+        { address=0XEBED, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Fire Breath" },
+        { address=0XEBED, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Aura Beam" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XEBC4, type="u16be", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Mail" },
+        { address=0XEBC6, type="u16be", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Shield" },
+        { address=0XEBCC, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Mail" },
+        { address=0XEBCF, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Shield" },
+        { address=0XEBEC, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Mail" },
+        { address=0XEBEF, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Band" },
+        { address=0XEBF2, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0XEC02, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Count - Gold Ring increased" },
+        { address=0XEC05, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Count - Gold B. increased" },
+        { address=0XEC3A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit2 Gold B. Chest in FR SC4 increased" },
+        { address=0XFF0C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Game Clear Hours increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA856, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0XECB0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit0-2 Unlocked Stages at Bosses Fort" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XEBC6, type="u16be", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wood Shield" },
+        { address=0XEBC6, type="u16be", condition="eq", value=0X03, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Large Shield" },
+        { address=0XEBC6, type="u16be", condition="eq", value=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Silver Shield" },
+        { address=0XEBCF, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wood Shield" },
+        { address=0XEBCF, type="u8", condition="bit_true", bit=2, mask=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Large Shield" },
+        { address=0XEBCF, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Silver Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XEC01, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Inventory Count - Door Key" },
+        { address=0XECA3, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="ff - Namo flips switch" },
+        { address=0XECAC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="0xff - Trap door activated" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEBA8, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Death counter - increases by one each time you die. Value hangs until the game is re-loaded." },
+      },
+    },
+  },
+}

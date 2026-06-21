@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Minky Momo no Panic Ball",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "minky-momo-no-panic-ball",
+    file = "minky-momo-no-panic-ball.zip",
+    hashes = {
+      { hash = "e7c22b3f0deca65ecdc2124477877452", label = "Minky Momo no Panic Ball {V1 mode}.d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X339A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X339B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives remaining increased" },
+        { address=0X339B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives remaining decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3398, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Score * 10" },
+      },
+    },
+  },
+}

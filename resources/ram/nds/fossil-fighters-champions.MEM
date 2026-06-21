@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fossil Fighters: Champions",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "fossil-fighters-champions",
+    file = "fossil-fighters-champions.zip",
+    hashes = {
+      { hash = "4c7a37da371611af577d3b0f1ccb32db", label = "Fossil Fighters Champions (USA) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+  },
+}

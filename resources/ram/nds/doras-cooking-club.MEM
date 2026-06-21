@@ -1,0 +1,34 @@
+return {
+  game = {
+    title = "Dora's Cooking Club",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "doras-cooking-club",
+    file = "doras-cooking-club.zip",
+    hashes = {
+      { hash = "630aa1f348cb579db171e6a83d935e02", label = "Dora's Cooking Club (Europe) (En,Fr,Es,Nl).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1292B8, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chopping Ingredients!" },
+        { address=0X1292B8, type="u8", condition="eq", value=0X0A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Drag Ingredients!" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1292D4, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Count a Set of Objects - Overall Average" },
+        { address=0X1292D8, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Count a Set of Objects - Number of beats" },
+        { address=0X1292DA, type="u16le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Normal Chef Hat" },
+        { address=0X1292DA, type="u16le", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Silver Chef Hat" },
+        { address=0X1292DA, type="u16le", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Golden Chef Hat" },
+      },
+    },
+  },
+}

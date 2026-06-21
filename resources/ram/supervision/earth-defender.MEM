@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Earth Defender",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "earth-defender",
+    file = "earth-defender.zip",
+    hashes = {
+      { hash = "9f130a26b3843d6a59da894b3692b978", label = "Earth Defender (USA, Europe).sv" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0X00AE, type="u8", condition="eq", value=0XFF, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss 1 defeated" },
+        { address=0X00AE, type="u8", condition="eq", value=0X64, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss 2 defeated" },
+      },
+    },
+  },
+}

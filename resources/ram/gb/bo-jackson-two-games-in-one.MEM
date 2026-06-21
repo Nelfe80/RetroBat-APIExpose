@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bo Jackson: Two Games in One",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "bo-jackson-two-games-in-one",
+    file = "bo-jackson-two-games-in-one.zip",
+    hashes = {
+      { hash = "24b4f33417fc95fe6b092bcd30605cb2", label = "Bo Jackson - Two Games in One (USA).gb" },
+    }
+  },
+
+  events = {
+  },
+}

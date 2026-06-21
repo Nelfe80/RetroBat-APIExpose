@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Radia Senki: Reimei Hen",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "radia-senki-reimei-hen",
+    file = "radia-senki-reimei-hen.zip",
+    hashes = {
+      { hash = "d8cb72cc00c627b8262d3897bbeea7d6", label = "Radia Senki - Reimei Hen (Japan) (En) (Dreamless,Jair,CX) (1.0).nes" },
+      { hash = "f520d2c3cf075a7421efc134ac3dbaee", label = "Radia Senki - Reimei Hen (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X60F6, type="u24le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="~Continued from 60f5~" },
+        { address=0X60F7, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="~Continued from 60f6~" },
+        { address=0X60F8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="~Continued from 60f7~" },
+        { address=0X60F9, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="~Continued from 60f8~" },
+        { address=0X60FA, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="~Continued from 60f9~" },
+        { address=0X60FB, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="~Continued from 60fa~" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6015, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+        { address=0X6035, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Saria level" },
+        { address=0X6075, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Haman Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1B16, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="ENEMY HEALTH FINALLY FOUND IT decreased" },
+        { address=0X1B16, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="ENEMY HEALTH FINALLY FOUND IT increased" },
+        { address=0X6013, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Max HP decreased" },
+        { address=0X6013, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Max HP increased" },
+        { address=0X6014, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Current HP decreased" },
+        { address=0X6014, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Current HP increased" },
+        { address=0X6033, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Saria max hp decreased" },
+        { address=0X6033, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Saria max hp increased" },
+        { address=0X6034, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Saria current hp decreased" },
+        { address=0X6034, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Saria current hp increased" },
+        { address=0X6053, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Daru Max HP decreased" },
+        { address=0X6053, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Daru Max HP increased" },
+        { address=0X6054, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Daru Current HP decreased" },
+        { address=0X6054, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Daru Current HP increased" },
+        { address=0X6093, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Baru Max HP decreased" },
+        { address=0X6093, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Baru Max HP increased" },
+        { address=0X6094, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Baru Current HP decreased" },
+        { address=0X6094, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Baru Current HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X60D0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+  },
+}

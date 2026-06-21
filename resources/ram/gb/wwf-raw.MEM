@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "WWF Raw",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-raw",
+    file = "wwf-raw.zip",
+    hashes = {
+      { hash = "6d2ab72fc3f632493a04fd432508067d", label = "WWF Raw (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XD422, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Luger | 01 = Hart | 02 = Michaels | 03 = Razor | 04 = Diesel | 05 = Doink | 06 = Taker | 07 = Yo" },
+      },
+      health = {
+        { address=0XCF10, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Energy decreased" },
+        { address=0XCF10, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Energy increased" },
+        { address=0XCF3F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2/Opponent Health decreased" },
+        { address=0XCF3F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2/Opponent Health increased" },
+      },
+    },
+  },
+}

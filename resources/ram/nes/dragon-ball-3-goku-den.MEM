@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Dragon Ball 3: Goku Den",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "dragon-ball-3-goku-den",
+    file = "dragon-ball-3-goku-den.zip",
+    hashes = {
+      { hash = "8069d6cd2720c97556ba4c2c9d5ca086", label = "Dragon Ball 3 - Gokuu Den (Japan).nes" },
+      { hash = "d1de969c4ada79f2e8392352abd9ef1d", label = "Dragon Ball 3 - Gokuu Den (Japan) (Rev 1).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0405, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="current hp of goku decreased" },
+        { address=0X0405, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="current hp of goku increased" },
+        { address=0X041F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max hp goku decreased" },
+        { address=0X041F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max hp goku increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Worm Whomper",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "worm-whomper",
+    file = "worm-whomper.zip",
+    hashes = {
+      { hash = "49999333cf35d0cb321802ca378a7af7", label = "Worm Whomper (USA, Europe).int" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X0DAC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player Score [16-bit] hex" },
+        { address=0X0DB4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player Score [16-bit] hex" },
+      },
+    },
+  },
+}

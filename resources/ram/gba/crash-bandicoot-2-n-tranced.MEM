@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Crash Bandicoot 2: N-Tranced",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "crash-bandicoot-2-n-tranced",
+    file = "crash-bandicoot-2-n-tranced.zip",
+    hashes = {
+      { hash = "03beecd053b2ddf56341a6a981c561fc", label = "Crash Bandicoot 2 - N-Tranced (Europe) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "617b2b2590e2925228dbdb162b05d6f6", label = "Crash Bandicoot 2 - N-Tranced (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7DAC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level [stability]" },
+        { address=0X7DAD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level Check (EU)" },
+        { address=0X7DB1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In-Level Check (US)" },
+        { address=0X8270, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Exiting Level Through Goal Check (US)" },
+        { address=0X8284, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Exiting Level Through Goal Check (EU) [32 Bit]" },
+        { address=0XA6D4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Wild Nile Ride 2=redgem 1=clear 0=complete" },
+        { address=0XA734, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total crates in current level (US)" },
+        { address=0XA744, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Last Loaded (US)" },
+        { address=0XA750, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total crates in current level (EU)" },
+        { address=0XA760, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Last Loaded (EU)" },
+        { address=0XEA7E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level Check 2?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA6EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (US) increased" },
+        { address=0XA6EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (US) decreased" },
+      },
+      health = {
+        { address=0X5924, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spaced Out Health decreased" },
+        { address=0X5924, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spaced Out Health increased" },
+        { address=0XA67F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power Ups Obtained/Bosses [US] [Bitcheck] decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA67F, type="u8", condition="eq", value=0X4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="CrunchSlide 5=Cocojump 3=Tropy 2=crashspin 1=trancerun 0=???" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB4DA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Relic?? 52=none 3a=gold increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA69B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Power Ups Obtained/Bosses [EU] [Bitcheck]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2AD0, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DEV-USEU-null block [516-bytes]" },
+        { address=0X8202, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current checkpoint (US)" },
+        { address=0XA6E8, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Crates broken in current level (US) - Note Found by Dexterspet" },
+        { address=0XA722, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Nitro Trigger Switch" },
+        { address=0XA74C, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Number of crates broken when breaking checkpoint crate (US)" },
+        { address=0XA754, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Game-US-Checkpoint-X" },
+        { address=0XA758, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Game-US-Checkpoint-Y" },
+        { address=0XA770, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Game-EU-Checkpoint-X" },
+        { address=0XA774, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Game-EU-Checkpoint-Y" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA719, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial Finish Type (US) [8-Bit] - Found by Dexterspet" },
+        { address=0XA720, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial Active Value (EU)" },
+        { address=0XA735, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial Finish Type (EU)" },
+      },
+    },
+  },
+}

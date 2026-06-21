@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mission: Impossible: Operation Surma",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "mission-impossible-operation-surma",
+    file = "mission-impossible-operation-surma.zip",
+    hashes = {
+      { hash = "54068c4366ce9072837003184b361a68", label = "Mission Impossible - Operation Surma (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

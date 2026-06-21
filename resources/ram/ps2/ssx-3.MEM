@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "SSX 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing, Sports"
+  },
+
+  rom = {
+    name = "ssx-3",
+    file = "ssx-3.zip",
+    hashes = {
+      { hash = "662c2c9772ef2943d4fdefa2c496a934", label = "SSX 3 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X4AA944, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="32bit Mac Best Combo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4AA6B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32bit Mac Crow's Nest Highest Score" },
+        { address=0X4AA96C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32bit Mac Most Points" },
+      },
+      collectibles = {
+        { address=0X4AA604, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32bit Mac Current Money increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4A9BB0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8bit Mac Snowflakes Launch Time" },
+        { address=0X4AA674, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="32bit Mac Snow Jam Quickest Time (seconds)" },
+        { address=0X4AA6B9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8bit Mac Launch Time Freestyle Medal" },
+        { address=0X4AA95C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit Mac Logest Air Time" },
+        { address=0X5305F0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="8bit Level/Area (careful, sticky)" },
+        { address=0X5A880C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Actual Timer SS1 dynamic" },
+      },
+    },
+  },
+}

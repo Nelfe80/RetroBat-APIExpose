@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Charlie and the Chocolate Factory",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "charlie-and-the-chocolate-factory",
+    file = "charlie-and-the-chocolate-factory.zip",
+    hashes = {
+      { hash = "8f894e945a95a9651bc1e02b673838b7", label = "Charlie and the Chocolate Factory (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

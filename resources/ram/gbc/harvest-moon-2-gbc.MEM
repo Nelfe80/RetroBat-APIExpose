@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Harvest Moon 2 GBC",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "harvest-moon-2-gbc",
+    file = "harvest-moon-2-gbc.zip",
+    hashes = {
+      { hash = "121cec82c0c9e7c476060ad2521739d4", label = "Harvest Moon 2 GBC (Germany) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "2b853ce3d85f790cc101c7bd6f8f1b91", label = "Harvest Moon 2 GBC (USA) (Fr) (v0.95).gbc" },
+      { hash = "74c9fe928dd97ae193e9f937ce340dcc", label = "Harvest Moon 2 GBC (Europe) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "a539a7a02639395ad8d7723199c81eae", label = "Harvest Moon 2 GBC (USA) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

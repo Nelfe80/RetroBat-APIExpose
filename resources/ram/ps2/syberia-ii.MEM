@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Syberia II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "syberia-ii",
+    file = "syberia-ii.zip",
+    hashes = {
+      { hash = "4576379012746ec0e1ff89eddc3602bc", label = "Syberia 2 (Europe)" },
+      { hash = "abcf1ce9dcdfc93a69163a66ec2da247", label = "Syberia II (Russia)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X49D5B4, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles On" },
+        { address=0X49D6A8, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles On" },
+      },
+    },
+  },
+}

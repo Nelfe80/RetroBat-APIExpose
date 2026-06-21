@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Gundam: The Battle Master",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Fighting"
+  },
+
+  rom = {
+    name = "gundam-the-battle-master",
+    file = "gundam-the-battle-master.zip",
+    hashes = {
+      { hash = "198abb0b453e251dd7ff0d963af68ad3", label = "Gundam the Battle Master (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XA250C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X153961, type="u8", condition="eq", value=0X70, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X153961, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="P1 Energy" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA250C, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X153949, type="u8", condition="eq", value=0X70, action="SHIELD_LOST", no_log=false, no_survey=false, desc="Shield Lost" },
+        { address=0X195709, type="u8", condition="eq", value=0X70, action="SHIELD_LOST", no_log=false, no_survey=false, desc="Shield Lost" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA2578, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Demo Timer" },
+      },
+    },
+  },
+}

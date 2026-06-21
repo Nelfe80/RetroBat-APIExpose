@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Zettai Zetsumei Toshi 3: Kowareyuku Machi to Kanojo no Uta",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "zettai-zetsumei-toshi-3-kowareyuku-machi-to-kanojo-no-uta",
+    file = "zettai-zetsumei-toshi-3-kowareyuku-machi-to-kanojo-no-uta.zip",
+    hashes = {
+      { hash = "a9f91bb89232699cfdda64237799c3ed", label = "Zettai Zetsumei Toshi 3 - Kowareyuku Machi to Kanojo no Uta (Japan) (En) (v1.1) (Geo-City Productions).iso" },
+      { hash = "aa84c0972712d8f3ce5887c1a6b0c006", label = "Zettai Zetsumei Toshi 3 - Kowareyuku Machi to Kanojo no Uta (Japan) (v1.02).iso" },
+    }
+  },
+
+  events = {
+  },
+}

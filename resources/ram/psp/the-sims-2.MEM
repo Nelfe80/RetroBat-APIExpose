@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "The Sims 2",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-sims-2",
+    file = "the-sims-2.zip",
+    hashes = {
+      { hash = "853efc99347c19ba9c599d9f25c8d0d6", label = "Sims 2, The (USA).iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XA29720, type="u32le", condition="eq", value=0X0911EBC8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadtree" },
+        { address=0XA29720, type="u32le", condition="eq", value=0X0906A6A8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadtree Meeting House" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X19C7CC4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time: Day" },
+        { address=0X19C7CC8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time: Hour" },
+      },
+    },
+  },
+}

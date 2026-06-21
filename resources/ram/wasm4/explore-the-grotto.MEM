@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Explore the Grotto",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "explore-the-grotto",
+    file = "explore-the-grotto.zip",
+    hashes = {
+      { hash = "267f705401f93937e1d8892f2bcc8fc8", label = "Explore the Grotto (World) (Donatien Rabiller).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X907C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x00 Title Screen," },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X926E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Health (0=Death, 1 per half heart, 6 at start)" },
+      },
+      health = {
+        { address=0X926F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0X926F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X92EA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0X92EB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Max Health" },
+      },
+    },
+  },
+}

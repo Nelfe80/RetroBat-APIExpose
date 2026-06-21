@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Haunting Ground",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Horror"
+  },
+
+  rom = {
+    name = "haunting-ground",
+    file = "haunting-ground.zip",
+    hashes = {
+      { hash = "77be36a54d51871acd2e9575f6c3a5f9", label = "Haunting Ground (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X88848B, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Cleared [dog mini game]" },
+        { address=0X8884EC, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beef Jerky [dog training ground - jar]" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X487A25, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Top Breeder, bit1 = Treasure Hunter" },
+        { address=0X8884EE, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Lavender [study]" },
+        { address=0X8884EE, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Magnesia" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8884E2, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Jar [Mansion 1F]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X88849C, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken marionete" },
+        { address=0X8884A2, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Defeat Debilitas without killing" },
+        { address=0X8884AC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit5 = unlocking the door leading to Chaos Forest" },
+        { address=0X8884DC, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken golden jar [kitchen]" },
+        { address=0X8884DC, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red vases [nursery]" },
+        { address=0X8884DC, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red vases [area under balcony]" },
+        { address=0X8884DC, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red jar" },
+        { address=0X8884DC, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red jar [refractor room]" },
+        { address=0X8884DD, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red vases [court]" },
+        { address=0X8884DD, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red vase [castle main gate]" },
+        { address=0X8884DE, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken golden jar [dog training grounds]" },
+        { address=0X8884DE, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884DE, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884DE, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884DF, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [mansion]" },
+        { address=0X8884DF, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884DF, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884DF, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884DF, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884DF, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884DF, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Chaos Forest]" },
+        { address=0X8884E3, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Viola Medallion [Hidden 4]" },
+        { address=0X8884E3, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Medallion [Hidden 5]" },
+        { address=0X8884E3, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Medallion [Hidden 6]" },
+        { address=0X8884E3, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Refined Antimony [Hidden 10]" },
+        { address=0X8884E8, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [mansion]" },
+        { address=0X8884E8, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [mansion]" },
+        { address=0X8884E8, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [mansion]" },
+        { address=0X8884EE, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red jar [House]" },
+        { address=0X8884EF, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red jar [House]" },
+        { address=0X8884F5, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [mansion]" },
+        { address=0X8884F5, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [mansion]" },
+        { address=0X8884F6, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [mansion]" },
+        { address=0X8884FA, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red jar [Tower]" },
+        { address=0X8884FB, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="red broken jar [Tower]" },
+        { address=0X8884FB, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red jar [House of Truth]" },
+        { address=0X8884FB, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="broken red jar [House of Truth]" },
+        { address=0X8884FC, type="u8", condition="bit_true", bit=7, mask=0X80, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Panic [door close at room with type writter]" },
+      },
+    },
+  },
+}

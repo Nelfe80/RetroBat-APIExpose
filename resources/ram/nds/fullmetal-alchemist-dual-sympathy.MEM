@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Fullmetal Alchemist: Dual Sympathy",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Beat 'em Up"
+  },
+
+  rom = {
+    name = "fullmetal-alchemist-dual-sympathy",
+    file = "fullmetal-alchemist-dual-sympathy.zip",
+    hashes = {
+      { hash = "ce52b9e78a945840833fe2d808d2c47d", label = "Fullmetal Alchemist - Dual Sympathy (Europe).nds" },
+    }
+  },
+
+  events = {
+    combat = {
+      enemies = {
+        { address=0X23A30E, type="u8", condition="eq", value=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sloth's boss chamber" },
+        { address=0X23A30E, type="u8", condition="eq", value=0X5A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Greed's second boss chamber (Story)" },
+        { address=0X23A30E, type="u8", condition="eq", value=0X5B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Greed's first boss chamber" },
+        { address=0X23A30E, type="u8", condition="eq", value=0X5C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Greed's second boss chamber (Character)" },
+        { address=0X23A30E, type="u8", condition="eq", value=0X6C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bald's boss chamber" },
+        { address=0X23A30E, type="u8", condition="eq", value=0X97, action="BOSS_HIT", no_log=false, no_survey=false, desc="Wrath's boss chamber (Character)" },
+        { address=0X23A30E, type="u8", condition="eq", value=0XCD, action="BOSS_HIT", no_log=false, no_survey=false, desc="Number 48's boss chamber" },
+        { address=0X23A30E, type="u8", condition="eq", value=0XF9, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dante's boss chamber" },
+        { address=0X23A30E, type="u8", condition="eq", value=0XFA, action="BOSS_HIT", no_log=false, no_survey=false, desc="Envy's boss chamber" },
+        { address=0X23A30E, type="u8", condition="eq", value=0XFB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pride's boss chamber" },
+      },
+    },
+  },
+}

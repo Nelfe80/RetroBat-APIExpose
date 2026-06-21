@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Indiana Jones and the Temple of Doom",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "indiana-jones-and-the-temple-of-doom",
+    file = "indiana-jones-and-the-temple-of-doom.zip",
+    hashes = {
+      { hash = "b7ff77f70a15a05295f8a7b104bd8907", label = "Indiana Jones and the Temple of Doom side A.woz" },
+      { hash = "71e31e6ab2bf001f7838e75e9811ca33", label = "Indiana Jones and the Temple of Doom side B.woz" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0804, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E4F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level transition" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0804, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - Starting with 5 increased" },
+        { address=0X0804, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - Starting with 5 decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0807, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] Score" },
+      },
+    },
+  },
+}

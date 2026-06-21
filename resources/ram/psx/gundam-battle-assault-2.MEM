@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Gundam: Battle Assault 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "gundam-battle-assault-2",
+    file = "gundam-battle-assault-2.zip",
+    hashes = {
+      { hash = "260665cc4567f21be361f6f1807de0a3", label = "Gundam Battle Assault 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDF804, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Everything else" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X180B6C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X180B6C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X180B74, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP Bars decreased" },
+        { address=0X180B74, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP Bars increased" },
+        { address=0X186E26, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X186E26, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X186E36, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X186E36, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XDF844, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Player 1 Mobile Suit Selection ID ;" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDF3BF, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack A Unlock Message" },
+        { address=0XDF3C0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack B Unlock Message" },
+        { address=0XDF802, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack A" },
+        { address=0XDF802, type="u8", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack B" },
+        { address=0XDF802, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Mode ;" },
+        { address=0XDF82A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Survival Mode Win Counter," },
+      },
+    },
+  },
+}

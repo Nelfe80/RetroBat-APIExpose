@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Dragon's Lair",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "dragons-lair",
+    file = "dragons-lair.zip",
+    hashes = {
+      { hash = "5f2be574b796fadd87574b7287138569", label = "Dragon's Lair (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1979F, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X197A6, type="u16be", condition="eq", value=0X95F4, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X197A6, type="u16be", condition="eq", value=0X95B4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X197A6, type="u16be", condition="eq", value=0X95BC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X197A6, type="u16be", condition="eq", value=0X95C4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X197A6, type="u16be", condition="eq", value=0X95CC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0X197A6, type="u16be", condition="eq", value=0X95D4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0X197A6, type="u16be", condition="eq", value=0X95DC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0X197A6, type="u16be", condition="eq", value=0X95E4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7" },
+        { address=0X197A6, type="u16be", condition="eq", value=0X95EC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dragon's Lair" },
+        { address=0X197A6, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID [16-Bit] (Each level is a group of scenes in a set order)" },
+        { address=0X197AE, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="'Next' Level ID (Levels 3 and 4 can be swapped in either order, and Levels 5 and 6 can too)" },
+        { address=0X197B0, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X197B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 2 of Current Level Played?" },
+        { address=0X197B1, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X197B1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 1 of Current Level Played?" },
+        { address=0X197B2, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X197B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 4 of Current Level Played?" },
+        { address=0X197B3, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X197B3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 3 of Current Level Played?" },
+        { address=0X197B5, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X197B5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 5 of Current Level Played?" },
+        { address=0X197CA, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 1 ID in Current Level" },
+        { address=0X197CE, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 2 ID in Current Level" },
+        { address=0X197D2, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 3 ID in Current Level" },
+        { address=0X197D6, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 4 ID in Current Level" },
+        { address=0X197DA, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scene 5 ID in Current Level" },
+      },
+      stage = {
+        { address=0X197A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gets set to 1 after... something? Usually the third stage when it happens. Especially when the 4" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X19760, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0xff When in scene, 0x00 with death" },
+        { address=0X19761, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Completed Scene/died on final action of scene" },
+        { address=0X1979F, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="Starting Lives (Shown as Lives: 5)" },
+        { address=0X1979F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1979F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+  },
+}

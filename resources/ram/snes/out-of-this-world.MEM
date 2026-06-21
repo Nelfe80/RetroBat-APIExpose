@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Out of This World",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "out-of-this-world",
+    file = "out-of-this-world.zip",
+    hashes = {
+      { hash = "8b8acdec1c2345477ddec5516413c2a1", label = "Out of This World (USA).sfc" },
+      { hash = "eca6ce2559706e1ddfb23e933818a465", label = "Out of this World (USA) (MSU-1) (Conn,JUD6MENT,PepilloPEV,Polargames,Relikk).sfc" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X0C4E, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="16bit Gun ammo [hex] 3e8=max [Used for a lot of other things]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Buzz! Brain Bender",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "buzz-brain-bender",
+    file = "buzz-brain-bender.zip",
+    hashes = {
+      { hash = "ec1c0f0a0795c69434759c9d801780f9", label = "Buzz! Brain Bender (Europe) (En,Fr,De,Es,It,Nl,Pt,Pl).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Las Vegas Blackjack",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "las-vegas-blackjack",
+    file = "las-vegas-blackjack.zip",
+    hashes = {
+      { hash = "3430691fb9c0367505634909be0297be", label = "Blackjack (France).bin" },
+      { hash = "972d38914e5aa8e80460b7d32c7c94b5", label = "Las Vegas Blackjack (USA, Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

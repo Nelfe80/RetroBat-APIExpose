@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Namco Museum",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "namco-museum",
+    file = "namco-museum.zip",
+    hashes = {
+      { hash = "60ac7a006e8a00581b832ceb8a000305", label = "Namco Museum (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10BDC, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X10BDC, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-Game" },
+        { address=0X18DD3, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X2288C, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0000, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mrs. Pacman - Level" },
+      },
+      stage = {
+        { address=0X222F4, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Perfect" },
+        { address=0X222F4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Galaga - Bonus Stage Kills" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAE34, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Life" },
+        { address=0XAE34, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0XAE34, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 Lives" },
+        { address=0XAE34, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="5 Lives" },
+        { address=0XAE34, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ms. Pac-Man - Lives Settings increased" },
+        { address=0XAE34, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ms. Pac-Man - Lives Settings decreased" },
+        { address=0XAE54, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0XAE54, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 Lives" },
+        { address=0XAE54, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="4 Lives" },
+        { address=0XAE54, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="5 Lives" },
+        { address=0XAE54, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Galga - Lives Settings increased" },
+        { address=0XAE54, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Galga - Lives Settings decreased" },
+        { address=0XAE9C, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Life" },
+        { address=0XAE9C, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+        { address=0XAE9C, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 Lives" },
+        { address=0XAE9C, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="5 Lives" },
+        { address=0XAE9C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dig Dug - Lives Settings increased" },
+        { address=0XAE9C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dig Dug - Lives Settings decreased" },
+        { address=0XF848, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="3" },
+        { address=0XF848, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="5" },
+        { address=0XF848, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Galaxian - Lives Settings increased" },
+        { address=0XF848, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Galaxian - Lives Settings decreased" },
+        { address=0X10AA0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Mrs. Pacman - Lives increased" },
+        { address=0X10AA0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mrs. Pacman - Lives decreased" },
+        { address=0X16560, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dig Dug - Lives Counter [8bit] increased" },
+        { address=0X16560, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dig Dug - Lives Counter [8bit] decreased" },
+        { address=0X16636, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X16676, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X166B6, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X166F6, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X16736, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X16776, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X167B6, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X167F6, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X18DE4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Galaxian - 1UP Score [32bit] increased" },
+        { address=0X18DE4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Galaxian - 1UP Score [32bit] decreased" },
+        { address=0X18E12, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Galaxian - Lives Counter increased" },
+        { address=0X18E12, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Galaxian - Lives Counter decreased" },
+        { address=0X2288C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Galaga - Life Counter [8bit] increased" },
+        { address=0X2288C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Galaga - Life Counter [8bit] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X10AB8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mrs. Pacman - points" },
+        { address=0X1655C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dig Dug - Score [32bit]" },
+        { address=0X21464, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Galaga - Score - Ones Place [Lower4]" },
+        { address=0X21465, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Galaga - Score - Tens Place [Lower4]" },
+        { address=0X21466, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Galaga - Score - Hundreds Place [Lower4]" },
+        { address=0X21467, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Galaga - Score - Thousands Place [Lower4]" },
+        { address=0X21468, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Galaga - Score - Ten-Thousands Place [Lower4]" },
+        { address=0X21469, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Galaga - Score - Hundreds-Thousands Place [Lower4]" },
+        { address=0X2146A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Galaga - Score - Millions Place [Lower4]" },
+        { address=0X2146B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Galaga - Score - Ten-Millions Place [Lower4]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0018, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ms. Pac-Man - Dots Eaten in Maze Counter (Deathless)" },
+        { address=0X163C4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dig Dug - Continue Timer [8bit]" },
+        { address=0X1657C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Dig Dug - Round Counter" },
+        { address=0X1836C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Galaxian - Stage Counter" },
+        { address=0X2288D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Galaga - Stage Counter [8bit]" },
+      },
+    },
+  },
+}

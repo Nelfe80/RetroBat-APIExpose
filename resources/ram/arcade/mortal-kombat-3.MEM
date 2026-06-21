@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Mortal Kombat 3",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "mortal-kombat-3",
+    file = "mortal-kombat-3.zip",
+    hashes = {
+      { hash = "3a6acd06f1f6e1d3d7c813cfba4bb29f", label = "mk3.7z <Mortal Kombat 3 (rev 2.1)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC12C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode" },
+        { address=0XC12C, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over/Lost Treasures" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC12C, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round End" },
+        { address=0XC12C, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Intro" },
+        { address=0XC14E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Wins" },
+        { address=0XC2C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Round Wins" },
+        { address=0XC422, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fatality" },
+        { address=0XC422, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pit Fatality" },
+        { address=0XC422, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Animality" },
+        { address=0XC422, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Friendship" },
+        { address=0XC422, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Babality" },
+        { address=0XC422, type="u8", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Brutality" },
+        { address=0XC422, type="u8", condition="eq", value=0XFFFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Logo appears" },
+        { address=0XC448, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Match - Current Round" },
+        { address=0XC44A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1" },
+        { address=0XC44A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2" },
+        { address=0XC44A, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finish Him" },
+        { address=0XC44A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round - Victory State" },
+        { address=0XC458, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Won in a Row" },
+        { address=0XC4DE, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fatality" },
+        { address=0XC4DE, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pit Fatality" },
+        { address=0XC4DE, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Animality" },
+        { address=0XC4DE, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Friendship" },
+        { address=0XC4DE, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Babality" },
+        { address=0XC4DE, type="u8", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Brutality" },
+      },
+      stage = {
+        { address=0XC442, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Subway" },
+        { address=0XC442, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Street" },
+        { address=0XC442, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Bank" },
+        { address=0XC442, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rooftop" },
+        { address=0XC442, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Balcony" },
+        { address=0XC442, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Bridge" },
+        { address=0XC442, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Soul Chamber" },
+        { address=0XC442, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bell Tower" },
+        { address=0XC442, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Temple" },
+        { address=0XC442, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Graveyard" },
+        { address=0XC442, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Pit III" },
+        { address=0XC442, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hidden Portal" },
+        { address=0XC442, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Noob's Dorfen" },
+        { address=0XC442, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game - Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC148, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - HP [16 bits] (0xa6 = Max HP) decreased" },
+        { address=0XC148, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - HP [16 bits] (0xa6 = Max HP) increased" },
+        { address=0XC2BE, type="u16le", condition="eq", value=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="< Frosty" },
+        { address=0XC2BE, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 - HP [16 bits]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC558, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocking Disabled" },
+      },
+    },
+  },
+}

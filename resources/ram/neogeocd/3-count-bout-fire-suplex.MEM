@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "3 Count Bout | Fire Suplex",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "3-count-bout-fire-suplex",
+    file = "3-count-bout-fire-suplex.zip",
+    hashes = {
+      { hash = "855d8a5d9e63593f1dc5d045def08932", label = "Fire Suplex ~ 3 Count Bout (Japan, USA) (En,Ja)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XA1C5, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Play Time" },
+      },
+    },
+  },
+}

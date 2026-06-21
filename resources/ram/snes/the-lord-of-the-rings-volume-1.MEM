@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "The Lord of the Rings: Volume 1",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "the-lord-of-the-rings-volume-1",
+    file = "the-lord-of-the-rings-volume-1.zip",
+    hashes = {
+      { hash = "d44a415b0fa893b73648452d97dadad2", label = "J.R.R. Tolkien's The Lord of the Rings - Volume 1 (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0374, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X0374, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Inventory" },
+        { address=0X0374, type="u8", condition="bit_true", bit=2, mask=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Dialogue Window active" },
+        { address=0X0374, type="u8", condition="bit_true", bit=7, mask=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="Out of the game" },
+        { address=0X1449, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Pages from the book shown at the beginning and in the credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0252, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current Level (Samwise Gamgee)" },
+        { address=0X0254, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current Level (Merry Brandybuck)" },
+        { address=0X0256, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current Level (Frodo)" },
+        { address=0X0258, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current Level (Pippin Took)" },
+        { address=0X025A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current Level (Legolas)" },
+        { address=0X025C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current Level (Aragorn)" },
+        { address=0X025E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current Level (Gimli)" },
+        { address=0X0260, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current Level (Gandalf)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0220, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Current HP (Samwise Gamgee) decreased" },
+        { address=0X0220, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Current HP (Samwise Gamgee) increased" },
+        { address=0X0222, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Current HP (Merry Brandybuck) decreased" },
+        { address=0X0222, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Current HP (Merry Brandybuck) increased" },
+        { address=0X0224, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0224, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X0226, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Current HP (Pippin Took) decreased" },
+        { address=0X0226, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Current HP (Pippin Took) increased" },
+        { address=0X0228, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Current HP (Legolas) decreased" },
+        { address=0X0228, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Current HP (Legolas) increased" },
+        { address=0X022A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Current HP (Aragorn) decreased" },
+        { address=0X022A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Current HP (Aragorn) increased" },
+        { address=0X022C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Current HP (Gimli) decreased" },
+        { address=0X022C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Current HP (Gimli) increased" },
+        { address=0X022E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Current HP (Gandalf) decreased" },
+        { address=0X022E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Current HP (Gandalf) increased" },
+        { address=0X0232, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Max HP (Samwise Gamgee) decreased" },
+        { address=0X0232, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Max HP (Samwise Gamgee) increased" },
+        { address=0X0234, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Max HP (Merry Brandybuck) decreased" },
+        { address=0X0234, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Max HP (Merry Brandybuck) increased" },
+        { address=0X0236, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Max HP (Frodo) decreased" },
+        { address=0X0236, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Max HP (Frodo) increased" },
+        { address=0X0238, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Max HP (Pippin Took) decreased" },
+        { address=0X0238, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Max HP (Pippin Took) increased" },
+        { address=0X023A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Max HP (Legolas) decreased" },
+        { address=0X023A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Max HP (Legolas) increased" },
+        { address=0X023C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Max HP (Aragorn] decreased" },
+        { address=0X023C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Max HP (Aragorn] increased" },
+        { address=0X023E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Max HP (Gimli) decreased" },
+        { address=0X023E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Max HP (Gimli) increased" },
+        { address=0X0240, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[BCD] Max HP (Gandalf) decreased" },
+        { address=0X0240, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[BCD] Max HP (Gandalf) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0262, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon (Samwise Gamgee)" },
+        { address=0X0264, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon (Merry Brandybuck)" },
+        { address=0X0268, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon (Pippin Took)" },
+        { address=0X026A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon (Legolas)" },
+        { address=0X026C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon (Aragorn)" },
+        { address=0X026E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon (Gimli)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0092, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] Amount of gold increased" },
+        { address=0X0F49, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Note about ring wraiths increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Taiko no Tatsujin: Taiko Drum Master",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "taiko-no-tatsujin-taiko-drum-master",
+    file = "taiko-no-tatsujin-taiko-drum-master.zip",
+    hashes = {
+      { hash = "a32e3c16a52841fe505f7ce1f63d2832", label = "Taiko no Tatsujin - Taiko Drum Master (Japan) (Tatacon Doukon Set)" },
+      { hash = "d95badfd28afd9db4e517701d63f900f", label = "Taiko no Tatsujin - Taiko Drum Master (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X875210, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Variation [32bit]" },
+      },
+      events = {
+        { address=0X8752A4, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 1 - Max Combo [32bit]" },
+        { address=0X875324, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 2 - Max Combo [32bit]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8752BC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Player 1 - Clear State [32bit]" },
+        { address=0X87533C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Player 2 - Clear State [32bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8752A0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 - Score [32bit]" },
+        { address=0X8752C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 - Top Score-Flag [32bit]" },
+        { address=0X875320, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 - Score [32bit]" },
+        { address=0X875348, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 - Top Score-Flag [32bit]" },
+        { address=0X876A7C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame - Watermelon Eating Contest - Highscore [32bit]" },
+        { address=0X876A94, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame - Fireworks Festival - Highscore [32bit]" },
+        { address=0X876AAC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame - Reach the Helicopter - Highscore [32bit]" },
+      },
+    },
+  },
+}

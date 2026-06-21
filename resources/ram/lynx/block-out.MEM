@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Block Out",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "block-out",
+    file = "block-out.zip",
+    hashes = {
+      { hash = "c81abf2919effd525b83c2103b75e6ca", label = "Block Out (USA, Europe).lnx" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X08FB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo/Pause Check" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X08E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current/Selected Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5465, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-Bit] Current Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XADAE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blockset" },
+      },
+    },
+  },
+}

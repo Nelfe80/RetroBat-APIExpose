@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Time Scanner",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "time-scanner",
+    file = "time-scanner.zip",
+    hashes = {
+      { hash = "5699c94f8e73f50bf551d9eebf811854", label = "timescan.7z <Time Scanner (set 2, System 16B)>" },
+    }
+  },
+
+  events = {
+  },
+}

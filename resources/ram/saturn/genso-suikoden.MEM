@@ -1,0 +1,107 @@
+return {
+  game = {
+    title = "Genso Suikoden",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "genso-suikoden",
+    file = "genso-suikoden.zip",
+    hashes = {
+      { hash = "d645021ff8adaada3398eee3313c321b", label = "Gensou Suikoden (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD1BBE, type="u8", condition="eq", value=0X63, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD02A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tir McDohl - Current Level" },
+        { address=0XD02D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tir McDohl - Weapon Level" },
+        { address=0XD0328, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gremio - Weapon Level" },
+        { address=0XD0378, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pahn - Weapon Level" },
+        { address=0XD0390, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cleo - Current Level" },
+        { address=0XD03C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cleo - Weapon Level" },
+        { address=0XD0418, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ted - Weapon Level" },
+        { address=0X175E10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ending Background?" },
+      },
+      zone = {
+        { address=0XD002F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="0x01 - On world map?" },
+        { address=0XD1BBE, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD0298, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tir McDohl - Current HP decreased" },
+        { address=0XD0298, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tir McDohl - Current HP increased" },
+        { address=0XD029A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tir McDohl - Max HP decreased" },
+        { address=0XD029A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tir McDohl - Max HP increased" },
+        { address=0XD0388, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cleo - Max HP decreased" },
+        { address=0XD0388, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cleo - Max HP increased" },
+        { address=0XD038A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cleo - Current HP decreased" },
+        { address=0XD038A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cleo - Current HP increased" },
+        { address=0XD4708, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 1 - Max HP decreased" },
+        { address=0XD4708, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 1 - Max HP increased" },
+        { address=0XD470A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 1 - Current HP decreased" },
+        { address=0XD470A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 1 - Current HP increased" },
+        { address=0XD475E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 2 - Current HP decreased" },
+        { address=0XD475E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 2 - Current HP increased" },
+        { address=0XD47B0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 3 - Max HP decreased" },
+        { address=0XD47B0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 3 - Max HP increased" },
+        { address=0XD47B2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 3 - Current HP decreased" },
+        { address=0XD47B2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 3 - Current HP increased" },
+        { address=0XD4806, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 4 - Current HP decreased" },
+        { address=0XD4806, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 4 - Current HP increased" },
+        { address=0XD485A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 5 - Current HP decreased" },
+        { address=0XD485A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 5 - Current HP increased" },
+        { address=0XD48AC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 6 - Max HP decreased" },
+        { address=0XD48AC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 6 - Max HP increased" },
+        { address=0XD48AE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party Slot 6 - Current HP decreased" },
+        { address=0XD48AE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party Slot 6 - Current HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XD00A3, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Ninja Suit" },
+        { address=0XD023A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitflags] Treasure" },
+      },
+      weapon = {
+        { address=0XD02D9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tir - Weapon ID" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD001C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Overflow increased" },
+        { address=0XD001E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0XD00BC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Silver Ring increased" },
+        { address=0XD00C2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Guard Ring increased" },
+        { address=0XD00C4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Power Ring increased" },
+        { address=0XD00C5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Speed Ring increased" },
+        { address=0XD00C9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Gold Necklace increased" },
+        { address=0XD023B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0XD023C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0XD023D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflags] Treasure increased" },
+        { address=0XD4DC6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money obtained from battle increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD00D2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Wooden Shield" },
+        { address=0XD00D4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Chaos Shield" },
+        { address=0XD00D5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Steel Shield" },
+        { address=0XD00D7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rock's Vault - Item Quantity - Earth Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD02E1, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Tir McDohl - Rune Attached" },
+      },
+    },
+  },
+}

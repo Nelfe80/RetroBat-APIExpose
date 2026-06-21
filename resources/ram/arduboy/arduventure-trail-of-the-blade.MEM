@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Arduventure: Trail of the Blade",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "arduventure-trail-of-the-blade",
+    file = "arduventure-trail-of-the-blade.zip",
+    hashes = {
+      { hash = "e99120c72e53b6aaf7676b4494059c02", label = "Arduventure - Trail of the Blade (World) (Team A.R.G.).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X01B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy Level" },
+        { address=0X022E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X01B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X01B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X0226, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X0226, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X0227, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X0227, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0238, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Game Triggers (Treasures)" },
+        { address=0X0239, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Game Triggers (Treasures)" },
+      },
+      weapon = {
+        { address=0X023D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[bitflags] Weapons Obtained" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X022A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0236, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[bitflags] bossActiveAlive" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0235, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Last Door Entered" },
+      },
+    },
+  },
+}

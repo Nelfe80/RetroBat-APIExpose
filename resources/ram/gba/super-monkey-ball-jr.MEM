@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Super Monkey Ball Jr.",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Maze"
+  },
+
+  rom = {
+    name = "super-monkey-ball-jr",
+    file = "super-monkey-ball-jr.zip",
+    hashes = {
+      { hash = "1e5a3679bb64a87ea2e23774a672ca7d", label = "Super Monkey Ball Jr. (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19FC, type="u8", condition="eq", value=0X05, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1A02, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X230C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[Credits Minigame] Distance Remaining" },
+        { address=0XAC57, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Unlocked" },
+        { address=0XD7A4, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Bananas Collected" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X406A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Monkey Fight] P1 Rounds Won" },
+        { address=0X40D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Monkey Fight] P2 Rounds Won" },
+        { address=0X413A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Monkey Fight] P3 Rounds Won" },
+        { address=0X41A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Monkey Fight] P4 Rounds Won" },
+        { address=0XDA3D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 1st Set Cleared" },
+        { address=0XDA3E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 2nd Set Cleared" },
+        { address=0XDA3F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 3rd Set Cleared" },
+        { address=0XDA40, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 4th Set Cleared" },
+        { address=0XDA41, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 5th Set Cleared" },
+        { address=0XDA42, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 6th Set Cleared" },
+        { address=0XDA43, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 7th Set Cleared" },
+        { address=0XDA44, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 8th Set Cleared" },
+        { address=0XDA45, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 9th Set Cleared" },
+        { address=0XDA46, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode 10th Set Cleared" },
+      },
+      stage = {
+        { address=0X1322, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="total bananas in a stage" },
+        { address=0X1324, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="remaining bananas in a stage (all stages)" },
+        { address=0X1352, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Total bananas in a stage (all stages)" },
+        { address=0X1354, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Remaining bananas in a stage (all stages)" },
+        { address=0X1379, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="this might have to do with stage tilt but that's not very useful" },
+        { address=0X19FC, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Practice Mode Stage Select" },
+        { address=0XAC56, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Master Stages Unlocked" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAADC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life count increased" },
+        { address=0XAADC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life count decreased" },
+        { address=0XDA48, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode Balls Remaining increased" },
+        { address=0XDA48, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Monkey Bowling] Challenge Mode Balls Remaining decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0250, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Overall Score" },
+        { address=0X4058, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Fight] Score" },
+        { address=0X4076, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Fight] P1 Total Score" },
+        { address=0XAAD4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0XAAF4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 1 Score" },
+        { address=0XAAF5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 2 Score" },
+        { address=0XAAF6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 3 Score" },
+        { address=0XAAF7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 4 Score" },
+        { address=0XAAF8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 5 Score" },
+        { address=0XAAF9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 6 Score" },
+        { address=0XAAFA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 7 Score" },
+        { address=0XAAFB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 8 Score" },
+        { address=0XAAFC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Monkey Golf] Hole 9 Score" },
+        { address=0XAC4C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Play Points" },
+        { address=0XAC4D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="play points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X241A4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="timer (resets upon starting the stage)" },
+      },
+    },
+  },
+}

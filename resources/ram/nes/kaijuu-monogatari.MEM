@@ -1,0 +1,126 @@
+return {
+  game = {
+    title = "Kaijuu Monogatari",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "kaijuu-monogatari",
+    file = "kaijuu-monogatari.zip",
+    hashes = {
+      { hash = "c064782f5729f32e6a858da551ba239e", label = "Kaijuu Monogatari (Japan).nes" },
+      { hash = "ea6fdb0d000affbe4c6752d8ca56d407", label = "Kaijuu Monogatari (Japan) (En) (v12.8.12) (DvD).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X025C, type="u8", condition="eq", value=0X48, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Sickle" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0244, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level: Hero" },
+        { address=0X0245, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level: Kupikupi" },
+        { address=0X0246, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level: Poyon" },
+        { address=0X0247, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level: Babubabu" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X025C, type="u8", condition="eq", value=0X42, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier's Sword" },
+        { address=0X025E, type="u8", condition="eq", value=0X23, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier's Helmet" },
+        { address=0X025F, type="u8", condition="eq", value=0X31, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier's Shield" },
+      },
+      health = {
+        { address=0X0234, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP: Hero decreased" },
+        { address=0X0234, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP: Hero increased" },
+        { address=0X0235, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP: Kupikupi decreased" },
+        { address=0X0235, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP: Kupikupi increased" },
+        { address=0X0236, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP: Poyoni decreased" },
+        { address=0X0236, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP: Poyoni increased" },
+        { address=0X02D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero Max HP decreased" },
+        { address=0X02D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero Max HP increased" },
+        { address=0X02D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kupikupi Max HP decreased" },
+        { address=0X02D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kupikupi Max HP increased" },
+        { address=0X02DA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Poyon Max HP decreased" },
+        { address=0X02DA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Poyon Max HP increased" },
+        { address=0X02DB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Babubabu Max HP decreased" },
+        { address=0X02DB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Babubabu Max HP increased" },
+        { address=0X059A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP decreased" },
+        { address=0X059A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP increased" },
+        { address=0X059B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 Current HP decreased" },
+        { address=0X059B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 Current HP increased" },
+        { address=0X059C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 Current HP decreased" },
+        { address=0X059C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 Current HP increased" },
+        { address=0X0672, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Max HP? (unconfirmed) decreased" },
+        { address=0X0672, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Max HP? (unconfirmed) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X025D, type="u8", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Leather Armor" },
+        { address=0X025D, type="u8", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Courage Mantle" },
+        { address=0X025D, type="u8", condition="eq", value=0X12, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Soldier's Armor" },
+        { address=0X025D, type="u8", condition="eq", value=0X13, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Iron Armor" },
+        { address=0X025D, type="u8", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Esper Clothes" },
+        { address=0X025D, type="u8", condition="eq", value=0X15, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ice Armor" },
+        { address=0X025D, type="u8", condition="eq", value=0X16, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Dragon Suit" },
+        { address=0X025D, type="u8", condition="eq", value=0X17, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Messiah Mantle" },
+        { address=0X025D, type="u8", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Demon Armor" },
+        { address=0X025D, type="u8", condition="eq", value=0X19, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Flame Armor" },
+        { address=0X025D, type="u8", condition="eq", value=0X1A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Earth Armor" },
+        { address=0X025D, type="u8", condition="eq", value=0X1B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Holy Clothes" },
+        { address=0X025D, type="u8", condition="eq", value=0X1C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Earth Mantle" },
+      },
+      weapon = {
+        { address=0X025C, type="u8", condition="eq", value=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Knife" },
+        { address=0X025C, type="u8", condition="eq", value=0X41, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spear" },
+        { address=0X025C, type="u8", condition="eq", value=0X43, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Braveman's Blade" },
+        { address=0X025C, type="u8", condition="eq", value=0X44, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Alen's Sword" },
+        { address=0X025C, type="u8", condition="eq", value=0X45, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dagon's Spear" },
+        { address=0X025C, type="u8", condition="eq", value=0X46, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Earth Staff" },
+        { address=0X025C, type="u8", condition="eq", value=0X47, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Magma Sword" },
+        { address=0X025C, type="u8", condition="eq", value=0X49, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Power Sword" },
+        { address=0X025C, type="u8", condition="eq", value=0X4A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Magic Sword" },
+        { address=0X025C, type="u8", condition="eq", value=0X4B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Sword" },
+        { address=0X025C, type="u8", condition="eq", value=0X4C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Air Cane" },
+        { address=0X025C, type="u8", condition="eq", value=0X4D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Earth Stick" },
+        { address=0X025C, type="u8", condition="eq", value=0X4E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Glacier Spear" },
+        { address=0X025C, type="u8", condition="eq", value=0X4F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blade of Love" },
+        { address=0X0260, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon: Kupikupi" },
+        { address=0X0264, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon: Poyon" },
+        { address=0X0268, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon: Babubabu" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0501, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[b0] - Unlocked door (Key of Dagon) increased" },
+        { address=0X0503, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[b0] - Soldier's Friend (Reharetta) increased" },
+        { address=0X0504, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[b0] - Dynamite (Destroyed Town) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X025F, type="u8", condition="eq", value=0X32, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Sparkling Shield" },
+        { address=0X025F, type="u8", condition="eq", value=0X33, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Fake Shield" },
+        { address=0X025F, type="u8", condition="eq", value=0X34, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Flame Shield" },
+        { address=0X025F, type="u8", condition="eq", value=0X35, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Air Shield" },
+        { address=0X025F, type="u8", condition="eq", value=0X36, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Purity Shield" },
+        { address=0X025F, type="u8", condition="eq", value=0X37, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Earth Shield" },
+        { address=0X0263, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield: Kupikupi" },
+        { address=0X0267, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield: Poyon" },
+        { address=0X026B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield: Babubabu" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0143, type="u8", condition="eq", value=0X14, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Devel" },
+        { address=0X0502, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[b0] - Unlocked door in passage north of Maiyo" },
+      },
+    },
+  },
+}

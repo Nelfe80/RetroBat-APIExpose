@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Capcom Fighting Evolution",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "capcom-fighting-evolution",
+    file = "capcom-fighting-evolution.zip",
+    hashes = {
+      { hash = "7b507445a77e5b08fde2bd87ba50d297", label = "Capcom Fighting Evolution (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X340C56, type="u8", condition="eq", value=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="Super Combo" },
+        { address=0X340C56, type="u8", condition="eq", value=0X020F, action="COMBO_HIT", no_log=false, no_survey=false, desc="Custom Combo Activation" },
+        { address=0X340EA0, type="u16le", condition="eq", value=0XAA, action="COMBO_HIT", no_log=false, no_survey=false, desc="Max for Custom Combo" },
+        { address=0X341394, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Hit Combo [8 bits]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X34115A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Red Earth Level [8 bits]" },
+        { address=0X341726, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Wins [8 bits]" },
+        { address=0X35C520, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 rounds (default)" },
+        { address=0X35C520, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Rounds (1P) [8 bits]" },
+      },
+      stage = {
+        { address=0X340C56, type="u8", condition="eq", value=0X0105, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Attacking (Ground)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X33B9F2, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="P1 - Damage Dealt [16 bits]" },
+        { address=0X340D94, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - HP [16 bits] decreased" },
+        { address=0X340D94, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - HP [16 bits] increased" },
+        { address=0X341354, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - HP [16 bits] decreased" },
+        { address=0X341354, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - HP [16 bits] increased" },
+        { address=0X341358, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Max HP [16 bits] decreased" },
+        { address=0X341358, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Max HP [16 bits] increased" },
+        { address=0X35C4C6, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Training - Damage Dealt [16 bits]" },
+        { address=0X35C4E2, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="2 stars (default)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X341118, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game - Score [32 bits]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X340DAA, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="P1 - Custom Combo Timer [16 bits]" },
+        { address=0X35C28C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Round Time [8 bits]" },
+      },
+    },
+  },
+}

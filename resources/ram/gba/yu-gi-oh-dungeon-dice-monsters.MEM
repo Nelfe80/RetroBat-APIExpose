@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Dungeon Dice Monsters",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-dungeon-dice-monsters",
+    file = "yu-gi-oh-dungeon-dice-monsters.zip",
+    hashes = {
+      { hash = "1ac4901f9a831d6b86ca776bb61f8d8b", label = "Yu-Gi-Oh! - Dungeon Dice Monsters (USA) (En,Es).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X27E2, type="u8", condition="eq", value=0XD5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="WorldChampionship" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X459D3, type="u8", condition="eq", value=0X1E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Full hp?" },
+        { address=0X459D3, type="u8", condition="eq", value=0X14, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Master 2 hp?" },
+        { address=0X459D3, type="u8", condition="eq", value=0X0A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Master 1 hp?" },
+        { address=0X459D3, type="u8", condition="eq", value=0XF6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead?" },
+        { address=0X4659A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Harpie Ladies in Box" },
+        { address=0X465A6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Giant Rock Soldiers in Box" },
+        { address=0X465DA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Black Luster Soldier in Box" },
+        { address=0X46606, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Penguin Soldier" },
+        { address=0X46660, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Corridor of the Dead" },
+      },
+      health = {
+        { address=0X46627, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Disc decreased" },
+        { address=0X46627, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Disc increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X27E2, type="u8", condition="eq", value=0XD2, action="AMMO_STATE", no_log=true, no_survey=false, desc="Gammon" },
+        { address=0X46598, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammoth Graveyards in Box" },
+        { address=0X4665E, type="u8", condition="bit_true", bit=5, mask=0X20, action="AMMO_STATE", no_log=true, no_survey=false, desc="Gammon Pre" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X465D8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Millenium Shield in box" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X465C6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Aqua Madoors in Box" },
+      },
+    },
+  },
+}

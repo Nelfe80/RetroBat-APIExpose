@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Curious George in Outer Space",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "curious-george-in-outer-space",
+    file = "curious-george-in-outer-space.zip",
+    hashes = {
+      { hash = "62771b4b82085e7262839d5904c43242", label = "Curious George in Outer Space side A.woz" },
+      { hash = "0942bcb5889bc12a8ffc82027c707566", label = "Curious George in Outer Space side B.woz" },
+    }
+  },
+
+  events = {
+  },
+}

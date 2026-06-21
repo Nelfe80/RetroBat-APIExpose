@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Electrocop",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "electrocop",
+    file = "electrocop.zip",
+    hashes = {
+      { hash = "c49ca94a908db219224c6d5baa206ab6", label = "Electrocop (World).lnx" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0094, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining - Rollover for seconds" },
+        { address=0X0095, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining - Seconds" },
+        { address=0X0096, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining - Minutes" },
+      },
+    },
+  },
+}

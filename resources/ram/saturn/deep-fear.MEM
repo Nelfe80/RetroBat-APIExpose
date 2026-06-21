@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Deep Fear",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "deep-fear",
+    file = "deep-fear.zip",
+    hashes = {
+      { hash = "0cb84f8a21db4b965d432445ae485c8b", label = "Deep Fear (USA) (Disc 1) (Unl)" },
+      { hash = "1c1f56cfa86d977624a45aa30e7b9f76", label = "Deep Fear (Europe) (Disc 1)" },
+      { hash = "27f2c4b2427a209c5cc43ada72223685", label = "Deep Fear (Europe) (Disc 2)" },
+      { hash = "cca651875bf4b4426339203924bb4fb8", label = "Deep Fear (USA) (Disc 2) (Unl)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15A66C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[U] [8-Bit] Gameplay paused = 0x01 (menu/map/interaction)" },
+        { address=0X15A66E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[U] [8-Bit] Pause Menu opened = 0x01" },
+        { address=0X15A6FC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[PAL] [8-Bit] Gameplay paused = 0x01 (menu/map/interaction)" },
+        { address=0X15A6FE, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[PAL] [8-Bit] Pause Menu opened = 0x01" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1B61F0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[U] [16-Bit] Regulator Air Level" },
+        { address=0X1B6244, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[U] [16-Bit] Player Air Level" },
+        { address=0X1B6280, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [16-Bit] Regulator Air Level" },
+        { address=0X1B6286, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[U] [16-Bit] Current Room Oxygen Level" },
+        { address=0X1B62D4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [16-Bit] Player Air Level" },
+        { address=0X1B6316, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [16-Bit] Current room oxygen level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X15A7AB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[U] [8-Bit] File: 'A Soldier's Letter' Obtained = 0x01" },
+        { address=0X15A83B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[PAL] [8-Bit] File: 'A Soldier's Letter' Obtained = 0x01" },
+      },
+      health = {
+        { address=0X1B624C, type="u16le", condition="eq", value=0X3E8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1B624C, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[U] [16-Bit] Player's Health" },
+        { address=0X1B62DC, type="u16le", condition="eq", value=0X3E8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1B62DC, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[PAL] [16-Bit] Player's Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1B6231, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[U] [8-Bit] Equipped Weapon" },
+        { address=0X1B624B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[U] [8-Bit] Weapon Ready Stance = 0x02" },
+        { address=0X1B62C1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] [8-Bit] Equipped Weapon" },
+        { address=0X1B62C9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] [8-Bit] Currently Equipped Weapon Displayed in Hand = 0x01" },
+        { address=0X1B62DB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] [8-Bit] Weapon Ready Stance = 0x02" },
+        { address=0X1B8DB8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[U] [8-Bit] Colt M1911A1 Weapon Slot" },
+        { address=0X1B8DB9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[U] [8-Bit] Glock 17 Weapon Slot" },
+        { address=0X1B8DBA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[U] [8-Bit] Special Weapon Slot" },
+        { address=0X1B8DBB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[U] [8-Bit] KPG L-9 Weapon Slot" },
+        { address=0X1B8E48, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] [8-Bit] Colt M1911A1 Weapon Slot" },
+        { address=0X1B8E49, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] [8-Bit] Glock 17 Weapon Slot" },
+        { address=0X1B8E4A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] [8-Bit] Special Weapon Slot" },
+        { address=0X1B8E4B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] [8-Bit] KPG L-9 Weapon Slot" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X15A46E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[U] [8-Bit] Current Ammo - Display Only" },
+        { address=0X15A4FE, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[PAL] [8-Bit] Current Ammo - Display Only" },
+      },
+    },
+  },
+}

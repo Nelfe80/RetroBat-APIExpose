@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Initial D",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "initial-d",
+    file = "initial-d.zip",
+    hashes = {
+      { hash = "6fb346ae06ec9c6895b197a80bb463df", label = "Initial D (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1021C, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing race demo" },
+        { address=0X585EC, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X585EC, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restarting" },
+        { address=0X585EC, type="u8", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="Retiring" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X10AC8, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Akina" },
+        { address=0X10AC8, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Usui" },
+        { address=0X10AC8, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Myogi" },
+        { address=0X10AC8, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Extra Course 1" },
+        { address=0X10AC8, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Extra Course 2" },
+        { address=0X10AC8, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Extra Course 3" },
+        { address=0X10AC8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X10B28, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal(after beat one time)" },
+        { address=0X10B28, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Hard(after beat two times)" },
+        { address=0X10B28, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Very Hard(after beat thre times)" },
+        { address=0X10B28, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dificulty meter" },
+      },
+    },
+  },
+}

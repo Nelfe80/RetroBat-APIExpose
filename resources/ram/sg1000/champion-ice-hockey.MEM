@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Champion Ice Hockey",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "champion-ice-hockey",
+    file = "champion-ice-hockey.zip",
+    hashes = {
+      { hash = "b3af58c60e62bb85522ddc29096cef60", label = "Champion Ice Hockey (Japan).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x01=Sega Logo/Title/Playing Game, 0x03=Demo" },
+        { address=0X0031, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x00=Playing, 0x01=Sega Logo/Title, 0x02=Demo" },
+        { address=0X0034, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x00 on Sega Logo/Title/Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X000C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="P1 Goals [BCD]" },
+        { address=0X000D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="P2 Goals [BCD]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X000E, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining in Period - Minutes [BCD]" },
+        { address=0X000F, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining in Period - Seconds [BCD]" },
+        { address=0X0010, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Remaining in Period (Subseconds. Starts at 0x0c, when it rolls over, decrements seconds)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "The Legend of Zelda: A Link to the Past [Subset - Glitch Showcase]",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-legend-of-zelda-a-link-to-the-past-subset-glitch-showcase",
+    file = "the-legend-of-zelda-a-link-to-the-past-subset-glitch-showcase.zip",
+    hashes = {
+      { hash = "03a63945398191337e896e5771f77173", label = "Zelda no Densetsu - Kamigami no Triforce (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X008A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Screen Index" },
+      },
+      zone = {
+        { address=0X0FFF, type="u8", condition="eq", value=0X1, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="In the Dark World" },
+        { address=0X0FFF, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="0=In the Light World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0DD0, type="u16le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="sprite is dead, totally inactive" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0403, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="b7-Heart Container Collected in Boss Room" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XF35A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Current Shield" },
+      },
+      player = {
+        { address=0X005D, type="u16le", condition="eq", value=0X04, action="SWIMMING", no_log=false, no_survey=false, desc="swimming" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X005D, type="u16le", condition="eq", value=0X1D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rolling back from Gargoyle gate or PullForRupees object" },
+        { address=0XC172, type="u8", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch is Orange, Orange Blocks are Down" },
+        { address=0XC172, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch is Blue, Blue Blocks are Down" },
+        { address=0XF0B1, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="b7-Switch pulled behind Big Chest in Skull Woods" },
+        { address=0XF29B, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="b6-Agahnim's Barrier Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0DD0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="An indicator to determine each sprite's state" },
+      },
+    },
+  },
+}

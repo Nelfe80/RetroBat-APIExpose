@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Low Gear</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>High Gear</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Low Gear</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>High Gear</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${red}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ABC 10000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ABC 10000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 ABC 10000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ABC 10000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 ABC 10000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 ABC 10000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 ABC 10000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 ABC 10000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 ABC 10000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 ABC 10000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 ABC 10000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 ABC 10000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 ABC 10000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 ABC 10000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 ABC 10000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 ABC 10000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 ABC 10000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 ABC 10000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 ABC 10000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 ABC 10000</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 ABC 10000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 ABC 10000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

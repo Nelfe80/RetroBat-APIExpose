@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Gundam: Battle Assault",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "gundam-battle-assault",
+    file = "gundam-battle-assault.zip",
+    hashes = {
+      { hash = "a447cee8853c1c2ba025d2476a31bb68", label = "Gundam Battle Assault (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE1452, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X11FF8E, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X11FF8E, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XE144E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X157F3A, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="3" },
+        { address=0X157F3A, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="2" },
+        { address=0X157F3A, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X157F3A, type="u8", condition="eq", value=0XFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="Ded" },
+        { address=0X157F3A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lifebars increased" },
+        { address=0X157F3A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lifebars decreased" },
+        { address=0X185ED6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lifebars increased" },
+        { address=0X185ED6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lifebars decreased" },
+      },
+      health = {
+        { address=0X12A06C, type="u24le", condition="eq", value=0X88, action="HEALTH_STATE", no_log=true, no_survey=false, desc="HP" },
+        { address=0X12A06C, type="u24le", condition="eq", value=0X8A, action="HEALTH_STATE", no_log=true, no_survey=false, desc="6 HP" },
+        { address=0X12A06C, type="u24le", condition="eq", value=0X8C, action="HEALTH_STATE", no_log=true, no_survey=false, desc="4 HP" },
+        { address=0X12A06C, type="u24le", condition="eq", value=0X8E, action="HEALTH_STATE", no_log=true, no_survey=false, desc="2 HP" },
+        { address=0X12A06C, type="u24le", condition="eq", value=0XA8, action="HEALTH_STATE", no_log=true, no_survey=false, desc="HP Air" },
+        { address=0X12A06C, type="u24le", condition="eq", value=0XAA, action="HEALTH_STATE", no_log=true, no_survey=false, desc="8 HP Air" },
+        { address=0X12A06C, type="u24le", condition="eq", value=0XAC, action="HEALTH_STATE", no_log=true, no_survey=false, desc="2 HP Air" },
+        { address=0X12A06C, type="u24le", condition="eq", value=0XAE, action="HEALTH_STATE", no_log=true, no_survey=false, desc="6 HP Air" },
+        { address=0X12A06C, type="u24le", condition="eq", value=0XF0, action="HEALTH_STATE", no_log=true, no_survey=false, desc="24LP or HP (ZakuII,Hy-gogg,ZZGundam)" },
+        { address=0X157F3D, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0X157F3D, type="u8", condition="eq", value=0X70, action="HIT", no_log=false, no_survey=false, desc="No HP" },
+        { address=0X185ED9, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="P2 Damage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X157F4A, type="u16le", condition="eq", value=0X1F4, action="AMMO_STATE", no_log=true, no_survey=false, desc="max" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE144E, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss (unlocks happen here)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12A06C, type="u24le", condition="eq", value=0X108, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Using Sword/Unblockable Attack" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X185EEA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Hit Counter" },
+      },
+    },
+  },
+}

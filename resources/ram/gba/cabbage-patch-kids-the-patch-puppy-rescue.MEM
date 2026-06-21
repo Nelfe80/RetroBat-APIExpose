@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Cabbage Patch Kids: The Patch Puppy Rescue",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "cabbage-patch-kids-the-patch-puppy-rescue",
+    file = "cabbage-patch-kids-the-patch-puppy-rescue.zip",
+    hashes = {
+      { hash = "25998f81ba65037dcde78250b7d2c28b", label = "Cabbage Patch Kids - The Patch Puppy Rescue (Europe).gba" },
+      { hash = "f05560ae14f622de028308b372ab2fe3", label = "Cabbage Patch Kids - The Patch Puppy Rescue (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X24C38, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+  },
+}

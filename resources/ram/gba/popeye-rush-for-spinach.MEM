@@ -1,0 +1,118 @@
+return {
+  game = {
+    title = "Popeye: Rush for Spinach",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Sports, Platform"
+  },
+
+  rom = {
+    name = "popeye-rush-for-spinach",
+    file = "popeye-rush-for-spinach.zip",
+    hashes = {
+      { hash = "a5bf85cd40533d76a1fb2b0b2f8d5b19", label = "Popeye - Rush for Spinach (USA, Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2E18, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Player has control" },
+        { address=0X2E18, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="CPU has control" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2A78, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Landed on ground facing right" },
+        { address=0X2A78, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Landed on ground facing left" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Town" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Docks" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Desert" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Jungle" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ghost Island" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Stone Age" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Moon" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Level 1" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Level 2" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Level 3" },
+        { address=0X2DE1, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Level 4" },
+        { address=0X2DE1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Next level adventure mode" },
+        { address=0X2DE3, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Town" },
+        { address=0X2DE3, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Docks" },
+        { address=0X2DE3, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Desert" },
+        { address=0X2DE3, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Jungle" },
+        { address=0X2DE3, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ghost Island" },
+        { address=0X2DE3, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Stone Age" },
+        { address=0X2DE3, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Moon" },
+        { address=0X2DE3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Challange mode current level progress" },
+        { address=0X2DEB, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unset" },
+        { address=0X2DEB, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skateboard trophy Olive" },
+        { address=0X2DEB, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast" },
+        { address=0X2DEB, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DEB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level 1" },
+        { address=0X2DEC, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unset" },
+        { address=0X2DEC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boat trophy Popeye" },
+        { address=0X2DEC, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast" },
+        { address=0X2DEC, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level 2" },
+        { address=0X2DED, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unset" },
+        { address=0X2DED, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rocket trophy Bluto" },
+        { address=0X2DED, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast" },
+        { address=0X2DED, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DED, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level 3" },
+        { address=0X2DEE, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unset" },
+        { address=0X2DEE, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jet-Pack trophy Wimpy" },
+        { address=0X2DEE, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast" },
+        { address=0X2DEE, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DEE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level 4" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2A78, type="u8", condition="eq", value=0X04, action="HIT", no_log=false, no_survey=false, desc="Hurt facing right" },
+        { address=0X2A78, type="u8", condition="eq", value=0X05, action="HIT", no_log=false, no_survey=false, desc="Hurt facing left" },
+        { address=0X2A79, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Take damage (spike)" },
+        { address=0X2A79, type="u8", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="Take damage (burn)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2DE4, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DE4, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Fast (Gold)" },
+        { address=0X2DE5, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DE5, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Fast (Gold)" },
+        { address=0X2DE6, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DE6, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Fast (Gold)" },
+        { address=0X2DE7, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DE7, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Fast (Gold)" },
+        { address=0X2DE8, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DE8, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Fast (Gold)" },
+        { address=0X2DE9, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DE9, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Fast (Gold)" },
+        { address=0X2DEA, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Ultra-Fast (Gold)" },
+        { address=0X2DEA, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Time Rush Fast (Gold)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2AB6, type="u8", condition="eq", value=0X13, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2AB6, type="u8", condition="eq", value=0X18, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch places (link mode)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2DE4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The Town" },
+        { address=0X2DE5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The Dock" },
+        { address=0X2DE6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The Desert" },
+        { address=0X2DE7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The Jungle" },
+        { address=0X2DE8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ghost Island" },
+        { address=0X2DE9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The Stone Age" },
+        { address=0X2DEA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The Moon" },
+      },
+    },
+  },
+}

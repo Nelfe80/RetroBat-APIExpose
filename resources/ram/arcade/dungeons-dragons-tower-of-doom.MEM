@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Dungeons & Dragons: Tower of Doom",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "dungeons-dragons-tower-of-doom",
+    file = "dungeons-dragons-tower-of-doom.zip",
+    hashes = {
+      { hash = "85712af9f7cc2ed48da39f14379e7756", label = "ddtod.7z <Dungeons & Dragons - tower of doom (940412 Euro)>" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X8060, type="u8", condition="eq", value=0X8F, action="JUMPING", no_log=false, no_survey=false, desc="jumps to rock in background" },
+      },
+    },
+  },
+}

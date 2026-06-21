@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "OutRunners",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "outrunners",
+    file = "outrunners.zip",
+    hashes = {
+      { hash = "dad0322e38b9efaa5551c0aa881fd633", label = "OutRunners (USA).md" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XB6B1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Select Screen" },
+        { address=0XEC8A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Player Time 'Minutes Decimals 1'" },
+        { address=0XEC8C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Player Time 'Minutes Unit 1'" },
+        { address=0XEC90, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Computer Time 'Seconds Decimals 1'" },
+        { address=0XEC92, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Player Time 'Seconds Unit 1'" },
+        { address=0XEC96, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Player Time 'MiliSeconds Decimals 1'" },
+        { address=0XEC98, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Player Time 'MiliSeconds Units 1'" },
+        { address=0XEE10, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Computer Time 'Seconds Decimals 1'" },
+        { address=0XEE12, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Computer Time 'Seconds Unit 1'" },
+      },
+    },
+  },
+}

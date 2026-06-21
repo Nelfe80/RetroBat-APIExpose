@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "LEGO Batman: The Videogame",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "lego-batman-the-videogame",
+    file = "lego-batman-the-videogame.zip",
+    hashes = {
+      { hash = "fa3348373a650610cc6ffbd32f1f617a", label = "LEGO Batman - The Videogame (Europe) (En,Fr,De,Es,It,Da) (Rev 1)" },
+      { hash = "30ce4392b51f033a2db914788518e980", label = "LEGO Batman - The Videogame (Europe) (En,Fr,De,Es,It,Da)" },
+      { hash = "a27380d962b95aa2cc30defd8c70bbc8", label = "LEGO Batman - The Videogame (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X103AB93F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="You Can Bank on Batman - Cleared" },
+        { address=0X103AB94B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="An Icy Reception - Cleared" },
+        { address=0X103AB957, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Two-Face Chase - Cleared" },
+        { address=0X103AB963, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="A Poisonous Appointment - Cleared" },
+        { address=0X103AB96F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Face-Off - Cleared" },
+        { address=0X103AB993, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="There She Goes Again - Cleared" },
+        { address=0X103AB99F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Batboat Battle - Cleared" },
+        { address=0X103AB9AB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Under the City - Cleared" },
+        { address=0X103AB9B7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zoo's Company - Cleared" },
+        { address=0X103AB9C3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zoo's Company - Cleared" },
+        { address=0X103AB9E7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Joker's Home Turf - Cleared" },
+        { address=0X103AB9F3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Little Fun at the Big Top - Cleared" },
+        { address=0X103AB9FF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Flight of the Bat - Cleared" },
+        { address=0X103ABA0B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="In the Dark Night - Cleared" },
+        { address=0X103ABA17, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="To the Top of the Tower - Cleared" },
+        { address=0X103ABA2F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Riddler Makes a Withdrawal - Cleared" },
+        { address=0X103ABA3B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="On the Rocks - Cleared" },
+        { address=0X103ABA47, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Green Fingers - Cleared" },
+        { address=0X103ABA53, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="An Enterprising Theft - Cleared" },
+        { address=0X103ABA5F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Breaking Blocks - Cleared" },
+        { address=0X103ABA6B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rockin' the Docks - Cleared" },
+        { address=0X103ABA76, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stealing the Show - Cleared" },
+        { address=0X103ABA77, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stealing the Show - Cleared" },
+        { address=0X103ABA9B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Arctic World - Cleared" },
+        { address=0X103ABAA7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="A Surprise for the Commissioner - Cleared" },
+        { address=0X103ABAB3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Biplane Blast - Cleared" },
+        { address=0X103ABABF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Joker's Masterpiece - Cleared" },
+        { address=0X103ABACB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Lure of the Night - Cleared" },
+        { address=0X103ABAD7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Dying of Laughter - Cleared" },
+      },
+      zone = {
+        { address=0X103ABA99, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Arctic World - Super Villain" },
+        { address=0X103ABA9A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Arctic World - Unlocked" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X103ABA83, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Harboring a Grudge - Cleared increased" },
+        { address=0X103ABA8F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="A Daring Rescue - Cleared increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X103ABA5D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Breaking Blocks - Super Villain" },
+        { address=0X103ABA5E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Breaking Blocks - Unlocked" },
+      },
+    },
+  },
+}

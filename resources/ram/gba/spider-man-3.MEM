@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Spider-Man 3",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "spider-man-3",
+    file = "spider-man-3.zip",
+    hashes = {
+      { hash = "7d2c4f995b82825aa63fe224733d769b", label = "Spider-Man 3 (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0FA0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Complettion Flag - 02" },
+        { address=0X10CD4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0X12F28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Search And Rescue Level Unlocked - 01" },
+        { address=0X12F3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Goblin Hunt Level Unlocked - 01" },
+        { address=0X12F50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Spidey Saves Level Unlocked - 01" },
+        { address=0X12F64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Sandstorm Level Unlocked - 01" },
+        { address=0X12F78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - The Dark Side Level Unlocked - 01" },
+        { address=0X12F9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Subway Rumble Level Unlocked - 01" },
+        { address=0X12FB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Toxic Shock Level Unlocked - 01" },
+        { address=0X12FC4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Bombs Away Level Unlocked - 01" },
+        { address=0X12FD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Copter Chase Level Unlocked - 01" },
+        { address=0X12FFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Court Disorder Level Unlocked - 01" },
+        { address=0X13010, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Follow That Limo Level Unlocked - 01" },
+        { address=0X13024, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Kingpin's Mansion Level Unlocked - 01" },
+        { address=0X13038, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Totally Amped Level Unlocked - 01" },
+        { address=0X1305C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Sand Hassles Level Unlocked - 01" },
+        { address=0X1305D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sand Hassles Level Completed" },
+        { address=0X13070, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Map - Quick Sand Level Unlocked - 01" },
+        { address=0X30058, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of punches thrown in level 1 first half" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X10CF0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Level Complete or Death - 01" },
+      },
+      health = {
+        { address=0X10CFC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spider-Man Health decreased" },
+        { address=0X10CFC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spider-Man Health increased" },
+        { address=0X10D7C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Power-Up" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X10D10, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Black Suit Rage Meter (16-bit)" },
+        { address=0X10D14, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Black Suit" },
+        { address=0X10D78, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Web Power-Up" },
+        { address=0X13071, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Quick Sand Completed (Black Suit Unlocked)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD610, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level timer (32-bit)" },
+      },
+    },
+  },
+}

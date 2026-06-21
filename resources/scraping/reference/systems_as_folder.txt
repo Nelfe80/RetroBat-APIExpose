@@ -1,0 +1,10 @@
+daphne
+dos
+mugen
+pc
+ps3
+singe
+sonicretro
+teknoparrot
+windows
+xash3d_fwgs

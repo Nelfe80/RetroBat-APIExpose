@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Thomas & Friends: A Day at the Races",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "thomas-friends-a-day-at-the-races",
+    file = "thomas-friends-a-day-at-the-races.zip",
+    hashes = {
+      { hash = "238d2bb7f1ddedaf8b8e8b099619d6b9", label = "Thomas & Friends - A Day at the Races (Europe) (En,Sv,No,Da,Fi)" },
+      { hash = "6be302c17036d3d56e3dc04662397a16", label = "Thomas & Friends - A Day at the Races (Europe) (Fr,De)" },
+      { hash = "df47b202cf8f01b80deea97b14187b54", label = "Thomas & Friends - A Day at the Races (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Franklin the Turtle: A Birthday Surprise",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "franklin-the-turtle-a-birthday-surprise",
+    file = "franklin-the-turtle-a-birthday-surprise.zip",
+    hashes = {
+      { hash = "f83c1c46855c555fb86b5904108f8aaa", label = "Franklin the Turtle - A Birthday Surprise (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XEC7D16, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Franklin's Score (Apple Minigame)" },
+        { address=0XEC7E56, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Bear's Score (Apple Minigame)" },
+        { address=0XEC7F96, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Beaver's Score (Apple Minigame)" },
+        { address=0XEC80D6, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Bunny's Score (Apple Minigame)" },
+      },
+    },
+  },
+}

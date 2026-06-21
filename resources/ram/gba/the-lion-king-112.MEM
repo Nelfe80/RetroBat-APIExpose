@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "The Lion King 1½",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-lion-king-112",
+    file = "the-lion-king-112.zip",
+    hashes = {
+      { hash = "3f1cb5398649ff0c43673e73cad3010e", label = "Lion King, The (Europe) (En,Fr,De,Es,It,Nl,Sv,Da).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDFB4, type="u8", condition="eq", value=0X70, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen / Save Select Menu" },
+        { address=0XDFB4, type="u8", condition="eq", value=0X38, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Level Select Menu" },
+        { address=0XDFB4, type="u8", condition="eq", value=0X64, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In Stage" },
+        { address=0XDFB4, type="u8", condition="eq", value=0X88, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X7C0A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Text on screen" },
+        { address=0X7C0A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-Bits) Level 'When Hyenas Attack' Text Box" },
+        { address=0X2794B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Text on screen" },
+        { address=0X2794B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-Bits) Level 'Finding Pumbaa' Text Box" },
+        { address=0X2842B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Text on Screen" },
+        { address=0X294AF, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Text on Screen" },
+        { address=0X294AF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-Bits) Level 'Hide N Seek' Text Box" },
+        { address=0X2A26F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Text on Screen" },
+        { address=0X2A26F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-Bits) Level 'Digga Tunnah' Text Box" },
+      },
+      stage = {
+        { address=0XAAEC, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Default HP number" },
+        { address=0XAAEC, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Upgrade obtained" },
+        { address=0XAAEC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8-Bits) Timon and Pumbaa HP (Auto-run stages)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2842B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-Bits) Level 'Colony Life' Text Box increased" },
+        { address=0X2842B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-Bits) Level 'Colony Life' Text Box decreased" },
+        { address=0X2C9E4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Colony Life' increased" },
+        { address=0X2C9E4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Colony Life' decreased" },
+      },
+      health = {
+        { address=0XAACC, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="No upgrades" },
+        { address=0XAACC, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="First upgrade" },
+        { address=0XAACC, type="u8", condition="eq", value=0X03, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Second upgrade" },
+        { address=0XAACC, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="(8-Bits) HP Upgrade (Timon)" },
+        { address=0XAAD4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-Bits) Power Up (Timon) - Shield Beetle decreased" },
+        { address=0XAAD5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-Bits) Power Up (Timon) - Remote Control decreased" },
+        { address=0XAAD6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-Bits) Power Up (Timon) - Grub Bowl decreased" },
+        { address=0XAAE0, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="No upgrades" },
+        { address=0XAAE0, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="First upgrade" },
+        { address=0XAAE0, type="u8", condition="eq", value=0X03, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Second Upgrade" },
+        { address=0XAAE0, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="(8-Bits) HP Upgrade (Pumbaa)" },
+        { address=0XAAE8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-Bits) Power Up (Pumbaa) - Shield Beetle decreased" },
+        { address=0XAAE9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-Bits) Power Up (Pumbaa) - Remote Control decreased" },
+        { address=0XAAEA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-Bits) Power Up (Pumbaa) - Grub Bowl decreased" },
+        { address=0XAAF4, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Obtained" },
+        { address=0XAAF4, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="(8-Bits) HP Upgrade (Team)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XAAD4, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Not caught" },
+        { address=0XAAD4, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item active" },
+        { address=0XAAD5, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item used / not caught" },
+        { address=0XAAD5, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item on hand" },
+        { address=0XAAD6, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item used/not caught" },
+        { address=0XAAD6, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item on hand" },
+        { address=0XAAE8, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Not caught" },
+        { address=0XAAE8, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item active" },
+        { address=0XAAE9, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item used / not caught" },
+        { address=0XAAE9, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item on hand" },
+        { address=0XAAEA, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item used/not caught" },
+        { address=0XAAEA, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Item on hand" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X32580, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Scaring the Buzzards' increased" },
+        { address=0X32580, type="u16le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Scaring the Buzzards' empty" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAAC4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-Bits) Heart Counter {Timon)" },
+        { address=0XAAD8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-Bits) Heart Counter (Pumbaa)" },
+        { address=0XAB08, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-Bits) Bug Counter" },
+        { address=0X2AF14, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Pride Land Rush Hour'" },
+        { address=0X2E4BC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Make a Run for It'" },
+        { address=0X2E854, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Stampede!'" },
+        { address=0X2F0D4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'LUAU!!!'" },
+        { address=0X2F6A8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Nala!'" },
+        { address=0X307C8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'The Cavalry Arrives'" },
+        { address=0X32B95, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'The Sky is Falling'" },
+        { address=0X32C78, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Digga Tunnah'" },
+        { address=0X33900, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for 'Oh no, Hyenas'" },
+        { address=0X462F4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-Bits) Damage Counter for ' Tunnel Escape'" },
+      },
+    },
+  },
+}

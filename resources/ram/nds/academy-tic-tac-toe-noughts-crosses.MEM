@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Academy: Tic-Tac-Toe Noughts & Crosses",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "academy-tic-tac-toe-noughts-crosses",
+    file = "academy-tic-tac-toe-noughts-crosses.zip",
+    hashes = {
+      { hash = "3f10bdcb18194ca675d53b28254a29f5", label = "Academy - Tic-Tac-Toe Noughts & Crosses (Europe, Australia)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X6EF10, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World" },
+      },
+    },
+  },
+}

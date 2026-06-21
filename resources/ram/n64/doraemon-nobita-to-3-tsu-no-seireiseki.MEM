@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Doraemon: Nobita to 3 Tsu no Seireiseki",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "doraemon-nobita-to-3-tsu-no-seireiseki",
+    file = "doraemon-nobita-to-3-tsu-no-seireiseki.zip",
+    hashes = {
+      { hash = "c2166455e94e89e9e3ab612b4377c443", label = "Doraemon - Nobita to 3tsu no Seireiseki (Japan).z64" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XF38C6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XF38C6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFCC94, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max HP" },
+        { address=0XFCC94, type="u8", condition="eq", value=0X64, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max" },
+      },
+    },
+  },
+}

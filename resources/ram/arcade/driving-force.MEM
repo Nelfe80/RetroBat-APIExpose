@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Driving Force",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Driving"
+  },
+
+  rom = {
+    name = "driving-force",
+    file = "driving-force.zip",
+    hashes = {
+      { hash = "b1b4b52fc0e199cdd532b74ba21a329a", label = "drivfrcp.7z <Driving Force (Pac-Man conversion)>" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0179, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Remainig [16-bit BE]" },
+      },
+    },
+  },
+}

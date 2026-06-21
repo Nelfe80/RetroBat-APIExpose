@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Mappy (PC-8801 Version)",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mappy",
+    file = "mappy.zip",
+    hashes = {
+      { hash = "61ca405fb5063c7e0b5e157a888beb3a", label = "Mappy.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF04, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Over/Title (if you got a Game Over in the session)" },
+        { address=0XD640, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDED8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round [8-bit Hex]" },
+        { address=0XE1D0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Round Completed Check [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBF04, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Counter [8bit] increased" },
+        { address=0XBF04, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Counter [8bit] decreased" },
+        { address=0XDEB4, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBEFC, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24-Bit BCD]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDE9A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Gosenzo Timer [16bit]" },
+      },
+    },
+  },
+}

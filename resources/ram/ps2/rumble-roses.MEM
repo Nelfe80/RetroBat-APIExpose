@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Rumble Roses",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "rumble-roses",
+    file = "rumble-roses.zip",
+    hashes = {
+      { hash = "67428343b272a94fbe861c800eeb1163", label = "Rumble Roses (USA)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X395844, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (32-bit)" },
+      },
+    },
+  },
+}

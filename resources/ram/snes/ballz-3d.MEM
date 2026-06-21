@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Ballz 3D",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ballz-3d",
+    file = "ballz-3d.zip",
+    hashes = {
+      { hash = "b61efd28676ea1f9ca650888753df2dc", label = "Ballz 3D - Fighting at Its Ballziest (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0356, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Remaining" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0298, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds won" },
+        { address=0X0F64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds won" },
+        { address=0X200E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level: 0=Easy, 1=Medium, 2=Hard" },
+        { address=0X2010, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Belt Level P1: 0=None, 1=Red, 2=Green, 3=Blue, 4=Black" },
+        { address=0X2012, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Belt Level P2: 0=None, 1=Red, 2=Green, 3=Blue, 4=Black" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X02AE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health decreased" },
+        { address=0X02AE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health increased" },
+        { address=0X02B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - Health Bar decreased" },
+        { address=0X02B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - Health Bar increased" },
+        { address=0X0EBA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health decreased" },
+        { address=0X0EBA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health increased" },
+        { address=0X0EBC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - Health Bar decreased" },
+        { address=0X0EBC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - Health Bar increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X241F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round Timer" },
+      },
+    },
+  },
+}

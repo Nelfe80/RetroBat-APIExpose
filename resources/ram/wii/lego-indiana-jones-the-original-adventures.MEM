@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "LEGO Indiana Jones: The Original Adventures",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "lego-indiana-jones-the-original-adventures",
+    file = "lego-indiana-jones-the-original-adventures.zip",
+    hashes = {
+      { hash = "a668cf6f0843b6580e37b8251f9a4271", label = "LEGO Indiana Jones - The Original Adventures (Europe) (En,Fr,De,Es,It,Da)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5B0926, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0926, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raiders of the Lost Ark - Into the Mountains - Level unlocked" },
+        { address=0X5B0936, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0936, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raiders of the Lost Ark - City of Danger - Level unlocked" },
+        { address=0X5B0946, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0946, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raiders of the Lost Ark - The Well of Souls - Level unlocked" },
+        { address=0X5B0956, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0956, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raiders of the Lost Ark - Pursuing the Ark - Level unlocked" },
+        { address=0X5B0986, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0986, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Temple of Doom - Shanghai Showdown - Level unlocked" },
+        { address=0X5B09A6, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B09A6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Temple of Doom - The Temple of Kali - Level unlocked" },
+        { address=0X5B09B6, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B09B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Temple of Doom - Free the Slaves - Level unlocked" },
+        { address=0X5B09C6, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B09C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Temple of Doom - Escape the Mines - Level unlocked" },
+        { address=0X5B09D6, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B09D6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Temple of Doom - Battle on the Bridge - Level unlocked" },
+        { address=0X5B09F6, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B09F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Last Crusade - The Hunt for Sir Richard - Level unlocked" },
+        { address=0X5B0A06, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0A06, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Last Crusade - Castle Rescue - Level unlocked" },
+        { address=0X5B0A16, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0A16, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Last Crusade - Motorcycle Escape - Level unlocked" },
+        { address=0X5B0A26, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0A26, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Last Crusade - Trouble in the Sky - Level unlocked" },
+        { address=0X5B0A36, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0A36, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Last Crusade - Desert Ambush - Level unlocked" },
+        { address=0X5B0A46, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X5B0A46, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Last Crusade - Temple of the Grail - Level unlocked" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5B0DDA, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Soldier (Desert)" },
+        { address=0X5B0DDB, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Colonel Dietrich" },
+        { address=0X5B0DDE, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="British Soldier" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X5B0DDF, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Willie (Dinner Suit)" },
+        { address=0X5B0DFD, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Character Treasure" },
+        { address=0X5B0DFD, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x6" },
+        { address=0X5B0DFD, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x8" },
+        { address=0X5B0DFD, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Magnet" },
+        { address=0X5B0DFD, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x10" },
+        { address=0X5B0DFE, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x2" },
+        { address=0X5B0DFE, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x4" },
+        { address=0X5B0DFE, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Poo Treasure" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X5B0DFC, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+  },
+}

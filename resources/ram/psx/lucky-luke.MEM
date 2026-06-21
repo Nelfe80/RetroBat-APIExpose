@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Lucky Luke",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "lucky-luke",
+    file = "lucky-luke.zip",
+    hashes = {
+      { hash = "f9a8aaf88e5dacdbdefbbc771bb529e7", label = "Lucky Luke (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X988E1, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="0 Off" },
+        { address=0X988E1, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="1 On" },
+        { address=0X98918, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="0 Off" },
+        { address=0XA1A60, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA14FC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates Y (level 9 - Wagon Race) 32 bits" },
+        { address=0XA1500, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates X (level 9 - Wagon Race) 32 bits" },
+        { address=0XA17BC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates X (level 6 - Indian Desert) 32 bits" },
+        { address=0XA17C0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates Y (level 6 - Indian Desert) 32 bits" },
+        { address=0XA187C, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Day" },
+        { address=0XA187C, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Night" },
+        { address=0XA4273, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0 Off" },
+        { address=0XA747C, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In level" },
+        { address=0XA747C, type="u8", condition="eq", value=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished level" },
+        { address=0XA747C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Related to level 8 bits" },
+        { address=0XCAAE6, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Begin" },
+        { address=0XCAAE6, type="u8", condition="eq", value=0X13, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finish" },
+        { address=0XCAAE6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round timer 8 bits" },
+        { address=0XE918C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates X (level 3 - Train) 32 bits" },
+        { address=0XE9190, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates Y (level 3 - Train) 16 bits" },
+        { address=0XED228, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates X (level 4 - Pueblos) 32 bits" },
+        { address=0XED22C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates Y (level 4 - Pueblos) 16 bits" },
+        { address=0XED230, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 - Pueblos Z-coordinates" },
+        { address=0X107420, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates X (level 1) 16 bits" },
+        { address=0X107424, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coordinates Y (level 1) 16 bits" },
+        { address=0X10E822, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0X10E822, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X10E822, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lucky Luke HP (level 7 - Saloon) 8 bits" },
+        { address=0X10E842, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0X10E842, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X10E842, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemies HP (level 7 - Saloon) 8 bits" },
+        { address=0X15E1B0, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All crystals" },
+        { address=0X15E1B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blue Crystals (Level 4 - Pueblos) 8 bits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA1A60, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives 8 bits increased" },
+        { address=0XA1A60, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives 8 bits decreased" },
+        { address=0XA1A62, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XA1A74, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Alive" },
+      },
+      health = {
+        { address=0XA1A62, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health 8 bits" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA1A64, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money 16 bits increased" },
+        { address=0XCD098, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money won in the Bonus Round 8 bits increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE3606, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0 Dead" },
+        { address=0XE3606, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="1 Alive" },
+        { address=0XE3632, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0XE3632, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XE72E4, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full health" },
+        { address=0XE72E4, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XECBAA, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full HP" },
+        { address=0XECBAA, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XF8C04, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full health" },
+        { address=0XF8C04, type="u8", condition="eq", value=0X03, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X13F8EA, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full health" },
+        { address=0X13F8EA, type="u8", condition="eq", value=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XE7C78, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jolly Jumper" },
+      },
+    },
+  },
+}

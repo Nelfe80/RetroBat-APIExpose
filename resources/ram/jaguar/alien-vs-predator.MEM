@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Alien vs. Predator",
+    system = "jaguar",
+    system_name = "Atari Jaguar",
+    genre = "Horror, Shooter"
+  },
+
+  rom = {
+    name = "alien-vs-predator",
+    file = "alien-vs-predator.zip",
+    hashes = {
+      { hash = "96bc77cfd1b2df85b5e6ae05594e74b0", label = "Alien vs Predator (World).j64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2F1E8, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Cheat Input Initiated. When Pushing Numpad 1 + 3 (also stays at 2 when releasing Pause and Selec" },
+        { address=0X2F378, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X2F378, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+        { address=0X4BE20, type="u32be", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title (stays at 0 when restoring a game, annoyingly..)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2F5AB, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SUBLEVEL 1" },
+        { address=0X2F5AB, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SUBLEVEL 2" },
+        { address=0X2F5AB, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SUBLEVEL 3" },
+        { address=0X2F5AB, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SUBLEVEL 4" },
+        { address=0X2F5AB, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SUBLEVEL 5" },
+      },
+      stage = {
+        { address=0X30A5C, type="u32be", condition="eq", value=0X18, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Turning around" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2F264, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Health Pack Meter (Predator) decreased" },
+        { address=0X2F264, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Health Pack Meter (Predator) increased" },
+        { address=0X30A6A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Health decreased" },
+        { address=0X30A6A, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2F307, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X2F307, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pulse Rifle" },
+        { address=0X2F307, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flamethrower" },
+        { address=0X2F307, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Smartgun" },
+        { address=0X2F334, type="u32be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Weapon Currently Equipped (Predator)" },
+        { address=0X2F340, type="u32be", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X2F340, type="u32be", condition="eq", value=0X120006, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pulse Rifle" },
+        { address=0X2F340, type="u32be", condition="eq", value=0X240006, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flamethrower" },
+        { address=0X2F340, type="u32be", condition="eq", value=0X430006, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Smartgun" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X391E4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE (aligned)] Score" },
+        { address=0X4BEA0, type="u32be", condition="eq", value=0X0002A943, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Leaderboard" },
+      },
+      collectibles = {
+        { address=0X2F214, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Ammo + Strength Meter #1" },
+        { address=0X2F224, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Ammo + Strength Meter #2" },
+        { address=0X2F234, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Ammo + Strength Meter #3" },
+        { address=0X2F244, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Ammo + Strength Meter #4" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X30A89, type="u8", condition="eq", value=0X0C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Thermal (Blue)" },
+        { address=0X30A89, type="u8", condition="eq", value=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Infrared (Yellow)" },
+        { address=0X30A89, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Electromagnetic (Purple)" },
+        { address=0X30A89, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Ultra Violet (Pink)" },
+        { address=0X30A89, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Night Vision (Green)" },
+      },
+    },
+  },
+}

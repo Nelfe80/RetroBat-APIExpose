@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Final Fantasy Crystal Chronicles: The Crystal Bearers",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "final-fantasy-crystal-chronicles-the-crystal-bearers",
+    file = "final-fantasy-crystal-chronicles-the-crystal-bearers.zip",
+    hashes = {
+      { hash = "ce45f93bc8bb83ff5293f5d812b1d3c3", label = "Final Fantasy Crystal Chronicles - The Crystal Bearers (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1192D68, type="u32be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 315 - Demon Wall" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XF753A0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Emblems | World Conquest" },
+        { address=0X1192B4C, type="u32be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 005 - New World Record" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF75391, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Materials | Deadly Poison" },
+        { address=0XF75398, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Materials | Death Mask" },
+        { address=0X11928EC, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 224 - Lifesaver increased" },
+        { address=0X11928EC, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 224 - Lifesaver decreased" },
+        { address=0X1192BE0, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 091 - Death Rays" },
+        { address=0X1192E0C, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 233 - My First Deadly Poison" },
+        { address=0X1192E28, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 317 - My First Death Mask" },
+      },
+      health = {
+        { address=0X119281C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 042 - Milk for Health decreased" },
+        { address=0X119281C, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 042 - Milk for Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XF7537E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Materials | Buried Treasure" },
+        { address=0X1192800, type="u32be", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 028 - Treasure Guardian Appearance" },
+        { address=0X1192DC0, type="u32be", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 184 - My First Buried Treasure" },
+      },
+      weapon = {
+        { address=0X1192AF8, type="u32be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 020 - New Weapon Confirmed" },
+        { address=0X1192B58, type="u32be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 010 - New Weapon Destruction" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF753D0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753D1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753D2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753D3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753D7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753D9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753DB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0XF753DF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] Accessories | Rings increased" },
+        { address=0X119296C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 208 - Pirate Treasure increased" },
+        { address=0X1192988, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 325 - Treasure Guardian Destruction increased" },
+        { address=0X1192B00, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 104 - Ring Toss King increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1192AC4, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 002 - Monster Boss Downed" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1192C7C, type="u32be", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 303 - My Shield Generator" },
+      },
+      player = {
+        { address=0X1192868, type="u32be", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 102 - No Swimming" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF75381, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Materials | Ivory Object" },
+        { address=0X1192AC8, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 040 - Pillar Destroyer" },
+        { address=0X1192ACC, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 039 - Bridge Destroyer" },
+        { address=0X1192B44, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 329 - Arms Destroyer" },
+        { address=0X1192B84, type="u32be", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 018 - Door to Tomorrow" },
+        { address=0X1192D0C, type="u32be", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 118 - Cherry Checkpoint Campaign" },
+        { address=0X1192D28, type="u32be", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 298 - Cherry Checkpoint Campaign II" },
+        { address=0X1192DCC, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-bit BE] Medals | 205 - My First Ivory Object" },
+      },
+    },
+  },
+}

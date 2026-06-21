@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Speed Racer: The Videogame",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "speed-racer-the-videogame",
+    file = "speed-racer-the-videogame.zip",
+    hashes = {
+      { hash = "ac4a64dd8452aacff37bb1403deafb04", label = "Speed Racer (USA) (En,Fr,Es,Pt)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5ECC20, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+        { address=0X5ED7A8, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA99214, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round House Flag" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X865B8C, type="u32le", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="on" },
+        { address=0X865B8C, type="u32le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health Replenish" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X869ACC, type="u32le", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="car destroyed" },
+        { address=0XF9C42C, type="u32le", condition="eq", value=0X017145C0, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="rival car destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X75DF60, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Track Direction" },
+      },
+    },
+  },
+}

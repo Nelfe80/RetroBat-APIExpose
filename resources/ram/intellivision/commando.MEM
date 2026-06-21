@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Commando",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "commando",
+    file = "commando.zip",
+    hashes = {
+      { hash = "9ff5833918a5accbfddc856258bc2d3b", label = "Commando (USA).int" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00C0, type="u8", condition="eq", value=0X60, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Mission completed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00C0, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Post death, get ready screen (transient after mission completed)" },
+        { address=0X0590, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 lives remaining increased" },
+        { address=0X0590, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 lives remaining decreased" },
+        { address=0X0594, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 lives remaining increased" },
+        { address=0X0594, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 lives remaining decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0D30, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 score (value * 100)" },
+        { address=0X0D34, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 score (value * 100)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0598, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="End of Mission 1, 2 and 3 boss" },
+        { address=0X0598, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="End of Mission 2 boss (also Bit 3)" },
+      },
+    },
+  },
+}

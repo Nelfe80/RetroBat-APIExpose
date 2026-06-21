@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Shadow Hearts [Subset - First Place Lottery Wins]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shadow-hearts-subset-first-place-lottery-wins",
+    file = "shadow-hearts-subset-first-place-lottery-wins.zip",
+    hashes = {
+      { hash = "4d3871f3b4195676e0788a935848d44f", label = "Shadow Hearts (Europe) (Es) (0.99) (Old Castle Street) [Subset - First Place Lottery Wins]" },
+      { hash = "81cf2a4c82001a132fe72bff3a018383", label = "Shadow Hearts (USA) [Subset - First Place Lottery Wins]" },
+      { hash = "a19bb2d7321e50433eb982fd0940ae59", label = "Shadow Hearts (Europe) [Subset - First Place Lottery Wins]" },
+    }
+  },
+
+  events = {
+  },
+}

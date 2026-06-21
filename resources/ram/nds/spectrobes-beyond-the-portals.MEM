@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "Spectrobes: Beyond the Portals",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "spectrobes-beyond-the-portals",
+    file = "spectrobes-beyond-the-portals.zip",
+    hashes = {
+      { hash = "dcc5807510fa8964e5dd55da693a5dcc", label = "Spectrobes - Beyond the Portals (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3D9097, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="--- Bit2 | After Credits" },
+        { address=0X3DB095, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X16DC0C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loading Zones [32bit]" },
+        { address=0X3D9083, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit3 | Nox: Southern Underground Ruins - Door 1 opened" },
+        { address=0X3D9084, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit2 | Nox: Southern Underground Ruins - Door 2 opened" },
+        { address=0X3D9085, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="--- Bit2 | Nox: Southern Underground Ruins - Door 3 opened" },
+        { address=0X3D919C, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Krawlosphere - Current Rounds Completed [16bit]" },
+        { address=0X3DB0FA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loading Zone ID [16bit]" },
+        { address=0X3DB146, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Battle - Current Round [16bit]" },
+        { address=0X3DB148, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Battle - Total Rounds [16bit]" },
+      },
+      zone = {
+        { address=0X3DB0C8, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map Active? [32bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X193470, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rallen - Current Health inside Battle [16bit] decreased" },
+        { address=0X193470, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rallen - Current Health inside Battle [16bit] increased" },
+        { address=0X193472, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rallen - Max Health inside Battle [16bit] decreased" },
+        { address=0X193472, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rallen - Max Health inside Battle [16bit] increased" },
+        { address=0X2301F0, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Excavation - Item Damage [32bit]" },
+        { address=0X2654A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Portal / Photon Energy Minigame - Game State [16bit] decreased" },
+        { address=0X2654A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Portal / Photon Energy Minigame - Game State [16bit] increased" },
+        { address=0X2654D8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Portal / Photon Energy Minigame - Current Speed (Sm/h) [16bit] decreased" },
+        { address=0X2654D8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Portal / Photon Energy Minigame - Current Speed (Sm/h) [16bit] increased" },
+        { address=0X2654E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Photon Energy - Energy collected [8bit] decreased" },
+        { address=0X2654E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Photon Energy - Energy collected [8bit] increased" },
+        { address=0X3DB418, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rallen - Current Health (Global) [16bit] decreased" },
+        { address=0X3DB418, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rallen - Current Health (Global) [16bit] increased" },
+        { address=0X3DB41A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rallen - Max Health (Global) [16bit] decreased" },
+        { address=0X3DB41A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rallen - Max Health (Global) [16bit] increased" },
+        { address=0X3DB6BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="--- HP Seed decreased" },
+        { address=0X3DB6BA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="--- HP Seed increased" },
+        { address=0X3DB804, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card Input - Spectrobes: Beyond the Portals - CP-67 - HP Seed [32bit] decreased" },
+        { address=0X3DB804, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card Input - Spectrobes: Beyond the Portals - CP-67 - HP Seed [32bit] increased" },
+        { address=0X3DBC10, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Photon Energy Collecting - Record [32bit] decreased" },
+        { address=0X3DBC10, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Photon Energy Collecting - Record [32bit] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3DB437, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Current Equipment - Suit [8bit]" },
+        { address=0X3DB6B4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="--- Emerald" },
+        { address=0X3DB790, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Card Input - Spectrobes - CP-38 Emerald Mineral [32bit]" },
+        { address=0X3DB849, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="------ Bit0 | Scalar Suit" },
+        { address=0X3DB84F, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="------ Bit0 | Scalar Suit" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17ED94, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Krawlosphere Sequence Battle - Results - Final Points Progress [32bit]" },
+        { address=0X17ED98, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Krawlosphere Sequence Battle - Results - Final Points Total [32bit]" },
+        { address=0X3DB43C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Experience Points [32bit]" },
+      },
+      collectibles = {
+        { address=0X3DB6B7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="--- Gold increased" },
+        { address=0X3DB85A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="--- Gold Prizmod increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3D9066, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="--- Bit0 | Gelberus Boss Start" },
+        { address=0X3D907C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="--- Bit0 | Gronos Boss Event Start" },
+        { address=0X3D9096, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="--- Bit1 | Final Boss Phase 2 (Scripted Win)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3D905D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="--- Bit7 | Jado destroyed Tower" },
+        { address=0X3D906B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="--- Bit0 | Space Ruins: Landing Point - Dialogue at the Ancient Ruins Door" },
+        { address=0X3D906E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="--- Bit0 | Space Ruins: Main Room - Flash Door opened" },
+        { address=0X3D906F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="--- Bit0 | Space Ruins: Main Room - Inspected the Corona Door" },
+        { address=0X3D9070, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="--- Bit0 | Space Ruins: Main Room - Failed to open the Aurora Door" },
+        { address=0X3DB3C0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Last Secret Door Property [8bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X258D64, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Awaken - Awake Time remaining [32bit]" },
+        { address=0X258D68, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Awaken - Auto-Cancel Time remaining [32bit]" },
+        { address=0X2654A6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Portal / Photon Energy Minigame - Game State Timer [16bit]" },
+        { address=0X2654DC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Portal / Photon Energy Minigame - Current Time [32bit]" },
+      },
+    },
+  },
+}

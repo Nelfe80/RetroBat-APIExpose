@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "Tales of Symphonia: Dawn of the New World",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "tales-of-symphonia-dawn-of-the-new-world",
+    file = "tales-of-symphonia-dawn-of-the-new-world.zip",
+    hashes = {
+      { hash = "a0563f9f13276548fa8aeeb07720c54e", label = "Tales of Symphonia - Dawn of the New World (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6718B4, type="u32be", condition="eq", value=0X0165, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X67D2A5, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Master of Black and White" },
+        { address=0X67D2A5, type="u8", condition="bit_true", bit=1, mask=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Peeping Tom" },
+        { address=0X67D2A5, type="u8", condition="bit_true", bit=2, mask=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Jewel Hunter!?" },
+        { address=0X67D2A6, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Perfect Partner" },
+        { address=0X67D2A6, type="u8", condition="bit_true", bit=1, mask=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Master Fisherman" },
+        { address=0X67D2A6, type="u8", condition="bit_true", bit=2, mask=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Berserker" },
+        { address=0X67D2A6, type="u8", condition="bit_true", bit=3, mask=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Divine Swordsman" },
+        { address=0X67D2A6, type="u8", condition="bit_true", bit=4, mask=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Monster Lover" },
+        { address=0X67D2A6, type="u8", condition="bit_true", bit=5, mask=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Prince of Monsters" },
+        { address=0X67D2A6, type="u8", condition="bit_true", bit=6, mask=0X40, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="King of Monsters" },
+        { address=0X67D2A6, type="u8", condition="bit_true", bit=7, mask=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Decipherer of the Seal" },
+        { address=0X67D2A7, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Timid Boy" },
+        { address=0X67D2A7, type="u8", condition="bit_true", bit=1, mask=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Knight of Ratatosk" },
+        { address=0X67D2A7, type="u8", condition="bit_true", bit=2, mask=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Prince of My Dreams" },
+        { address=0X67D2A7, type="u8", condition="bit_true", bit=3, mask=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Ratatosk Mode" },
+        { address=0X67D2A7, type="u8", condition="bit_true", bit=4, mask=0X10, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Marta's Knight" },
+        { address=0X67D2A7, type="u8", condition="bit_true", bit=5, mask=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="You Are You" },
+        { address=0X67D2A7, type="u8", condition="bit_true", bit=6, mask=0X40, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Summon Spirit Ratatosk" },
+        { address=0X67D2A7, type="u8", condition="bit_true", bit=7, mask=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Destined Partner" },
+        { address=0X67D2DF, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Fang" },
+        { address=0X68EE5B, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Aura of the Demonic Realm" },
+        { address=0X6B1D6B, type="u8", condition="eq", value=0X6, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demons" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X68EE5E, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Reunited World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X68EB9D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Life Bottle Quantity] [8-Bits] increased" },
+        { address=0X68EB9D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Life Bottle Quantity] [8-Bits] decreased" },
+        { address=0X68EFD8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Bottle Lake Sinoa" },
+        { address=0X68EFDB, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Bottle Dynasty Ruins" },
+        { address=0X68EFE1, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Bottle Temple of Darkness" },
+        { address=0X68F0D9, type="u32be", condition="eq", value=0X1E9808, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Winds died down" },
+      },
+      health = {
+        { address=0X67D2A8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Emil Actual HP] [16-Bits BE] decreased" },
+        { address=0X67D2A8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Emil Actual HP] [16-Bits BE] increased" },
+        { address=0X67D2AC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Emil Max HP] [16-Bits] decreased" },
+        { address=0X67D2AC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Emil Max HP] [16-Bits] increased" },
+        { address=0X67D390, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Marta Actual HP] [16-Bits BE] decreased" },
+        { address=0X67D390, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Marta Actual HP] [16-Bits BE] increased" },
+        { address=0X67D560, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Monster 1 Actual HP] [16-Bits BE] decreased" },
+        { address=0X67D560, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Monster 1 Actual HP] [16-Bits BE] increased" },
+        { address=0X67D648, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Monster 2 Actual HP] [16-Bits BE] decreased" },
+        { address=0X67D648, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Monster 2 Actual HP] [16-Bits BE] increased" },
+        { address=0X68F0D9, type="u32be", condition="eq", value=0XFAE38, action="HIT", no_log=false, no_survey=false, desc="Find richter hurt" },
+        { address=0X11439934, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy HP] [32-Bits BE] decreased" },
+        { address=0X11439934, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy HP] [32-Bits BE] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X6718B4, type="u32be", condition="eq", value=0X44, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Meltokio Weapon Shop" },
+        { address=0X6718B4, type="u32be", condition="eq", value=0X79, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flanoir Weapon Shop" },
+        { address=0X6718B4, type="u32be", condition="eq", value=0X8A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Luin Weapon Shop" },
+        { address=0X6718B4, type="u32be", condition="eq", value=0X97, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Asgard Weapon Shop" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X68E5A0, type="u8", condition="eq", value=0X0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Fire" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Water" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Earth" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X3, action="MONEY_STATE", no_log=false, no_survey=false, desc="Wind" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X4, action="MONEY_STATE", no_log=false, no_survey=false, desc="Blue Lightning" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X5, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ice" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Light" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X7, action="MONEY_STATE", no_log=false, no_survey=false, desc="Darkness" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X8, action="MONEY_STATE", no_log=false, no_survey=false, desc="Yellow Lightning" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0X9, action="MONEY_STATE", no_log=false, no_survey=false, desc="Red Lightning" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0XA, action="MONEY_STATE", no_log=false, no_survey=false, desc="Explode" },
+        { address=0X68E5A0, type="u8", condition="eq", value=0XB, action="MONEY_STATE", no_log=false, no_survey=false, desc="Feuer" },
+        { address=0X68EFE0, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Spinner Temple of Ice" },
+        { address=0X68F0D9, type="u32be", condition="eq", value=0XFA000, action="MONEY_STATE", no_log=false, no_survey=false, desc="Obtain sorcerers Ring" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X68EE66, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Quick-Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X68EE68, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hidden Door" },
+        { address=0X68EFDF, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Stone Block Triet Ruins" },
+        { address=0X68F0D9, type="u32be", condition="eq", value=0XFC328, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Open the door behind lumen'saltar" },
+        { address=0X68F0D9, type="u32be", condition="eq", value=0X4C6E68, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Some sort of switch" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X68F0D9, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Story Progression]" },
+      },
+    },
+  },
+}

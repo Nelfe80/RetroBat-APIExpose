@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Iridion 3D",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle-Game, Action, Shooter, Avion, 3Eme Personne"
+  },
+
+  rom = {
+    name = "iridion-3d",
+    file = "iridion-3d.zip",
+    hashes = {
+      { hash = "f88df40fedb9d31a6e59dba4a9be1b2a", label = "Iridion 3D (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+  },
+}

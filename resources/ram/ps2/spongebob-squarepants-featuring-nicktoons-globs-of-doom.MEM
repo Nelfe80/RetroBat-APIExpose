@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "SpongeBob SquarePants featuring Nicktoons: Globs of Doom",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "spongebob-squarepants-featuring-nicktoons-globs-of-doom",
+    file = "spongebob-squarepants-featuring-nicktoons-globs-of-doom.zip",
+    hashes = {
+      { hash = "c97b97e573436fca1f0429788a03c73d", label = "Nickelodeon SpongeBob SquarePants featuring Nicktoons - Globs of Doom (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3D8DB0, type="u16le", condition="eq", value=0X000000FD, action="PAUSE_ON", no_log=false, no_survey=false, desc="Loading & Pause Screen" },
+        { address=0X3D9054, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is paused" },
+        { address=0X3D98D0, type="u32le", condition="eq", value=0X00010101, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game is currently paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3D98D0, type="u32le", condition="eq", value=0X00010001, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player has loaded into a Level and is now playing the Game 100 to 120 hits/ticks = The Player ha" },
+        { address=0XA1CB00, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bikini Bottom Stage 1 has been cleared" },
+        { address=0XA1CB00, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bikini Bottom Stage 2 has been cleared" },
+        { address=0XA1CB00, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bikini Bottom Boss Stage has been cleared" },
+        { address=0XA1CB00, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zim's Town Stage 1 has been cleared" },
+        { address=0XA1CB00, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zim's Town Stage 2 has been cleared" },
+        { address=0XA1CB00, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zim's Town Boss Stage has been cleared" },
+        { address=0XA1CB01, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Amity Park Stage 1 Clear" },
+        { address=0XA1CB01, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Amity Park Stage 2 Clear" },
+        { address=0XA1CB01, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Amity Park Boss Stage Clear" },
+        { address=0XA1CB01, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Retroville Stage 1 Clear" },
+        { address=0XA1CB01, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Retroville Stage 2 Clear" },
+        { address=0XA1CB01, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Retroville Boss Stage Clear" },
+        { address=0XA1CB01, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pupununu Stage 1 Clear" },
+        { address=0XA1CB01, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pupununu Stage 2 Clear" },
+        { address=0XA24450, type="u8", condition="eq", value=0X15, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spongebob (Why's Spongebob the only one that gets a different ID for a Slide Level???)" },
+      },
+      zone = {
+        { address=0X13C1384, type="u32le", condition="eq", value=0XF974FC4E, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Hub World" },
+      },
+      stage = {
+        { address=0X401660, type="u16le", condition="eq", value=0X6184, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bikini Bottom Bathroom Citizen has been loaded in Bikini Bottom Stage 2" },
+        { address=0X13C1394, type="u32le", condition="eq", value=0X0CD3F528, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Pupununu Stage 2 for some reason" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X13C1384, type="u32le", condition="eq", value=0X523C424A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bikini Bottom Boss Stage" },
+        { address=0X13C1384, type="u32le", condition="eq", value=0X4AA237F0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Zim's Town Boss Stage" },
+        { address=0X13C1384, type="u32le", condition="eq", value=0XFD1EF8E3, action="BOSS_HIT", no_log=false, no_survey=false, desc="Amity Park Boss Stage" },
+        { address=0X13C1384, type="u32le", condition="eq", value=0X20000000, action="BOSS_HIT", no_log=false, no_survey=false, desc="Retroville Stage 2 and also Pupununu Stage 2 as well as the Second to last Final Boss for some r" },
+        { address=0X13C1384, type="u32le", condition="eq", value=0X3CC00000, action="BOSS_HIT", no_log=false, no_survey=false, desc="Retroville Boss Stage" },
+        { address=0X13C1384, type="u32le", condition="eq", value=0X40404040, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Stage" },
+        { address=0X13C1394, type="u32le", condition="eq", value=0X4847F48, action="BOSS_HIT", no_log=false, no_survey=false, desc="The second to last Final Boss Stage for some reason" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XA244A0, type="u8", condition="eq", value=0X07, action="JUMPING", no_log=true, no_survey=false, desc="A Second Player has jumped in" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA1CB00, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bikini Bottom Door has been opened" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11AC8C4, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

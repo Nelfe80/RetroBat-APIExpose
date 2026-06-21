@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Gex 3: Deep Pocket Gecko",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "gex-3-deep-pocket-gecko",
+    file = "gex-3-deep-pocket-gecko.zip",
+    hashes = {
+      { hash = "91eb6db42e92e2df05cc2b40f0dbc2f0", label = "Gex 3 - Deep Pocket Gecko (USA).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XDC1E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID [Menu order] 00=Mission Control" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD8F6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss Health [00=death]" },
+        { address=0XDC4E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XDC4E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XDC50, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Health 00=death" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XDC65, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="bit0 = WWG boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XDB7E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Password block" },
+      },
+    },
+  },
+}

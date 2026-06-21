@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Playboy: The Mansion",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Construction and Management Simulation, Strategy"
+  },
+
+  rom = {
+    name = "playboy-the-mansion",
+    file = "playboy-the-mansion.zip",
+    hashes = {
+      { hash = "3b66ac27de15c78b9d6dd4cc181c9437", label = "Playboy - The Mansion (USA)" },
+      { hash = "a39a5837faaa3c59dbca096a2c86cbd6", label = "Playboy - The Mansion (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

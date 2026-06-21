@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Phoenix Wright: Ace Attorney",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Visual Novel"
+  },
+
+  rom = {
+    name = "phoenix-wright-ace-attorney",
+    file = "phoenix-wright-ace-attorney.zip",
+    hashes = {
+      { hash = "8ce06f66ab81444511bef20b3fe9c632", label = "Phoenix Wright - Ace Attorney (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDAAD6, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="To Be Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCD104, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Data (80 Bytes?) [EU]" },
+        { address=0XCE06C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Screen Background ID (32-bit) [US]" },
+        { address=0XCE070, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Previous Screen Background ID (32-bit) [US]" },
+        { address=0XCE300, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Data (80 Bytes?) [JP]" },
+        { address=0XD0160, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Data (80 Bytes?) [FR]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCEB73, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Meter (8-bit) [US] decreased" },
+        { address=0XCEB73, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Meter (8-bit) [US] increased" },
+      },
+    },
+  },
+}

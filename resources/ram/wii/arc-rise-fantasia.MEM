@@ -1,0 +1,103 @@
+return {
+  game = {
+    title = "Arc Rise Fantasia",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "arc-rise-fantasia",
+    file = "arc-rise-fantasia.zip",
+    hashes = {
+      { hash = "f5a1e6293e24c79d42327027281cdf84", label = "Arc Rise Fantasia (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4475C9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bitfield] Overworld pick ups" },
+        { address=0X449E78, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] L'arc's Level" },
+        { address=0X449F30, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Ryfia's Level" },
+        { address=0X44A2C8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bbit BE] Alf's Level" },
+        { address=0X44A438, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bbit BE] Nico's Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X449289, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="number held of Cotardie" },
+        { address=0X44DF50, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Imperial Soldier" },
+        { address=0X44DF51, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Imperial Soldier" },
+        { address=0X44DF56, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Imperial Undead" },
+        { address=0X44DF57, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Imperial Undead" },
+        { address=0X44DF64, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Imperial Undead (2)" },
+        { address=0X44DF65, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Imperial Undead (2)" },
+        { address=0X44DF77, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Republic Soldier" },
+        { address=0X44E112, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Deathchanter, first fight" },
+        { address=0X44E113, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Deathchanter, first fight" },
+        { address=0X44E114, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Deathchanter, second fight" },
+        { address=0X44E115, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Deathchanter, second fight" },
+      },
+      health = {
+        { address=0X449E80, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bit BE] L'arc's current HP decreased" },
+        { address=0X449E80, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bit BE] L'arc's current HP increased" },
+        { address=0X449E90, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bbit BE] L'arc's total HP decreased" },
+        { address=0X449E90, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bbit BE] L'arc's total HP increased" },
+        { address=0X449F38, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bbit BE] Ryfia's current HP decreased" },
+        { address=0X449F38, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bbit BE] Ryfia's current HP increased" },
+        { address=0X449F48, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bbit BE] Ryfia's total HP decreased" },
+        { address=0X449F48, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bbit BE] Ryfia's total HP increased" },
+        { address=0X449FF0, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Serge's current HP decreased" },
+        { address=0X449FF0, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE] Serge's current HP increased" },
+        { address=0X44A000, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Serge's total HP decreased" },
+        { address=0X44A000, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE] Serge's total HP increased" },
+        { address=0X44A2D0, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bbit BE] Alf's current HP decreased" },
+        { address=0X44A2D0, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bbit BE] Alf's current HP increased" },
+        { address=0X44A2E0, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bbit BE] Alf's total HP decreased" },
+        { address=0X44A2E0, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bbit BE] Alf's total HP increased" },
+        { address=0X44A440, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bbit BE] Niko's Current HP decreased" },
+        { address=0X44A440, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bbit BE] Niko's Current HP increased" },
+        { address=0X44A450, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bbit BE] Niko's Total HP decreased" },
+        { address=0X44A450, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bbit BE] Niko's Total HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X44725C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitfields] Event flags for the treasure quest" },
+        { address=0X4492FC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="number held of Emerald" },
+        { address=0X44DF9C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Emeraldas" },
+        { address=0X44DF9D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Emeraldas" },
+      },
+      weapon = {
+        { address=0X4491B4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="number held of Balmung weapon" },
+        { address=0X4491B6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="number held of Medical Sword weapon" },
+        { address=0X4491B8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="number held of Lumberblade weapon" },
+        { address=0X4491B9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="number held of wooden sword weapon" },
+        { address=0X4491C4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="number held of Interruptor weapon" },
+        { address=0X44920B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="number held of Gigant Blade weapon" },
+        { address=0X44A7C0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="block attached to the Claymore weapon" },
+        { address=0X44A8D0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Bitfield] Weapon Secret has been unlocked for Wooden Sword" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X44E0EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Final Boss" },
+        { address=0X44E0ED, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Bitfield] Bestiary Entry - Final Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X44913C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of shield of aegis currently held" },
+      },
+      player = {
+        { address=0X44939F, type="u8", condition="change", action="SWIMMING", no_log=true, no_survey=false, desc="[Bitflags] L'Arc Custome unlocked - swimsuit" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4477B0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[Bitfield] ruins of hilbert blocked section and Flagship Percival Pick ups" },
+      },
+    },
+  },
+}

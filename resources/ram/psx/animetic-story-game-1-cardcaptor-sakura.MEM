@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Animetic Story Game 1: Cardcaptor Sakura",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "animetic-story-game-1-cardcaptor-sakura",
+    file = "animetic-story-game-1-cardcaptor-sakura.zip",
+    hashes = {
+      { hash = "1ce1ef247d89b1645ed843792c473f7d", label = "Animetic Story Game 1 - Card Captor Sakura (Japan) (Disc 1)" },
+      { hash = "2826df39fe5e39dba1bdc03ed3b668de", label = "Animetic Story Game 1 - Card Captor Sakura (Japan) (En) (v1.0) (NoOneee) (Disc 1)" },
+      { hash = "595ded2d155ea31cc1cf8d6cc83938f9", label = "Animetic Story Game 1 - Card Captor Sakura (Japan) (Disc 2)" },
+      { hash = "7fe97adda08ea241d11278bf20118fd9", label = "Animetic Story Game 1 - Card Captor Sakura (Japan) (En) (v1.0) (NoOneee) (Disc 2)" },
+    }
+  },
+
+  events = {
+  },
+}

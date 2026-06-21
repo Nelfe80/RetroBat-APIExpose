@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "LEGO The Lord of the Rings",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "lego-the-lord-of-the-rings",
+    file = "lego-the-lord-of-the-rings.zip",
+    hashes = {
+      { hash = "d935eeefa00075222376f65fc049b4b8", label = "LEGO The Lord of the Rings (Europe) (En,Fr,De,Es,It,Nl,Da)" },
+      { hash = "a3375b292d42d6603922cbfeb63ba56a", label = "LEGO The Lord of the Rings (USA) (En,Fr,Es,Pt)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCC5970, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID [32bit BE; mirror]" },
+        { address=0XD5CA00, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Mode [32bit BE]" },
+      },
+    },
+  },
+}

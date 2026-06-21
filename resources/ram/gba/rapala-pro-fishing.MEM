@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Rapala Pro Fishing",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "rapala-pro-fishing",
+    file = "rapala-pro-fishing.zip",
+    hashes = {
+      { hash = "1a92e287f154d62c136ebe524e75c7f2", label = "Rapala Pro Fishing (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+  },
+}

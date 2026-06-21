@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "B.O.B.",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "b-o-b",
+    file = "b-o-b.zip",
+    hashes = {
+      { hash = "6dd99077ae4e896155a88363b0649080", label = "B.O.B. (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFEE3, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 = Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC036, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="X Coordinates - Last Level" },
+      },
+      stage = {
+        { address=0XC714, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCB72, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0XCB72, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+      },
+      health = {
+        { address=0XCC06, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Bar decreased" },
+        { address=0XCC06, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Bar increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCB3C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Wave Ammo" },
+        { address=0XCB3E, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Bolt Ammo" },
+        { address=0XCB40, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Rocket Ammo" },
+        { address=0XCB42, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Flamethrower Ammo" },
+        { address=0XCB44, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Triple Shot Ammo" },
+        { address=0XCB46, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Single Shot Ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCB38, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Remote" },
+      },
+    },
+  },
+}

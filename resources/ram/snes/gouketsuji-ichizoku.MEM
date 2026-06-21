@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Gouketsuji Ichizoku",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "gouketsuji-ichizoku",
+    file = "gouketsuji-ichizoku.zip",
+    hashes = {
+      { hash = "3f5a432ef53daf9dd40d9e4df49bf2d2", label = "Gouketsuji Ichizoku (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1329, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round n????" },
+        { address=0X1360, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Round Won" },
+        { address=0X1362, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Round Won" },
+        { address=0X1EA1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level (Easy - Hard)" },
+      },
+      stage = {
+        { address=0X1E90, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages!" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X132A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Attack Enimies increased" },
+        { address=0X132A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Attack Enimies decreased" },
+        { address=0X1397, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Attack end increased" },
+        { address=0X1397, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Attack end decreased" },
+        { address=0X1EB5, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Attack (8/16/Infinito) 0/1/2 increased" },
+        { address=0X1EB5, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Attack (8/16/Infinito) 0/1/2 decreased" },
+      },
+      health = {
+        { address=0X1231, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP decreased" },
+        { address=0X1231, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP increased" },
+        { address=0X1233, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 HP decreased" },
+        { address=0X1233, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 HP increased" },
+      },
+    },
+  },
+}

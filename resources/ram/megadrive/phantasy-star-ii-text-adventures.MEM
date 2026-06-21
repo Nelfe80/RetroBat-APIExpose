@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Phantasy Star II: Text Adventures",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "phantasy-star-ii-text-adventures",
+    file = "phantasy-star-ii-text-adventures.zip",
+    hashes = {
+      { hash = "10195dfcde401acafd406f2640e384de", label = "Phantasy Star II - Anne's Adventure (Japan) (SegaNet).md" },
+      { hash = "4efb0bc21c9df35ff39eb1862f972c47", label = "Phantasy Star II - Huey's Adventure (Japan) (SegaNet).md" },
+      { hash = "5abe74899da838cc9dc7cabfb4d8f816", label = "Phantasy Star II - Shilka's Adventure (Japan) (SegaNet).md" },
+      { hash = "76cb3b2ec8b827ec9288d28bc8d0cd3b", label = "Phantasy Star II - Amia's Adventure (Japan) (SegaNet).md" },
+      { hash = "83f22a27147bdfd85d405daf111fde92", label = "Phantasy Star II - Yushis's Adventure (Japan) (SegaNet).md" },
+      { hash = "8ce3458a47e1dcb75982403e8b3cbf3f", label = "Phantasy Star II - Rudger's Adventure (Japan) (SegaNet).md" },
+      { hash = "d60bc80b482dfc1b31cb6c383f3fd88c", label = "Phantasy Star II - Nei's Adventure (Japan) (SegaNet).md" },
+      { hash = "dbe39f02548beaae0aa652dc4874c09e", label = "Phantasy Star II - Kinds's Adventure (Japan) (SegaNet).md" },
+      { hash = "cee72632b13d435674b2ddac637c5f8e", label = "Phantasy Star II - Anne's Adventure (Japan) (En) (v20100710) (Jon Najar).md" },
+      { hash = "cbdf6fe34574675dbd9da1cfccd6b9f5", label = "Phantasy Star II - Amia's Adventure (Japan) (En) (v20100710) (Jon Najar).md" },
+      { hash = "3c1ce24f8d84735d67fc6e0380c5e4c5", label = "Phantasy Star II - Yushis's Adventure (Japan) (En) (v20100710) (Jon Najar).md" },
+      { hash = "12260bf5b7863f4489d627865dba1eec", label = "Phantasy Star II - Huey's Adventure (Japan) (En) (v20100710) (Jon Najar).md" },
+      { hash = "ca9c437ccf387fb581f9ee00cfb14f34", label = "Phantasy Star II - Kinds's Adventure (Japan) (En) (v20100710) (Jon Najar).md" },
+      { hash = "30fb373aa2d47af800712f6897823309", label = "Phantasy Star II - Nei's Adventure (Japan) (En) (v20100710) (Jon Najar).md" },
+      { hash = "35d2cd35f238c59b645f77be6e64ab81", label = "Phantasy Star II - Shiika's Adventure (Japan) (En) (v20100710) (Jon Najar).md" },
+      { hash = "dbc8487b78b63efc151b80ea89de17ff", label = "Phantasy Star II - Rudger's Adventure (Japan) (En) (v20100710) (Jon Najar).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF94, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBF94, type="u8", condition="eq", value=0X2E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead End" },
+        { address=0XBF94, type="u8", condition="eq", value=0X1E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead End" },
+        { address=0XBF94, type="u8", condition="eq", value=0X17, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead End" },
+        { address=0XBF94, type="u8", condition="eq", value=0X0E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead End" },
+      },
+      health = {
+        { address=0XB6D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Eusis] O'Conner HP decreased" },
+        { address=0XB6D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Eusis] O'Conner HP increased" },
+        { address=0XB6F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Eusis] Shelley HP decreased" },
+        { address=0XB6F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Eusis] Shelley HP increased" },
+        { address=0XB878, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Rudger] Drill Mole HP decreased" },
+        { address=0XB878, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Rudger] Drill Mole HP increased" },
+        { address=0XB8AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Nei] Rabid Dog HP decreased" },
+        { address=0XB8AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Nei] Rabid Dog HP increased" },
+        { address=0XB8E0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Nei] Giant Rat HP decreased" },
+        { address=0XB8E0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Nei] Giant Rat HP increased" },
+        { address=0XB8FA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Nei] Hunter HP decreased" },
+        { address=0XB8FA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Nei] Hunter HP increased" },
+        { address=0XB97C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Amia] Bat HP decreased" },
+        { address=0XB97C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Amia] Bat HP increased" },
+        { address=0XB996, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Anne] Poison Fang HP decreased" },
+        { address=0XB996, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Anne] Poison Fang HP increased" },
+        { address=0XB9E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Anne] Kite Devil HP decreased" },
+        { address=0XB9E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Anne] Kite Devil HP increased" },
+        { address=0XB9EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Shilka] Robo Guard HP decreased" },
+        { address=0XB9EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Shilka] Robo Guard HP increased" },
+        { address=0XBA18, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Kinds] Nezumi HP decreased" },
+        { address=0XBA18, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Kinds] Nezumi HP increased" },
+        { address=0XBA32, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Kinds] Amoeboid HP decreased" },
+        { address=0XBA32, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Kinds] Amoeboid HP increased" },
+        { address=0XBA4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Kinds] Coolie HP decreased" },
+        { address=0XBA4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Kinds] Coolie HP increased" },
+        { address=0XC00C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0XC00C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XBF94, type="u8", condition="eq", value=0X33, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Room" },
+      },
+      weapon = {
+        { address=0XBF94, type="u8", condition="eq", value=0X1F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shop" },
+        { address=0XBF94, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shop" },
+        { address=0XBF94, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shop" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB91F, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Obtained golden ring" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBF94, type="u8", condition="eq", value=0X2F, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Before a Door" },
+        { address=0XBF94, type="u8", condition="eq", value=0X30, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Beyond the Door" },
+        { address=0XBF94, type="u8", condition="eq", value=0X32, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Ornate Door" },
+      },
+    },
+  },
+}

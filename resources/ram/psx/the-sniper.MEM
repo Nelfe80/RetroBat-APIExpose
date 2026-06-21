@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "The Sniper",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-sniper",
+    file = "the-sniper.zip",
+    hashes = {
+      { hash = "ce2ec6a7bfbbc4d92ace52c652817740", label = "Simple 1500 Series Vol. 56 - The Sniper (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE9B20, type="u16le", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu" },
+        { address=0XE9B20, type="u16le", condition="eq", value=0X06, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Cutscene in final stage" },
+        { address=0XE9B20, type="u16le", condition="eq", value=0X09, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XEB1E8, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Option one" },
+        { address=0XEB1E8, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Option two" },
+        { address=0XEB1E8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time of day - different choices in each level" },
+      },
+      stage = {
+        { address=0X6ECCC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Story mode - Current stage minus 1" },
+        { address=0X6ECD0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Practice mode - Current stage minus 1" },
+        { address=0XE9C50, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0XE9C50, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Practice mode - Number of mafia in stage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE9B48, type="u32le", condition="eq", value=0XFFFFFFFF, action="AMMO_STATE", no_log=true, no_survey=false, desc="Practice" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Jig-A-Pix: Wild World",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "jig-a-pix-wild-world",
+    file = "jig-a-pix-wild-world.zip",
+    hashes = {
+      { hash = "00ca0a2db179701db82812d04fdddc3c", label = "Jigapix - Wild World (Europe) (En,Fr,De,Es,It,Nl) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+  },
+}

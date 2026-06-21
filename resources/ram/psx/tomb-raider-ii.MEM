@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Tomb Raider II",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tomb-raider-ii",
+    file = "tomb-raider-ii.zip",
+    hashes = {
+      { hash = "28dd33bf9d2faa0e52e2315de16e41fd", label = "Tomb Raider II - Starring Lara Croft (USA) (Rev 2)" },
+      { hash = "466f75a92104129b3a090fa2169175bf", label = "Tomb Raider II - Starring Lara Croft (USA) (Rev 3)" },
+      { hash = "53b1f9163f4b2d9a064c10859e02fa6e", label = "Tomb Raider II - Starring Lara Croft (USA) (Rev 1)" },
+      { hash = "b036ae9f9efd019e8a33897852b18dd0", label = "Tomb Raider II - Starring Lara Croft (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X87A7C, type="u16le", condition="eq", value=0X28, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="venice violins; 0x40: title screen; ..." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X87A20, type="u16le", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="all guns; 0x12: level skip" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1E04A7, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1E079F, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1E0A97, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1E2BD7, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1E33DB, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1E3427, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0X19E6C6, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="active" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XDE682, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold; bit1: jade; bit2: silver" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1CED2C, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="active" },
+        { address=0X1CED78, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="active" },
+        { address=0X1CEDC4, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="active" },
+        { address=0X1CEE10, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="active" },
+        { address=0X1CEF40, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="active" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1FFFE3, type="u8", condition="eq", value=0X11, action="SWIMMING", no_log=true, no_survey=false, desc="swim" },
+        { address=0X1FFFE3, type="u8", condition="eq", value=0X1C, action="JUMPING", no_log=true, no_survey=false, desc="upwards jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1BB766, type="u16le", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="closed; 1: open" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X87A20, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="in-game cheat trigger counter (16-bit)" },
+      },
+    },
+  },
+}

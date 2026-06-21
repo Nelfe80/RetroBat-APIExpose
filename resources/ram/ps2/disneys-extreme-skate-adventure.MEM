@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Disney's Extreme Skate Adventure",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "disneys-extreme-skate-adventure",
+    file = "disneys-extreme-skate-adventure.zip",
+    hashes = {
+      { hash = "43468a2ace2d3c817945244499d8f94a", label = "Disney's Extreme Skate Adventure (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA8893F, type="u8", condition="eq", value=0XB7, action="DEMO_MODE", no_log=false, no_survey=false, desc="Funky Demon" },
+        { address=0XA9E228, type="u32le", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+      events = {
+        { address=0X8AE2D4, type="u32le", condition="eq", value=0X1, action="COMBO_HIT", no_log=false, no_survey=false, desc="In a Combo" },
+        { address=0X8B0584, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Float] Combo Manual Seconds Elapsed" },
+        { address=0X8B05F4, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Float] Combo Grind Seconds Elapsed" },
+        { address=0X8B0664, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Float] Combo Lip Seconds Elapsed" },
+        { address=0X8B20A8, type="u32le", condition="eq", value=0X1, action="COMBO_HIT", no_log=false, no_survey=false, desc="Landed" },
+        { address=0X8B20A8, type="u32le", condition="eq", value=0X2, action="COMBO_HIT", no_log=false, no_survey=false, desc="Score Vanishing" },
+        { address=0X8B20F8, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Trick Count (Multiplier)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA88478, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total Level Goals" },
+        { address=0XA88488, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total Level Goals Mirror" },
+        { address=0XA88494, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed Goals" },
+        { address=0XA88498, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed Goals Mirror" },
+        { address=0XA884A8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed Goals Mirror" },
+        { address=0XA88920, type="u8", condition="eq", value=0XB6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pizza Planet" },
+        { address=0XA88920, type="u8", condition="eq", value=0XB5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Olliewood/Andy's House (Default)" },
+        { address=0XA88920, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Levels Unlocked" },
+        { address=0XA88921, type="u8", condition="eq", value=0XB7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zurg" },
+        { address=0XA88921, type="u8", condition="eq", value=0XB6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jessie" },
+        { address=0XA88921, type="u8", condition="eq", value=0XB5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scar's Canyon" },
+        { address=0XA88921, type="u8", condition="eq", value=0XB4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Graveyard" },
+        { address=0XA88921, type="u8", condition="eq", value=0XB3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pride Rock (Default)" },
+        { address=0XA88921, type="u8", condition="eq", value=0XB2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clayton's Ship" },
+        { address=0XA88921, type="u8", condition="eq", value=0XB1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Human Camp" },
+        { address=0XA88921, type="u8", condition="eq", value=0XB0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle Treehouse (Default)" },
+        { address=0XA88921, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Skaters/Levels Unlocked" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Andy's Room" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pizza Planet" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jungle Treehouse" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Human Camp" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Clayton's Ship" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pride Rock" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Graveyard" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scar's Canyon" },
+        { address=0XA88954, type="u16le", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Olliewood" },
+        { address=0XA88954, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+      zone = {
+        { address=0XA88920, type="u8", condition="eq", value=0XB7, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Zurg's World" },
+        { address=0XA88954, type="u16le", condition="eq", value=0X3, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Zurg's World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA88935, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Blondie" },
+        { address=0XA88939, type="u8", condition="eq", value=0XB0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pumpkin Hoodie (Shirt)" },
+        { address=0XA8893E, type="u8", condition="eq", value=0XB4, action="LIVES_STATE", no_log=false, no_survey=false, desc="Afterlife" },
+        { address=0XA8893F, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier Caste" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8B20A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+        { address=0X8B20AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Base Score" },
+        { address=0X8B20B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bottom Middle Combo Score" },
+        { address=0X8B20B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combo Score (Persistent)" },
+        { address=0X8B20BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combo Score (Volatile)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XA88925, type="u8", condition="eq", value=0XB4, action="JUMPING", no_log=true, no_survey=false, desc="Jump 5" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA8848C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Goal ID" },
+        { address=0XA8892D, type="u8", condition="eq", value=0XB6, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time-4-New" },
+        { address=0XA8892D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[bitflags] Glasses Unlocked" },
+      },
+    },
+  },
+}

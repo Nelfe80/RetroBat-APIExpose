@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "Power Rangers: Time Force",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "power-rangers-time-force",
+    file = "power-rangers-time-force.zip",
+    hashes = {
+      { hash = "bab2493e313554ad374250d6571e7595", label = "Saban's Power Rangers - Time Force (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD5D58, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Displays when gameplay is active or stopped by a dialogue box or the pause menu" },
+        { address=0XD5D5C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Displays when gameplay is active or stopped by a dialogue box or the pause menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD53D9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to change to 01 when level results screen appears." },
+        { address=0XD5424, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Indicates what level you're on" },
+        { address=0XE7530, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to display Level Results" },
+        { address=0XE7531, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to display Level Results" },
+        { address=0XE7534, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This address is used as part of the trigger for the level results screen." },
+        { address=0XE7538, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to display Level Results" },
+        { address=0XE7539, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to display Level Results" },
+        { address=0XE7540, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to display Level Results" },
+        { address=0XE7541, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to display Level Results" },
+        { address=0XE7545, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This address is used as part of the trigger for the level results screen" },
+        { address=0XE7550, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to display Level Results" },
+        { address=0XE7551, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Seems to display Level Results" },
+        { address=0XE7554, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This address is used as part of the trigger for the level results screen." },
+        { address=0XE7555, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This address is used as part of the trigger for the level results screen." },
+        { address=0X12B9C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is the message box trigger for Level 1" },
+        { address=0X12B9F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is the message box trigger for Level 6" },
+        { address=0X12BA04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is the message box trigger for Level 7" },
+        { address=0X12BA10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is the message box trigger for Level 4" },
+        { address=0X12BA40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is the message box trigger for Level 3" },
+        { address=0X12BA4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is the message box trigger for Level 5" },
+        { address=0X12BA58, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is the message box trigger for Level 2" },
+        { address=0X12BA5C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is the player's health (Level 2)" },
+        { address=0X12BA68, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This is meter used for special moves (Level 2)" },
+      },
+      stage = {
+        { address=0XC64D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Represents the character you're playing as on both the character select screen and within the le" },
+        { address=0X12BA1C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Indicates that the artifact of Level 1 has been collected" },
+        { address=0X12BA64, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Indicates that the artifact of Level 4 has been collected" },
+        { address=0X12BA94, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Indicates that the artifact of Level 3 has been collected" },
+        { address=0X12BAA0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Indicates the artifact of Level 5 has been collected." },
+        { address=0X12BAAC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Indicates that the artifact of Level 2 has been collected" },
+        { address=0X1C65B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This is the address used to add protection for the Level 1 achievements, as Level 1 and the hub" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X12B9C4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="This is the life counter in Level 1 increased" },
+        { address=0X12B9C4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="This is the life counter in Level 1 decreased" },
+        { address=0X12B9F4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life counter for Level 6 increased" },
+        { address=0X12B9F4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life counter for Level 6 decreased" },
+        { address=0X12BA00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life counter in Level 7 increased" },
+        { address=0X12BA00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life counter in Level 7 decreased" },
+        { address=0X12BA0C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life counter for Level 4 increased" },
+        { address=0X12BA0C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life counter for Level 4 decreased" },
+        { address=0X12BA3C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life counter for Level 3 increased" },
+        { address=0X12BA3C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life counter for Level 3 decreased" },
+        { address=0X12BA48, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life counter for Level 5 increased" },
+        { address=0X12BA48, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life counter for Level 5 decreased" },
+        { address=0X12BA54, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="This is the life counter in Level 2 increased" },
+        { address=0X12BA54, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="This is the life counter in Level 2 decreased" },
+      },
+      health = {
+        { address=0XC30DA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Could possibly be part of the trigger for the Health Bonus message decreased" },
+        { address=0XC30DA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Could possibly be part of the trigger for the Health Bonus message increased" },
+        { address=0X12D768, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health meter for Enemies? decreased" },
+        { address=0X12D768, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health meter for Enemies? increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD53EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Seems to change to 01 when level boss is beaten" },
+        { address=0X12D740, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Appears to indicate when a boss is defeated" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC30D8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="This is part of the address that is used to play the in-game messages. I used this in order to c" },
+        { address=0XC30F8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="This is part of the address that is used to play the in-game messages. I used this in order to c" },
+        { address=0XC9B1C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Time!!!" },
+      },
+    },
+  },
+}

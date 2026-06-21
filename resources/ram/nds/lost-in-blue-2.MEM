@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Lost in Blue 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "lost-in-blue-2",
+    file = "lost-in-blue-2.zip",
+    hashes = {
+      { hash = "4cfb36cfb72df1a1dc8a8911d493b75f", label = "Lost in Blue 2 (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X17BCB6, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X17BCB6, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Looking at Ground" },
+        { address=0X17BCF6, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X17C103, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="White Round Shell Quantity" },
+        { address=0X17C106, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Black Round Shell Quantity" },
+        { address=0X17C109, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Round Shell Quantity" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X17BCC7, type="u8", condition="eq", value=0X11, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lifeboat Ending" },
+        { address=0X17BCC7, type="u8", condition="eq", value=0X12, action="LIVES_STATE", no_log=false, no_survey=false, desc="Bad Lifeboat Ending" },
+        { address=0X17BCC7, type="u8", condition="eq", value=0X15, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Jack Death" },
+      },
+      health = {
+        { address=0X17C1DB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jack Health % decreased" },
+        { address=0X17C1DB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jack Health % increased" },
+        { address=0X17C1DF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Amy Health % decreased" },
+        { address=0X17C1DF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Amy Health % increased" },
+        { address=0X17C1ED, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jack Energy Length decreased" },
+        { address=0X17C1ED, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jack Energy Length increased" },
+        { address=0X17C1FB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Amy Energy Length decreased" },
+        { address=0X17C1FB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Amy Energy Length increased" },
+      },
+    },
+  },
+}

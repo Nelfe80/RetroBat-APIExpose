@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Cinnamon: Yume no Daibouken",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "cinnamon-yume-no-daibouken",
+    file = "cinnamon-yume-no-daibouken.zip",
+    hashes = {
+      { hash = "6c923128bbe3baf6b242f58b8b1e4154", label = "Cinnamon Game Series 2 - Yume no Daibouken (Japan).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X22A0, type="u8", condition="eq", value=0X0, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In stage" },
+        { address=0X22A0, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X22A0, type="u8", condition="eq", value=0X5, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2EAD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of stages cleared?" },
+        { address=0X324C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amount of sweets collected in level?" },
+        { address=0X332C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage clear flag" },
+      },
+      zone = {
+        { address=0X22A0, type="u8", condition="eq", value=0X4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+        { address=0X2D54, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current selected world" },
+      },
+      stage = {
+        { address=0X2D2C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage selection" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X323A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X323A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X22A0, type="u8", condition="eq", value=0X9, action="SCORE_STATE", no_log=false, no_survey=false, desc="High scores" },
+        { address=0X2E40, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Town - Stage 1 High score" },
+        { address=0X2E44, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Town - Stage 2 High score" },
+        { address=0X2E48, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Town - Stage 3 High score" },
+        { address=0X2E4C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Park - Stage 1 high score" },
+        { address=0X2E50, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Park - Stage 2 high score" },
+        { address=0X2E54, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Park - Stage 3 High score" },
+        { address=0X2E58, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Flower Field - Stage 1 high score" },
+        { address=0X2E5C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Flower Field - Stage 2 high score" },
+        { address=0X2E60, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Flower Field - Stage 3 high score" },
+        { address=0X2E64, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Clock Tower - Stage 1 high score" },
+        { address=0X2E68, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Clock Tower - Stage 2 high score" },
+        { address=0X2E6C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Clock Tower - Stage 3 high score" },
+        { address=0X2E70, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Amusement Park - Stage 1 high score" },
+        { address=0X2E74, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Amusement Park - Stage 2 high score" },
+        { address=0X2E78, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Amusement Park - Stage 3 high score" },
+        { address=0X2E7C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tower - Stage 1 high score" },
+        { address=0X2E80, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tower - Stage 2 high score" },
+        { address=0X2E84, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tower - Stage 3 high score" },
+        { address=0X2E88, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sky - Stage 1 high score" },
+        { address=0X2E8C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sky - Stage 2 high score" },
+        { address=0X2E90, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sky - Stage 3 high score" },
+        { address=0X2E94, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Flying Garden - Stage 1 high score" },
+        { address=0X2E98, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Flying Garden - Stage 2 high score" },
+        { address=0X2E9C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Flying Garden - Stage 3 high score" },
+        { address=0X2EA0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Space - High Score" },
+        { address=0X2EA4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Land of Sweets - High Score" },
+        { address=0X2EA8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Ocean - High Score" },
+        { address=0X3248, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X22A0, type="u8", condition="eq", value=0XA, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+      },
+    },
+  },
+}

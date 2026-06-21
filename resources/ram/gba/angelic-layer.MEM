@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Angelic Layer",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "angelic-layer",
+    file = "angelic-layer.zip",
+    hashes = {
+      { hash = "1950bec3827a706bcf603bf27794c270", label = "Kidou Tenshi Angelic Layer - Misaki to Yume no Tenshi-tachi (Japan).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2E5C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hikaru's Level minus 1 (story progess checker)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0F00, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player's Physical HP decreased" },
+        { address=0X0F00, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player's Physical HP increased" },
+        { address=0X362C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Displayed damage taken by either opponent, use to reject Astral Emission" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3AD8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Angel Points, 16-bit" },
+      },
+      collectibles = {
+        { address=0X3668, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Rounds of a Battle, usually 01, becomes 03 during a multi-round tournament. increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2E76, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player ACTIVE HP counter" },
+        { address=0X2F82, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy ACTIVE HP counter" },
+      },
+    },
+  },
+}

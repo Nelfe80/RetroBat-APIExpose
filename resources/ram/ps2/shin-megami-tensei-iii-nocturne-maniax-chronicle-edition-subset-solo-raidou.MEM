@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Shin Megami Tensei III: Nocturne Maniax Chronicle Edition [Subset - Solo+Raidou]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-iii-nocturne-maniax-chronicle-edition-subset-solo-raidou",
+    file = "shin-megami-tensei-iii-nocturne-maniax-chronicle-edition-subset-solo-raidou.zip",
+    hashes = {
+      { hash = "c3ee116ad71941957d9073d9bade76ae", label = "Shin Megami Tensei III - Nocturne Maniax - Chronicle Edition (Japan) (En) (v1.1.3) (Jang & Krisan Thyme)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2FBF84, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0X2FBF84, type="u16le", condition="eq", value=0X2B6, action="DEMO_MODE", no_log=false, no_survey=false, desc="No Reason / Demon Ending Cutscene" },
+        { address=0X2FBF84, type="u16le", condition="eq", value=0X329, action="DEMO_MODE", no_log=false, no_survey=false, desc="true demon ending" },
+        { address=0X12AA184, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA184, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA188, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA270, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA270, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA274, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA35C, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA35C, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA360, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA448, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA448, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA44C, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA534, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA534, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA538, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA620, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA620, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA624, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA70C, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA70C, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA710, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA7F8, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA7F8, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA7FC, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA8E4, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA8E4, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA8E8, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AA9D0, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AA9D0, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AA9D4, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AAABC, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AAABC, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AAAC0, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+        { address=0X12AABA8, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X12AABA8, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Summoned" },
+        { address=0X12AABAC, type="u8", condition="eq", value=0XC0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raidou" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12A9C55, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Specter fight 1 cleared" },
+      },
+      zone = {
+        { address=0X2FBF84, type="u16le", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World map pre-conception" },
+        { address=0X2FBF84, type="u16le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World map Vortex World" },
+        { address=0X2FBF84, type="u16le", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World map near Ginza" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2FBF84, type="u16le", condition="eq", value=0X21, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diet Building" },
+        { address=0X2FBF84, type="u16le", condition="eq", value=0X321, action="LIVES_STATE", no_log=false, no_survey=false, desc="Fountain of Life" },
+      },
+      health = {
+        { address=0X11CDE06, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0X11CDE06, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0X11CDEF2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X11CDEF2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X11CDFDE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X11CDFDE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0X11CE0CA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 HP decreased" },
+        { address=0X11CE0CA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 HP increased" },
+        { address=0X11CE1B6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 HP decreased" },
+        { address=0X11CE1B6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 HP increased" },
+        { address=0X11CE2A2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 HP decreased" },
+        { address=0X11CE2A2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 HP increased" },
+        { address=0X11D0F06, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ose HP decreased" },
+        { address=0X11D0F06, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ose HP increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12A9BCC, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Noah Door not entered" },
+        { address=0X12A9BCE, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Ahriman Door not entered" },
+      },
+    },
+  },
+}

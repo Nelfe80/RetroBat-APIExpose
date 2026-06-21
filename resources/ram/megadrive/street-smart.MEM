@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Street Smart",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "street-smart",
+    file = "street-smart.zip",
+    hashes = {
+      { hash = "7a926aaea9e526066a75c253738b633c", label = "Street Smart (Japan, USA) (En).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9048, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XF110, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue mode" },
+        { address=0XF140, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XF412, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="In Continue" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XF150, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X904A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIVES increased" },
+        { address=0X904A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIVES decreased" },
+        { address=0XF086, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIFE increased" },
+        { address=0XF086, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIFE decreased" },
+      },
+      health = {
+        { address=0X9240, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X9240, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0XF0F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP BOTH decreased" },
+        { address=0XF0F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP BOTH increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF02D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money: xx.000.000 increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF122, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME" },
+      },
+    },
+  },
+}

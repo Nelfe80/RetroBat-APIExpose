@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Tiny Toon Adventures: Buster's Bad Dream",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "tiny-toon-adventures-busters-bad-dream",
+    file = "tiny-toon-adventures-busters-bad-dream.zip",
+    hashes = {
+      { hash = "9ba9ba05be9bff52143e07cdf962d0ad", label = "Tiny Toon Adventures - Buster's Bad Dream (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X2A036, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Buster HP decreased" },
+        { address=0X2A036, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Buster HP increased" },
+        { address=0X2A076, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Buster HP decreased" },
+        { address=0X2A076, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Buster HP increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0DB8, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Control Pad" },
+        { address=0X0DB8, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="A-Button" },
+      },
+    },
+  },
+}

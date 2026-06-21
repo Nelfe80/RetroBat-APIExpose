@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Puzzle Series Vol. 6: Illust Logic",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-series-vol-6-illust-logic",
+    file = "puzzle-series-vol-6-illust-logic.zip",
+    hashes = {
+      { hash = "3d07fafa2a33a04da153872e7dc5929e", label = "Puzzle Series Vol. 6 - Illust Logic (Japan).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X4E196, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Profile 1 - Gold Rank Certification Puzzle Solved increased" },
+        { address=0X4E1AE, type="u24le", condition="eq", value=0X4B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rank" },
+        { address=0X4EACE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Profile 2 - Gold Rank Certification Puzzle Solved increased" },
+        { address=0X4EAE6, type="u24le", condition="eq", value=0X4B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rank" },
+        { address=0X4F406, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Profile 3 - Gold Rank Certification Puzzle Solved increased" },
+      },
+    },
+  },
+}

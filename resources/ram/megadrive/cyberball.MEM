@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Cyberball",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "cyberball",
+    file = "cyberball.zip",
+    hashes = {
+      { hash = "e19be4bcb50e4908c5b9af3bd69caa39", label = "Cyberball (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF662, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XFB6C, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="One Player" },
+        { address=0XFB6C, type="u8", condition="eq", value=0X0E, action="DEMO_MODE", no_log=false, no_survey=false, desc="Two Players" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XF618, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player One Score - 2nd Period" },
+        { address=0XF619, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player One Score - 1st Period" },
+        { address=0XF61A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player One Score - 4th Period" },
+        { address=0XF61B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player One Score - 3rd Period" },
+        { address=0XF61C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player One Score - 6th Period / Overtime" },
+        { address=0XF61D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player One Score - 5th Period" },
+        { address=0XF61E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Player One Score - Game Total" },
+        { address=0XF628, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player Two / CPU Score - 2nd Period" },
+        { address=0XF629, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player Two / CPU Score - 1st Period" },
+        { address=0XF62A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player Two / CPU Score - 4th Period" },
+        { address=0XF62B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player Two / CPU Score - 3rd Period" },
+        { address=0XF62C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player Two / CPU Score - 6th Period / Overtime" },
+        { address=0XF62D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player Two / CPU Score - 5th Period" },
+        { address=0XF62E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Player Two / CPU Score - Game Total" },
+        { address=0XFB57, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="0xf8 = 'Kickoff Occuring' check for 'score on kickoff' achievement" },
+      },
+      collectibles = {
+        { address=0XF6E8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BCD] Player Upgrade / Repair Cost (used to subtract money from each player's team funds)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF56C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[8-bit BCD] Game Timer (Seconds)" },
+        { address=0XF56D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[8-bit BCD] Game Timer (Minutes)" },
+        { address=0XF615, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player One - Timeouts Remaining" },
+        { address=0XF625, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Two / CPU - Timeouts Remaining" },
+        { address=0XF662, type="u8", condition="eq", value=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Halftime Show" },
+      },
+    },
+  },
+}

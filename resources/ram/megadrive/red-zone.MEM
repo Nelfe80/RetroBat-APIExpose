@@ -1,0 +1,116 @@
+return {
+  game = {
+    title = "Red Zone",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "red-zone",
+    file = "red-zone.zip",
+    hashes = {
+      { hash = "b351a24e0873756de1fa22282cf81ec0", label = "Red Zone (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0037, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="ff - Demo mode" },
+        { address=0X0197, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="ff - Game Over (all dead)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2EB9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ff - You are in the airbase zone" },
+        { address=0XFD28, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- This decreases when an asteroid hits you and the level resets" },
+        { address=0XFD2A, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- This decreases when an asteroid hits you and the level resets" },
+        { address=0XFD2C, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Current level - Asteroid minigame" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X003A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ff - Mirage died" },
+        { address=0X003B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ff - Rocco died" },
+        { address=0X003D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ff - Shades died" },
+      },
+      health = {
+        { address=0X01AA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health display bar decreased" },
+        { address=0X01AA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health display bar increased" },
+        { address=0X032C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Left rocket health decreased" },
+        { address=0X032C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Left rocket health increased" },
+        { address=0X0330, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Left hellfire health decreased" },
+        { address=0X0330, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Left hellfire health increased" },
+        { address=0X0332, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Left stinger health decreased" },
+        { address=0X0332, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Left stinger health increased" },
+        { address=0X0334, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Right rocket health decreased" },
+        { address=0X0334, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Right rocket health increased" },
+        { address=0X0338, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Right hellfire health decreased" },
+        { address=0X0338, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Right hellfire health increased" },
+        { address=0X033A, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Right stinger health decreased" },
+        { address=0X033A, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Right stinger health increased" },
+        { address=0X033C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Right jet health decreased" },
+        { address=0X033C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Right jet health increased" },
+        { address=0X033E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Left jet health decreased" },
+        { address=0X033E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Left jet health increased" },
+        { address=0X0340, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Radar health decreased" },
+        { address=0X0340, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Radar health increased" },
+        { address=0X0342, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Tail health decreased" },
+        { address=0X0342, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Tail health increased" },
+        { address=0X2D16, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="- Damage taken" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X030E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Selected Weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00CE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Score - High 2 bytes" },
+        { address=0X00D0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Score - Low 2 bytes" },
+        { address=0XFD20, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- P1 Score - High 2 bytes - Asteroid minigame" },
+        { address=0XFD22, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- P1 Score - Low 2 bytes - Asteroid minigame" },
+        { address=0XFD24, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- P2 Score - High 2 bytes - Asteroid minigame" },
+        { address=0XFD26, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- P2 Score - Low 2 bytes - Asteroid minigame" },
+      },
+      collectibles = {
+        { address=0X00B0, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Rocket ammo fired" },
+        { address=0X00B2, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Hellfire ammo fired" },
+        { address=0X00B4, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Stinger ammo fired" },
+        { address=0X00B6, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Cannon ammo fired" },
+        { address=0X0316, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Current ammo remaining" },
+        { address=0X031A, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Stinger ammo remaining" },
+        { address=0X031C, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Cannon ammo remaining" },
+        { address=0X031E, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Rocket ammo remaining" },
+        { address=0X0320, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Hellfire ammo remaining" },
+        { address=0X4E9A, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="- Ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X003C, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="ff - Invincibility mode" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00A8, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="- Tanks destroyed (in game)" },
+        { address=0X00AA, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="- Rocked pads destroyed (in game)" },
+        { address=0X00AC, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="- Missile pads destroyed (in game)" },
+        { address=0X00BA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objectives completed" },
+        { address=0X00BC, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="- Tanks destroyed" },
+        { address=0X00BE, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="- Rocket pads destroyed" },
+        { address=0X00C0, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="- Missile pads destroyed" },
+        { address=0X00CA, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="- Secondary targets destroyed" },
+        { address=0X00CC, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="- Mig-21 destroyed" },
+        { address=0X019E, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="ff - Game Over (destroyed)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2D2B, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="ff - Main radar destroyed" },
+      },
+    },
+  },
+}

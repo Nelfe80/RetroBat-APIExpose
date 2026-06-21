@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Missile War",
+    system = "arcadia",
+    system_name = "Arcadia 2001",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "missile-war",
+    file = "missile-war.zip",
+    hashes = {
+      { hash = "4a9404e44df9a747549f7af0b18df632", label = "Missile War (USA, Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

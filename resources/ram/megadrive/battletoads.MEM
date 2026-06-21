@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Battletoads",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up, Platform"
+  },
+
+  rom = {
+    name = "battletoads",
+    file = "battletoads.zip",
+    hashes = {
+      { hash = "216af7457a84ec56100c3f258d9ac6f1", label = "Battletoads (World) (Ru) (NewGame).md" },
+      { hash = "f1e299d6eb40e3ecec6460d96e1e4dc9", label = "Battletoads (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDFF7, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01 - paused" },
+        { address=0XFE7C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDFFE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="beat level odd" },
+        { address=0XDFFF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="beat level even" },
+        { address=0XE154, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level progress" },
+        { address=0XE2B3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0xFE level4 2nd 5000 collect" },
+        { address=0XED4A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level scene or event count up" },
+      },
+      stage = {
+        { address=0XDF04, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id" },
+        { address=0XE000, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="in stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDFE4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives lost during queen fight increased" },
+        { address=0XDFE4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives lost during queen fight decreased" },
+        { address=0XE047, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="player 1 lives increased" },
+        { address=0XE047, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player 1 lives decreased" },
+      },
+      health = {
+        { address=0XE006, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 1 health decreased" },
+        { address=0XE006, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 1 health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFE0E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16 bit score = 0-9990" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XDFF8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="turns to 1 on transistion to 1st level boss" },
+      },
+    },
+  },
+}

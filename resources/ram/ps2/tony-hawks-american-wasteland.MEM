@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Tony Hawk's American Wasteland",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "tony-hawks-american-wasteland",
+    file = "tony-hawks-american-wasteland.zip",
+    hashes = {
+      { hash = "c4a52c17232234aecd4154f7e2603037", label = "Tony Hawk's American Wasteland (USA) (Collector's Edition)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7D1FBC, type="u16le", condition="eq", value=0X9, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X9AF739, type="u8", condition="eq", value=0XB6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Cutscene Subtitles" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X715EDC, type="u32le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grounded" },
+        { address=0X7D1FBC, type="u16le", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select - Created Park - Load Park / High Scores" },
+        { address=0X7D1FBC, type="u16le", condition="eq", value=0X15, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select" },
+        { address=0X7D1FBC, type="u16le", condition="eq", value=0X1A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select - Created Park" },
+        { address=0X7D1FBC, type="u16le", condition="eq", value=0X24, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select - Created Park - Pre-Made Parks" },
+        { address=0X9AF70E, type="u8", condition="eq", value=0XB6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tip: press R2 in the air to level out" },
+        { address=0X9AF739, type="u8", condition="eq", value=0XB4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Music Zones" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9AF733, type="u8", condition="eq", value=0XB7, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score/Special Meter" },
+        { address=0X9AF734, type="u8", condition="eq", value=0XB2, action="SCORE_STATE", no_log=false, no_survey=false, desc="Base Score" },
+        { address=0XD238C0, type="u32le", condition="eq", value=0X1CA38B5C, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score/Free Skate, Options" },
+        { address=0XD23978, type="u32le", condition="eq", value=0XF9283EE7, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Run" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD55644, type="u32le", condition="eq", value=0X750, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="1m" },
+        { address=0XD55644, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time" },
+      },
+    },
+  },
+}

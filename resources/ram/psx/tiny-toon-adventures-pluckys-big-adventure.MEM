@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Tiny Toon Adventures: Plucky's Big Adventure",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "tiny-toon-adventures-pluckys-big-adventure",
+    file = "tiny-toon-adventures-pluckys-big-adventure.zip",
+    hashes = {
+      { hash = "894970cedb468331b16d9bf019792796", label = "Tiny Toon Adventures - Plucky's Big Adventure (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X7CB12, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Babs Health decreased" },
+        { address=0X7CB12, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Babs Health increased" },
+        { address=0X7D8FA, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hampton Health decreased" },
+        { address=0X7D8FA, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hampton Health increased" },
+        { address=0X7DE8A, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Buster Health decreased" },
+        { address=0X7DE8A, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Buster Health increased" },
+        { address=0X7E152, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Plucky Health decreased" },
+        { address=0X7E152, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Plucky Health increased" },
+      },
+    },
+  },
+}

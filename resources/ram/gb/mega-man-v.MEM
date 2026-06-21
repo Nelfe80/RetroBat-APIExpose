@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Mega Man V",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "mega-man-v",
+    file = "mega-man-v.zip",
+    hashes = {
+      { hash = "309fc69d5ab1d2b17d0bbc127faf04c1", label = "Rockman World 5 (Japan) (SGB Enhanced).gb" },
+      { hash = "b53fe06db30ab689153135990354dd5a", label = "Mega Man V (Europe) (SGB Enhanced).gb" },
+      { hash = "b98ce4d1606c2fd533557b3cd16de789", label = "Mega Man V (USA) - World 5 DX (v1.0) (marc_max).gb" },
+      { hash = "ceb17d831b410d91aa41bf2819cbed82", label = "Mega Man V (USA) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XDE8F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Part" },
+        { address=0XDEDD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XDEDE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC675, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Boss (No edit) increased" },
+        { address=0XC675, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Boss (No edit) decreased" },
+        { address=0XC698, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Boss 2 increased" },
+        { address=0XC698, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Boss 2 decreased" },
+        { address=0XDD2D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (No edit) increased" },
+        { address=0XDD2D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (No edit) decreased" },
+        { address=0XDF34, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XDF34, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XDE9E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health (Max = 0x98) decreased" },
+        { address=0XDE9E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health (Max = 0x98) increased" },
+        { address=0XDF3C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Balancer decreased" },
+        { address=0XDF3C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Balancer increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XDE9C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Bits" },
+        { address=0XDE9D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC658, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health (Except Venus)" },
+        { address=0XC836, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+        { address=0XCCC1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD73A, type="u16le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames (16-Bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC6B5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="boss timer countdown 2" },
+      },
+    },
+  },
+}

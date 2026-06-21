@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Britney's Dance Beat",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "britneys-dance-beat",
+    file = "britneys-dance-beat.zip",
+    hashes = {
+      { hash = "c63cc1fe21fbf30becdd60dbf17b3a5a", label = "Britney's Dance Beat (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2F6E10, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+      events = {
+        { address=0X94B4F4, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Combo" },
+        { address=0X94B4F8, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Max combo" },
+        { address=0X983434, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Also Current Combo" },
+        { address=0X983438, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Also Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2F3274, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Adj." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X356690, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="ACTUAL POITNS Points for the pass" },
+        { address=0X356694, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points for the pass" },
+      },
+    },
+  },
+}

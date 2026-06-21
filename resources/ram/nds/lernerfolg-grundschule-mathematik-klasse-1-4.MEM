@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Lernerfolg Grundschule: Mathematik - Klasse 1-4",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lernerfolg-grundschule-mathematik-klasse-1-4",
+    file = "lernerfolg-grundschule-mathematik-klasse-1-4.zip",
+    hashes = {
+      { hash = "4008c89fc46380f7e585ef0ccb85e3ee", label = "Lernerfolg Grundschule - Mathematik (Germany).nds" },
+    }
+  },
+
+  events = {
+  },
+}

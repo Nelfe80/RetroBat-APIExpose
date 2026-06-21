@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 JI 16600</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 DG 9700</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 JP 2000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 HA 2000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 JJ 2000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 EV 2000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 RC 2000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 JN 2000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 CM 2000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 JB 2000</text>
+		</text>
+	</view>
+</theme>

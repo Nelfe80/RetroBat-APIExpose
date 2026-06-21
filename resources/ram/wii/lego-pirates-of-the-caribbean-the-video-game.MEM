@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "LEGO Pirates of the Caribbean: The Video Game",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "lego-pirates-of-the-caribbean-the-video-game",
+    file = "lego-pirates-of-the-caribbean-the-video-game.zip",
+    hashes = {
+      { hash = "456c06d2a05f397e27108422429d2ba0", label = "LEGO Pirates of the Caribbean - The Video Game (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8102D4, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Last level loaded" },
+        { address=0X1080D76, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chapter complete" },
+      },
+      zone = {
+        { address=0X1080C80, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080C80, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 1 - Singapore - True Pirate" },
+        { address=0X1080C83, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 1 - Singapore - Minikits" },
+        { address=0X1080C86, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080C86, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080C8A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Bitflag] At World's End - Chapter 1 - Singapore - Compass Pieces" },
+        { address=0X1080C94, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080C94, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 2 - Davy Jones' Locker - True Pirate" },
+        { address=0X1080C97, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 2 - Davy Jones' Locker - Minikits" },
+        { address=0X1080C9A, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080C9A, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080C9E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Bitflag] At World's End - Chapter 2 - Davy Jones' Locker - Compass Pieces" },
+        { address=0X1080CA8, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080CA8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 3 - Norrington's Choice - True Pirate" },
+        { address=0X1080CAE, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080CAE, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080CBC, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080CBC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 4 - The Brethren Court - True Pirate" },
+        { address=0X1080CBF, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080CBF, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 4 - The Brethren Court - Minikits" },
+        { address=0X1080CC2, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080CC2, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080CC6, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Bitflag] At World's End - Chapter 4 - The Brethren Court - Compass Pieces" },
+        { address=0X1080CD0, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080CD0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 5 - The Maelstrom - True Pirate" },
+        { address=0X1080CD3, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="At World's End - Chapter 5 - The Maelstrom - Minikits" },
+        { address=0X1080CD6, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080CD6, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080CDA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Bitflag] At World's End - Chapter 5 - The Maelstrom - Compass Pieces" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1080C09, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080C0B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Chest - Chapter 1 - Pelegosto - Minikits" },
+        { address=0X1080C0E, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080C0E, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080C12, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflag] Dead Man's Chest - Chapter 1 - Pelegosto - Compass Pieces" },
+        { address=0X1080C1D, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080C1F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Chest - Chapter 2 - A Touch Of Destiny - Minikits" },
+        { address=0X1080C22, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080C22, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080C26, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflag] Dead Man's Chest - Chapter 2 - A Touch Of Destiny - Compass Pieces" },
+        { address=0X1080C31, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080C33, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Chest - Chapter 3 - The Dutchman's Secret - Minikits" },
+        { address=0X1080C36, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080C36, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080C3A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflag] Dead Man's Chest - Chapter 3 - The Dutchman's Secret - Compass Pieces" },
+        { address=0X1080C45, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080C47, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Chest - Chapter 4 - Isla Cruces - Minikits" },
+        { address=0X1080C4A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080C4A, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080C4E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflag] Dead Man's Chest - Chapter 4 - Isla Cruces - Compass Pieces" },
+        { address=0X1080C59, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1080C5B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Man's Chest - Chapter 5 - The Kraken - Minikits" },
+        { address=0X1080C5E, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Freeplay unlocked" },
+        { address=0X1080C5E, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chapter unlocked" },
+        { address=0X1080C62, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1081201, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x4" },
+        { address=0X1081201, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x6" },
+        { address=0X1081201, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x8" },
+        { address=0X1081201, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x10" },
+        { address=0X1081202, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Always Double Treasure" },
+        { address=0X1081202, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Treasure x2" },
+        { address=0X1081203, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Character Treasure" },
+        { address=0X1081203, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Magnet" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1080CAB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="At World's End - Chapter 3 - Norrington's Choice - Minikits increased" },
+        { address=0X1080CB2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Bitflag] At World's End - Chapter 3 - Norrington's Choice - Compass Pieces increased" },
+        { address=0X108122A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold brick count increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1084019, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1084059, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="yes" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1081202, type="u8", condition="bit_true", bit=6, mask=0X40, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1081202, type="u8", condition="bit_true", bit=0, mask=0X01, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Breathe Underwater" },
+      },
+    },
+  },
+}

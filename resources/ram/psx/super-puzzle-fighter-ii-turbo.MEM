@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Super Puzzle Fighter II Turbo",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "super-puzzle-fighter-ii-turbo",
+    file = "super-puzzle-fighter-ii-turbo.zip",
+    hashes = {
+      { hash = "e99797f3f5967a7edff4b85fc8e0a43a", label = "Super Puzzle Fighter II Turbo (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X170F6, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Normal Match" },
+        { address=0X170F6, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Training Demo" },
+        { address=0X1FEBD0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode Check" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1AE571, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Won - Player" },
+        { address=0X1AE575, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Chain - End of round total" },
+        { address=0X1AE577, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power Gem - End of round total" },
+        { address=0X1AE5CC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Bonus" },
+        { address=0X1AE766, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Highest Chain in Round" },
+        { address=0X1AE767, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Highest Power Gem in Round" },
+        { address=0X1AE81D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Won - CPU" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1AE550, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score - 32 Bit Value" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1AE63E, type="u8", condition="eq", value=0X4E, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Whole Screen Full" },
+        { address=0X1AE71B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Rotation" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1AE6F0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Timer" },
+        { address=0X1AE71A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter Gems CPU Side Message" },
+        { address=0X1AE72A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter Gems Dropping on CPU Side" },
+        { address=0X1AE9C6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter Gems Player Side Message" },
+        { address=0X1AE9D6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter Gems Dropping Player Side" },
+      },
+    },
+  },
+}

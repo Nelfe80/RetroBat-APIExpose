@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Saru! Get You! 2: Ukki Ukki Disc",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "saru-get-you-2-ukki-ukki-disc",
+    file = "saru-get-you-2-ukki-ukki-disc.zip",
+    hashes = {
+      { hash = "52a9a4cf4de1e2f7ad7a8615b8dea377", label = "Saru! Get You! 2 - Ukki Ukki Disc (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2C0064, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Puzzles Cleared" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2C19D4, type="u32le", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Masked" },
+        { address=0X2C19D4, type="u32le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Filled" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Vib-Ripple [Subset - Imported Photo Petas]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "vib-ripple-subset-imported-photo-petas",
+    file = "vib-ripple-subset-imported-photo-petas.zip",
+    hashes = {
+      { hash = "a3a97786b8ba2d02c303703d34913942", label = "Vib-Ripple [Subset - Imported Photo Petas]" },
+    }
+  },
+
+  events = {
+  },
+}

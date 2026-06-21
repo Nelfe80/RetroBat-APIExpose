@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "MotorStorm: Arctic Edge",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "motorstorm-arctic-edge",
+    file = "motorstorm-arctic-edge.zip",
+    hashes = {
+      { hash = "aa7077c97ed27af91f1f45796dcb59c5", label = "MotorStorm - Arctic Edge (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi,Pl,Ru,El).iso" },
+    }
+  },
+
+  events = {
+  },
+}

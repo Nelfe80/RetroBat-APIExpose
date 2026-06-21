@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Frogs and Flies",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "frogs-and-flies",
+    file = "frogs-and-flies.zip",
+    hashes = {
+      { hash = "dcc2956c7a39fdbf1e861fc5c595da0d", label = "Frogs and Flies (USA).a26" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X005B, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Player - Jumping" },
+        { address=0X005C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Oponent - Jumping" },
+      },
+    },
+  },
+}

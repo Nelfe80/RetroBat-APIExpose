@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Fatal Frame: Mask of the Lunar Eclipse",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fatal-frame-mask-of-the-lunar-eclipse",
+    file = "fatal-frame-mask-of-the-lunar-eclipse.zip",
+    hashes = {
+      { hash = "f76b93dd4ec7848655d1c4bae442468d", label = "Zero - Tsukihami no Kamen (Japan) (En) (v1.5) (Tempus)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3EE560, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Slow Lens Level - Ruka" },
+        { address=0X3EE564, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Zero Lens Level - Ruka" },
+        { address=0X3EE568, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Blow Lens Level - Ruka" },
+        { address=0X3EE56C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Blast Lens Level - Ruka" },
+        { address=0X3EE570, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Pierce Lens Level - Ruka" },
+        { address=0X3EE574, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Lunar Lens Level - Ruka" },
+        { address=0X3EE578, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Crush Lens Level - Ruka" },
+        { address=0X3EE57C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Stop Lens Level - Ruka" },
+        { address=0X3EE584, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Slow Lens Level - Misaki" },
+        { address=0X3EE588, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Zero Lens Level - Misaki" },
+        { address=0X3EE58C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Push Lens Level - Misaki" },
+        { address=0X3EE594, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Crush Lens Level - Misaki" },
+        { address=0X3EE598, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Stop Lens Level - Misaki" },
+        { address=0X3EE5A0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Focus Lens Level - Choshiro" },
+        { address=0X3EE5A4, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Explode Lens Level - Choshiro" },
+        { address=0X3EE5A8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Chain Lens Level - Choshiro" },
+        { address=0X3EE735, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Captured - #140 - Pair Going to Lunar Underworld Hall" },
+        { address=0X3EE736, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Captured - #139 - Pair Going Down the Underground Path" },
+        { address=0X3EE74E, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Captured - #147 - Sakuya Going Around Island 3" },
+        { address=0X3EE74F, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Captured - #145 - Sakuya Going Around Island 1" },
+        { address=0X3EE74F, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Captured - #146 - Sakuya Going Around Island 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3EED6D, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Captured - #220 - Face Cut From Dead Body" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3EF1BB, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-Up Lens 'Stop'" },
+        { address=0X3EF1BB, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-Up Lens 'Explode'" },
+        { address=0X3EF1BB, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-Up Lens 'Crush'" },
+        { address=0X3EF1BB, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-Up Lens 'Extend'" },
+        { address=0X3EF1BB, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-Up Lens 'Moon'" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3EE5C4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Photo Points" },
+        { address=0X3EEEB0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] High Score - Mission 1-1" },
+        { address=0X3EEEF0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] High Score - Mission 5-1" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3EE6D9, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=true, no_survey=false, desc="Captured - #100 - Jumping Patient" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3EE423, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Equipment 'Switch'" },
+        { address=0X3EE4DB, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch" },
+        { address=0X3EE60A, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Captured - #6 - Child Standing Inside Door" },
+        { address=0X3EE61C, type="u8", condition="bit_true", bit=7, mask=0X80, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Captured - #11 - Patient Before Ward Door" },
+        { address=0X3EE623, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Captured - #16 - Girl Standing on Stairs" },
+        { address=0X3EE640, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Captured - #35 - Director Crossing Before Door" },
+        { address=0X3EE6D4, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Captured - #95 - Blocking Nurse" },
+        { address=0X3EE6DB, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Captured - #96 - 2 People Opening Door" },
+        { address=0X3EE717, type="u8", condition="bit_true", bit=6, mask=0X40, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Captured - #122 - You Haibara Before the Hidden Door" },
+        { address=0X3EE751, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Captured - #154 - Lunar Eclipse Sakuya Going to Door" },
+      },
+    },
+  },
+}

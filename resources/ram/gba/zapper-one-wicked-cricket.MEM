@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Zapper: One Wicked Cricket!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "zapper-one-wicked-cricket",
+    file = "zapper-one-wicked-cricket.zip",
+    hashes = {
+      { hash = "9a83e6571c9543a1a4d658564f02be4c", label = "Zapper - One Wicked Cricket! (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X09C2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8-bit bitflag] Level 1 Clear" },
+        { address=0X09C3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8-bit bitflag] Level 2 Clear" },
+        { address=0X09C4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8-bit bitflag] Level 3 Clear" },
+        { address=0X09C5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8-bit bitflag] Level 4 Clear" },
+        { address=0X09C6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8-bit bitflag] Level 5 Clear" },
+        { address=0X09C7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8-bit bitflag] Level 6 Clear" },
+        { address=0X09E0, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="bonus stage 1 complete" },
+        { address=0X09E0, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="bonus stage 2 complete" },
+        { address=0X0A95, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Area 1 Level 1 Puzzle Clear" },
+        { address=0X0A95, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Area 1 Level 2 Puzzle Clear" },
+        { address=0X0A95, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Area 1 Level 3 Puzzle Clear" },
+        { address=0X0A96, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Area 2 Level 1 Puzzle Clear" },
+        { address=0X0A96, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Area 2 Level 2 Puzzle Clear" },
+        { address=0X0A96, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Area 2 Level 3 Puzzle Clear" },
+        { address=0X0B69, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit bitflag] In bonus level" },
+        { address=0X0B6B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit bitflag] In bonus level" },
+        { address=0X7A6B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8-bit bitflag] Temporary Area Bonus Cleared" },
+      },
+      stage = {
+        { address=0X0A4D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Selected Stage" },
+        { address=0X4DF0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage Orb Count" },
+        { address=0X4DF4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8-bit bitflag] Stage Puzzle Done" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4EEC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives increased" },
+        { address=0X4EEC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives decreased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4DD8, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[8-bit bitflag] Has Helmet/Invincibility" },
+      },
+    },
+  },
+}

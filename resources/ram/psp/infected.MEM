@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Infected",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "infected",
+    file = "infected.zip",
+    hashes = {
+      { hash = "14c9f99b02feeac629aad1d6dca6ab8a", label = "Infected (Europe) (En,Fr,Es).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB28B94, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32bit] Credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFB8EC4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[16bit] Lives increased" },
+        { address=0XFB8EC4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16bit] Lives decreased" },
+      },
+      health = {
+        { address=0XB36974, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 2=First Health Bought decreased" },
+        { address=0XB36974, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 2=First Health Bought increased" },
+        { address=0XB36A14, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] 2=Second Health Bought decreased" },
+        { address=0XB36A14, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] 2=Second Health Bought increased" },
+        { address=0XFB8ED0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Health decreased" },
+        { address=0XFB8ED0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XFB8B14, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Ammo In Gun Magazine" },
+      },
+    },
+  },
+}

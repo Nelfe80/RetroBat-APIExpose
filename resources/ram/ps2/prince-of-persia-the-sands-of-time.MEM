@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Prince of Persia: The Sands of Time",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "prince-of-persia-the-sands-of-time",
+    file = "prince-of-persia-the-sands-of-time.zip",
+    hashes = {
+      { hash = "36cd63c12312e6587b3100dcd6be35ce", label = "Prince of Persia - The Sands of Time (USA) (En,Fr,Es)" },
+      { hash = "80979dfaf7d7205b0a1c6a4bd2f3a2dd", label = "Prince of Persia - The Sands of Time (USA) [Prince of Persia Machintosh (1992) Mode]" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X181F2C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit][PoP 1] Level ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X181EF4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit][PoP 1] Max Health decreased" },
+        { address=0X181EF4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit][PoP 1] Max Health increased" },
+        { address=0X181EF8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit][PoP 1] Health Display decreased" },
+        { address=0X181EF8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit][PoP 1] Health Display increased" },
+        { address=0X181EFC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit][PoP 1] Enemy Health Display decreased" },
+        { address=0X181EFC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit][PoP 1] Enemy Health Display increased" },
+        { address=0X13C01FC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Farah's Health decreased" },
+        { address=0X13C01FC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Farah's Health increased" },
+      },
+    },
+  },
+}

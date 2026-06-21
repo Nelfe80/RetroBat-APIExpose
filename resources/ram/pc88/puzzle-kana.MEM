@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Puzzle Kana?",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-kana",
+    file = "puzzle-kana.zip",
+    hashes = {
+      { hash = "7b8387228e629fffe80fc103f30962e4", label = "Puzzle Kana.d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X86B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X864E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Roulette: Lives Count increased" },
+        { address=0X864E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Roulette: Lives Count decreased" },
+        { address=0X8666, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="UFO Shooter: Lives Count increased" },
+        { address=0X8666, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="UFO Shooter: Lives Count decreased" },
+        { address=0X86B2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X86B2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X86FB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Balls Remaining increased" },
+        { address=0X86FB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Balls Remaining decreased" },
+      },
+    },
+  },
+}

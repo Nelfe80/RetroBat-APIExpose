@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Conflict: Desert Storm",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "conflict-desert-storm",
+    file = "conflict-desert-storm.zip",
+    hashes = {
+      { hash = "8ecb3ad119198b62d053a47fb90b4821", label = "Conflict - Desert Storm (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3CF628, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="yes" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X34ED34, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="on" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X68B310, type="u8", condition="eq", value=0X11, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ADVANCED WEAPONS TRAINING" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X68B310, type="u8", condition="eq", value=0XA, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Human Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X68B310, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current Mission" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "World Championship Poker",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "world-championship-poker",
+    file = "world-championship-poker.zip",
+    hashes = {
+      { hash = "c6394e32b564c770fe1971fdf2b1e8f2", label = "World Championship Poker (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

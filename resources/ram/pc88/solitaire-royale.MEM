@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Solitaire Royale",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "solitaire-royale",
+    file = "solitaire-royale.zip",
+    hashes = {
+      { hash = "ee4c7205d56384f37414f7f199484ece", label = "Solitaire Royale.d88" },
+    }
+  },
+
+  events = {
+  },
+}

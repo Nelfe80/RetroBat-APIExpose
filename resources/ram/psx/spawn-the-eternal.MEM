@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Spawn: The Eternal",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "spawn-the-eternal",
+    file = "spawn-the-eternal.zip",
+    hashes = {
+      { hash = "ff2185fcf702f1d2c748e259230cc8ee", label = "Spawn - The Eternal (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA0404, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1FFDDE, type="u16le", condition="eq", value=0X2E53, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1FFDDE, type="u16le", condition="eq", value=0X5453, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Video" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X744EC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X7F051, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X7F051, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X7F160, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X7F160, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+      },
+    },
+  },
+}

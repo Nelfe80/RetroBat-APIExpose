@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Road Trip",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "road-trip",
+    file = "road-trip.zip",
+    hashes = {
+      { hash = "12c7a6d38e6c0dbaf4b20a61c3a20374", label = "Road Trip (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0241, type="u8", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Ingame" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0113, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Current Goal" },
+      },
+    },
+  },
+}

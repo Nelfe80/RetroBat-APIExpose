@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Air",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "air",
+    file = "air.zip",
+    hashes = {
+      { hash = "23ca1dcc542f6cde7d26b3d5f8627b64", label = "Air (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X22B104, type="u32le", condition="eq", value=0XFFFFFFFF, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Save screen after credits" },
+        { address=0X22B104, type="u32le", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X224E8C, type="u16le", condition="eq", value=0X03F4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yoshino Scenario Clear Screen" },
+        { address=0X224E8C, type="u16le", condition="eq", value=0X0427, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yakusoku Scenario Clear Screen" },
+      },
+    },
+  },
+}

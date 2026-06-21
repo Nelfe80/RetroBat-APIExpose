@@ -1,0 +1,116 @@
+return {
+  game = {
+    title = "Spawn: Armageddon",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "spawn-armageddon",
+    file = "spawn-armageddon.zip",
+    hashes = {
+      { hash = "0420a706d21c5253dffdfb82982232a1", label = "Spawn - Armageddon (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X29A7CF, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Number of Inputs on Pause Menu" },
+        { address=0X2D3F2B, type="u8", condition="eq", value=0X18, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Pause Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1BEB8C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID? (ASCII Text) (20 Bytes)" },
+        { address=0X2C976F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Controls Locked (01) (Level completion?)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2C9184, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (Static Mirror) [Float BE] decreased" },
+        { address=0X2C9184, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (Static Mirror) [Float BE] increased" },
+        { address=0X2C9188, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health [Float BE] decreased" },
+        { address=0X2C9188, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health [Float BE] increased" },
+        { address=0X2C918F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of Health Upgrades Purchased decreased" },
+        { address=0X2C918F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of Health Upgrades Purchased increased" },
+        { address=0X2C91D8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Difficulty (Damage Taken Multiplier) [Float BE]" },
+        { address=0X2C91DC, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Difficulty (Damage Done Multiplier) [Float BE]" },
+        { address=0X2D4068, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Menu Screen ID [32-Bit BE] decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2D4068, type="u32be", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - New Game" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Select Mission" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Select Mission - Select Difficulty" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level Intro" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Bonus Material" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Options" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X09, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Accessing Memory Card" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pause Menu - General" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pause Menu - Weapons" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X0C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pause Menu - Hell Powers" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X0D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Encyclopedia" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X0E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Encyclopedia - No Information Available?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X0F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Encyclopedia - Viewing" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mission Failed" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X12, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pause Menu - Quit" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X13, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Quit?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Warp?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X15, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pause Menu - Options" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X16, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pause Menu - Controller" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X17, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power Up Menu" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X19, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Buy Ammunition" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X1A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Upgrade Weapon" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X1B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Purchase Health/Necroplasm/Ammo" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X1C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Load Game Menu" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X1D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Save Game Menu" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X1E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Save Game Menu?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X1F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Level Results Screen" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X21, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X22, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Bonus Material - Concept Gallery" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X23, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Bonus Material - Comic Gallery" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X24, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Title Screen - Credits" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X25, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pause Menu - Encyclopedia - Selection" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X26, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Encyclopedia - No Information Available?" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X27, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Pause Menu - Encyclopedia - Viewing" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X28, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Quit Game From Level Intro" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X29, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Upgrade Weapon" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X2A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Game Complete" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X2B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Replay Mission Warning 1" },
+        { address=0X2D4068, type="u32be", condition="eq", value=0X2C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Replay Mission Warning 2" },
+      },
+      weapon = {
+        { address=0X29B18B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Total Number of Weapons?" },
+        { address=0X2C955A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons Unlocked Bitflags" },
+        { address=0X2C955B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons Unlocked Bitflags" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2C91B8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Results Screen: Technique Points? [32-Bit BE]" },
+      },
+      collectibles = {
+        { address=0X2C950C, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Shotgun Ammo [32-Bit BE]" },
+        { address=0X2C9510, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Semi-Auto Pistols Ammo [32-Bit BE]" },
+        { address=0X2C9514, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Madcap SMG Ammo [32-Bit BE]" },
+        { address=0X2C9518, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Mini-Gun Ammo [32-Bit BE]" },
+        { address=0X2C951C, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Brimstone Cannon Ammo [32-Bit BE]" },
+        { address=0X2C9520, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Burst Missile Launcher Ammo [32-Bit BE]" },
+        { address=0X2C9524, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Inferno Cannon Ammo [32-Bit BE]" },
+        { address=0X2D3FAF, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Bit 0 - Infinite Ammo Cheat Enabled" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2C9586, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bit 3 - Boss Encounter" },
+      },
+    },
+  },
+}

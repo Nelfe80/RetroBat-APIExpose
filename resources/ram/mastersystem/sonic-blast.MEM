@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "Sonic Blast",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "sonic-blast",
+    file = "sonic-blast.zip",
+    hashes = {
+      { hash = "ce7f314a657e0f0fe506fb7aea016f31", label = "Sonic Blast (Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1119, type="u8", condition="eq", value=0X16, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1119, type="u8", condition="eq", value=0X24, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1123, type="u8", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="Watching Demo" },
+        { address=0X1E08, type="u8", condition="eq", value=0X7F, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1119, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal Levels" },
+        { address=0X123E, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the Ground" },
+        { address=0X1CE8, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alive" },
+        { address=0X1CE8, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1CE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit 0] (Works in Blue Marine Zone)" },
+        { address=0X1ED4, type="u8", condition="eq", value=0X59, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Green Hill Zone" },
+        { address=0X1ED4, type="u8", condition="eq", value=0X69, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yellow Desert Zone" },
+        { address=0X1ED4, type="u8", condition="eq", value=0X6F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Volcano Zone" },
+        { address=0X1ED4, type="u8", condition="eq", value=0X72, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blue Marine Zone" },
+        { address=0X1ED4, type="u8", condition="eq", value=0X76, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Silver Castle Zone" },
+        { address=0X1ED4, type="u8", condition="eq", value=0X65, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Zone cleared (After defeating a Boss)" },
+      },
+      stage = {
+        { address=0X1119, type="u8", condition="eq", value=0X25, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Black screen after a bonus stage" },
+        { address=0X1119, type="u8", condition="eq", value=0X3E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act Screen" },
+        { address=0X112D, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 2" },
+        { address=0X112D, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act 3" },
+        { address=0X1161, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="when you reach the end of the act (in front of the sign)" },
+        { address=0X1173, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Green Hill Act 1" },
+        { address=0X1174, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Green Hill Act 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1178, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [8-bit BCD] increased" },
+        { address=0X1178, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [8-bit BCD] decreased" },
+        { address=0X124C, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X124D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+        { address=0X1405, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1119, type="u8", condition="eq", value=0X3B, action="TREASURE", no_log=false, no_survey=false, desc="Initial Emeralds" },
+        { address=0X1161, type="u8", condition="eq", value=0X0C, action="TREASURE", no_log=false, no_survey=false, desc="Emerald" },
+        { address=0X1172, type="u8", condition="eq", value=0X1, action="TREASURE_GREEN_EMERALD_CHAOS_EMERALD", no_log=false, no_survey=false, desc="Green Emerald" },
+        { address=0X1172, type="u8", condition="eq", value=0X1, action="TREASURE_YELLOW_EMERALD_CHAOS_EMERALD", no_log=false, no_survey=false, desc="Yellow Emerald" },
+        { address=0X1172, type="u8", condition="eq", value=0X1, action="TREASURE_RED_EMERALD_CHAOS_EMERALD", no_log=false, no_survey=false, desc="Red Emerald" },
+        { address=0X1172, type="u8", condition="eq", value=0X1, action="TREASURE_BLUE_EMERALD_CHAOS_EMERALD", no_log=false, no_survey=false, desc="Blue Emerald" },
+        { address=0X1172, type="u8", condition="eq", value=0X1, action="TREASURE_SILVER_EMERALD_CHAOS_EMERALD", no_log=false, no_survey=false, desc="Silver Emerald" },
+        { address=0X124D, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Unequipped" },
+        { address=0X124D, type="u8", condition="eq", value=0X87, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Equipped" },
+        { address=0X1405, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Unequipped" },
+        { address=0X1405, type="u8", condition="eq", value=0XFF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Equipped" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1161, type="u8", condition="eq", value=0X0B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring" },
+        { address=0X125E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings collected in the stage [8-bit BCD] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1119, type="u8", condition="eq", value=0X3C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+        { address=0X112C, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss (true ending)" },
+        { address=0X112D, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Act 1 (or true final boss)" },
+        { address=0X112E, type="u8", condition="eq", value=0X0F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Silver Castle Boss" },
+        { address=0X112E, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss (true ending)" },
+        { address=0X1ED4, type="u8", condition="eq", value=0X60, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1552, type="u8", condition="eq", value=0X1, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="invincibility frame" },
+      },
+      player = {
+        { address=0X111F, type="u8", condition="eq", value=0X1, action="JUMPING", no_log=false, no_survey=false, desc="2 (Jump)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X111F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

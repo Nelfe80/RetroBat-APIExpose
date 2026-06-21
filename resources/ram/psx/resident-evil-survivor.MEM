@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Resident Evil: Survivor",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Tir avec accessoire, Action"
+  },
+
+  rom = {
+    name = "resident-evil-survivor",
+    file = "resident-evil-survivor.zip",
+    hashes = {
+      { hash = "7f009ee09a398be094220e3e943ac458", label = "Resident Evil - Survivor (USA)" },
+      { hash = "391d2b7e6a5d87eb04db05573f12a45b", label = "Resident Evil - Survivor (USA) (Light Gun Support) (Raziel)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X62DBE, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of Continues Used" },
+        { address=0X62DFC, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X62DFC, type="u8", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X637E2, type="u8", condition="eq", value=0X0F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Main Menu/Loading/Title Screen" },
+        { address=0X637E2, type="u8", condition="eq", value=0XFF, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits/Results" },
+        { address=0X63812, type="u16le", condition="eq", value=0X0010, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0XB3CE4, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="False" },
+        { address=0XB3CE4, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="True" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6FD30, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="D Rank" },
+        { address=0X6FD30, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="C Rank" },
+        { address=0X6FD30, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="B Rank" },
+        { address=0X6FD30, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="A Rank" },
+        { address=0X6FD30, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="S Rank" },
+        { address=0X6FD30, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Results Screen: Rank Background" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA8584, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X105F32, type="u8", condition="eq", value=0X0A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X10611A, type="u8", condition="eq", value=0X0A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0XA8584, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAF802, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Number of Loaded Bullets in Weapon Slot 1" },
+        { address=0XAF812, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Number of Loaded Bullets in Weapon Slot 2" },
+        { address=0XC0B96, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Handgun A (default)" },
+        { address=0XC0B96, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Handgun B" },
+        { address=0XC0B96, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Handgun C" },
+        { address=0XC0B96, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Handgun D" },
+        { address=0XC0B96, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0XC0B96, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Magnum" },
+        { address=0XC0B96, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rocket Launcher" },
+        { address=0XC0B96, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grenade Gun" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X62FD0, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="Final Boss, Phase 2 Defeated" },
+        { address=0X62FD0, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Lott Scream, Plant" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X63812, type="u16le", condition="eq", value=0X016A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Monitor Room" },
+      },
+    },
+  },
+}

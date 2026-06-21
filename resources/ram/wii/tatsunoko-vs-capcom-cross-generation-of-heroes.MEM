@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Tatsunoko vs. Capcom: Cross Generation of Heroes",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "tatsunoko-vs-capcom-cross-generation-of-heroes",
+    file = "tatsunoko-vs-capcom-cross-generation-of-heroes.zip",
+    hashes = {
+      { hash = "8ff54a24336002eb9df1bd06e5ed57a8", label = "Tatsunoko vs. Capcom - Cross Generation of Heroes (Japan) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X33AF14, type="u32be", condition="eq", value=0X0E, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X33B01C, type="u32be", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Uncharted Region of China" },
+        { address=0X33B01C, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game - Stage [32 bits BE]" },
+        { address=0X33DA90, type="u32be", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage (1st phase)" },
+        { address=0X33DA90, type="u32be", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage (2nd phase)" },
+        { address=0X33DA90, type="u32be", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage (3rd phase)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X33B130, type="u32be", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="2-star (default)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X33B02C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game - Score [32 bits BE] // multiply by 100 to get the two padding zeroes?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X33AF14, type="u32be", condition="eq", value=0X05, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X33AF14, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Mode [32 bits BE]" },
+        { address=0X33B108, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Time Attack Timer [32 bits BE] // works for Arcade too" },
+        { address=0X33B164, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Save Data - Time Played [32 bits BE]" },
+        { address=0X33DA90, type="u32be", condition="eq", value=0X0A, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ending" },
+        { address=0X33DA90, type="u32be", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack finished" },
+        { address=0X33DA90, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Arcade Match [32 bits BE] // works for Survival and Time Attack too" },
+      },
+    },
+  },
+}

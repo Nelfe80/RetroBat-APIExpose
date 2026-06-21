@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Meteos",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "meteos",
+    file = "meteos.zip",
+    hashes = {
+      { hash = "fa402dd4855a17247544169be73be595", label = "Meteos (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X64425, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Bit 0 = Meteos Credits (End of the Universe)" },
+        { address=0X3BFE74, type="u8", condition="eq", value=0X19, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Download" },
+        { address=0X3BFF69, type="u8", condition="eq", value=0XFF, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X65D14, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Weak" },
+        { address=0X65D14, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Average" },
+        { address=0X65D14, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strong" },
+        { address=0X65D14, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Powerful" },
+        { address=0X65D14, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overwhelming" },
+        { address=0X65D14, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Simple CPU Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X64423, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Florias Set (Indie Music Troupe)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X64238, type="u8", condition="bit_true", bit=1, mask=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Straight Route 2 (500.000 Points)" },
+        { address=0X2117C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score on Time War" },
+        { address=0X21218C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score for Meteo War" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X64422, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Trinova Set (Bossa Cafe)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X64414, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0X64414, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Driller Bomb" },
+        { address=0X64414, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rocket" },
+        { address=0X3BFE74, type="u8", condition="eq", value=0X13, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Item Switch" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X64388, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Meteo Quantity" },
+        { address=0X6438D, type="u8", condition="bit_true", bit=3, mask=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time" },
+        { address=0X64422, type="u8", condition="bit_true", bit=4, mask=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Hevendor Set (Space-Time Continuum)" },
+        { address=0X65D10, type="u8", condition="bit_true", bit=0, mask=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="If 0 Stock, if 1 Time" },
+        { address=0X65D18, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="2:00 Time War" },
+        { address=0X65D18, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="5:00 Time War" },
+        { address=0X65D18, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="100-Meteo War" },
+        { address=0X65D18, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="1000 Meteo War" },
+        { address=0X65D18, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Last Saved Time War Mode" },
+        { address=0X65D21, type="u8", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time War" },
+        { address=0X65D21, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ingame Mode" },
+        { address=0X21188C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Meteos for Time War" },
+        { address=0X3BFE74, type="u8", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time War" },
+        { address=0X3BFE74, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Menu ID" },
+        { address=0X3BFF50, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Timer for Meteo War and Deluge (?)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Ape Escape Academy",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ape-escape-academy",
+    file = "ape-escape-academy.zip",
+    hashes = {
+      { hash = "aaa793611ec65c972c65ec96141a114a", label = "Ape Academy (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X882323, type="u32le", condition="eq", value=0X5F333038, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="803_ - 803_staff.bin - Credits" },
+        { address=0X1A711A0, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[19 bytes] Constant of 'src/803_staff/vag.c', seen when credits are playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CE7668, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player is playing the round." },
+        { address=0X1CE7668, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player has won the round, re-load mini-game" },
+        { address=0X1CE7668, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flag to indicate the player has won that round of Spot the Difference." },
+      },
+      stage = {
+        { address=0X1CE3C88, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game is done" },
+        { address=0X1CE3C88, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game is actively being played" },
+        { address=0X1CE3C88, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Flag that indicates whether the round of Monkey Ole is currently active." },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1A71050, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player's health in Monkey Dice. Player starts with 3 health. Goes down in increments of 1 if the" },
+        { address=0X1A71050, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player's health in Monkey Dice. Player starts with 3 health. Goes down in increments of 1 if the" },
+        { address=0X1A71054, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's health in Monkey Dice. Enemy starts with 3 health. Goes down in increments of 1 if the e" },
+        { address=0X1A71054, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's health in Monkey Dice. Enemy starts with 3 health. Goes down in increments of 1 if the e" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1BE7918, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="When this section is Year Select, indicates whether the mode has been selected." },
+        { address=0X1BFD534, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter at the end of Senior Yr. 2 bingo to denote how many possible line configurations it's it" },
+        { address=0X1BFE674, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter at the end of Junior Yr. 3 bingo to denote how many possible line configurations it's it" },
+        { address=0X1BFE8B4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter at the end of Junior Yr. 2 bingo to denote how many possible line configurations it's it" },
+        { address=0X1BFEF34, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter at the end of Junior Yr. 1 bingo to denote how many possible line configurations it's it" },
+        { address=0X1C01334, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Counter at the end of Senior Yr. 1 bingo to denote how many possible line configurations it's it" },
+      },
+    },
+  },
+}

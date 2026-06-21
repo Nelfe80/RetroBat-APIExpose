@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Blasteroids",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "blasteroids",
+    file = "blasteroids.zip",
+    hashes = {
+      { hash = "2e4e7be832d73b84cf2b1538f91106c1", label = "blstroid3.7z <Blasteroids (rev 3)>" },
+      { hash = "379139d55945c5f246c7caca8948ad75", label = "blstroid.7z <Blasteroids (rev 4)>" },
+      { hash = "6c17c88d247ccae747cb06509ebb37dd", label = "blstroidg.7z <Blasteroids (German, rev 2)>" },
+      { hash = "e28e9b13b4960d0308b5231c78e13175", label = "blstroidh.7z <Blasteroids (with heads)>" },
+      { hash = "fa62b076b025ac675351f6ad200fcff1", label = "blstroid2.7z <Blasteroids (rev 2)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1304, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits" },
+        { address=0X3A0B, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits (mirrored)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFFE55E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: shields" },
+        { address=0XFFE55C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: power shots" },
+      },
+      health = {
+        { address=0XFFE548, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: energy" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X8365B0, type="u32be", condition="change", action="TREASURE", color="white", min=50000, max=50000, no_log=false, no_survey=false, desc="Score delta 50000-50000: Bonus" },
+        { address=0X8365B0, type="u32be", condition="change", action="TREASURE", color="white", min=100000, max=100000, no_log=false, no_survey=false, desc="Score delta 100000-100000: Score 100000" },
+        { address=0X8365B0, type="u32be", condition="change", action="TREASURE", color="white", min=150000, max=150000, no_log=false, no_survey=false, desc="Score delta 150000-150000: Score 150000" },
+        { address=0X29B2, type="u16le", condition="change", action="TREASURE", color="white", min=50000, max=50000, no_log=false, no_survey=false, desc="Score delta 50000-50000: Bonus" },
+        { address=0X29B2, type="u16le", condition="change", action="TREASURE", color="white", min=100000, max=100000, no_log=false, no_survey=false, desc="Score delta 100000-100000: Score delta 100000-100000" },
+        { address=0X29B2, type="u16le", condition="change", action="TREASURE", color="white", min=150000, max=150000, no_log=false, no_survey=false, desc="Score delta 150000-150000: Score delta 150000-150000" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="white", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Score 200" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Yellow crystal, saucer" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=750, max=750, no_log=false, no_survey=false, desc="Score delta 750-750: Yellow/red crystal various" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=1250, max=1250, no_log=false, no_survey=false, desc="Score delta 1250-1250: Score 1250" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=1500, max=1500, no_log=false, no_survey=false, desc="Score delta 1500-1500: Score 1500" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=1750, max=1750, no_log=false, no_survey=false, desc="Score delta 1750-1750: Score 1750" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=1800, max=1800, no_log=false, no_survey=false, desc="Score delta 1800-1800: Score 1800" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="white", min=2250, max=2250, no_log=false, no_survey=false, desc="Score delta 2250-2250: Score 2250" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="white", min=2500, max=2500, no_log=false, no_survey=false, desc="Score delta 2500-2500: End sector" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="white", min=3000, max=3000, no_log=false, no_survey=false, desc="Score delta 3000-3000: End galaxy, green saucer" },
+        { address=0X8365B0, type="u32be", condition="change", action="SCORE_STATE", color="white", min=4000, max=4000, no_log=false, no_survey=false, desc="Score delta 4000-4000: Saucer red/white" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) score" },
+        { address=0X392E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) score" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="white", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Score delta 200-200" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="yellow", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Yellow crystal, saucer" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="yellow", min=750, max=750, no_log=false, no_survey=false, desc="Score delta 750-750: Yellow/red crystal various" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="yellow", min=1250, max=1250, no_log=false, no_survey=false, desc="Score delta 1250-1250: Score delta 1250-1250" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="yellow", min=1500, max=1500, no_log=false, no_survey=false, desc="Score delta 1500-1500: Score delta 1500-1500" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="yellow", min=1750, max=1750, no_log=false, no_survey=false, desc="Score delta 1750-1750: Score delta 1750-1750" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="yellow", min=1800, max=1800, no_log=false, no_survey=false, desc="Score delta 1800-1800: Score delta 1800-1800" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="white", min=2250, max=2250, no_log=false, no_survey=false, desc="Score delta 2250-2250: Score delta 2250-2250" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="white", min=2500, max=2500, no_log=false, no_survey=false, desc="Score delta 2500-2500: End sector" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="white", min=3000, max=3000, no_log=false, no_survey=false, desc="Score delta 3000-3000: End galaxy, green saucer" },
+        { address=0X29B2, type="u16le", condition="change", action="SCORE_STATE", color="white", min=4000, max=4000, no_log=false, no_survey=false, desc="Score delta 4000-4000: Saucer red/white" },
+      },
+      collectibles = {
+        { address=0XFFCF05, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8365B0, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=10, max=10, no_log=false, no_survey=false, desc="Score delta 10-10: Destroy little grey asteroid" },
+        { address=0X8365B0, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=50, max=50, no_log=false, no_survey=false, desc="Score delta 50-50: Destroy little red asteroid" },
+        { address=0X8365B0, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Destroy little blue asteroid" },
+        { address=0X8365B0, type="u32be", condition="change", action="OBJECT_DESTROYED", color="white", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Destroy medium asteroid" },
+        { address=0X8365B0, type="u32be", condition="change", action="OBJECT_DESTROYED", color="green", min=7500, max=7500, no_log=false, no_survey=false, desc="Score delta 7500-7500: Mukors enemy tubes green" },
+        { address=0X29B2, type="u16le", condition="change", action="OBJECT_DESTROYED", color="white", min=10, max=10, no_log=false, no_survey=false, desc="Score delta 10-10: Destroy little grey asteroid" },
+        { address=0X29B2, type="u16le", condition="change", action="OBJECT_DESTROYED", color="white", min=50, max=50, no_log=false, no_survey=false, desc="Score delta 50-50: Destroy little red asteroid" },
+        { address=0X29B2, type="u16le", condition="change", action="OBJECT_DESTROYED", color="white", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Destroy little blue asteroid" },
+        { address=0X29B2, type="u16le", condition="change", action="OBJECT_DESTROYED", color="white", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Destroy medium asteroid" },
+        { address=0X29B2, type="u16le", condition="change", action="OBJECT_DESTROYED", color="green", min=7500, max=7500, no_log=false, no_survey=false, desc="Score delta 7500-7500: Mukors enemy tubes green" },
+      },
+    },
+  },
+}

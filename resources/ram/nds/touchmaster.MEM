@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "TouchMaster",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "touchmaster",
+    file = "touchmaster.zip",
+    hashes = {
+      { hash = "2303cef3e229c65eab9ff6a5e9a9ac46", label = "TouchMaster (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XD4950, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - 3 Peak Deluxe [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD4A40, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Hot Hoops [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD4B30, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Solitaire Classic - 1 Card Flip [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD4C20, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Target 21 [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD4D10, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Mah Jongg Pairs - Simple Tiles [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD4E00, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Wordz [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD4EF0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Trivia [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD4FE0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Word Search [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD50D0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Double Take [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD51C0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - 5 Star Generals [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD52B0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Crystal Balls [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD53A0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Pairs - 5 Rows [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5490, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Pick Up 6 [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5580, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Mahki - 4 Tiles [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5670, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Artifact [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5760, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Power Cell [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5850, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Go Wild [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5940, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Uplift [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5A30, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Times Square [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5B20, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Triple Elevens [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5C10, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Gem Slide [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5D00, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Phoenix 13 [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5DF0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Pond Kings [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5EE0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Solitaire Classic - 3 Card Flip [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD5FD0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Mahki - 5 Tiles [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD60C0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Pairs - 4 Rows [240 Bytes, 24 Bytes per Entry] increased" },
+        { address=0XD61B0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Highscore - Mah Jongg Pairs - Traditional Tiles [240 Bytes, 24 Bytes per Entry] increased" },
+      },
+    },
+  },
+}

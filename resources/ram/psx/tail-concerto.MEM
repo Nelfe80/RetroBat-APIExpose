@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Tail Concerto",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "tail-concerto",
+    file = "tail-concerto.zip",
+    hashes = {
+      { hash = "353dc59331c232dc08afcc8204cd62f4", label = "Tail Concerto (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XCD744, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player's HP. decreased" },
+        { address=0XCD744, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player's HP. increased" },
+        { address=0X168948, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Guardian HP. decreased" },
+        { address=0X168948, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Guardian HP. increased" },
+        { address=0X16FFCC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Reconstruction Crew HP. decreased" },
+        { address=0X16FFCC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Reconstruction Crew HP. increased" },
+        { address=0X18ADFC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pris Sisters Robo v1 HP. decreased" },
+        { address=0X18ADFC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pris Sisters Robo v1 HP. increased" },
+        { address=0X19044E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pris Sisters Robo v2 HP. decreased" },
+        { address=0X19044E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pris Sisters Robo v2 HP. increased" },
+        { address=0X1B6E08, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cat Balloon HP. decreased" },
+        { address=0X1B6E08, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cat Balloon HP. increased" },
+        { address=0X1BB78C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cat Tank HP. decreased" },
+        { address=0X1BB78C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cat Tank HP. increased" },
+        { address=0X1C50E0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Black Cat Mecha-II HP. decreased" },
+        { address=0X1C50E0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Black Cat Mecha-II HP. increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD429F, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Triggered boss fight." },
+        { address=0XD42A9, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Triggered boss fight." },
+        { address=0XD42B8, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Triggered boss fight." },
+        { address=0XD42BA, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Triggered boss fight." },
+        { address=0XD42C7, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Triggered boss fight." },
+        { address=0XD42C8, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Triggered boss fight." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD42BD, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Triggered the trap door." },
+        { address=0XD42C6, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Moving Fortress is destroyed." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCA171, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Whistle pickup. (Resaca, Clock Tower)" },
+        { address=0XD429B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Resaca events." },
+      },
+    },
+  },
+}

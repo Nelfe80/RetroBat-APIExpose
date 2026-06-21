@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Majou Densetsu II: Daimashikyou Galious",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "majou-densetsu-ii-daimashikyou-galious",
+    file = "majou-densetsu-ii-daimashikyou-galious.zip",
+    hashes = {
+      { hash = "0490289d181e004d5fa0193af893ef96", label = "Majou Densetsu II - Daimashikyou Galious (Japan) (En) (pacnsacdave).nes" },
+      { hash = "7417e5b1c947f064f35fc5ceb0ece719", label = "Majou Densetsu II - Daimashikyou Galious (Japan) (En) (Manipulate) (0.31b).nes" },
+      { hash = "fc35363788c66d2ed58714705c9bdad2", label = "Majou Densetsu II - Daimashikyou Galious (Japan).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X07C0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01=Popolon is dead" },
+        { address=0X07C1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01=Aphrodite is dead" },
+      },
+      health = {
+        { address=0X00B2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Popolon energy bar decreased" },
+        { address=0X00B2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Popolon energy bar increased" },
+        { address=0X00B3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Venus energy bar decreased" },
+        { address=0X00B3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Venus energy bar increased" },
+        { address=0X03E0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy hp _1 decreased" },
+        { address=0X03E0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy hp _1 increased" },
+        { address=0X03E1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy hp _2 decreased" },
+        { address=0X03E1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy hp _2 increased" },
+        { address=0X03E2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy hp _3 decreased" },
+        { address=0X03E2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy hp _3 increased" },
+        { address=0X07C3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Poplon energy tier decreased" },
+        { address=0X07C3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Poplon energy tier increased" },
+        { address=0X07C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Venus energy tier decreased" },
+        { address=0X07C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Venus energy tier increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X07C6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=parasol bit1=angel ring increased" },
+        { address=0X07C7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit1=neclace bit2=bracelet bit3=black onion bit4= cross bit5=devil ring bit6=candle increased" },
+        { address=0X07D2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo (decimal)" },
+        { address=0X07D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins (decimal) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0060, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Room id? 00=none 01=boss 02=password 03=weapon shop 04=item shop 05=items hop" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X00B6, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="invincibility animation" },
+        { address=0X07D7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit0=asurot shield bit1=great shield" },
+      },
+    },
+  },
+}

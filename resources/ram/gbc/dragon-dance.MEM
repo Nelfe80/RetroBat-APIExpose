@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Dragon Dance",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "dragon-dance",
+    file = "dragon-dance.zip",
+    hashes = {
+      { hash = "0c6a0f2add131ca4afd24763fe3c3a04", label = "Dragon Dance (USA) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9906, type="u32le", condition="eq", value=0XFCDCE4D8, action="GAME_OVER", no_log=false, no_survey=false, desc="game over ('ame ')" },
+        { address=0XC5C2, type="u8", condition="eq", value=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XC620, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="game is not paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9906, type="u32le", condition="eq", value=0XDCE3DAFC, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear (' cle')" },
+        { address=0XC5C2, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage cleared" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCA00, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bool -> Fireball powerup decreased" },
+        { address=0XCA03, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bool -> Fireball powerup decreased" },
+        { address=0XCA06, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bool -> Fireball powerup decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XCA00, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1st Fireball not fired" },
+        { address=0XCA00, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1st Fireball fired and are on screen" },
+        { address=0XCA03, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="2nd Fireball not fired" },
+        { address=0XCA03, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="2nd Fireball fired and are on screen" },
+        { address=0XCA06, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="3rd Fireball not fired" },
+        { address=0XCA06, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="3rd Fireball fired and are on screen" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCA00, type="u8", condition="eq", value=0X00, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into 1st Fireball not fired" },
+        { address=0XCA00, type="u8", condition="eq", value=0X01, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into 1st Fireball fired and are on screen" },
+        { address=0XCA03, type="u8", condition="eq", value=0X00, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into 2nd Fireball not fired" },
+        { address=0XCA03, type="u8", condition="eq", value=0X01, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into 2nd Fireball fired and are on screen" },
+        { address=0XCA06, type="u8", condition="eq", value=0X00, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into 3rd Fireball not fired" },
+        { address=0XCA06, type="u8", condition="eq", value=0X01, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into 3rd Fireball fired and are on screen" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC900, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Normal Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Partially broken Double Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Double Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Unbreakable block" },
+        { address=0XC900, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Upperleft part of Big Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Upperright part of Big Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Lowerleft part of Big Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Lowerright part of Big Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X0A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="S Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X0B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="D Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X0C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="T Block" },
+        { address=0XC900, type="u8", condition="eq", value=0X0D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P Block" },
+      },
+    },
+  },
+}

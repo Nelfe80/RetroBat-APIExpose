@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Kidou Senshi Gundam: Renpou vs. Zeon DX",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "kidou-senshi-gundam-renpou-vs-zeon-dx",
+    file = "kidou-senshi-gundam-renpou-vs-zeon-dx.zip",
+    hashes = {
+      { hash = "2bf2e6451c194365f5e05a7242571647", label = "Kidou Senshi Gundam - Renpou vs. Zeon & DX (Japan) (Disc 2) (Kidou Senshi Gundam - Renpou vs. Zeon DX)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3D0622, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Menu Selection" },
+        { address=0X3D172C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Value" },
+        { address=0X3D1B9D, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Game over select (happens when player presses continue)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X3D17D4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage ID" },
+        { address=0X3D1AFC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Starting Stage Selection" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3D17F6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] FED Reinforcement Health Bar decreased" },
+        { address=0X3D17F6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] FED Reinforcement Health Bar increased" },
+        { address=0X3D17FC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Zeon Reinforcement Health Bar decreased" },
+        { address=0X3D17FC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Zeon Reinforcement Health Bar increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3AC254, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8 Bit] Mobile suit selection (NOT IN GAME SUIT ID)" },
+        { address=0X3AC255, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8 Bit] Moble Suit Weapon Selection" },
+        { address=0X3D1ADC, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8 Bit] Ground real suit ID" },
+        { address=0X3D1ADD, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8 Bit] Real Space Suit ID" },
+        { address=0X3D1AE4, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8 Bit] Ground Mobile suit weapon ID" },
+        { address=0X3D1AE5, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8 Bit] Space Mobile suit weapon ID" },
+        { address=0X3D1E56, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[16 Bit] Mobile Suit Health" },
+      },
+      weapon = {
+        { address=0X3D1F2C, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[32 Bit] Main weapon Ammunition" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3D1F38, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32 Bit] sub weapon ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3D20AA, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8 Bit] Mobile suits destroyed" },
+        { address=0X3D20AB, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8 Bit] Number of mobile armors destroyed" },
+        { address=0X3D20AC, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8 Bit] Number of aircraft destroyed" },
+        { address=0X3D20AD, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8 Bit] Number of tanks destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3D16DC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Block Out Control timer" },
+      },
+    },
+  },
+}

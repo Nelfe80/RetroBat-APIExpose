@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Darius",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "darius",
+    file = "darius.zip",
+    hashes = {
+      { hash = "05dac074b9f194d74c44848eb15ad53f", label = "Darius (World) (Genesis Mini, Mega Drive Mini).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0DC8, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0DC9, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X0DC9, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X0DD0, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Amount of Credits Inserted" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X14BA, type="u16be", condition="eq", value=0X00, action="LEVEL_A", no_log=false, no_survey=false, desc="A" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X01, action="LEVEL_B", no_log=false, no_survey=false, desc="B" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X02, action="LEVEL_C", no_log=false, no_survey=false, desc="C" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X03, action="LEVEL_D", no_log=false, no_survey=false, desc="D" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X04, action="LEVEL_E", no_log=false, no_survey=false, desc="E" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X05, action="LEVEL_F", no_log=false, no_survey=false, desc="F" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X06, action="LEVEL_G", no_log=false, no_survey=false, desc="G" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X07, action="LEVEL_H", no_log=false, no_survey=false, desc="H" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X08, action="LEVEL_I", no_log=false, no_survey=false, desc="I" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X09, action="LEVEL_J", no_log=false, no_survey=false, desc="J" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X0A, action="LEVEL_K", no_log=false, no_survey=false, desc="K" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X0B, action="LEVEL_L", no_log=false, no_survey=false, desc="L" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X0C, action="LEVEL_M", no_log=false, no_survey=false, desc="M" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X0D, action="LEVEL_N", no_log=false, no_survey=false, desc="N" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X0E, action="LEVEL_O", no_log=false, no_survey=false, desc="O" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X0F, action="LEVEL_P", no_log=false, no_survey=false, desc="P" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X10, action="LEVEL_Q", no_log=false, no_survey=false, desc="Q" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X11, action="LEVEL_R", no_log=false, no_survey=false, desc="R" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X12, action="LEVEL_S", no_log=false, no_survey=false, desc="S" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X13, action="LEVEL_T", no_log=false, no_survey=false, desc="T" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X14, action="LEVEL_U", no_log=false, no_survey=false, desc="U" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X15, action="LEVEL_V", no_log=false, no_survey=false, desc="V" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X16, action="LEVEL_W", no_log=false, no_survey=false, desc="W" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X17, action="LEVEL_X", no_log=false, no_survey=false, desc="X" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X18, action="LEVEL_Y", no_log=false, no_survey=false, desc="Y" },
+        { address=0X14BA, type="u16be", condition="eq", value=0X19, action="LEVEL_Z", no_log=false, no_survey=false, desc="Z" },
+      },
+      zone = {
+        { address=0X14BA, type="u16be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Zone" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X14BB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives increased" },
+        { address=0X14BB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X14BD, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max Missile" },
+        { address=0X14BD, type="u8", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max Laser" },
+        { address=0X14BD, type="u8", condition="eq", value=0X17, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Max Wave" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X14B4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score x10 (16-bits)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X02FD, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Arcade" },
+        { address=0X02FD, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="26 bosses" },
+        { address=0X0C5D, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ending Boss Rush" },
+        { address=0X169F, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X14BF, type="u8", condition="eq", value=0X07, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Max Arm" },
+        { address=0X14BF, type="u8", condition="eq", value=0X0F, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Max Super" },
+        { address=0X14BF, type="u8", condition="eq", value=0X17, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Max Hyper" },
+      },
+    },
+  },
+}

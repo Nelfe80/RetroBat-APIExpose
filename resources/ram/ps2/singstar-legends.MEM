@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "SingStar Legends",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "singstar-legends",
+    file = "singstar-legends.zip",
+    hashes = {
+      { hash = "6efe95ca5dcd0e047465779f50555b7c", label = "SingStar Legends (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

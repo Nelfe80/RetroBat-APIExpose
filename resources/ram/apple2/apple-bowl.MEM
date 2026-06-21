@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Apple Bowl",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "apple-bowl",
+    file = "apple-bowl.zip",
+    hashes = {
+      { hash = "ac05cb753b77cf22622493c51bc47203", label = "Apple Bowl (1979)(Apple Computer).do" },
+    }
+  },
+
+  events = {
+  },
+}

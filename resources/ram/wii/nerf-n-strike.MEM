@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Nerf N-Strike",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "nerf-n-strike",
+    file = "nerf-n-strike.zip",
+    hashes = {
+      { hash = "278b1a8c8556a5ccb88673fd3761e131", label = "Nerf N-Strike (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

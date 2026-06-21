@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Pea Shootin' Pete",
+    system = "dos",
+    system_name = "DOS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "pea-shootin-pete",
+    file = "pea-shootin-pete.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X196AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number" },
+        { address=0X196BA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of balls on the screen (0x00 for stage clear)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X196B6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="0x01 - Shield Active" },
+      },
+    },
+  },
+}

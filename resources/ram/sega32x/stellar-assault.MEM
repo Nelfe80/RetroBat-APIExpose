@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "Stellar Assault",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "stellar-assault",
+    file = "stellar-assault.zip",
+    hashes = {
+      { hash = "1415a8675adf3e8647b3df673b50056d", label = "Stellar Assault (USA, Europe).32x" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X804C, type="u16be", condition="eq", value=0X0000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen + Trace Mode" },
+        { address=0X804C, type="u16be", condition="eq", value=0X6000, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode + 3D viewer" },
+        { address=0XA040, type="u16be", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="Game paused if ffff. Unpaused if 0000." },
+        { address=0XA0AE, type="u16be", condition="eq", value=0X8BEC, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="2 8c0c=1 8c2c=blank 8cb6=0 8cc4=blank 8cd2=blank 8ce0=outside of countdown or game over, stable" },
+        { address=0XF000, type="u8", condition="eq", value=0X50, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Mission 4 and end of game" },
+        { address=0XF000, type="u8", condition="eq", value=0X88, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Mission 2" },
+        { address=0XF000, type="u8", condition="eq", value=0XCC, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Mission 6 first half" },
+        { address=0XF000, type="u8", condition="eq", value=0XD8, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Post launch sequencing and beginning of Mission 1" },
+        { address=0XF000, type="u8", condition="eq", value=0XD9, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Mission 3" },
+        { address=0XF000, type="u8", condition="eq", value=0XDA, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Launch sequence" },
+        { address=0XF000, type="u8", condition="eq", value=0XF8, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Mission 5" },
+        { address=0XF022, type="u16be", condition="eq", value=0X3B11, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="M1" },
+        { address=0XF022, type="u16be", condition="eq", value=0X8B77, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="M2" },
+        { address=0XF022, type="u16be", condition="eq", value=0X6818, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="M3" },
+        { address=0XF022, type="u16be", condition="eq", value=0X7C2D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="M4" },
+        { address=0XF022, type="u16be", condition="eq", value=0X3DE5, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="M5" },
+        { address=0XF022, type="u16be", condition="eq", value=0X592E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="M6 part 1" },
+        { address=0XF022, type="u16be", condition="eq", value=0X7199, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="M6 part 2" },
+        { address=0XF022, type="u16be", condition="eq", value=0X8FFB, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="ending cinematic" },
+        { address=0XF022, type="u16be", condition="eq", value=0XA68F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="credits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA104, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of credits remaining. Starts at 0x00 and beocmes 0x03 on your first death. Remains 3 and" },
+        { address=0XA104, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of credits remaining. Starts at 0x00 and beocmes 0x03 on your first death. Remains 3 and" },
+      },
+      health = {
+        { address=0X8143, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Low warning flashes, alternates between 0x04 and 06. decreased" },
+        { address=0X8143, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Low warning flashes, alternates between 0x04 and 06. increased" },
+        { address=0XA062, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Red Energy. 1a=full (decimal 26) 0d=half (dec 13) 03=Energy Low warning decreased" },
+        { address=0XA062, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Red Energy. 1a=full (decimal 26) 0d=half (dec 13) 03=Energy Low warning increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA054, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Decimal score value 1 of 2. 0xupper, Swizzled value, multiply by 0x10000 + next address." },
+        { address=0XA056, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Decimal score value 2 of 2. (0x07d0 -> 0x0fa0 means you've earned a total of 4000 points, etc.)" },
+        { address=0XA058, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="First two digits of displayed score (0x0100) if score is [10],094,593" },
+        { address=0XA05A, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Second two digits of displayed score (0x0009) if score is 10,[09]4,593" },
+        { address=0XA05C, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Third pair of digits of displayed score (0x0405) if score is 10,09[4,5]93" },
+        { address=0XA05E, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Last pair of digits of displayed score (0903) if score is 10,094,5[93]" },
+      },
+      collectibles = {
+        { address=0XA0BC, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="During mission clear, this goes to 0xffff during tally, then returns to 0x00. But not if you are" },
+        { address=0XC400, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rapidly switches between 0x03 and 0x0d when Feather 1 is firing machine gun. 0d=not firing machi" },
+        { address=0XF004, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0x80 during docking sequence during mission clear, works as protection against chain explosions" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF000, type="u8", condition="eq", value=0XE8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 6 second half including final boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA160, type="u16be", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Decimal timer counter, not visible to player. Matches Mission Time in Mission 6. When reaches 0x" },
+        { address=0XEE16, type="u8", condition="eq", value=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="C (Default)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8103, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Target arrow to next object flashes, alternates between 0x04 and 06." },
+        { address=0XA064, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ship shield energy. 00=destroyed. a1=full" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA108, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer that pauses if you pause the game." },
+      },
+    },
+  },
+}

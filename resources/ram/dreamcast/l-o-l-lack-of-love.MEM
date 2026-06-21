@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "L.O.L.: Lack of Love",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "l-o-l-lack-of-love",
+    file = "l-o-l-lack-of-love.zip",
+    hashes = {
+      { hash = "4ab193310e28704b961c75105bc5233e", label = "L.O.L. - Lack of Love (Japan)" },
+      { hash = "5a0d53ce943cc6ea758784ce1252d340", label = "L.O.L. - Lack of Love (Japan) (En) (v1.1) (Rolly)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X77FD62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max health decreased" },
+        { address=0X77FD62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max health increased" },
+        { address=0X77FD66, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="current health decreased" },
+        { address=0X77FD66, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="current health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XEF80, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="hunger rings. when not on the main menu, from 0-6. equals 53 when transistioning from the main m" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4CE1C0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="amount of times you've harassed big guard ant - when it reaches 6, the 'boss' is ready to attack" },
+      },
+    },
+  },
+}

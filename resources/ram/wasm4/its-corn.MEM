@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "It's Corn!",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "its-corn",
+    file = "its-corn.zip",
+    hashes = {
+      { hash = "435e45c38ba4cd2f750b223ca7a580b4", label = "It's Corn! (World) (Sander in 't Veld).wasm" },
+    }
+  },
+
+  events = {
+  },
+}

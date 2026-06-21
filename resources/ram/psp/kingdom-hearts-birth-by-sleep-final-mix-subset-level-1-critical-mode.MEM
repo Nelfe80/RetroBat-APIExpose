@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Kingdom Hearts: Birth by Sleep -Final Mix- [Subset - Level 1 Critical Mode]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kingdom-hearts-birth-by-sleep-final-mix-subset-level-1-critical-mode",
+    file = "kingdom-hearts-birth-by-sleep-final-mix-subset-level-1-critical-mode.zip",
+    hashes = {
+      { hash = "83bf2fbc26d0f921a4b535d27889018b", label = "Kingdom Hearts - Birth by Sleep - Final Mix [Subset - Level 1 Critical Mode].iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1F19B11, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X1F19B17, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arena level" },
+        { address=0X1F25F01, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty level" },
+      },
+    },
+  },
+}

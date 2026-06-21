@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Star Wars: Rebel Assault",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "star-wars-rebel-assault",
+    file = "star-wars-rebel-assault.zip",
+    hashes = {
+      { hash = "90e4b7dda0d2b9d5117086271bdfa5ff", label = "Star Wars - Rebel Assault (USA, Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X95AF2, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (01)" },
+        { address=0XABB33, type="u8", condition="eq", value=0X09, action="PAUSE_ON", no_log=false, no_survey=false, desc="First Person Lasers Paused" },
+        { address=0XABB33, type="u8", condition="eq", value=0X0B, action="PAUSE_ON", no_log=false, no_survey=false, desc="First Person Torpedos Paused" },
+        { address=0XABB33, type="u8", condition="eq", value=0X0D, action="PAUSE_ON", no_log=false, no_survey=false, desc="Third Person Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X95AD6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Cutscene Progress" },
+      },
+      stage = {
+        { address=0XABC63, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Skip Active (01)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XABA92, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XABA92, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XABA8C, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XABA94, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XABB00, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Targets Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XABC76, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level Time?" },
+      },
+    },
+  },
+}

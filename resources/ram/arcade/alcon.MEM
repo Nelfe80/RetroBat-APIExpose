@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Alcon",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "alcon",
+    file = "alcon.zip",
+    hashes = {
+      { hash = "2d0ac987f2742d80be501b9334b9f064", label = "alcon.7z <Alcon (US)>" },
+      { hash = "73d6a4ad8ba46b255f33c32b94c989f7", label = "slapfigh.7z <Slap Fight (A77 set, 8606M PCB)>" },
+      { hash = "dc3bbaf06ce9e9fa5017ed8ae9af6048", label = "slapfigha.7z <Slap Fight (A76 set, GX-006-A PCB)>" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0189, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current player remaining lives increased" },
+        { address=0X0189, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current player remaining lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X018F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Selectable Weapon/Feature" },
+        { address=0X01D7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current weapon" },
+        { address=0X01DD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current weapon (as array index)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0184, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-Bit - 6 LE Packed BCD Digits] Current Player Score" },
+        { address=0X0192, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit BCD] Frame Score Accumulator" },
+        { address=0X03DF, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, first entry" },
+        { address=0X03FF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, second entry" },
+        { address=0X041F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 3rd entry" },
+        { address=0X043F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 4th entry" },
+        { address=0X045F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 5th entry" },
+        { address=0X047F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 6th entry" },
+        { address=0X049F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 7th entry" },
+        { address=0X04BF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 8th entry" },
+        { address=0X04DF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 9th entry" },
+        { address=0X04FF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 10th entry" },
+        { address=0X051F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 11th entry" },
+        { address=0X053F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 12th entry" },
+        { address=0X055F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 13th entry" },
+        { address=0X057F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 14th entry" },
+        { address=0X059F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 15th entry" },
+        { address=0X05BF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit - 4 LE Packed BCD Digits] Enemy score, 16th entry" },
+        { address=0X59A2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit Address] Score tens location" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X01BF, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Status" },
+      },
+    },
+  },
+}

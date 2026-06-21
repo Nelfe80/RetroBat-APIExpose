@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Akuji the Heartless",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "akuji-the-heartless",
+    file = "akuji-the-heartless.zip",
+    hashes = {
+      { hash = "f4c60fca3a248a8129e345a38a302d33", label = "Akuji the Heartless (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFBABE, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8bit] Title Screen" },
+        { address=0X11F1A8, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8bit] Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA8D6C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Level Complete" },
+        { address=0XC4706, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Master" },
+        { address=0XC4714, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Bit Flag for collected Items in level 1" },
+        { address=0XC4715, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Bit Flag for collected Items in level 1" },
+        { address=0XC4716, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Bit Flag for collected Items in level 1" },
+        { address=0XC4717, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Bit Flag for collected Items in level 1" },
+        { address=0XC4791, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Bit Flag for collected Items in level 1" },
+        { address=0XDC8CD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level 1 Piston Movement" },
+        { address=0XDC901, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level 1 Piston Movement" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB828C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives [Text] increased" },
+        { address=0XB828C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives [Text] decreased" },
+        { address=0XB8290, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0XB8290, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+        { address=0XC47C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0XC47C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+      health = {
+        { address=0XB822C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health [Display] decreased" },
+        { address=0XB822C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health [Display] increased" },
+        { address=0XB8230, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health decreased" },
+        { address=0XB8230, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health increased" },
+        { address=0X11FEEF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health Boosts (Pointed :\) decreased" },
+        { address=0X11FEEF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health Boosts (Pointed :\) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB826C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Selected Spells Ammo" },
+        { address=0XB8270, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] Selected Spells Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB832C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Health [Display]" },
+        { address=0XB8330, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] Boss Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XBA746, type="u8", condition="eq", value=0XCA, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC47F0, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[8bit] Checkpoint Hit" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB1891, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[8bit] Level Timer" },
+      },
+    },
+  },
+}

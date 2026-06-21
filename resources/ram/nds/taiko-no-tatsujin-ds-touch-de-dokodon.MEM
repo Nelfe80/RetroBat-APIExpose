@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Taiko no Tatsujin DS: Touch de Dokodon!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "taiko-no-tatsujin-ds-touch-de-dokodon",
+    file = "taiko-no-tatsujin-ds-touch-de-dokodon.zip",
+    hashes = {
+      { hash = "db5a25378f23e47377002f149e6e5b31", label = "Taiko no Tatsujin DS - Touch de Dokodon! (Japan) (Rev 1).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X2AFC6C, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Song played - Combo [32bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2795A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="After Song - Points [32bit]" },
+        { address=0X2AFC68, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Song played - Points [32bit]" },
+      },
+      collectibles = {
+        { address=0X279572, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crowns - Easy [mirror] increased" },
+        { address=0X279573, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crowns - Normal [mirror] increased" },
+        { address=0X279574, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crowns - Hard [mirror] increased" },
+        { address=0X279575, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crowns - Oni [mirror] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2AFC70, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Song played - Perfect Counter [32bit]" },
+        { address=0X2AFC74, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Song played - Good Counter [32bit]" },
+        { address=0X2AFC78, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Song played - Miss Counter [32bit]" },
+      },
+    },
+  },
+}

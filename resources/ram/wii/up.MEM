@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Up",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "up",
+    file = "up.zip",
+    hashes = {
+      { hash = "637f38537071a7e2c4f37b2583c91bd1", label = "Disney-Pixar Up (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X81FA74, type="u32be", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause/Level complete" },
+        { address=0X84622C, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="In-pause/Loading screen" },
+        { address=0X84AEE0, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-bit BE] [Boolean] Menu/Pause/Credits flags" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X828828, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] [ASCII] Level ID" },
+        { address=0X84622C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Playing a level" },
+        { address=0X84622C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Boolean] Flag when a level is played" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X81AB9C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Health decreased" },
+        { address=0X81AB9C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Health increased" },
+      },
+    },
+  },
+}

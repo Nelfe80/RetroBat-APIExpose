@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "The Hitchhiker's Guide to the Galaxy",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-hitchhikers-guide-to-the-galaxy",
+    file = "the-hitchhikers-guide-to-the-galaxy.zip",
+    hashes = {
+      { hash = "ce0b5e83a40016079574409e405c5e7c", label = "The Hitchhiker's Guide to the Galaxy r58.woz" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X50E6, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bit BE] Score" },
+      },
+      collectibles = {
+        { address=0X50E5, type="u8", condition="eq", value=0XAF, action="MONEY_STATE", no_log=false, no_survey=false, desc="Access Space (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hatchway (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XBC, action="MONEY_STATE", no_log=false, no_survey=false, desc="Engine Room (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XBE, action="MONEY_STATE", no_log=false, no_survey=false, desc="Entry Bay Number Two (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XBF, action="MONEY_STATE", no_log=false, no_survey=false, desc="Corridor, Aft End (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XC0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Corridor, Fore End (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XC9, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bridge (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XCF, action="MONEY_STATE", no_log=false, no_survey=false, desc="Nutrimat slot (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XD2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Galley (Heart of Gold)" },
+        { address=0X50E5, type="u8", condition="eq", value=0XDA, action="MONEY_STATE", no_log=false, no_survey=false, desc="Marvin's Pantry (Heart of Gold)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5469, type="u8", condition="eq", value=0XF0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="switch on" },
+        { address=0X5469, type="u8", condition="eq", value=0XF3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="block" },
+      },
+    },
+  },
+}

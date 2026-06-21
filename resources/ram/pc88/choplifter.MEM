@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Choplifter",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "choplifter",
+    file = "choplifter.zip",
+    hashes = {
+      { hash = "89b47d7cf7e794d62cdbabe98bb12a8a", label = "Choplifter {V1 mode}.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X51A8, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Demo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X51AA, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="False" },
+        { address=0X51AA, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0X51AA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Carrying Hostages" },
+        { address=0X51BF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Casualties [8bit BCD]" },
+        { address=0X51C0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Successfully Rescued [8bit BCD]" },
+        { address=0X51C1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Held [8bit]" },
+        { address=0X526A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Rescued" },
+        { address=0X526B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Held" },
+        { address=0X526D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages Killed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X526A, type="u8", condition="eq", value=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="64 //crown will pop up upon completion - perfect game = win condition - deaths allowed" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X51DA, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[Boolean] Helicopter Destroyed" },
+        { address=0X5266, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[Boolean] Fourth Entrance Destroyed" },
+        { address=0X5267, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[Boolean] Third Entrance Destroyed" },
+        { address=0X5268, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[Boolean] Second Entrance Destroyed" },
+        { address=0X5269, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[Boolean] First Entrance Destroyed" },
+      },
+    },
+  },
+}

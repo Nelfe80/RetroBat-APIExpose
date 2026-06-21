@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Prince of Persia",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "prince-of-persia",
+    file = "prince-of-persia.zip",
+    hashes = {
+      { hash = "6f49df735cd2cf9d351d549f1cbfdaa9", label = "Prince of Persia (Japan).sfc" },
+      { hash = "8ffc8d34bc75bc049122894b4292eb85", label = "Prince of Persia (USA).sfc" },
+      { hash = "abca51c8ed56d15aa25c8c3eebe5f65c", label = "Prince of Persia (USA) (Pt).sfc" },
+      { hash = "afb0ac757692243be9fe1725c98141db", label = "Prince of Persia (USA) (MSU-1) (Sega CD OST) (Conn,Relikk) (1.0).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0527, type="u8", condition="eq", value=0XC, action="DEMO_MODE", no_log=false, no_survey=false, desc="120 mins; B= 110 mins; A= 100 mins; after that, it decreases: 99, 98..." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0060, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear = 1d" },
+        { address=0X0061, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear = 16" },
+      },
+      stage = {
+        { address=0X024F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Room Value of Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0508, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X0508, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X050A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health max amount decreased" },
+        { address=0X050A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health max amount increased" },
+        { address=0X050D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy health max amount decreased" },
+        { address=0X050D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy health max amount increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X024C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage counter= [15 in demo, remains until game starts] [changes immediately after the screen goe" },
+        { address=0X050B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy health counter" },
+        { address=0X0529, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Seconds counter [ff in demo]" },
+      },
+    },
+  },
+}

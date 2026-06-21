@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Spider-Man 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "spider-man-2",
+    file = "spider-man-2.zip",
+    hashes = {
+      { hash = "7e15ae4b69920e0e2cd76318e07372d6", label = "Spider-Man 2 (USA).nds" },
+      { hash = "be73e1558a4ff80d4436148a5ab79b4e", label = "Spider-Man 2 (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "e5331a644de2a3ec550d082fb486865e", label = "Spider-Man 2 (Europe).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X15B3D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+      stage = {
+        { address=0X15B400, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Victims. 2st Mision, Hostages. 5st Mission" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X15B3EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spidey Health decreased" },
+        { address=0X15B3EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spidey Health increased" },
+        { address=0X15B3F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Upgrades decreased" },
+        { address=0X15B3F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Upgrades increased" },
+        { address=0X15B3F4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mysterio,Doc Ock,Vulture Health (16 Bit) decreased" },
+        { address=0X15B3F4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mysterio,Doc Ock,Vulture Health (16 Bit) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15B444, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Time Limit Of a Level (no editable) 16 Bit" },
+      },
+    },
+  },
+}

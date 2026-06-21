@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Ghost in the Shell: Stand Alone Complex",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "ghost-in-the-shell-stand-alone-complex",
+    file = "ghost-in-the-shell-stand-alone-complex.zip",
+    hashes = {
+      { hash = "194bcf1b91fd2ef5de65c961d5149a30", label = "Ghost in the Shell - Stand Alone Complex (Europe) (En,Fr,De,Es,It)" },
+      { hash = "76b077efe463da422179696972d678be", label = "Ghost in the Shell - Stand Alone Complex (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X3694F0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="overall stage id" },
+        { address=0X3694F4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="some kind of super-sub-stage id?" },
+        { address=0X3694F8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="training sub-stage. universal?" },
+        { address=0X369530, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="overall stage id" },
+        { address=0X369538, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="training substage. universal?" },
+      },
+    },
+  },
+}

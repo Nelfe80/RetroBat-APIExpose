@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Buffers Evolution",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "buffers-evolution",
+    file = "buffers-evolution.zip",
+    hashes = {
+      { hash = "9b15b2236cae605f7bc3bea3859fdd36", label = "Buffers Evolution (Japan).ws" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00D9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID, Starts at 1, updates when a level is chosen" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X00DB, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Current Form Slot Used" },
+        { address=0X00DE, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Current Form Used:" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0106, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="10 - Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0106, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current Time - Seconds" },
+        { address=0X011A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[54 bytes] Best time for each level" },
+        { address=0X0162, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[54 bytes] Time section for Each level in the menu" },
+      },
+    },
+  },
+}

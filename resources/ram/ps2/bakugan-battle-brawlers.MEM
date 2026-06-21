@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bakugan: Battle Brawlers",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "bakugan-battle-brawlers",
+    file = "bakugan-battle-brawlers.zip",
+    hashes = {
+      { hash = "e058d1c70207d787e5adb6bb7ac61541", label = "Bakugan - Battle Brawlers (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

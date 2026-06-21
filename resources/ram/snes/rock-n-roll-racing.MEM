@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Rock n' Roll Racing",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "rock-n-roll-racing",
+    file = "rock-n-roll-racing.zip",
+    hashes = {
+      { hash = "1978359063c02ad2badd3c0e993aca14", label = "Rock N' Roll Racing (USA).sfc" },
+      { hash = "4b01b8c7900ac523351b2cc01870287e", label = "Rock N' Roll Racing (Europe) (Pt).sfc" },
+      { hash = "ea99d9924329380fe4a0d523caf9d2e2", label = "Rock 'N' Roll Racing (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0355, type="u8", condition="eq", value=0XC, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0E25, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Bit0 = Car 1 CPU Control (Demo)" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X029B, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Races (bound to World)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1AEE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deaths (Anyone)" },
+      },
+      health = {
+        { address=0X0EDF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP decreased" },
+        { address=0X0EDF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP increased" },
+        { address=0X0EE0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Car 2 HP decreased" },
+        { address=0X0EE0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Car 2 HP increased" },
+        { address=0X0EE1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Car 3 HP decreased" },
+        { address=0X0EE1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Car 3 HP increased" },
+        { address=0X0EE2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Car 4 HP decreased" },
+        { address=0X0EE2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Car 4 HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0E40, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="2nd powerup in race (readonly) ?" },
+        { address=0X0E41, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="3rd power up (read only) ?" },
+      },
+      weapon = {
+        { address=0X02B8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon upgrade modifier" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X02A8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="total points/score" },
+        { address=0X02AA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Have" },
+        { address=0X02AB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Need" },
+      },
+      collectibles = {
+        { address=0X13BB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money 1 (00 - 99) increased" },
+        { address=0X13BC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money 2 (100 - 9900) increased" },
+        { address=0X13BD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money 3 (10k - 990k) increased" },
+        { address=0X13BE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money 4 (1kk - 9kk) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0E8B, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Maximum Jump (01 - 07)" },
+        { address=0X0EAD, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Locust Jump Jets Available (Goes to max each lap)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0019, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="looping counter for P1 car x-axis byte" },
+        { address=0X001B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="looping counter for P1 car y-axis byte" },
+        { address=0X023F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Screensaver Timer" },
+        { address=0X0A22, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Minute byte for internal timer. The whole timer stops at 9 minutes and 59.99 seconds." },
+        { address=0X0A24, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="10-second-increment byte for internal timer. Resets every 6 increments." },
+        { address=0X0A26, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Second byte for internal timer (resets every 10 seconds)" },
+        { address=0X0A28, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Decisecond byte for internal timer" },
+        { address=0X0A2A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Centisecond byte for internal timer" },
+        { address=0X0BE9, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Race Time (Seconds)" },
+        { address=0X0BEA, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Race Time (Minutes)" },
+        { address=0X127E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer?" },
+      },
+    },
+  },
+}

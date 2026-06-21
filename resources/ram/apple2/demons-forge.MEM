@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Demon's Forge",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "demons-forge",
+    file = "demons-forge.zip",
+    hashes = {
+      { hash = "d1e28255dcaa07d4f8291639bec84d2b", label = "The Demon's Forge.woz" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0051, type="u8", condition="eq", value=0XC0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0200, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[256 bytes] input buffer (bit7 set on newly typed characters, cleared when pressing return)" },
+      },
+    },
+  },
+}

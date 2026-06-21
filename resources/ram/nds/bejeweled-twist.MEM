@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Bejeweled Twist",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "bejeweled-twist",
+    file = "bejeweled-twist.zip",
+    hashes = {
+      { hash = "e4ba6958b04c0e076790b291d844122e", label = "Bejeweled Twist (Europe, Australia).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3886F4, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Help Tab" },
+        { address=0X3886F4, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X39A4AD, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-Game (no demo)" },
+      },
+      events = {
+        { address=0X399DB8, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="- Combo - Number of Matches in One Move [EU]" },
+        { address=0X5C1858, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Offset] - Combo - Number of Matches in One Move [US]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X399D88, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Combo - Number of Gems Cleared in One Move (Matched Moves) [EU]" },
+        { address=0X399D8C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Combo - Number of Gems Cleared in One Move (All Gems) [EU]" },
+        { address=0X399DE8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Stats - Number of Coals Cleared in a match [EU]" },
+        { address=0X399DF0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Stats - Number of Flame Gems Cleared in a match [EU]" },
+        { address=0X399DF4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Stats - Number of Lightning Gems Cleared in a match [EU]" },
+        { address=0X399DF8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Stats - Number of Supernova Gems Cleared in a match [EU]" },
+        { address=0X399DFC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Stats - Number of Fruit Gems Cleared in a match [EU]" },
+        { address=0X5C1F74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Offset] - Round - Current Round Number Related [US]" },
+      },
+      stage = {
+        { address=0X36B2EC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="- Round - Current Round Number Actual [US]" },
+        { address=0X38884C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="- Round - Current Round Number Actual [EU]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X36B2F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Score - Meter Progression Actual [US]" },
+        { address=0X388850, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Score - Meter Progression Actual [EU]" },
+        { address=0X39A038, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Total Score Actual Value [EU]" },
+        { address=0X39A03C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Total Score Display Value [EU]" },
+        { address=0X5BF9D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Offset 2] - Score - Total Score Actual Value [US]" },
+        { address=0X5BF9D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Offset 2] - Score - Total Score Display Value [US]" },
+        { address=0X5C17C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Offset] - Score - Meter Progression Related [US]" },
+        { address=0X5C1B94, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Offset] - Score - Total Score Actual Value [US]" },
+        { address=0X5C1B98, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Offset] - Score - Total Score Display Value [US]" },
+        { address=0X5C1F28, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Offset] - Score - Meter Progression 2 [US]" },
+      },
+    },
+  },
+}

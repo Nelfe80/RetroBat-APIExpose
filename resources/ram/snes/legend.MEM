@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Legend",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "legend",
+    file = "legend.zip",
+    hashes = {
+      { hash = "0c684458019a60b0e16acb408f1418ea", label = "Legend (USA).sfc" },
+      { hash = "711afe5a0d32b3b1e40afcfaada20fa9", label = "Legend (USA) (Pt) (ripman) (1.0).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00AD, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="playing" },
+        { address=0X01F9, type="u8", condition="eq", value=0X95, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue screen" },
+        { address=0X1287, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="DEMO=00" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1279, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 = Level Select active" },
+        { address=0X127D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Selection" },
+        { address=0X194F, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1 (entire)" },
+        { address=0X194F, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2 (2,4,6)" },
+        { address=0X194F, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3 (07,8" },
+        { address=0X194F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE ID (divided by parts)" },
+        { address=0X1951, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 / The Jail / Bonus" },
+        { address=0X1951, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X1951, type="u8", condition="eq", value=0X18, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X1951, type="u8", condition="eq", value=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X1951, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X1951, type="u8", condition="eq", value=0X30, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X1951, type="u8", condition="eq", value=0X38, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X1951, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE ID?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1283, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Share lives: 00 = Off, 01 = On increased" },
+        { address=0X1283, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Share lives: 00 = Off, 01 = On decreased" },
+        { address=0X1309, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X1309, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0X1485, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death" },
+      },
+      health = {
+        { address=0X130D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X130D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X12A7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold: X00000 increased" },
+        { address=0X12A8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold: X0000 increased" },
+        { address=0X12A9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold: X000 increased" },
+        { address=0X12AA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold: X00 increased" },
+        { address=0X12AB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold: X0 increased" },
+        { address=0X12AC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold: 0X increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1485, type="u8", condition="eq", value=0X6A, action="BOSS_HIT", no_log=false, no_survey=false, desc="full?" },
+        { address=0X1951, type="u8", condition="eq", value=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last Boss" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1388, type="u16le", condition="eq", value=0X0500, action="JUMPING", no_log=false, no_survey=false, desc="jump kick" },
+        { address=0X1389, type="u16le", condition="eq", value=0X0500, action="JUMPING", no_log=false, no_survey=false, desc="jump kick" },
+        { address=0X1389, type="u16le", condition="eq", value=0X0A00, action="JUMPING", no_log=false, no_survey=false, desc="Jump Slash" },
+      },
+    },
+  },
+}

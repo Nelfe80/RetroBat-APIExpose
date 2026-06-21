@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Tony Hawk's Project 8 [Subset - Single Run Classic Goals]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "tony-hawks-project-8-subset-single-run-classic-goals",
+    file = "tony-hawks-project-8-subset-single-run-classic-goals.zip",
+    hashes = {
+      { hash = "34a1c3279dcbfd9ad60b63b96706578b", label = "Tony Hawk's Project 8 (USA) [Subset - Single Run Classic Goals].iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X67D5AC, type="u32le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grounded" },
+        { address=0XD93FB0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Prior Level" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X1F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Training" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X18, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Suburbs" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X1B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Downtown" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X1A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="City Center" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X19, action="NEW_LEVEL", no_log=false, no_survey=false, desc="High School" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X1C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Crete Park" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X1D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fun Park" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X16, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Downhill" },
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X1E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Your Room (Career)/Create A Skater (Create)" },
+        { address=0XD93FB4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0XD93FB4, type="u16le", condition="eq", value=0X17, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Car Factory" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X98A325, type="u8", condition="eq", value=0XB7, action="LIVES_STATE", no_log=false, no_survey=false, desc="Bob Burnquist" },
+        { address=0X98A325, type="u8", condition="eq", value=0XB6, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lyn-Z Adams Hawkins" },
+        { address=0X98A325, type="u8", condition="eq", value=0XB5, action="LIVES_STATE", no_log=false, no_survey=false, desc="Tony Hawk" },
+        { address=0X98A325, type="u8", condition="eq", value=0XB3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Stereo" },
+        { address=0X98A325, type="u8", condition="eq", value=0XB2, action="LIVES_STATE", no_log=false, no_survey=false, desc="Birdhouse" },
+        { address=0X98A325, type="u8", condition="eq", value=0XB1, action="LIVES_STATE", no_log=false, no_survey=false, desc="Almost" },
+        { address=0X98A325, type="u8", condition="eq", value=0XB0, action="LIVES_STATE", no_log=false, no_survey=false, desc="Element" },
+        { address=0X98A325, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bitflags] Day in the Life/Sponsor Movies Unlocked increased" },
+        { address=0X98A325, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bitflags] Day in the Life/Sponsor Movies Unlocked decreased" },
+        { address=0X98A326, type="u8", condition="eq", value=0XB6, action="LIVES_STATE", no_log=false, no_survey=false, desc="Daewon Song" },
+        { address=0X98A326, type="u8", condition="eq", value=0XB5, action="LIVES_STATE", no_log=false, no_survey=false, desc="Ryan Scheckler" },
+        { address=0X98A326, type="u8", condition="eq", value=0XB4, action="LIVES_STATE", no_log=false, no_survey=false, desc="Paul Rodriguez" },
+        { address=0X98A326, type="u8", condition="eq", value=0XB3, action="LIVES_STATE", no_log=false, no_survey=false, desc="Rodney Mullen" },
+        { address=0X98A326, type="u8", condition="eq", value=0XB2, action="LIVES_STATE", no_log=false, no_survey=false, desc="Bam Margera" },
+        { address=0X98A326, type="u8", condition="eq", value=0XB1, action="LIVES_STATE", no_log=false, no_survey=false, desc="Nyjah Huston" },
+        { address=0X98A326, type="u8", condition="eq", value=0XB0, action="LIVES_STATE", no_log=false, no_survey=false, desc="Dustin Dollin" },
+        { address=0X98A366, type="u8", condition="eq", value=0XB5, action="LIVES_STATE", no_log=false, no_survey=false, desc="Day in the Life Stevie Williams" },
+        { address=0X98A366, type="u8", condition="eq", value=0XB4, action="LIVES_STATE", no_log=false, no_survey=false, desc="Day in the Life Mike Vallely" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X67DFF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

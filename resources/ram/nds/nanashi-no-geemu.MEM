@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Nanashi no Geemu",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nanashi-no-geemu",
+    file = "nanashi-no-geemu.zip",
+    hashes = {
+      { hash = "9ea74998bf715925ea743193ec39fb81", label = "Nanashi no Geemu (Japan).nds" },
+      { hash = "f4b27b6a76f54df9c804ff635b57ce95", label = "Nameless Game, The (Japan) (En) (v1.2) (Nagato,Ryusui,Summvs).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDEC04, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Something related to the scene? Anyways, this is 0 on the title screen, use in conjunction with" },
+        { address=0XDEE08, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game over/Pause thing, stays at 1?" },
+        { address=0XDEF3C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="10th email - Game title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDEC00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Day" },
+      },
+      zone = {
+        { address=0XDEC18, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Horizontal movement in game world" },
+        { address=0XDEC24, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Horizontal movement in game world" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XDEF14, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bloom Ring" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF197C, type="u8", condition="eq", value=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="OK 90 = Broken" },
+      },
+    },
+  },
+}

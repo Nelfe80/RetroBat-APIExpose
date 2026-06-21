@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Singer Sewing Machine Operation Software",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "singer-sewing-machine-operation-software",
+    file = "singer-sewing-machine-operation-software.zip",
+    hashes = {
+      { hash = "52f46e74689516225055b8576079ee24", label = "Sewing Machine Operation Software (USA) (En,Fr,Es) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

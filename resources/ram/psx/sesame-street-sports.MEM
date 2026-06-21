@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Sesame Street Sports",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing, Sports"
+  },
+
+  rom = {
+    name = "sesame-street-sports",
+    file = "sesame-street-sports.zip",
+    hashes = {
+      { hash = "8e778696106d730c57e10078b15393d2", label = "Sesame Street Sports (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6EB47, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Neighborhood" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Farm Cattle Yard" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Forest Playground" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Snowy Lodge" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beach Docks" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Forest River" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="City Park" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Farm Pigsty" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Snake Slide Playground" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Snow Sculpture Mountain" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boardwalk Beach" },
+        { address=0X6EB47, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dragon Mountain River" },
+        { address=0X6EB47, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level-ID (not in logical order)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6EABA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hit Object or obstacle, goes to 4 and counts down" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6E814, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Counter ON" },
+        { address=0X6E838, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Token Counter ON" },
+        { address=0X6E988, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Training Counter" },
+        { address=0X6EB10, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap Counter" },
+        { address=0X6EB4D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap Counter(strange behavior)" },
+        { address=0X86DC2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Might be odd-16-bit timer" },
+      },
+    },
+  },
+}

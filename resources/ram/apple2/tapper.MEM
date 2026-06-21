@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Tapper",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tapper",
+    file = "tapper.zip",
+    hashes = {
+      { hash = "baa866c80409d9ec9972273210b96132", label = "Tapper (1983)(Bally Midway)[cr M.B.P.A.].do" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006E, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X006E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X006E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+  },
+}

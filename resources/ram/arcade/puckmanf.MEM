@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "puckmanf",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "puckmanf",
+    file = "puckmanf.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X4E6E, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

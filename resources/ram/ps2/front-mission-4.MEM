@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Front Mission 4",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "front-mission-4",
+    file = "front-mission-4.zip",
+    hashes = {
+      { hash = "011319de7c0917a40d2a17b417eb7448", label = "Front Mission 4 (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X5FDB54, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle 2 - Transport HP decreased" },
+        { address=0X5FDB54, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle 2 - Transport HP increased" },
+      },
+    },
+  },
+}

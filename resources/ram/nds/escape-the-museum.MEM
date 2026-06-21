@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Escape the Museum",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "escape-the-museum",
+    file = "escape-the-museum.zip",
+    hashes = {
+      { hash = "fd8e2ec099bf15aa42fb6fe172b8499c", label = "Escape the Museum (USA) (En,Fr,De,Es).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7A017, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X79360, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Current Level in Story" },
+        { address=0X79380, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Global Accuracy in Level" },
+        { address=0X7A038, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32 Bit] Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X795A7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Progression | Medieval England and Age of Discoveries" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X79378, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32 Bit] Total Misses | Hidden Object" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8401C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Time Taken" },
+      },
+    },
+  },
+}

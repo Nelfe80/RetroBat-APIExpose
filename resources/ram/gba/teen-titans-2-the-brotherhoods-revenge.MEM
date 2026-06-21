@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Teen Titans 2: The Brotherhood's Revenge",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "teen-titans-2-the-brotherhoods-revenge",
+    file = "teen-titans-2-the-brotherhoods-revenge.zip",
+    hashes = {
+      { hash = "c9ce90b98c6cc2f60847d6f39ecf11c5", label = "Teen Titans 2 (USA) (En,Fr).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF105, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All levels unlocked" },
+        { address=0XF105, type="u8", condition="eq", value=0X0D, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission 13 Ultimate Brain Completed" },
+        { address=0XF105, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Levels Unlocked" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XF975, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Robin energy 1" },
+        { address=0XF975, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Robin energy 2" },
+        { address=0XF975, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Robin energy 3" },
+        { address=0XF976, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Cyborg energy 1" },
+        { address=0XF976, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Cyborg energy 2" },
+        { address=0XF976, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Cyborg energy 3" },
+        { address=0XF977, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Beast Boy energy 1" },
+        { address=0XF977, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Beast Boy energy 2" },
+        { address=0XF977, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Beast Boy energy 3" },
+        { address=0XF977, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Raven energy 1" },
+        { address=0XF977, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Raven energy 2" },
+        { address=0XF978, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Raven energy 3" },
+        { address=0XF978, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Starfire energy 1" },
+        { address=0XF978, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Starfire energy 2" },
+        { address=0XF978, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Starfire energy 3" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7826, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+      },
+    },
+  },
+}

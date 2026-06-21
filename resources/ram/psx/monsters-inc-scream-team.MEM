@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Monsters, Inc. Scream Team",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "monsters-inc-scream-team",
+    file = "monsters-inc-scream-team.zip",
+    hashes = {
+      { hash = "008d0c674cbe9da486cccd7bd58f0810", label = "Disney-Pixar Monsters, Inc. - Monstros e Companhia - Ilha Assustadora (Portugal)" },
+      { hash = "12fecb24f0e3897c64dd3a835bbe2fa7", label = "Disney-Pixar Monsters, Inc. - Skraemmeoen (Denmark)" },
+      { hash = "14eae1baf9c888f151a79bd7719e151a", label = "Disney-Pixar Monsters, Inc. - Skraemmaroen (Sweden)" },
+      { hash = "22d8264cf086359c2336a6b5e999709f", label = "Disney-Pixar Monsters en Co. - Schrik Eiland (Netherlands)" },
+      { hash = "261c5194be5a842f938d100f25709a95", label = "Disney-Pixar Monsters, Inc. - Scare Island (Europe)" },
+      { hash = "34420a3fbb9a19d35af0245dad6ad5cb", label = "Disney-Pixar Monstres & Cie - L'ile de l'Epouvante (France)" },
+      { hash = "35bf4837e97df9875a1b9a3a3a06369c", label = "Disney-Pixar Monsterit Oy - Saeikkysaari (Finland)" },
+      { hash = "64e5cb911efa71df167416c40db814d9", label = "Disney-Pixar Monsters, Inc. - Scream Team (USA)" },
+      { hash = "c3457b0e92fd36865213449afd7038fb", label = "Disney-Pixar Die Monster AG - Schreckens-Insel (Germany)" },
+      { hash = "ce25a85aabea38fb515a7109a4318290", label = "Disney-Pixar Monstruos, S.A. - Isla de los Sustos (Spain)" },
+      { hash = "dc02037eea4870ee062b71906c72e1b9", label = "Disney-Pixar Monsterbedriften - Skrekkoya (Norway)" },
+      { hash = "ef25523661baf168073cf8592f3494b2", label = "Monsters, Inc. - Monsters Academy (Japan)" },
+      { hash = "f3b2a5ca51cfa91443823c7b7cea8757", label = "Disney-Pixar Monsters & Co. - L'Isola dello Spavento (Italy)" },
+    }
+  },
+
+  events = {
+  },
+}

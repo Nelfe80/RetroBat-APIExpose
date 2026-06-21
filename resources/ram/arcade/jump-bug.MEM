@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "jumpbug",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "jump-bug",
+    file = "jump-bug.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X4219, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4202, type="u64be", condition="change", action="SCORE_STATE", min=10, max=100, no_log=false, no_survey=false, desc="Score delta 10-100: A simple regular action" },
+        { address=0X4202, type="u64be", condition="change", action="SCORE_STATE", color="orange", min=110, max=200, no_log=false, no_survey=false, desc="Score delta 110-200: Score delta 110-200" },
+        { address=0X4202, type="u64be", condition="change", action="SCORE_STATE", color="cyan", min=210, max=400, no_log=false, no_survey=false, desc="Score delta 210-400: Score delta 210-400" },
+        { address=0X4202, type="u64be", condition="change", action="SCORE_STATE", color="green", min=410, max=1000, no_log=false, no_survey=false, desc="Score delta 410-1000: Score delta 410-1000" },
+      },
+    },
+  },
+}

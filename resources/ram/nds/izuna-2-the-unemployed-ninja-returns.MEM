@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Izuna 2: The Unemployed Ninja Returns",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "izuna-2-the-unemployed-ninja-returns",
+    file = "izuna-2-the-unemployed-ninja-returns.zip",
+    hashes = {
+      { hash = "2dfe9d9d24cff87ecb7aa730b5b04c9e", label = "Izuna 2 - The Unemployed Ninja Returns (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F38A6, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Claw Photo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E5060, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fuuka level" },
+        { address=0X1E66F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kagen level" },
+        { address=0X1E7D90, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Suiren level" },
+        { address=0X1E9428, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Utsuho level" },
+        { address=0X1EAAC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Takushiki level" },
+        { address=0X1EC158, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hinagiku level" },
+        { address=0X1ED7F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ichika level" },
+        { address=0X1EEE88, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gen-an level" },
+        { address=0X1F0520, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Suzuri level" },
+        { address=0X1F1BB8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Himiko level" },
+        { address=0X1F3351, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X1F3352, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1F385D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier (Male) Photo" },
+        { address=0X1F385E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier (female) Photo" },
+        { address=0X1F38B1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Red-Eye Soldier Photo" },
+        { address=0X1F392B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Photo" },
+      },
+      health = {
+        { address=0X1DDF48, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Izuna Current HP decreased" },
+        { address=0X1DDF48, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Izuna Current HP increased" },
+        { address=0X1DF5E0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shino HP decreased" },
+        { address=0X1DF5E0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shino HP increased" },
+        { address=0X1E2310, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mitsumoto current HP decreased" },
+        { address=0X1E2310, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mitsumoto current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1F38A5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Breaker Photo" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1F314C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1F3906, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mouse Boss Photo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1F3300, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Baldur Mugen chasm flag" },
+        { address=0X1F3303, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Twins Mugen chasm flag" },
+        { address=0X1F3305, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Anima Mugen chasm flag" },
+        { address=0X1F3306, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Corona Mugen chasm flag" },
+        { address=0X1F3307, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Grimla Mugen chasm flag" },
+        { address=0X1F3308, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Abyss Mugen chasm flag" },
+      },
+    },
+  },
+}

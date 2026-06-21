@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Barbie: Ocean Discovery",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "barbie-ocean-discovery",
+    file = "barbie-ocean-discovery.zip",
+    hashes = {
+      { hash = "89de435cb69325b42d569015ca09f49f", label = "Barbie - Ocean Discovery (USA) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEA9F, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Music? b0 = victory jingle, 85 = post-victory, 89 = title / cutscene minigame, ab = crystal city" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XCB72, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 bit] stage id, changes from 00 to 09" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC222, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="1 after treasure is found" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC369, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] - 00 during game, 01 during pause menu increased" },
+      },
+    },
+  },
+}

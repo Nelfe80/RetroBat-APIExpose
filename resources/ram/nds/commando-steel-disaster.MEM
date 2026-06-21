@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Commando: Steel Disaster",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "commando-steel-disaster",
+    file = "commando-steel-disaster.zip",
+    hashes = {
+      { hash = "fe4455b5dd6f761072af3013b6f6afcf", label = "Commando - Steel Disaster (USA) (En,Fr,Es).nds" },
+    }
+  },
+
+  events = {
+  },
+}

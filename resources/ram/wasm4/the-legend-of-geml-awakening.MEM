@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Legend of GEML: Awakening",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-legend-of-geml-awakening",
+    file = "the-legend-of-geml-awakening.zip",
+    hashes = {
+      { hash = "7e372d919d84e94f14c71222f1f372f2", label = "Legend of GEML, The - Awakening (World) (Robby Zampino,Ethan Hunter).wasm" },
+    }
+  },
+
+  events = {
+  },
+}

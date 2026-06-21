@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "alieninvp2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "alien-invasion-part-ii",
+    file = "alien-invasion-part-ii.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X21FF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X20F8, type="u16be", condition="change", action="SCORE_STATE", color="orange", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Score 200" },
+        { address=0X20F8, type="u16be", condition="change", action="SCORE_STATE", color="cyan", min=300, max=300, no_log=false, no_survey=false, desc="Score delta 300-300: Score 300" },
+        { address=0X20F8, type="u16be", condition="change", action="SCORE_STATE", min=400, max=100, no_log=false, no_survey=false, desc="Score delta 400-100: Mystery" },
+      },
+      collectibles = {
+        { address=0X20EB, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X20F8, type="u16be", condition="change", action="OBJECT_DESTROYED", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Ship Scores" },
+      },
+    },
+  },
+}

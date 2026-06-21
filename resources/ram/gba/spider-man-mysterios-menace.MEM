@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Spider-Man: Mysterio's Menace",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "spider-man-mysterios-menace",
+    file = "spider-man-mysterios-menace.zip",
+    hashes = {
+      { hash = "fbda16cbc7e3f81aa5b90da955d3e114", label = "Spider-Man - Mysterio's Menace (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7D64, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] spider-man pause menu icon color" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0040, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] [Hex] Difficulty Level" },
+        { address=0X7DAC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] [Hex] Level highlighted on map 00-06" },
+        { address=0X7DC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] [Hex] last level entered" },
+        { address=0X80B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] [Hex] number of objectives in level collected" },
+        { address=0X80C0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] [Hex] levels complete" },
+        { address=0X80DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] which screen you are on in the level" },
+        { address=0XA830, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] number of enemies in current level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X80B8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] [Hex] lives total (value - 1) increased" },
+        { address=0X80B8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] [Hex] lives total (value - 1) decreased" },
+      },
+      health = {
+        { address=0XB158, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Hex] Spider-man current health decreased" },
+        { address=0XB158, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Hex] Spider-man current health increased" },
+        { address=0XCA83, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Current Health decreased" },
+        { address=0XCA83, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Current Health increased" },
+        { address=0XCA84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] health bar graphic decreased" },
+        { address=0XCA84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] health bar graphic increased" },
+        { address=0XFD28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] mysterio current health decreased" },
+        { address=0XFD28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] mysterio current health increased" },
+        { address=0XFEE4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Hex] Electro current health decreased" },
+        { address=0XFEE4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Hex] Electro current health increased" },
+        { address=0X10260, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] [Hex] Rhino current health decreased" },
+        { address=0X10260, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] [Hex] Rhino current health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XB178, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit] silver suit armor" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB184, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[8bit] web ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF678, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] [Hex] hammerhead boss health" },
+        { address=0X10708, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] [Hex] Scorpion boss current health" },
+        { address=0X11F0C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] [Hex] Big Wheel boss current health" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFA68, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] [Hex] Hammerhead night club time current health" },
+      },
+    },
+  },
+}

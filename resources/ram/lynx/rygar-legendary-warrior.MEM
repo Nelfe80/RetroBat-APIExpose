@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Rygar: Legendary Warrior",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "rygar-legendary-warrior",
+    file = "rygar-legendary-warrior.zip",
+    hashes = {
+      { hash = "ff6fff314446ab70dfecb21e2de4a2f6", label = "Rygar (World).lnx" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="eq", value=0X0F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="titlescreen" },
+        { address=0X001A, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over animation" },
+        { address=0X003A, type="u8", condition="eq", value=0X31, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Scorescreen" },
+        { address=0X003A, type="u8", condition="eq", value=0X92, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Moving" },
+        { address=0X003A, type="u8", condition="eq", value=0X8B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Standing Still" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X004E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X004E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (XX) Hex" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X001A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Counter (XX) Hex increased" },
+        { address=0X001A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Counter (XX) Hex decreased" },
+        { address=0X0055, type="u16le", condition="eq", value=0X18, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Dead" },
+        { address=0X0087, type="u16le", condition="eq", value=0X14, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X19EA, type="u8", condition="eq", value=0X34, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XDC31, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sprite for Powerup 1: 8f = Active" },
+        { address=0XDC41, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sprite for Powerup 3: 85 = Active" },
+        { address=0XDC4A, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sprite for Powerup 4: c3 = Active" },
+        { address=0XDC8A, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sprite for Powerup 2: 73 = Active" },
+      },
+      weapon = {
+        { address=0X000B, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon not active" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0000, type="u8", condition="eq", value=0XFA, action="SCORE_STATE", no_log=false, no_survey=false, desc="game completed score screen" },
+        { address=0X0000, type="u8", condition="eq", value=0X59, action="SCORE_STATE", no_log=false, no_survey=false, desc="screen after score screen (used to ensure score is tallied up)" },
+        { address=0X002D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: 00X.X00.000" },
+        { address=0X002E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: 000.0XX.000" },
+        { address=0X002F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: 000.000.XX0" },
+        { address=0X0055, type="u16le", condition="eq", value=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="Crouching" },
+        { address=0X0055, type="u16le", condition="eq", value=0X10, action="SCORE_STATE", no_log=false, no_survey=false, desc="Rotating object in/out of score screens" },
+        { address=0X0055, type="u16le", condition="eq", value=0X12, action="SCORE_STATE", no_log=false, no_survey=false, desc="Looking at player on score screen" },
+        { address=0X0055, type="u16le", condition="eq", value=0X0A, action="SCORE_STATE", no_log=false, no_survey=false, desc="Attack" },
+        { address=0X0055, type="u16le", condition="eq", value=0X16, action="SCORE_STATE", no_log=false, no_survey=false, desc="Player bounce off enemy" },
+        { address=0X0055, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="02 = Walking to/from state 12 on score screen" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0055, type="u16le", condition="eq", value=0X06, action="JUMPING", no_log=false, no_survey=false, desc="Jumping upwards" },
+        { address=0X0055, type="u16le", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Falling down from jumping or falling off ledge" },
+        { address=0X0087, type="u16le", condition="eq", value=0X25, action="JUMPING", no_log=false, no_survey=false, desc="Cave Man Jumping Down" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0053, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player Direction" },
+      },
+    },
+  },
+}

@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Phoenix Wright: Ace Attorney - Justice for All",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Visual Novel"
+  },
+
+  rom = {
+    name = "phoenix-wright-ace-attorney-justice-for-all",
+    file = "phoenix-wright-ace-attorney-justice-for-all.zip",
+    hashes = {
+      { hash = "305d9643dd405800b56a4bc0ebcd7081", label = "Phoenix Wright - Ace Attorney - Justice for All (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB6BCB, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="To Be Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA9E6C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Screen Background ID (16-bit) [US]" },
+        { address=0XA9E6E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backup Screen Background ID (16-bit) [US]" },
+        { address=0XA9E70, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Previous Screen Background ID (16-bit) [US]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XAB5F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Meter (8-bit) [US] decreased" },
+        { address=0XAB5F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Meter (8-bit) [US] increased" },
+        { address=0XAB5F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Meter HUD (8-bit) [US] decreased" },
+        { address=0XAB5F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Meter HUD (8-bit) [US] increased" },
+      },
+    },
+  },
+}

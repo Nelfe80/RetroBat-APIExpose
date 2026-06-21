@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Despicable Me: Minion Mayhem",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "despicable-me-minion-mayhem",
+    file = "despicable-me-minion-mayhem.zip",
+    hashes = {
+      { hash = "89b08e31e425fe577eef8f9049064ae0", label = "Despicable Me - Minion Mayhem (Europe) (En,Fr,De,Es,It,Sv,No,Da,Fi).nds" },
+    }
+  },
+
+  events = {
+  },
+}

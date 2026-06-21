@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Alone in the Dark: One-Eyed Jack's Revenge",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "alone-in-the-dark-one-eyed-jacks-revenge",
+    file = "alone-in-the-dark-one-eyed-jacks-revenge.zip",
+    hashes = {
+      { hash = "97a7b9b1a54115d0e1b7a8535dad5360", label = "Alone in the Dark - One-Eyed Jack's Revenge (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6A7D4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="possible way to ID demo?" },
+        { address=0X6A7D6, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="possible way to ID demo?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA1820, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(16 bit) 3rd item on ground (after 1st enemy die)" },
+        { address=0XA1822, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(16 bit) 2nd item on ground (after 1st enemy die)" },
+        { address=0XA1824, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(16 bit) 1st item on ground (after 1st enemy die)" },
+      },
+      health = {
+        { address=0XE768C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Your HP decreased" },
+        { address=0XE768C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Your HP increased" },
+        { address=0X110AE8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Your HP decreased" },
+        { address=0X110AE8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Your HP increased" },
+        { address=0X110D78, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) enemy HP decreased" },
+        { address=0X110D78, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) enemy HP increased" },
+        { address=0X110DF8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) garden 1st branch HP decreased" },
+        { address=0X110DF8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) garden 1st branch HP increased" },
+        { address=0X110DFA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) garden 2nd branch HP decreased" },
+        { address=0X110DFA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) garden 2nd branch HP increased" },
+        { address=0X12A124, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Your HP decreased" },
+        { address=0X12A124, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Your HP increased" },
+        { address=0X12B40C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Your HP decreased" },
+        { address=0X12B40C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Your HP increased" },
+        { address=0X12BE78, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Your HP decreased" },
+        { address=0X12BE78, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Your HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X110AD8, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="(16 bit) Thompson ammo" },
+        { address=0X110AEA, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="(16 bit) Revolver ammo" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA181C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(8 bit) 0=disable temporary 3d objects/characters" },
+        { address=0XB08EA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="disable 3d objects? or layers?" },
+        { address=0XB08EE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="disable 3d objects? or layers?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE78AC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(16 bit) 1st Guard HP (House gate entrance)" },
+        { address=0X110D08, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(16 bit) Enemy HP - 1st enemy you encounter in game" },
+      },
+    },
+  },
+}

@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Attack of the Saiyans",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-ball-z-attack-of-the-saiyans",
+    file = "dragon-ball-z-attack-of-the-saiyans.zip",
+    hashes = {
+      { hash = "a974e55ce282c82b6b9bf170d907d140", label = "Dragon Ball Z - Attack of the Saiyans (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9F934, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Flame" },
+        { address=0X9FA07, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X9FA08, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X9FA12, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Used" },
+        { address=0XCC5EC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Flame" },
+      },
+      events = {
+        { address=0X9F979, type="u8", condition="eq", value=0X4, action="COMBO_HIT", no_log=false, no_survey=false, desc="Scombo Saiyan Attack" },
+        { address=0X9F979, type="u8", condition="eq", value=0X5, action="COMBO_HIT", no_log=false, no_survey=false, desc="SCombo (Heavenly Sunlight)" },
+        { address=0X9F979, type="u8", condition="eq", value=0X7, action="COMBO_HIT", no_log=false, no_survey=false, desc="SCombo (Earthling Strike)" },
+        { address=0XCC4B0, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo UP" },
+        { address=0XCD48F, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Goku - Skills - Energy Wave Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCDA4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Krillin Level" },
+        { address=0XCDB84, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Krillin XP left for next level" },
+        { address=0XCDDD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tien XP left for level up" },
+      },
+      zone = {
+        { address=0X9F837, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bit 4 = Raditz Spirit World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCC5FD, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ladies" },
+        { address=0XCC730, type="u16le", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="enemy dead / out of combat" },
+      },
+      health = {
+        { address=0X9F897, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="HP Capsule 50" },
+        { address=0X9F898, type="u8", condition="eq", value=0X5, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Ring" },
+        { address=0X9FA0B, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X9FA11, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Used" },
+        { address=0XCC4A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Seed decreased" },
+        { address=0XCC4A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Seed increased" },
+        { address=0XCC73C, type="u16le", condition="eq", value=0XB4, action="HIT", no_log=false, no_survey=false, desc="Picollo (damaged)" },
+        { address=0XCC73C, type="u16le", condition="eq", value=0XD7, action="HIT", no_log=false, no_survey=false, desc="Vegeta (damaged)" },
+        { address=0XCD300, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Goku's Current HP decreased" },
+        { address=0XCD300, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Goku's Current HP increased" },
+        { address=0XCD54C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gohan current HP [32bit] decreased" },
+        { address=0XCD54C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gohan current HP [32bit] increased" },
+        { address=0XCD798, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Piccolo current hp decreased" },
+        { address=0XCD798, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Piccolo current hp increased" },
+        { address=0XCD9E4, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<32-bit> Krillin current HP decreased" },
+        { address=0XCD9E4, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<32-bit> Krillin current HP increased" },
+        { address=0XCD9EC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<32-bit> Krillin max HP decreased" },
+        { address=0XCD9EC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<32-bit> Krillin max HP increased" },
+        { address=0XCDC30, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tien current HP decreased" },
+        { address=0XCDC30, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tien current HP increased" },
+        { address=0XCDE7C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yamcha HP (32-bit) decreased" },
+        { address=0XCDE7C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yamcha HP (32-bit) increased" },
+        { address=0XCE560, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 1 HP [16bit] decreased" },
+        { address=0XCE560, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 1 HP [16bit] increased" },
+        { address=0XCEB14, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 2 HP [16bit] decreased" },
+        { address=0XCEB14, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 2 HP [16bit] increased" },
+        { address=0XCF0C8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 3 HP [16bit] decreased" },
+        { address=0XCF0C8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 3 HP [16bit] increased" },
+        { address=0XCF67C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Slot 4 HP [16bit] decreased" },
+        { address=0XCF67C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Slot 4 HP [16bit] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCC4AE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Offense Ring increased" },
+        { address=0XCC4B2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Hammock" },
+        { address=0XCC601, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Pinball increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAF140, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Copies MAP id, but also behaves differently in boss battles" },
+        { address=0XCC5EF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Start of scouterable Bosses - Rival Dinosaur" },
+        { address=0XD2358, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Might be map ID, changes to 0000 in some boss battles" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCC74D, type="u8", condition="eq", value=0X60, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Selecting who to switch with" },
+        { address=0XCC764, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCC73C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy type (recolors share type)" },
+      },
+    },
+  },
+}

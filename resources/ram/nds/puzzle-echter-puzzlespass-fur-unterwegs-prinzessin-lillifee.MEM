@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle - Echter Puzzlespass für Unterwegs: Prinzessin Lillifee",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-echter-puzzlespass-fur-unterwegs-prinzessin-lillifee",
+    file = "puzzle-echter-puzzlespass-fur-unterwegs-prinzessin-lillifee.zip",
+    hashes = {
+      { hash = "9c04494d6a08a9a4b8e3a6ae56eede3c", label = "Prinzessin Lillifee Puzzle - Echter Puzzlespass fuer Unterwegs (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

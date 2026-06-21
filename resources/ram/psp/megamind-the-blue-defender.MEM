@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Megamind: The Blue Defender",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "megamind-the-blue-defender",
+    file = "megamind-the-blue-defender.zip",
+    hashes = {
+      { hash = "21497a6fc72aec839a83d5a578bc0826", label = "DreamWorks Megamind - The Blue Defender (Europe) (En,Fr,De,Es,It,Nl).iso" },
+      { hash = "7ee16bd2890f22ef4fc7a148cb0bba59", label = "DreamWorks Megamind - The Blue Defender (USA) (En,Fr).iso" },
+      { hash = "aeb9df39c1765a2b3c76606c3ce586b7", label = "DreamWorks Megamind - The Blue Defender (Russia).iso" },
+    }
+  },
+
+  events = {
+  },
+}

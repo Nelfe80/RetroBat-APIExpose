@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Colony Wars: Red Sun",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "colony-wars-red-sun",
+    file = "colony-wars-red-sun.zip",
+    hashes = {
+      { hash = "a4628d93b8c27fbafd387f55a11c3436", label = "Colony Wars - Red Sun (USA)" },
+      { hash = "c83772498dc62890e5e131bf34490a08", label = "Colony Wars - Red Sun (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X120F2C, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[PAL] Game is paused, HUD hidden, player can't have control" },
+        { address=0X120F58, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[NTSC] Game is paused, HUD hidden, player can't have control" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X41B26, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] No weapon overheat ('ROCKWROK' cheat)" },
+        { address=0X41B28, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] All weapons available in-game ('Big Daddy' cheat)" },
+        { address=0X41B2B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] All weapons available to buy ('Armoury' cheat)" },
+        { address=0X41B2C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Weapons and Ships for free ('Break and Enter' cheat)" },
+        { address=0X41B62, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] No weapon overheat ('ROCKWROK' cheat)" },
+        { address=0X41B64, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] All weapons available in-game ('Big Daddy' cheat)" },
+        { address=0X41B67, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] All weapons available to buy ('Armoury' cheat)" },
+        { address=0X41B68, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Weapons and Ships for free ('Break and Enter' cheat)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X42610, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[NTSC] Amount of hardpoints available" },
+        { address=0X42618, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[NTSC] Rating points" },
+      },
+      collectibles = {
+        { address=0X41B25, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[NTSC] Infinite ammo ('Sly and Devious' cheat)" },
+        { address=0X41B61, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[PAL] Infinite ammo ('Sly and Devious' cheat)" },
+        { address=0X4261C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[NTSC] Money increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X41B24, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[NTSC] Invincibility ('Awrate' cheat)" },
+        { address=0X41B60, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[PAL] Invincibility ('Awrate' cheat)" },
+        { address=0X45154, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[NTSC] Selected ship max shields stat, applied on mission start" },
+      },
+      player = {
+        { address=0X3C182, type="u16le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[NTSC] Jumpgate escape count (?) for this entity group, next one is offset by 0x378" },
+        { address=0X3CBEA, type="u16le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[NTSC] Some aribtrary count for entity group? Cargo count that went through jumpage for Convoy" },
+      },
+    },
+  },
+}

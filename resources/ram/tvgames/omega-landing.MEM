@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Omega Landing",
+    system = "tvgames",
+    system_name = "Elektor TV Games Computer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "omega-landing",
+    file = "omega-landing.zip",
+    hashes = {
+      { hash = "067b6b03e52f2a9a1b3ecbdcaba66c07", label = "Omega Landing (Europe) (ESS-011-7).tvc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1763, type="u8", condition="eq", value=0XD0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Floor" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1507, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st Value, Resets on Death" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1760, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X1784, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Generated Buildings/Blocks Value" },
+      },
+    },
+  },
+}

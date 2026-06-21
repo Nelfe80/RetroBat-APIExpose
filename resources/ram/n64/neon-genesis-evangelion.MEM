@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Neon Genesis Evangelion",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Fighting, Shooter"
+  },
+
+  rom = {
+    name = "neon-genesis-evangelion",
+    file = "neon-genesis-evangelion.zip",
+    hashes = {
+      { hash = "5e1940ca1236a76e8f2d15de0414ae55", label = "Neon Genesis Evangelion (Japan).z64" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1FA162, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X1FA163, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X1FA164, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

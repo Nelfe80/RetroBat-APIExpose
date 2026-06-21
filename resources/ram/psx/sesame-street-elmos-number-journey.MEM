@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sesame Street: Elmo's Number Journey",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "sesame-street-elmos-number-journey",
+    file = "sesame-street-elmos-number-journey.zip",
+    hashes = {
+      { hash = "455082e5b1a4a7d022ead14928dc5f6d", label = "Sesame Street - Elmo's Number Journey (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

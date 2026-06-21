@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Super Monkey Ball: Touch & Roll",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Platform, Puzzle, Strategy"
+  },
+
+  rom = {
+    name = "super-monkey-ball-touch-roll",
+    file = "super-monkey-ball-touch-roll.zip",
+    hashes = {
+      { hash = "0c130bbb232d33f96db02f4974f6d591", label = "Super Monkey Ball - Touch & Roll (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XEC421, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player rounds won Monkey Hockey" },
+        { address=0XEC422, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy rounds won Monkey Hockey" },
+        { address=0X1ED243, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X1ED243, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X1ED243, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X1ED243, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bowling Challenge Level" },
+        { address=0X1FBE18, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bits 0 and 1 represent whether the two red goals have been gotten." },
+        { address=0X201160, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0 if you are playing a stage, becomes 1 after you touch the goal" },
+      },
+      zone = {
+        { address=0XE9194, type="u8", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Wet 'N' Windy" },
+        { address=0XE9194, type="u8", condition="eq", value=0X1, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Junglistic Journey" },
+        { address=0XE9194, type="u8", condition="eq", value=0X2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Blistering Sands" },
+        { address=0XE9194, type="u8", condition="eq", value=0X3, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fantascene Falls" },
+        { address=0XE9194, type="u8", condition="eq", value=0X4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Palarvar Lava" },
+        { address=0XE9194, type="u8", condition="eq", value=0X5, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ice Lolly Land" },
+        { address=0XE9194, type="u8", condition="eq", value=0X6, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Tempest Storm" },
+        { address=0XE9194, type="u8", condition="eq", value=0X7, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Meteorite Mayhem" },
+        { address=0XE9194, type="u8", condition="eq", value=0X8, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Big Bang Boom" },
+        { address=0XE9194, type="u8", condition="eq", value=0X9, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Zero G Station" },
+        { address=0XE9194, type="u8", condition="eq", value=0X0A, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Studio One" },
+        { address=0XE9194, type="u8", condition="eq", value=0X0B, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mesh Mosh" },
+        { address=0XE9194, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+        { address=0X1FBDF0, type="u8", condition="eq", value=0X4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="bonus level" },
+        { address=0X1FBDF0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Level inside of a world" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1FB8E2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amount of bananas you have collected in the current level. Resets upon level completion or death" },
+        { address=0X1FBDF4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Extra lives increased" },
+        { address=0X1FBDF4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Extra lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC5714, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points to win for Monkey Hockey" },
+        { address=0XEC41F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player score for Monkey Hockey" },
+        { address=0X24353C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score during the staff roll minigame" },
+        { address=0X245018, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigolf total score with Meemee" },
+        { address=0X245258, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mini Golf total score when playing as Baby" },
+        { address=0X245278, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigolf total score when playing as Aiai" },
+        { address=0X2452D8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigolf total score when playing as Gongon" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE924C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Submode for Monkey Race" },
+        { address=0X1ED3D0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Minigolf Submode" },
+      },
+    },
+  },
+}

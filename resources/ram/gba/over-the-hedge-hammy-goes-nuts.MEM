@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Over the Hedge: Hammy Goes Nuts!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "over-the-hedge-hammy-goes-nuts",
+    file = "over-the-hedge-hammy-goes-nuts.zip",
+    hashes = {
+      { hash = "ec77810214f9b39fdc7fe1f2f1cf5cc3", label = "Over the Hedge - Hammy Goes Nuts! (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF73C, type="u8", condition="eq", value=0X23, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max" },
+        { address=0XF73C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Story Levels Unlocked" },
+        { address=0XF740, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0XF77C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Selected Level in Menu" },
+      },
+    },
+  },
+}

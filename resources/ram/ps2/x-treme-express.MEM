@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "X-treme Express",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "x-treme-express",
+    file = "x-treme-express.zip",
+    hashes = {
+      { hash = "b55f0a28c2ba7fba9c6ef537ec526f82", label = "X-treme Express - World Grand Prix (Europe)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X237782, type="u16le", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Snow Plain" },
+        { address=0X237782, type="u16le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Metropolis" },
+        { address=0X237782, type="u16le", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Coastline" },
+        { address=0X237782, type="u16le", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cityscape" },
+        { address=0X237782, type="u16le", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rural Lane" },
+        { address=0X237782, type="u16le", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Subway" },
+        { address=0X237782, type="u16le", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Avenue B" },
+        { address=0X237782, type="u16le", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Alpine Way" },
+        { address=0X237782, type="u16le", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rock Route" },
+        { address=0X237782, type="u16le", condition="eq", value=0X9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="South Isle" },
+        { address=0X237782, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2279B0, type="u16le", condition="eq", value=0X24, action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego-D" },
+      },
+    },
+  },
+}

@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "The Pinball of the Dead",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "the-pinball-of-the-dead",
+    file = "the-pinball-of-the-dead.zip",
+    hashes = {
+      { hash = "627b22d7e3c4dbce8191c7765c58e17a", label = "Pinball of the Dead, The (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7C9E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Using Continue" },
+        { address=0X8BFE, type="u16le", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XAE81, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Has used continue" },
+        { address=0XAE84, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X15B7, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Top" },
+        { address=0X15B7, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bottom" },
+        { address=0X15B7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ball 1 Screen Level Y" },
+        { address=0X162F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Top" },
+        { address=0X162F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bottom" },
+        { address=0X162F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ball 2 Pos Screen Level Y" },
+        { address=0X16A7, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Top" },
+        { address=0X16A7, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bottom" },
+        { address=0X16A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ball 3 Screen Level Y" },
+        { address=0X171F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Top" },
+        { address=0X171F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bottom" },
+        { address=0X171F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ball 4 Screen Level Y" },
+      },
+      stage = {
+        { address=0XAE97, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Wondering" },
+        { address=0XAE97, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Movement" },
+        { address=0XAE97, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cemetary" },
+        { address=0XAE97, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select in Normal Mode" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2D13, type="u8", condition="eq", value=0X28, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X836B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Word Progress: DIE" },
+      },
+      health = {
+        { address=0X82FE, type="u8", condition="eq", value=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Big Buere Appears" },
+        { address=0X82FE, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Big Buere Condition Counter and HP" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XAEAC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score /10 Wondering" },
+        { address=0XAEB0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score /10 Movement" },
+        { address=0XAEB4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score /10 Cemetery" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1A5C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-Hit] Boss HP (to 0x00)" },
+        { address=0X83BA, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Ready" },
+        { address=0X83EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Killed" },
+        { address=0X840D, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Closed" },
+        { address=0X840E, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Door Arrow Blue" },
+        { address=0X840E, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Door Arrow Right" },
+        { address=0X8B8B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Ball Active in Table (Not In Boss Room)" },
+        { address=0XAEC3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Room Exit" },
+        { address=0X14574, type="u32le", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Stats: Bosses Defeated" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X83BA, type="u8", condition="eq", value=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="45 sec Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8367, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="'Steve','Ricky' Hit Counter (Max: 0x06)" },
+        { address=0X83BC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Kill Counter for Undead Feature Bonus (Refer to Manual (e.g. 0x78: Boss Ready)" },
+        { address=0X83CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Kill Counter" },
+        { address=0X840E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Condition Counter" },
+        { address=0X8410, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Kill Counter Indicator DEATH (updates after returning to table)" },
+        { address=0X8426, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Condition Counter 'Movement'" },
+      },
+    },
+  },
+}

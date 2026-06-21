@@ -1,0 +1,128 @@
+return {
+  game = {
+    title = "Grand Theft Auto: Chinatown Wars",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Action, Adventure, Racing, Driving, Shooter"
+  },
+
+  rom = {
+    name = "grand-theft-auto-chinatown-wars",
+    file = "grand-theft-auto-chinatown-wars.zip",
+    hashes = {
+      { hash = "2d3ceae26086951378acb64942e8d69c", label = "Grand Theft Auto - Chinatown Wars (Europe) (En,Fr,De,Es,It) (v1.01).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD558A9, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="completed" },
+        { address=0XD558A9, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="not completed" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD558B4, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0XD55AAD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fire Fighter - highest level completed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD55862, type="u24le", condition="eq", value=0X042F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadly Xin" },
+        { address=0XD55898, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="completed" },
+        { address=0XD55898, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="not completed" },
+        { address=0XD558AD, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0XD558AD, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="not unlocked" },
+        { address=0XD558BC, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="unlocked" },
+        { address=0XD558BC, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="not unlocked" },
+        { address=0XD5596D, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="yes" },
+      },
+      health = {
+        { address=0X158CF56, type="u8", condition="eq", value=0X7F, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max" },
+        { address=0X158CF56, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XD55862, type="u24le", condition="eq", value=0X0414, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons of Mass Destruction (Heston 3)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD55816, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Riding Shotgun - Industrial saved score" },
+        { address=0XD55818, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Riding Shotgun - Willis saved score" },
+        { address=0XD5581A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Riding Shotgun - Beechwood City saved score" },
+        { address=0XD5581C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Riding Shotgun - Purgatory saved score" },
+        { address=0XD5581E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Riding Shotgun - Suffolk saved score" },
+        { address=0XD55820, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Riding Shotgun - East Holland saved score" },
+        { address=0XD55822, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Riding Shotgun - Hove Beach saved score" },
+        { address=0XD55824, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Riding Shotgun - Little Bay saved score" },
+      },
+      collectibles = {
+        { address=0XD54D08, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money found on street increased" },
+        { address=0XD54D20, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money made from drug trading increased" },
+        { address=0XD54D24, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money spent on scratch cards increased" },
+        { address=0XD54D24, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Money spent on scratch cards empty" },
+        { address=0XD54D28, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money won on scratch cards increased" },
+        { address=0X158D03C, type="u32le", condition="eq", value=0XFFFFFFFF, action="AMMO_STATE", no_log=false, no_survey=false, desc="melee weapon" },
+        { address=0X158D040, type="u32le", condition="eq", value=0X01, action="AMMO_STATE", no_log=false, no_survey=false, desc="melee weapon" },
+        { address=0X1783774, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XD55000, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Colony Island" },
+        { address=0XD55000, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Steinway park" },
+        { address=0XD55000, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Beechwood City apartments" },
+        { address=0XD55000, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Northern Gardens" },
+        { address=0XD55000, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="The Meat Quarter" },
+        { address=0XD55000, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="Fishmarket South" },
+        { address=0XD55000, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="Hatton Gardens" },
+        { address=0XD55000, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Northwood roofs" },
+        { address=0XD55001, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="President's City" },
+        { address=0XD55001, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Firefly Projects" },
+        { address=0XD55001, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="East Island City police parking lot" },
+        { address=0XD55001, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Rotterdam Hill sidewalk" },
+        { address=0XD55001, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="Beechwood City alley" },
+        { address=0XD55001, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="Francis Intl Airport intersection" },
+        { address=0XD55001, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="North Holland" },
+        { address=0XD55001, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Northwood apartments" },
+        { address=0XD55002, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Middle Park West dirt jump" },
+        { address=0XD55002, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Castle Garden City" },
+        { address=0XD55002, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Purgatory" },
+        { address=0XD55002, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Steinway gas station" },
+        { address=0XD55002, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="Rotterdamn Hill grass park" },
+        { address=0XD55002, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="Beechwood City big jump near highway" },
+        { address=0XD55002, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="The Exchange" },
+        { address=0XD55002, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Francis Intl Airport dumpster" },
+        { address=0XD55003, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Middle Park West dirt jump" },
+        { address=0XD55003, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Outlook Park" },
+        { address=0XD55003, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="East Island City warehouse lot" },
+        { address=0XD55003, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Meadows Park" },
+        { address=0XD55003, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="Industrial" },
+        { address=0XD55003, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="Chase Point" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD54D46, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Number of cars and bikes destroyed" },
+        { address=0XD54D48, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Number of boats destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD55862, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Last mission completed" },
+        { address=0XD558B2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chan 8 - Counterfeit Gangster status" },
+        { address=0XD55907, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Selma encounters" },
+        { address=0XD55908, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Giorgio encounters" },
+        { address=0XD55909, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tommy encounters" },
+        { address=0XD5590A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Guy encounter" },
+        { address=0XD5590B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Wilhelm encounters" },
+        { address=0XD5590C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Alonzo encounters" },
+        { address=0XD5590D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Marcy encounters" },
+        { address=0XD5590E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Cherie encounter" },
+      },
+    },
+  },
+}

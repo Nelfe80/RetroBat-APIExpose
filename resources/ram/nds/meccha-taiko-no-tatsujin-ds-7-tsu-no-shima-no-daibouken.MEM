@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Meccha! Taiko no Tatsujin DS: 7-Tsu no Shima no Daibouken",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "meccha-taiko-no-tatsujin-ds-7-tsu-no-shima-no-daibouken",
+    file = "meccha-taiko-no-tatsujin-ds-7-tsu-no-shima-no-daibouken.zip",
+    hashes = {
+      { hash = "67e68a5fa3c8891128cd0cb42710014d", label = "Metcha! Taiko no Tatsujin DS - 7-tsu no Shima no Daibouken (Japan).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X2AC390, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Profile 2 - Song - Lifetime Respect -女編- increased" },
+        { address=0X2AC390, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Profile 2 - Song - Lifetime Respect -女編- decreased" },
+      },
+    },
+  },
+}

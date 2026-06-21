@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Shining Force: The Sword of Hajya",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shining-force-the-sword-of-hajya",
+    file = "shining-force-the-sword-of-hajya.zip",
+    hashes = {
+      { hash = "4c749140795a0fb69a06574d5187cd25", label = "Shining Force - The Sword of Hajya (USA) (Debug Patch) (Bartis 1989).gg" },
+      { hash = "6079e87a1668c314b1a71d62572039da", label = "Shining Force Gaiden II - Jashin no Kakusei (Japan) (Debug Patch) (Bartis1989).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0CCC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 Specific Byte" },
+        { address=0X0D12, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 Specific Bytes" },
+        { address=0X0D5C, type="u8", condition="eq", value=0X7E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Closed" },
+        { address=0X0D5C, type="u8", condition="eq", value=0X7F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Opened" },
+        { address=0X0D5C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 15 East chest (8-bit)" },
+        { address=0X0DB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5 Specific Bytes (Chest Related)" },
+        { address=0X0DC1, type="u8", condition="eq", value=0X7E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="closed" },
+        { address=0X0DC1, type="u8", condition="eq", value=0X7F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Opened" },
+        { address=0X0DC1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 15 West Chest (8-Bit)" },
+        { address=0X0E06, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 20 west chest (used in caricatur's original logic)" },
+        { address=0X0E17, type="u8", condition="eq", value=0X7E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unopned" },
+        { address=0X0E17, type="u8", condition="eq", value=0X7F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="opened" },
+        { address=0X0E17, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10 Eastern Chest" },
+        { address=0X0E68, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10 Western Chest" },
+        { address=0X0EC0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="16-bit Used to check if the player is on level 20." },
+        { address=0X0EC8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 Specifi Bytes" },
+        { address=0X0ECE, type="u8", condition="eq", value=0X7F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Open" },
+        { address=0X0ECE, type="u8", condition="eq", value=0X7E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Closed" },
+        { address=0X0ECE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 20 East Chest (used in caricatur's logic)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0D10, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="16-bit = 0f06 during all of Level 10. increased" },
+      },
+    },
+  },
+}

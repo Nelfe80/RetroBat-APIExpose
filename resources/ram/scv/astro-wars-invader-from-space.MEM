@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Astro Wars: Invader From Space",
+    system = "scv",
+    system_name = "Super Cassette Vision",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "astro-wars-invader-from-space",
+    file = "astro-wars-invader-from-space.zip",
+    hashes = {
+      { hash = "5c0a8b9e0ae3bdc62cf758c8de3c621c", label = "Astro Wars - Invaders from Space (Japan, France).bin" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X310B, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over text" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X304C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (6 digits, decimal offset by 0x30, loops back to 0)" },
+      },
+    },
+  },
+}

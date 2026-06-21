@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Armada",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Role-Playing, Shooter"
+  },
+
+  rom = {
+    name = "armada",
+    file = "armada.zip",
+    hashes = {
+      { hash = "54c32a480d100a9c02a041fea25b39fa", label = "Armada (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC58B74, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Hp decreased" },
+        { address=0XC58B74, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Hp increased" },
+      },
+    },
+  },
+}

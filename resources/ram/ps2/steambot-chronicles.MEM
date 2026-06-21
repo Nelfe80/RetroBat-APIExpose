@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Steambot Chronicles",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Role-Playing, Sandbox"
+  },
+
+  rom = {
+    name = "steambot-chronicles",
+    file = "steambot-chronicles.zip",
+    hashes = {
+      { hash = "dc6f2ae4f16c0c3a72226472024ca4fe", label = "Steambot Chronicles (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB9BC60, type="u32le", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XC33C60, type="u32le", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X58F720, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mech Grounded" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X58F6F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Mech Health - Maximum Capacity decreased" },
+        { address=0X58F6F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Mech Health - Maximum Capacity increased" },
+        { address=0X58F6F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Mech Health - Current Amount decreased" },
+        { address=0X58F6F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Mech Health - Current Amount increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA93418, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA93418, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+        { address=0XA93418, type="u8", condition="eq", value=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Previously opened???" },
+        { address=0XA936A8, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA936A8, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+        { address=0XA93938, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA93938, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+        { address=0XA93BC8, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA93BC8, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+        { address=0XA93E58, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA93E58, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+        { address=0XA940E8, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA940E8, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+        { address=0XA94B28, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA94B28, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+        { address=0XA95FA8, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA95FA8, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+        { address=0XA96238, type="u8", condition="eq", value=0X00, action="TREASURE", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XA96238, type="u8", condition="eq", value=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Opened" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X587408, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X58BD10, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time of Day" },
+      },
+    },
+  },
+}

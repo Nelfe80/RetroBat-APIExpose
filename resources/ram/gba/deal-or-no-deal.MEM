@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Deal or No Deal",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "deal-or-no-deal",
+    file = "deal-or-no-deal.zip",
+    hashes = {
+      { hash = "7618d824c146a521ecaad69d4b8443ea", label = "Deal or No Deal (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7B68, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1750, type="u16le", condition="eq", value=0X5, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Keep Your Case/Switch Cases/Quit" },
+        { address=0X1750, type="u16le", condition="eq", value=0X1B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Revealing the last case after switching case" },
+        { address=0X177A, type="u16le", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Keep Your Case" },
+        { address=0X177A, type="u16le", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Cases" },
+        { address=0X177A, type="u16le", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Quit" },
+        { address=0X4438, type="u16le", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switched case at end" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1734, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Case opening timer/scene timer." },
+        { address=0X1738, type="u16le", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Receiving banker offer" },
+        { address=0X1738, type="u16le", condition="eq", value=0X4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Opening case" },
+        { address=0X1738, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (@ 0x1734) type." },
+      },
+    },
+  },
+}

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>double_joystick_8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Light Fuse</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Light Fuse</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${red}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 RBD 310011</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 JMR 280009</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 TYC 245007</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 SLW 220006</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 DP  205006</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 DAR 180005</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 LLB 165004</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HAN 130003</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 FUN 119002</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 MAD 108001</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

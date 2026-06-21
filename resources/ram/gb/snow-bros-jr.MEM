@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Snow Bros. Jr.",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "snow-bros-jr",
+    file = "snow-bros-jr.zip",
+    hashes = {
+      { hash = "b4cee49981c3124df8bbd40a60426f9e", label = "Snow Brothers (USA).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC67D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage value (fixed)" },
+        { address=0XC67E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage value (amendable)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC689, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Credits Left increased" },
+        { address=0XC689, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Credits Left decreased" },
+        { address=0XC699, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="number of lives increased" },
+        { address=0XC699, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="number of lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC69F, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some Sort Of Balloon Power-Up? (bit gets reset and a timer activates)" },
+        { address=0XC69F, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Range Up" },
+        { address=0XC69F, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power Up" },
+        { address=0XC69F, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Speed Up" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC687, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC67F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Game State/Music State Hybrid" },
+      },
+    },
+  },
+}

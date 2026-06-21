@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Supersonic Warriors",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-ball-z-supersonic-warriors",
+    file = "dragon-ball-z-supersonic-warriors.zip",
+    hashes = {
+      { hash = "09f49996195a3fce6141306f9eeb2944", label = "Dragon Ball Z - Supersonic Warriors (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X50E8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues used" },
+        { address=0X50F6, type="u8", condition="eq", value=0XE9, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Frame before credits" },
+        { address=0X50F6, type="u8", condition="eq", value=0XE8, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X6F50, type="u16le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="16 bit music id? (original mickyt code note) // ADDENDUM: music speed id. the higher it is, the" },
+      },
+      events = {
+        { address=0X08A8, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="max combo battle z" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X50AD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="possible z battle round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X08A4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="battle z stats after battle life remaing increased" },
+        { address=0X08A4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="battle z stats after battle life remaing decreased" },
+      },
+      health = {
+        { address=0X274B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="total energy static decreased" },
+        { address=0X274B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="total energy static increased" },
+        { address=0X2826, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="opponent health goku saga vegeta health 3? decreased" },
+        { address=0X2826, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="opponent health goku saga vegeta health 3? increased" },
+        { address=0X2827, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="opponent max health decreased" },
+        { address=0X2827, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="opponent max health increased" },
+        { address=0X2828, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="further enemy hp decreased" },
+        { address=0X2828, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="further enemy hp increased" },
+        { address=0X4C2C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="opponent health?, vegeta in goku saga? decreased" },
+        { address=0X4C2C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="opponent health?, vegeta in goku saga? increased" },
+        { address=0X4C2D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="opponent 2 health? 48 for both ginyu and frieza in 2 values (goku saga) decreased" },
+        { address=0X4C2D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="opponent 2 health? 48 for both ginyu and frieza in 2 values (goku saga) increased" },
+        { address=0X4C30, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="opponent health, vegeta in goku saga 2? decreased" },
+        { address=0X4C30, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="opponent health, vegeta in goku saga 2? increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4DB4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16-bit) money increased" },
+      },
+    },
+  },
+}

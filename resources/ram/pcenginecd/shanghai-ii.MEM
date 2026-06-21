@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Shanghai II",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Puzzle, Strategy"
+  },
+
+  rom = {
+    name = "shanghai-ii",
+    file = "shanghai-ii.zip",
+    hashes = {
+      { hash = "1062a9cbaebf758318892535432d9525", label = "Shanghai II (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0087, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="2 if you exit the pause menu without pressing a selection, 1 otherwise" },
+        { address=0X021E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1 if pause menu is open/hint function is being used, 0 otherwise" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X004C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Timed mode score (*10)" },
+      },
+      collectibles = {
+        { address=0X0042, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="1 on demo, 0 during normal gameplay increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0048, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="1 if you are playing timed mode, 0 otherwise" },
+        { address=0X0049, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time elapsed (Board ends at 30720) [16-bit BE]" },
+      },
+    },
+  },
+}

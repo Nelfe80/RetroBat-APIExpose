@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Fullmetal Alchemist 2: Curse of the Crimson Elixir",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "fullmetal-alchemist-2-curse-of-the-crimson-elixir",
+    file = "fullmetal-alchemist-2-curse-of-the-crimson-elixir.zip",
+    hashes = {
+      { hash = "47c55b482f1d70d85ad6c95189bf5c33", label = "Fullmetal Alchemist 2 - Curse of the Crimson Elixir (USA)" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X292586, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[bitflags] Treasures" },
+      },
+    },
+  },
+}

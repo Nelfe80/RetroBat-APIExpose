@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "SSX 3",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "ssx-3",
+    file = "ssx-3.zip",
+    hashes = {
+      { hash = "d0d33104d62f81108214f9a328ce0a9e", label = "SSX 3 (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Ridge Racer DS",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "ridge-racer-ds",
+    file = "ridge-racer-ds.zip",
+    hashes = {
+      { hash = "2472a2291024d4de81750ac22306d3ea", label = "Ridge Racer DS (USA, Europe).nds" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X9E85C, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Set Records" },
+        { address=0X9E85C, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Free Run Practice" },
+        { address=0X9E85C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack - Lap Mode" },
+        { address=0XA7878, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0XA7878, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Geral - Current Mode" },
+        { address=0XD8EA4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="In a Race - Final Time [16-bits]" },
+      },
+    },
+  },
+}

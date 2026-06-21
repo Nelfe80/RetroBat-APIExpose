@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Final Lap 2000",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "final-lap-2000",
+    file = "final-lap-2000.zip",
+    hashes = {
+      { hash = "a466797b353d610f43a0f030cec721c1", label = "Final Lap 2000 (Japan).ws" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0196, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X0196, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Ending" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X0196, type="u8", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour mode" },
+        { address=0X092E, type="u8", condition="eq", value=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Special Machine unlocked" },
+        { address=0X092E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Unlockables (increments after winning each race in World Tour)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0196, type="u8", condition="eq", value=0X05, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial mode" },
+        { address=0X08CF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Lap time minutes" },
+        { address=0X08D5, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Race time centiseconds conversion" },
+        { address=0X08D7, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Race time minutes" },
+        { address=0X0972, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lose" },
+        { address=0X0972, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Race timer seconds countdown" },
+      },
+    },
+  },
+}

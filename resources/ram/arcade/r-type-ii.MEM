@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "rtype2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "r-type-ii",
+    file = "r-type-ii.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XE381A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE381C, type="u32be", condition="change", action="SCORE_STATE", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Various scores" },
+        { address=0XE381C, type="u32be", condition="change", action="SCORE_STATE", color="orange", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Score 200" },
+        { address=0XE381C, type="u32be", condition="change", action="SCORE_STATE", color="cyan", min=300, max=500, no_log=false, no_survey=false, desc="Score delta 300-500: Score 300" },
+        { address=0XE381C, type="u32be", condition="change", action="SCORE_STATE", color="green", min=600, max=1000, no_log=false, no_survey=false, desc="Score delta 600-1000: Score 600" },
+        { address=0XE381C, type="u32be", condition="change", action="SCORE_STATE", min=1100, max=2000, no_log=false, no_survey=false, desc="Score delta 1100-2000: Score 1100" },
+      },
+    },
+  },
+}

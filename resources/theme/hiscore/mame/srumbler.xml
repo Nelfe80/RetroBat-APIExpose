@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 TOKUROU  35000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 YUKIO    30000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 KYOKO    25000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 HARUMI   20000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 TAMAYO   15000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 KUCHINO  10000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 CAPCOM   5000</text>
+		</text>
+	</view>
+</theme>

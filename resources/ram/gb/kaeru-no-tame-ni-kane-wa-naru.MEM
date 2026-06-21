@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Kaeru no Tame ni Kane wa Naru",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "kaeru-no-tame-ni-kane-wa-naru",
+    file = "kaeru-no-tame-ni-kane-wa-naru.zip",
+    hashes = {
+      { hash = "1fd8f7940f3a63012888c0014d5ab014", label = "Kaeru no Tame ni Kane wa Naru (Japan) (Es) (v1.0).gb" },
+      { hash = "4ebe14c4c51555908c0e4cabb66dc813", label = "Kaeru no Tame ni Kane wa Naru (Japan).gb" },
+      { hash = "5e477cdea0b3266b505ac5938ddc5e5c", label = "Kaeru no Tame ni Kane wa Naru (Japan) (En) (v1.0) (ryanbgstl).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC42F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="side view areas," },
+        { address=0XC42F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Destination data byte 1: 00 = overworld," },
+        { address=0XCC0F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Event Trigger 6? (1 = when last guy at the well leaves, 3 = guy at lowest level of mine tells yo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCBCD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max HP (number of hearts in lifemeter) increased" },
+        { address=0XCBCD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max HP (number of hearts in lifemeter) decreased" },
+      },
+      health = {
+        { address=0XCAAE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health of current enemy being fought decreased" },
+        { address=0XCAAE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health of current enemy being fought increased" },
+        { address=0XCBCC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Remaining Health decreased" },
+        { address=0XCBCC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Remaining Health increased" },
+        { address=0XCC41, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1's/following character 1's remaining health (00 for characters following the Prince of Sa" },
+        { address=0XCC41, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1's/following character 1's remaining health (00 for characters following the Prince of Sa" },
+        { address=0XCC49, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2's/following character 2's remaining health (00 for characters following the Prince of Sa" },
+        { address=0XCC49, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2's/following character 2's remaining health (00 for characters following the Prince of Sa" },
+        { address=0XCC51, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3's/following character 3's remaining health (00 for characters following the Prince of Sa" },
+        { address=0XCC51, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3's/following character 3's remaining health (00 for characters following the Prince of Sa" },
+        { address=0XCC59, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4's/following character 4's remaining health (00 for characters following the Prince of Sa" },
+        { address=0XCC59, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4's/following character 4's remaining health (00 for characters following the Prince of Sa" },
+        { address=0XCC61, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5's remaining health decreased" },
+        { address=0XCC61, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5's remaining health increased" },
+        { address=0XCC69, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6's remaining health decreased" },
+        { address=0XCC69, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6's remaining health increased" },
+        { address=0XCC71, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 7's remaining health decreased" },
+        { address=0XCC71, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 7's remaining health increased" },
+        { address=0XCC79, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 8's remaining health decreased" },
+        { address=0XCC79, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 8's remaining health increased" },
+        { address=0XCC81, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 9's remaining health decreased" },
+        { address=0XCC81, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 9's remaining health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XCBF3, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Current form's sword? (matches 0xcbe6 when human, ff when frog or snake)" },
+        { address=0XCC15, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Event Trigger: turns from D9 to D8 when you can get Mamicon, becomes DA as you get the Mamicon a" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCBDB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="coins high increased" },
+        { address=0XCBDC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="coins middle increased" },
+        { address=0XCBDD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="coins lowest increased" },
+        { address=0XCC0E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Event Trigger 5?, 1 = Elder finally stops refusing to help, 3 = Spell cast on Ice Cavern, 7 = Pr" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCBE3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield (No Shield = FF, Wooden Shield = 00, Leather Shield = 01, Iron Shield = 2, Mirror Shield" },
+        { address=0XCC14, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Event Trigger: turns from 0D to 2D when you first use the Mirror Shield on the Mammoth, turns to" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCBE4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rock/Block Moving Items (Wristband = 5, Hyper Glove = 6, Nothing = FF)" },
+        { address=0XCBE8, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Warp Door (16 when obtained, FF when not yet obtained)" },
+        { address=0XCC0B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Event Trigger 2? (09 when Riding Hood is in the shop, 37 when she's in her hideout, becomes 0B a" },
+      },
+    },
+  },
+}

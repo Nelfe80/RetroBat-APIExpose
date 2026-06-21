@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sudoku-NBP",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sudoku-nbp",
+    file = "sudoku-nbp.zip",
+    hashes = {
+      { hash = "e732ecc69f205751c8aa69d10aefdcf0", label = "Sudoku-NBP (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+  },
+}

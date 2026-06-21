@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Brutal: Paws of Fury",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "brutal-paws-of-fury",
+    file = "brutal-paws-of-fury.zip",
+    hashes = {
+      { hash = "f551034768405cef3fd7c908377e80fe", label = "Brutal - Paws of Fury (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X169EE, type="u16be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0370, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 health decreased" },
+        { address=0X0370, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 health increased" },
+        { address=0X03E4, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 health decreased" },
+        { address=0X03E4, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X02ED, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer on" },
+      },
+    },
+  },
+}

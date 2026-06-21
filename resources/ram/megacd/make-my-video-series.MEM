@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Make My Video Series",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "make-my-video-series",
+    file = "make-my-video-series.zip",
+    hashes = {
+      { hash = "2443b9ca11a3e5efed2417c1da865fe6", label = "Make My Video - Kris Kross (USA)" },
+      { hash = "31a75e7ec30ace5060593b526306f9b1", label = "Make My Video - Marky Mark and the Funky Bunch (USA)" },
+      { hash = "b6d6dc841ced34dab4b40ea112f711a2", label = "Make My Video - INXS (USA)" },
+      { hash = "efc484956183811fbb30fae4405dc0e3", label = "Power Factory (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8686, type="u16be", condition="eq", value=0X46, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Logo-title." },
+        { address=0X8686, type="u16be", condition="eq", value=0X62, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Intro credits." },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8908, type="u16be", condition="eq", value=0XE00, action="BOSS_HIT", no_log=false, no_survey=false, desc="fail, boss 'They're garbage!'" },
+      },
+    },
+  },
+}

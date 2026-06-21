@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Pokémon LeafGreen Version [Subset - Professor Oak Challenge]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "pokemon-leafgreen-version-subset-professor-oak-challenge",
+    file = "pokemon-leafgreen-version-subset-professor-oak-challenge.zip",
+    hashes = {
+      { hash = "223ac5717907037ef91778c354935902", label = "Pokemon - LeafGreen Version (Rev 1) [Subset - Professor Oak Challenge].gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2C2D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 1 Level" },
+        { address=0X2C33C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 2 Level" },
+        { address=0X2C3A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 3 Level" },
+        { address=0X2C404, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 4 Level" },
+        { address=0X2C468, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 5 Level" },
+        { address=0X2C4CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pokemon 6 Level" },
+      },
+    },
+  },
+}

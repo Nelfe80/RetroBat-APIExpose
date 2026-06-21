@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Knights of Valour 2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "knights-of-valour-2",
+    file = "knights-of-valour-2.zip",
+    hashes = {
+      { hash = "87ca6ae89b1fb54735da2a19db96ea78", label = "kov2.7z <Knights of Valour 2 (V107, Hong Kong)>" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1890A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X1890A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+      },
+    },
+  },
+}

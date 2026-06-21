@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Resistance: Retribution",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "resistance-retribution",
+    file = "resistance-retribution.zip",
+    hashes = {
+      { hash = "f35aabdde6ceaf637316a0b22fc09825", label = "Resistance - Retribution (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

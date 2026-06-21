@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Truck Kyousoukyoku - Ai to Kanashimi no Rodeo",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "truck-kyousoukyoku-ai-to-kanashimi-no-rodeo",
+    file = "truck-kyousoukyoku-ai-to-kanashimi-no-rodeo.zip",
+    hashes = {
+      { hash = "fd97ec951d121c6bf02db5cfd671f001", label = "Truck Kyousoukyoku - Ai to Kanashimi no Rodeo (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Irritating Stick [Subset - IrRAtating Custom Courses]",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "irritating-stick-subset-irratating-custom-courses",
+    file = "irritating-stick-subset-irratating-custom-courses.zip",
+    hashes = {
+      { hash = "cedd39df07cf42d53b4acc34f8cf262b", label = "Irritating Stick (USA) [Subset - Irritating RA].bin" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5054C, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X5054C, type="u8", condition="eq", value=0X3, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X5054C, type="u8", condition="eq", value=0X16, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+        { address=0X50588, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X505AC, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[Lower4] Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X50628, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Course Cleared" },
+        { address=0X508A0, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X508A1, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X508A2, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X508A4, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X508A5, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X508A6, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X508A7, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X5096C, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X5096C, type="u8", condition="eq", value=0X43, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 68" },
+        { address=0X5096C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X5096D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X5096E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X5096F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50970, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50971, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50972, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50973, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50974, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50975, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50976, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50977, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50978, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X50979, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X5097A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+        { address=0X5097B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Course - Aritifical Intelligence Level Sum Operand" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X504F4, type="u8", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="Cheat Activated" },
+        { address=0X50500, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Lower4] Lives increased" },
+        { address=0X50500, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Lower4] Lives decreased" },
+        { address=0X50608, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Count" },
+        { address=0X50630, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+  },
+}

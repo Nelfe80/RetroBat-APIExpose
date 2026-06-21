@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Hang-On Jr.",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Motorcycle"
+  },
+
+  rom = {
+    name = "hang-on-jr",
+    file = "hang-on-jr.zip",
+    hashes = {
+      { hash = "f4406990abc60e110f926b977e3e5792", label = "hangonjr.7z <Hang-On Jr. Rev.B>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0200, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0200, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Racing/Demo" },
+        { address=0X0200, type="u8", condition="eq", value=0X05, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Progress Bar on Race Results" },
+        { address=0X0200, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Finished/Game Over Race Results" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0267, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Background Color Pallet" },
+        { address=0X028F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number (Used in HUD)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X02A0, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE] BCD Current Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0030, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dip Switches" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0200, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Screen Identifier" },
+      },
+    },
+  },
+}

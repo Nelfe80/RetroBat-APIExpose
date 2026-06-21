@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Robots",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "robots",
+    file = "robots.zip",
+    hashes = {
+      { hash = "2107dcc752cffa688720fd50277dfa8e", label = "Robots (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

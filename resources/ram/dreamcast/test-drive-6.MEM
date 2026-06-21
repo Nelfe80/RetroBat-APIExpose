@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Test Drive 6",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "test-drive-6",
+    file = "test-drive-6.zip",
+    hashes = {
+      { hash = "4703b5056a4a910d11dec1ca96673f3e", label = "Test Drive 6 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11FBA0, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-Bit-A] Credits" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X11FA38, type="u8", condition="eq", value=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+      },
+    },
+  },
+}

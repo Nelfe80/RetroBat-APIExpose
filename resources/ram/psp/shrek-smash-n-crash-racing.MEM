@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Shrek: Smash n' Crash Racing",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shrek-smash-n-crash-racing",
+    file = "shrek-smash-n-crash-racing.zip",
+    hashes = {
+      { hash = "8180351fc0562933ea067aca164e285b", label = "DreamWorks Shrek - Smash n' Crash Racing (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA512A5, type="u8", condition="eq", value=0XF6, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA512A5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Menu Selection" },
+      },
+    },
+  },
+}

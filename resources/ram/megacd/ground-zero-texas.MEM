@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Ground Zero Texas",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "ground-zero-texas",
+    file = "ground-zero-texas.zip",
+    hashes = {
+      { hash = "0a3b03f3aa306bf76ee78dc1ee130712", label = "Ground Zero Texas (USA) (Disc 2)" },
+      { hash = "ce35f52d95bfc57be16a2b03f741e146", label = "Ground Zero Texas (USA) (Disc 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB992, type="u16be", condition="eq", value=0X0003, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBC54, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Circle code on Level 1" },
+        { address=0XBC56, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Square code on Level 1" },
+        { address=0XBC58, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Triangle code on Level 1" },
+        { address=0XBC5A, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hexagon code on Level 1" },
+        { address=0XC244, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC25A, type="u16be", condition="eq", value=0X0004, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Empty scene" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0030, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="In battle" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0084, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First meet Pike in Plaza Square" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X009C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Street gang messes with people in Main Street (2 different scenes)" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00A4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hooker shoots in Hotel Window" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00AC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="People scatter in Hotel Window" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00B0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ranger eyes waitress" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00B4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Drunk guy gets into car in Hotel Window" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00E4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Robbers in Plaza Square" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0104, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Smugglers loading a pick up truck in Main Street" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0110, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Guy in van shoots at you and takes hostage in Plaza Square" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0130, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Guy gets bottle broken over head in Cantina" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X013C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First meet DiSalvo in Hotel Window" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X014C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ranger steals suitcase of money from white suiters in Cantina" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0168, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Weapons sale goes wrong in Plaza Square" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X016C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Couple making out, woman ambushes in Plaza Square" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0170, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Guy with code in Cantina" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0184, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="DiSalvo with bucket attacked in Hotel Window" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X01A4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Matthews attacked in Main Street" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X01CC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First meet Breen in Cantina" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X01D8, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First meet Matthews in Main Street" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0200, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="White suit guys pay cards in Cantina" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0228, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="End of level 1 movie" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X03FC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00D4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Fight first aliens in Mission" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00FC, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First enter shed, meet workers" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0188, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="First mine entry, meet miners" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X01A8, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Enter alien base in Mission" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0020, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="People running in Plaza Square" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X002C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hotel Window damage battle" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0038, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Short haybale shot at Hotel Window" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0050, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="People running in Main Street" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00D8, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cantina aftermath" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X01C0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cantina overrun by storm troopers" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0210, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Main Street overrun by storm troopers" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0218, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Plaza Square overrun by storm troopers" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0294, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Storm troopers attack in opening movie" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00D0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hotel Window gets destroyed/Laser cannon shoot" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X00F0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Incoming transmission begins level 4" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0100, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Plaza Square gets destroyed" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X020C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="DiSalvo gets laser cannon" },
+        { address=0XC25A, type="u16be", condition="eq", value=0X0070, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Get nuked (game over)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBAA8, type="u8", condition="eq", value=0X03, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+  },
+}

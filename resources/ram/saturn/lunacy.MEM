@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Lunacy",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "lunacy",
+    file = "lunacy.zip",
+    hashes = {
+      { hash = "2e09cf0ead17dbf58df873054116c6e3", label = "Lunacy (USA) (Disc 1)" },
+      { hash = "3daa388d813cc69f9ae359d1f5bc3b4b", label = "Lunacy (USA) (Disc 2)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X13E956, type="u8", condition="bit_true", bit=5, mask=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="Bracelet of Life." },
+        { address=0X13ED9F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[flag2] Morse dies" },
+        { address=0X13EDA4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[flag2] Find Bracelet of Life 1 increased" },
+        { address=0X13EDA4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[flag2] Find Bracelet of Life 1 decreased" },
+        { address=0X13EDA6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[flag2] Find Bracelet of Life 2 increased" },
+        { address=0X13EDA6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[flag2] Find Bracelet of Life 2 decreased" },
+        { address=0X13EDA7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[flag2] Find Bracelet of Life 3 increased" },
+        { address=0X13EDA7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[flag2] Find Bracelet of Life 3 decreased" },
+        { address=0X13EDAB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[flag2] Girl: Illusion door of death" },
+        { address=0X13EDB3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[flag2] Hannah dies" },
+        { address=0X13EDBD, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[flag2] Mac dies" },
+        { address=0X13EDD7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[flag2] Rose and Hal die" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1992C8, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold door is rusted." },
+      },
+    },
+    state = {
+      player = {
+        { address=0X13EDD3, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[flag2] Jump with feather, Rose watches" },
+        { address=0X19928E, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[flag] Rope jump 3, found rope ladder" },
+        { address=0X1992BE, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[flag] Rope jump 1" },
+        { address=0X1992C1, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[flag] Rope jump 2" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X13EDAA, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[flag2] Use seed on illusion door" },
+        { address=0X13EDAD, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[bits2] Fred: Meg warned me about Power of Illusion door" },
+        { address=0X13EDBE, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[flag2] Axed stone door open" },
+        { address=0X13EDBF, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[bits2] How to open stone door?" },
+        { address=0X13EDFD, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[flag2] Music room door unlocked" },
+        { address=0X1992A0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[flag] Well door unlocked" },
+        { address=0X1992A5, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[flag] Flour door opened" },
+        { address=0X1992C6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[flag] Well door is locked" },
+        { address=0X1992C7, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[flag] Well door is found" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X199283, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Area, Room" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Yukkuri Tanoshimu Otona no Jigsaw Puzzle DS: Sekai no Meiga 1",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "yukkuri-tanoshimu-otona-no-jigsaw-puzzle-ds-sekai-no-meiga-1",
+    file = "yukkuri-tanoshimu-otona-no-jigsaw-puzzle-ds-sekai-no-meiga-1.zip",
+    hashes = {
+      { hash = "709bc5e0fe5ae073969565c8191ee533", label = "Yukkuri Tanoshimu - Otona no Jigsaw Puzzle DS - Sekai no Meiga 1 - Renaissance, Baroque no Kyoshou (Japan).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X4D17C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="--- Death of the Virgin / Caravaggio" },
+      },
+    },
+  },
+}

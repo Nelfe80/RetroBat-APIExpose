@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Arcade Classics",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Compilation, Action"
+  },
+
+  rom = {
+    name = "arcade-classics",
+    file = "arcade-classics.zip",
+    hashes = {
+      { hash = "1c0b65d3cc82f56f7ad05ce63dc4d097", label = "Arcade Classics (USA, Europe).md" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dai Kaijuu Deburas",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "dai-kaijuu-deburas",
+    file = "dai-kaijuu-deburas.zip",
+    hashes = {
+      { hash = "52c1ce5616a04f43a4b9df63e3d93a00", label = "Daikaijuu Deburas (Japan).nes" },
+    }
+  },
+
+  events = {
+  },
+}

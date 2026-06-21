@@ -1,0 +1,123 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Monster Capsule GB",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-monster-capsule-gb",
+    file = "yu-gi-oh-monster-capsule-gb.zip",
+    hashes = {
+      { hash = "b980da92693762bd3a7a4791fe08766e", label = "Yu-Gi-Oh! - Monster Capsule GB (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "9dffcf7d5cf44bd85a09d2a3c379954a", label = "Yu-Gi-Oh! - Monster Capsule GB (Japan) (En) (v1.0) (Bownly).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC23A, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0 normally, 1 if the pause menu is up, 2 if the save menu is up" },
+        { address=0XC44E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Which submenu of the current pause menu you're in. When you back out of a submenu, this retains" },
+        { address=0XC9DC, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Among other things, is 0 after beating a Monster World adventure, and is set to 0xc8 when you ge" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC852, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level of your first MC in battle, in placement order" },
+        { address=0XC85A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skill level data for your first MC in battle, in placement order" },
+      },
+      zone = {
+        { address=0XC25F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Index of current selection on menus/dialogue boxes with multiple options (except when viewing yo" },
+        { address=0XC2EE, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current number of saved dolls (How many Monster World adventures you have beaten)." },
+        { address=0X15FEE, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="This code note is a list of inventory item IDs for Monster World adventures. This is unrelated t" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC2F1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current number of HP Capsules decreased" },
+        { address=0XC2F1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current number of HP Capsules increased" },
+        { address=0XC854, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP of your first MC in battle, in placement order decreased" },
+        { address=0XC854, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP of your first MC in battle, in placement order increased" },
+        { address=0XC868, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP of your first MC in battle, in placement order decreased" },
+        { address=0XC868, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP of your first MC in battle, in placement order increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCAC0, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Among other things, when you use an Evolution Capsule, this points to the address in ROM contain" },
+      },
+      collectibles = {
+        { address=0XB1E4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Counter for number of Game Overs during Mokuba's Monster World advenuture. Maxes out at 0xff inc" },
+        { address=0XB1E5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Counter for number of Game Overs during Weevil's Monster World advenuture. Maxes out at 0xff inc" },
+        { address=0XB1E6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Counter for number of Game Overs during Rex's Monster World advenuture. Maxes out at 0xff increa" },
+        { address=0XB1E7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Counter for number of Game Overs during Mai's Monster World advenuture. Maxes out at 0xff increa" },
+        { address=0XB1E8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Counter for number of Game Overs during Kaiba's Monster World advenuture. Maxes out at 0xff incr" },
+        { address=0XB1E9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents which character is following you during certain Monster World adventures. 0 by defaul" },
+        { address=0XB304, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB305, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB306, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB307, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB308, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB309, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB30A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB30B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB30C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB30D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB30E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB30F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB312, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB313, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB314, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB315, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB316, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB317, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB318, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB319, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB31A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB31B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB31C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB31D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB31E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Represents various things during Monster World adventures increased" },
+        { address=0XB404, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during each Monster World adventure increased" },
+        { address=0XB405, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during each Monster World adventure increased" },
+        { address=0XB406, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during each Monster World adventure increased" },
+        { address=0XB407, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during each Monster World adventure increased" },
+        { address=0XB409, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during Mai's and Kaiba's Monster World adventures increased" },
+        { address=0XB40A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during Mai's and Kaiba's Monster World adventures increased" },
+        { address=0XB40B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during Kaiba's Monster World adventure increased" },
+        { address=0XB40C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during Kaiba's Monster World adventure increased" },
+        { address=0XB40D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during Kaiba's Monster World adventure increased" },
+        { address=0XB40E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during Kaiba's Monster World adventure increased" },
+        { address=0XB40F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during Kaiba's Monster World adventure increased" },
+        { address=0XB410, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitflags used during Kaiba's Monster World adventure increased" },
+        { address=0XC2F5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="First item in inventory (Only normally used during Monster World adventures) increased" },
+        { address=0XC2F6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Second item in inventory (Only normally used during Monster World adventures) increased" },
+        { address=0XC2F7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Third item in inventory (Only normally used during Monster World adventures) increased" },
+        { address=0XC2F8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Fourth item in inventory (Only normally used during Monster World adventures) increased" },
+        { address=0XCB91, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="In battle and during special events in Monster World, current dice roll state increased" },
+        { address=0XDFED, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Timer used for various purposes during the opening (Fading the opening company logos, cutscenes" },
+        { address=0X15FE6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This code note is a list of bitflags during Mai's and Kaiba's Monster World adventures. This is" },
+        { address=0X15FE7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This code note is a list of bitflags during Mai's and Kaiba's Monster World adventures. This is" },
+        { address=0X15FE8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This code note is a list of bitflags during Mai's and Kaiba's Monster World adventures. This is" },
+        { address=0X15FE9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This code note is a list of bitflags during Mai's and Kaiba's Monster World adventures. This is" },
+        { address=0X15FEA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This code note is a list of bitflags during Mai's and Kaiba's Monster World adventures. This is" },
+        { address=0X15FEB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This code note is a list of bitflags during Mai's and Kaiba's Monster World adventures. This is" },
+        { address=0X15FEC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This code note is a list of bitflags during Mai's and Kaiba's Monster World adventures. This is" },
+        { address=0X15FED, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="This code note is a list of bitflags during Mai's and Kaiba's Monster World adventures. This is" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC7A4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="In battle, the battle index of the object on the current tile" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB1EA, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Counter for how many times you've beaten the guy on floor 3 blocking the rare Capsule Machine (T" },
+        { address=0XB2E3, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Big flags tracking various level completion and other states" },
+      },
+    },
+  },
+}

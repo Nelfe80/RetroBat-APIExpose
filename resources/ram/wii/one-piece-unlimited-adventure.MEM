@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "One Piece: Unlimited Adventure",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure, Fighting"
+  },
+
+  rom = {
+    name = "one-piece-unlimited-adventure",
+    file = "one-piece-unlimited-adventure.zip",
+    hashes = {
+      { hash = "9c25205a9da79651a23032dd78a8de66", label = "Shonen Jump One Piece - Unlimited Adventure (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1341E16, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sword Soldier" },
+        { address=0X1341E17, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Knuckle Soldier" },
+        { address=0X1341E18, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Golem Soldier" },
+        { address=0X1341E19, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mass Attack Soldier" },
+        { address=0X101EB4D5, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Juice for Ladies" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Neon Genesis Evangelion: Shito Ikusei",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Simulation"
+  },
+
+  rom = {
+    name = "neon-genesis-evangelion-shito-ikusei",
+    file = "neon-genesis-evangelion-shito-ikusei.zip",
+    hashes = {
+      { hash = "e9016134c7c84eeabc3ec273949f7ced", label = "Neon Genesis Evangelion - Shito Ikusei (Japan) (En) (v1.0) (AGTT).ws" },
+      { hash = "329f6dd7f50a8c77f64c57c9f486a94e", label = "Neon Genesis Evangelion - Shito Ikusei (Japan) (En) (v1.1) (AGTT).ws" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1105F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Pollution Level" },
+        { address=0X11669, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Ability Training - Current Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1166B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Ability Training - Remaining Lives increased" },
+        { address=0X1166B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Ability Training - Remaining Lives decreased" },
+      },
+      health = {
+        { address=0X11048, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Angel Energy decreased" },
+        { address=0X11048, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Angel Energy increased" },
+        { address=0X11112, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Angel 1 Registered - Max HP decreased" },
+        { address=0X11112, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Angel 1 Registered - Max HP increased" },
+        { address=0X11114, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Angel 1 Registered - Current HP decreased" },
+        { address=0X11114, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Angel 1 Registered - Current HP increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X110B2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Z-Blocker A" },
+        { address=0X110B3, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Z-Blocker B" },
+      },
+    },
+  },
+}

@@ -1,0 +1,107 @@
+return {
+  game = {
+    title = "Tenchi Muyo! Game-Hen",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "tenchi-muyo-game-hen",
+    file = "tenchi-muyo-game-hen.zip",
+    hashes = {
+      { hash = "66836fdf6ab04377f8f904996fc70e42", label = "Tenchi Muyou! Game Hen (Japan) (En) (Borderline,LNFT) (1.1).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1418, type="u32le", condition="eq", value=0X7FFF7FFF, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0X10EF8, type="u16le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="16-Bits Game over 2 = 5339" },
+        { address=0X10EFA, type="u16le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="16-Bits Game over = d1e6" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X102BA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tenchi current level (out of battle)" },
+        { address=0X1030A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aeka current level (out of battle)" },
+        { address=0X1035A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ryoko current level (out of battle)" },
+        { address=0X103AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mihoshi current level (out of battle)" },
+        { address=0X103FA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ryo-Ohki current level (out of battle)" },
+        { address=0X1044A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sasami current level (out of battle)" },
+        { address=0X1049A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Katsuhito current level (out of battle)" },
+        { address=0X104EA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Washu current level (out of battle)" },
+        { address=0X1053A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Azaka current level (out of battle)" },
+        { address=0X1058A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kamidake current level (out of battle)" },
+        { address=0X105DA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yukinojou current level (out of battle)" },
+        { address=0X1062A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shitsuki current level (out of battle)" },
+        { address=0X106F7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Battle introdutory cleared" },
+        { address=0X106FC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (River)" },
+        { address=0X106FD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Funaho)" },
+        { address=0X106FE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Woods)" },
+        { address=0X106FF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Cliffs)" },
+        { address=0X10700, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Bridge)" },
+        { address=0X10701, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Main Gates Tenchi's Shrine)" },
+        { address=0X10702, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Back Gates Tenchi's Shrine)" },
+        { address=0X10705, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Block A)" },
+        { address=0X10706, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Prison)" },
+        { address=0X10707, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Block B)" },
+        { address=0X10708, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Factory)" },
+        { address=0X10709, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Storage)" },
+        { address=0X10712, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (stage after battle rush)" },
+        { address=0X10713, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Dining Room)" },
+        { address=0X10714, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0=Defeat all enemies and complete the stage (Private Room)" },
+        { address=0X1071B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit0= Clear the final stage and finish the game" },
+      },
+      stage = {
+        { address=0X01FB, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="in 32-Bits use to reset after stage = 360809c4" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1028D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="4st Enemy Dead =01" },
+        { address=0X10EC3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0100= Dead? slot 2" },
+      },
+      health = {
+        { address=0X10040, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1st Player char current HP decreased" },
+        { address=0X10040, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1st Player char current HP increased" },
+        { address=0X10041, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1st Player char Max HP decreased" },
+        { address=0X10041, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1st Player char Max HP increased" },
+        { address=0X10090, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2st Player char current HP decreased" },
+        { address=0X10090, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2st Player char current HP increased" },
+        { address=0X10091, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2st Player char max HP decreased" },
+        { address=0X10091, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2st Player char max HP increased" },
+        { address=0X100E0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3st Player char current HP decreased" },
+        { address=0X100E0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3st Player char current HP increased" },
+        { address=0X100E1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3st Player char max HP decreased" },
+        { address=0X100E1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3st Player char max HP increased" },
+        { address=0X10130, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4st Player char current HP decreased" },
+        { address=0X10130, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4st Player char current HP increased" },
+        { address=0X10131, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4st Player char max HP decreased" },
+        { address=0X10131, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4st Player char max HP increased" },
+        { address=0X10180, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1st Enemy char current HP decreased" },
+        { address=0X10180, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1st Enemy char current HP increased" },
+        { address=0X10181, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1st Enemy char max HP decreased" },
+        { address=0X10181, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1st Enemy char max HP increased" },
+        { address=0X101D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2st Enemy char current HP decreased" },
+        { address=0X101D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2st Enemy char current HP increased" },
+        { address=0X101D1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2st Enemy char max HP decreased" },
+        { address=0X101D1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2st Enemy char max HP increased" },
+        { address=0X10220, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3st Enemy char current HP decreased" },
+        { address=0X10220, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3st Enemy char current HP increased" },
+        { address=0X10221, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="3st Enemy char max HP decreased" },
+        { address=0X10221, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="3st Enemy char max HP increased" },
+        { address=0X10270, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4st Enemy char current HP decreased" },
+        { address=0X10270, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4st Enemy char current HP increased" },
+        { address=0X10271, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="4st Enemy char max HP decreased" },
+        { address=0X10271, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="4st Enemy char max HP increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X10715, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit0=Kill the boss (Laboratory)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Snoopy to the Rescue",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "snoopy-to-the-rescue",
+    file = "snoopy-to-the-rescue.zip",
+    hashes = {
+      { hash = "e5f4f7bd9e9b764595d69d0157239824", label = "Snoopy to the Rescue (1984)(Random House)(Side B)[cr Apple Mafia].do" },
+      { hash = "cbfa5238c3dd794af75d1c71face9d5f", label = "Snoopy to the Rescue (1984)(Random House)(Side A)[cr Apple Mafia].do" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0E51, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (alt address, sets to default when player amount is chosen but has late value change) incr" },
+        { address=0X0E51, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (alt address, sets to default when player amount is chosen but has late value change) decr" },
+        { address=0X171B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (accurate timing with start of gameplay and with death) increased" },
+        { address=0X171B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (accurate timing with start of gameplay and with death) decreased" },
+      },
+    },
+  },
+}

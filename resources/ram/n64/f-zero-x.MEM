@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "F-Zero X",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "f-zero-x",
+    file = "f-zero-x.zip",
+    hashes = {
+      { hash = "753437d0d8ada1d12f3f9cf0f0a5171f", label = "F-Zero X (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDCE5F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCD380, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Select Mode: 0=GP Race, 1=Time Attack, 2=Death Race, 3=VS Battle, 4=*Course Edit*, 5=Practice, 6" },
+        { address=0XE5EDA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Retries (lives) increased" },
+        { address=0XE5EDA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Retries (lives) decreased" },
+        { address=0XF8514, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Universal Track ID (30-35 = X Cup, 36 = Death Race, 37 = ending)" },
+      },
+      health = {
+        { address=0X2893F, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="81 = damage beeping?" },
+        { address=0X2C4925, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="20 = damage?" },
+        { address=0X2C4B48, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Car 01 - Current Bar Health decreased" },
+        { address=0X2C4B48, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Car 01 - Current Bar Health increased" },
+        { address=0X2C4B4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Car 01 - Max Bar Health decreased" },
+        { address=0X2C4B4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Car 01 - Max Bar Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2C4928, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 01 - Points (16-bit)" },
+        { address=0X2C4CD0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 02 - Points" },
+        { address=0X2C5078, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 03 - Points" },
+        { address=0X2C5420, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 04 - Points" },
+        { address=0X2C57C8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 05 - Points" },
+        { address=0X2C5B70, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 06 - Points" },
+        { address=0X2C5F18, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 07 - Points" },
+        { address=0X2C62C0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 08 - Points" },
+        { address=0X2C6668, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 09 - Points" },
+        { address=0X2C6A10, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 10 - Points" },
+        { address=0X2C6DB8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 11 - Points" },
+        { address=0X2C7160, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 12 - Points" },
+        { address=0X2C7508, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 13 - Points" },
+        { address=0X2C78B0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 14 - Points" },
+        { address=0X2C7C58, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 15 - Points" },
+        { address=0X2C8000, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 16 - Points" },
+        { address=0X2C83A8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 17 - Points" },
+        { address=0X2C8750, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 18 - Points" },
+        { address=0X2C8AF8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 19 - Points" },
+        { address=0X2C8EA0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 20 - Points" },
+        { address=0X2C9248, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 21 - Points" },
+        { address=0X2C95F0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 22 - Points" },
+        { address=0X2C9998, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 23 - Points" },
+        { address=0X2C9D40, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 24 - Points" },
+        { address=0X2CA0E8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 25 - Points" },
+        { address=0X2CA490, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 26 - Points" },
+        { address=0X2CA838, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 27 - Points" },
+        { address=0X2CABE0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 28 - Points" },
+        { address=0X2CAF88, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 29 - Points" },
+        { address=0X2CB330, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[2 Byte] Car 30 - Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCD38C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack: 0=Time Attack, 1=Records" },
+        { address=0X2C4BA8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[4 Byte] Car 01 - Time ( 2 years, 3 months to overlap it)" },
+        { address=0X2C4BC0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[4 Byte] Car 01 - Total Time (milliseconds)" },
+        { address=0X2C4BC4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[4 Byte] Car 01 - Total Time" },
+      },
+    },
+  },
+}

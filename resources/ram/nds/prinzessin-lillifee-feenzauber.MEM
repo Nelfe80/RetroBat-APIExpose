@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Prinzessin Lillifee: Feenzauber",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "prinzessin-lillifee-feenzauber",
+    file = "prinzessin-lillifee-feenzauber.zip",
+    hashes = {
+      { hash = "060f2dba1cb76a1c7c07a15525487ac0", label = "Prinzessin Lillifee - Feenzauber (Germany).nds" },
+      { hash = "e5a0f8b5ea6ae3eb832dfe6c4c71758e", label = "Prinses Lillifee (Europe) (Fr,De,Nl).nds" },
+    }
+  },
+
+  events = {
+  },
+}

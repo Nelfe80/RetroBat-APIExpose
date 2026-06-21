@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Metroid Prime [Subset - NES Metroid]",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "metroid-prime-subset-nes-metroid",
+    file = "metroid-prime-subset-nes-metroid.zip",
+    hashes = {
+      { hash = "fec584fdb8702f35f8e2ee14507aec64", label = "Metroid Prime (USA) (Rev 2) [Subset - NES Metroid]" },
+      { hash = "28a1414af556131ebcabcf5f20e92755", label = "Metroid Prime (Europe) (En,Fr,De,Es,It) [Subset - NES Metroid]" },
+      { hash = "04906804b3d678ab8fae50767f316a03", label = "Metroid Prime (USA) (Rev 0) [Subset - NES Metroid]" },
+    }
+  },
+
+  events = {
+  },
+}

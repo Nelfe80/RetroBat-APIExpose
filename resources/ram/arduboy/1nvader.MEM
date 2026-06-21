@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "1nvader",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "1nvader",
+    file = "1nvader.zip",
+    hashes = {
+      { hash = "4ab84300d714610cbb7cda1f6a826730", label = "1nvader (World) (v1.0) (Alt).hex" },
+      { hash = "cee7f24fab74cef92ff1e03cd76d38cb", label = "1nvader (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X02E0, type="u8", condition="eq", value=0X09, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0320, type="u8", condition="eq", value=0X09, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X028A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total number of waves cleared." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0280, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X028C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (f55e93794cd6aaa8a0e3133deda8655d)" },
+        { address=0X0BA1, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+      },
+    },
+  },
+}

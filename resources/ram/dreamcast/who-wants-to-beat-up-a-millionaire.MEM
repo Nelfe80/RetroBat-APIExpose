@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Who Wants to Beat Up a Millionaire",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "who-wants-to-beat-up-a-millionaire",
+    file = "who-wants-to-beat-up-a-millionaire.zip",
+    hashes = {
+      { hash = "6a92583404b9f45413184ee78557759e", label = "Who Wants to Beat Up a Millionaire (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Nekketsu Kakutou Densetsu",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "nekketsu-kakutou-densetsu",
+    file = "nekketsu-kakutou-densetsu.zip",
+    hashes = {
+      { hash = "73ac2d914ef33ecc430eb7801e88282b", label = "Nekketsu Kakutou Densetsu (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X05B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="First player level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0322, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead player 3" },
+        { address=0X0328, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead player 4" },
+      },
+      health = {
+        { address=0X04C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="First player HP decreased" },
+        { address=0X04C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="First player HP increased" },
+        { address=0X04C3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP. Player 2 decreased" },
+        { address=0X04C3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP. Player 2 increased" },
+        { address=0X04C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP. Player 3 decreased" },
+        { address=0X04C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP. Player 3 increased" },
+        { address=0X04C5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP. Player 4 decreased" },
+        { address=0X04C5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP. Player 4 increased" },
+        { address=0X05EB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Maximum HP Player 1 decreased" },
+        { address=0X05EB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Maximum HP Player 1 increased" },
+      },
+    },
+  },
+}

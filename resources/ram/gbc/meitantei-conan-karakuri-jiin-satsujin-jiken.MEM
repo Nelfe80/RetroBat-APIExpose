@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Meitantei Conan: Karakuri Jiin Satsujin Jiken",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "meitantei-conan-karakuri-jiin-satsujin-jiken",
+    file = "meitantei-conan-karakuri-jiin-satsujin-jiken.zip",
+    hashes = {
+      { hash = "1689c2205cc7b3bd020e85d2ea73fdf7", label = "Detective Conan - The Mechanical Temple Murder Case (Japan) (En) (v1.0) (Psyklax).gbc" },
+      { hash = "3a3e92c106a8674642e0ee3c0c793a9f", label = "Meitantei Conan - Karakuri Jiin Satsujin Jiken (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

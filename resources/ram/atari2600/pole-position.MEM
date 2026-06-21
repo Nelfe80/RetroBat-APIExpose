@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Pole Position",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "pole-position",
+    file = "pole-position.zip",
+    hashes = {
+      { hash = "a4ff39d513b993159911efe01ac12eba", label = "Pole Position (USA).a26" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X005C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Countdown" },
+        { address=0X005D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time XX00" },
+        { address=0X005E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time 00XX" },
+      },
+    },
+  },
+}

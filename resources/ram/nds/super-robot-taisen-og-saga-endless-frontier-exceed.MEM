@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Super Robot Taisen OG Saga: Endless Frontier Exceed",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "super-robot-taisen-og-saga-endless-frontier-exceed",
+    file = "super-robot-taisen-og-saga-endless-frontier-exceed.zip",
+    hashes = {
+      { hash = "9d43e6b67bacfab9fd3ead1be115c5be", label = "Mugen no Frontier EXCEED - Super Robot Taisen OG Saga (Japan) (En) (v1.0) (Artema Translations).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1AD3E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alady Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1AD126, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Carbuncle Bounty" },
+      },
+    },
+  },
+}

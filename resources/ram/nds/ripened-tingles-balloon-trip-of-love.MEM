@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Ripened: Tingle's Balloon Trip of Love",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ripened-tingles-balloon-trip-of-love",
+    file = "ripened-tingles-balloon-trip-of-love.zip",
+    hashes = {
+      { hash = "c3aff3de85f5004bd3059e67b137640e", label = "Irozuki Tingle no Koi no Balloon Trip (Japan) (En) (v1.1) (Team Tingle).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA7CE0, type="u16le", condition="eq", value=0X116, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Chap14 finished, credits" },
+        { address=0XA7EB0, type="u16le", condition="eq", value=0XF, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XA7ED0, type="u16le", condition="eq", value=0X2, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Complete. Flips back to 1 right before saving after credits" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XBC860, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Fishing Champ 6-3" },
+      },
+      stage = {
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ludicrous Labyrinth" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Naughty Kid" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kindergarten of War" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Strawberry in Wonderland" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sushi Man Dun" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rainbow Walker" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Musroom Warrior" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Izumi in the Noise" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0X9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Paradise A.K.A." },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0XA, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Orange Fortress" },
+        { address=0XBCD6C, type="u16le", condition="eq", value=0XB, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Super Dungeon Brothers" },
+        { address=0XBCD6C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="DunJon stage ID" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XBC868, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Another Man's Treasure 12-2" },
+      },
+      weapon = {
+        { address=0X1E0D18, type="u32le", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Choose your weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X19D89C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sniper score" },
+      },
+      collectibles = {
+        { address=0XBC867, type="u8", condition="bit_true", bit=1, mask=0X02, action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Collector 11-3" },
+        { address=0X1E0D28, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="DunJon Coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA7CE0, type="u16le", condition="eq", value=0X111, action="BOSS_HIT", no_log=false, no_survey=false, desc="Before and after last boss fight" },
+        { address=0XA7CE0, type="u16le", condition="eq", value=0X169, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss" },
+        { address=0X19D8B8, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="First form is up" },
+        { address=0X19D94C, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss hp phase 1 and 2" },
+        { address=0X202FF0, type="u32le", condition="eq", value=0XBC0, action="BOSS_HIT", no_log=false, no_survey=false, desc="No more pink HP" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA7CE0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Current sub-screen" },
+        { address=0X1E0D18, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Encounter in dunjon" },
+        { address=0X202FF0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="HP against the last boss. The displayed hp is 0x8 farther and adjusts to this hp over time" },
+      },
+    },
+  },
+}

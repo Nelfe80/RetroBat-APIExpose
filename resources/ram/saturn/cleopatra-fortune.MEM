@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Cleopatra Fortune",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "cleopatra-fortune",
+    file = "cleopatra-fortune.zip",
+    hashes = {
+      { hash = "cfe6f8752044ea6bca7dca9716f548c4", label = "Cleopatra Fortune (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X172CB1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Highest stage cleared" },
+        { address=0X17BA8A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Upper4] Vs Round" },
+        { address=0X193D0A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level - Arcade" },
+        { address=0X193D22, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Blocks cleared" },
+      },
+      stage = {
+        { address=0X172CA1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage - Mystery Mode" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X193D04, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score overflow" },
+        { address=0X193D06, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X172CAC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time - Seconds - Mystery Mode" },
+      },
+    },
+  },
+}

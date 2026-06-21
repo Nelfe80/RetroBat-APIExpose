@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Keitai Denjuu Telefang: Power Version",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "keitai-denjuu-telefang-power-version",
+    file = "keitai-denjuu-telefang-power-version.zip",
+    hashes = {
+      { hash = "e0cb7315349851951532a959fd50eb9d", label = "Keitai Denjuu Telefang - Power Version (Japan) (En) (v1.44) (andwhyisit).gbc" },
+      { hash = "bae9542c90b3b440572f554f6181538c", label = "Keitai Denjuu Telefang - Power Version (Japan) (En) (v1.62) (kmeisthax, andwhyisit).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0XC903, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Map Area Indicator (10th digit = vertical, single digit = horizontal on the world map, outside o" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC955, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Trailing Monsters Current Health decreased" },
+        { address=0XC955, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Trailing Monsters Current Health increased" },
+        { address=0XD502, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP of own Denjuu - slot 1? decreased" },
+        { address=0XD502, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP of own Denjuu - slot 1? increased" },
+        { address=0XD544, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP of facing Denjuu decreased" },
+        { address=0XD544, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP of facing Denjuu increased" },
+        { address=0XD55A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy telefang 2 hp decreased" },
+        { address=0XD55A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy telefang 2 hp increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC500, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC501, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC502, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC503, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC504, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC505, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC506, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC507, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC508, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC509, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC50A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC50B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC50C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0XC50D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure chest bits: UNMAPPED WHICH BIT IS WHICH CHEST" },
+        { address=0X200000E, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Held Item" },
+        { address=0X200007A, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Held Item" },
+        { address=0X3002A00, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item found after battle" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC53E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 0 actives on opening cavern doors in 2nd town cave" },
+        { address=0XC590, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bit 5 = UnlockAntenna through switch in cave Palm Sea" },
+      },
+    },
+  },
+}

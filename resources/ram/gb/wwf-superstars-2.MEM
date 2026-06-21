@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "WWF Superstars 2",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-superstars-2",
+    file = "wwf-superstars-2.zip",
+    hashes = {
+      { hash = "07006fe2f7363d475e34fbf63e4e94d1", label = "WWF Superstars 2 (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC020, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health decreased" },
+        { address=0XC020, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health increased" },
+        { address=0XC0A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy health decreased" },
+        { address=0XC0A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XFFF3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="enemy opponent time outside the ring (10 seconds = 0a) increased" },
+        { address=0XFFF4, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="cage match" },
+      },
+    },
+  },
+}

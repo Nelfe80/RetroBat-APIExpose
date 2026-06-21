@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Warsong | Langrisser: The Descendants of Light",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "warsong-langrisser-the-descendants-of-light",
+    file = "warsong-langrisser-the-descendants-of-light.zip",
+    hashes = {
+      { hash = "146996a42ef0cca2578f4d56da2c4206", label = "Warsong (USA).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5582, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="empty exp bar" },
+        { address=0X5582, type="u8", condition="eq", value=0X0F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="max exp bar without leveling (1st tier)" },
+        { address=0X5582, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Experience to next level (55x2 down)" },
+        { address=0X5585, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (starting with Garett, 55x5 down)" },
+        { address=0X55B5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mina (Level)" },
+        { address=0X55C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sabra (Level)" },
+        { address=0X57D5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Starting point for Thorne level s3" },
+        { address=0XE3EA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unit on offense level" },
+        { address=0XE432, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unit level on defense" },
+      },
+      stage = {
+        { address=0X0027, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Cheat Menu" },
+        { address=0X584C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mina when guest level 4, character slot" },
+        { address=0X584D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mina class when guest stage 4" },
+        { address=0X5852, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mina Exp bar when guest stage 4" },
+        { address=0X5855, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mina level when guest stage 4" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X557D, type="u24be", condition="eq", value=0X41, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier" },
+        { address=0XE37A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier Unit on defensive" },
+        { address=0XE3DA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unit on offense's class/soldier type" },
+        { address=0XE422, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unit on defense's class/soldier type" },
+        { address=0XE8CC, type="u8", condition="eq", value=0X0B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier" },
+        { address=0XFD46, type="u24be", condition="eq", value=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier" },
+      },
+      health = {
+        { address=0X557E, type="u8", condition="eq", value=0X0A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="10" },
+        { address=0X557E, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health/HP Master List 55xE" },
+        { address=0X558E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Baldarov (when playable) health remaining decreased" },
+        { address=0X558E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Baldarov (when playable) health remaining increased" },
+        { address=0X559E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Calais (when playable) health remaining decreased" },
+        { address=0X559E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Calais (when playable) health remaining increased" },
+        { address=0X55AE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mina (when playable) health remaining decreased" },
+        { address=0X55AE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mina (when playable) health remaining increased" },
+        { address=0X55BE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sabra (when playable) health remaining decreased" },
+        { address=0X55BE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sabra (when playable) health remaining increased" },
+        { address=0X55CE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tiberon (when playable) health remaining decreased" },
+        { address=0X55CE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tiberon (when playable) health remaining increased" },
+        { address=0X55DE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Thorne (when playable) health remaining decreased" },
+        { address=0X55DE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Thorne (when playable) health remaining increased" },
+        { address=0X55EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bayard (when playable) health remaining decreased" },
+        { address=0X55EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bayard (when playable) health remaining increased" },
+        { address=0X55FE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Carleon (when playable) health remaining decreased" },
+        { address=0X55FE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Carleon (when playable) health remaining increased" },
+        { address=0X560E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lance (when playable) health remaining decreased" },
+        { address=0X560E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lance (when playable) health remaining increased" },
+        { address=0XE3CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unit on offense health remaining decreased" },
+        { address=0XE3CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unit on offense health remaining increased" },
+        { address=0XE414, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unit on defense health remaining decreased" },
+        { address=0XE414, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unit on defense health remaining increased" },
+        { address=0XFD55, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="might be cursor over troop health decreased" },
+        { address=0XFD55, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="might be cursor over troop health increased" },
+        { address=0XFD56, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="might be cursor over troop leaders health decreased" },
+        { address=0XFD56, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="might be cursor over troop leaders health increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X5581, type="u8", condition="eq", value=0X05, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Magic Shield" },
+      },
+    },
+  },
+}

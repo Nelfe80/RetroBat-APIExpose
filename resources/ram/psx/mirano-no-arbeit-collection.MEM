@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Mirano no Arbeit Collection",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mirano-no-arbeit-collection",
+    file = "mirano-no-arbeit-collection.zip",
+    hashes = {
+      { hash = "ae4489845605cad0d5cf6a4fc10ee523", label = "Mirano no Arbeit Collection (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X67BB4, type="u24le", condition="eq", value=0X196, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending Cutscene & Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X83314, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Concert Game (Difficulty Level)" },
+        { address=0X861AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cows Game (Difficulty Level)" },
+        { address=0X86654, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fruit Game (Difficulty Level)" },
+        { address=0X8B62C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Burger Game (Difficulty Level)" },
+        { address=0XCC384, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hospital Game (Difficulty Level)" },
+        { address=0XCC684, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Washing Game (Difficulty Level)" },
+        { address=0XCC688, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Food Game (Food Left) & Pizza Delivery Game (Difficulty Level)" },
+        { address=0XCC68C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Food Game (Difficulty Level)" },
+      },
+      stage = {
+        { address=0X67BB4, type="u24le", condition="eq", value=0X136, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="General Map" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X76, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hospital Game" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X64, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Food Game" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X52, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Pizza Delivery Game" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X16, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cows Game" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fruit Game" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X124, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Park" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Home" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X100, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Burger Game" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Washing Game" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X112, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Concert Game" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X88, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Menu" },
+        { address=0X67BB4, type="u24le", condition="eq", value=0X172, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Free Play" },
+        { address=0X67BB4, type="u24le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X83328, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Concert Game (Points)" },
+        { address=0X861B8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Cows Game (Free Play Points)" },
+        { address=0X8CBF4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Burger Game (Free Play Points)" },
+        { address=0XCC330, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Food Game (Free Play Points)" },
+      },
+      collectibles = {
+        { address=0X773A8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

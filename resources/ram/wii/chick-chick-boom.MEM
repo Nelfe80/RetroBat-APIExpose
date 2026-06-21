@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Chick Chick BOOM",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "chick-chick-boom",
+    file = "chick-chick-boom.zip",
+    hashes = {
+      { hash = "fb3a2105a52f383a966603a76a4bfbd6", label = "Chick Chick BOOM (USA) (WiiWare)" },
+      { hash = "36085093bdffd0286ad44a3451681f63", label = "Chick Chick BOOM (Europe) (WiiWare)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3CFF4C, type="u32be", condition="eq", value=0X00000002, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Won" },
+        { address=0X3CFF4C, type="u32be", condition="eq", value=0XFFFFFFFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game on" },
+        { address=0X3CFF60, type="u32be", condition="eq", value=0X00000003, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X3CFF60, type="u32be", condition="eq", value=0XFFFFFFFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game on" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2C91F8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Duel mode Yellow team rounds won" },
+        { address=0X2C91FC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Duel mode Black team rounds won" },
+        { address=0X2C9204, type="u32be", condition="eq", value=0X00000000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yellow team" },
+        { address=0X2C9204, type="u32be", condition="eq", value=0X00000001, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Black team" },
+        { address=0X2C9204, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Winning team of last round" },
+      },
+      stage = {
+        { address=0X2C9104, type="u32be", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="All the basics!" },
+        { address=0X2C9104, type="u32be", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The high art of battle!" },
+        { address=0X2C9104, type="u32be", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Extra energy and Pinata bonus!" },
+        { address=0X2C9104, type="u32be", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The power of special attacks!" },
+        { address=0X2C9104, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE] Active Tutorial level" },
+        { address=0X2CAA68, type="u32be", condition="eq", value=0X0000, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tip active/menu" },
+        { address=0X2CAA68, type="u32be", condition="eq", value=0X0800, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gameplay and endscreen" },
+        { address=0X2CAA68, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE] Start of round tip active" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2C90F8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Active mode" },
+        { address=0X2C9108, type="u32be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Time mode active time limit" },
+        { address=0X2C9200, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Duel mode round counter" },
+        { address=0X39F4D4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Time mode difficulty, in menu" },
+        { address=0X39F6B4, type="u32be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Time Mode Time Limit, in menu" },
+      },
+    },
+  },
+}

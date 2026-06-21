@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "LEGO Stunt Rally",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "lego-stunt-rally",
+    file = "lego-stunt-rally.zip",
+    hashes = {
+      { hash = "3d75b453859c2c6f1c84b68ca987adda", label = "LEGO Stunt Rally (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da).gbc" },
+      { hash = "c468c6d714a2d86e2f68bdcdbb40b658", label = "LEGO Stunt Rally (USA).gbc" },
+    }
+  },
+
+  events = {
+    state = {
+      temporary = {
+        { address=0XC164, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+  },
+}

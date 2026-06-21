@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "The Simpsons: Road Rage",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "the-simpsons-road-rage",
+    file = "the-simpsons-road-rage.zip",
+    hashes = {
+      { hash = "8f0fdaeda361783ee74abd980b418388", label = "Simpsons, The - Road Rage (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1CF0, type="u8", condition="eq", value=0XB0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="backgrounds" },
+        { address=0X1CF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="selected background" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1C94, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="total money increased" },
+        { address=0X38F0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="current money increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X38FB, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="items destroyed (mission mode)" },
+        { address=0X3924, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="items destroyed (road rage bonus)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X38F8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Passengers Time" },
+      },
+    },
+  },
+}

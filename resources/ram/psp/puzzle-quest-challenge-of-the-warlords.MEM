@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Puzzle Quest: Challenge of the Warlords",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-quest-challenge-of-the-warlords",
+    file = "puzzle-quest-challenge-of-the-warlords.zip",
+    hashes = {
+      { hash = "ad7aa11956c2b070bd3d630a7a276f61", label = "Puzzle Quest - Challenge of the Warlords (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9C4650, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="In Battle (continues to the victory screen and once you progress past it, it becomes 0 once more" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA004DA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Up Screen - Applying Skill Points" },
+      },
+      stage = {
+        { address=0XA004DA, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA007E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Victory Screen - Score - 32 Bit" },
+      },
+      collectibles = {
+        { address=0XA007D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Victory Screen - Gold Gained - Under 'For Your Victory' increased" },
+        { address=0XA007DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Victory Screen - Gold Gained - Under 'Cunning Also Gives You' increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1151179, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Turn Timer - Battle" },
+      },
+    },
+  },
+}

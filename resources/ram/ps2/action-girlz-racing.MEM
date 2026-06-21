@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Action Girlz Racing",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "action-girlz-racing",
+    file = "action-girlz-racing.zip",
+    hashes = {
+      { hash = "742abab396aeef3278d8a51e01d3a060", label = "Action Girlz Racing (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X713884, type="u16le", condition="eq", value=0X07, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X713884, type="u16le", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Choosing a level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X461AD4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="first player CUP Score" },
+        { address=0X461AD8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2nd CUP Score" },
+        { address=0X461ADC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="3rd CUP Score" },
+        { address=0X461AE0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="4th cup score" },
+        { address=0X461AE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="5th cup score" },
+        { address=0X461AE8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="6th cup score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X74BCC4, type="u32le", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+      },
+    },
+  },
+}

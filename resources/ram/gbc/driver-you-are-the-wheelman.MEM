@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "Driver: You Are The Wheelman",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "driver-you-are-the-wheelman",
+    file = "driver-you-are-the-wheelman.zip",
+    hashes = {
+      { hash = "413e1acd7847d628364163eb2c97cecd", label = "Driver - You Are the Wheelman (USA) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC52B, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0XC52B, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XC541, type="u16le", condition="eq", value=0X013E, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XC541, type="u16le", condition="eq", value=0X033E, action="GAME_OVER", no_log=false, no_survey=false, desc="Mission debriefings / game over" },
+        { address=0XD81F, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XDBFC, type="u16le", condition="eq", value=0X004D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo (driver logo)" },
+        { address=0XDBFC, type="u16le", condition="eq", value=0X014D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo (with gameplay)" },
+        { address=0XDBFC, type="u16le", condition="eq", value=0X0158, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo (after being idle on the main menu - for 1 demo gameplay cycle)" },
+        { address=0XDBFD, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Player or demo gameplay" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD86A, type="u8", condition="eq", value=0X38, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max level police" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD868, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full health" },
+        { address=0XD868, type="u8", condition="eq", value=0X38, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Totaled car" },
+        { address=0XD868, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health Bar" },
+        { address=0XD86C, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full health" },
+        { address=0XD86C, type="u8", condition="eq", value=0X38, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Totaled car" },
+        { address=0XD86C, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Enemy Car Health Bar" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD81F, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Driving Games (Checkpoint)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD86F, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer not displayed" },
+        { address=0XD86F, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer being displayed" },
+        { address=0XD86F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer On-Display Value" },
+        { address=0XD871, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Mission Timer" },
+        { address=0XD892, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Flag Counter" },
+        { address=0XDC39, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Checkpoint Race - Miami 1" },
+        { address=0XDC3C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Checkpoint Race - Miami 2" },
+        { address=0XDC3F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Checkpoint Race - L.A. 1" },
+        { address=0XDC42, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Checkpoint Race - L.A. 2" },
+        { address=0XDC45, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Checkpoint Race - N.Y. 1" },
+        { address=0XDC48, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Checkpoint Race - N.Y. 2" },
+        { address=0XDC4B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Get Away Race - Miami 1" },
+        { address=0XDC4E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Get Away Race - Miami 2" },
+        { address=0XDC51, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Get Away Race - L.A. 1" },
+        { address=0XDC54, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Get Away Race - L.A. 2" },
+        { address=0XDC57, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Get Away Race - N.Y. 1" },
+        { address=0XDC5A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Get Away Race - N.Y. 2" },
+        { address=0XDC5D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Pursuit Race - Miami 1" },
+        { address=0XDC60, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Pursuit Race - Miami 2" },
+        { address=0XDC63, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Pursuit Race - L.A. 1" },
+        { address=0XDC66, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Pursuit Race - L.A. 2" },
+        { address=0XDC69, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Pursuit Race - N.Y. 1" },
+        { address=0XDC6C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Pursuit Race - N.Y. 2" },
+        { address=0XDC6F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Survival - Miami" },
+        { address=0XDC72, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Survival - L.A." },
+        { address=0XDC75, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[3-bytes BCD] Best Time: Survival - N.Y." },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 GUNFRONT 292870</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 KEPPEL   30000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 HARUMI K 25000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 KUZUKAWA 20000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MARIRIN  15000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 NATSUKO  10000</text>
+		</text>
+	</view>
+</theme>

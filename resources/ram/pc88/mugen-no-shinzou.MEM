@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Mugen no Shinzou",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mugen-no-shinzou",
+    file = "mugen-no-shinzou.zip",
+    hashes = {
+      { hash = "30bec2bafb30f4034faaf4770ed7b4c0", label = "Mugen no Shinzou [Set 02] {V1 mode}.d88" },
+      { hash = "cc2bd48f0160f246aeb55390f92d7ec4", label = "Mugen no Shinzou.d88" },
+    }
+  },
+
+  events = {
+  },
+}

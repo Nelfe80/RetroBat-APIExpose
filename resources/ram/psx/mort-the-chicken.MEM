@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Mort the Chicken",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "mort-the-chicken",
+    file = "mort-the-chicken.zip",
+    hashes = {
+      { hash = "aa0c3f08ce97b3cea95fd6a74b3e4ce0", label = "Mort the Chicken (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB55AC, type="u16le", condition="eq", value=0X2, action="DEMO_MODE", no_log=false, no_survey=false, desc="Macro Active" },
+        { address=0XB818C, type="u16le", condition="eq", value=0X1, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Active in Level" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB5600, type="u16le", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Restart/Clear Level" },
+        { address=0XB5600, type="u16le", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select" },
+      },
+      stage = {
+        { address=0XB818C, type="u16le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active in Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9CC60, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power-Up Slot ID decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X9CC60, type="u16le", condition="eq", value=0X1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Spring" },
+        { address=0X9CC60, type="u16le", condition="eq", value=0X2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Neck Extender" },
+        { address=0X9CC60, type="u16le", condition="eq", value=0X3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Chick Magnet" },
+        { address=0X9CC60, type="u16le", condition="eq", value=0X4, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Chick Cannon" },
+        { address=0X9CC60, type="u16le", condition="eq", value=0X5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X9CC60, type="u16le", condition="eq", value=0X7, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Magnifying Glass" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF10B4, type="u16le", condition="eq", value=0X882, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coins" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XBD5F2, type="u16le", condition="eq", value=0X0, action="JUMPING", no_log=false, no_survey=false, desc="Grounded" },
+        { address=0XBD5F2, type="u16le", condition="eq", value=0X1, action="JUMPING", no_log=false, no_survey=false, desc="Gliding" },
+        { address=0XBD5F2, type="u16le", condition="eq", value=0X2, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF10B4, type="u16le", condition="eq", value=0X13D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Man (Cheat: BXBZ)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB6970, type="u32le", condition="eq", value=0X1723, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Jokes 1 (Cheat: OOXX)" },
+        { address=0XB6970, type="u32le", condition="eq", value=0X1512, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Jokes 2 (Cheat: OXOX)" },
+        { address=0XB6970, type="u32le", condition="eq", value=0X1688, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Jokes 3 (Cheat: OXOO)" },
+        { address=0XB6970, type="u32le", condition="eq", value=0X16C8, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Jokes 4 (Cheat: XOXX)" },
+        { address=0XB6970, type="u32le", condition="eq", value=0X1623, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Jokes 5 (Cheat: XXXX)" },
+      },
+    },
+  },
+}

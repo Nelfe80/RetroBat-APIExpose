@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Bomb Jack",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bomb-jack",
+    file = "bomb-jack.zip",
+    hashes = {
+      { hash = "d00e07046291efda14a076b870d26fd5", label = "Bomb Jack.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00FA, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X0754, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[In Single Bits] Demo Mode" },
+        { address=0X4602, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4601, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Levels" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0302, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[In Single Bits] Infinite Lives Cheat increased" },
+        { address=0X0302, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[In Single Bits] Infinite Lives Cheat decreased" },
+        { address=0X4602, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives and Game Over increased" },
+        { address=0X4602, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives and Game Over decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X254A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Enemy Coins Collected increased" },
+        { address=0X5214, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[In Single Bits] Coin Power increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0301, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[In Single Bits] Invincibility Cheat" },
+      },
+      player = {
+        { address=0X3CD3, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[In Single Bits] In mid-air (Jumping/Falling)" },
+      },
+    },
+  },
+}

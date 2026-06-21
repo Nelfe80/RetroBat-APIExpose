@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "Super Mario Land 2: 6 Golden Coins",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "super-mario-land-2-6-golden-coins",
+    file = "super-mario-land-2-6-golden-coins.zip",
+    hashes = {
+      { hash = "1d2c316f9f32727261328c7a49b22e2c", label = "Super Mario Land 2 - 6 Golden Coins (USA, Europe) (Rev 1).gb" },
+      { hash = "4bd6e929ec716a5c7fe7dc684860d551", label = "Super Mario Land 2 - 6 Golden Coins (USA, Europe) (Rev 2).gb" },
+      { hash = "55935b66d1a130967dffc6e911d4e42e", label = "SML2 (Japan) - Super Mario Land 2 DX (v1.81) (toruzz).gb" },
+      { hash = "946a4a60bbd5328ca2250d5f9f0606c7", label = "SML2 (USA) - Super Mario Land 2 DX (v1.81) (toruzz).gb" },
+      { hash = "98dab710bdf256c1f1cf92c31d58d632", label = "Super Mario Land 2 - 6-tsu no Kinka (Japan).gb" },
+      { hash = "9efef8cea73bafbaaeb779b97356149f", label = "Super Mario Land 2 - 6-tsu no Kinka (Japan) (Rev 2).gb" },
+      { hash = "a8413347d5df8c9d14f97f0330d67bce", label = "Super Mario Land 2 - 6 Golden Coins (USA, Europe).gb" },
+      { hash = "dfed3323300c23a691846291fdefb2b7", label = "Super Mario Land 2 - 6 Golden Coins (USA, Europe) (Rev 2) (Es) (v1.0) (PalKnights).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFF9B, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X08, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X14, action="GAME_PLAYING", no_log=false, no_survey=false, desc="leaving level" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X18, action="GAME_PLAYING", no_log=false, no_survey=false, desc="level beaten" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA042, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Levels complete" },
+        { address=0XA2C5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Levels complete" },
+        { address=0XA848, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="opening level completed." },
+        { address=0XA849, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="tree zone 1 complete" },
+        { address=0XA84A, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Secret Exit" },
+        { address=0XA84A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Normal Exit" },
+        { address=0XA84B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="tree zone 3 complete" },
+        { address=0XA84C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tree zone 4 complete" },
+        { address=0XA84E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="pumpkin zone 1 compete" },
+        { address=0XA84F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="pumpkin zone 2 complete" },
+        { address=0XA850, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="pumpkkin zone 3 complete" },
+        { address=0XA853, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="macro zone 1 complete" },
+        { address=0XA854, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="macro zone 2 complete" },
+        { address=0XA855, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="macro zone 3 complete" },
+        { address=0XA858, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="space zone 1 complete" },
+        { address=0XA85D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="turtle zone 1 completed" },
+        { address=0XA85E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="turtle zone 2 complete" },
+        { address=0XA862, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mario zone 1 complete" },
+        { address=0XA863, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mario zone 2 complete" },
+        { address=0XA864, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Merio Zone 3 complete" },
+        { address=0XA867, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="hippo level completed" },
+        { address=0XA86B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Macro Secret level complete" },
+        { address=0XA86C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tree Zone secret Complete" },
+        { address=0XA86D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Turtle Zone Secret Complete" },
+        { address=0XA86E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="pumpkin zone secret1 completen" },
+        { address=0XA86F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pumpkin Zone secret 2 complete" },
+        { address=0XA870, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goomba stage next to tree zone complete" },
+        { address=0XA871, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="space zone secret xomplete" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X1C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="overworld? cutscene? before wario's castle?" },
+      },
+      zone = {
+        { address=0XFF9B, type="u8", condition="eq", value=0X0C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="world map/coin slots" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA22C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="number of lives [8-bit BCD] increased" },
+        { address=0XA22C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="number of lives [8-bit BCD] decreased" },
+        { address=0XFF9B, type="u8", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA262, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Count [16-bit BCD] increased" },
+        { address=0XA2CB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of golden coins collected increased" },
+        { address=0XA437, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="00 = title screen/file select/demo, 5B = in a level, world map increased" },
+        { address=0XA84D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="tree zone final complete. gold coin obtained increased" },
+        { address=0XA851, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="pumpkin zone final complete. gold coin obtained increased" },
+        { address=0XA856, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="MAcro Zone final complete. Gold Coin Obtained increased" },
+        { address=0XA859, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="space zone final complete. golden coin obtained. increased" },
+        { address=0XA85F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="turtle zone final complete. gold coin obtained. increased" },
+        { address=0XA865, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Mario Zone 4 (final) complete. Golden coin obtained increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAFC5, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss enemy health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA271, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA2A0, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="ff = checkpoint reached" },
+        { address=0XFFF6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(sml2dx) 00=mario 01=luigi bit4=switching characters" },
+      },
+    },
+  },
+}

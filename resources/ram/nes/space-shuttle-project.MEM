@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Space Shuttle Project",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Flight Simulator"
+  },
+
+  rom = {
+    name = "space-shuttle-project",
+    file = "space-shuttle-project.zip",
+    hashes = {
+      { hash = "a2e5ee8130ab6abdcb70ecd45cddd4df", label = "Space Shuttle Project (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0xff: demo mode" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0020, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X001F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives increased" },
+        { address=0X001F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives decreased" },
+      },
+    },
+  },
+}

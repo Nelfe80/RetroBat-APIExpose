@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Space Invaders",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "space-invaders",
+    file = "space-invaders.zip",
+    hashes = {
+      { hash = "5558b39b21cc90b0b2f0a4358c043eec", label = "Space Invaders (Japan).ws" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0822, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00D0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives settings increased" },
+        { address=0X00D0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives settings decreased" },
+        { address=0X00D4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Bonus Life Pts configuration increased" },
+        { address=0X00D4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Bonus Life Pts configuration decreased" },
+        { address=0X0820, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P1 Lives increased" },
+        { address=0X0820, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P1 Lives decreased" },
+        { address=0X0821, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P2 Lives increased" },
+        { address=0X0821, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] P2 Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00E0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Score (hexa)" },
+      },
+    },
+  },
+}

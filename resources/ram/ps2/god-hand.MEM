@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "God Hand",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "god-hand",
+    file = "god-hand.zip",
+    hashes = {
+      { hash = "073a7876cd12b52cb75a25802f8ab40a", label = "God Hand (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X466354, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Float] Demon King Angra HP" },
+        { address=0X5686E2, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues per Stage" },
+        { address=0X5686E7, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon appeared" },
+        { address=0X5E7517, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused / Map" },
+        { address=0X5F4528, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Stats: Continues" },
+      },
+      events = {
+        { address=0X56875A, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Total Combo Slots" },
+        { address=0X5687BF, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Punch] Technique - Sugar Gene Combo" },
+        { address=0X568802, type="u8", condition="bit_true", bit=4, mask=0X10, action="COMBO_HIT", no_log=false, no_survey=false, desc="Discombobulator unlocked" },
+        { address=0X568880, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Techniques Square Combo Slot 1" },
+        { address=0X568884, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Techniques Square Combo Slot 2" },
+        { address=0X568888, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Techniques Square Combo Slot 3" },
+        { address=0X56888C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Techniques Square Combo Slot 4" },
+        { address=0X568890, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Techniques Square Combo Slot 5" },
+        { address=0X568894, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Techniques Square Combo Slot 6" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5686EC, type="u16le", condition="eq", value=0XBB8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 begins" },
+        { address=0X5686EC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level guage" },
+        { address=0X56875C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemies defeated at Level 1" },
+        { address=0X56875E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemies defeated at Level 2" },
+        { address=0X568760, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemies defeated at Level 3" },
+        { address=0X56879D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Kick] Technique - Right Roundhouse 1" },
+        { address=0X56879E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Kick] Technique - Right Roundhouse 2" },
+        { address=0X56879F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Kick] Technique - Right Roundhouse 3" },
+        { address=0X5687A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Kick] Technique - Left Roundhouse" },
+        { address=0X5687B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Kick] Technique - Back Roundhouse" },
+        { address=0X569284, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stages Complete" },
+      },
+      stage = {
+        { address=0X5686DE, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Previous Stage ID" },
+        { address=0X5686E4, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8-1 Little Devil Challenge - Timed Fight" },
+        { address=0X5686E4, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7-4 Little Devil Challenge - Oh, My Car!" },
+        { address=0X5686E5, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6-3 Little Devil Challenge - Timed Fight" },
+        { address=0X5686E5, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5-5 Little Devil Challenge - Timed Fight" },
+        { address=0X5686E5, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4-5 Little Devil Challenge - Oh, My Car!" },
+        { address=0X5686E5, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3-1 Little Devil Challenge - Timed Fight" },
+        { address=0X5686E5, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2-2 Little Devil Challenge - Timed Fight" },
+        { address=0X5686E5, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1-2 Little Devil Challenge - Oh, My Car!" },
+        { address=0X5686E5, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1-1 Little Devil Challenge - Arena" },
+        { address=0X56873C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Keys (Stage 2)" },
+        { address=0X5E7506, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+        { address=0X8C2AF4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hits done to the boat in Rock Star Tour Boat stage." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X568764, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemies defeated at Level Die" },
+        { address=0X568766, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Citizen Deaths" },
+        { address=0X5F4524, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game Stats: Lv. Die Kills" },
+      },
+      health = {
+        { address=0X568824, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Fruit Smoothie" },
+        { address=0X568824, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Tropical Smoothie" },
+        { address=0X5D4F04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP [Float] Do more testing decreased" },
+        { address=0X5D4F04, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP [Float] Do more testing increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5686F0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X568810, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Shop - Gold Plate 1 increased" },
+        { address=0X568811, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Shop - Gold Plate 2 increased" },
+        { address=0X568812, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Shop - Gold Plate 3 increased" },
+        { address=0X568826, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Plate" },
+        { address=0X192DCD8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Bet on Chihuahua Races increased" },
+        { address=0X192DCE0, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money won from Chihuahua Races increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X465EEC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Float] Main Boss HP" },
+        { address=0X4661F8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[float] boss hp" },
+        { address=0X4661FC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[float] boss hp 2" },
+        { address=0X466200, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[float] boss hp 3" },
+        { address=0X466204, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[float] boss hp 4" },
+        { address=0X466208, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[float] boss hp 5" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X5687C4, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[Punch] Technique - Invincible Fist" },
+      },
+    },
+  },
+}

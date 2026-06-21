@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Soukoban Perfect",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "soukoban-perfect",
+    file = "soukoban-perfect.zip",
+    hashes = {
+      { hash = "195749805c96c44cd08fdaf903788432", label = "Soukoban Perfect (Game disk).d88" },
+    }
+  },
+
+  events = {
+  },
+}

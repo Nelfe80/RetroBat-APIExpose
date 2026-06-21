@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Cosmo Police Galivan",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform, Role-Playing"
+  },
+
+  rom = {
+    name = "cosmo-police-galivan",
+    file = "cosmo-police-galivan.zip",
+    hashes = {
+      { hash = "f7f9c2b28a6b146c8364f8c48c0bd555", label = "Cosmo Police Galivan (Japan) (En) (v1.0) (Jair).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7F73, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beam Blade Level" },
+        { address=0X7F77, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Metal Blade Level" },
+        { address=0X7F7B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire Blade Level" },
+        { address=0X7F7F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Laser Blade Level" },
+        { address=0X7F83, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Thunder Blade Level" },
+        { address=0X7F87, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hyper Blade Level" },
+        { address=0X7F8B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cosmo Blade Level" },
+        { address=0X7F99, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level 1 digit" },
+        { address=0X7F9A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level 10 digit" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7F58, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="01 - Life Capsule increased" },
+        { address=0X7F58, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01 - Life Capsule decreased" },
+        { address=0X7F59, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="01 - Life Capsule in use increased" },
+        { address=0X7F59, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01 - Life Capsule in use decreased" },
+      },
+      health = {
+        { address=0X0487, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP 1000 digit decreased" },
+        { address=0X0487, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP 1000 digit increased" },
+        { address=0X7F90, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP 1 digit decreased" },
+        { address=0X7F90, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP 1 digit increased" },
+        { address=0X7F91, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP - 10 digit decreased" },
+        { address=0X7F91, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP - 10 digit increased" },
+        { address=0X7F92, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP - 100 digit decreased" },
+        { address=0X7F92, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP - 100 digit increased" },
+        { address=0X7F93, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP 1000 digit decreased" },
+        { address=0X7F93, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP 1000 digit increased" },
+        { address=0X7FA5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health - 1 digit decreased" },
+        { address=0X7FA5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health - 1 digit increased" },
+        { address=0X7FA6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health 10 digit decreased" },
+        { address=0X7FA6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health 10 digit increased" },
+        { address=0X7FA7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP - 100 digit decreased" },
+        { address=0X7FA7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP - 100 digit increased" },
+        { address=0X7FA8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health 1000 digit decreased" },
+        { address=0X7FA8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health 1000 digit increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X7F0C, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="01 - Cosmo Suit" },
+      },
+      weapon = {
+        { address=0X7FAF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sub-weapon selected" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0484, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP 1 digit" },
+        { address=0X0485, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP 10 digit" },
+        { address=0X0486, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP 100 digit" },
+        { address=0X7E00, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0x01 - Fourth boss defeated (Dragon Worm)" },
+        { address=0X7E02, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="0x01 - Door to fourth boss open" },
+        { address=0X7E08, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0x01 - Area 5 - Boss defeated" },
+        { address=0X7E0C, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0x01 - Third boss defeated (Mechanical Dragon)" },
+        { address=0X7E2A, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0x01 - First boss defeated" },
+        { address=0X7E42, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0x01 - Second boss defeated" },
+        { address=0X7E57, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0x01 - Last Boss Defeated" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X7F54, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="01 - Barrier Shield" },
+        { address=0X7F55, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="01 - Barrier Shield in use" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0281, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Current object number for this screen" },
+        { address=0X7E15, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="0x02 - Area 6 - Defense Computer Destroyed" },
+        { address=0X7E3D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="0x02 - Area 5 - Defense Computer Destroyed" },
+      },
+    },
+  },
+}

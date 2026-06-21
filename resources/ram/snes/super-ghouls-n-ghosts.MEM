@@ -1,0 +1,119 @@
+return {
+  game = {
+    title = "Super Ghouls 'n Ghosts",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "super-ghouls-n-ghosts",
+    file = "super-ghouls-n-ghosts.zip",
+    hashes = {
+      { hash = "19b2d7a555ecef4c453a819e67e61574", label = "Super Ghouls 'N Ghosts (USA).sfc" },
+      { hash = "fd2b81bb70d82894021de5a08e2b2fb3", label = "Super Ghouls N Ghosts (USA) (MSU-1).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0278, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title / menu / intro" },
+        { address=0X0278, type="u8", condition="eq", value=0X8, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="game over no continue?" },
+        { address=0X0278, type="u8", condition="eq", value=0X9, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="transition to title?" },
+        { address=0X0278, type="u8", condition="eq", value=0XB, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="enemy credits and ending credits" },
+        { address=0X02F9, type="u16le", condition="eq", value=0X13, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="'Continue'" },
+        { address=0X02FC, type="u8", condition="eq", value=0X4F, action="PAUSE_ON", no_log=false, no_survey=false, desc="weapon strikes ghost, in first slot on game load(i), upause(i)" },
+        { address=0X02FD, type="u8", condition="eq", value=0XF2, action="PAUSE_ON", no_log=false, no_survey=false, desc="stage ends (i) f3=pause2 (i)" },
+        { address=0X02FD, type="u8", condition="eq", value=0XF4, action="PAUSE_OFF", no_log=false, no_survey=false, desc="unpause (i)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0276, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="magic going out" },
+        { address=0X0276, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="recoving from casting magic" },
+        { address=0X0CA5, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Visible on ground" },
+      },
+      stage = {
+        { address=0X0278, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage starting" },
+        { address=0X0278, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="pixel out transition (4-1 to 2) (last stage to loop)" },
+        { address=0X028D, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1:the dead place" },
+        { address=0X028D, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2:The Rotting Sea" },
+        { address=0X028D, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3:Vermilion Horror" },
+        { address=0X028D, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4:The Ghoul's Stomach" },
+        { address=0X028D, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4:The Ghoul's Stomach - part 2 (must have 1 for part 2 on 0xf)" },
+        { address=0X028D, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="5:The Deep Chill" },
+        { address=0X028D, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="6:The Castle of the Emperor" },
+        { address=0X028D, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="7:Hallway of Ghouls" },
+        { address=0X028D, type="u8", condition="eq", value=0X9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="E:The Throne Room" },
+        { address=0X028D, type="u8", condition="eq", value=0XD, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="part of intro" },
+        { address=0X028D, type="u8", condition="eq", value=0X11, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(1 frame)trigger reloop message" },
+        { address=0X028D, type="u8", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ride away to sunrise (goes 12,17,c,12 on load)" },
+        { address=0X028D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage:" },
+        { address=0X0C9D, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="False, 01=True" },
+        { address=0X0C9D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(k:entity e) Stage 1 Key Available to grab" },
+        { address=0X0DEA, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True - this isn't right every time" },
+        { address=0X0DEA, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Grabbed" },
+        { address=0X0DEA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 Key Visible" },
+        { address=0X0E0B, type="u8", condition="eq", value=0XBC, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X0E0B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Related to Stage 1 Key Sprite" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0278, type="u8", condition="eq", value=0X5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="trigger death / stays at 5 at game over" },
+        { address=0X02F9, type="u16le", condition="eq", value=0XB, action="LOSE_LIFE", no_log=false, no_survey=false, desc="'Mongolian Death Worms' Third Cousin'" },
+        { address=0X02FB, type="u8", condition="eq", value=0X47, action="LOSE_LIFE", no_log=false, no_survey=false, desc="window breaks (intro), gargoyle dies, ice snake dies, sardius platform breaks" },
+        { address=0X02FD, type="u8", condition="eq", value=0X61, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1up" },
+        { address=0X02FD, type="u8", condition="eq", value=0X64, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death crawler spin" },
+        { address=0X044A, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0AD1, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="True (Death animation after killing it)" },
+      },
+      health = {
+        { address=0X0440, type="u8", condition="eq", value=0XD8, action="HIT", no_log=false, no_survey=false, desc="player taking damage or dead" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X02FB, type="u8", condition="eq", value=0X38, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon strikes chest/enemy (most)" },
+        { address=0X02FD, type="u8", condition="eq", value=0X69, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon strikes wall" },
+        { address=0X14A8, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="new weapon exposed, when the weapon despawns 2 is returned" },
+        { address=0X14D3, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="lance" },
+        { address=0X14D3, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ench lance" },
+        { address=0X14D3, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="dagger" },
+        { address=0X14D3, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ench dagger" },
+        { address=0X14D3, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="bow" },
+        { address=0X14D3, type="u8", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="enchanted bow" },
+        { address=0X14D3, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="scythe" },
+        { address=0X14D3, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="flame" },
+        { address=0X14D3, type="u8", condition="eq", value=0X9, action="WEAPON_STATE", no_log=false, no_survey=false, desc="enchanted flame" },
+        { address=0X14D3, type="u8", condition="eq", value=0XA, action="WEAPON_STATE", no_log=false, no_survey=false, desc="axe" },
+        { address=0X14D3, type="u8", condition="eq", value=0XB, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ench axe" },
+        { address=0X14D3, type="u8", condition="eq", value=0XC, action="WEAPON_STATE", no_log=false, no_survey=false, desc="blade" },
+        { address=0X14D3, type="u8", condition="eq", value=0XD, action="WEAPON_STATE", no_log=false, no_survey=false, desc="ench blade" },
+        { address=0X14D3, type="u8", condition="eq", value=0XE, action="WEAPON_STATE", no_log=false, no_survey=false, desc="bracelet" },
+        { address=0X14D3, type="u8", condition="eq", value=0XF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="enchanted bracelet" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X028D, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="The Ghoul's Stomach-boss" },
+        { address=0X02FD, type="u8", condition="eq", value=0X60, action="BOSS_HIT", no_log=false, no_survey=false, desc="ice boss attack, sardius makes platform" },
+        { address=0X0A95, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="False, 01=True" },
+        { address=0X0AD1, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="False" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X02FC, type="u8", condition="eq", value=0X56, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield magic" },
+      },
+      player = {
+        { address=0X0440, type="u8", condition="eq", value=0XD1, action="JUMPING", no_log=false, no_survey=false, desc="jump start (1 frame)" },
+        { address=0X14BB, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="False" },
+        { address=0X14BB, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="True" },
+        { address=0X14CC, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="First Jump" },
+        { address=0X14CC, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Double Jump, 03=Triple Jump, etc" },
+      },
+    },
+  },
+}

@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Gain Ground SX",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "gain-ground-sx",
+    file = "gain-ground-sx.zip",
+    hashes = {
+      { hash = "98433e7f28d63a6e33192807d7ebd0a9", label = "Gain Ground SX (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0255, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X1752, type="u8", condition="eq", value=0X28, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X180B, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+  },
+}

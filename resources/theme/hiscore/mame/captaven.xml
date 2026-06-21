@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ←(( 500000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 Tac 400000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 H.O 300000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 GAU 200000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5  X( 100000</text>
+		</text>
+	</view>
+</theme>

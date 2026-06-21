@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "King's Knight Special",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kings-knight-special",
+    file = "kings-knight-special.zip",
+    hashes = {
+      { hash = "bd60f2e3dcc2d25225670fd54e330118", label = "King's Knight Special (Disk 1).d88" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XFE02, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rayjack's (Knight) Hp decreased" },
+        { address=0XFE02, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rayjack's (Knight) Hp increased" },
+        { address=0XFE15, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kaliva's (Wizard) Hp decreased" },
+        { address=0XFE15, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kaliva's (Wizard) Hp increased" },
+        { address=0XFE28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Varusa's (Monster) Hp decreased" },
+        { address=0XFE28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Varusa's (Monster) Hp increased" },
+        { address=0XFE3B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Toby's (Thief) Hp decreased" },
+        { address=0XFE3B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Toby's (Thief) Hp increased" },
+      },
+    },
+  },
+}

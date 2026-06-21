@@ -1,0 +1,124 @@
+return {
+  game = {
+    title = "Mortal Kombat II",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-ii",
+    file = "mortal-kombat-ii.zip",
+    hashes = {
+      { hash = "a95c0e7c1d35fd42cd2e3eb7b06cb6d0", label = "Mortal Kombat II (Japan, USA) (En).32x" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF7AF, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Pre-Title Story" },
+        { address=0XF7AF, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Logo w/ Lightning Animation, Pre-Title" },
+        { address=0XF7AF, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen / Config / Test Modes" },
+        { address=0XF7AF, type="u8", condition="eq", value=0X09, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen - Character Information Cards" },
+        { address=0XF7AF, type="u8", condition="eq", value=0X0A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Match (Including In-Demo!)" },
+        { address=0XF7AF, type="u8", condition="eq", value=0X0C, action="GAME_OVER", no_log=false, no_survey=false, desc="Character Ending Cards" },
+        { address=0XF7AF, type="u8", condition="eq", value=0X0D, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Production Credits" },
+        { address=0XF7AF, type="u8", condition="eq", value=0X0E, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="GAME OVER (Both from not continuing and from after end credits)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAAC0, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dead Pool" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kombat Tomb" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wasteland" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tower" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Living" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Armory" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pit II" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Portal" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kahn's Arena" },
+        { address=0XAAC0, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goro's Lair (Jade or Smoke Fight)" },
+        { address=0XAAC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Kombat Zone]" },
+        { address=0XEDA6, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Progress/Waiting to Start" },
+        { address=0XEDA6, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Wins Round" },
+        { address=0XEDA6, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Wins Round" },
+        { address=0XEDA6, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finish Him!" },
+        { address=0XEDA6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Result/Status" },
+        { address=0XEDA8, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round not yet started" },
+        { address=0XEDA8, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Started" },
+        { address=0XF72E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dead Pool" },
+        { address=0XF72E, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kombat Tomb" },
+        { address=0XF72E, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wasteland" },
+        { address=0XF72E, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tower" },
+        { address=0XF72E, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Living" },
+        { address=0XF72E, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Armory" },
+        { address=0XF72E, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pit II" },
+        { address=0XF72E, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Portal" },
+        { address=0XF72E, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kahn's Arena" },
+        { address=0XF72E, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Goro's Lair" },
+        { address=0XF72E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Test Modes] Background Value - Fights will be in this arena" },
+        { address=0XF7B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Won" },
+        { address=0XF7B9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds Won" },
+        { address=0XF7C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won (Global)" },
+        { address=0XFA94, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won (Global? Steak)" },
+      },
+      stage = {
+        { address=0XB9F6, type="u8", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Roundhouse Kick" },
+        { address=0XEC2E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P1 Rounds Won - Current Battle (Actual)" },
+        { address=0XEC30, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P2 Rounds Won - Current Battle (Actual)" },
+        { address=0XEC32, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P1 Rounds Won Total (Actual, Writeable)" },
+        { address=0XEC36, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="CPU" },
+        { address=0XEC36, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P1" },
+        { address=0XEC36, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P1 Control (Actual - Updates once round starts)" },
+        { address=0XEC38, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="CPU" },
+        { address=0XEC38, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P2" },
+        { address=0XEC38, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="P2 Control (Actual - Updates once round starts)" },
+        { address=0XEDAA, type="u16be", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="None [Yet] - Acid Pool Stage Fatality" },
+        { address=0XEDAA, type="u16be", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Fatality (The Pit II)" },
+        { address=0XEDAA, type="u16be", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Fatality (Kombat Tomb)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XB99A, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="P1 HP (Actual) - Damage instantly and fully applied to this" },
+        { address=0XBA20, type="u24be", condition="eq", value=0X65, action="HIT", no_log=false, no_survey=false, desc="0x66=Lui Kang Fireball (damage at 0x66)" },
+        { address=0XBA20, type="u24be", condition="eq", value=0X83, action="HIT", no_log=false, no_survey=false, desc="Kitana Fan Lift (No Damage)" },
+        { address=0XBA20, type="u24be", condition="eq", value=0X85, action="HIT", no_log=false, no_survey=false, desc="0x88=Jax Gotcha Grab (damage twice at 0x88)" },
+        { address=0XBA36, type="u24be", condition="eq", value=0X18, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0XBA5A, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="P2 HP (Actual) - Damage instantly and fully applied to this" },
+        { address=0XBAF6, type="u24be", condition="eq", value=0X18, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0XED00, type="u8", condition="bit_true", bit=1, mask=0X02, action="HIT", no_log=false, no_survey=false, desc="No Damage to P1 Active" },
+        { address=0XED00, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="No Damage to P2 Active" },
+        { address=0XF7B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP (Display Only) - Scrolls to the actual health value when actual health changes decreased" },
+        { address=0XF7B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP (Display Only) - Scrolls to the actual health value when actual health changes increased" },
+        { address=0XF7B1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP (Display Only) - Scrolls to the actual health value when actual health changes decreased" },
+        { address=0XF7B1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP (Display Only) - Scrolls to the actual health value when actual health changes increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF7AE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0x01=During Gameplay when not in a Match (Tower Climb, Character Select, Game Over, etc increase" },
+        { address=0XF7C1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0x01 During Round Won where the icons are displayed increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XB9F6, type="u8", condition="eq", value=0X09, action="JUMPING", no_log=false, no_survey=false, desc="Jump Punch" },
+        { address=0XB9F6, type="u8", condition="eq", value=0X0A, action="JUMPING", no_log=false, no_survey=false, desc="Jump Kick" },
+        { address=0XBA20, type="u24be", condition="eq", value=0X72, action="JUMPING", no_log=false, no_survey=false, desc="Mileena Teleport (then goes to 0x51 for jump kick)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF7AF, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="MIDWAY PRESENTS" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAB8F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Timer (Actual)" },
+        { address=0XF7B3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

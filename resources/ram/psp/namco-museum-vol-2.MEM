@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Namco Museum Vol. 2",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "namco-museum-vol-2",
+    file = "namco-museum-vol-2.zip",
+    hashes = {
+      { hash = "b3190b7d3bf96cec79d95381b585fa45", label = "Namco Museum Vol. 2 (Japan).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE3C201, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In Game Sharing Menu (Select Game)/Title Screen" },
+        { address=0XF063B0, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1786194, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA44021, type="u8", condition="eq", value=0X09, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA44021, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XF063B0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Motos Arrangement - Lives [8bit] increased" },
+        { address=0XF063B0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Motos Arrangement - Lives [8bit] decreased" },
+        { address=0X14B6468, type="u24le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dragon Spirit - 1UP Score [24bit BCD] increased" },
+        { address=0X14B6468, type="u24le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dragon Spirit - 1UP Score [24bit BCD] decreased" },
+        { address=0X14B6614, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dragon Spirit - Life Meter [8bit] increased" },
+        { address=0X14B6614, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dragon Spirit - Life Meter [8bit] decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF05C84, type="u16le", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="1-5 (Blinky Boss)" },
+        { address=0XF05C84, type="u16le", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="2-5 (Pinky Boss)" },
+      },
+    },
+  },
+}

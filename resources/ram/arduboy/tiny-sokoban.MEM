@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Tiny Sokoban",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tiny-sokoban",
+    file = "tiny-sokoban.zip",
+    hashes = {
+      { hash = "c1021b50977c48f87aeebff2e3fee0e5", label = "Tiny Sokoban (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0309, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level ID Index 2" },
+        { address=0X0B10, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+  },
+}

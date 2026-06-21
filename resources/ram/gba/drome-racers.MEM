@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Drome Racers",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "drome-racers",
+    file = "drome-racers.zip",
+    hashes = {
+      { hash = "585a0f57c4db96b18dbf15f9c0c2fa6f", label = "Drome Racers (Europe) (En,Fr,De,Da).gba" },
+      { hash = "9f39a0635363f9e534a4b48c64d52322", label = "Drome Racers (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X81D0, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits left" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD9A4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer flashing lap time" },
+        { address=0XD9B0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (for some reasons 5)" },
+        { address=0XD9B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer 00:00:XX" },
+        { address=0XD9B8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer 00:XX:00" },
+        { address=0XD9BC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer XX:00:00" },
+        { address=0XDA34, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Record (Desert)" },
+      },
+    },
+  },
+}

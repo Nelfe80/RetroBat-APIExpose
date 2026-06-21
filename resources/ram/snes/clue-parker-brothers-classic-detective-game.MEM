@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Clue: Parker Brothers' Classic Detective Game",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "clue-parker-brothers-classic-detective-game",
+    file = "clue-parker-brothers-classic-detective-game.zip",
+    hashes = {
+      { hash = "061fb90e60bc8ec8128ae4bb8f5884c8", label = "Clue (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

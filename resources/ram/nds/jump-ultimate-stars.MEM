@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "Jump Ultimate Stars",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "jump-ultimate-stars",
+    file = "jump-ultimate-stars.zip",
+    hashes = {
+      { hash = "678da3a077b2ceb562e6b831e1eae0b6", label = "Jump Ultimate Stars (Japan) (En) (JUS Translation).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB4088, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bit 6 = Unlock 1st set of worlds (Warp Gate 1)" },
+      },
+      zone = {
+        { address=0XB40FB, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Taizo Mote King world unlock" },
+        { address=0XB4101, type="u8", condition="eq", value=0X6, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Midori No Makibao World Trigger" },
+        { address=0XB4109, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Secret World Spawns (Tottemo Luckyman)" },
+      },
+      stage = {
+        { address=0XB0C94, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages unlocked" },
+        { address=0XB0C95, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages unlocked" },
+        { address=0XB0C96, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages unlocked" },
+        { address=0XB0C97, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages unlocked" },
+        { address=0XB0C98, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages unlocked" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB40E2, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="God Galaxy Unlock" },
+        { address=0XB40E3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Note Ch2" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB40D8, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Planet X 3 unlocked" },
+        { address=0XB40D9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 2" },
+        { address=0XB40DA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 3" },
+        { address=0XB40DB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 4" },
+        { address=0XB40DC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 5" },
+        { address=0XB40DD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 6" },
+        { address=0XB40DE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 7" },
+        { address=0XB40DF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 8" },
+        { address=0XB40E0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 9" },
+        { address=0XB40E1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Tower 10" },
+        { address=0XB410D, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Planet X 4 unlocked" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XB40B2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Eyeshield 21 Ch1" },
+        { address=0XB40B3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Eyeshield 21 Ch2" },
+        { address=0XB40B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Eyeshield 21 Ch3" },
+        { address=0XB40B5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Eyeshield 21 Ch4" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB408B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="One Piece Challenge 1 Objectives" },
+        { address=0XB408C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="One Piece Challenge 2 Objectives" },
+        { address=0XB408D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="One Piece Challenge 3 Objectives" },
+        { address=0XB408E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="HxH Challenge 1 Objectives" },
+        { address=0XB408F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="HxH Challenge 2 Objectives" },
+        { address=0XB4090, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="HxH Challenge 3 Objectives" },
+        { address=0XB4091, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Black Cat Challenge 1 Objectives" },
+        { address=0XB4092, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Black Cat Challenge 2 Objectives" },
+        { address=0XB4093, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DBZ Challenge 1 Objectives" },
+        { address=0XB4094, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DBZ Challenge 2 Objectives" },
+        { address=0XB4095, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="DBZ Challenge 3 Objectives" },
+        { address=0XB4096, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Saint Seiya 1 Objectives" },
+        { address=0XB4097, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Saint Seiya 2 Objectives" },
+        { address=0XB4098, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Saint Seiya 3 Objectives" },
+        { address=0XB4099, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rokudenashi Blues 1 Objectives" },
+        { address=0XB409A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rokudenashi Blues 2 Objectives" },
+        { address=0XB409B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Majin Tantei 1st Chapter Objectives" },
+        { address=0XB409C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Majin Tantei Chapter 2 Objectives" },
+        { address=0XB409D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Muhyo Bureau 1st Chapter Objectives" },
+        { address=0XB409E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Muhyo Bureau Ch2 Objectives" },
+        { address=0XB409F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="D. Gray-Man Ch1 Objectives" },
+        { address=0XB40A0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="D. Gray-Man Ch2 Objectives" },
+        { address=0XB410B, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Planet X Unlocked" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Play Action Football",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "play-action-football",
+    file = "play-action-football.zip",
+    hashes = {
+      { hash = "4cee4e93651d9468e7ef47975b71aca2", label = "Play Action Football (USA).gb" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "N2O: Nitrous Oxide",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing, Shooter"
+  },
+
+  rom = {
+    name = "n2o-nitrous-oxide",
+    file = "n2o-nitrous-oxide.zip",
+    hashes = {
+      { hash = "b593cac0c5508aea9f6d63ea81a3187b", label = "N2O - Nitrous Oxide (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8EC8C, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="32-bit Main Menu Title" },
+      },
+    },
+  },
+}

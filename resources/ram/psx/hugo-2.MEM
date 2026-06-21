@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hugo 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "hugo-2",
+    file = "hugo-2.zip",
+    hashes = {
+      { hash = "4a3a7c9a1a8fc3ebea2b123ea279a979", label = "Hugo 2 (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

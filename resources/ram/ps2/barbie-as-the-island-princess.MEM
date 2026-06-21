@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Barbie as The Island Princess",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "barbie-as-the-island-princess",
+    file = "barbie-as-the-island-princess.zip",
+    hashes = {
+      { hash = "7a3ffb9aab2c8d5620f83b4c4fbee2d2", label = "Barbie as the Island Princess (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

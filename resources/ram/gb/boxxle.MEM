@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Boxxle",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "boxxle",
+    file = "boxxle.zip",
+    hashes = {
+      { hash = "239fd20f424ee53d2f11018dbd942df4", label = "Boxxle (USA, Europe) (Rev 1).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9C42, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="pause if 343a" },
+        { address=0XC0FA, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01=Pause" },
+        { address=0XC2D8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[2 Byte] Steps (used in countdown when watching demo)" },
+        { address=0XC2EC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="1=in demo" },
+        { address=0XC2EF, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="6=title/demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC0FC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="both Password used AND playing own created level" },
+        { address=0XC120, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Passkey - 2nd Character; When playing each bit represents which level you've cleared" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Entry (after retry or other)" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level after passkey or select" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Passkey Entry" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cutscene" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu: Play/Create" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu: Play/Passkey" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X30, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu: Retry/Select" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu: Next/Select" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X60, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu: Small/Large (Create Level)" },
+        { address=0XC2EB, type="u8", condition="eq", value=0X70, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu: Create/Select" },
+        { address=0XC2EB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0x00 = After first move in level.." },
+        { address=0XC2ED, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="hidden levels 1?" },
+        { address=0XC2ED, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mode: 0=Play, 1=Create/hidden level 2," },
+        { address=0XC2EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (0 based)" },
+        { address=0XC300, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Complete indicator" },
+      },
+      zone = {
+        { address=0XC11F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Passkey - 1st Character; When playing equals world (0 based)" },
+      },
+      stage = {
+        { address=0XC002, type="u8", condition="eq", value=0X7B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="win pose on small sized level" },
+        { address=0XC002, type="u8", condition="eq", value=0X7F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="win pose on a large sized level" },
+        { address=0XC11E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level ? (not stage) starting 0000 then 0100" },
+        { address=0XC2D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1=on stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC0F2, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Idle timer (seconds)" },
+      },
+    },
+  },
+}

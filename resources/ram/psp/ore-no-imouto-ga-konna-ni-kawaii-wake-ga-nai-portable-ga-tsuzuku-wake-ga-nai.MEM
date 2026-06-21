@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Ore no Imouto ga Konna ni Kawaii Wake ga Nai Portable ga Tsuzuku Wake ga Nai",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ore-no-imouto-ga-konna-ni-kawaii-wake-ga-nai-portable-ga-tsuzuku-wake-ga-nai",
+    file = "ore-no-imouto-ga-konna-ni-kawaii-wake-ga-nai-portable-ga-tsuzuku-wake-ga-nai.zip",
+    hashes = {
+      { hash = "9301db284a43e95a6d680866c9fae274", label = "Ore no Imouto ga Konna ni Kawaii Wake ga Nai Portable ga Tsuzuku Wake ga Nai (Japan) (Disc 1).iso" },
+      { hash = "ac444be4230a2a052370356d6b14fb45", label = "OreImo Tsuzuku (Disc 2) (Japan) (En) (v1.0) (Rinjinbu Translations).iso" },
+      { hash = "ac5099bb53223ee2ea797e3d503e4741", label = "Ore no Imouto ga Konna ni Kawaii Wake ga Nai Portable ga Tsuzuku Wake ga Nai (Japan) (Disc 2).iso" },
+      { hash = "ddb565f42359c2d3ff97f05d18d01290", label = "OreImo Tsuzuku (Disc 1) (Japan) (En) (v1.0) (Rinjinbu Translations).iso" },
+    }
+  },
+
+  events = {
+  },
+}

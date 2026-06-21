@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mana Khemia 2: Fall of Alchemy",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "mana-khemia-2-fall-of-alchemy",
+    file = "mana-khemia-2-fall-of-alchemy.zip",
+    hashes = {
+      { hash = "1c8cfbd80e17317974e5d76d87644fa6", label = "Mana Khemia 2 - Fall of Alchemy (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Ikari Warriors",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "ikari-warriors",
+    file = "ikari-warriors.zip",
+    hashes = {
+      { hash = "2c328bdf40e4f20cbf49fa9a33655eb7", label = "ikarijpb.7z <>" },
+      { hash = "48d3ae5228ee3e06b37ba02308f4514d", label = "ikarijp.7z <Ikari (Japan No Continues)>" },
+      { hash = "aa3d232a06740d816e6dba449d25be26", label = "ikari.7z <Ikari Warriors (US JAMMA)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5DB7, type="u8", condition="bit_true", bit=5, mask=0X20, action="GAME_OVER", no_log=false, no_survey=false, desc="set to 1 on game over screen" },
+        { address=0X5E07, type="u8", condition="bit_true", bit=5, mask=0X20, action="GAME_OVER", no_log=false, no_survey=false, desc="set to 1 on game over screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5DC6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 lives increased" },
+        { address=0X5DC6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 lives decreased" },
+        { address=0X5E16, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 lives increased" },
+        { address=0X5E16, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X5DB7, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="L (longer shots)" },
+        { address=0X5DB7, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="S (faster shots)" },
+        { address=0X5DB7, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="B (red grenades)" },
+        { address=0X5DB7, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="F (fire shot)" },
+        { address=0X5DB7, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="set to 1 while under water sometimes" },
+        { address=0X5E07, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="L (longer shots)" },
+        { address=0X5E07, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="S (faster shots)" },
+        { address=0X5E07, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="B (red grenades)" },
+        { address=0X5E07, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="F (fire shot)" },
+        { address=0X5E07, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="set to 1 while under water sometimes" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5C5F, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] High Score XXXXXX0" },
+        { address=0X5DC7, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] Player 1 score XXXXXX0" },
+        { address=0X5E17, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] Player 2 score XXXXXX0" },
+      },
+      collectibles = {
+        { address=0X5DEB, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player 1 ammo" },
+        { address=0X5E3B, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] Player 2 ammo" },
+      },
+    },
+  },
+}

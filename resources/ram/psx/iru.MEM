@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "...Iru!",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "iru",
+    file = "iru.zip",
+    hashes = {
+      { hash = "372b003e0db5e51a13a7ace480a675d4", label = "...Iru! (Japan) (En) (v1.0) (SnowyAria)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7EA84, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Blinks every frame, 0x00 on pause" },
+        { address=0X1FFE94, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused indicator" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XF8227, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="'The world will plunge into...'" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF8213, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ibn-Ghazi Ingredient D" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X72354, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="EVC_FREE (not during credits) [ASCII 8 bytes] increased" },
+        { address=0X1CA3C0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="during credits: STAFF [ASCII 5 bytes] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7E9A8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Touching a wall or solid object" },
+        { address=0X8D810, type="u32le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Distance of killer from door while being chased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7E0FC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="In game timer [stop in pause]" },
+        { address=0X7E990, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="In game timer [stop both in inventory and pause]" },
+        { address=0X929E0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="In game timer [stop both in inventory and pause]" },
+      },
+    },
+  },
+}

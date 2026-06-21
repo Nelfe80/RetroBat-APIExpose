@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bomberman Blitz",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bomberman-blitz",
+    file = "bomberman-blitz.zip",
+    hashes = {
+      { hash = "29ad2e3ea16bd002ea62569dc452387a", label = "Bomberman Blitz (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Wonder Trek",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "wonder-trek",
+    file = "wonder-trek.zip",
+    hashes = {
+      { hash = "22c97c7196af50ba8a0831856088aa32", label = "Wonder Trek (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

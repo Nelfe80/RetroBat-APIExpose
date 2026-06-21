@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Tetris",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tetris",
+    file = "tetris.zip",
+    hashes = {
+      { hash = "63134f9340bbe229e92b564dd383851c", label = "Tetris (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X824E0C, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="None (at the moment)" },
+        { address=0X824E0C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Single" },
+        { address=0X824E0C, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Double" },
+        { address=0X824E0C, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Triple" },
+        { address=0X824E0C, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tetris" },
+        { address=0X829EE4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+        { address=0X829EF0, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+        { address=0X829EF4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+        { address=0X829EF8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+        { address=0X829EFC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+        { address=0X829F00, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+        { address=0X829F04, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+        { address=0X829F08, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+        { address=0X829F0C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Highlights] - > [Statistics] -> [Line Clears]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17BC5EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Origin High Score" },
+        { address=0X17BC5F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Treadmill High Score" },
+        { address=0X17BC5F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Laser High Score" },
+        { address=0X17BC5FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Flood High Score" },
+        { address=0X17BC600, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Split High Score" },
+        { address=0X17BC604, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Scanner High Score" },
+        { address=0X17BC608, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Flashlight High Score" },
+        { address=0X17BC60C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chill High Score" },
+        { address=0X17BC610, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Magnetic High Score" },
+        { address=0X17BC614, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Ledges High Score" },
+        { address=0X17BC618, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Radical High Score" },
+      },
+    },
+  },
+}

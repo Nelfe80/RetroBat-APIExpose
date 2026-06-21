@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Metroid: Other M",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure, Shooter"
+  },
+
+  rom = {
+    name = "metroid-other-m",
+    file = "metroid-other-m.zip",
+    hashes = {
+      { hash = "fdf13885a6d492e2709cc6e351d3ee0d", label = "Metroid - Other M (USA) (En,Fr,Es) (Rev 1)" },
+      { hash = "7ebb786a693d48e922710ac39f21f39b", label = "Metroid - Other M (Europe) (En,Fr,De,Es,It) (Rev 1)" },
+      { hash = "7f35eaa0226f5d4538d6242463ed9ed5", label = "Metroid - Other M (USA) (En,Fr,Es)" },
+      { hash = "600c2d1206e3ada0181d56f7acbbe936", label = "Metroid - Other M (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC95D42, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fight with Nightmare (Round 1) began" },
+        { address=0XC95D43, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fight with Nightmare (Round 1) complete" },
+        { address=0XC95D43, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fight with Nightmare (Round 2) started" },
+        { address=0XC95D43, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fight with Nightmare (Round 2) complete" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC7B093, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Standing in the Lava Puddles at the Crater during Goyagma's fight" },
+        { address=0XC8B9B4, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bit BE] Samus Health decreased" },
+        { address=0XC8B9B4, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bit BE] Samus Health increased" },
+        { address=0XCA4E27, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Total Energy Tanks found decreased" },
+        { address=0XCA4E27, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Total Energy Tanks found increased" },
+        { address=0XCA4E33, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Total Energy Parts found. decreased" },
+        { address=0XCA4E33, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Total Energy Parts found. increased" },
+        { address=0XCCCF2F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Tank decreased" },
+        { address=0XCCCF2F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Tank increased" },
+        { address=0XCCCF43, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCF43, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCCF4B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCF4B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCCF57, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCF57, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCCF5F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCF5F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCCF73, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCF73, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCCF97, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCF97, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCCFAF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCFAF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCCFBF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Tank decreased" },
+        { address=0XCCCFBF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Tank increased" },
+        { address=0XCCCFDF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCFDF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCCFFB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCCFFB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCD003, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCD003, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCD007, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCD007, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCD00B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCD00B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCD013, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Tank decreased" },
+        { address=0XCCD013, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Tank increased" },
+        { address=0XCCD037, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCD037, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCD03B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCD03B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCD04B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCD04B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCD077, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Part decreased" },
+        { address=0XCCD077, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Part increased" },
+        { address=0XCCD08F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Tank decreased" },
+        { address=0XCCD08F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Tank increased" },
+        { address=0XCCD097, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Bit1] Energy Tank decreased" },
+        { address=0XCCD097, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Bit1] Energy Tank increased" },
+        { address=0X15CB308, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Samus current Health [Can be edited] decreased" },
+        { address=0X15CB308, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE] Samus current Health [Can be edited] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC95CA3, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Crater Interior, Cutscene at the top - getting the Varia suit authorization" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XDA3D3B, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="In the lava" },
+        { address=0XDA3D3B, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Samus has grappled the hook in its' mouth" },
+        { address=0XDA3D3B, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Beached' on the platform. This can happen if Samus hooks the grapple or shoots Vorash out of th" },
+        { address=0X15AD344, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32-Bit, BE] Boss HP" },
+        { address=0X160AC40, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32-bit BE] Boss HP" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XCA4E21, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Space Jump" },
+      },
+    },
+  },
+}

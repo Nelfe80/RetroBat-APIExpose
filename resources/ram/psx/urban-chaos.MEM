@@ -1,0 +1,105 @@
+return {
+  game = {
+    title = "Urban Chaos",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Beat 'em Up, Racing, Shooter"
+  },
+
+  rom = {
+    name = "urban-chaos",
+    file = "urban-chaos.zip",
+    hashes = {
+      { hash = "c7c0a66d81b82677c867f0c697eb047b", label = "Urban Chaos (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF668C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MAYBE LEVEL INDICATOR?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X19146C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Cop Rescue - Health decreased" },
+        { address=0X19146C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Cop Rescue - Health increased" },
+        { address=0X1914C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Gatecrasher - Health decreased" },
+        { address=0X1914C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Gatecrasher - Health increased" },
+        { address=0X1918EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Cop Rescue - Health (Cooper) decreased" },
+        { address=0X1918EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Cop Rescue - Health (Cooper) increased" },
+        { address=0X194874, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Psycho Park - Health decreased" },
+        { address=0X194874, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Psycho Park - Health increased" },
+        { address=0X19495C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) -Southside Offensive - Health decreased" },
+        { address=0X19495C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) -Southside Offensive - Health increased" },
+        { address=0X194A34, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Trouble in the Park - Health decreased" },
+        { address=0X194A34, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Trouble in the Park - Health increased" },
+        { address=0X194C04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Arms Breaker - Health decreased" },
+        { address=0X194C04, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Arms Breaker - Health increased" },
+        { address=0X194DD4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Semtex - Health decreased" },
+        { address=0X194DD4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Semtex - Health increased" },
+        { address=0X194F44, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - RTA - Health decreased" },
+        { address=0X194F44, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - RTA - Health increased" },
+        { address=0X1954D4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Grim Gardens - Health decreased" },
+        { address=0X1954D4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Grim Gardens - Health increased" },
+        { address=0X1955AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Media Trouble - Health decreased" },
+        { address=0X1955AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Media Trouble - Health increased" },
+        { address=0X1955E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - The Fallen - Health decreased" },
+        { address=0X1955E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - The Fallen - Health increased" },
+        { address=0X195618, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Gun Hunt - Health decreased" },
+        { address=0X195618, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Gun Hunt - Health increased" },
+        { address=0X195A20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Urban Shakedown - Health decreased" },
+        { address=0X195A20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Urban Shakedown - Health increased" },
+        { address=0X196824, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Mission) - Auto-Destruct - Health decreased" },
+        { address=0X196824, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Mission) - Auto-Destruct - Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X196F68, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Mission) Driving Gold - Timer (Milliseconds) increased" },
+        { address=0X196F69, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Mission) Driving Gold - Timer (Seconds) increased" },
+        { address=0X197814, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Mission) Combat Gold - Timer (Milliseconds) increased" },
+        { address=0X197815, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Mission) Combat Gold - Timer (Seconds) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XF8378, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Voice Lines" },
+        { address=0XF8379, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Voice Lines" },
+        { address=0X194F68, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Animation" },
+        { address=0X194F6C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Health" },
+        { address=0X194FC7, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Sprint" },
+        { address=0X197E7A, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Stamina" },
+        { address=0X197E7B, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Constitution" },
+        { address=0X197EE0, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Strength" },
+        { address=0X197EE7, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Reflexes" },
+        { address=0X197FFC, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 1" },
+        { address=0X198010, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 2" },
+        { address=0X198024, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 3" },
+        { address=0X198038, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 4" },
+        { address=0X198060, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 5" },
+        { address=0X198074, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 6" },
+        { address=0X198088, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 7" },
+        { address=0X19809C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 8" },
+        { address=0X1980B0, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 9" },
+        { address=0X1980C4, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 10" },
+        { address=0X1980D8, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 11" },
+        { address=0X1980EC, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(Mission) - The Jump - Bonus 12" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1AEBD8, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Incomplete" },
+        { address=0X1AEBD8, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X1AEC00, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Incomplete" },
+        { address=0X1AEC00, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X1AEC14, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Incomplete" },
+        { address=0X1AEC14, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X1AEC28, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Incomplete" },
+        { address=0X1AEC28, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X1AEC3C, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Incomplete" },
+        { address=0X1AEC3C, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Complete" },
+      },
+    },
+  },
+}

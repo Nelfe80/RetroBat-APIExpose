@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Splash Lake",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "splash-lake",
+    file = "splash-lake.zip",
+    hashes = {
+      { hash = "e6910e893ba3028336254113113850a9", label = "Splash Lake - Ostrich Daibouken (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1772, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Loaded" },
+        { address=0X178B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Latest Level Unlocked" },
+        { address=0X17D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Current Set Level" },
+        { address=0X17D3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Current Sub Levels" },
+        { address=0X1814, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X176B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Life increased" },
+        { address=0X176B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Life decreased" },
+        { address=0X176D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X176D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+        { address=0X1787, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Life Mode increased" },
+        { address=0X1787, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Life Mode decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1774, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 bit] Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X177D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Hidden Objects 1-8" },
+        { address=0X177E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Hidden Objects 9-16" },
+        { address=0X177F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Hidden Objects 17-24" },
+        { address=0X1780, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Hidden Objects 25-32" },
+        { address=0X1781, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Hidden Objects 33-40" },
+        { address=0X1782, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Hidden Objects 41-48" },
+        { address=0X1783, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Hidden Objects 49-56" },
+        { address=0X1784, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Hidden Object 57-60 [Bits 3-0]" },
+      },
+    },
+  },
+}

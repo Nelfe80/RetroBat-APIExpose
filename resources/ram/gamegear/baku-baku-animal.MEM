@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Baku Baku Animal",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "baku-baku-animal",
+    file = "baku-baku-animal.zip",
+    hashes = {
+      { hash = "3ff5a4888076e7a5905bc565563c3692", label = "Baku Baku (USA).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number" },
+        { address=0X0766, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of blocks cleared in one move" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X075A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player's Falling Block (Right) Rotation increased" },
+        { address=0X075A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player's Falling Block (Right) Rotation decreased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0701, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Left Block - currently falling" },
+        { address=0X0723, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Player's Next Block (Left)" },
+        { address=0X0741, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Right Block - Currently Falling" },
+        { address=0X0763, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Player's Next Block (Right)" },
+        { address=0X0764, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks you're about to drop on opponent" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0490, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current Round Timer" },
+        { address=0X0491, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current round timer" },
+      },
+    },
+  },
+}

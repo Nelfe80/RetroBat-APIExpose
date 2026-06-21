@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "apache3",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "apache-3",
+    file = "apache-3.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X7848, type="u32be", condition="change", action="TREASURE", color="blue", min=2000, max=10000, no_log=false, no_survey=false, desc="Score delta 2000-10000: A bonus type range" },
+        { address=0X7848, type="u32be", condition="change", action="TREASURE", color="white", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Challenge Stage Perfect" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7848, type="u32be", condition="change", action="SCORE_STATE", min=50, max=200, no_log=false, no_survey=false, desc="Score delta 50-200: Score delta 50-200" },
+        { address=0X7848, type="u32be", condition="change", action="SCORE_STATE", color="orange", min=210, max=400, no_log=false, no_survey=false, desc="Score delta 210-400: Score delta 210-400" },
+        { address=0X7848, type="u32be", condition="change", action="SCORE_STATE", color="cyan", min=410, max=600, no_log=false, no_survey=false, desc="Score delta 410-600: Score delta 410-600" },
+        { address=0X7848, type="u32be", condition="change", action="SCORE_STATE", color="green", min=610, max=1900, no_log=false, no_survey=false, desc="Score delta 610-1900: Score delta 610-1900" },
+      },
+      collectibles = {
+        { address=0X7D7A, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits/lives" },
+      },
+    },
+  },
+}

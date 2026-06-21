@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Who Wants to Be a Millionaire: 2nd Edition",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "who-wants-to-be-a-millionaire-2nd-edition",
+    file = "who-wants-to-be-a-millionaire-2nd-edition.zip",
+    hashes = {
+      { hash = "866dca02365fd72f9ad396dca758d8b5", label = "Who Wants to Be a Millionaire - 2nd Edition (USA).gbc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XC214, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Audience" },
+        { address=0XC214, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Phonecall" },
+        { address=0XC214, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="50/50" },
+      },
+    },
+  },
+}

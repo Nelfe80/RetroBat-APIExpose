@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Atlantis: The Lost Tales",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "atlantis-the-lost-tales",
+    file = "atlantis-the-lost-tales.zip",
+    hashes = {
+      { hash = "4a9e37ec4498b682f3511b39c3a5cc5c", label = "Atlantis - The Lost Tales (Europe) (Disc 2)" },
+      { hash = "9c24712c856c6d82b4c823956212eaac", label = "Atlantis - The Lost Tales (Europe) (Disc 3)" },
+      { hash = "bda16301946e3ce516e0dae1f6aaf407", label = "Atlantis - The Lost Tales (Europe) (Disc 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X82374, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="CH5 - Speak with guards at coast [game over]" },
+        { address=0X82375, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="CH5 - Speak with guards at coast [game over]" },
+        { address=0X82381, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="CH5 - Speak with guards at coast [Game Over]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8233D, type="u8", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="CH3 - Agatha - lead to death scene" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X823A1, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="CH11 - Speak to Garcelos [about ring]" },
+        { address=0X823B7, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="CH11 - Agatha [gave the ring to consort]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8232C, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="CH2 - Guards at Museum door" },
+        { address=0X8232D, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="CH2 - Guards at Museum door" },
+        { address=0X8232E, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="CH2 - Guards at Hangar Access door" },
+        { address=0X8232F, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="CH2 - Guards at Hangar Access door" },
+        { address=0X8234A, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="CH2 - Guards at Hangar Access door" },
+      },
+    },
+  },
+}

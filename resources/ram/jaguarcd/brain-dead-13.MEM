@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Brain Dead 13",
+    system = "jaguarcd",
+    system_name = "Atari Jaguar CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "brain-dead-13",
+    file = "brain-dead-13.zip",
+    hashes = {
+      { hash = "6516d3fe6be7f24ac4364f518b6badf6", label = "BrainDead 13 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X73A3, type="u8", condition="eq", value=0XB0, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused (options screen)" },
+        { address=0X73A4, type="u32be", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="not paused" },
+        { address=0X73A4, type="u32be", condition="eq", value=0XFFFFFFFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7424, type="u32be", condition="eq", value=0XFFFFFFFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="in the 'revival' scene(AKA coming back to life)" },
+        { address=0X7428, type="u32be", condition="eq", value=0XFFFFFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="in a death scene/the opening and main menu" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X7454, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="ffffffff = garden boss beaten?" },
+        { address=0X7460, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="ffffffff = orange witch flag for final boss (eyeball grabbed)" },
+        { address=0X7464, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="ffffffff = blue witch flag for final boss (eyeball grabbed)" },
+      },
+    },
+  },
+}

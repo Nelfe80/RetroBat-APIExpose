@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "KiKi KaiKai",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Shooter, Run and Gun"
+  },
+
+  rom = {
+    name = "kiki-kaikai",
+    file = "kiki-kaikai.zip",
+    hashes = {
+      { hash = "0d6de0fee8ef07c96c94275623ce98d1", label = "pce/kikikai.7z <Kiki KaiKai>" },
+      { hash = "b345329df7acc1938c291440dd1ed5ad", label = "Kiki Kaikai (Japan).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006B, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X14C9, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X14C9, type="u8", condition="eq", value=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Red upgrade" },
+      },
+    },
+  },
+}

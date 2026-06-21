@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Penalty",
+    system = "tvgames",
+    system_name = "Elektor TV Games Computer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "penalty",
+    file = "penalty.zip",
+    hashes = {
+      { hash = "8b1da672b8636205efc79c9c29f2438d", label = "Penalty (Europe) (Peter Marschat).tvc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X174F, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Initial" },
+        { address=0X174F, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Blank" },
+        { address=0X1765, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Unlock Movement" },
+        { address=0X17C9, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Initial" },
+        { address=0X17C9, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Blank" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17C7, type="u8", condition="eq", value=0X1F, action="SCORE_STATE", no_log=false, no_survey=false, desc="Scored" },
+        { address=0X17C7, type="u8", condition="eq", value=0XFF, action="SCORE_STATE", no_log=false, no_survey=false, desc="No Score" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X176A, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="Jump" },
+      },
+    },
+  },
+}

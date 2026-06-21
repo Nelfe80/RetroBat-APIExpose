@@ -1,0 +1,106 @@
+return {
+  game = {
+    title = "3-D Tetris",
+    system = "virtualboy",
+    system_name = "Virtual Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "3-d-tetris",
+    file = "3-d-tetris.zip",
+    hashes = {
+      { hash = "ecf1218706e9b547eab9e4be58d54e21", label = "3-D Tetris (USA).vb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X39F8, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not Showing Demo" },
+        { address=0X39F8, type="u16le", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Showing Demo" },
+        { address=0X3B3C, type="u32le", condition="eq", value=0X07, action="GAME_OVER", no_log=false, no_survey=false, desc="0/Game Over" },
+        { address=0X3DB0, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X3DB0, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X3DEC, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off" },
+        { address=0X3DEC, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="On" },
+        { address=0X75F8, type="u32le", condition="eq", value=0XFFF124DC, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X75F8, type="u32le", condition="eq", value=0XFFF135C0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Pre-Title Screen" },
+        { address=0X75F8, type="u32le", condition="eq", value=0XFFF14494, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X065C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stages Saved as Cleared in Puzzle Mode" },
+        { address=0X3974, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of Blocks Being Cleared Currently" },
+        { address=0X3A04, type="u16le", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear It!" },
+        { address=0X3A08, type="u16le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear It!" },
+        { address=0X3A34, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X3E88, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Lines Cleared - 3-D Tetris" },
+        { address=0X3E98, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Lines Cleared - Center Fill" },
+        { address=0X3ED8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear It! Units Remaining" },
+        { address=0X75F8, type="u32le", condition="eq", value=0XFFF14094, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Center-Fill & 3-D Tetris Round Start" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X000C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 - High Score - 3-D Tetris Type-A - Easy" },
+        { address=0X005C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - 3-D Tetris - Type-A - Normal" },
+        { address=0X00AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - 3-D Tetris - Type-A - Hard" },
+        { address=0X019C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - 3-D Tetris - Clear It! - Easy" },
+        { address=0X01EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - 3-D Tetris - Clear It! - Normal" },
+        { address=0X023C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - 3-D Tetris - Clear It! - Hard" },
+        { address=0X032C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Type-A - Easy" },
+        { address=0X037C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Type-A - Normal" },
+        { address=0X03CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Type-A - Hard" },
+        { address=0X041C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Type-B - Easy" },
+        { address=0X046C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Type-B - Normal" },
+        { address=0X04BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Type-B - Hard" },
+        { address=0X050C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Clear It! - Easy" },
+        { address=0X055C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Clear It! - Normal" },
+        { address=0X05AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top 1 Score - Center-Fill - Clear It! - Hard" },
+        { address=0X3A00, type="u16le", condition="eq", value=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores" },
+        { address=0X3AC0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Scored With 5th Layer" },
+        { address=0X3AC4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Scored With 4th Layer" },
+        { address=0X3AC8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Scored With 3rd Layer" },
+        { address=0X3ACC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Scored With 2nd Layer" },
+        { address=0X3AD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Scored With 1st Layer" },
+        { address=0X3AFC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X3B04, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Earned From Last Drop" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X28C2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="40[25 Bytes] [8-bit] [Per Bit] 1st Layer Blocks:" },
+        { address=0X28CE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1st Layer Center Block" },
+        { address=0X28DB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[25 Bytes] [8-bit] [Per Bit] 2nd Layer Blocks:" },
+        { address=0X28E7, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="2nd Layer Center Block" },
+        { address=0X28F4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[25 Bytes] [8-bit] [Per Bit] 3rd Layer Blocks:" },
+        { address=0X2900, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="3rd Layer Center Block" },
+        { address=0X290D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[25 Bytes] [8-bit] [Per Bit] 4th Layer Blocks:" },
+        { address=0X2919, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="4th Layer Center Block" },
+        { address=0X2926, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[25 Bytes] [8-bit] [Per Bit] 5th Layer Blocks:" },
+        { address=0X2932, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="5th Layer Center Block" },
+        { address=0X293F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[25 Bytes] [8-bit] [Per Bit] 6th Layer Blocks:" },
+        { address=0X294B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="6th Layer Center Block" },
+        { address=0X2958, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cull Top Face" },
+        { address=0X2958, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cull Bottom Face" },
+        { address=0X2958, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cull Left Face" },
+        { address=0X2958, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cull Right Face" },
+        { address=0X2958, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cull Front Face Face" },
+        { address=0X2958, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cull Back Face" },
+        { address=0X2958, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="No Culling" },
+        { address=0X2964, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="7th Layer Center Block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3E64, type="u32le", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="1 chain (1x) -> 0x01" },
+        { address=0X3E64, type="u32le", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="2 chain (2x) -> 0x02" },
+        { address=0X3E64, type="u32le", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="3 chain (4x) -> 0x04" },
+        { address=0X3E64, type="u32le", condition="eq", value=0X05, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="4 chain (8x) -> 0x08" },
+        { address=0X3E64, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chain Counter & Multiplier" },
+      },
+    },
+  },
+}

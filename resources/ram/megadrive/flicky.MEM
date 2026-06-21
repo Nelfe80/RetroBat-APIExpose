@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Flicky",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "flicky",
+    file = "flicky.zip",
+    hashes = {
+      { hash = "805cc0b3724f041126a57a4d956fd251", label = "Flicky (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD2A4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD29B, type="u8", condition="eq", value=0X00, action="LEVEL_NEVER_ENTERED", no_log=false, no_survey=false, desc="never entered" },
+        { address=0XD29B, type="u8", condition="eq", value=0X01, action="LEVEL_ENTERED", no_log=false, no_survey=false, desc="entered" },
+        { address=0XD29B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level select cheat - only 0x01 while on level select screen" },
+        { address=0XD82C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round [Hex]" },
+        { address=0XD82D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round [Dec]" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X40, action="LEVEL_TO_SEGA", no_log=false, no_survey=false, desc="to sega" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X44, action="LEVEL_SEGA", no_log=false, no_survey=false, desc="sega" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X04, action="LEVEL_PUSH_START_BUTTON", no_log=false, no_survey=false, desc="push start button" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X08, action="LEVEL_TO_INSTRUCTIONS", no_log=false, no_survey=false, desc="to instructions" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X0C, action="LEVEL_INSTRUCTIONS", no_log=false, no_survey=false, desc="instructions {" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X18, action="LEVEL_TO_GAMEPLAY", no_log=false, no_survey=false, desc="to gameplay," },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X10, action="LEVEL_TO_LEVEL_SELECT", no_log=false, no_survey=false, desc="to level select" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X14, action="LEVEL_LEVEL_SELECT", no_log=false, no_survey=false, desc="level select" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X1C, action="LEVEL_TRANSITION_BETWEEN_LEVELS", no_log=false, no_survey=false, desc="transition between levels" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X24, action="LEVEL_GAMEPLAY", no_log=false, no_survey=false, desc="gameplay" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X20, action="LEVEL_DEAD", no_log=false, no_survey=false, desc="dead" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="dead" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X2C, action="LEVEL_BONUS_ROUND", no_log=false, no_survey=false, desc="bonus round" },
+        { address=0XFFC0, type="u24be", condition="eq", value=0X3C, action="LEVEL_DEMO", no_log=false, no_survey=false, desc="demo" },
+        { address=0XFFC0, type="u24be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Screen? Used to detect if level select is used, to stop users from instantly unlocking Just Begi" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD883, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [00=game over] increased" },
+        { address=0XD883, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [00=game over] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD87E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [Hundred Thou, Ten Thou]" },
+        { address=0XD87F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [Ten Mill, Millions]" },
+        { address=0XD880, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [Tens, Ones]" },
+        { address=0XD881, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [Thousands, Hundreds]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4494, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible" },
+        { address=0X4495, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible" },
+      },
+    },
+  },
+}

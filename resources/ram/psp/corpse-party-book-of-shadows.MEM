@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Corpse Party: Book of Shadows",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "corpse-party-book-of-shadows",
+    file = "corpse-party-book-of-shadows.zip",
+    hashes = {
+      { hash = "c833cf75c1151e2f4f7eab6472834065", label = "Corpse Party - Book of Shadows (USA) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

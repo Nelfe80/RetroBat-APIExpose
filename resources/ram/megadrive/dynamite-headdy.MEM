@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "Dynamite Headdy (Japan)",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "dynamite-headdy",
+    file = "dynamite-headdy.zip",
+    hashes = {
+      { hash = "4a93b16e5ae7117d9af37343e46c71d5", label = "Dynamite Headdy (Japan) (Es) (v1.1) (Wave).md" },
+      { hash = "cdb36911439289d3453060f58682057c", label = "Dynamite Headdy (Japan).md" },
+      { hash = "d43cd7d31616d2992e3b1ac389ef4eb1", label = "Dynamite Headdy (Japan) (En) (v070428) (Jon Najar).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD004, type="u8", condition="bit_true", bit=0, mask=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="1 when choice made." },
+        { address=0XD047, type="u16be", condition="eq", value=0X120, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Try Again!" },
+        { address=0XD047, type="u16be", condition="eq", value=0X100, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Give Up." },
+        { address=0XE802, type="u16be", condition="eq", value=0X00, action="CORPORATE_SCREEN", no_log=false, no_survey=false, desc="SEGA logo." },
+        { address=0XE802, type="u16be", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title." },
+        { address=0XE802, type="u16be", condition="eq", value=0X28, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo curtain." },
+        { address=0XE802, type="u16be", condition="eq", value=0X2C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo gameplay." },
+        { address=0XE806, type="u16be", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Play." },
+        { address=0XE806, type="u16be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause." },
+        { address=0XE93C, type="u16be", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="0 left." },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XD238, type="u16le", condition="eq", value=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Full." },
+        { address=0XD238, type="u16le", condition="eq", value=0X6F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Panics, leaves." },
+        { address=0XD238, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Money stage goon 1 HP." },
+        { address=0XD23C, type="u16le", condition="eq", value=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Full." },
+        { address=0XD23C, type="u16le", condition="eq", value=0X6F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Panics, leaves." },
+        { address=0XD23C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Money stage goon 2 HP." },
+        { address=0XEA00, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 1" },
+        { address=0XEA02, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 2" },
+        { address=0XEA04, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 3" },
+        { address=0XEA06, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 4" },
+        { address=0XEA08, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 5" },
+        { address=0XEA0A, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 6" },
+        { address=0XEA0C, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 7" },
+        { address=0XEA0E, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 8" },
+        { address=0XEA10, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SBPs stage 9" },
+        { address=0XEE82, type="u16be", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal gameplay." },
+        { address=0XEE82, type="u16be", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Showing results." },
+        { address=0XEE82, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Results." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE8EC, type="u16be", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 (no offset)." },
+        { address=0XE8EC, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives. increased" },
+        { address=0XE8EC, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives. decreased" },
+      },
+      health = {
+        { address=0XD102, type="u16be", condition="eq", value=0X14, action="HIT", no_log=false, no_survey=false, desc="Hurt." },
+        { address=0XD200, type="u32be", condition="eq", value=0X20, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max, 32." },
+        { address=0XD200, type="u32be", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Last hit." },
+        { address=0XD200, type="u32be", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Headdy HP." },
+        { address=0XD268, type="u16be", condition="eq", value=0X48, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full." },
+        { address=0XD268, type="u16be", condition="eq", value=0X3F, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Defeated." },
+        { address=0XD268, type="u16be", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Izayoi not active." },
+        { address=0XD268, type="u16be", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Izayoi HP." },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XE802, type="u16be", condition="eq", value=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Treasure logo." },
+        { address=0XE802, type="u16be", condition="eq", value=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Treasure logo." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE8F6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Secret Bonus Points (THIS STAGE)." },
+        { address=0XE8FA, type="u16le", condition="eq", value=0X270F, action="SCORE_STATE", no_log=false, no_survey=false, desc="Maximum, 9999(00)." },
+        { address=0XE8FA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score." },
+        { address=0XE934, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Banked Secret Bonus Points." },
+        { address=0XE938, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Banked Stage Points." },
+      },
+      collectibles = {
+        { address=0XDE44, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money stage background character timer. increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD234, type="u16le", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full." },
+        { address=0XD234, type="u16le", condition="eq", value=0X72, action="BOSS_HIT", no_log=false, no_survey=false, desc="Screaming." },
+        { address=0XD234, type="u16le", condition="eq", value=0X71, action="BOSS_HIT", no_log=false, no_survey=false, desc="Knocked out." },
+        { address=0XD240, type="u16be", condition="eq", value=0X60, action="BOSS_HIT", no_log=false, no_survey=false, desc="Starting." },
+        { address=0XD240, type="u16be", condition="eq", value=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last hit." },
+        { address=0XD240, type="u16be", condition="eq", value=0X3F, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead." },
+      },
+    },
+    state = {
+      player = {
+        { address=0XD102, type="u16be", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jump." },
+        { address=0XFFDB, type="u8", condition="eq", value=0X4, action="JUMPING", no_log=false, no_survey=false, desc="B." },
+        { address=0XFFDB, type="u8", condition="eq", value=0X5, action="JUMPING", no_log=false, no_survey=false, desc="C." },
+        { address=0XFFDB, type="u8", condition="eq", value=0X6, action="JUMPING", no_log=false, no_survey=false, desc="A." },
+      },
+    },
+  },
+}

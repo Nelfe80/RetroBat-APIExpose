@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Baldur's Gate: Dark Alliance",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Beat 'em Up, Role-Playing"
+  },
+
+  rom = {
+    name = "baldurs-gate-dark-alliance",
+    file = "baldurs-gate-dark-alliance.zip",
+    hashes = {
+      { hash = "bceab2cf38673bf2eded4283487ce3b0", label = "Baldur's Gate - Dark Alliance (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X52FBA4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="PLAYER : Level" },
+        { address=0X52FBA5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="PLAYER : Level to up" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X52FBF4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PLAYER : HP [float BE] decreased" },
+        { address=0X52FBF4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PLAYER : HP [float BE] increased" },
+        { address=0X52FBF8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PLAYER : HP Max [float BE] decreased" },
+        { address=0X52FBF8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PLAYER : HP Max [float BE] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X52FC30, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="PLAYER : Skill Points [32-bit BE]" },
+      },
+      collectibles = {
+        { address=0X52FC2C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="PLAYER : Money [32-bit BE] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1BA68C, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="EVENT : Chapter 1 - BugBear Boss start [32-bit BE]" },
+        { address=0X1BA8DC, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="EVENT : Chapter 2 - Boss Mines battle init [32-bit BE]" },
+        { address=0X1BA8E4, type="u32be", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="EVENT : Chapter 2 - Boss Mines 3 defeated [32-bit BE]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1BA62C, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="EVENT : Chapter 1 - Ipswitch's Medalion Quest completed [32-bit BE]" },
+        { address=0X1BA694, type="u32be", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="EVENT : Chapter 1 - Cellar Door opened [32-bit BE]" },
+        { address=0X1BA704, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="EVENT : Chapter 1 - Orb Destroyed in Crypt [32-bit BE]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1D3B18, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="BOSS : Orb of the Undead Timer [32-bit BE]" },
+        { address=0X335820, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="ENGINE : Last boss encountered [128-bit ASCII]" },
+        { address=0X661740, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="TIMER : Related to the current level [32-bit BE]" },
+        { address=0X691D5C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="PLAYER : Health Potion counter [32-bit BE]" },
+        { address=0X691D60, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="PLAYER2 : Health Potion counter [32-bit BE]" },
+      },
+    },
+  },
+}

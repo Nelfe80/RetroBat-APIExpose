@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Super Bomberman 3",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Puzzle-Game, Maze"
+  },
+
+  rom = {
+    name = "super-bomberman-3",
+    file = "super-bomberman-3.zip",
+    hashes = {
+      { hash = "681343f71b5fce4f7e960f3091e56026", label = "Super Bomberman 3 (Europe).sfc" },
+      { hash = "9567c61825bba0937fdb7fd20f1d714c", label = "Super Bomberman 3 (Europe) (Hidden Stages Unlock) (1.0) (Tedenfe).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6C6E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select: Battle Mode" },
+      },
+      zone = {
+        { address=0X2903, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Select" },
+      },
+      stage = {
+        { address=0X0348, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X034A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Extra lives increased" },
+        { address=0X034A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Extra lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1257, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="speed powerup" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17DA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X12EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0X12ED, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X12FF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="e0=normal a0= walk through bombs c0= walk through blocks" },
+      },
+    },
+  },
+}

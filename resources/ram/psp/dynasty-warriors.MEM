@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Dynasty Warriors",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dynasty-warriors",
+    file = "dynasty-warriors.zip",
+    hashes = {
+      { hash = "3c8455234ad0623281bbf12934ec66a2", label = "Dynasty Warriors (Europe).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X946A78, type="u16le", condition="eq", value=0X1C, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X946A78, type="u16le", condition="eq", value=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stage Title" },
+        { address=0X946A78, type="u16le", condition="eq", value=0X21, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Main Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBE1318, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+      },
+      stage = {
+        { address=0X946DB4, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yellow Turbans" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hu Lao Gate" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Guan Du" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chang Ban" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Chi Bi" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="He Fei" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yi Ling" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nan Zhong" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Wu Zhang Plains" },
+        { address=0X946DB4, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Xu Chang" },
+        { address=0X946DB4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X9A03F9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Changes in different stages (unknown purpose)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X94E898, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lu Bu dead" },
+        { address=0X9ABD64, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(Bit0) Enemy Life Off increased" },
+        { address=0X9ABD64, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(Bit0) Enemy Life Off decreased" },
+        { address=0X9AC2E9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Zhao Yun - Life increased" },
+        { address=0X9AC2E9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Zhao Yun - Life decreased" },
+      },
+      health = {
+        { address=0X99B7C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Displayed enemy health amount decreased" },
+        { address=0X99B7C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Displayed enemy health amount increased" },
+        { address=0X99B7D4, type="u8", condition="eq", value=0X0C, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Lu Bu" },
+        { address=0X99B7D4, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Displayed enemy health bar" },
+        { address=0XCD1042, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Player HP decreased" },
+        { address=0XCD1042, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Player HP increased" },
+        { address=0XCDD012, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) Enemy HP? (Needs testing) decreased" },
+        { address=0XCDD012, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) Enemy HP? (Needs testing) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8EDEB7, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) 0x4c68 = Score tally screen" },
+        { address=0X145ED48, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Score - Yellow Turban Rebellion (unreliable, tested on Free Mode, Han forces)" },
+        { address=0X145F548, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Score - Guan Du + He Fei (unreliable)" },
+        { address=0X145FD48, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Score - Hu Lao Gate (unreliable)" },
+        { address=0X1460548, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Score - Chang Ban (unreliable)" },
+        { address=0X14A8384, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Musou Score - Stage 1" },
+        { address=0X14A8388, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Musou Score - Stage 2" },
+        { address=0X14A838C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Musou Score - Stage 3" },
+        { address=0X14A8390, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Musou Score - Stage 4" },
+        { address=0X14A8394, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Musou Score - Stage 5" },
+        { address=0X14A83AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit) Final Musou Score - Total" },
+      },
+    },
+  },
+}

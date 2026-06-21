@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Samurai Jack: The Amulet of Time",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "samurai-jack-the-amulet-of-time",
+    file = "samurai-jack-the-amulet-of-time.zip",
+    hashes = {
+      { hash = "473c1f5bd97f5f96a5b19f3e18121d81", label = "Samurai Jack - The Amulet of Time (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1425D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="When Jack Die" },
+        { address=0X1428C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Whit Jack Death" },
+      },
+      health = {
+        { address=0X1425C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X1425C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X14288, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Some Enemy HP decreased" },
+        { address=0X14288, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Some Enemy HP increased" },
+      },
+    },
+  },
+}

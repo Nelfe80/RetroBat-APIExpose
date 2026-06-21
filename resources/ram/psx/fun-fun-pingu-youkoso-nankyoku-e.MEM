@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fun! Fun! Pingu: Youkoso! Nankyoku e",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fun-fun-pingu-youkoso-nankyoku-e",
+    file = "fun-fun-pingu-youkoso-nankyoku-e.zip",
+    hashes = {
+      { hash = "5d6fdb3ab887121879b58717b3977742", label = "Fun! Fun! Pingu - Youkoso! Nankyoku e (Japan) (Shokai Suuryou Genteiban)" },
+    }
+  },
+
+  events = {
+  },
+}

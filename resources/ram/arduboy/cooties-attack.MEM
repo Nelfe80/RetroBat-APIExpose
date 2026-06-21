@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Cooties Attack!",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cooties-attack",
+    file = "cooties-attack.zip",
+    hashes = {
+      { hash = "be7af750131954405ea874d8c307ee0c", label = "Cooties Attack (World).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0269, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X026A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+      },
+    },
+  },
+}

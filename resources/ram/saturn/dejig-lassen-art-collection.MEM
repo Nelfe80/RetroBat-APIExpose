@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "DeJig: Lassen - Art Collection",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "dejig-lassen-art-collection",
+    file = "dejig-lassen-art-collection.zip",
+    hashes = {
+      { hash = "f7ddb753673e55b6b952da7f729e8e8c", label = "DeJig - Lassen - Art Collection (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X13C9AC, type="u8", condition="eq", value=0X29, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X190DD0, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Galaxy of Life" },
+        { address=0X190DD0, type="u8", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="Miracle of Life" },
+        { address=0X190DD0, type="u8", condition="eq", value=0X0E, action="LIVES_STATE", no_log=false, no_survey=false, desc="Circle of Life" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15063A, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Elapsed (in seconds)" },
+        { address=0X1BF76A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="This is the movie timer" },
+      },
+    },
+  },
+}

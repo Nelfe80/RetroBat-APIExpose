@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Silent Scope 2: Dark Silhouette",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "silent-scope-2-dark-silhouette",
+    file = "silent-scope-2-dark-silhouette.zip",
+    hashes = {
+      { hash = "d3be3bffa4e8eb3c3f21c95bb7b15cc8", label = "Silent Scope 2 - Dark Silhouette (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X25081A, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Sniper 1 (Jackal) - Game Over ID (04)" },
+        { address=0X2509A2, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Sniper 2 (Falcon) - Game Over ID (04)" },
+        { address=0X262674, type="u16le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [US]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X246EA0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared Rounds in Boss Battle Survival [US]" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="London" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chemical Weapon Laboratory 2 April 03:00AM" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Airport/Gatwick 3 April 12:00PM" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Organization Armory/North Yorkshire 3 April 06:10AM" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Theater/Birmingham 3 April 09:35PM" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Secret Base/London 4 April 02:07AM" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tower Bridge/London 4 April 05:00AM" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Westminster/London 4 April 05:50AM" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X13, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Indoor Shooting Range" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X14, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Duel: City" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X15, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Duel: Forest" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X16, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Duel: Air" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X17, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chemical Weapon Laboratory (Intro Cutscene)" },
+        { address=0X250B20, type="u16le", condition="eq", value=0X19, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Outdoor Shooting Range" },
+        { address=0X250B20, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID - Story Mode [US]" },
+        { address=0X250B28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Progress" },
+        { address=0X3E1884, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missiosns Cleared [US]" },
+        { address=0X3E1885, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missiosns Cleared [US]" },
+        { address=0X3E1886, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missiosns Cleared [US]" },
+        { address=0X3E1887, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missiosns Cleared [US]" },
+        { address=0X3E1888, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missiosns Cleared [US]" },
+        { address=0X3E1889, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missiosns Cleared [US]" },
+        { address=0X3E188A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missiosns Cleared [US]" },
+        { address=0X3E188B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Missiosns Cleared [US]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X25084C, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Sniper 1 (Jackal) - Life [16-Bit] [US] increased" },
+        { address=0X25084C, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sniper 1 (Jackal) - Life [16-Bit] [US] decreased" },
+        { address=0X2509D4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Sniper 2 (Falcon) - Life [16-Bit] [US] increased" },
+        { address=0X2509D4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sniper 2 (Falcon) - Life [16-Bit] [US] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X250808, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sniper 1 (Jackal) - Score [32-Bit] [US]" },
+        { address=0X250990, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sniper 2 (Falcon) - Score [32-Bit] [US]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X246E98, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle Mode Boss ID [US]" },
+        { address=0X246E9C, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="In-Combat" },
+        { address=0X246E9C, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Intro" },
+        { address=0X246E9C, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle Mode Results Screen" },
+        { address=0X246EA4, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Training" },
+        { address=0X246EA4, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X246EA4, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Score Attack" },
+        { address=0X246EA4, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Survival" },
+        { address=0X250B84, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health 1 Mirror [16-Bit] [US]" },
+        { address=0X250B8A, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Max Boss Health 1 Mirror [16-Bit] [US]" },
+        { address=0X250B98, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health 2 Mirror [16-Bit] [US]" },
+        { address=0X250B9E, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Max Boss Health 2 Mirror [16-Bit] [US]" },
+        { address=0X3E161E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battles Unlocked [US]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2467E8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Targets Hit - Indoor Shooting Range [US]" },
+        { address=0X2467EC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Total Targets - Indoor Shooting Range [US]" },
+        { address=0X246E68, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Total Targets - Outdoor Shooting Range [US]" },
+        { address=0X246E6C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Targets Hit - Outdoor Shooting Range [US]" },
+        { address=0X3E1AA1, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Indoor Shooting Range Completed Count?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3E1A9A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Continued [8-Bit] [US]" },
+      },
+    },
+  },
+}

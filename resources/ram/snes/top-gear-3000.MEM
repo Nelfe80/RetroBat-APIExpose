@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Top Gear 3000",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "top-gear-3000",
+    file = "top-gear-3000.zip",
+    hashes = {
+      { hash = "23eaa07e3f3315fa43f4b4d94ec97a7b", label = "Top Gear 3000 (USA).sfc" },
+      { hash = "d7daf47df1d1c3f63595968a9ee4b234", label = "Top Gear 3000 (USA) (MSU-1) (Conn,Kurrono) (2.0).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Delta Force: Urban Warfare",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "delta-force-urban-warfare",
+    file = "delta-force-urban-warfare.zip",
+    hashes = {
+      { hash = "9abb03c68f99384bd215a840503cdc8f", label = "Delta Force Urban Warfare (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA4D08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level status" },
+        { address=0XC7048, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 11: Fire Range - Kills" },
+        { address=0XF450A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (4 part) v1" },
+        { address=0XF450C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (3 part) v1" },
+        { address=0XF4510, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (1 part) v1" },
+        { address=0XF4512, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (2 part) v1" },
+        { address=0XF4528, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (5 open) v1" },
+        { address=0XFE26A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10: Airfield door (5 open) v3" },
+        { address=0X108E34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10: Airfield door (5 open) v2" },
+        { address=0X108E40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 10: Airfield door (5 open) v1" },
+        { address=0X10E5E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (3 part) v2" },
+        { address=0X10E5E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (2 part) v2" },
+        { address=0X10E5E6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (4 part) v2" },
+        { address=0X10E5E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (1 part) v2" },
+        { address=0X10E600, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: Warhouse - Keycard B door (5 open) v2" },
+      },
+      stage = {
+        { address=0XF0878, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 5: The Lab - Hostage follow v2" },
+        { address=0X10F150, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 5: The Lab - Hostage follow v1" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1027E0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player: Weapon change v1" },
+        { address=0X103118, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player: Weapon change v1" },
+        { address=0X10A2C8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player: Weapon change v1" },
+        { address=0X10B388, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player: Weapon change v1" },
+        { address=0X10DF80, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player: Weapon change v1" },
+        { address=0X10EF38, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player: Weapon change v1" },
+        { address=0X138E38, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Player: Weapon change v1" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC4F4C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Cheat: Infinite Ammo" },
+        { address=0X10112C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Grenades v1" },
+        { address=0X1012CC, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Mines v1" },
+        { address=0X101590, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Knifes v1" },
+        { address=0X10170C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Uzi bullets v1" },
+        { address=0X101864, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: M4 bullets v1" },
+        { address=0X101894, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: M203 gas v1" },
+        { address=0X101CAC, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Grenades v1" },
+        { address=0X101E4C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Mines v1" },
+        { address=0X1021C4, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: MP5 bullets v1" },
+        { address=0X10228C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: P14 Pistol bullets v1" },
+        { address=0X102354, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Uzi bullets v1" },
+        { address=0X108E5C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Grenades v1" },
+        { address=0X108FFC, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Mines v1" },
+        { address=0X1092C0, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: Knifes v1" },
+        { address=0X109374, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: MP5 bullets v1" },
+        { address=0X10943C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: P14 Pistol bullets v1" },
+        { address=0X10A6DC, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: MP5 bullets v1" },
+        { address=0X10A6E8, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: MP5 clips v1" },
+        { address=0X10A7A4, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: P14 Pistol bullets v1" },
+        { address=0X10A7B0, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: P14 Pistol clips v1" },
+        { address=0X12567C, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo: M82A1 bullets v1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC2048, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheat: Invincible" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA4CFC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective (final)" },
+        { address=0XA4D14, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective 1" },
+        { address=0XA4D18, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective 2" },
+        { address=0XA4D1C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective 3" },
+        { address=0XA4D20, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective 4" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAD64C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level 5: Hazmat storage - bomb timer (min)" },
+        { address=0XAD64E, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level 5: Hazmat storage - bomb timer (sec 0x)" },
+        { address=0XAD650, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level 5: Hazmat storage - bomb timer (sec x0)" },
+      },
+    },
+  },
+}

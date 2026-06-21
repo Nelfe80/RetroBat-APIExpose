@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "The Powerpuff Girls: Chemical X-Traction",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Miscellaneous, Beat 'em Up"
+  },
+
+  rom = {
+    name = "the-powerpuff-girls-chemical-x-traction",
+    file = "the-powerpuff-girls-chemical-x-traction.zip",
+    hashes = {
+      { hash = "2991bb68eca54813d6b834adbbbacc4c", label = "Powerpuff Girls, The - Chemical X-Traction (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8A975, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Buttercup Story Level Done" },
+        { address=0X8A976, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bubbles Story Level Done" },
+        { address=0X8A977, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blossom Story Level Done" },
+        { address=0XDBB98, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Length" },
+        { address=0XDBB9F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds Amount" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XBACDE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0XBACDE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0XBB01E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent HP decreased" },
+        { address=0XBB01E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XBAEF2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon" },
+        { address=0XBB232, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Opponent Weapon" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE69AE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Timer" },
+      },
+    },
+  },
+}

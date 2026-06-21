@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Kishin Douji Zenki: Batoru Raiden",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "kishin-douji-zenki-batoru-raiden",
+    file = "kishin-douji-zenki-batoru-raiden.zip",
+    hashes = {
+      { hash = "2152cca035b8e3080d9eddb5bea8d94d", label = "Kishin Douji Zenki - Battle Raiden (Japan).sfc" },
+      { hash = "9c0e97741d4558578c57e3f79e0adb44", label = "Demon Child Zenki - Battle Raiden (Japan) (En) (1.0) (Dynamic Designs).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00C9, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue b6?" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0204, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X0205, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sub Stage" },
+        { address=0X023C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage select activated 01" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0213, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives? increased" },
+        { address=0X0213, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives? decreased" },
+      },
+      health = {
+        { address=0X0214, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0214, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X0215, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Double HP? decreased" },
+        { address=0X0215, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Double HP? increased" },
+        { address=0X0216, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X0216, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X021E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16 bit '" },
+        { address=0X0220, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16 bit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0218, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss HP" },
+        { address=0X0219, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Max Boss HP" },
+      },
+    },
+  },
+}

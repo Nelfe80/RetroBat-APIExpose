@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Akira",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure, Visual Novel"
+  },
+
+  rom = {
+    name = "akira",
+    file = "akira.zip",
+    hashes = {
+      { hash = "0b70dfcdccca9e0a9d51096d4347f06f", label = "Akira (Japan) (En) (v0.995) (Grimm Translations).nes" },
+      { hash = "15a6ee7c758e80b0e143f90185fa1b02", label = "Akira (Japan).nes" },
+      { hash = "3296794f3ceb04638e488adfc0459404", label = "Akira (Japan) (En) (DankTrans) (0.995).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002D, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game State (0 = Title, 1 = In Game, 2 = Menu)" },
+        { address=0X0052, type="u8", condition="eq", value=0X18, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="'at the credits'" },
+      },
+    },
+  },
+}

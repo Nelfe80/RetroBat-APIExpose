@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Superman",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "superman",
+    file = "superman.zip",
+    hashes = {
+      { hash = "83bbdab4bb18df392e67ceebabd157c7", label = "Superman (USA) (Kemco).nes" },
+    }
+  },
+
+  events = {
+  },
+}

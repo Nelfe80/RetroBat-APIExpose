@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Casper: Friends Around the World",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "casper-friends-around-the-world",
+    file = "casper-friends-around-the-world.zip",
+    hashes = {
+      { hash = "106b61c9d51a6726af47ac54932504fd", label = "Casper - Friends Around the World (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCCCC0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused - Val 1" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X97D0A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) All Level" },
+        { address=0X981B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Japan level - Val 10" },
+        { address=0XACD10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level China - Val 12" },
+        { address=0XAD1D1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit)level South America - Val 2" },
+        { address=0XAD634, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Selecting a level on the map Val (0-11)" },
+        { address=0XAD94D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit)level Hollywood - Val 1" },
+        { address=0XAE114, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16 bit) 0 - Hollywood,Venice arkanoid clear flag" },
+        { address=0XAE115, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(bit 8) 0 object collected in level arkanoid Hollywood,Venice" },
+        { address=0XAE23C, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16 bit) 0 - China arkanoid clear flag" },
+        { address=0XAE2D0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16 bit) 0 - South America,London,Paris,Moscow,Japan arkanoid clear flag" },
+        { address=0XCC224, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level Venice - Val 6" },
+        { address=0XD4E8C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level Egypt - Val 17" },
+        { address=0X145C37, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 4 - Val 7" },
+        { address=0X15CFD7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 1 - Val 1" },
+        { address=0X1601B7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 5 - Val 9" },
+        { address=0X165543, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 2 - Val 3" },
+        { address=0X16AB63, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 7 - Val 13" },
+        { address=0X16ADCF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 8 - Val 15" },
+        { address=0X16BC47, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 6 - Val 11" },
+        { address=0X16BCE7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 9 - Val 17" },
+        { address=0X16F663, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Arkanoid level 3 - Val 5" },
+        { address=0X187C18, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level Moscow - Val 8" },
+        { address=0X18E9A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level London - Val 3" },
+        { address=0X18E9D1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level Paris - Val 4" },
+        { address=0X195CD3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level India - Val 15" },
+        { address=0X1CBCB3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level Atlantis - Val 19" },
+        { address=0X1E7CBF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) level Kibosh - Val 20" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X97D7E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) The life of Mr. Fatty increased" },
+        { address=0X97D7E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) The life of Mr. Fatty decreased" },
+        { address=0X97DAC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) Kibosh Lives increased" },
+        { address=0X97DAC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) Kibosh Lives decreased" },
+        { address=0XAD07D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) Life Holliwood - val 80 increased" },
+        { address=0XAD07D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) Life Holliwood - val 80 decreased" },
+        { address=0XAD1CD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) Life Paris - val 80 increased" },
+        { address=0XAD1CD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) Life Paris - val 80 decreased" },
+        { address=0XAD2AD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) Life Venice - val 80 increased" },
+        { address=0XAD2AD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) Life Venice - val 80 decreased" },
+        { address=0XAD3AD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) Life India - val 80 increased" },
+        { address=0XAD3AD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) Life India - val 80 decreased" },
+        { address=0XAE27C, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(32 bit) Cordinate life Arcanoid - China,India increased" },
+        { address=0XAE27C, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(32 bit) Cordinate life Arcanoid - China,India decreased" },
+        { address=0XDCAB1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) Casper's Life increased" },
+        { address=0XDCAB1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) Casper's Life decreased" },
+      },
+      health = {
+        { address=0XADDAC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health bar casper decreased" },
+        { address=0XADDAC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health bar casper increased" },
+        { address=0XDCAE0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) Health bar casper decreased" },
+        { address=0XDCAE0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) Health bar casper increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDF4A0, type="u8", condition="eq", value=0X2, action="JUMPING", no_log=false, no_survey=false, desc="jumping" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X97B58, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) Level timer" },
+      },
+    },
+  },
+}

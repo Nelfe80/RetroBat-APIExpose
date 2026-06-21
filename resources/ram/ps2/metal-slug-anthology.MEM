@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Metal Slug: Anthology",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "metal-slug-anthology",
+    file = "metal-slug-anthology.zip",
+    hashes = {
+      { hash = "d4cd163e316bcafa2e4adf68134efea6", label = "Metal Slug Anthology (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X29D14C, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="20 Continues" },
+        { address=0X29D14C, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="10 Continues" },
+        { address=0X29D14C, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="5 Continues" },
+        { address=0X29D14C, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Free Play" },
+      },
+      events = {
+        { address=0X1B84B0C, type="u8", condition="eq", value=0X1C2, action="COMBO_HIT", no_log=false, no_survey=false, desc="Max" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X182437E, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X182437E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Metal Slug Super Vehicle-001] Lives increased" },
+        { address=0X182437E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Metal Slug Super Vehicle-001] Lives decreased" },
+        { address=0X182AED6, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1B92E73, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rocket Launcher" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Shot" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Heavy Machine Gun" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Gun" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Enemy Chaser" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X0E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Drop Shot" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X0D, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Iron Lizard" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X0F, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Super Grenade" },
+        { address=0X1B92E73, type="u8", condition="eq", value=0X12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Two Machine Guns" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1B84DC8, type="u8", condition="eq", value=0X75, action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Max" },
+        { address=0X1B84DC8, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="[Metal Slug 4] Char Invincibility Timer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X18244C9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Metal Slug Super Vehicle-001] Bomb Counter" },
+        { address=0X1930351, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Metal Slug 2 Super Vehicle-001/II] Bomb Counter" },
+        { address=0X1B84B0C, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[Metal Slug 4] Combo Timer" },
+        { address=0X1B84DF0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[176 bytes] [Metal Slug 4] Entity Slot #01" },
+        { address=0X1B92DE4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Metal Slug 4] Main Timer" },
+      },
+    },
+  },
+}

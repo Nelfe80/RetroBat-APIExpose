@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Grooverider: Slot Car Thunder",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "grooverider-slot-car-thunder",
+    file = "grooverider-slot-car-thunder.zip",
+    hashes = {
+      { hash = "a71e59252027dbac2ced40067ea3eb19", label = "Grooverider - Slot Car Thunder (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

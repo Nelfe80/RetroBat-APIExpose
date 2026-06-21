@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>paddle</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>High / Low</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${lime}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${lime}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 MRS 99999999</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 HOU 93583760</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 ABC 8028904</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 YU. 5000000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 BIN 4800000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 KAG 4600000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 MIY 4400000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 MAT 4200000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 IKA 4000000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 A.O 3800000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 DLR 3750250</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

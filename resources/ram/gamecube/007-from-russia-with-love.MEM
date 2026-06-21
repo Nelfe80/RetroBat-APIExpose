@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "007: From Russia with Love",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter, Stealth"
+  },
+
+  rom = {
+    name = "007-from-russia-with-love",
+    file = "007-from-russia-with-love.zip",
+    hashes = {
+      { hash = "942ad3c2a000f15f3a563699dd00f758", label = "007 - From Russia with Love (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

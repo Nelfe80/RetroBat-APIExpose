@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Donkey Kong 64 [Subset - Multi]",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "donkey-kong-64-subset-multi",
+    file = "donkey-kong-64-subset-multi.zip",
+    hashes = {
+      { hash = "beadde9c49b1cc768a61537e495bb294", label = "Donkey Kong 64 [Subset - Multi].z64" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X7FCC48, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X7FCC48, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X7FCF52, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health decreased" },
+        { address=0X7FCF52, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X76A0D4, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Hoard" },
+        { address=0X7FC9B6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Diddy Kong Coins P1 - Coin Hoard increased" },
+        { address=0X7FCA10, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lanky Kong Coins P1 - Coin Hoard increased" },
+        { address=0X7FCA72, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Tiny Kong Coins P1 - Coin Hoard increased" },
+        { address=0X7FCACC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Chunky Kong Coins P1 - Coin Hoard increased" },
+        { address=0X7FCB2E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Krusha Coins P1 - Coin Hoard increased" },
+        { address=0X7FCCB8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Diddy Kong Coins P2 - Coin Hoard increased" },
+        { address=0X7FCD1A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lanky Kong Coins P2 - Coin Hoard increased" },
+        { address=0X7FCD74, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Tiny Kong Coins P2 - Coin Hoard increased" },
+        { address=0X7FCDD6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Chunky Kong Coins P2 - Coin Hoard increased" },
+        { address=0X7FCE30, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Krusha Coins P2 - Coin Hoard increased" },
+        { address=0X7FCFC2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Diddy Kong Coins P3 - Coin Hoard increased" },
+        { address=0X7FD01C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lanky Kong Coins P3 - Coin Hoard increased" },
+        { address=0X7FD07E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Tiny Kong Coins P3 - Coin Hoard increased" },
+        { address=0X7FD0D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Chunky Kong Coins P3 - Coin Hoard increased" },
+        { address=0X7FD13A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Krusha Coins P3 - Coin Hoard increased" },
+        { address=0X7FD2C4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Diddy Kong Coins P4 - Coin Hoard increased" },
+        { address=0X7FD326, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lanky Kong Coins P4 - Coin Hoard increased" },
+        { address=0X7FD380, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Tiny Kong Coins P4 - Coin Hoard increased" },
+        { address=0X7FD3E2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Chunky Kong Coins P4 - Coin Hoard increased" },
+        { address=0X7FD43C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Krusha Coins P4 - Coin Hoard increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X76A068, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Timer (16-bit)" },
+      },
+    },
+  },
+}

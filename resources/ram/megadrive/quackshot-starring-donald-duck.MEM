@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "QuackShot starring Donald Duck",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "quackshot-starring-donald-duck",
+    file = "quackshot-starring-donald-duck.zip",
+    hashes = {
+      { hash = "768400efa2ed2eed0cd84b940e812458", label = "QuackShot Starring Donald Duck ~ QuackShot - I Love Donald Duck - Guruzia Ou no Hihou (World) (Fr) (v1.0) (Terminus).md" },
+      { hash = "a184d044b122b73026b8f4f8fb6bc528", label = "QuackShot Starring Donald Duck (World).md" },
+      { hash = "ade4e47b0fbd329acaf36efc4f8d637d", label = "QuackShot Starring Donald Duck (World) (Rev A).md" },
+      { hash = "eb6fcd984ae84668b3818590880fb262", label = "QuackShot Starring Donald Duck ~ QuackShot - I Love Donald Duck - Guruzia Ou no Hihou (World) (Ru).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8F7C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Number Playing" },
+        { address=0X8F8E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode: 00=Yes, 63=No" },
+        { address=0X8F98, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0X8F9C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="cursor on pause menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8F34, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Duckburg" },
+        { address=0X8F34, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mexico" },
+        { address=0X8F34, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Transylvania" },
+        { address=0X8F34, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Viking Ship" },
+        { address=0X8F34, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="South Pole" },
+        { address=0X8F34, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Maharajah" },
+        { address=0X8F34, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Egypt" },
+        { address=0X8F34, type="u8", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hideout" },
+        { address=0X8F34, type="u8", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Island" },
+        { address=0X8F34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+      stage = {
+        { address=0X8F36, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="sub stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8F98, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives increased" },
+        { address=0X8F98, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives decreased" },
+      },
+      health = {
+        { address=0X9038, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Duckula health decreased" },
+        { address=0X9038, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Duckula health increased" },
+        { address=0X9039, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tiger health decreased" },
+        { address=0X9039, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tiger health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XEEF2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Real Treasure Map = ff" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XEEF6, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="from 0 to ff when Gyro gives Bubblegum Ammo to Donald" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8F7B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="0f to 00 after killing last boss" },
+        { address=0X9078, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health" },
+        { address=0X92A0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Viking Ghost boss health" },
+      },
+    },
+  },
+}

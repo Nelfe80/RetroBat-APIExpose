@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Zed Blade",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "zed-blade",
+    file = "zed-blade.zip",
+    hashes = {
+      { hash = "ad7690ec619673225f1e0f7f265d5fa8", label = "zedblade.7z <Zed Blade / Operation Ragnarok>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9011, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Gameplay [Active=02; Title Screen=00]" },
+        { address=0X901C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Game Activated [Value=01]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFD8B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty [Level 1=00; Level 8=07]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0228, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [Initial default value=03] increased" },
+        { address=0X0228, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [Initial default value=03] decreased" },
+        { address=0XFD89, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives per Credit increased" },
+        { address=0XFD89, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives per Credit decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0262, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shot [3 Way=00; Wave=01; Vertical=02]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X909C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="P2 Playing (01 = playing, 02 = continue counter)" },
+        { address=0X909D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="P1 Playing (01 = playing, 02 = continue counter)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Soldier of Fortune",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "soldier-of-fortune",
+    file = "soldier-of-fortune.zip",
+    hashes = {
+      { hash = "89a9a46e3012d8437a6d2651d0a23705", label = "Soldier of Fortune (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X195E20, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2DEA2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Kills of loaded level" },
+        { address=0X2DEA58, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Level Kills?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X5EF558, type="u8", condition="eq", value=0X64, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X5EF558, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health" },
+      },
+    },
+  },
+}

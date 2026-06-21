@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Jikkyou Oshaberi Parodius: Forever with Me",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "jikkyou-oshaberi-parodius-forever-with-me",
+    file = "jikkyou-oshaberi-parodius-forever-with-me.zip",
+    hashes = {
+      { hash = "51cb6cd8bcb494a332f98386d7ec1f1d", label = "Jikkyou Oshaberi Parodius - Forever with Me (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

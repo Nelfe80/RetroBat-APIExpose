@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Monster Capsule: Breed and Battle",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "yu-gi-oh-monster-capsule-breed-and-battle",
+    file = "yu-gi-oh-monster-capsule-breed-and-battle.zip",
+    hashes = {
+      { hash = "a15b9b7b0453ae402c4704208d027fa2", label = "Yu-Gi-Oh! Monster Capsule Breed & Battle (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB3AEC, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="New Game" },
+        { address=0XB3AEC, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XB3B44, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+  },
+}

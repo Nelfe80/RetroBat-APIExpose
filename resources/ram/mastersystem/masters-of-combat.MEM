@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Masters of Combat",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "masters-of-combat",
+    file = "masters-of-combat.zip",
+    hashes = {
+      { hash = "7f4c7a57ae46837f01ef9a0c85065250", label = "Masters of Combat (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0714, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X0714, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+      },
+    },
+  },
+}

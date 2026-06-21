@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Aztec",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "aztec",
+    file = "aztec.zip",
+    hashes = {
+      { hash = "0c183c99e2ddacf37be9fc49ca18de1e", label = "Aztec (4am crack).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

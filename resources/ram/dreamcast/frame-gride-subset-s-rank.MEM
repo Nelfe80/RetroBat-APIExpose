@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Frame Gride [Subset - S Rank]",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "frame-gride-subset-s-rank",
+    file = "frame-gride-subset-s-rank.zip",
+    hashes = {
+      { hash = "3c1e14cf4e4616bf5a6b4fe4c8edcec6", label = "Frame Gride [Subset - S Rank]" },
+    }
+  },
+
+  events = {
+  },
+}

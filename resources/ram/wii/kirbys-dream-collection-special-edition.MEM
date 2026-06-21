@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Kirby's Dream Collection: Special Edition",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "kirbys-dream-collection-special-edition",
+    file = "kirbys-dream-collection-special-edition.zip",
+    hashes = {
+      { hash = "a3c200d4434e1a4a4c4e1decd0c94307", label = "Kirby's Dream Collection - Special Edition (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X14F818C, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="New Challange Stages! Level ID [32-bit BE]" },
+      },
+    },
+  },
+}

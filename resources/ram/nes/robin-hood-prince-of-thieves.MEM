@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Robin Hood: Prince of Thieves",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "robin-hood-prince-of-thieves",
+    file = "robin-hood-prince-of-thieves.zip",
+    hashes = {
+      { hash = "4a6f495b8138edfe6d91c5fab01981f2", label = "Robin Hood - Prince of Thieves (USA).nes" },
+      { hash = "6f1c1a5a92268747be143a3b1cd656ce", label = "Robin Hood - Prince of Thieves (Germany).nes" },
+      { hash = "7b77b9aaa40d02388609f5cc718a5528", label = "Robin Hood - Prince of Thieves (USA) (Rev 1).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00D6, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Flag" },
+        { address=0X00E0, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="This byte is counting inputs at the title screen; wraps back to 0 after 32 A/B presses." },
+        { address=0X07A0, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Input buffer on title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0173, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Area, 01 - Sewers, 02 - Shewood Forest, 03 - Locksley Mannor" },
+        { address=0X0174, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="'Sub levels' of 'level 06'" },
+        { address=0X0176, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X04F8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Robin Death Sprite - 0x00 = Dead" },
+        { address=0X04F9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Companion 1 Death Sprite - 0x00 = Dead" },
+        { address=0X04FA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Companion 2 Death Sprite - 0x00 = Dead" },
+        { address=0X04FB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Companion 3 Death Sprite - 0x00 = Dead" },
+        { address=0X04FC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Companion 4 Death Sprite - 0x00 = Dead" },
+      },
+      health = {
+        { address=0X017B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (only updated in 'player' menu) decreased" },
+        { address=0X017B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (only updated in 'player' menu) increased" },
+        { address=0X04EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Robin Battle Health decreased" },
+        { address=0X04EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Robin Battle Health increased" },
+        { address=0X04EB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Companion 1 Health decreased" },
+        { address=0X04EB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Companion 1 Health increased" },
+        { address=0X04EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Companion 2 Health decreased" },
+        { address=0X04EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Companion 2 Health increased" },
+        { address=0X04ED, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Companion 3 Health decreased" },
+        { address=0X04ED, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Companion 3 Health increased" },
+        { address=0X04EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Companion 4 Health decreased" },
+        { address=0X04EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Companion 4 Health increased" },
+        { address=0X0604, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0604, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X0605, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Hp on screen decreased" },
+        { address=0X0605, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Hp on screen increased" },
+        { address=0X0781, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Duel Robin's Health (Not stable outside of duels) decreased" },
+        { address=0X0781, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Duel Robin's Health (Not stable outside of duels) increased" },
+        { address=0X0782, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Duel Enemy Health (Not stable outside of duels) decreased" },
+        { address=0X0782, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Duel Enemy Health (Not stable outside of duels) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0177, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X0178, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold roll over increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X015D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objects on the screen (Food, arrows, bandaids, people, etc)" },
+      },
+    },
+  },
+}

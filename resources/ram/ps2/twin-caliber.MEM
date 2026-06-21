@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Twin Caliber",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "twin-caliber",
+    file = "twin-caliber.zip",
+    hashes = {
+      { hash = "f794a8a1812dcc0680b3eb7221f49105", label = "Twin Caliber (Europe) (En,Fr,Es,It)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X673A8C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit float] Player 1 score (logical value)" },
+        { address=0X673A94, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit float] Player 1 score (display value -- displayed value is truncated to integer)" },
+      },
+    },
+  },
+}

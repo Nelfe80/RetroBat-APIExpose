@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "JJ: Tobidase Daisakusen Part II",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "jj-tobidase-daisakusen-part-ii",
+    file = "jj-tobidase-daisakusen-part-ii.zip",
+    hashes = {
+      { hash = "e075fcd8dc48a67e5c52480e124a200c", label = "JJ - Tobidase Daisakusen Part II (Japan) (En) (v1.0) (DvD Translations).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X00E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life increased" },
+        { address=0X00E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life decreased" },
+      },
+    },
+  },
+}

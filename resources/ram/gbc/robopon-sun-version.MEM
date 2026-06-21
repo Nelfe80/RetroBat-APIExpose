@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Robopon: Sun Version",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "robopon-sun-version",
+    file = "robopon-sun-version.zip",
+    hashes = {
+      { hash = "398f7b60ea114b90b24503178f47e8d8", label = "Robopon - Sun Version (USA) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC9C1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="R1 Level" },
+        { address=0XCB3B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Caleyu Lab Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC9C6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="R1 current HP decreased" },
+        { address=0XC9C6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="R1 current HP increased" },
+        { address=0XC9C8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="R1 max HP decreased" },
+        { address=0XC9C8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="R1 max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC7EB, type="u8", condition="eq", value=0X1F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Plane" },
+        { address=0XC98A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0XC98C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0XCA49, type="u16le", condition="eq", value=0X18, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mem Ring" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDF54, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jumper Distance" },
+      },
+    },
+  },
+}

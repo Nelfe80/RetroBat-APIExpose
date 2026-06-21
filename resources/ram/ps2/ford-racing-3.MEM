@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Ford Racing 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "ford-racing-3",
+    file = "ford-racing-3.zip",
+    hashes = {
+      { hash = "3d1c789ad54e785294a10a56ffe002af", label = "Ford Racing 3 (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X3C8A9E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8bit] GT World Comp" },
+        { address=0X3C8B1E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8bit] The GT World Cup" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X3C8CC1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] Concept Shield" },
+        { address=0X3C8CC2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] Generations Shield" },
+        { address=0X3C8CC3, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] GT Shield" },
+        { address=0X3C8CC4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] Mustangs Shield" },
+        { address=0X3C8CC5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] SVT Shield" },
+        { address=0X3C8CC6, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] Thunderbirds Shield" },
+        { address=0X3C8CC7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] Trucks Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3C8B9B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Time Attack" },
+      },
+    },
+  },
+}

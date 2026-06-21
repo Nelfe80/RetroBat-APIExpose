@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Donkey Kong Country 2: Diddy's Kong Quest [Subset - Bonus]",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "donkey-kong-country-2-diddys-kong-quest-subset-bonus",
+    file = "donkey-kong-country-2-diddys-kong-quest-subset-bonus.zip",
+    hashes = {
+      { hash = "e3b96cadbbd2a5b8de98de7ff2a1bd45", label = "Donkey Kong Country 2 - Diddy's Kong Quest [Subset - Bonus].sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X06B1, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="CrocodileCauldron, 03=KremQuay" },
+        { address=0X06B1, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="KrazyKremland, 05=GloomyGulch, 06=KRoolsKeep, 07=FlyingKrock" },
+        { address=0X06B1, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID - 00=Overworld, A,B,C,D,E=LostWorld, 01=GangplankGalleon" },
+      },
+      stage = {
+        { address=0X06AB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage IDs (editable)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X08BE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Lives increased" },
+        { address=0X08BE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Lives decreased" },
+      },
+    },
+  },
+}

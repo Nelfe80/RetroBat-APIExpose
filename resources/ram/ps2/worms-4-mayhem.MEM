@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Worms 4: Mayhem",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "worms-4-mayhem",
+    file = "worms-4-mayhem.zip",
+    hashes = {
+      { hash = "d476cb861d1d4127b3940695061dc1b8", label = "Worms 4 - Mayhem (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XF3B624, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Silver Damage" },
+        { address=0XF3B638, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Bronze Damage" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XF3B634, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Specialist" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF09AEC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bits] Item Shop - Coins increased" },
+      },
+    },
+  },
+}

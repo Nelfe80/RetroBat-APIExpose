@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Shaun the Sheep: Off His Head",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "shaun-the-sheep-off-his-head",
+    file = "shaun-the-sheep-off-his-head.zip",
+    hashes = {
+      { hash = "aee21dd98f95d347b292203147c11f31", label = "Shaun the Sheep - Off His Head (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Tokyo Road Race",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "tokyo-road-race",
+    file = "tokyo-road-race.zip",
+    hashes = {
+      { hash = "6d05c63e1be8e138604e528a61bd3559", label = "Battle Gear 2 (Japan)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0000, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="NOTE: The interlacing in this game is kind of dookie. Might need to investigate a better means o" },
+      },
+    },
+  },
+}

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Golgo 13: The Mafat Conspiracy",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "golgo-13-the-mafat-conspiracy",
+    file = "golgo-13-the-mafat-conspiracy.zip",
+    hashes = {
+      { hash = "f86a3ad9522f908996c1a9b9b0c51089", label = "Mafat Conspiracy, The (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0077, type="u8", condition="change", action="PAUSE_OFF", no_log=false, no_survey=false, desc="Paused = 01 Unpaused = 00" },
+        { address=0X0371, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0374, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level? Stage ID?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X007B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X007B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X007C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+  },
+}

@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Izuna: Legend of the Unemployed Ninja",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "izuna-legend-of-the-unemployed-ninja",
+    file = "izuna-legend-of-the-unemployed-ninja.zip",
+    hashes = {
+      { hash = "2086bac3c59ddf693a2fcc86989ce14e", label = "Izuna - Legend of the Unemployed Ninja (USA).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X16F528, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X16F528, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X16F52C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X16F52C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X16FF60, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Path of trials HP decreased" },
+        { address=0X16FF60, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Path of trials HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1708BC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32Bit) Money (USA) increased" },
+        { address=0X17C74C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32Bit) Money (EUR) increased" },
+      },
+    },
+  },
+}

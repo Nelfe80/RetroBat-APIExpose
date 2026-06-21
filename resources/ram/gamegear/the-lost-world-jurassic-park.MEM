@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "The Lost World: Jurassic Park",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-lost-world-jurassic-park",
+    file = "the-lost-world-jurassic-park.zip",
+    hashes = {
+      { hash = "68d9f394bf0dd0382a8052e60b3b8a1b", label = "Lost World, The - Jurassic Park (USA).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0308, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID: 02 = Baryonyx Area; 03 = Brachiosaurus Area; 04 = Mamenchisaurus Area; 05 = Triceratop" },
+        { address=0X1AB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID (Selection Only)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1E02, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Music ID: 50 = Death; 34 = Game Over; 30 = victory; 44 = Caution!" },
+      },
+      health = {
+        { address=0X030F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health (Cannot Be Edited) decreased" },
+        { address=0X030F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health (Cannot Be Edited) increased" },
+        { address=0X1908, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X1908, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X08A1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Car Damage during T-Rex Chase 02 = Dead increased" },
+        { address=0X08A1, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Car Damage during T-Rex Chase 02 = Dead empty" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X02F1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Lights = 01 = On; 02= Off" },
+        { address=0X030B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage in level? 00 = Level; 01 = Boss Stage; 02 = Boss victory" },
+        { address=0X1B08, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+  },
+}

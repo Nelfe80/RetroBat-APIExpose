@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Bursting Balloons",
+    system = "tvgames",
+    system_name = "Elektor TV Games Computer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bursting-balloons",
+    file = "bursting-balloons.zip",
+    hashes = {
+      { hash = "d6b3a7879a1be746e994926d91601f60", label = "Bursting Balloons (Europe) (ESS-010-B).tvc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1756, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X1756, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1752, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] BCD Score" },
+        { address=0X1754, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] BE High Score for Session" },
+      },
+    },
+  },
+}

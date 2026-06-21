@@ -1,0 +1,105 @@
+return {
+  game = {
+    title = "Medabots AX: Rokusho Version",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "medabots-ax-rokusho-version",
+    file = "medabots-ax-rokusho-version.zip",
+    hashes = {
+      { hash = "a6e3e17f96065a33c8ad3b540583fb64", label = "Medabots AX - Rokusho Ver. (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "08a002ca5de6e28726c3d17644137b23", label = "Medabots AX - Rokusho Ver. (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10008, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X46C3C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kuwagata Medal Level" },
+        { address=0X46C48, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mermaid Medal Level" },
+        { address=0X46C60, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spider Medal Level" },
+        { address=0X46C62, type="u16le", condition="eq", value=0X12C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0X46C6C, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bear Medal Level" },
+        { address=0X46C78, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monkey Medal Level" },
+        { address=0X46C84, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Devil Medal Level" },
+        { address=0X46C9C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Phoenix Medal Level" },
+        { address=0X46CB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alien Medal Level" },
+        { address=0X46D28, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Head - Clearshield" },
+      },
+      zone = {
+        { address=0X020A, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map/In-Between Fights" },
+      },
+      stage = {
+        { address=0X46C62, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ruins Stage" },
+        { address=0X46C6E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Seashore Stage" },
+        { address=0X46C7A, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lake Stage" },
+        { address=0X46C86, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Factory Stage" },
+        { address=0X46C9E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Polar Region Stage" },
+        { address=0X46CB6, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Forest Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X18012, type="u32le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X46CD8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Head - Deathbreak" },
+        { address=0X46D58, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Right - Deathmissile" },
+        { address=0X46DD8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Left - DeathLaser" },
+        { address=0X46E58, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Legs - Deathcrawler" },
+      },
+      health = {
+        { address=0X18012, type="u32le", condition="eq", value=0X32, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Starting" },
+        { address=0X18012, type="u32le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player Leader - Head HP" },
+        { address=0X18014, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Leader - Right Arm HP decreased" },
+        { address=0X18014, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Leader - Right Arm HP increased" },
+        { address=0X18016, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Leader - Left Arm HP decreased" },
+        { address=0X18016, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Leader - Left Arm HP increased" },
+        { address=0X18018, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Leader - Legs HP decreased" },
+        { address=0X18018, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Leader - Legs HP increased" },
+        { address=0X1819E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Leader - Head HP decreased" },
+        { address=0X1819E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Leader - Head HP increased" },
+        { address=0X181A0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Leader - Right Arm HP decreased" },
+        { address=0X181A0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Leader - Right Arm HP increased" },
+        { address=0X181A2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Leader - Left Arm HP decreased" },
+        { address=0X181A2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Leader - Left Arm HP increased" },
+        { address=0X181A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Leader - Legs HP decreased" },
+        { address=0X181A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Leader - Legs HP increased" },
+        { address=0X1832A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Partner - Head HP decreased" },
+        { address=0X1832A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Partner - Head HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4163A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Robattle Points" },
+        { address=0X4163C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Winner Points" },
+        { address=0X41640, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points" },
+      },
+      collectibles = {
+        { address=0X46ED6, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Star" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X46C06, type="u16le", condition="eq", value=0X18, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Judge Shield (Monoklar)" },
+        { address=0X46DA0, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Right - Judge Shield" },
+        { address=0X46DA8, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Right - Knightshield" },
+        { address=0X46E28, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Left - Greatshield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X19B81, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Starting" },
+        { address=0X19B81, type="u8", condition="eq", value=0XFA, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Warning" },
+        { address=0X19B81, type="u8", condition="eq", value=0XF9, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Out" },
+        { address=0X19B81, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Match Timer" },
+      },
+    },
+  },
+}

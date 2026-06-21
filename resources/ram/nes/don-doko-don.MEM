@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Don Doko Don",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "don-doko-don",
+    file = "don-doko-don.zip",
+    hashes = {
+      { hash = "b8f26746fc437f677b986e7dcd5c65f5", label = "Don Doko Don (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0039, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0066, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power Up" },
+      },
+    },
+  },
+}

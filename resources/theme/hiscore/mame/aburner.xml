@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 YU.  500000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 KIMU 450000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 BIN  400000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 SADA 350000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 KIYO 300000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 HIRO 250000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 YASU 200000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 TAKA 200000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 TO 3 200000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 RU 4 150000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 KUMA 140000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 OHTA 130000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 YAMA 120000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 WAKA 110000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 KATA 100000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 GOKI 90000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 SEGA 80000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 C KO 70000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 MAMI 60000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 MOMO 50000</text>
+		</text>
+	</view>
+</theme>

@@ -1,0 +1,105 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Budokai [Subset - Martial Arts Tournament]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-ball-z-budokai-subset-martial-arts-tournament",
+    file = "dragon-ball-z-budokai-subset-martial-arts-tournament.zip",
+    hashes = {
+      { hash = "1e6e210a4670b3e8f9f1c324987ae0fc", label = "Dragon Ball Z - Budokai [Subset - Tournament Winner]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5E60E7, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Roundhouse" },
+        { address=0X5E94CF, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Roundhouse" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5E60E5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hellzone Grenade" },
+        { address=0X5E94CD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hellzone Grenade" },
+      },
+      zone = {
+        { address=0X5E6154, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Champion Vest" },
+        { address=0X5E61AB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tournament (Novice)" },
+        { address=0X5E61AC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tournament (Adept)" },
+        { address=0X5E61AD, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tournament (Advanced)" },
+        { address=0X5E953C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Champion Vest" },
+        { address=0X5E9593, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tournament (Novice)" },
+        { address=0X5E9594, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tournament (Adept)" },
+        { address=0X5E9595, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tournament (Advanced)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5E6100, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Beam" },
+        { address=0X5E6101, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Ball" },
+        { address=0X5E612E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Drain increased" },
+        { address=0X5E612E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Drain decreased" },
+        { address=0X5E614A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Extract For 10 increased" },
+        { address=0X5E614A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Extract For 10 decreased" },
+        { address=0X5E614B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Extract For 100 increased" },
+        { address=0X5E614B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Extract For 100 decreased" },
+        { address=0X5E614C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Extract For 1000 increased" },
+        { address=0X5E614C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Extract For 1000 decreased" },
+        { address=0X5E614D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Extract For 10000 increased" },
+        { address=0X5E614D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Extract For 10000 decreased" },
+        { address=0X5E94E8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Beam" },
+        { address=0X5E94E9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Ball" },
+        { address=0X5E9516, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Drain increased" },
+        { address=0X5E9516, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Drain decreased" },
+        { address=0X5E9532, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Extract For 10 increased" },
+        { address=0X5E9532, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Extract For 10 decreased" },
+        { address=0X5E9533, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Extract For 100 increased" },
+        { address=0X5E9533, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Extract For 100 decreased" },
+        { address=0X5E9534, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Extract For 1000 increased" },
+        { address=0X5E9534, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Extract For 1000 decreased" },
+        { address=0X5E9535, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Extract For 10000 increased" },
+        { address=0X5E9535, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Extract For 10000 decreased" },
+      },
+      health = {
+        { address=0X570EC0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X570EC0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+        { address=0X570F00, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health decreased" },
+        { address=0X570F00, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health increased" },
+        { address=0X5E60D2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Burst decreased" },
+        { address=0X5E60D2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Burst increased" },
+        { address=0X5E6124, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Field (17) decreased" },
+        { address=0X5E6124, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Field (17) increased" },
+        { address=0X5E6129, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Field (18) decreased" },
+        { address=0X5E6129, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Field (18) increased" },
+        { address=0X5E615A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gero's Energy R&D decreased" },
+        { address=0X5E615A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gero's Energy R&D increased" },
+        { address=0X5E6174, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gero's Perpetual Energy R&D decreased" },
+        { address=0X5E6174, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gero's Perpetual Energy R&D increased" },
+        { address=0X5E94BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Burst decreased" },
+        { address=0X5E94BA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Burst increased" },
+        { address=0X5E950C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Field (17) decreased" },
+        { address=0X5E950C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Field (17) increased" },
+        { address=0X5E9511, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Field (18) decreased" },
+        { address=0X5E9511, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Field (18) increased" },
+        { address=0X5E9542, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gero's Energy R&D decreased" },
+        { address=0X5E9542, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gero's Energy R&D increased" },
+        { address=0X5E955C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gero's Perpetual Energy R&D decreased" },
+        { address=0X5E955C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gero's Perpetual Energy R&D increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X790384, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Legend of Hercule - Current Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X576444, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="P1 Combo Counter" },
+      },
+    },
+  },
+}

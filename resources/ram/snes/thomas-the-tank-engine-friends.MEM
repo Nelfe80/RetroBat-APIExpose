@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Thomas the Tank Engine & Friends",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "thomas-the-tank-engine-friends",
+    file = "thomas-the-tank-engine-friends.zip",
+    hashes = {
+      { hash = "923ec0c22b5083b6e3a32e54f822f4fb", label = "Thomas the Tank Engine & Friends (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X003D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Race Background" },
+        { address=0X010B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="How orld are you? (Difficulty Level): 0=4 or younger, 2=5, 6 or 7, 4=8 or older" },
+      },
+      stage = {
+        { address=0X0100, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID?" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0210, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Thomas Coords (Switch Game)" },
+      },
+    },
+  },
+}

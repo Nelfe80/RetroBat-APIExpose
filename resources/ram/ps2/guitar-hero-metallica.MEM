@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Guitar Hero: Metallica",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "guitar-hero-metallica",
+    file = "guitar-hero-metallica.zip",
+    hashes = {
+      { hash = "d504cab7341d041814b055508fa1abc5", label = "Guitar Hero - Metallica (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4A9668, type="u32le", condition="eq", value=0X1FB7BF7B, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Cleaner" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4A9668, type="u32le", condition="eq", value=0X4D94B7E4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Creeping Death" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCBF6C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Song - Score [32 bits]" },
+      },
+      collectibles = {
+        { address=0X9711C8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Song CUT - Money 32 bits increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4A9668, type="u32le", condition="eq", value=0X6CF6D8DC, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken, Beat & Scarred" },
+        { address=0X4A9668, type="u32le", condition="eq", value=0X7791B1B3, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Seek & Destroy" },
+      },
+    },
+  },
+}

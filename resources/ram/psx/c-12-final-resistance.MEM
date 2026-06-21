@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "C-12: Final Resistance",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "c-12-final-resistance",
+    file = "c-12-final-resistance.zip",
+    hashes = {
+      { hash = "d6ac58430a4c1e627e76e70fc8fbd706", label = "C-12 - Final Resistance (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCC920, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not in Demo" },
+        { address=0XCC920, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Demo" },
+        { address=0XF1568, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="start menu" },
+        { address=0XF1568, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="pause menu" },
+        { address=0XF1B4C, type="u8", condition="eq", value=0XB0, action="PAUSE_ON", no_log=false, no_survey=false, desc="pause toggle" },
+        { address=0XF352C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8bit] curren pause menu tab" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF32DC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="prompt max/goal frames to reach before stopping" },
+        { address=0XF7FFC, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="loading levels/main menu" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF3B44, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16bit] help soldier mission flag" },
+      },
+      health = {
+        { address=0XF38D8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health decreased" },
+        { address=0XF38D8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health increased" },
+        { address=0X1D1BEC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] alien tank health decreased" },
+        { address=0X1D1BEC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] alien tank health increased" },
+        { address=0X1DD0A0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="last enemy scanned health decreased" },
+        { address=0X1DD0A0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="last enemy scanned health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XF38DC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon eqipped" },
+        { address=0XF38FB, type="u8", condition="eq", value=0XB4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="second attack avaliable" },
+        { address=0XF38FF, type="u8", condition="eq", value=0XB4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="second attack avaliable" },
+        { address=0XF3937, type="u8", condition="eq", value=0XB4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="second attack avaliable" },
+        { address=0XF393B, type="u8", condition="eq", value=0XB4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="second attack avaliable" },
+        { address=0XF393F, type="u8", condition="eq", value=0XB4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="second attack avaliable" },
+        { address=0XF3943, type="u8", condition="eq", value=0XB4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="second attack avaliable" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF38EC, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="mag ammo" },
+        { address=0XF38EE, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="luncher ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1B1F22, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16bit] final boss health" },
+        { address=0X1DB29C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] boss cables" },
+        { address=0X1DB2AC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] boss cables" },
+        { address=0X1DB2BC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] boss cables" },
+        { address=0X1DB2CC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] boss cables" },
+        { address=0X1DB2DC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] boss cables" },
+        { address=0X1DB2EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] boss cables" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCCA60, type="u16le", condition="eq", value=0X0000, action="SHIELD_LOST", no_log=false, no_survey=false, desc="not active" },
+        { address=0XCCA60, type="u16le", condition="eq", value=0X1000, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="fully active" },
+        { address=0XF3900, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shields amount" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF3BC0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="main door mission active" },
+        { address=0XF3BC1, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="main door mission complete" },
+        { address=0X14F170, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[16bit] area 15 red door" },
+      },
+    },
+  },
+}

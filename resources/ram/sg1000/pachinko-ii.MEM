@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Pachinko II",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "pachinko-ii",
+    file = "pachinko-ii.zip",
+    hashes = {
+      { hash = "a3409283bf8c808a15095cc005a74975", label = "Pachinko II (Taiwan) (Unl).sg" },
+      { hash = "eadae13ff73047a47f354e258c12619e", label = "Pachinko II (Japan).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0063, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo/menu" },
+        { address=0X0063, type="u8", condition="eq", value=0X05, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+  },
+}

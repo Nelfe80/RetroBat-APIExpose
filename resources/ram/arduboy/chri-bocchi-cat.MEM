@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Chri-Bocchi Cat",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "chri-bocchi-cat",
+    file = "chri-bocchi-cat.zip",
+    hashes = {
+      { hash = "44de0080719b914d0d1c7bff26abeb76", label = "Chri-Bocchi Cat (World) (v0.04).hex" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X04DA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+      },
+    },
+  },
+}

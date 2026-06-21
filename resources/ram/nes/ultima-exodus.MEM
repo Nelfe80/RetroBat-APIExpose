@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Ultima: Exodus",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ultima-exodus",
+    file = "ultima-exodus.zip",
+    hashes = {
+      { hash = "61bb41bb32659344ad7b67073d773dca", label = "Ultima - Kyoufu no Exodus (Japan).nes" },
+      { hash = "a4317a080ea111c8be02ed7c23cc8977", label = "Ultima - Exodus (USA).nes" },
+      { hash = "b3d92568ffd9f9d3ba34ed8ca4c2aeb8", label = "Ultima - Exodus (USA) (Original Music) (v1.0) (Fox Cunning).nes" },
+    }
+  },
+
+  events = {
+  },
+}

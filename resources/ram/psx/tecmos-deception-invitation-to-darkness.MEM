@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "Tecmo's Deception: Invitation to Darkness",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Horror, Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "tecmos-deception-invitation-to-darkness",
+    file = "tecmos-deception-invitation-to-darkness.zip",
+    hashes = {
+      { hash = "9075c3dd2362668a08f3a23f3620cd41", label = "Tecmo's Deception - Invitation to Darkness (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X86BB0, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Main Menu/Demo Playing" },
+        { address=0X9F63C, type="u8", condition="eq", value=0X11, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X9F63C, type="u8", condition="eq", value=0X12, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Quit" },
+        { address=0X9F675, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8-Bits] Inventory - DemonHorn" },
+        { address=0XA1B8E, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="A: Demoness" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA1CBC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8-Bits] Chapter clear flag" },
+        { address=0XA37E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-Bits] Player Level" },
+        { address=0XA386C, type="u32le", condition="eq", value=0X00000000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Floor" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9F64E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-Bits] Prisoners - Soldier" },
+        { address=0XA1B8C, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="C: She Death" },
+        { address=0XA1B8E, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="A: Dead King" },
+        { address=0XA1B8F, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="A: Deathtron" },
+        { address=0XA3840, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-Bits] She Death exp" },
+      },
+      health = {
+        { address=0XA058D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8-Bits] Invader 1 HP decreased" },
+        { address=0XA058D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8-Bits] Invader 1 HP increased" },
+        { address=0XA06F1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8-Bits] Invader 2 HP decreased" },
+        { address=0XA06F1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8-Bits] Invader 2 HP increased" },
+        { address=0XA0855, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8-Bits] Invader 3 HP decreased" },
+        { address=0XA0855, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8-Bits] Invader 3 HP increased" },
+        { address=0XA37E2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8-Bits] Player Current Health decreased" },
+        { address=0XA37E2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8-Bits] Player Current Health increased" },
+        { address=0XA37E3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8-Bits] Player Max Health decreased" },
+        { address=0XA37E3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8-Bits] Player Max Health increased" },
+        { address=0XA3B72, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8-Bits] HP Bonus - Higher value = more deducted from bonus decreased" },
+        { address=0XA3B72, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8-Bits] HP Bonus - Higher value = more deducted from bonus increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA1B4C, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="B: Gold Tub" },
+        { address=0XA3868, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bits] Gold Value increased" },
+        { address=0XB34FC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-Bits] Enemy remaining stamina when capturing - Based on remaining HP and previous capture at" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9F684, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8-Bits] Inventory - Block Orb" },
+        { address=0XA1B44, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="C: Spike" },
+        { address=0XA1B44, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="B: Poison Rod" },
+        { address=0XA1B44, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="A: Fire Spike" },
+        { address=0XA1B44, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="C: Pit" },
+        { address=0XA1B44, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="B: Floor Lift" },
+        { address=0XA1B44, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="A: Poison Pit" },
+        { address=0XA1B44, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="C: Ton Weight" },
+        { address=0XA1B44, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="B: Metal Ball" },
+        { address=0XA1B45, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="A: Fire Bomb" },
+        { address=0XA1B45, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="C: Stomp" },
+        { address=0XA1B45, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="B: Poison Toe" },
+        { address=0XA1B45, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="A: Fire Foot" },
+      },
+    },
+  },
+}

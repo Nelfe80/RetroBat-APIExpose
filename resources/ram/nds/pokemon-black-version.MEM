@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Pokémon Black Version",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-black-version",
+    file = "pokemon-black-version.zip",
+    hashes = {
+      { hash = "bd562276c75b98cbd185231c1b1d016e", label = "Pokemon - Black Version (USA, Europe) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X23D1ED, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magnezone" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X23BFE3, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Worker Eddie (Cold Storage)" },
+        { address=0X23D1F3, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Herdier" },
+      },
+      health = {
+        { address=0X1404C0, type="u8", condition="eq", value=0X09, action="HIT", no_log=false, no_survey=false, desc="Damaged" },
+        { address=0X23BFB7, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="HP Up (Route 3)" },
+        { address=0X23BFBC, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="HP Up (Route 9)" },
+        { address=0X258230, type="u16le", condition="eq", value=0X47A, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Low HP theme" },
+        { address=0X2BEFC8, type="u8", condition="eq", value=0X09, action="HIT", no_log=false, no_survey=false, desc="Player's Damaged" },
+        { address=0X2BF048, type="u8", condition="eq", value=0X09, action="HIT", no_log=false, no_survey=false, desc="Opponent Damaged" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X23D8D0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] High Score of Super Single Subway" },
+        { address=0X23D8D2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] High Score of Super Double Subway" },
+        { address=0X23D8D4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] High Score of Super Multi Subway (with trainer)" },
+        { address=0X23F5AE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Battle Institute Rank Points" },
+      },
+      collectibles = {
+        { address=0X23CDAC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money: increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X23D1E7, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shieldon" },
+      },
+      player = {
+        { address=0X23C00A, type="u8", condition="bit_true", bit=1, mask=0X02, action="SWIMMING", no_log=true, no_survey=false, desc="Swimmer M Wright (Route 17)" },
+        { address=0X23C00A, type="u8", condition="bit_true", bit=2, mask=0X04, action="SWIMMING", no_log=true, no_survey=false, desc="Swimmer F Joyce (Route 17)" },
+        { address=0X23C00D, type="u8", condition="bit_true", bit=1, mask=0X02, action="SWIMMING", no_log=true, no_survey=false, desc="Swimmer M Berke (Route 17)" },
+        { address=0X23C011, type="u8", condition="bit_true", bit=3, mask=0X08, action="SWIMMING", no_log=true, no_survey=false, desc="Swimmer F Caroline (Route 17)" },
+        { address=0X23D1CB, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=true, no_survey=false, desc="Jumpluff" },
+      },
+    },
+  },
+}

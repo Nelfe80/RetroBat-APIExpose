@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Thunder Spirits",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "thunder-spirits",
+    file = "thunder-spirits.zip",
+    hashes = {
+      { hash = "4dcb347551a5d8a232e972f3adbe9c23", label = "Thunder Spirits (Japan) (En).sfc" },
+      { hash = "b8249a26bfedeb4c723cc021c23f2652", label = "Thunder Spirits (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A9B, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level; 00 = Easy, 01 = Normal, 02 = Hard, 03 = Mania" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1A9D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1A9D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1B61, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon" },
+      },
+    },
+  },
+}

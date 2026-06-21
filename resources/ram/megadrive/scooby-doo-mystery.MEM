@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Scooby-Doo Mystery",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "scooby-doo-mystery",
+    file = "scooby-doo-mystery.zip",
+    hashes = {
+      { hash = "a817e01d52a8ee1fd8c9dc0502c000c9", label = "Scooby Doo Mystery (USA) (Ru) (v1.25) (Splinker).md" },
+      { hash = "f27ea503631e67c05860926099d97f7a", label = "Scooby-Doo Mystery (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X09EA, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Bit 1 - Pause/Title Screen?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X068E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a level ?" },
+        { address=0X06AE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected item on a level ?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0A98, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bumper Cars Health (Shaggy & Scoob) decreased" },
+        { address=0X0A98, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bumper Cars Health (Shaggy & Scoob) increased" },
+        { address=0X0A9A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bumper Cars Health (Clown) decreased" },
+        { address=0X0A9A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bumper Cars Health (Clown) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X06B4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Interacting Object ID?" },
+        { address=0X19EC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Gardener's Room door opened state from Hallway ?" },
+        { address=0X19F8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Doors puzzle state in The Hallway:" },
+        { address=0X1A6E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Gardener's Room door opened state from room?" },
+        { address=0X1BC6, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="heather" },
+        { address=0X2A0F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Doors closed bits, can move through - 0 - can move" },
+      },
+    },
+  },
+}

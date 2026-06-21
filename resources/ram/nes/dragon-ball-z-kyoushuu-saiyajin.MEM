@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Kyoushuu! Saiyajin",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "dragon-ball-z-kyoushuu-saiyajin",
+    file = "dragon-ball-z-kyoushuu-saiyajin.zip",
+    hashes = {
+      { hash = "50d43061ae602102445a200f674378e8", label = "Dragon Ball Z - Kyoushuu! Saiya Jin (Japan) (En).nes" },
+      { hash = "939e7bebe89126d0a87fc767b93cc611", label = "Dragon Ball Z - Kyoushuu! Saiya Jin (Japan) (En) (Twilight Translations) (1.01).nes" },
+      { hash = "efe4220028f9159b9c751033d0fe983a", label = "Dragon Ball Z - Kyoushuu! Saiya Jin (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001F, type="u8", condition="eq", value=0X75, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0201, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 1 Level" },
+        { address=0X0213, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 2 Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0290, type="u8", condition="eq", value=0XC0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Goku (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XC1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Piccolo (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XC2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Radditz (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XC5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Nappa (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XC6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Vegeta (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XC7, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Saiba (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XC8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cucumber (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XC9, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Kaiware (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XCE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Vegeta (oozaru; dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XCF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="King Kai (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pumpkin (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Brock (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Garlic Jr. (transformed; dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ginger (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Jasmine (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Nikki (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Herb (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD7, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sansho (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XD8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cinnamon (dead)" },
+        { address=0X0290, type="u8", condition="eq", value=0XDA, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Garlic Jr. (dead)" },
+      },
+      health = {
+        { address=0X0202, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 Health decreased" },
+        { address=0X0202, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 Health increased" },
+        { address=0X020A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 Battle Energy (BE) decreased" },
+        { address=0X020A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 Battle Energy (BE) increased" },
+        { address=0X0214, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 2 Health decreased" },
+        { address=0X0214, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 2 Health increased" },
+        { address=0X0226, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 Health decreased" },
+        { address=0X0226, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 Health increased" },
+        { address=0X0238, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 Health decreased" },
+        { address=0X0238, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 Health increased" },
+        { address=0X024A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 5 Health decreased" },
+        { address=0X024A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 5 Health increased" },
+        { address=0X025C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 6 Health decreased" },
+        { address=0X025C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 6 Health increased" },
+        { address=0X026E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 7 Health decreased" },
+        { address=0X026E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 7 Health increased" },
+        { address=0X0292, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP decreased" },
+        { address=0X0292, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP increased" },
+        { address=0X02A4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 Current HP decreased" },
+        { address=0X02A4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 Current HP increased" },
+        { address=0X02B6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 Current HP decreased" },
+        { address=0X02B6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 Current HP increased" },
+        { address=0X02C8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 Current HP decreased" },
+        { address=0X02C8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 Current HP increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X009F, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Encountered Saibamen (miniboss fight)" },
+      },
+    },
+  },
+}

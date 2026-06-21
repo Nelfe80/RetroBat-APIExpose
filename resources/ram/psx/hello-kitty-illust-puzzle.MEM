@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Hello Kitty: Illust Puzzle",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hello-kitty-illust-puzzle",
+    file = "hello-kitty-illust-puzzle.zip",
+    hashes = {
+      { hash = "f3618287eb1be75e7c07694f747eb761", label = "Simple 1500 Series - Hello Kitty Vol. 02 - Illust Puzzle (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X1FFA8E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This determins if you in the stage select menu." },
+      },
+    },
+  },
+}

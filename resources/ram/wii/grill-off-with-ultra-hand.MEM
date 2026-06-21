@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Grill-Off with Ultra Hand!",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "grill-off-with-ultra-hand",
+    file = "grill-off-with-ultra-hand.zip",
+    hashes = {
+      { hash = "8dd6b5b0ba7444ddc15a7734ab34690c", label = "Grill-Off with Ultra Hand! (USA) (Club Nintendo) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

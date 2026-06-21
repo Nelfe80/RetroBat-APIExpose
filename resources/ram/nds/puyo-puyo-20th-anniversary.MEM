@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Puyo Puyo!! 20th Anniversary",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puyo-puyo-20th-anniversary",
+    file = "puyo-puyo-20th-anniversary.zip",
+    hashes = {
+      { hash = "a004047cc4732cd768cbeb1002f45c15", label = "Puyo Puyo!! - Puyopuyo 20th Anniversary (Japan).nds" },
+      { hash = "f5d9c3c1e23ffa28107750727bacb0ce", label = "Puyo Puyo!! - Puyopuyo 20th Anniversary (Japan) (En) (v1.0) (Precise Museum).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1108F2, type="u8", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X110C0F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused Check [8bit]" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Angry (Pointing)" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Annoyed" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Concerned" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Surprised (Open Mouth)" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Happy (Closed Eyes)" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Pointing (Happy)" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Thinking" },
+        { address=0X1629F2, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Shocked" },
+        { address=0X162A0A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Manzai Demo [8bit]" },
+        { address=0X3566A0, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Story Mode - Continue Screen Check [8bit]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X11D342, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Cleared" },
+        { address=0X11D343, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Cleared" },
+        { address=0X11D344, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Graduation Exam Cleared" },
+        { address=0X11D344, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Big Chain 1 Cleared" },
+        { address=0X11D344, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Big Chain 2 Cleared" },
+        { address=0X11D344, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Big Chain 3 Cleared" },
+        { address=0X11D345, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Big Chain with All Clear 1 Cleared" },
+        { address=0X11D345, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Big Chain with All Clear 2 Unlocked" },
+        { address=0X11D345, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Big Chain with All Clear 2 Cleared" },
+        { address=0X11D345, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Simultaneous Clear 1 Cleared" },
+        { address=0X11D345, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Simultaneous Clear 2 Unlocked" },
+        { address=0X11D345, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Simultaneous Clear 2 Cleared" },
+        { address=0X11D346, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Simultaneous Clear 3 Unlocked" },
+        { address=0X11D346, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Simultaneous Clear 3 Cleared" },
+        { address=0X11D346, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Chain Seeds 1 Cleared" },
+        { address=0X11D346, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Chain Seeds 2 Cleared" },
+        { address=0X11D346, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Chain Seeds 3 Cleared" },
+        { address=0X11D347, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Chibi Puyo Big Chain 1 Cleared" },
+        { address=0X11D347, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Chibi Puyo Big Chain 2 Cleared" },
+        { address=0X11D347, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Chibi Puyo Seed 1 Cleared" },
+        { address=0X11D347, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Chibi Puyo Seed 2 Cleared" },
+        { address=0X11D348, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Rotation-Less Big Chain Cleared" },
+        { address=0X11D348, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Blindfold Big Chain 1 Cleared" },
+        { address=0X11D348, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge Test - Blindfold Big Chain 2 Cleared" },
+        { address=0X11D348, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge VS - Challenge Puyo Puyo Cleared" },
+        { address=0X11D349, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge VS - Challenge Puyo Tsu Cleared" },
+        { address=0X11D349, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge VS - Challenge Puyo Sun Cleared" },
+        { address=0X11D349, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge VS - Challenge Fever Cleared" },
+        { address=0X11D349, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Challenge VS - Challenge Nazo Puyo Cleared" },
+        { address=0X11E38C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Free VS - Nuisance/Ojama Puyo Level [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X11E1CB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Free VS - Lives (Pair) [8bit] increased" },
+        { address=0X11E1CB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Free VS - Lives (Pair) [8bit] decreased" },
+      },
+      health = {
+        { address=0X16FD0A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pair Puyo - 1P & 2P HP [8bit] decreased" },
+        { address=0X16FD0A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pair Puyo - 1P & 2P HP [8bit] increased" },
+        { address=0X16FD18, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pair Puyo - 3P & 4P HP [8bit] decreased" },
+        { address=0X16FD18, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pair Puyo - 3P & 4P HP [8bit] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X11D4DC, type="u16le", condition="eq", value=0X270F, action="SCORE_STATE", no_log=false, no_survey=false, desc="9999 Points" },
+        { address=0X11D4DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Shop Points [16bit]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X11D331, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Puyo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11E1C0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Free VS - Machine Time (Pair) [16bit]" },
+      },
+    },
+  },
+}

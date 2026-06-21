@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "Pro Jumper! Guilty Gear Tangent!?",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pro-jumper-guilty-gear-tangent",
+    file = "pro-jumper-guilty-gear-tangent.zip",
+    hashes = {
+      { hash = "f5bbbbbc8bc8f1c22308bb6e51b9b376", label = "Pro Jumper! Guilty Gear Tangent! (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB7280, type="u32le", condition="eq", value=0XFFFFFFFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X24048C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[b4] Paused" },
+        { address=0X2412B2, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[b0] Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB6AE6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Hard Game Cleared" },
+        { address=0XB6AE7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Game Cleared" },
+        { address=0XB6AE8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Stage 1 Cleared" },
+        { address=0XB6AE9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Stage 2 Cleared" },
+        { address=0XB6AEA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Stage 3 Cleared" },
+        { address=0XB6AEB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Stage 4 Cleared" },
+        { address=0XB6AEC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Stage 5 Cleared" },
+        { address=0XB6AED, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Stage 6 Cleared" },
+        { address=0XB6AEE, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Hard Stage 1 Cleared" },
+        { address=0XB6AEF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Hard Stage 2 Cleared" },
+        { address=0XB6AF0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Hard Stage 3 Cleared" },
+        { address=0XB6AF1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Hard Stage 4 Cleared" },
+        { address=0XB6AF2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Hard Stage 5 Cleared" },
+        { address=0XB6AF3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[b0] Hard Stage 6 Cleared" },
+      },
+      stage = {
+        { address=0XB6AF4, type="u16le", condition="eq", value=0X99, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'Perfect!' Rating" },
+        { address=0XB6AF4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 High Score" },
+        { address=0XB7244, type="u16le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Full-Frontal Fuji" },
+        { address=0XB7244, type="u16le", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rome Laid Bare" },
+        { address=0XB7244, type="u16le", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Halloween Au Naturel" },
+        { address=0XB7244, type="u16le", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rainforest Revealed" },
+        { address=0XB7244, type="u16le", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Disrobed Dungeon" },
+        { address=0XB7244, type="u16le", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nude York" },
+        { address=0XB7244, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X2412B3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[b0] Return to Stage Select" },
+        { address=0X2412F8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[b0] Stage Active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB7280, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (Editable) increased" },
+        { address=0XB7280, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (Editable) decreased" },
+        { address=0XB7284, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (Display) increased" },
+        { address=0XB7284, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (Display) decreased" },
+        { address=0XB7288, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max Lives increased" },
+        { address=0XB7288, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB6AF6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage 2 High Score" },
+        { address=0XB6AF8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage 3 High Score" },
+        { address=0XB6AFA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage 4 High Score" },
+        { address=0XB6AFC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage 5 High Score" },
+        { address=0XB6AFE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage 6 High Score" },
+        { address=0XB6B00, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hard Stage 1 High Score" },
+        { address=0XB6B02, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hard Stage 2 High Score" },
+        { address=0XB6B04, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hard Stage 3 High Score" },
+        { address=0XB6B06, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hard Stage 4 High Score" },
+        { address=0XB6B08, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hard Stage 5 High Score" },
+        { address=0XB6B0A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hard Stage 6 High Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2412EC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[b0] Boss Active" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XFFFE0C, type="u32be", condition="eq", value=0X4B465645, action="JUMPING", no_log=true, no_survey=false, desc="KFVE = Pro Jumper! Guilty Gear Tangent! (USA)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2412B0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[b0] First Time Stage Cleared" },
+        { address=0X2412B1, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[b0] First Time Game Cleared" },
+      },
+    },
+  },
+}

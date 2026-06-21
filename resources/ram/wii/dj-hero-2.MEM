@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "DJ Hero 2",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dj-hero-2",
+    file = "dj-hero-2.zip",
+    hashes = {
+      { hash = "1185be1c51424f3e7c906ad840cfc03c", label = "DJ Hero 2 (USA) (En,Fr,Es)" },
+      { hash = "0fc0d9e396634645daa34f93050955d2", label = "DJ Hero 2 (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

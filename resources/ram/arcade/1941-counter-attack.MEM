@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "1941: Counter Attack",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "1941-counter-attack",
+    file = "1941-counter-attack.zip",
+    hashes = {
+      { hash = "7af6266cc52234b5aa339b16695f7fc4", label = "1941.7z <1941 - Counter Attack (900227 World)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0D58, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X0D6A, type="u8", condition="bit_true", bit=6, mask=0X40, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Credit Usage (0x00=1 Credit to Start or Continue, 0x01=2 Credits 2 Start and 1 to Continue)" },
+        { address=0X0D6C, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Plays Sound (0x0=No, 0x1=Yes)" },
+        { address=0X0D6C, type="u8", condition="bit_true", bit=6, mask=0X40, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Allow Continue (0x0=No, 0x1=Yes--Default)" },
+        { address=0X0D88, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="2 Credit to Start, 1 Credit to Continue" },
+        { address=0XC000, type="u8", condition="eq", value=0X0F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Push Start" },
+        { address=0XC597, type="u8", condition="eq", value=0X04, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Timer Active" },
+        { address=0XC597, type="u8", condition="eq", value=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XC617, type="u8", condition="eq", value=0X04, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Timer Active" },
+        { address=0XC617, type="u8", condition="eq", value=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9B80, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Ground Targets Spawned?" },
+        { address=0XC002, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0x01 On Mission List (Cleared when stage loaded)" },
+      },
+      stage = {
+        { address=0XC003, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x01 While Playing a Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0DA4, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death (Exploding/Crashing)" },
+        { address=0X0DA6, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death (Exploding/Crashing)" },
+        { address=0X0DCC, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Brigadier General" },
+        { address=0X0DCD, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Brigadier General" },
+      },
+      health = {
+        { address=0XFF0DA4, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: energy" },
+        { address=0X0DA4, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 Vital Remaining (Health)" },
+        { address=0X0DA6, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 Vital Remaining (Health)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFF0DB6, type="u32be", condition="change", action="TREASURE", min=5000, max=5000, no_log=false, no_survey=false, desc="Score delta 5000-5000: Various medium" },
+        { address=0XFF0DB6, type="u32be", condition="change", action="TREASURE", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Various high" },
+        { address=0XFF0DB6, type="u32be", condition="change", action="TREASURE", color="orange", min=50000, max=50000, no_log=false, no_survey=false, desc="Score delta 50000-50000: Holstein" },
+        { address=0XFF0DB6, type="u32be", condition="change", action="TREASURE", color="white", min=80000, max=80000, no_log=false, no_survey=false, desc="Score delta 80000-80000: Strawberry" },
+        { address=0XFF0DB6, type="u32be", condition="change", action="TREASURE", min=100000, max=100000, no_log=false, no_survey=false, desc="Score delta 100000-100000: Dragonfly" },
+      },
+      weapon = {
+        { address=0XFFC578, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: extreme firepower" },
+        { address=0X0DC8, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X0DC8, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M-Gun" },
+        { address=0X0DC8, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="S-Shell" },
+        { address=0X0DC8, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile" },
+        { address=0X0DC9, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X0DC9, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M-Gun" },
+        { address=0X0DC9, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="S-Shell" },
+        { address=0X0DC9, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFF0DB6, type="u32be", condition="change", action="SCORE_STATE", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Various" },
+        { address=0X0D98, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score xxxx0000 [16-Bit] BCD" },
+        { address=0X0D9A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score 0000xxxx [16-Bit] BCD" },
+        { address=0X0DB6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score xxxx0000 [16-Bit] BCD" },
+        { address=0X0DB8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score 0000xxyy [16-Bit] BCD" },
+        { address=0X0DBA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score xxxx0000 [16-Bit] BCD" },
+        { address=0X0DBC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score 0000xxyy [16-Bit] BCD" },
+      },
+      collectibles = {
+        { address=0XFF0D59, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+        { address=0XC597, type="u8", condition="eq", value=0X0A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Insert Additional Coin" },
+        { address=0XC617, type="u8", condition="eq", value=0X0A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Insert Additional Coin" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFF0DB6, type="u32be", condition="change", action="OBJECT_DESTROYED", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Destroy simple plane" },
+        { address=0XFF0DB6, type="u32be", condition="change", action="OBJECT_DESTROYED", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Destroy submarine" },
+        { address=0XFF0DB6, type="u32be", condition="change", action="OBJECT_DESTROYED", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Destroy crane, houses, stuff" },
+        { address=0X0D6C, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Throttle Game Speed (0x0=Off, 0x01=On)" },
+        { address=0X0D6C, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="0x01: Free Play On" },
+        { address=0X0D6C, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Freeze (0x0=Off, 0x1=On)" },
+        { address=0X0D6C, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Flip (0x0=Off, 0x01=On)" },
+        { address=0X0D6C, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Game Mode (0x0=Game, 0x01=Test)" },
+        { address=0X9B72, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P1 Aircrafts Destroyed" },
+        { address=0X9B74, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P2 Aircrafts Destroyed" },
+        { address=0X9B76, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P1 Ground Targets Destroyed?" },
+        { address=0X9B78, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P2 Ground Targets Destroyed?" },
+        { address=0XC00A, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P1 Results Destroying Percentage (BCD)" },
+        { address=0XC00C, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P2 Results Destroying Percentage (BCD)" },
+        { address=0XC01A, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P1 Last Shooting Percentage + Last Destroying Percentage (BCD)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0DE6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Weapon Time Remaining (BCD)" },
+        { address=0X0DE9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 Weapon Time Remaining (BCD)" },
+        { address=0XC597, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 Display Status" },
+        { address=0XC5BF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P1 Continue Timer (Seconds)" },
+        { address=0XC617, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 Display Status" },
+        { address=0XC63F, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P2 Continue Timer (Seconds)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "MegaSokoban",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "megasokoban",
+    file = "megasokoban.zip",
+    hashes = {
+      { hash = "f2b7be0bf03db4b1c1e0fed810cabd32", label = "MegaSokoban (World) (Martin Sustek) (Alt).uze" },
+      { hash = "fd44ff2316a2c20b328896b1d29db155", label = "MegaSokoban (World) (Martin Sustek).uze" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0000, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pink Block (Walkable Space)" },
+        { address=0X0000, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Black Hole" },
+        { address=0X0000, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Piece (Not In Hole)" },
+        { address=0X0000, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Piece (In Hole)" },
+        { address=0X0000, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Black" },
+        { address=0X0000, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Brick (Wall)" },
+        { address=0X0000, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[176 bytes] Level Grid" },
+        { address=0X0187, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16bit] Level" },
+      },
+    },
+  },
+}

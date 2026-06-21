@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Max Payne",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "max-payne",
+    file = "max-payne.zip",
+    hashes = {
+      { hash = "aa4acde4d4147725f74efbd03a1c65e4", label = "Max Payne Advance (Europe) (En,Fr,De).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8039, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X14C54, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death / Respawn Menu choice" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XE968, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current weapon 00 Pipe 02 Eagle 03 Pistol 04 Dual 06 Shotgun 06 Bat 08 Rifle" },
+        { address=0XE96C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current weapon bullets" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Dancing Stage Fusion",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dancing-stage-fusion",
+    file = "dancing-stage-fusion.zip",
+    hashes = {
+      { hash = "4f215b95e827d6b144a8595c05c30172", label = "Dancing Stage Fusion (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBA310, type="u8", condition="eq", value=0X19, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XBA310, type="u8", condition="eq", value=0X22, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XBA310, type="u8", condition="eq", value=0X23, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XBA310, type="u8", condition="eq", value=0X3A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XDA4FD, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[8 Bit] Options - Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDA4F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Options - Game Level" },
+      },
+      stage = {
+        { address=0XBA31E, type="u16le", condition="eq", value=0XFFFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="End" },
+        { address=0XBA31E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Current Stages" },
+        { address=0XDA4F9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Options - Max Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBA340, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Previous Total Score" },
+        { address=0XBA344, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Total Score" },
+        { address=0XBB5A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Previous Total Score" },
+        { address=0XBB5A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Total Score" },
+      },
+    },
+  },
+}

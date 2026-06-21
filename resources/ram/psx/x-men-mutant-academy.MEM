@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "X-Men: Mutant Academy",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "x-men-mutant-academy",
+    file = "x-men-mutant-academy.zip",
+    hashes = {
+      { hash = "2d95c5440d8e805f78c0e720be4a4163", label = "X-Men - Mutant Academy (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBE3E4, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X1E7244, type="u8", condition="eq", value=0X07, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+      events = {
+        { address=0XA1E86, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="COMBO (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9EB40, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0X9EB40, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0X9EB40, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5" },
+        { address=0X9EB40, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="7" },
+        { address=0X9EB40, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="9" },
+        { address=0X9EB40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ROUNDS (8-bit)" },
+        { address=0X9F0AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ROUNDS WON (8-bit)" },
+        { address=0XA1E8C, type="u8", condition="eq", value=0X6A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="S (Ground)" },
+        { address=0XA1F28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ROUNDS WON - P1 (8-bit)" },
+        { address=0XA24FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ROUNDS WON - P2 (8-bit)" },
+        { address=0XBE3E8, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0XBE3E8, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0XBE3E8, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5" },
+        { address=0XBE3E8, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="7" },
+        { address=0XBE3E8, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="9" },
+        { address=0XBE3E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ROUNDS (8-bit)" },
+        { address=0X1E6594, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0X1E6594, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0X1E6594, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5" },
+        { address=0X1E6594, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="7" },
+        { address=0X1E6594, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="9" },
+        { address=0X1E6594, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ROUNDS - Visual only (8-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9EBAC, type="u8", condition="eq", value=0X04, action="HIT", no_log=false, no_survey=false, desc="x5 damage" },
+        { address=0XA1E5C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP BAR - Green part (16-bit) decreased" },
+        { address=0XA1E5C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP BAR - Green part (16-bit) increased" },
+        { address=0XA1E5E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP BAR - Red part (16-bit) decreased" },
+        { address=0XA1E5E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP BAR - Red part (16-bit) increased" },
+        { address=0XA2430, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP BAR P2 - Green part (16-bit) decreased" },
+        { address=0XA2430, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP BAR P2 - Green part (16-bit) increased" },
+        { address=0XA2432, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP BAR P2 - Red part (16-bit) decreased" },
+        { address=0XA2432, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP BAR P2 - Red part (16-bit) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1F8DD8, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Attacks" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9EB44, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME - countdown (8-bit)" },
+      },
+    },
+  },
+}

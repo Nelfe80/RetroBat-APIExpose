@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Power Stone",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "power-stone",
+    file = "power-stone.zip",
+    hashes = {
+      { hash = "c4e93e077549ca2ae6804f9bc97d856c", label = "pstone.zip <Power Stone>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB3699D, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Left side Main Player 1" },
+        { address=0XB3699D, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Right side player is active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB36753, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 win (final battle win con)" },
+        { address=0XB36753, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 wins (regular battle win con)" },
+        { address=0XB36753, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Left player Rounds won/stamp" },
+        { address=0XB36754, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Perfect round" },
+        { address=0XB36755, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Perfect round" },
+        { address=0XB367CB, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 win (final battle win con)" },
+        { address=0XB367CB, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 wins (regular battle win con)" },
+        { address=0XB367CB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Right player Rounds won/stamp" },
+        { address=0XB367CC, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Perfect round" },
+        { address=0XB367CD, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Perfect round" },
+        { address=0XB36977, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Challenge 1" },
+        { address=0XB36977, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Challenge 2" },
+        { address=0XB36977, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Challenge 3" },
+        { address=0XB36977, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round (Challenge) #" },
+      },
+      stage = {
+        { address=0XA973A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="might be related to stage #" },
+        { address=0XAB2BDE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="might be related to stage #" },
+        { address=0XB0202D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="might be related to stage #" },
+        { address=0XB027A5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="might be how many stages played in current session" },
+        { address=0XB051F5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="might be related to stage #" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Londo (Falcon's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mutsu (Ryoma's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tong-An (Wang-Tang's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Manches (Jack's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dawnvolta (Gunrock's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dullstown (Galuda's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Oedo (Ayame's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mahdad (Rouge's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Skullhaven (Kraken's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Avalon Is.(Valgas's stage)" },
+        { address=0XB3697D, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Avalon Is.(Final Valgas's stage)" },
+        { address=0XB3697D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB2EE2C, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead/transition" },
+        { address=0XB2EE2E, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead/transition" },
+        { address=0XB2EE30, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead/transition" },
+        { address=0XB360E0, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead/transition" },
+        { address=0XB360E2, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead/transition" },
+        { address=0XB360E4, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead/transition" },
+      },
+      health = {
+        { address=0XB2EE2C, type="u16le", condition="eq", value=0X00F0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="starting hp" },
+        { address=0XB2EE2C, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Left side Player Yellow Health (HP) - [HP CHECKS]" },
+        { address=0XB2EE2E, type="u16le", condition="eq", value=0X00F0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="starting hp" },
+        { address=0XB2EE2E, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Left side Player Red Health (HP)" },
+        { address=0XB2EE30, type="u16le", condition="eq", value=0X00F0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="starting hp" },
+        { address=0XB2EE30, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Left side Player Blue Health (HP)" },
+        { address=0XB360E0, type="u16le", condition="eq", value=0X00F0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="starting hp" },
+        { address=0XB360E0, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Right side Player Yellow Health (HP) - [HP CHECKS]" },
+        { address=0XB360E2, type="u16le", condition="eq", value=0X00F0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="starting hp" },
+        { address=0XB360E2, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Left side Player Red Health (HP)" },
+        { address=0XB360E4, type="u16le", condition="eq", value=0X00F0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="starting hp" },
+        { address=0XB360E4, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Right side Player Blue Health (HP)" },
+      },
+    },
+  },
+}

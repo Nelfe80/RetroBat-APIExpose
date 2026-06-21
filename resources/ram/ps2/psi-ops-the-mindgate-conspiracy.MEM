@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Psi-Ops: The Mindgate Conspiracy",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "psi-ops-the-mindgate-conspiracy",
+    file = "psi-ops-the-mindgate-conspiracy.zip",
+    hashes = {
+      { hash = "3a82dbf1137110b405a5e166decb2bb0", label = "Psi-Ops - The Mindgate Conspiracy (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5BEC80, type="u32le", condition="eq", value=0X8915A0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Game Credits" },
+        { address=0X8068B0, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="not Paused" },
+        { address=0X8068B0, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XC966C4, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC966C4, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="locked" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1DEA167, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII] Level ID From the Game Files" },
+      },
+      stage = {
+        { address=0XC966B9, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC966B9, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC966B9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Unlocked Held Hostage [Play Movies]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5BEC80, type="u32le", condition="eq", value=0X408CF0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="You're Not Dead?" },
+        { address=0XC96662, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96662, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC96663, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96663, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC96679, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96679, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC9669F, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC9669F, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="locked" },
+        { address=0X1DED066, type="u16le", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="UN Soldier" },
+        { address=0X1DED066, type="u16le", condition="eq", value=0X100, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Crispy Soldier" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC97FD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(Total game) Score" },
+        { address=0XC97FD4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score in the mission" },
+      },
+      collectibles = {
+        { address=0XC96633, type="u8", condition="eq", value=0X01, action="AMMO_STATE", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96633, type="u8", condition="eq", value=0X00, action="AMMO_STATE", no_log=false, no_survey=false, desc="locked" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC963D0, type="u32le", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Max Orbs" },
+        { address=0XC9663E, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC9663E, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC9663F, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC9663F, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC96672, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96672, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC96673, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96673, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC96674, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96674, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC96675, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96675, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC96676, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96676, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC96677, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC96677, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="locked" },
+        { address=0X1DED064, type="u8", condition="eq", value=0XDB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight [Extra Content]" },
+        { address=0X1DED064, type="u8", condition="eq", value=0XDC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush [Extra Content]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5BEC80, type="u32le", condition="eq", value=0X2D5C70, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Closed-Door Meeting" },
+        { address=0XC966A0, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0XC966A0, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="locked" },
+        { address=0XC97F2C, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Number of things broken in the mission" },
+        { address=0XC97F30, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The number of objects that were blown up in the mission" },
+        { address=0XC97FA8, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="(Total game) Number of things broken" },
+        { address=0XC97FAC, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(Total game) The number of objects that were blown up" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E9DF4C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="start Real Time Cutscene boss Edgar Barret round 2" },
+      },
+    },
+  },
+}

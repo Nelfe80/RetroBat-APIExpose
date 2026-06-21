@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Double Dungeons",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "double-dungeons",
+    file = "double-dungeons.zip",
+    hashes = {
+      { hash = "5ba010cd617c6f2b0f6e926fd4ef8a42", label = "Double Dungeons (USA).pce" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0307, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level" },
+        { address=0X0317, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Experience to Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0234, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] 1=Dead" },
+        { address=0X031D, type="u8", condition="eq", value=0XA, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Thunder" },
+      },
+      health = {
+        { address=0X0220, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Enemy Health decreased" },
+        { address=0X0220, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Enemy Health increased" },
+        { address=0X0309, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] HP decreased" },
+        { address=0X0309, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] HP increased" },
+        { address=0X030B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] HP Max decreased" },
+        { address=0X030B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] HP Max increased" },
+        { address=0X031D, type="u8", condition="eq", value=0X9, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Burst" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X031B, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dagger" },
+        { address=0X031B, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Short Sword" },
+        { address=0X031B, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Long Sword" },
+        { address=0X031B, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Broad Sword" },
+        { address=0X031B, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Strong Sword" },
+        { address=0X031B, type="u8", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gradius" },
+        { address=0X031B, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Sword" },
+        { address=0X031B, type="u8", condition="eq", value=0X7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Giant Scythe" },
+        { address=0X031B, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Blade" },
+        { address=0X031B, type="u8", condition="eq", value=0X9, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dragon Slayer" },
+        { address=0X031B, type="u8", condition="eq", value=0XA, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Devil Blade" },
+        { address=0X031B, type="u8", condition="eq", value=0XB, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grand Master" },
+        { address=0X031B, type="u8", condition="eq", value=0XC, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Short Spear" },
+        { address=0X031B, type="u8", condition="eq", value=0XD, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Long Spear" },
+        { address=0X031B, type="u8", condition="eq", value=0XE, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pilum" },
+        { address=0X031B, type="u8", condition="eq", value=0XF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Jared" },
+        { address=0X031B, type="u8", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Javelin" },
+        { address=0X031B, type="u8", condition="eq", value=0X11, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Battle Axe" },
+        { address=0X031B, type="u8", condition="eq", value=0X12, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Viking Axe" },
+        { address=0X031B, type="u8", condition="eq", value=0X13, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tomahawk" },
+        { address=0X031B, type="u8", condition="eq", value=0X14, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Battle Pick" },
+        { address=0X031B, type="u8", condition="eq", value=0X15, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Zagnal" },
+        { address=0X031B, type="u8", condition="eq", value=0X16, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Light Flail" },
+        { address=0X031B, type="u8", condition="eq", value=0X17, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Heavy Flail" },
+        { address=0X031B, type="u8", condition="eq", value=0X18, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Giant Flail" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0313, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Gold increased" },
+      },
+    },
+  },
+}

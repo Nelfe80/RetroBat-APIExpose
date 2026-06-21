@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Spider-Man: Shattered Dimensions",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "spider-man-shattered-dimensions",
+    file = "spider-man-shattered-dimensions.zip",
+    hashes = {
+      { hash = "8803a3e61affccb37931fbed06805ec5", label = "Spider-Man - Shattered Dimensions (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X32C4F9, type="u8", condition="bit_true", bit=1, mask=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo: This One Has Bite" },
+        { address=0X32C4F9, type="u8", condition="bit_true", bit=2, mask=0X04, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo: Great Power Required" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X32C51E, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Defense] Dodge (Stage 1)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X32C51B, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Upgrades" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X32C4FA, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Combat: Weapon Thief" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X32C4F6, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="End of Chaos: Defeat all boss villains." },
+        { address=0X32C4F7, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ultimate Spider-Man: Complete any mode (except Boss Rush) with Super Hero Combat difficulty and" },
+        { address=0X32C4F7, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Villain Vanquisher: Complete Boss Rush Mode." },
+      },
+    },
+  },
+}

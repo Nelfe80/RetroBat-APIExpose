@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Strikers 1945",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "strikers-1945",
+    file = "strikers-1945.zip",
+    hashes = {
+      { hash = "fe683044d0bed45aa3a0c5d0e20cb672", label = "Strikers 1945 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X996F2, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Menu/Credits" },
+        { address=0X99730, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XAED9C, type="u8", condition="eq", value=0X19, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XAED9C, type="u8", condition="eq", value=0X1A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XAED9C, type="u8", condition="eq", value=0X1C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo showing some plane arts" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC2F1C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level id" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X996B4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X996B4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X99750, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives player 2 increased" },
+        { address=0X99750, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives player 2 decreased" },
+        { address=0XC8417, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting lives increased" },
+        { address=0XC8417, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X996B8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16 bits" },
+        { address=0X996BA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score millions" },
+        { address=0XC8418, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score limit" },
+      },
+    },
+  },
+}

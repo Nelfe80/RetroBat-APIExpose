@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Mortal Kombat II",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-ii",
+    file = "mortal-kombat-ii.zip",
+    hashes = {
+      { hash = "00328fce69991cc9759ffef7d547a0b8", label = "Mortal Kombat II (World) (Ru) (NewGame).md" },
+      { hash = "c8e887ca9cdde7bde85f324f66d34b2d", label = "Mortal Kombat II (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF456, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Current credits [00-30] 8bit" },
+        { address=0XF457, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Starting credits [01-30] 8bit" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAB3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round number" },
+        { address=0XEEAC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 won round tokens, resets with lost fight." },
+        { address=0XEEAE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 won round tokens, resets with lost fight." },
+        { address=0XF9C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background selected in test modes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB622, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player life increased" },
+        { address=0XB622, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player life decreased" },
+        { address=0XB712, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 life increased" },
+        { address=0XB712, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 life decreased" },
+      },
+      health = {
+        { address=0XEF7A, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Test Modes; Enabled = 1, No damage to P1 =3, No damage to P2 =5;" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAB96, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0XAB97, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

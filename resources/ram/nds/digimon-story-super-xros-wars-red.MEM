@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Digimon Story: Super Xros Wars Red",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "digimon-story-super-xros-wars-red",
+    file = "digimon-story-super-xros-wars-red.zip",
+    hashes = {
+      { hash = "86c56ec860d8f9559430026c45f293d7", label = "Digimon Story - Super Xros Wars - Red (Japan).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1F071E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Digimon in Slot 1 Max HP] [8-Bits] decreased" },
+        { address=0X1F071E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Digimon in Slot 1 Max HP] [8-Bits] increased" },
+        { address=0X1F0720, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Digimon in Slot 1 Actual HP] [8-Bits] decreased" },
+        { address=0X1F0720, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Digimon in Slot 1 Actual HP] [8-Bits] increased" },
+      },
+    },
+  },
+}

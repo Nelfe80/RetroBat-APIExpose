@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Dementium II",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Horror, Shooter"
+  },
+
+  rom = {
+    name = "dementium-ii",
+    file = "dementium-ii.zip",
+    hashes = {
+      { hash = "b42791cf277cd2e573c8027b81394502", label = "Dementium II (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X12E404, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Zombie Health decreased" },
+        { address=0X12E404, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Zombie Health increased" },
+        { address=0X12E406, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8bit] Zombie Damage" },
+        { address=0X12E6C1, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8bit] Revolver Damage" },
+        { address=0X12E947, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8bit] Shank Damage" },
+        { address=0X2E7312, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Chapter 5 Player Health decreased" },
+        { address=0X2E7312, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Chapter 5 Player Health increased" },
+        { address=0X2EDB6A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Chapter 1 Player Health decreased" },
+        { address=0X2EDB6A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Chapter 1 Player Health increased" },
+        { address=0X2EF882, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Chapter 2 Player Health decreased" },
+        { address=0X2EF882, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Chapter 2 Player Health increased" },
+        { address=0X2F11FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Malatesta Health decreased" },
+        { address=0X2F11FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Malatesta Health increased" },
+        { address=0X2F1E7A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Chapter 3 Player Health decreased" },
+        { address=0X2F1E7A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Chapter 3 Player Health increased" },
+        { address=0X2F3382, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Chapter 4 Player Health decreased" },
+        { address=0X2F3382, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Chapter 4 Player Health increased" },
+        { address=0X2F80F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Wendigo Health decreased" },
+        { address=0X2F80F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Wendigo Health increased" },
+        { address=0X2FE8FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Gnaw Health decreased" },
+        { address=0X2FE8FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Gnaw Health increased" },
+        { address=0X30057C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Gnaw Health decreased" },
+        { address=0X30057C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Gnaw Health increased" },
+        { address=0X30A71C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Gorgamesh 1 Health decreased" },
+        { address=0X30A71C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Gorgamesh 1 Health increased" },
+        { address=0X3149BC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Gorg 2 Health decreased" },
+        { address=0X3149BC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Gorg 2 Health increased" },
+        { address=0X31D2F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Gorg 3 Health decreased" },
+        { address=0X31D2F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Gorg 3 Health increased" },
+        { address=0X31DD6C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] melondDS Malatesta health decreased" },
+        { address=0X31DD6C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] melondDS Malatesta health increased" },
+        { address=0X322A74, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] melond DS clossus health decreased" },
+        { address=0X322A74, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] melond DS clossus health increased" },
+        { address=0X3246E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Collosus Health decreased" },
+        { address=0X3246E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Collosus Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2E6F58, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Chapter 5 Weapon Equipped" },
+        { address=0X2ED780, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Chapter 1 Current Weapon Magazine" },
+        { address=0X2ED7B0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Chapter 1 Weapon Equipped" },
+        { address=0X2EF4C8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Chapter 2 Weapon Equipped" },
+        { address=0X2F1AC0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Chapter 3 Weapon Equipped" },
+        { address=0X2F2FC8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Chapter 4 Weapon Equipped" },
+        { address=0X2F8970, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Survival Mode Weapon Equipped" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2C2FFE, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Boarded Doorways" },
+        { address=0X2C2FFF, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Boarded Doorways" },
+        { address=0X2C3004, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Boarded Doorways" },
+        { address=0X2C301B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Gear Door Solved" },
+        { address=0X2C30E6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Boarded Doorways" },
+        { address=0X2C30EF, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Boarded Doorways" },
+        { address=0X2C30F6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Webbed Doorways" },
+        { address=0X2C30F7, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Webbed Doorways" },
+      },
+    },
+  },
+}

@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Desert Strike",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "desert-strike",
+    file = "desert-strike.zip",
+    hashes = {
+      { hash = "df89aa1ebc5f42db21fb8d12d9e78511", label = "Desert Strike (Europe) (En,Fr,De,Es).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0F6C, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Gun allowed = 00, not allowed =01, Game over Screen = 0c" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0A89, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X0AA9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage?" },
+        { address=0X0AC9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage?" },
+        { address=0X0AE9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage?" },
+        { address=0X0B09, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage?" },
+        { address=0X0EEF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage?" },
+        { address=0X1134, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Command Centre Destructed, Stage 2 Enemy Amabassor(Total = 4)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0ED5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0ED5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X111F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Biologic Weapon Destructed(Total = 06)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1120, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Missile Silos Destroyed" },
+        { address=0X1147, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Missile Silos Destroyed" },
+      },
+    },
+  },
+}

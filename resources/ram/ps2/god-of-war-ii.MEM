@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "God of War II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "god-of-war-ii",
+    file = "god-of-war-ii.zip",
+    hashes = {
+      { hash = "87651d0c2e349e298c694fc650337351", label = "God of War II (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X36B0F4, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32bit] Max Combo" },
+        { address=0X36C550, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32bit] Challenge 1 Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X335869, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Athena Blade's Level" },
+        { address=0X33586B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Atlas Quake level" },
+        { address=0X33586C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Chronos's Rage level" },
+        { address=0X33586E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Typhon's Bane level" },
+        { address=0X33586F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Spear of Destiny level" },
+        { address=0X335870, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Barbarian Hammer level" },
+        { address=0X335871, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Head of Euryale level" },
+        { address=0X335872, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Blade of Olympus level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2D7AE4, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32bit] 'you are dead' weird screen transition, the thing that youd see in final fantasy battles" },
+        { address=0X2D8F08, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32bit] freezing causes the 'you are dead' screen to not display a black screen, but instead the" },
+        { address=0X3347C4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] kraken death" },
+        { address=0X36B0C8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32bit] Total Deaths" },
+        { address=0X36B5C0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="flip to 00 to make everything die instantly" },
+      },
+      health = {
+        { address=0X2D86A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Infinite health (savable. is a cheat. block.) decreased" },
+        { address=0X2D86A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Infinite health (savable. is a cheat. block.) increased" },
+        { address=0X2D8748, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Current health decreased" },
+        { address=0X2D8748, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Current health increased" },
+        { address=0X3328AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] draining kratos's health into the blade decreased" },
+        { address=0X3328AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] draining kratos's health into the blade increased" },
+        { address=0X335866, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health Bar decreased" },
+        { address=0X335866, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health Bar increased" },
+        { address=0X36C548, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32bit] Challenge 1 Damage Taken" },
+        { address=0XDA74F8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] potential Euryale health? decreased" },
+        { address=0XDA74F8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] potential Euryale health? increased" },
+        { address=0X1B4BF38, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] colossus health decreased" },
+        { address=0X1B4BF38, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] colossus health increased" },
+        { address=0X1B4BFF8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] colossus health decreased" },
+        { address=0X1B4BFF8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] colossus health increased" },
+        { address=0X1B4C0B8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Colossus health decreased" },
+        { address=0X1B4C0B8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Colossus health increased" },
+        { address=0X1B4C758, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Colossus health decreased" },
+        { address=0X1B4C758, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Colossus health increased" },
+        { address=0X1B4D798, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Colossus health decreased" },
+        { address=0X1B4D798, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Colossus health increased" },
+        { address=0X1B4E138, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Colossus health 8 decreased" },
+        { address=0X1B4E138, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Colossus health 8 increased" },
+        { address=0X1B4E548, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Colossus health 7 decreased" },
+        { address=0X1B4E548, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Colossus health 7 increased" },
+        { address=0X1B4E958, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[float] Colossus health 6 decreased" },
+        { address=0X1B4E958, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[float] Colossus health 6 increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2D84C4, type="u16le", condition="eq", value=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Completed the game (treasures unlocked, blade of olympus unlocked)" },
+        { address=0X2D90BC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[8bit] Treasures Unlocked" },
+      },
+      weapon = {
+        { address=0X335834, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapons / Magic Unlocked" },
+        { address=0X335835, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapons / Magic Unlocked" },
+        { address=0X335836, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] Weapons / relics" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X739156, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[ASCII] Shield of Perseus" },
+      },
+      player = {
+        { address=0X22662C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[8bit] flipping to 00 gives infinite double jumps" },
+      },
+    },
+  },
+}

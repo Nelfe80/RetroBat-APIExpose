@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Simply Mahjong",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "simply-mahjong",
+    file = "simply-mahjong.zip",
+    hashes = {
+      { hash = "de9a5a6ce3c4f3f115535666c237a022", label = "Simply Mahjong (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X129B74, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Current level" },
+      },
+    },
+  },
+}

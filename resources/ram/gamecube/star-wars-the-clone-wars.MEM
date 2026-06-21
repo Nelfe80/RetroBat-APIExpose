@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Star Wars: The Clone Wars",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "star-wars-the-clone-wars",
+    file = "star-wars-the-clone-wars.zip",
+    hashes = {
+      { hash = "9445e2aad2843e568229e66eb6cb1a91", label = "Star Wars - The Clone Wars (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X4A0F15, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Cheat Activated | Unlimited Ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4A0F14, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheat Activated | Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4A02CB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 1" },
+        { address=0X4A02D3, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 2" },
+        { address=0X4A02DB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 3" },
+        { address=0X4A02E3, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 4" },
+        { address=0X4A02EB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 5" },
+        { address=0X4A02F3, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 6" },
+        { address=0X4A02FB, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 7" },
+        { address=0X4A0303, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 8" },
+        { address=0X4A030B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 9" },
+        { address=0X4A0313, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 10" },
+        { address=0X4A031B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 11" },
+        { address=0X4A0323, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 12" },
+        { address=0X4A032B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 13" },
+        { address=0X4A0333, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 14" },
+        { address=0X4A033B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 15" },
+        { address=0X4A0343, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Bonus Objectives Mission 16" },
+      },
+    },
+  },
+}

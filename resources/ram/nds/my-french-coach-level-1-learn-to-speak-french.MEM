@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "My French Coach: Level 1 - Learn to Speak French",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "my-french-coach-level-1-learn-to-speak-french",
+    file = "my-french-coach-level-1-learn-to-speak-french.zip",
+    hashes = {
+      { hash = "f8b7c5f6081468f30e89a07e48bfc246", label = "My French Coach - Level 1 - Learn to Speak French (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

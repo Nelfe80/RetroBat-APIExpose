@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Der Langrisser",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "der-langrisser",
+    file = "der-langrisser.zip",
+    hashes = {
+      { hash = "0e86c25835287e364bf7f3f6592f4c8f", label = "Langrisser, Der (Japan) (En) (v1.02) (Byuu).sfc" },
+      { hash = "e5bc92bccd1f5de77c41a9838b7d1f1b", label = "Langrisser, Der (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X18A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ERWIN LV4 - ERWIN LEVEL UP!!! NO LEVEL 10!!!" },
+        { address=0XB02E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL UP Erwin - Confirmado *0x0X' X = Level" },
+        { address=0XB02F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level up Erwin" },
+        { address=0X12095, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level up Erwin" },
+      },
+    },
+  },
+}

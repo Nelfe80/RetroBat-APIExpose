@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Altered Space",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "altered-space",
+    file = "altered-space.zip",
+    hashes = {
+      { hash = "012ee0a196c03cca91a43a9eadbecfb6", label = "Altered Space - A 3-D Alien Adventure (USA).gb" },
+      { hash = "b4ab37ee420c11285be1c634c34f5726", label = "Altered Space - A 3-D Alien Adventure (Europe).gb" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Peter Pan: Return to Never Land",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "peter-pan-return-to-never-land",
+    file = "peter-pan-return-to-never-land.zip",
+    hashes = {
+      { hash = "f4ecea185671315836d37313c57db1d8", label = "Peter Pan in Disney's Return to Never Land (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF329C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Unlocked levels (US)" },
+        { address=0XF32A2, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1st Tinkerbell level beaten? (US)" },
+        { address=0XF32B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of levels beaten in current area? (US)" },
+        { address=0XF4A7A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01 = level finished? (US)" },
+        { address=0XF4A9C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="04 = level completed? (US)" },
+        { address=0X106096, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="01 = level loaded? (US)" },
+        { address=0X106328, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (EU)" },
+        { address=0X106336, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="01 = level loaded (EU)" },
+        { address=0X1B1B68, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Films collected in current visit to a level (US)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XF32AA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (US) decreased" },
+        { address=0XF32AA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (US) increased" },
+        { address=0XF32B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health (US) decreased" },
+        { address=0XF32B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health (US) increased" },
+        { address=0XF32B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Upper 4 = health boosts found (US) decreased" },
+        { address=0XF32B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Upper 4 = health boosts found (US) increased" },
+        { address=0XF354A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (EU) decreased" },
+        { address=0XF354A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (EU) increased" },
+        { address=0XF3550, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health (EU) decreased" },
+        { address=0XF3550, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health (EU) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X106088, type="u32le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[32 Bit] Level ID" },
+      },
+    },
+  },
+}

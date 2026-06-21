@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 UUU 10000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 NNN 10000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 III 10000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 VVV 10000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 EEE 10000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 RRR 10000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 SSS 10000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 AAA 10000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 LLL 10000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 !!! 10000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 UUU 10000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 NNN 10000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 III 10000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 VVV 10000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 EEE 10000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 RRR 10000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 SSS 10000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 AAA 10000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 LLL 10000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 !!! 10000</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 UUU 10000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 NNN 10000</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 III 10000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 VVV 10000</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 EEE 10000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 RRR 10000</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 SSS 10000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 AAA 10000</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 LLL 10000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 !!! 10000</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 UUU 10000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 NNN 10000</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 III 10000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 VVV 10000</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 EEE 10000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 RRR 10000</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 SSS 10000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 AAA 10000</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 LLL 10000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 !!! 10000</text>
+		</text>
+		<text name="hiscoreline41" extra="true">
+			<text>#41 UUU 10000</text>
+		</text>
+		<text name="hiscoreline42" extra="true">
+			<text>#42 NNN 10000</text>
+		</text>
+		<text name="hiscoreline43" extra="true">
+			<text>#43 III 10000</text>
+		</text>
+		<text name="hiscoreline44" extra="true">
+			<text>#44 VVV 10000</text>
+		</text>
+		<text name="hiscoreline45" extra="true">
+			<text>#45 EEE 10000</text>
+		</text>
+		<text name="hiscoreline46" extra="true">
+			<text>#46 RRR 10000</text>
+		</text>
+		<text name="hiscoreline47" extra="true">
+			<text>#47 SSS 10000</text>
+		</text>
+		<text name="hiscoreline48" extra="true">
+			<text>#48 AAA 10000</text>
+		</text>
+		<text name="hiscoreline49" extra="true">
+			<text>#49 LLL 10000</text>
+		</text>
+		<text name="hiscoreline50" extra="true">
+			<text>#50 !!! 10000</text>
+		</text>
+	</view>
+</theme>

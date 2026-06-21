@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "WEC Le Mans",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "wec-le-mans",
+    file = "wec-le-mans.zip",
+    hashes = {
+      { hash = "0da2498129ce6d4cacb6ffb1dc7fb504", label = "WEC Le Mans (1988)(Ocean Software).dsk" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X08DE, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X08E1, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16-bit BCD] Time Left XXX.X" },
+        { address=0X08E3, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16-bit BCD] Lap Time XXX.X" },
+      },
+    },
+  },
+}

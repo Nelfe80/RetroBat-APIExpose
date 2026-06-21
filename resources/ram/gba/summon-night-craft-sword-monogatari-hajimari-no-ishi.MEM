@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Summon Night Craft Sword Monogatari: Hajimari no Ishi",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "summon-night-craft-sword-monogatari-hajimari-no-ishi",
+    file = "summon-night-craft-sword-monogatari-hajimari-no-ishi.zip",
+    hashes = {
+      { hash = "6d676a8cb2d528a647e62110653418a8", label = "Summon Night - Craft Sword Monogatari - Hajimari no Ishi (Japan).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9001, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X09B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health (In-battle) decreased" },
+        { address=0X09B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health (In-battle) increased" },
+        { address=0X09C0, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player Health (In-Battle) (before most recent damage)" },
+        { address=0X0D44, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health (In-battle) decreased" },
+        { address=0X0D44, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health (In-battle) increased" },
+        { address=0X9024, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health - Max (Outside Battle) decreased" },
+        { address=0X9024, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health - Max (Outside Battle) increased" },
+        { address=0X9026, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health - Current (Outside Battle) decreased" },
+        { address=0X9026, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health - Current (Outside Battle) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X9046, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon 1" },
+        { address=0X9047, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon 2" },
+        { address=0X9048, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon 3" },
+        { address=0X90E4, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X90E4, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Golden" },
+        { address=0X90E5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon ID" },
+        { address=0X90E6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Effect" },
+        { address=0X90E7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Special Attack" },
+        { address=0X90E8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Upgrade Material 1" },
+        { address=0X90E9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Upgrade Material 2" },
+        { address=0X90EA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Upgrade Material 3" },
+        { address=0X90EB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon TEC" },
+        { address=0X90EC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon ATK" },
+        { address=0X90EE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon DEF" },
+        { address=0X90F0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon AGL" },
+        { address=0X90F2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Base ATK" },
+        { address=0X90F4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Base DEF" },
+        { address=0X90F6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Base AGL" },
+        { address=0X90F8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon DUR" },
+        { address=0X90FA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon DUR Max" },
+        { address=0X90FC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Base DUR" },
+        { address=0X90FE, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X90FE, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Golden Glow" },
+        { address=0X9100, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X9100, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Golden" },
+        { address=0X911C, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X911C, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Golden" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X95AC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Disgaea Infinite",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "disgaea-infinite",
+    file = "disgaea-infinite.zip",
+    hashes = {
+      { hash = "2ee224b56776470f78b4789c75997867", label = "Disgaea Infinite (USA).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA010E1, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Netherworld SP Healing" },
+        { address=0XA010E3, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Netherworld HP Healing" },
+        { address=0XA02738, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Netherworld" },
+      },
+      zone = {
+        { address=0XA010E2, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Another World's Language" },
+        { address=0XA010EC, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Human World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA010DE, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Flag Cliche" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA010E1, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-Up Unit" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Hugo",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "hugo",
+    file = "hugo.zip",
+    hashes = {
+      { hash = "e20f98e5b90853749212a761ca9c9d8b", label = "Hugo (Europe)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC3CF8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Arcade mode levels completed (Es)" },
+        { address=0XC3D88, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Arcade mode levels completed (Nl,Pt)" },
+        { address=0XC3DF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (Es)" },
+        { address=0XC3E78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (Nl,Pt)" },
+        { address=0XC4128, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Arcade mode levels completed (De)" },
+        { address=0XC42E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (De)" },
+        { address=0XC4B38, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Arcade mode levels completed (EU,Fr,It)" },
+        { address=0XC4C1C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Arcade mode levels completed (Da,Fi)" },
+        { address=0XC4C38, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Arcade mode levels completed (No,Sv)" },
+        { address=0XC4C44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (EU,Fr,It)" },
+        { address=0XC4D28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (Da,Fi)" },
+        { address=0XC4D4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (No,Sv)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC9340, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead end" },
+        { address=0XDAD38, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lumberjack: lives (state 3) (Da,Fi) increased" },
+        { address=0XDAD38, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lumberjack: lives (state 3) (Da,Fi) decreased" },
+        { address=0XEA0E4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Forest: lives (EU) increased" },
+        { address=0XEA0E4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest: lives (EU) decreased" },
+        { address=0XEF46C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lumberjack: lives (state 1) (Da,Fi) increased" },
+        { address=0XEF46C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lumberjack: lives (state 1) (Da,Fi) decreased" },
+      },
+    },
+  },
+}

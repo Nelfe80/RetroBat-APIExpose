@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "The Legend of Heroes: Trails in the Sky FC",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-legend-of-heroes-trails-in-the-sky-fc",
+    file = "the-legend-of-heroes-trails-in-the-sky-fc.zip",
+    hashes = {
+      { hash = "c183b117a01a596ce5cf0378ecc9b766", label = "Legend of Heroes, The - Trails in the Sky (USA).iso" },
+      { hash = "cac7b4421efbe182ea1e8f70c7c70b60", label = "Legend of Heroes, The - Trails in the Sky (USA) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

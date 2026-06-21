@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Rockman & Forte",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "rockman-forte",
+    file = "rockman-forte.zip",
+    hashes = {
+      { hash = "55d9cdb05f53a3f7a5e3eacb81b28f09", label = "Rockman & Forte (Japan).sfc" },
+      { hash = "57f96c09eaea20382a52f55e5d4c7871", label = "Rockman & Forte (Japan) (En) (MMB) (v1.0) (Aeon Genesis).sfc" },
+      { hash = "97380a1a0b1246c186c917a14fad312e", label = "Rockman & Forte (Japan) (Es) (MMB) (v1.0) (Aeon Genesis).sfc" },
+      { hash = "c9ddffdd95603bb91f9dc1d772fa059d", label = "Rockman & Forte (Japan) (En) (RMF) (v1.0) (Aeon Genesis).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FE0, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Normal Gameplay/TItle Screen" },
+        { address=0X1FE0, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Rockman's Demo" },
+        { address=0X1FE0, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Forte's Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0BC5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="40- Level Complete" },
+      },
+      stage = {
+        { address=0X0B73, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage(in the menu only?)" },
+        { address=0X1DEF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage screen?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0B7E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0B7E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0C2F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X0C2F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0B80, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons active Table" },
+        { address=0X0BB3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X19EF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+        { address=0X1A2F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0C4F, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump Height" },
+      },
+    },
+  },
+}

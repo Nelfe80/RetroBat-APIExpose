@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Battle Athletess: Daiundoukai GTO",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Sports"
+  },
+
+  rom = {
+    name = "battle-athletess-daiundoukai-gto",
+    file = "battle-athletess-daiundoukai-gto.zip",
+    hashes = {
+      { hash = "ec5a3d43751eea0649689033c7df4141", label = "Battle Athletess - Daiundoukai GTO (Grand Trial Onnanoco) (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X1CAFF6, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage [16bit; mirror]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1C160C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Akari Stage - 1st Place" },
+        { address=0X1C161C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Akari Stage - 2nd Place" },
+        { address=0X1C162C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Akari Stage - 3rd Place" },
+        { address=0X1C163C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Akari Stage - 4th Place" },
+        { address=0X1C164C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Akari Stage - 5th Place" },
+        { address=0X1C165C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ichino Stage - 1st Place" },
+        { address=0X1C166C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ichino Stage - 2nd Place" },
+        { address=0X1C167C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ichino Stage - 3rd Place" },
+        { address=0X1C168C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ichino Stage - 4th Place" },
+        { address=0X1C169C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ichino Stage - 5th Place" },
+        { address=0X1C16AC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tanya Stage - 1st Place" },
+        { address=0X1C16BC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tanya Stage - 2nd Place" },
+        { address=0X1C16CC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tanya Stage - 3rd Place" },
+        { address=0X1C16DC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tanya Stage - 4th Place" },
+        { address=0X1C16EC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tanya Stage - 5th Place" },
+        { address=0X1C16FC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Jessie Stage - 1st Place" },
+        { address=0X1C170C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Jessie Stage - 2nd Place" },
+        { address=0X1C171C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Jessie Stage - 3rd Place" },
+        { address=0X1C172C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Jessie Stage - 4th Place" },
+        { address=0X1C173C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Jessie Stage - 5th Place" },
+        { address=0X1C174C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ling-Pha Stage - 1st Place" },
+        { address=0X1C175C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ling-Pha Stage - 2nd Place" },
+        { address=0X1C176C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ling-Pha Stage - 3rd Place" },
+        { address=0X1C177C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ling-Pha Stage - 4th Place" },
+        { address=0X1C178C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ling-Pha Stage - 5th Place" },
+        { address=0X1C179C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ayla Stage - 1st Place" },
+        { address=0X1C17AC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ayla Stage - 2nd Place" },
+        { address=0X1C17BC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ayla Stage - 3rd Place" },
+        { address=0X1C17CC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ayla Stage - 4th Place" },
+        { address=0X1C17DC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Ayla Stage - 5th Place" },
+        { address=0X1C17EC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Kouchou Stage - 1st Place" },
+        { address=0X1C17FC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Kouchou Stage - 2nd Place" },
+        { address=0X1C180C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Kouchou Stage - 3rd Place" },
+        { address=0X1C181C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Kouchou Stage - 4th Place" },
+        { address=0X1C182C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Kouchou Stage - 5th Place" },
+        { address=0X1C183C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tomoe Stage - 1st Place" },
+        { address=0X1C184C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tomoe Stage - 2nd Place" },
+        { address=0X1C185C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tomoe Stage - 3rd Place" },
+        { address=0X1C186C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tomoe Stage - 4th Place" },
+        { address=0X1C187C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Best Time - Tomoe Stage - 5th Place" },
+      },
+    },
+  },
+}

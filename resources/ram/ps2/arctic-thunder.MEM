@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Arctic Thunder",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "arctic-thunder",
+    file = "arctic-thunder.zip",
+    hashes = {
+      { hash = "baad0642a245f81e613a4c76a1a87015", label = "Arctic Thunder (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X281420, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not Paused" },
+        { address=0X281420, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1530820, type="u16le", condition="eq", value=0X0E, action="GAME_OVER", no_log=false, no_survey=false, desc="Top 10 Racers and Ending" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2813D0, type="u32le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ancient Battle Ground" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XF95034, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="8-Bit - Cheats - Weapons decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XF95034, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off" },
+        { address=0XF95034, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No Power Ups" },
+        { address=0XF95034, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Boost Mode" },
+        { address=0XF95034, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Atomic Snowballs" },
+        { address=0XF95034, type="u8", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Grappling Hooks" },
+        { address=0XF95034, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rooster Power Ups" },
+        { address=0XF95034, type="u8", condition="eq", value=0X09, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Random Power Ups" },
+        { address=0XF95034, type="u8", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Snow Bombs" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2813D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Current Points" },
+        { address=0X281E58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Current Points Within A Race" },
+        { address=0XD6ABC0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Top 10 Scores - Points - Blizzard In D.C." },
+        { address=0XD6AC70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Top 10 Scores - Points - Swizz Alps" },
+        { address=0XD6AD20, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Top 10 Scores - Points - Logging Run" },
+        { address=0XD6ADD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Top 10 Scores - Points - Chernobyl Meltdown" },
+        { address=0XD6AE80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Top 10 Scores - Points - Lost Himalayan City" },
+        { address=0X1530A64, type="u16le", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+        { address=0X15F3B4C, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="49.41 - Default Time" },
+        { address=0X15F3B4C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Blizzard In D.C. - 1st Place Time Score." },
+        { address=0X15F3BFC, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="46.83 - Default Time" },
+        { address=0X15F3BFC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Swiss Alps - 1st Place Time Score." },
+        { address=0X15F3CAC, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="37.22 - Default Time" },
+        { address=0X15F3CAC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Logging Run - 1st Place Time Score." },
+        { address=0X15F3D5C, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="42.72 - Default Time" },
+        { address=0X15F3D5C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Chernobyl Meltdown - 1st Place Time Score." },
+        { address=0X15F3E0C, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="42.23 - Default Time" },
+        { address=0X15F3E0C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Lost Himalayan City - 1st Place Time Score." },
+        { address=0X15F3EBC, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="34.41 - Default Time" },
+        { address=0X15F3EBC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Winter Sports Park - 1st Place Time Score." },
+        { address=0X15F3F6C, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="43.91 - Default Time" },
+        { address=0X15F3F6C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Alaskan Pipeline - 1st Place Time Score." },
+        { address=0X15F401C, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="42.72 - Default Time" },
+        { address=0X15F401C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Haunted Forest - 1st Place Time Score." },
+        { address=0X15F40CC, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="49.41 - Default Time" },
+        { address=0X15F40CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - UFO Encounter - 1st Place Time Score." },
+        { address=0X15F417C, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="49.41 - Default Time" },
+        { address=0X15F417C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Great Wall Of China - 1st Place Time Score." },
+        { address=0X15F422C, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="49.41 - Default Time" },
+        { address=0X15F422C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Atlantis - 1st Place Time Score." },
+        { address=0X15F42DC, type="u32le", condition="eq", value=0X1, action="SCORE_STATE", no_log=false, no_survey=false, desc="49.41 - Default Time" },
+        { address=0X15F42DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Thrill Chill Fun Park - 1st Place Time Score." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X21D310, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-Bit - Golden Medals - UFO Encounter" },
+        { address=0X21D340, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-Bit - Silver Medals - UFO Encounter" },
+        { address=0X21D370, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-Bit - Bronze Medals - UFO Encounter" },
+        { address=0X2813C8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-Bit - Upgrade Shop - Unlock Tracks" },
+        { address=0X28177C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-Bit - Track Select" },
+        { address=0X282DD8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-Bit - In-Game Snowmen Counter" },
+        { address=0X16F177C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32-Bit - Yellow Checkpoint Timer" },
+      },
+    },
+  },
+}

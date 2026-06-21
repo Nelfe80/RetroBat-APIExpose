@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Bust A Groove",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Music"
+  },
+
+  rom = {
+    name = "bust-a-groove",
+    file = "bust-a-groove.zip",
+    hashes = {
+      { hash = "396a50d5a8e6b2c7b8687b06a0ccc614", label = "Bust A Groove (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X61560, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+      events = {
+        { address=0X68758, type="u8", condition="eq", value=0X34, action="COMBO_HIT", no_log=false, no_survey=false, desc="high scoring moves" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X6870B, type="u8", condition="eq", value=0XC, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="win" },
+        { address=0X6870B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="--CURRENT STAGE--" },
+      },
+    },
+  },
+}

@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Go! Go! Hypergrind",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "go-go-hypergrind",
+    file = "go-go-hypergrind.zip",
+    hashes = {
+      { hash = "01d01b0f97459b43c7d9a1a92b120bde", label = "Go! Go! Hypergrind (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4C508C, type="u32be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[32-bit BE/bool] Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4CC770, type="u32be", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Toon City Complete" },
+        { address=0X4CC770, type="u32be", condition="eq", value=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Western Film Complete" },
+        { address=0X4CC770, type="u32be", condition="eq", value=0X15, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fantasy Studio Complete" },
+        { address=0X4CC770, type="u32be", condition="eq", value=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Haunted Night Complete" },
+        { address=0X4CC770, type="u32be", condition="eq", value=0X25, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Factory Complete" },
+        { address=0X4CC770, type="u32be", condition="eq", value=0X30, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Jungle Complete" },
+        { address=0X4CC770, type="u32be", condition="eq", value=0X35, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ninja Village Complete" },
+        { address=0X4CC770, type="u32be", condition="eq", value=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hong Kong Night Complete" },
+        { address=0X4CC770, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Current Round (-1)" },
+      },
+      stage = {
+        { address=0X4C5058, type="u32be", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Toon City" },
+        { address=0X4C5058, type="u32be", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Western Film" },
+        { address=0X4C5058, type="u32be", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fantasy Studio" },
+        { address=0X4C5058, type="u32be", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Haunted Night" },
+        { address=0X4C5058, type="u32be", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Factory" },
+        { address=0X4C5058, type="u32be", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jungle" },
+        { address=0X4C5058, type="u32be", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ninja Village" },
+        { address=0X4C5058, type="u32be", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hong Kong Night" },
+        { address=0X4C5058, type="u32be", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special (Gym)" },
+        { address=0X4C5058, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE] Stage" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Toon City" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Western Film" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fantasy Studio" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Haunted Night" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Factory" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jungle" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ninja Village" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hong Kong Night" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Special (Gym)" },
+        { address=0X4CC76C, type="u32be", condition="eq", value=0X9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Finale" },
+        { address=0X4CC76C, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE] Story Stage" },
+        { address=0X4CC8CB, type="u8", condition="eq", value=0XB0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Toon City (Default)" },
+        { address=0X4CC8CB, type="u8", condition="eq", value=0XB1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Western Film" },
+        { address=0X4CC8CB, type="u8", condition="eq", value=0XB2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fantasy Studio" },
+        { address=0X4CC8CB, type="u8", condition="eq", value=0XB3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Haunted Night" },
+        { address=0X4CC8CB, type="u8", condition="eq", value=0XB4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Factory" },
+        { address=0X4CC8CB, type="u8", condition="eq", value=0XB5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Jungle" },
+        { address=0X4CC8CB, type="u8", condition="eq", value=0XB6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ninja Village" },
+        { address=0X4CC8CB, type="u8", condition="eq", value=0XB7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hong Kong Night" },
+        { address=0X4CC8CB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages Unlocked" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4C51AC, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-bit BE] Battle Opponent Health decreased" },
+        { address=0X4C51AC, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-bit BE] Battle Opponent Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4C50E8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Total Score" },
+        { address=0X4C50EC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Best Link Score" },
+        { address=0X4C5138, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Simon Says Score" },
+        { address=0X4CC570, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 1 Points" },
+        { address=0X4CC5A4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 2 Points" },
+        { address=0X4CC5D8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 3 Points" },
+        { address=0X4CC60C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 4 Points" },
+        { address=0X4CC640, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 5 Points" },
+        { address=0X4CC674, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 6 Points" },
+        { address=0X4CC6A8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 7 Points" },
+        { address=0X4CC6DC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 8 Points" },
+        { address=0X4CC710, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 9 Points" },
+        { address=0X4CC744, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Rank 10 Points" },
+        { address=0X4CD038, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Loading Screen Minigame Points" },
+      },
+      collectibles = {
+        { address=0X4CC881, type="u8", condition="eq", value=0XB0, action="MONEY_STATE", no_log=false, no_survey=false, desc="No. 099 - Gold Medal" },
+        { address=0X4CC8A0, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Rank Money increased" },
+        { address=0X4CC8D0, type="u32be", condition="eq", value=0X0, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Medal" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4C50F4, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE] Reaction Time" },
+        { address=0X4C5114, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-bit BE/bool] Extra Time Bonus" },
+      },
+    },
+  },
+}

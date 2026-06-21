@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Erika to Satoru no Yume Bouken",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "erika-to-satoru-no-yume-bouken",
+    file = "erika-to-satoru-no-yume-bouken.zip",
+    hashes = {
+      { hash = "9e9274b23ceed878a57b50d7f735075f", label = "Erika to Satoru no Yume Bouken (Japan) (En) (v1.0) (Stardust Crusaders).nes" },
+      { hash = "e9393cf6e90f5a59bedf4232e81cea60", label = "Erika to Satoru no Yume Bouken (Japan).nes" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Bomberman Land",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "bomberman-land",
+    file = "bomberman-land.zip",
+    hashes = {
+      { hash = "6fcd853f93edd424d747db9b26c476cc", label = "Bomberman Land (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBFBEDD, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCE17F4, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Zone" },
+        { address=0XCE17F4, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blue Zone" },
+        { address=0XCE17F4, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yellow Zone" },
+        { address=0XCE17F4, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Green Zone" },
+        { address=0XCE17F4, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="White Zone" },
+        { address=0XCE17F4, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rainbow Zone" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCE2CB8, type="u8", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="On" },
+        { address=0XD614E4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Mini-game Life's/Chances (Story Mode) increased" },
+        { address=0XD614E4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Mini-game Life's/Chances (Story Mode) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD614C4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bits - Current Mini-games Score (In Story Mode)" },
+        { address=0XD614FC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bits - Current Mini-games High Score (In Story Mode)" },
+      },
+      collectibles = {
+        { address=0XCE181C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Quantity [32-bits] increased" },
+        { address=0XDAA198, type="u24le", condition="eq", value=0XF423F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Max Money" },
+        { address=0XDAE958, type="u24le", condition="eq", value=0XF423F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Max Money" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDAE958, type="u24le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="In Hammer Time Money Quantity [24-bits]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Flappy Birdie",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "flappy-birdie",
+    file = "flappy-birdie.zip",
+    hashes = {
+      { hash = "0e6d0272a0257667cda05d5d7cc5afad", label = "Flappy Birdie (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X022F, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Main Menu/Game Over Screen" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01FF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+        { address=0X0224, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Road Rash",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Racing"
+  },
+
+  rom = {
+    name = "road-rash",
+    file = "road-rash.zip",
+    hashes = {
+      { hash = "ffd22b376ea20ecd4ed6710688a1d25a", label = "Road Rash (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA5866, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Flag" },
+        { address=0XA5E7F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused Flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDAD3B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X82FC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Health decreased" },
+        { address=0X82FC0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Health increased" },
+        { address=0X83000, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mike's Health decreased" },
+        { address=0X83000, type="u24le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mike's Health increased" },
+        { address=0X83040, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cydney's Health decreased" },
+        { address=0X83040, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cydney's Health increased" },
+        { address=0X83080, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slim's Health decreased" },
+        { address=0X83080, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slim's Health increased" },
+        { address=0X830C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pearl's Health decreased" },
+        { address=0X830C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pearl's Health increased" },
+        { address=0X83100, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jon's Health decreased" },
+        { address=0X83100, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jon's Health increased" },
+        { address=0X83140, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rhonda's Health decreased" },
+        { address=0X83140, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rhonda's Health increased" },
+        { address=0X83180, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bose's Health decreased" },
+        { address=0X83180, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bose's Health increased" },
+        { address=0X831C0, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Axle's Health decreased" },
+        { address=0X831C0, type="u24le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Axle's Health increased" },
+        { address=0X83200, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Angel's or Butch's Health decreased" },
+        { address=0X83200, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Angel's or Butch's Health increased" },
+        { address=0X83240, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Buzz's Health decreased" },
+        { address=0X83240, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Buzz's Health increased" },
+        { address=0X83280, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Chino's or Druid's Health decreased" },
+        { address=0X83280, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Chino's or Druid's Health increased" },
+        { address=0X832C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hog's Health decreased" },
+        { address=0X832C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hog's Health increased" },
+        { address=0X83300, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Serge's Health decreased" },
+        { address=0X83300, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Serge's Health increased" },
+        { address=0X83340, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slash's Health decreased" },
+        { address=0X83340, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slash's Health increased" },
+        { address=0X1D7814, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pacific Highway Bike Health: decreased" },
+        { address=0X1D7814, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pacific Highway Bike Health: increased" },
+        { address=0X1D7818, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pacific Highway Bike Health: decreased" },
+        { address=0X1D7818, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pacific Highway Bike Health: increased" },
+        { address=0X1D7838, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pacific Highway Bike Health: decreased" },
+        { address=0X1D7838, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pacific Highway Bike Health: increased" },
+        { address=0X1DB950, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sierra Nevada Bike Health: decreased" },
+        { address=0X1DB950, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sierra Nevada Bike Health: increased" },
+        { address=0X1DB954, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sierra Nevada Bike Health: decreased" },
+        { address=0X1DB954, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sierra Nevada Bike Health: increased" },
+        { address=0X1DB974, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sierra Nevada Bike Health: decreased" },
+        { address=0X1DB974, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sierra Nevada Bike Health: increased" },
+        { address=0X1DC318, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Napa Valley Bike Health: decreased" },
+        { address=0X1DC318, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Napa Valley Bike Health: increased" },
+        { address=0X1DC31C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Napa Valley Bike Health: decreased" },
+        { address=0X1DC31C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Napa Valley Bike Health: increased" },
+        { address=0X1DC33C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Nappa Valley Bike Health: decreased" },
+        { address=0X1DC33C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Nappa Valley Bike Health: increased" },
+        { address=0X1DFA30, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="The Peninsula Bike Health: decreased" },
+        { address=0X1DFA30, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="The Peninsula Bike Health: increased" },
+        { address=0X1DFA34, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="The Peninsula Bike Health: decreased" },
+        { address=0X1DFA34, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="The Peninsula Bike Health: increased" },
+        { address=0X1DFA54, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="The Peninsula Bike Health: decreased" },
+        { address=0X1DFA54, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="The Peninsula Bike Health: increased" },
+        { address=0X1E000C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bike Health decreased" },
+        { address=0X1E000C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bike Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XDBD4E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Value - weapon held?" },
+        { address=0XDBEF8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon or fist?" },
+        { address=0XF28B6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="value = weapon held?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Bleach GC: Tasogare ni Mamieru Shinigami",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "bleach-gc-tasogare-ni-mamieru-shinigami",
+    file = "bleach-gc-tasogare-ni-mamieru-shinigami.zip",
+    hashes = {
+      { hash = "5e639bfbbc23a3a9e8c0df58f676a372", label = "Bleach GC - Tasogare ni Mamieru Shinigami (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X40577B, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="13Bansyoubu Clear GG" },
+      },
+      stage = {
+        { address=0X405767, type="u8", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last Stage, Yoruichi is unlocked here" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X40573C, type="u32be", condition="eq", value=0X41F00000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="30" },
+        { address=0X40573C, type="u32be", condition="eq", value=0X42700000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="60" },
+        { address=0X40573C, type="u32be", condition="eq", value=0X42C60000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="99" },
+        { address=0X40573C, type="u32be", condition="eq", value=0X4479C000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Infinite" },
+        { address=0X40573C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time 32bits Be" },
+        { address=0X405767, type="u8", condition="eq", value=0X0E, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Beaten" },
+        { address=0X405767, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lesson Mode Unlocked Counter" },
+        { address=0X40576F, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Opening" },
+        { address=0X40576F, type="u8", condition="eq", value=0X0F, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ending Unlocked" },
+        { address=0X40576F, type="u8", condition="eq", value=0X09, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="End Game" },
+        { address=0X40576F, type="u8", condition="eq", value=0X0A, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="End Game" },
+        { address=0X40576F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Scneario Unlocked - Counter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Dr. Muto",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "dr-muto",
+    file = "dr-muto.zip",
+    hashes = {
+      { hash = "cbf1b0b4efd3cc555967f173dda514e9", label = "Dr. Muto (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2C7258, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Joystick control of character disabled (except pause menu)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2BAC2C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Is Reloading | 0 = No, 1 = Yes" },
+        { address=0X2C6F60, type="u32le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On Solid Ground" },
+        { address=0X2ED47E, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Water Wheel Lasers Disabled (Aqeum, Lagoon Ending)" },
+        { address=0X2ED485, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Girder 1 dropped (Flotos, Furnace Interior)" },
+        { address=0X2ED486, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Girder 2 dropped (Flotos, Furnace Interior)" },
+        { address=0X2ED486, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Girder 3 dropped (Flotos, Furnace Interior)" },
+        { address=0X2ED486, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Girder 4 dropped (Flotos, Furnace Interior)" },
+        { address=0X2ED486, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Girder 5 dropped (Flotos, Furnace Interior)" },
+        { address=0X2F3B5C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Is Loaded | 0 = No, 1 = Yes" },
+        { address=0X2F5318, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII] Level Name" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2C6F60, type="u32le", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Pit" },
+      },
+      health = {
+        { address=0X2C7260, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health | Range 0-6 decreased" },
+        { address=0X2C7260, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health | Range 0-6 increased" },
+        { address=0X2EE794, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health | Range 4-6 decreased" },
+        { address=0X2EE794, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health | Range 4-6 increased" },
+        { address=0X3A3FBC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Small Health Vials decreased" },
+        { address=0X3A3FBC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Small Health Vials increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2EEC7C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Flags" },
+        { address=0X2EECB8, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Bar Display | Range 0-8" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2C6F64, type="u32le", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Player Is Double Jumping | 0 = False, 1 = True" },
+        { address=0X2C6F68, type="u32le", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Player Is Jumping | 0 = False, 1 = True" },
+        { address=0X2C6F74, type="u32le", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="Player Is Swimming | 0 = False, 1 = True" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2C1D50, type="u32le", condition="eq", value=0X0D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="SWITCHOFF (Robot)" },
+        { address=0X3FDDC0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Player Controls Blocked By Cutscene | 0 = No, 1 = Yes" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2EE7A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Health HUD Timer" },
+        { address=0X2EE7B0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Health HUD Blinking Green Light Timer" },
+        { address=0X2EE97C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Health Vial HUD Timer" },
+      },
+    },
+  },
+}

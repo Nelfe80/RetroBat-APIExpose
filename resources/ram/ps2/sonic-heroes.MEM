@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Sonic Heroes",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "sonic-heroes",
+    file = "sonic-heroes.zip",
+    hashes = {
+      { hash = "4ad9c308634161b0e4e8f69caa09139c", label = "Sonic Heroes (Europe, Australia) (En,Fr,De,Es,It)" },
+      { hash = "6b66d825438acff5cc1b3c1e39ad52a3", label = "Sonic Heroes (USA) (En,Ja,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4CDF50, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused (bit0)" },
+        { address=0XB11A2F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Objects paused (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB11A30, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Geometry (8-bit)" },
+      },
+      stage = {
+        { address=0X4CDDD8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="current Stage (8-bit) {NTSC}" },
+        { address=0X4CDDE8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage you first started in (8-bit) {NTSC}" },
+        { address=0X4CDF58, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="current Stage (8-bit) {PAL}" },
+        { address=0X4CDF68, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage you first started in (8-bit) {PAL}" },
+        { address=0XB7C608, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Speed Characters Level (8-bit)" },
+        { address=0XB7C609, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Flight Characters Level (8-bit)" },
+        { address=0XB7C60A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Power Characters Level (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4DE220, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [32bit] {PAL} increased" },
+        { address=0X4DE220, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [32bit] {PAL} decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X51A9B8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Green Chaos Emerald collected (bit0)" },
+        { address=0X51A9C4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Blue Chaos Emerald collected (bit0)" },
+        { address=0X51A9D0, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Yellow Chaos Emerald collected (bit0)" },
+        { address=0X51A9DC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="White Chaos Emerald collected (bit0)" },
+        { address=0X51A9E8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Turquoise Chaos Emerald collected (bit0)" },
+        { address=0X51A9F4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Purple Chaos Emerald collected (bit0)" },
+        { address=0X51AA00, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Red Chaos Emerald collected (bit0)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4DE0B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Blue Character (32-bit) {NTSC}" },
+        { address=0X4DE0B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Yellow Character (32-bit) {NTSC}" },
+        { address=0X4DE0B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Red Character (32-bit) {NTSC}" },
+        { address=0X4DE230, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Blue Character [32bit] {PAL}" },
+        { address=0X4DE234, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Yellow Character [32bit] {PAL}" },
+        { address=0X4DE238, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Red Character [32bit] {PAL}" },
+        { address=0X51A390, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Team Sonic Statics: Seaside Hill - Score (32-bit)" },
+      },
+      collectibles = {
+        { address=0X4DE080, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings (32bit) {NTSC-U} increased" },
+        { address=0X4DE200, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings [32bit] {PAL} increased" },
+        { address=0X51A38C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Team Sonic Statics: Seaside Hill - Rings (16-bit) increased" },
+        { address=0XB11A2A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="HUD - Ring Icon & the complete right side of the HUD (8-bit) increased" },
+        { address=0XB11A32, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="HUD - Score, Time & Rings (8-bit) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X477EEC, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="last activated Checkpoint (32-bit)" },
+        { address=0XB7C63C, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="objects collected/destroyed for mission (8-bit)" },
+        { address=0XB7F3D0, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Team Sonic, Team Dark & Team Chaotix: Objects destroyed in the level (32-bit)" },
+        { address=0XB7F5B0, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Team Rose: Objects destroyed in the level (32-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X477EF0, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time for the last activated checkpoint: Minutes (32-bit)" },
+        { address=0X477EF4, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time for the last activated checkpoint: Seconds (32-bit)" },
+        { address=0XB11A31, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time paused (8-bit)" },
+      },
+    },
+  },
+}

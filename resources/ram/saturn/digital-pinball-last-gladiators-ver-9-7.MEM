@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Digital Pinball: Last Gladiators Ver.9.7",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "digital-pinball-last-gladiators-ver-9-7",
+    file = "digital-pinball-last-gladiators-ver-9-7.zip",
+    hashes = {
+      { hash = "43797034a7bf1afb172ecf74bc9e4f80", label = "Digital Pinball - Last Gladiators Ver.9.7 (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

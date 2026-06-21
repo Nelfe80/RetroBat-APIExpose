@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pac-Man Fever",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Party"
+  },
+
+  rom = {
+    name = "pac-man-fever",
+    file = "pac-man-fever.zip",
+    hashes = {
+      { hash = "285d19f4300ef70705d7dae6144a9ae0", label = "Pac-Man Fever (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

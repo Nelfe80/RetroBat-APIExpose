@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "InfoGenius Productivity Pak: Spell Checker and Calculator",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "infogenius-productivity-pak-spell-checker-and-calculator",
+    file = "infogenius-productivity-pak-spell-checker-and-calculator.zip",
+    hashes = {
+      { hash = "70cf0bbc9f4a2bbc4c89649406b09e59", label = "InfoGenius Productivity Pak - Spell Checker and Calculator (USA).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFF98, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0XFF98, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Credits after title screen" },
+      },
+    },
+  },
+}

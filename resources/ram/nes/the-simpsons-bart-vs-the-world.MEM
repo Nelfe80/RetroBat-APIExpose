@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Simpsons: Bart vs. the World",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-simpsons-bart-vs-the-world",
+    file = "the-simpsons-bart-vs-the-world.zip",
+    hashes = {
+      { hash = "c510177d6bde87f2aa00dfcc3de9f825", label = "Simpsons, The - Bart vs. the World (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

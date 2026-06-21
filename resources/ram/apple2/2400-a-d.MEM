@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "2400 A.D.",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "2400-a-d",
+    file = "2400-a-d.zip",
+    hashes = {
+      { hash = "0d23fe58739ee8404bfb90acb2e9d418", label = "2400 A.D. (4am crack) side A.dsk" },
+      { hash = "2525f48dc7b848f9f94e2d1696e1cc88", label = "2400 A.D. (4am crack) side B.dsk" },
+      { hash = "833d0ab375dc79e6e3e3083a26460938", label = "2400 A.D. - Player Disk.woz" },
+      { hash = "abe8e029c99e7b0ba9041a7e54cd8783", label = "2400 A.D. - Program Disk.woz" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X75CE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Stat decreased" },
+        { address=0X75CE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Stat increased" },
+      },
+    },
+  },
+}

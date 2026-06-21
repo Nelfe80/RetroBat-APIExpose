@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Pearl Version [Subset - League Stars]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-pearl-version-subset-league-stars",
+    file = "pokemon-pearl-version-subset-league-stars.zip",
+    hashes = {
+      { hash = "b889c127bc441b9a5dec057266eec3e5", label = "Pokemon - Pearl Version (USA) [Subset - League Stars].nds" },
+    }
+  },
+
+  events = {
+  },
+}

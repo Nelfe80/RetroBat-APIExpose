@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Jack Bros.",
+    system = "virtualboy",
+    system_name = "Virtual Boy",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "jack-bros",
+    file = "jack-bros.zip",
+    hashes = {
+      { hash = "05ba60f0ac1aacedd57321f0ed5f62ca", label = "Jack Bros. (USA) (De) (No-Debug) (v1.0) (KR155E,televandalist).vb" },
+      { hash = "1b177fe2dd12ec1d67f6a43502f8d391", label = "Jack Bros. no Meiro de Hiihoo! (Japan).vb" },
+      { hash = "8819d31f9922dc2eea31a051f4d6d667", label = "Jack Bros. (USA) (Es) (No-Debug) (v1.0) (Max1323,televandalist).vb" },
+      { hash = "ee873c9969c15e92ca9a0f689c4ce5ea", label = "Jack Bros. (USA).vb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0xff = game paused" },
+        { address=0X00CE, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x0000 = DEMO, 0xFFFF = NOT DEMO" },
+        { address=0X017A, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0164, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Area Clear Star Bonus" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X012C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0xffff - when dead" },
+      },
+      health = {
+        { address=0X6431, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Bar decreased" },
+        { address=0X6431, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Bar increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XEC50, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="01 during demo increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X7A31, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 01 - Lamia - Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0150, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Potion" },
+        { address=0X6306, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Jack Shield (third bubble)" },
+        { address=0X6346, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Jack Shield (second bubble)" },
+        { address=0X6386, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Jack Shield (first bubble)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0112, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage Timer" },
+      },
+    },
+  },
+}

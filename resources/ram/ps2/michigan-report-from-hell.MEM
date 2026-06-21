@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Michigan: Report from Hell",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "michigan-report-from-hell",
+    file = "michigan-report-from-hell.zip",
+    hashes = {
+      { hash = "551a546d1108d4b1b6c1c131108125c4", label = "Michigan (Japan)" },
+      { hash = "7c3e3404f410eb09a8aa158159adecdd", label = "Michigan - Report from Hell (Europe) (En,Fr,Es,It)" },
+      { hash = "989b8ac87e014181be7673dfecd33891", label = "Michigan - Report from Hell (Europe) (En,Fr,Es,It) (Widescreen) (v1.0) (Souzooka)" },
+      { hash = "ec0f24d81c533dd11e46dc17a6354511", label = "Michigan (Japan) (Widescreen) (v1.0) (Souzooka)" },
+      { hash = "38d26e47b509cee855bec3d9824ffd93", label = "Michigan - Report from Hell (Europe) (En,Fr,Es,It) (Fog Effect Restoration) (v1.0) (Souzooka)" },
+      { hash = "f124aaafed5c87d74bfbb6c5df5196f5", label = "Michigan - Report from Hell (Europe) (En,Fr,Es,It) (Fog Effect Restoration + Widescreen) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X32D578, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 1 = Enable Level Select" },
+      },
+      stage = {
+        { address=0X33DB4C, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Pamela's Level (Tutorial)" },
+        { address=0X33DB4C, type="u16le", condition="eq", value=0X56, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ann Anderson - Level 1: International Hotel" },
+        { address=0X33DB4C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[PAL] (32bit] Stage ID" },
+        { address=0X355318, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[PAL] (32bit] Next Stage To Load" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X33B558, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[PAL] (32bit) Suspense Points (Curr Level?)" },
+        { address=0X33B55C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[PAL] (32bit) Erotic Points (Curr Level)" },
+        { address=0X33B560, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[PAL] (32bit) Immoral Points (Curr Level)" },
+      },
+    },
+  },
+}

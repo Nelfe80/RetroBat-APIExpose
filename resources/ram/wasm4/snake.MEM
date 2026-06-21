@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Snake",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "snake",
+    file = "snake.zip",
+    hashes = {
+      { hash = "66e91f10d6c807e25b0656aba3549e91", label = "Snake (World) (Tomas Tulka).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0014, type="u8", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+  },
+}

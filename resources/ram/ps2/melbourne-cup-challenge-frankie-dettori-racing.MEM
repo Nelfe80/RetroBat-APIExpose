@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Melbourne Cup Challenge | Frankie Dettori Racing",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "melbourne-cup-challenge-frankie-dettori-racing",
+    file = "melbourne-cup-challenge-frankie-dettori-racing.zip",
+    hashes = {
+      { hash = "844caa39874ef7f0dd99846c8d3ef335", label = "Frankie Dettori Racing (Australia)" },
+    }
+  },
+
+  events = {
+  },
+}

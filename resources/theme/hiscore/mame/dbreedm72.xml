@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 'NABE.. 275800</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2  ROKUJI 20202000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 MOICHI 0</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 YOSHIG 0</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 AAAAA. 0</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FAN.   0</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 HANIWA 20202000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 K.F    0</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 AAAAAA 20202000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 YAAZA. 41414100</text>
+		</text>
+	</view>
+</theme>

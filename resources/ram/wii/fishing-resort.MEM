@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Fishing Resort",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "fishing-resort",
+    file = "fishing-resort.zip",
+    hashes = {
+      { hash = "283ac168cafe3365831f47abfec722bf", label = "Fishing Resort (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X13A8D00, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32bitBE] Award List - Miraculous - Combo Master #29 - Caught 30 or more in 1 try of Smelt Fishi" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X13A8567, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="bought" },
+        { address=0X13A8567, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Aquarium Rooms - B1 Trop/Salt Tank No.2 level" },
+        { address=0X13A858F, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 2" },
+        { address=0X13A858F, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 3 (25,000 points)" },
+        { address=0X13A858F, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="MAX (50,000 points)" },
+        { address=0X13A858F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Aquarium Rooms - Trop/Salt Tank No.1 - current level" },
+        { address=0X13A8590, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit BE] Aquarium Rooms - Trop/Salt Tank No.2 - current level" },
+        { address=0X13A8593, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Trop/Salt Tank No.2 - current level" },
+        { address=0X13A8F70, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bitBE] Award List - #25 My 1st Aquarium Level Up" },
+        { address=0X13A8FD0, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32bitBE] Award List - Special - 1st Goal Achieved (First targets caught)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1438144, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Weight of Fish for Fishpoint screen - Catch entry 6 decreased" },
+        { address=0X1438144, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Weight of Fish for Fishpoint screen - Catch entry 6 increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X139E85B, type="u8", condition="eq", value=0X2, action="TREASURE", no_log=false, no_survey=false, desc="report your catch" },
+        { address=0X139E85B, type="u8", condition="eq", value=0X3, action="TREASURE", no_log=false, no_survey=false, desc="complete" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5889F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Journal Entry - Current Day - Points earned total" },
+        { address=0XEBB734, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Member Card Fishing Points (Save 2?, Dynamic?)" },
+        { address=0XEBC3C8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Fisherman Ranking Experience points (Dynamic?)" },
+      },
+      collectibles = {
+        { address=0X139E897, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="Start" },
+        { address=0X139E897, type="u8", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Talked to other NPC, dorado spawning location revealed" },
+        { address=0X139E897, type="u8", condition="eq", value=0X3, action="MONEY_STATE", no_log=false, no_survey=false, desc="completed" },
+        { address=0X13A8928, type="u32be", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X139E873, type="u8", condition="eq", value=0X1, action="SWIMMING", no_log=true, no_survey=false, desc="completed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEC00E3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Pennant Coral fish caught counter in Logbook 2?" },
+        { address=0XEE097C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Kayak - Racing Normal Record Time Teman Paradise" },
+        { address=0X13582E3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Pennant Coral fish caught counter" },
+        { address=0X139E827, type="u8", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="catch magoi" },
+        { address=0X139E827, type="u8", condition="eq", value=0X3, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="complete" },
+        { address=0X139E827, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Quest Log - Kerikil River - Sentiments of the Fish" },
+        { address=0X139E843, type="u8", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="find siblings" },
+        { address=0X139E843, type="u8", condition="eq", value=0X2, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="find sister" },
+        { address=0X139E843, type="u8", condition="eq", value=0X3, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X139E843, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Quest Log - Dua Ribu - Dua Ribu - Time To Eat" },
+        { address=0X13A8C70, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bitBE] Award List - Miraculous - # 23 Target Hunter (Catch 3 bulletin board target, unlocks a" },
+        { address=0X13A8D30, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bitBE] Award List - Special - First Fishing Resort #1 - visit hotel fishing resort first time" },
+        { address=0X13A8D48, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bitBE] Award List - Special - My 1st villa mirador - visit first time (don't award)" },
+        { address=0X13A8DF0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bitBE] Award List - Special - My 1st Cruiser Ship (Sleep in Cruiser for first time, no achiev" },
+        { address=0X13A8FE8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bitBE] Award List - Special - 1st Early Morning - Give to first time morning fishers (no rewa" },
+        { address=0X13A9000, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bitBE] Award List - Special - My 1st Midnight Rendezvous - Night Fishing First time" },
+        { address=0X146A398, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dynamic - Kayak Racing Normal current time Teman Paradise" },
+      },
+    },
+  },
+}

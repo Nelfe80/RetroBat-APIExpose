@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Congo - The Movie: The Lost City of Zinj",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "congo-the-movie-the-lost-city-of-zinj",
+    file = "congo-the-movie-the-lost-city-of-zinj.zip",
+    hashes = {
+      { hash = "4fea784eacc5c5a3ea2f57f682ca7b68", label = "Congo - The Movie - The Lost City of Zinj (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X172272, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="May be used to indicate 'demo'" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X17232A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lead-zero Level-ID" },
+        { address=0X172BAA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Diamonds (Current Level)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1813C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives, 'zero' is last-life, game-over is FF increased" },
+        { address=0X1813C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives, 'zero' is last-life, game-over is FF decreased" },
+      },
+      health = {
+        { address=0X171F62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Better HP decreased" },
+        { address=0X171F62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Better HP increased" },
+        { address=0X17BBB7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (along with 171f62) decreased" },
+        { address=0X17BBB7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (along with 171f62) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1813DC, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol;" },
+        { address=0X1813DC, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun;" },
+        { address=0X1813DC, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Machine Gun;" },
+        { address=0X1813DC, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile Launcher;" },
+        { address=0X1813DC, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Diamond Laser" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1813FE, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Pistol Ammo 16-bit" },
+        { address=0X181404, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shotgun Ammo 16-bit" },
+        { address=0X18140A, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Machine Gun Ammo 16-bit" },
+        { address=0X18140D, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo Backpack?" },
+        { address=0X181410, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Rocket Launcher Ammo 16-bit" },
+        { address=0X181416, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Diamonds (Total) (This is also ammo because laser-gun uses diamonds to shoot lasers.) 16-bit" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X181424, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Ammo Backpack? It increases by one each time, so probably." },
+      },
+    },
+  },
+}

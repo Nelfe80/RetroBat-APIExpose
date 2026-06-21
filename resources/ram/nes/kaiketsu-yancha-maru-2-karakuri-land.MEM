@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Kaiketsu Yancha Maru 2: Karakuri Land",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "kaiketsu-yancha-maru-2-karakuri-land",
+    file = "kaiketsu-yancha-maru-2-karakuri-land.zip",
+    hashes = {
+      { hash = "be8808b4a5670e344689ef9ccd678f94", label = "Kaiketsu Yanchamaru 2 - Karakuri Land (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0010, type="u8", condition="eq", value=0X0, action="DEMO_MODE", no_log=false, no_survey=false, desc="in demo, in game map" },
+        { address=0X0010, type="u8", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game in game demo" },
+        { address=0X0056, type="u8", condition="eq", value=0X14, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue select" },
+        { address=0X00AF, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="in game" },
+        { address=0X00AF, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="in pause" },
+        { address=0X03C8, type="u8", condition="eq", value=0XB2, action="PAUSE_ON", no_log=false, no_survey=false, desc="start pause" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X005E, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X005E, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2" },
+        { address=0X005E, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3" },
+        { address=0X005E, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 4" },
+        { address=0X005E, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5" },
+        { address=0X005E, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 6" },
+        { address=0X005E, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 7" },
+        { address=0X005E, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 8" },
+        { address=0X005E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X003A, type="u8", condition="eq", value=0X13, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Die" },
+        { address=0X00F4, type="u16le", condition="eq", value=0XBC69, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss Death" },
+        { address=0X00F5, type="u8", condition="eq", value=0XBE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="boss first hit" },
+        { address=0X00F5, type="u8", condition="eq", value=0XBC, action="LOSE_LIFE", no_log=false, no_survey=false, desc="boss death" },
+      },
+      health = {
+        { address=0X0094, type="u8", condition="eq", value=0X03, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max health" },
+        { address=0X0094, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="min health" },
+        { address=0X0094, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Player" },
+        { address=0X00F5, type="u8", condition="eq", value=0XBB, action="HIT", no_log=false, no_survey=false, desc="(player start: 0xbb, Boss active: 0xbc, first hit boss: 0xbe, come back 0xbb if player take dama" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0018, type="u16le", condition="eq", value=0X189D, action="BOSS_HIT", no_log=false, no_survey=false, desc="start" },
+        { address=0X003A, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X003A, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="stage 2" },
+        { address=0X003A, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="stage 3" },
+        { address=0X003A, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="stage 4" },
+        { address=0X003A, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="stage 5" },
+        { address=0X003A, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="stage 6" },
+        { address=0X003A, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="stage 7" },
+        { address=0X003A, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="stage 8" },
+        { address=0X003A, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2" },
+        { address=0X003A, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 3" },
+        { address=0X003A, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 4" },
+        { address=0X003A, type="u8", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 5" },
+        { address=0X003A, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 6" },
+        { address=0X003A, type="u8", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss 7" },
+        { address=0X003A, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss" },
+        { address=0X003A, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Intro after title" },
+        { address=0X003A, type="u8", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="Intro ,Map" },
+        { address=0X003A, type="u8", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="End game" },
+        { address=0X0218, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="spot 1 in smoke" },
+        { address=0X0218, type="u8", condition="eq", value=0X50, action="BOSS_HIT", no_log=false, no_survey=false, desc="spot 2" },
+        { address=0X0780, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="max health" },
+        { address=0X0780, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="min health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X008E, type="u8", condition="eq", value=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="magic shield" },
+        { address=0X03C8, type="u8", condition="eq", value=0X60, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="10 secondes, 0 secondes" },
+        { address=0X03C8, type="u8", condition="eq", value=0X69, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="9secondes" },
+        { address=0X03C8, type="u8", condition="eq", value=0X68, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="8 secondes" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X03C8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Transformations and shield timer" },
+      },
+    },
+  },
+}

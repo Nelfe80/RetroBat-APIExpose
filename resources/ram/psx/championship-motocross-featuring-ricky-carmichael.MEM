@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Championship Motocross Featuring Ricky Carmichael",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "championship-motocross-featuring-ricky-carmichael",
+    file = "championship-motocross-featuring-ricky-carmichael.zip",
+    hashes = {
+      { hash = "0ece18fca31c1253f1a845e132b60e73", label = "Championship Motocross featuring Ricky Carmichael (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD4FE8, type="u16le", condition="eq", value=0XB, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo, Intro Movie or Credits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X86E86, type="u16le", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Normal, Indoor 1 or Sunny" },
+        { address=0X86E86, type="u16le", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Light Rain, Indoor 2 or Overcast" },
+        { address=0X86E86, type="u16le", condition="eq", value=0X2, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Heavy Rain, Indoor 3 or Arid" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD4FE8, type="u16le", condition="eq", value=0XA, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0XD4FE8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Mode" },
+      },
+    },
+  },
+}

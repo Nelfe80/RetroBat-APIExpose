@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Spirits & Spells",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "spirits-spells",
+    file = "spirits-spells.zip",
+    hashes = {
+      { hash = "dce828e687f05511c1ad70e936b5ef25", label = "Spirits & Spells (USA).gba" },
+      { hash = "f146baf10cf767d2313c4da94a5845eb", label = "Castleween (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "8daee9fe02459c2084d461d4f2e8e481", label = "Mahou no Pumpkin - Ann to Greg no Daibouken (Japan).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7EA0, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stage/Title ID (32-bit)" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834755B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X083476BD, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stage title card" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834775D, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Over/Continue" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834777B, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X08355C71, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X08355E2D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stage title card" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X08355ED1, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Over/Continue" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X08355EE3, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834DFB9, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen transition" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834DFBD, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834E005, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue (i.e. load a save)" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834E0B9, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stage title card" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834E159, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Over/Continue" },
+        { address=0X7EAC, type="u32le", condition="eq", value=0X0834E177, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0876, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Souls Collected In Current Level (8-bit)" },
+        { address=0X0877, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Candy Collected In Current Level (8-bit)" },
+        { address=0X0878, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Candy In Current Level (8-bit)" },
+        { address=0X0879, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Souls In Current Level (8-bit)" },
+        { address=0X0886, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[JPN] Souls Collected In Current Level (8-bit)" },
+        { address=0X0887, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[JPN] Candy Collected In Current Level (8-bit)" },
+        { address=0X0888, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[JPN] Total Candy In Current Level (8-bit)" },
+        { address=0X0889, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[JPN] Total Souls In Current Level (8-bit)" },
+      },
+      stage = {
+        { address=0X7EA4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID (8-bit)" },
+        { address=0X7EA8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Real Stage ID (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0875, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) increased" },
+        { address=0X0875, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) decreased" },
+        { address=0X0885, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[JPN] Lives (8-bit) increased" },
+        { address=0X0885, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[JPN] Lives (8-bit) decreased" },
+      },
+      health = {
+        { address=0X087B, type="u8", condition="eq", value=0X2, action="HIT", no_log=false, no_survey=false, desc="Flying away (after taking damage)" },
+        { address=0X088B, type="u8", condition="eq", value=0X2, action="HIT", no_log=false, no_survey=false, desc="Flying away (after taking damage)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0870, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (32-bit)" },
+        { address=0X0880, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[JPN] Score (32-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0C34, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Difficulty (8-bit)" },
+      },
+    },
+  },
+}

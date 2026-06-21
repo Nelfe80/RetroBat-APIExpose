@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Super Mario Galaxy [Subset - Coin Collector]",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "super-mario-galaxy-subset-coin-collector",
+    file = "super-mario-galaxy-subset-coin-collector.zip",
+    hashes = {
+      { hash = "7966a3aa5aaa2b14e810a6c4af87ec78", label = "Super Mario Galaxy [Subset - Coin Collector]" },
+    }
+  },
+
+  events = {
+  },
+}

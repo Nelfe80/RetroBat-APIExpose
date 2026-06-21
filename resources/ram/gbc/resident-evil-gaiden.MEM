@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Resident Evil: Gaiden",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "resident-evil-gaiden",
+    file = "resident-evil-gaiden.zip",
+    hashes = {
+      { hash = "0d0f492716005ec56d38a4fde204fe38", label = "Resident Evil Gaiden (Europe) (Pt) (v1.1) (ajkmetiuk).gbc" },
+      { hash = "3c0c5fceebff4d9730875a9362d26aa1", label = "Resident Evil Gaiden (USA).gbc" },
+      { hash = "8a7f483857e251d56a16594ca84d1a7e", label = "Resident Evil Gaiden (Europe) (En,Fr,De,Es,It).gbc" },
+      { hash = "dd1fa7bae0dfc92295dde04458604fd3", label = "Resident Evil Gaiden (USA) (Ru) (v1.0) (TagTeam).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC3C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gas Launcher Rounds" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC3AB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bit 2 - Health Doc Collected decreased" },
+        { address=0XC3AB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bit 2 - Health Doc Collected increased" },
+        { address=0XC3B9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Leon Health (Max = 64) decreased" },
+        { address=0XC3B9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Leon Health (Max = 64) increased" },
+        { address=0XC3BA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lucia Health (Max = 3C) decreased" },
+        { address=0XC3BA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lucia Health (Max = 3C) increased" },
+        { address=0XC3BB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Barry Health (Max = 78) decreased" },
+        { address=0XC3BB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Barry Health (Max = 78) increased" },
+        { address=0X10546, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 1 decreased" },
+        { address=0X10546, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 1 increased" },
+        { address=0X10646, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 2 decreased" },
+        { address=0X10646, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 2 increased" },
+        { address=0X10746, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 3 decreased" },
+        { address=0X10746, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 3 increased" },
+        { address=0X10846, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 4 decreased" },
+        { address=0X10846, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 4 increased" },
+        { address=0X10946, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 5 decreased" },
+        { address=0X10946, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 5 increased" },
+        { address=0X10A46, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 6 decreased" },
+        { address=0X10A46, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 6 increased" },
+        { address=0X10B46, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 7 decreased" },
+        { address=0X10B46, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 7 increased" },
+        { address=0X10C46, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 8 decreased" },
+        { address=0X10C46, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 8 increased" },
+        { address=0X10D46, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health 9 decreased" },
+        { address=0X10D46, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health 9 increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC3C3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Assault Rifle Ammo" },
+        { address=0XC3C4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Grenade Gun Ammo" },
+        { address=0XC3C5, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Rocket Launcher Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA00D, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 7 - BOW Defeated (Right before final boss)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC2E1, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Last Event ID/Current Objective" },
+      },
+    },
+  },
+}

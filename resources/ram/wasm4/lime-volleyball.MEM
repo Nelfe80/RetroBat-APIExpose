@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Lime Volleyball",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lime-volleyball",
+    file = "lime-volleyball.zip",
+    hashes = {
+      { hash = "c82a60174974a213286e68dba16f9a37", label = "Lime Volleyball (World) (Bruno Garcia).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3A88, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3AAC, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[32bit] Player 1 Jump Cool Down" },
+        { address=0X3ABC, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[32bit] Player 2 Jump Cool Down" },
+      },
+    },
+  },
+}

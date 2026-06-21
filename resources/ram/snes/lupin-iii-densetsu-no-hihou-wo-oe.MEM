@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Lupin III: Densetsu no Hihou wo Oe!",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "lupin-iii-densetsu-no-hihou-wo-oe",
+    file = "lupin-iii-densetsu-no-hihou-wo-oe.zip",
+    hashes = {
+      { hash = "e5b0cfce81837d97a215da82cb02a273", label = "Lupin Sansei - Densetsu no Hihou o Oe! (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0090, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background sprite data" },
+      },
+      stage = {
+        { address=0X1004, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id (0d is the highest)" },
+        { address=0X1005, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stairs / door" },
+        { address=0X1005, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bit indicates whether the player has entered a door on the stage." },
+        { address=0X1006, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bit is 01 if entered from the left on stage 12" },
+        { address=0X1007, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bit is 01 if entered from the right on stage 12" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0AF0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="number of health packs reamining decreased" },
+        { address=0X0AF0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="number of health packs reamining increased" },
+        { address=0X0AF5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0X0AF5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0071, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="8-bit Stage 8 boss movement data?" },
+        { address=0X092D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="8Bit Boss (max at 1e)" },
+      },
+    },
+  },
+}

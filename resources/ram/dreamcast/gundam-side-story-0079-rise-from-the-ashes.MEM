@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Gundam Side Story 0079: Rise from the Ashes",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "gundam-side-story-0079-rise-from-the-ashes",
+    file = "gundam-side-story-0079-rise-from-the-ashes.zip",
+    hashes = {
+      { hash = "4004cfbef3296c866d3a1ad52cc89acd", label = "Gundam Side Story 0079 - Rise from the Ashes (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

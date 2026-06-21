@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Arthur! Ready to Race",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "arthur-ready-to-race",
+    file = "arthur-ready-to-race.zip",
+    hashes = {
+      { hash = "2f195b0e6f7e16367a7c21a82e5e7f80", label = "Arthur! Ready to Race (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F45E, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not in Demo" },
+        { address=0X1F45E, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Demo" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X93468, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Counter increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X21468, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tomato Counter" },
+        { address=0X2160D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Library Chase Timer" },
+        { address=0X21694, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Backyard Chase Timer" },
+        { address=0X99ED0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Card Counter" },
+      },
+    },
+  },
+}

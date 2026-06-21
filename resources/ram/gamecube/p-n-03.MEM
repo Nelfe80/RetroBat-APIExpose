@@ -1,0 +1,109 @@
+return {
+  game = {
+    title = "P.N.03",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "p-n-03",
+    file = "p-n-03.zip",
+    hashes = {
+      { hash = "7cf46f6316c565fd57317f8363c6e35d", label = "P.N. 03 (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19E659, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8bit] Continues" },
+        { address=0X19E694, type="u32be", condition="eq", value=0X000FBFFF, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending Credits" },
+        { address=0X1B3E84, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Blackbird" },
+        { address=0X1B3E84, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Papillon" },
+      },
+      events = {
+        { address=0X1876D0, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32-bit BE] Curent Combo (US)" },
+        { address=0X1876E0, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32-bit BE] Room: Max Combo (US)" },
+        { address=0X189B2C, type="u32be", condition="eq", value=0X2460, action="COMBO_HIT", no_log=false, no_survey=false, desc="US - EU Offset" },
+        { address=0X189B30, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32bit BE] [EU] Combo - Current Room" },
+        { address=0X189B40, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32bit BE] [EU] Max Combo - Current Room" },
+        { address=0X19E6C2, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8bit] Max Mission Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19E694, type="u32be", condition="eq", value=0X000FBFFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Cleared" },
+        { address=0X1B5D14, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32bit BE] Cleared Rooms - Only Locks in Door transitions" },
+        { address=0X1B5D17, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8bit] Cleared Rooms - Only Locks in Door transitions" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X195B0B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="bit2 - damage taken (US)" },
+        { address=0X19E650, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit BE] Health decreased" },
+        { address=0X19E650, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit BE] Health increased" },
+        { address=0X19E654, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit BE] Energy decreased" },
+        { address=0X19E654, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit BE] Energy increased" },
+        { address=0X19E6C3, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8bit] No Damage Cleared Rooms" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X19E65A, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Prima Fusion" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Prima Blazer" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Prima Guardian" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Intera Fusion" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Intera Blazer" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Intera Guardian" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ultra Fusion" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ultra Blazer" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ultra Guardian" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X09, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Blackbird" },
+        { address=0X19E65A, type="u8", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Papillon" },
+        { address=0X19E6D8, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Prima Fusion Suit - Acquired" },
+        { address=0X19E6DB, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit] Suit Barrier Upgrades" },
+        { address=0X19E6DC, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit] Suit Palm Shot Upgrades" },
+        { address=0X19E6DD, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit] Suit Automatic Upgrades" },
+        { address=0X19E6DE, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit] Suit Energy Upgrades" },
+        { address=0X19E6E3, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit boolean] Prima Fusion Suit - Energy Drive Upgrade Purchased" },
+        { address=0X19E6E8, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Prima Blazer Suit - Acquired" },
+        { address=0X19E6F8, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Prima Guardian Suit - Acquired" },
+        { address=0X19E708, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Intera Fusion Suit - Acquired" },
+        { address=0X19E718, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Intera Blazer Suit - Acquired" },
+        { address=0X19E728, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Intera Guardian Suit - Acquired" },
+        { address=0X19E738, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Ultra Fusion Suit - Acquired" },
+        { address=0X19E748, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Ultra Blazer Suit - Acquired" },
+        { address=0X19E758, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Ultra Guardian Suit - Acquired" },
+        { address=0X19E768, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Bklackbird Suit - Acquired" },
+        { address=0X19E778, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit Boolean] Papillon Suit - Acquired" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1876D8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Room: Score (US)" },
+        { address=0X189B38, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] [EU] Score - Current Room" },
+        { address=0X19E668, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Total Points - Shop" },
+        { address=0X19E6B8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Total Points - End of Mission" },
+        { address=0X19E6C4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Total Points - Playthrough" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCAE4F4, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32bitBE] Boss Health - Current" },
+        { address=0XCAE4F8, type="u32be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32bitBE] Boss Health - Max" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1876DC, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-bit BE] Room: Enemies Destroyed (US)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1876CC, type="u32be", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Combo time left (US)" },
+        { address=0X189B2C, type="u32be", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[32bit BE] [EU] Combo Timer - Current Room" },
+      },
+    },
+  },
+}

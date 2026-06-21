@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Disaster Report",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "disaster-report",
+    file = "disaster-report.zip",
+    hashes = {
+      { hash = "f72926c211e648f754ffae7f96f6aa9d", label = "Disaster Report (USA)" },
+      { hash = "63cb26e0d10dcfc625bedaf58a913a24", label = "SOS - The Final Escape (Europe) (En,Fr,De)" },
+      { hash = "4c087a10b0f790efd817f848ba510209", label = "Zettai Zetsumei Toshi (Japan) (v2.00)" },
+      { hash = "ad863e60d7948bdf088afb19072312af", label = "Disaster Report (USA) (Text Depth Fix) (v1.00) (Souzooka)" },
+      { hash = "87c0205440f3c1031c71e63ff27c367f", label = "Disaster Report (USA) (Text Depth Fix + Anti-Blur) (v1.00) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X380768, type="u32le", condition="eq", value=0X8, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3808B8, type="u32le", condition="eq", value=0X1, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+  },
+}

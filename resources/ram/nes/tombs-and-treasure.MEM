@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Tombs and Treasure",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "tombs-and-treasure",
+    file = "tombs-and-treasure.zip",
+    hashes = {
+      { hash = "5c7222553020ae8940e4ab9de5cb9342", label = "Tombs & Treasure (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X060B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld coordinates (high4=Y,low4=X)" },
+        { address=0X063A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player level [calculated in battle]" },
+        { address=0X069B, type="u8", condition="eq", value=0XB4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="ground smashed [court of columns]" },
+        { address=0X069F, type="u8", condition="eq", value=0XB3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="golden globe on ground [court of columns]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0636, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X0636, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+        { address=0X0638, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy hp remaining (does not go to 0 on defeat) decreased" },
+        { address=0X0638, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy hp remaining (does not go to 0 on defeat) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0690, type="u8", condition="eq", value=0XB6, action="MONEY_STATE", no_log=false, no_survey=false, desc="move pile of gold [castillo]" },
+        { address=0X0690, type="u8", condition="eq", value=0XB3, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold stand not put on pedestal [el caracol]" },
+        { address=0X0691, type="u8", condition="eq", value=0XB4, action="MONEY_STATE", no_log=false, no_survey=false, desc="ring of itza in inventory [ball court]" },
+        { address=0X0691, type="u8", condition="eq", value=0XB3, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold mirror in inventory [castillo]" },
+        { address=0X0697, type="u8", condition="eq", value=0XB1, action="MONEY_STATE", no_log=false, no_survey=false, desc="put gold stand on second pedestal [el caracol]" },
+        { address=0X0698, type="u8", condition="eq", value=0XB5, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold mirror not taken [castillo]" },
+        { address=0X0698, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold stand not taken [castillo]" },
+        { address=0X069A, type="u8", condition="eq", value=0XB3, action="MONEY_STATE", no_log=false, no_survey=false, desc="pile of gold not moved [castillo]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0694, type="u8", condition="eq", value=0XB3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="blue block not put [castillo]" },
+        { address=0X0698, type="u8", condition="eq", value=0XB1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="put blue block [castillo]" },
+        { address=0X069E, type="u8", condition="eq", value=0XB3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="take blue block [ball court]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X069C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="b7: crystal key not used [well of sacrifice]" },
+      },
+    },
+  },
+}

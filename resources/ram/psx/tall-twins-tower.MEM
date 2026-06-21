@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Tall: Twins Tower",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tall-twins-tower",
+    file = "tall-twins-tower.zip",
+    hashes = {
+      { hash = "9cbc3c422a7247ed91fe15e68dcfe9f8", label = "Tall - Twins Tower (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDD8BC, type="u8", condition="eq", value=0XAC, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demos" },
+        { address=0XDD8BC, type="u8", condition="eq", value=0X3C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Multiplayer Demos." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDEC7C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level One" },
+        { address=0XDEC7C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Two" },
+        { address=0XDEC7C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Three" },
+        { address=0XDEC7C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Four" },
+        { address=0XDEC7C, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Five" },
+        { address=0XDEC7C, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Six" },
+        { address=0XDEC7C, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Seven" },
+        { address=0XDEC7C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level counter." },
+        { address=0XE3E8C, type="u16le", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level uncompleted" },
+        { address=0XE3E8C, type="u16le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level completed" },
+        { address=0XE3E8C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puzzle Levels" },
+        { address=0XE4018, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The final of the 100 addresses for the 100 puzzle levels." },
+        { address=0XEAB50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Second Leaderboard Level Count" },
+      },
+    },
+  },
+}

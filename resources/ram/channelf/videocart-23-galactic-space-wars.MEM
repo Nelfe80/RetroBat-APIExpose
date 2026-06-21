@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-23: Galactic Space Wars",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "videocart-23-galactic-space-wars",
+    file = "videocart-23-galactic-space-wars.zip",
+    hashes = {
+      { hash = "9e0711b140e22729687db1e1354980ab", label = "Galactic Space Wars, Lunar Lander (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Rabbids Go Home",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "rabbids-go-home",
+    file = "rabbids-go-home.zip",
+    hashes = {
+      { hash = "2458645dfceb01ee1333bfca92795145", label = "Rabbids Go Home (Europe) (En,Fr,De,Es,It,Nl) (NDSi Enhanced).nds" },
+      { hash = "f2b8afae013e13279ecd568b5baa9bba", label = "Rabbids Go Home - A Comedy Adventure (USA) (En,Fr,Es) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1560E0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [32 Bit] Zone ID" },
+        { address=0X1574F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P2" },
+        { address=0X157504, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P3" },
+        { address=0X157510, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P4" },
+        { address=0X15751C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P5" },
+        { address=0X157528, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P6" },
+        { address=0X157534, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P7" },
+        { address=0X157540, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P8" },
+        { address=0X15754C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P9" },
+        { address=0X157558, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P10" },
+        { address=0X157564, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P11" },
+        { address=0X157584, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z2P1" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1574EC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Level Status | Z1P1 increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1560C0, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[USA] | [32 Bit] Total Objects Collected" },
+        { address=0X156500, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[EU] | [32 Bit] Total Objects Collected" },
+        { address=0X1574FD, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[USA] | [8 Bit] Total Objects | Z1P2" },
+      },
+    },
+  },
+}

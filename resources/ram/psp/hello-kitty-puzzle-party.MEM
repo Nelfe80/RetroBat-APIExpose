@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Hello Kitty: Puzzle Party",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hello-kitty-puzzle-party",
+    file = "hello-kitty-puzzle-party.zip",
+    hashes = {
+      { hash = "2d2967a960eff336be39ca834e3bb5cb", label = "Hello Kitty - Puzzle Party (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X985E20, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X985E20, type="u16le", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Picture Perfect Title" },
+        { address=0X985E20, type="u16le", condition="eq", value=0X11, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Jigsaw Puzzle Title" },
+        { address=0X985E20, type="u16le", condition="eq", value=0X16, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Tasty Tidbits Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC8E36C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Tasty Tidbits - Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC8E386, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Tasty Tidbits - High Score" },
+        { address=0X11CE06C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Tasty Tidbits - Current Score" },
+      },
+    },
+  },
+}

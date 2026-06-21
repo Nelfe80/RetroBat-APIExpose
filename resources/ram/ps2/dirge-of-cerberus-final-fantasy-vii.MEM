@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Dirge of Cerberus: Final Fantasy VII",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing, Shooter"
+  },
+
+  rom = {
+    name = "dirge-of-cerberus-final-fantasy-vii",
+    file = "dirge-of-cerberus-final-fantasy-vii.zip",
+    hashes = {
+      { hash = "1b99e3fe59e00b43d98f6efbcce43249", label = "Dirge of Cerberus - Final Fantasy VII (USA)" },
+      { hash = "876041589206cf4dbc6d5f5aba849818", label = "Dirge of Cerberus - Final Fantasy VII (USA) (Widescreen) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X47CC84, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4B6D86, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D87, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D88, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D89, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D8A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D8B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D8C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D8D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D8E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0X4B6D8F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Extra Missions - Cleared" },
+        { address=0XA0B74E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0XA0B490, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Missions" },
+        { address=0XA0B4A4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Accuracy Rate Stage Rank" },
+        { address=0XA0B4A8, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Critical Hits Stage Rank" },
+        { address=0XA0B4AC, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Items Used Stage Rank" },
+        { address=0XA0B4B0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Magic Casted Stage Rank" },
+        { address=0XA0B4B8, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mako Collected Stage Rank" },
+        { address=0XA0B4CC, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Mission Stage Rank" },
+        { address=0XA0B4EC, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Mission Stage Rank" },
+        { address=0XA0B4F0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Mission Stage Rank" },
+        { address=0XA0B4F4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Mission Stage Rank" },
+        { address=0XA0B524, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Killchains Stage Rank" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA0B470, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Sustained" },
+        { address=0XA0B4BC, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Sustained Stage Rank" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2329EC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Changes to 0x04 when entering a shop in a level. Can be used for finding items to block out buyi" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X234008, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss State" },
+        { address=0X238BD8, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="ASCII Boss Name Part 1" },
+        { address=0X238BDC, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="ASCII Boss Name Part 2" },
+        { address=0X238BE0, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="ASCII Boss Name Part 3" },
+        { address=0X238C59, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Healthbar Active" },
+        { address=0X238C5C, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Healthbar" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA0B450, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Targets Destroyed" },
+        { address=0XA0B4A0, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Targets Destroyed Stage Rank" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA0B4C0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times KO'd Stage Rank" },
+        { address=0XA0B4C4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Expired Stage Rank" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Racing Gears Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "racing-gears-advance",
+    file = "racing-gears-advance.zip",
+    hashes = {
+      { hash = "072f378e3ae2d271f384b886be067031", label = "Racing Gears Advance (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "1dac1484f1d66158b1cfae3da7c79af9", label = "Racing Gears Advance (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

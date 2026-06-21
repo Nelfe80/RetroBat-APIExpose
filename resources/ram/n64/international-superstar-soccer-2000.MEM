@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "International Superstar Soccer 2000",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Sports, Football"
+  },
+
+  rom = {
+    name = "international-superstar-soccer-2000",
+    file = "international-superstar-soccer-2000.zip",
+    hashes = {
+      { hash = "23a4ed8d79882594206173b1d476f0e9", label = "International Superstar Soccer 2000 (USA) (En,Es).z64" },
+      { hash = "9f101b6f6bef4f267deb5c6c37a24b97", label = "International Superstar Soccer 2000 (Europe) (En,De).z64" },
+      { hash = "cc2be97a16744860fae8a94611479c4c", label = "International Superstar Soccer 2000 (Europe) (Fr,It).z64" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X2B5613, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Config, Game Time: 00-02" },
+      },
+    },
+  },
+}

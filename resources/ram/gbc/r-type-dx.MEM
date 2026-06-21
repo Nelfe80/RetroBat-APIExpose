@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "R-Type DX",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "r-type-dx",
+    file = "r-type-dx.zip",
+    hashes = {
+      { hash = "dae7b7625d41d8a06266b09924154bb2", label = "R-Type DX (USA, Europe) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

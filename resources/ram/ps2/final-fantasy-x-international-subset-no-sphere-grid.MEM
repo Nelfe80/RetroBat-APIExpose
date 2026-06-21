@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Final Fantasy X: International [Subset - No Sphere Grid]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "final-fantasy-x-international-subset-no-sphere-grid",
+    file = "final-fantasy-x-international-subset-no-sphere-grid.zip",
+    hashes = {
+      { hash = "154765cf0f11ca4096b2db5505e49ab7", label = "Final Fantasy X - International [Subset - No Sphere Grid]" },
+    }
+  },
+
+  events = {
+  },
+}

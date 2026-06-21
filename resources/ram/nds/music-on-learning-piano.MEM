@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Music On: Learning Piano",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "music-on-learning-piano",
+    file = "music-on-learning-piano.zip",
+    hashes = {
+      { hash = "bedf9644597131aae9497c7b9be6b6ac", label = "Music on - Learning Piano (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5B5F8, type="u8", condition="eq", value=0XB2, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+        { address=0X5B5F8, type="u8", condition="eq", value=0X38, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X5B5F8, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Song Demo" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6B1C4, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+  },
+}

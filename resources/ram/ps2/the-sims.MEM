@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Sims",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-sims",
+    file = "the-sims.zip",
+    hashes = {
+      { hash = "2012df07da7a60e2755cc04255c4ecc5", label = "Sims, The (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

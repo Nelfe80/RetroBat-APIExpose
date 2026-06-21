@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Rakugaki Showtime",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "rakugaki-showtime",
+    file = "rakugaki-showtime.zip",
+    hashes = {
+      { hash = "68358cf4d689d1d61e7a7efd554482fd", label = "Rakugaki Showtime (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAEDA4, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Num of Continues used" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XAEC5C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage / Mode State" },
+        { address=0XAEEF0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal Mode - Highest HP at end of previous stages" },
+        { address=0XAEEF4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal Mode - Current Stage" },
+        { address=0XD3530, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal Mode - Stage 7 Enemy" },
+        { address=0XD3534, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal Mode - Stage 10 Enemy" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAEEDC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal Mode - Timer at beginning of current stage" },
+      },
+    },
+  },
+}

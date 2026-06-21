@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mega Man Battle Network 4: Red Sun",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "mega-man-battle-network-4-red-sun",
+    file = "mega-man-battle-network-4-red-sun.zip",
+    hashes = {
+      { hash = "d0dee5c06972cb072391cd968a248d52", label = "Megaman - Battle Network 4 - Red Sun (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

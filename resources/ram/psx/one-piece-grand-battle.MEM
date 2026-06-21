@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "One Piece: Grand Battle!",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "one-piece-grand-battle",
+    file = "one-piece-grand-battle.zip",
+    hashes = {
+      { hash = "30ad437faa1a133c092c19aacc4564ce", label = "Shonen Jump's One Piece - Grand Battle (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1B74B4, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - Who's Credits" },
+        { address=0X1B74BC, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - Cheat useable" },
+        { address=0X1B74C2, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - Correct Buttons" },
+        { address=0X1B74C4, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - 1st Input" },
+        { address=0X1B74C6, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - 2nd Input" },
+        { address=0X1B74C8, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - 3rd Input" },
+        { address=0X1B74CA, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - 4th Input" },
+        { address=0X1B74CC, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - 5th Input" },
+        { address=0X1B74CE, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - 6th Input" },
+        { address=0X1B74D0, type="u8", condition="eq", value=0X0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Image Fullscreen" },
+        { address=0X1B74D0, type="u8", condition="eq", value=0X1, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Image with Border" },
+        { address=0X1B74D0, type="u8", condition="eq", value=0X2, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="3D Animation" },
+        { address=0X1B74D2, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - Fadeout" },
+        { address=0X1B825C, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0X1B825C, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="In a Demo" },
+        { address=0X1B825C, type="u8", condition="eq", value=0X0A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1B8278, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues left in Event Battle" },
+      },
+      events = {
+        { address=0X19B31C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 1 - Supporter Combo" },
+        { address=0X19C130, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 2 - Supporter Combo" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X19A01C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Max Health (16bit) decreased" },
+        { address=0X19A01C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Max Health (16bit) increased" },
+        { address=0X19A01E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Current Health (16bit) decreased" },
+        { address=0X19A01E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Current Health (16bit) increased" },
+        { address=0X19A064, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Max Health (16bit) decreased" },
+        { address=0X19A064, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - Max Health (16bit) increased" },
+        { address=0X19A066, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Current Health (16bit) decreased" },
+        { address=0X19A066, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - Current Health (16bit) increased" },
+        { address=0X19BB56, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Damage Source (16bit)" },
+        { address=0X19BB7F, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Current Damage taken" },
+        { address=0X19C96A, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Damage Source (16bit)" },
+        { address=0X19C993, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Current Damage taken" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1B4D9A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures - Current Character" },
+        { address=0X1B4DA2, type="u8", condition="eq", value=0X3, action="TREASURE", no_log=false, no_survey=false, desc="Treasures" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X19A050, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 - Coin Timer increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X19BB70, type="u16le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Player 1 - Invincibility Frames (16bit)" },
+        { address=0X19C984, type="u16le", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Player 2 - Invincibility Frames (16bit)" },
+      },
+      player = {
+        { address=0X19AE58, type="u8", condition="eq", value=0X0E, action="JUMPING", no_log=true, no_survey=false, desc="Preparing for Jump" },
+        { address=0X19AE58, type="u8", condition="eq", value=0X10, action="JUMPING", no_log=true, no_survey=false, desc="Jump" },
+        { address=0X19AE58, type="u8", condition="eq", value=0X12, action="JUMPING", no_log=true, no_survey=false, desc="Double Jump" },
+        { address=0X19AE58, type="u8", condition="eq", value=0X26, action="JUMPING", no_log=true, no_survey=false, desc="Arlong's Water Jump Attack" },
+        { address=0X19AE58, type="u8", condition="eq", value=0X27, action="JUMPING", no_log=true, no_survey=false, desc="Arlong's Water Jump Landing" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X19AE58, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Holding Object" },
+        { address=0X19AE58, type="u8", condition="eq", value=0X14, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocking" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X199FF4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round Timer" },
+        { address=0X1B74C0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Credits - Timer until Input Reset" },
+        { address=0X1B83E6, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Options - Time Limit" },
+      },
+    },
+  },
+}

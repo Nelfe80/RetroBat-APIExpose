@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Egg Mania",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "egg-mania",
+    file = "egg-mania.zip",
+    hashes = {
+      { hash = "3b58275a454884b6fa70fa007544c998", label = "Egg Mania (USA) (En,Fr,Es).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8010, type="u8", condition="eq", value=0X0, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In Level" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8020, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Number" },
+        { address=0XB28C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="OverEasy First Level (?)" },
+        { address=0XB294, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level ID" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X16914, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Solo Combo Score- Number of combo bricks added to game score [32bit)" },
+        { address=0X16998, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game Score [32bit]" },
+        { address=0X1699C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score [32bit]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X78A4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Number of Blocks Placed" },
+        { address=0XC438, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="I-Block 3 Piece" },
+        { address=0XC438, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dot Block" },
+        { address=0XC438, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Corner 3 Piece" },
+        { address=0XC438, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="I-Block 2 piece" },
+        { address=0XC438, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="S-Block" },
+        { address=0XC438, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Z-Block" },
+        { address=0XC438, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Arch Block" },
+        { address=0XC438, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0XC438, type="u8", condition="eq", value=0X09, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blank" },
+        { address=0XC438, type="u8", condition="eq", value=0X0A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Filler" },
+        { address=0XC438, type="u8", condition="eq", value=0X0B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hammer" },
+        { address=0XC438, type="u8", condition="eq", value=0X0C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Storm" },
+        { address=0XC438, type="u8", condition="eq", value=0X0D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cross" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8018, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32bit] Demo Timer" },
+        { address=0X83EC, type="u8", condition="eq", value=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X83EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit]Game Mode" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Thexder Neo",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "thexder-neo",
+    file = "thexder-neo.zip",
+    hashes = {
+      { hash = "cfb54de460de309d06c4dcd1cb74396d", label = "Thexder Neo (USA) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XC9A078, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD80B2C, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shields" },
+      },
+    },
+  },
+}

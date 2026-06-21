@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "The Pagemaster",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-pagemaster",
+    file = "the-pagemaster.zip",
+    hashes = {
+      { hash = "46fbdebb1227b6068d7a44f03a0f04a4", label = "Pagemaster, The (USA).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X01E8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X01E8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Barbie: Super Model",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "barbie-super-model",
+    file = "barbie-super-model.zip",
+    hashes = {
+      { hash = "fdecc2c3cb3c351dad5d54da7999d3c0", label = "Barbie Super Model (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0025, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01 = pause?" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0027, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x01 In Main Stage, 0x02 in dress up" },
+        { address=0X0814, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X018E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X018E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0044, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

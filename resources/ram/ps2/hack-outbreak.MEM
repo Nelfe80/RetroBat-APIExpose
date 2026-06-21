@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = ".hack//Outbreak",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hack-outbreak",
+    file = "hack-outbreak.zip",
+    hashes = {
+      { hash = "8ed3507f07a5b8885585c86c3f35b702", label = "Dot Hack Part 3 - Outbreak (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA84DF4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Wiseman -> Card Games Continued" },
+        { address=0XA84DF5, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Wiseman -> Card Games Continued" },
+        { address=0XA84DF9, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Balmung -> The World Continued" },
+        { address=0XA84DFA, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Balmung -> The World Continued" },
+        { address=0XA84DFB, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Balmung -> The World Continued" },
+        { address=0XA84DFF, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Piros -> Fair eyes Continued" },
+        { address=0XA84E00, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Piros -> Fair eyes Continued" },
+        { address=0XA84E04, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Sanjuro -> Musashi Continued" },
+        { address=0XA84E05, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Sanjuro -> Musashi Continued" },
+        { address=0XA84E09, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Gardenia -> Cats Continued" },
+        { address=0XA84E0A, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Gardenia -> Cats Continued" },
+        { address=0XA84E0E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Natsume -> Dinner! Continued" },
+        { address=0XA84E0F, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Natsume -> Dinner! Continued" },
+        { address=0XA84E13, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Moonstone -> Pup Continued" },
+        { address=0XA84E14, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Moonstone -> Pup Continued" },
+        { address=0XA84E1D, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Rachel -> High School Continued" },
+        { address=0XA84E1E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Rachel -> High School Continued" },
+        { address=0XA84E22, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Nuke Usagimaru -> Books Continued" },
+        { address=0XA84E23, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Nuke Usagimaru -> Books Continued" },
+        { address=0XA84E27, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Terajima Ryoko -> Greetings Continued" },
+        { address=0XA84E28, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Terajima Ryoko -> Greetings Continued" },
+        { address=0XA893DA, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Squilla Demon" },
+        { address=0XA893E4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Wander Demon" },
+        { address=0XA8949D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Demon Wyvern" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA89F66, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kite's Level" },
+        { address=0XE1D648, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Field Level" },
+      },
+      zone = {
+        { address=0XA84DF8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Balmung -> The World" },
+        { address=0XA84DFC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Balmung -> The World End" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA84E17, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Marlo -> My life increased" },
+        { address=0XA84E17, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Marlo -> My life decreased" },
+        { address=0XA84E18, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Marlo -> My life Continued increased" },
+        { address=0XA84E18, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Marlo -> My life Continued decreased" },
+        { address=0XA84E19, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Marlo -> My life Continued increased" },
+        { address=0XA84E19, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Marlo -> My life Continued decreased" },
+        { address=0XA84E1A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Marlo -> My life End increased" },
+        { address=0XA84E1A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[bitflags] Mailer -> Marlo -> My life End decreased" },
+        { address=0XA893CC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Crane" },
+        { address=0XA893ED, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Glare" },
+        { address=0XA89437, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Black Death" },
+        { address=0XA8947A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Deadly Present" },
+        { address=0XA8947C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Head" },
+        { address=0XA89480, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Living Dead" },
+        { address=0XA89482, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Undead Voodoo" },
+        { address=0XA89493, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Deadly Moth" },
+        { address=0XA894B0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Death Implant" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA89321, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Treasure Boxes Opened" },
+        { address=0XA89323, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Gott's Treasure" },
+        { address=0XA89F3E, type="u16le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Ryu Book VI -> Gott's Treasures Obtained" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA89476, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Fake Money increased" },
+        { address=0XA89F6C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (GP) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA8380D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Key Items -> Event Item -> Basin Shield" },
+        { address=0XA893E1, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Shield Man" },
+        { address=0XA893E2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ryu Book IV -> Bestiary -> Shield Devil" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA89322, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ryu Book VI -> Breakables Broken" },
+        { address=0XA89F12, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ryu Book VI -> Breakables Broken" },
+      },
+    },
+  },
+}

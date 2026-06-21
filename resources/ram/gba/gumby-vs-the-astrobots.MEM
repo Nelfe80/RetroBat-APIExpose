@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Gumby vs. the Astrobots",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "gumby-vs-the-astrobots",
+    file = "gumby-vs-the-astrobots.zip",
+    hashes = {
+      { hash = "81528aa0f4ababa9d4a6e1c71f6be3f5", label = "Gumby vs. the Astrobots (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X18295, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Wild West clear" },
+        { address=0X18295, type="u8", condition="eq", value=0X0B, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tales of North Pole clear" },
+        { address=0X18295, type="u8", condition="eq", value=0X0F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Transylvania Tales clear" },
+        { address=0X18295, type="u8", condition="eq", value=0X12, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="African Safari clear" },
+        { address=0X18295, type="u8", condition="eq", value=0X14, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Magic Castle clear" },
+        { address=0X18295, type="u8", condition="eq", value=0X17, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Attack of the Astrobots clear" },
+        { address=0X182AD, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Wild West clear" },
+        { address=0X182AD, type="u8", condition="eq", value=0X0B, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tales of North Pole clear" },
+        { address=0X182AD, type="u8", condition="eq", value=0X0F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Transylvania Tales clear" },
+        { address=0X182AD, type="u8", condition="eq", value=0X12, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="African Safari clear" },
+        { address=0X182AD, type="u8", condition="eq", value=0X14, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Magic Castle clear" },
+        { address=0X182AD, type="u8", condition="eq", value=0X17, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Attack of the Astrobots clear" },
+        { address=0X182C5, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Wild West clear" },
+        { address=0X182C5, type="u8", condition="eq", value=0X0B, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tales of North Pole clear" },
+        { address=0X182C5, type="u8", condition="eq", value=0X0F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Transylvania Tales clear" },
+        { address=0X182C5, type="u8", condition="eq", value=0X12, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="African Safari clear" },
+        { address=0X182C5, type="u8", condition="eq", value=0X14, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The Magic Castle clear" },
+        { address=0X182C5, type="u8", condition="eq", value=0X17, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Attack of the Astrobots clear" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X18296, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - File 1 increased" },
+        { address=0X18296, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - File 1 decreased" },
+        { address=0X182AE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - File 2 increased" },
+        { address=0X182AE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - File 2 decreased" },
+        { address=0X182C6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - File 3 increased" },
+        { address=0X182C6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - File 3 decreased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X18297, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Double jump" },
+        { address=0X182AF, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Double jump" },
+        { address=0X182C7, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Double jump" },
+      },
+    },
+  },
+}

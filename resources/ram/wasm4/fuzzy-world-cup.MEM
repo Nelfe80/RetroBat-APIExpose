@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Fuzzy World Cup",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fuzzy-world-cup",
+    file = "fuzzy-world-cup.zip",
+    hashes = {
+      { hash = "bd8e69f715855fcf292331c7846b8199", label = "Fuzzy World Cup (World) (v1.0) (Damian Girardi, Sebastian Alvarez).wasm" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X826F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sudden Death Flag" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X81E4, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Player 1 Kick/Jump Direction" },
+        { address=0X81F0, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Player 2 (computer) Kick/Jump Direction" },
+      },
+    },
+  },
+}

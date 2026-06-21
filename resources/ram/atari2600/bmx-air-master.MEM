@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "BMX Air Master",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "bmx-air-master",
+    file = "bmx-air-master.zip",
+    hashes = {
+      { hash = "968efc79d500dce52a906870a97358ab", label = "BMX Air Master (USA).a26" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0022, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[8bit]" },
+      },
+    },
+  },
+}

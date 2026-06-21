@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ULMV 149830</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 ULKT 71040</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 VTKA 46030</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ?999 2070</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 !♪♆[double-music-note] 1010</text>
+		</text>
+	</view>
+</theme>

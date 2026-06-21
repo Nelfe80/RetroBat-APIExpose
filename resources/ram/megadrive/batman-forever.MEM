@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "Batman Forever",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "batman-forever",
+    file = "batman-forever.zip",
+    hashes = {
+      { hash = "49c9588affa2b64e3bc94cd5c1b5d38b", label = "Batman Forever (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC56C, type="u8", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused or post stage screen" },
+        { address=0XC56C, type="u8", condition="eq", value=0X09, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XC56C, type="u8", condition="eq", value=0X0B, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+        { address=0XC56C, type="u8", condition="eq", value=0X0C, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XD9B8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Is Paused" },
+        { address=0XFBC0, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off (only acceptable option)" },
+        { address=0XFBC0, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X97A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round over at =01" },
+        { address=0XC564, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Current level" },
+        { address=0XC580, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(256-bit bitfield) Health boxes picked up in the level" },
+        { address=0XC5E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(256-bit bitfield) Enemies killed in the level." },
+        { address=0XC600, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(256-bit bitfield) Secret Areas found in the level." },
+        { address=0XC604, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(bitfield) Additional Secret Areas found in the level." },
+        { address=0XEA89, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level?" },
+        { address=0XEAD3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level?" },
+        { address=0XF838, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XF838, type="u8", condition="eq", value=0X0F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 16" },
+        { address=0XF838, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Won" },
+        { address=0XF838, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Training Level" },
+        { address=0XFBB6, type="u8", condition="eq", value=0X00, action="LEVEL_ONLY_VALID_NUMBER", no_log=false, no_survey=false, desc="Only valid number." },
+        { address=0XFBB6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Level Selection from Cheat Menu." },
+        { address=0XFD8C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Section?" },
+      },
+      stage = {
+        { address=0XC56C, type="u8", condition="eq", value=0X0D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Loading post stage screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD9D4, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="(final life)" },
+        { address=0XD9D4, type="u8", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="Starting lives left." },
+        { address=0XD9D4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) Lives increased" },
+        { address=0XD9D4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) Lives decreased" },
+        { address=0XE7B8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives? increased" },
+        { address=0XE7B8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives? decreased" },
+        { address=0XEA2A, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death." },
+      },
+      health = {
+        { address=0XC584, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(bitfield) Additional Health Boxes decreased" },
+        { address=0XC584, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(bitfield) Additional Health Boxes increased" },
+        { address=0XE6FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) Display Health decreased" },
+        { address=0XE6FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) Display Health increased" },
+        { address=0XE913, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XE913, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XE914, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XE914, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XE915, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XE915, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XE916, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) Player's Health decreased" },
+        { address=0XE916, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) Player's Health increased" },
+        { address=0XEA2A, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="(8-bit) Enemy 2's Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X9BBD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sub Weapons" },
+        { address=0XE85A, type="u16be", condition="eq", value=0XEC47, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Robin Sonic Blast Weapon" },
+        { address=0XE90D, type="u8", condition="eq", value=0X1B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Choice (Which Weapon)" },
+        { address=0XE945, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Using Main Weapons" },
+        { address=0XFBBE, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Two Weapons, only acceptable option." },
+        { address=0XFBBE, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="All Weapons" },
+        { address=0XFFAC, type="u8", condition="eq", value=0XC4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slippery Goo" },
+        { address=0XFFAC, type="u8", condition="eq", value=0XA4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bat Bola" },
+        { address=0XFFAC, type="u8", condition="eq", value=0X84, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Electric Pellet" },
+        { address=0XFFAC, type="u8", condition="eq", value=0X64, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Force Wall" },
+        { address=0XFFAC, type="u8", condition="eq", value=0X44, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sticky Goo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XE85A, type="u16be", condition="eq", value=0X8A45, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Robin Electro Shield" },
+        { address=0XE85A, type="u16be", condition="eq", value=0X82B2, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Riddler Thug Electroshield" },
+      },
+      player = {
+        { address=0XE85A, type="u16be", condition="eq", value=0X90E5, action="JUMPING", no_log=false, no_survey=false, desc="Clown Smash Jump" },
+        { address=0XE85A, type="u16be", condition="eq", value=0XC6F0, action="JUMPING", no_log=false, no_survey=false, desc="Sugar/Spice Jump Warp" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XE85A, type="u16be", condition="eq", value=0X0452, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Robin Block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC566, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(8-bit) 'Current Scene'" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Space Armada",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "space-armada",
+    file = "space-armada.zip",
+    hashes = {
+      { hash = "b7c771a6062ee673936008754c987fd1", label = "Space Armada (World).int" },
+    }
+  },
+
+  events = {
+  },
+}

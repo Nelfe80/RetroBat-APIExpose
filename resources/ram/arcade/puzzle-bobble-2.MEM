@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Puzzle Bobble 2 (Neo Geo)",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-bobble-2",
+    file = "puzzle-bobble-2.zip",
+    hashes = {
+      { hash = "e0d17d88ad08e13d3a2cd4ef38f7c4d5", label = "pbobbl2n.7z <Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3034, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits: last digit is unit" },
+        { address=0X3038, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits: last number is tens" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5830, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round number +1 (clone)" },
+      },
+      zone = {
+        { address=0XE700, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Letter in Puzzle Mode:" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X57DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score related: bigger numbers (16 bits)" },
+        { address=0X57DE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score related (hex) (16 bits)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5832, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (16 bits)" },
+      },
+    },
+  },
+}

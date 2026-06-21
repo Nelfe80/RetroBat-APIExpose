@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "WWF WrestleMania 2000",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-wrestlemania-2000",
+    file = "wwf-wrestlemania-2000.zip",
+    hashes = {
+      { hash = "7fa5a6dde384652120b46475b193dff9", label = "WWF WrestleMania 2000 (USA, Europe) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

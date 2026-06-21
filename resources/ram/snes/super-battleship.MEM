@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Super Battleship",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Board"
+  },
+
+  rom = {
+    name = "super-battleship",
+    file = "super-battleship.zip",
+    hashes = {
+      { hash = "603dfc96eb23f6f07f01cf03d210d252", label = "Garry Kitchen's Super Battletank (Europe).sfc" },
+      { hash = "e54701014e2a92ac21166525082b06e1", label = "Super Battleship (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0E47, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Rounds" },
+        { address=0X127E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0428, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ship 1 HP decreased" },
+        { address=0X0428, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ship 1 HP increased" },
+        { address=0X043A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0X043A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0X043C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X043C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X043E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X043E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0374, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ship 1 Gun Ammo" },
+      },
+    },
+  },
+}

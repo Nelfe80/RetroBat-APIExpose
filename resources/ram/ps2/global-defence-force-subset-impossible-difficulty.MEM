@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Global Defence Force [Subset - Impossible Difficulty]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "global-defence-force-subset-impossible-difficulty",
+    file = "global-defence-force-subset-impossible-difficulty.zip",
+    hashes = {
+      { hash = "3b950e8442461574cd936c0b976f3cc4", label = "Global Defence Force [Subset - Impossible Difficulty]" },
+    }
+  },
+
+  events = {
+  },
+}

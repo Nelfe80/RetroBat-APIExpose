@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "One Piece: Gigant Battle!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "one-piece-gigant-battle",
+    file = "one-piece-gigant-battle.zip",
+    hashes = {
+      { hash = "62c2e5e62168206d334ffc5e210b88ac", label = "One Piece - Gigant Battle! (Europe).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9E262, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0XB335E, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Scene Demo 1: Normal (Default)" },
+        { address=0XB335E, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Scene Demo 2: Shiver (Default)" },
+        { address=0XB335E, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Scene Demo 3: Fate [New]" },
+        { address=0XB335F, type="u8", condition="bit_true", bit=3, mask=0X08, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [New]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB31D8, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Thousand Sunny" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sabaody Arch" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sabaody Park" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amazon Lily" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Impel Down" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="East Blue Park" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Merry's Lagoon" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Judicial Sky" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Marineford" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Resort" },
+        { address=0XB31D8, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flowery Feast" },
+        { address=0XB31D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0XB3243, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rookie Level (Easy)" },
+        { address=0XB3243, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="East Blue Level (Normal)" },
+        { address=0XB3243, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grand Line Level (Hard)" },
+        { address=0XB3360, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Up! [New]" },
+        { address=0XB3D31, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Story Mode - Luffy Level" },
+        { address=0XB3D32, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Story Mode - Zoro Level" },
+        { address=0XB3D74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assist - Franky Level" },
+        { address=0XB3D75, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assist - Brook Level" },
+        { address=0XB3D77, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assist - Marco Level" },
+        { address=0XB3D94, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3000 Worlds" },
+      },
+      stage = {
+        { address=0XB3224, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB3CA8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sadie" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XB3198, type="u8", condition="eq", value=0X07, action="TREASURE", no_log=false, no_survey=false, desc="Edit Pirate Team / Treasure" },
+        { address=0XB335F, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasures (Default)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB31EC, type="u8", condition="eq", value=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="30 Sec" },
+        { address=0XB31EC, type="u8", condition="eq", value=0X20, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="60 Sec" },
+        { address=0XB31EC, type="u8", condition="eq", value=0X30, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="90 Sec" },
+        { address=0XB31EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Free Battle Time Setting" },
+      },
+    },
+  },
+}

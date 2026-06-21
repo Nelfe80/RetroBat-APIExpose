@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "The Flintstones",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-flintstones",
+    file = "the-flintstones.zip",
+    hashes = {
+      { hash = "c012d50635485789b5a31b1fa0d51af6", label = "Flintstones, The (USA) (En,Fr,De,Es,It).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X003C, type="u8", condition="eq", value=0X19, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X003C, type="u8", condition="eq", value=0XFD, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits/Scores" },
+      },
+    },
+  },
+}

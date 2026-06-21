@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Digital Dance Mix Vol. 1: Namie Amuro",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "digital-dance-mix-vol-1-namie-amuro",
+    file = "digital-dance-mix-vol-1-namie-amuro.zip",
+    hashes = {
+      { hash = "c56b0225b9ceb2bb845cfb6bd8d90837", label = "Digital Dance Mix Vol. 1 - Namie Amuro (Japan) (Rev A) (10M, 12M)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X15B1A1, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X15B1A1, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Time Up" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X15681B, type="u8", condition="eq", value=0X2, action="SCORE_STATE", no_log=false, no_survey=false, desc="Time Attack / Score Attack (depending on minigame)" },
+        { address=0X156852, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chase the Dance - Top score" },
+        { address=0X15AAAA, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chase the Dance - Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X15A941, type="u8", condition="eq", value=0X2, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door my sunshine" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15681B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Minigame difficulty" },
+        { address=0X15B226, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Minigame timer" },
+      },
+    },
+  },
+}

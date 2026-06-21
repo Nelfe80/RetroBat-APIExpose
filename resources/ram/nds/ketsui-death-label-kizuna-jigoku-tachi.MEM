@@ -1,0 +1,82 @@
+return {
+  game = {
+    title = "Ketsui Death Label: Kizuna Jigoku Tachi",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "ketsui-death-label-kizuna-jigoku-tachi",
+    file = "ketsui-death-label-kizuna-jigoku-tachi.zip",
+    hashes = {
+      { hash = "24175d7c714b97a06b97a969e1bddb1d", label = "Ketsui Death Label - Kizuna Jigoku-tachi (Japan).nds" },
+      { hash = "3a2a1a3cb0a890fab5f26f6d95cdfe2c", label = "Ketsui Death Label - Kizuna Jigoku-tachi (Japan) (En) (v0.2) (z3tzilla)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5601C, type="u8", condition="eq", value=0X4, action="DEMO_MODE", no_log=false, no_survey=false, desc="Replay/demo" },
+        { address=0X572F8, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X572F8, type="u8", condition="eq", value=0XD, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X57324, type="u8", condition="eq", value=0X64, action="PAUSE_OFF", no_log=false, no_survey=false, desc="In game, unpaused" },
+        { address=0X57324, type="u8", condition="eq", value=0X65, action="PAUSE_ON", no_log=false, no_survey=false, desc="In game, paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X572F8, type="u8", condition="eq", value=0XC, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Course clear" },
+      },
+      stage = {
+        { address=0X572F8, type="u8", condition="eq", value=0XB, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="White flash at stage stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X56018, type="u8", condition="eq", value=0XA, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Evaccaneer (and Evaccaneer Doom Very Hard/Death Label)" },
+        { address=0X57443, type="u8", condition="eq", value=0X4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Label" },
+        { address=0X90AE8, type="u8", condition="eq", value=0X6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Label" },
+        { address=0X90AF0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) increased" },
+        { address=0X90AF0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) decreased" },
+        { address=0X90E84, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total 1-Ups Collected (32-bit) increased" },
+        { address=0X90E84, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total 1-Ups Collected (32-bit) decreased" },
+        { address=0X90F1C, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Label Bosses Defeated (16-bit)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X90CCC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (32-bit)" },
+        { address=0X90EEC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Score 1 (32-bit)" },
+        { address=0X90EF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Score 2 (32-bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X56018, type="u8", condition="eq", value=0X1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sea Horse" },
+        { address=0X56018, type="u8", condition="eq", value=0X2, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bull Frog" },
+        { address=0X56018, type="u8", condition="eq", value=0X3, action="BOSS_HIT", no_log=false, no_survey=false, desc="Jem & Eni" },
+        { address=0X56018, type="u8", condition="eq", value=0X4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sphinx" },
+        { address=0X56018, type="u8", condition="eq", value=0X5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Vinogradov" },
+        { address=0X56018, type="u8", condition="eq", value=0X6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Jamadhar" },
+        { address=0X56018, type="u8", condition="eq", value=0X7, action="BOSS_HIT", no_log=false, no_survey=false, desc="Black Draft" },
+        { address=0X56018, type="u8", condition="eq", value=0X8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Cinderella Amber" },
+        { address=0X56018, type="u8", condition="eq", value=0X9, action="BOSS_HIT", no_log=false, no_survey=false, desc="Trafalgar" },
+        { address=0X56018, type="u8", condition="eq", value=0XB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Evaccaneer Doom (Hard C)" },
+        { address=0X56018, type="u8", condition="eq", value=0XE, action="BOSS_HIT", no_log=false, no_survey=false, desc="Evaccaneer Doom (Doom mode)" },
+        { address=0X57324, type="u8", condition="eq", value=0X6E, action="BOSS_HIT", no_log=false, no_survey=false, desc="In game, between bosses" },
+        { address=0X57443, type="u8", condition="eq", value=0X0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Novice or Normal" },
+        { address=0X57443, type="u8", condition="eq", value=0X1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X57443, type="u8", condition="eq", value=0X2, action="BOSS_HIT", no_log=false, no_survey=false, desc="Very Hard" },
+        { address=0X57C30, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Max HP (32-bit)" },
+        { address=0X57C34, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(32bit) boss health" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5735C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage Timer (32-bit)" },
+      },
+    },
+  },
+}

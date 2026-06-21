@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Captain Goodnight and the Islands of Fear",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "captain-goodnight-and-the-islands-of-fear",
+    file = "captain-goodnight-and-the-islands-of-fear.zip",
+    hashes = {
+      { hash = "dcaeefe497a0233467941157e4036027", label = "Captain Goodnight and the Islands of Fear side A.woz" },
+      { hash = "86372e640291d9c6fc3fa01d94704bbf", label = "Captain Goodnight and the Islands of Fear side B.woz" },
+    }
+  },
+
+  events = {
+  },
+}

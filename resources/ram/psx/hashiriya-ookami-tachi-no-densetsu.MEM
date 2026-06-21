@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Hashiriya: Ookami-tachi no Densetsu",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hashiriya-ookami-tachi-no-densetsu",
+    file = "hashiriya-ookami-tachi-no-densetsu.zip",
+    hashes = {
+      { hash = "14cc8c24aab9737a017ce730b5f8cda2", label = "Hashiriya - Ookami-tachi no Densetsu (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA2398, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Story Clears Saved" },
+      },
+    },
+  },
+}

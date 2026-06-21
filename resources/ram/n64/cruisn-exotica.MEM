@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cruis'n Exotica",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "cruisn-exotica",
+    file = "cruisn-exotica.zip",
+    hashes = {
+      { hash = "db7a03b77d44db81b8a3fcdfc4b72d8c", label = "Cruis'n Exotica (USA).z64" },
+    }
+  },
+
+  events = {
+  },
+}

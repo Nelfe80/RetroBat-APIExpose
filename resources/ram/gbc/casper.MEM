@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Casper",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "casper",
+    file = "casper.zip",
+    hashes = {
+      { hash = "e99687d3558fd7fc4af702ea1abd9957", label = "Casper (USA).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC1BB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bits] Cinematic Act 1 | Base value 0x00" },
+        { address=0XC1F6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bits] Cinematic Act 1 | Base value 0x00" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC1BD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bits] Tied to life (useless) increased" },
+        { address=0XC1BD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bits] Tied to life (useless) decreased" },
+        { address=0XC1BE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bits] Life | Base value 0x82 increased" },
+        { address=0XC1BE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bits] Life | Base value 0x82 decreased" },
+        { address=0XC24A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bits] Life bosses | Base value = 0x00 increased" },
+        { address=0XC24A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bits] Life bosses | Base value = 0x00 decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC1A6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bits] Gold Coins | Base value 0x00 increased" },
+        { address=0XC1F3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bits] Door opening increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC1B0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Number of bosses kill (reset after exit room) | Base value = 0x00" },
+        { address=0XC1B1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Boss kitchen | Base value = 0x00" },
+        { address=0XC1B2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Boss graveyard | Base value = 0x00" },
+        { address=0XC1B3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Boss garden | Base value = 0x00" },
+        { address=0XC1B4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Lazarus boss perfum ? | Base value = 0x00" },
+        { address=0XC1B5, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Bathroom boss | Base value 0x00" },
+        { address=0XC1B6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Military boss | Base value 0x00" },
+        { address=0XC1B7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Trio baseball boss | Base value 0x00" },
+        { address=0XC1B8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Wrath boss | Base value = 0x00" },
+        { address=0XC1B9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bits] Final boss | Base value = 0x00" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC158, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bits] Key color utility condition for piece after second green door" },
+        { address=0XC1CF, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bits] Open door condition" },
+        { address=0XC288, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bits] Color Doors | Base value = 0xff" },
+      },
+    },
+  },
+}

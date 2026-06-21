@@ -1,0 +1,111 @@
+return {
+  game = {
+    title = "Point Blank DS",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "point-blank-ds",
+    file = "point-blank-ds.zip",
+    hashes = {
+      { hash = "0090b0fcb15c05daba0235908ad61860", label = "Point Blank DS (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC7D2C, type="u8", condition="eq", value=0X0E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XC7FBC, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Brain Massage Titles" },
+        { address=0XC7FBC, type="u8", condition="eq", value=0X07, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue screen" },
+        { address=0XC7FBC, type="u8", condition="eq", value=0X0A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XC7FBC, type="u8", condition="eq", value=0X0B, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Choosing a stage" },
+        { address=0XD1C70, type="u16le", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XD27F0, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XDBC2B, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 2" },
+        { address=0XDBC2C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 3" },
+        { address=0XDBC2D, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 4" },
+        { address=0XDBC2E, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 5" },
+        { address=0XDBC2F, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 6" },
+        { address=0XDBC30, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 7" },
+        { address=0XDBC31, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 8" },
+        { address=0XDBC32, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 9" },
+        { address=0XDBC33, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 10" },
+        { address=0XDBC34, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 11" },
+        { address=0XDBC35, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 12" },
+        { address=0XDBC36, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 13" },
+        { address=0X1741FE, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X1741FE, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (Below 1500)" },
+        { address=0X1741FE, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (Above 1500)" },
+        { address=0X1741FE, type="u8", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (Beat old record)" },
+        { address=0X175A06, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Expert" },
+        { address=0X175A06, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Good" },
+        { address=0X175A06, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not Bad!" },
+        { address=0X175A06, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Try Harder!" },
+        { address=0X175A06, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Give Up!" },
+        { address=0X175A08, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Museum - Gator Choosing the title" },
+        { address=0X175A42, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Museum - Crab Choosing the title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD27E6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Completed Stage" },
+        { address=0X1742C8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Time Finished" },
+        { address=0X1742D0, type="u8", condition="eq", value=0X1E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1742D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Final level firework counts" },
+      },
+      stage = {
+        { address=0XD1C78, type="u16le", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="-0x13: Final Stage Playing OR last stage for practice" },
+        { address=0XD1C78, type="u16le", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Result" },
+        { address=0XD1C78, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Current Stages" },
+        { address=0X1742C8, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shooting the fireworks with the number of hitted targets" },
+        { address=0X1742C8, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shooting the final fireworks for congratulations" },
+        { address=0X1742C8, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="CONGRATULATIONS!" },
+        { address=0X1742C8, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Calculating Stage Score" },
+        { address=0X1742C8, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting shooting some fireworks after done calculating" },
+        { address=0X1742C8, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="End" },
+        { address=0X1742C8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Final Stage Transition" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD27F0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives increased" },
+        { address=0XD27F0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC7FBC, type="u8", condition="eq", value=0X06, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+        { address=0XC7FBC, type="u8", condition="eq", value=0X1C, action="SCORE_STATE", no_log=false, no_survey=false, desc="Brain Massage High Score" },
+        { address=0XDBC2A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8 Bit Flags] 100 Titles - 1" },
+        { address=0X17393C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Minigame Score" },
+        { address=0X174138, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Final Result Screen Score" },
+        { address=0X1742BC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Museum - Clay Score" },
+        { address=0X174C55, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Museum - Tanks Ones Score" },
+        { address=0X174C56, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Museum - Tanks Tenth Score" },
+        { address=0X175A3E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8 Bit] Museum - Crabs Score" },
+      },
+      collectibles = {
+        { address=0X1742B9, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8 Bit] Museum - Clay Ammo" },
+        { address=0X174328, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coins" },
+        { address=0X174328, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Heart + Coins" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD1CB8, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[Bit 0] Arcade Door" },
+        { address=0XD1CB9, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8 Bit] Arcade - Door Difficulty" },
+        { address=0X173900, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective" },
+        { address=0X173900, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door opening" },
+        { address=0X173900, type="u8", condition="eq", value=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Closing" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X175A3A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16 Bit] Extended Timer" },
+      },
+    },
+  },
+}

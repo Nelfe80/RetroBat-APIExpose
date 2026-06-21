@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Ys III: Wanderers from Ys",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "ys-iii-wanderers-from-ys",
+    file = "ys-iii-wanderers-from-ys.zip",
+    hashes = {
+      { hash = "5f00e6cf276b34927c819b376ba27cc4", label = "Ys III - Wanderers from Ys (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2C61, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Beginning" },
+        { address=0X2C61, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0D1B, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X0D1B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Adol's Level" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0086, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0X00A9, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+  },
+}

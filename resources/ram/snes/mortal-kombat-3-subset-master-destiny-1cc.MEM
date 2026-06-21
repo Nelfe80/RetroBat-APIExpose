@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Mortal Kombat 3 [Subset - Master Destiny 1cc]",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-3-subset-master-destiny-1cc",
+    file = "mortal-kombat-3-subset-master-destiny-1cc.zip",
+    hashes = {
+      { hash = "e1bc1d063355ae09757ec691fafeec7e", label = "Mortal Kombat 3 [Subset - Master Destiny 1cc].sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00D2, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X00D2, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not In Demo (pretty much everywhere else)" },
+        { address=0X3808, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Credits/Continues" },
+        { address=0X39D8, type="u16le", condition="eq", value=0X0F, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X39D8, type="u16le", condition="eq", value=0X12, action="DEMO_MODE", no_log=false, no_survey=false, desc="Story Screen (used between demos too)" },
+        { address=0X39D8, type="u16le", condition="eq", value=0X13, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Dev Team Credits + Main Menu" },
+        { address=0X39D8, type="u16le", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over + Story" },
+        { address=0X3AF6, type="u16le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="30 credits on/off" },
+        { address=0X3B1A, type="u16le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="view game credits on/off" },
+        { address=0X3B22, type="u16le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off" },
+        { address=0X3B22, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="On" },
+        { address=0X3B22, type="u16le", condition="eq", value=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="On" },
+      },
+      events = {
+        { address=0X3ADE, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="combos on/off" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3640, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1: Rounds Won" },
+        { address=0X3802, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="round (player 2)" },
+        { address=0X39BC, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Fatality" },
+        { address=0X39DE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="kombat zone select" },
+        { address=0X3B1E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="kombat zone on/off" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X05AA, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Percentage given from combo Fight 2 - Enemy or P2" },
+        { address=0X08AA, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Percentage given from combo Fight 1 - Enemy or P2" },
+        { address=0X09AA, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Percentage given from combo - Player 1" },
+        { address=0X3634, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP player 1 decreased" },
+        { address=0X3634, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP player 1 increased" },
+        { address=0X37F6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp player 2 decreased" },
+        { address=0X37F6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp player 2 increased" },
+        { address=0X3AE6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2x health on/off decreased" },
+        { address=0X3AE6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2x health on/off increased" },
+        { address=0X3AEA, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="2x damage on/off" },
+        { address=0X3B2A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health recovery on/off decreased" },
+        { address=0X3B2A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health recovery on/off increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3AD6, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="block on/off" },
+        { address=0X3AFE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="switcheroo on/off" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0132, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer (units)" },
+        { address=0X0136, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer (dozens)" },
+        { address=0X0232, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time (Ones)" },
+        { address=0X0236, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time (Tens)" },
+        { address=0X032F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Timer Freezes if !=0" },
+        { address=0X0332, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Timer - Seconds (ones) Editable," },
+        { address=0X0336, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Timer - Seconds (tens) Editable" },
+        { address=0X0337, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="upper8 of 16bit timer used outside of fights" },
+        { address=0X05A8, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo Hit Counter Fight 2 - Enemy or P2" },
+        { address=0X07A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="hit counter player 1 ???" },
+        { address=0X08A8, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="16-bit Combo Hit Counter Fight 1 - Enemy or P2" },
+        { address=0X09A8, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="16-bit Combo Hit Counter - Player 1" },
+        { address=0X0BA8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="hit counter player 1" },
+        { address=0X39F8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="battle counter" },
+        { address=0X3AE2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer on/off" },
+        { address=0X3AEE, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="max fatality time on/off" },
+      },
+    },
+  },
+}

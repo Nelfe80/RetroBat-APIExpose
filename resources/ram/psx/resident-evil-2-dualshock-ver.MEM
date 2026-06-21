@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Resident Evil 2: DualShock Ver.",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "resident-evil-2-dualshock-ver",
+    file = "resident-evil-2-dualshock-ver.zip",
+    hashes = {
+      { hash = "2e78f5817db6bb9dfb0208068d0801ce", label = "Resident Evil 2 - Dual Shock Ver. (USA) (Disc 2)" },
+      { hash = "33df147cc40901c4f96e4e9328cc9218", label = "Resident Evil 2 - Dual Shock Ver. (USA) (Disc 1)" },
+      { hash = "fc1719931d3d1f5dea926399177513e9", label = "Resident Evil 2 - Dual Shock Ver. (USA) (Es) (Doblaje) (v2.01) (Uncle Victor) (Disc 1)" },
+      { hash = "199911462f78e24522a91c3efd10379f", label = "Resident Evil 2 - Dual Shock Ver. (USA) (Es) (Doblaje) (v2.01) (Uncle Victor) (Disc 2)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD47E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extreme Battle Mode Level (Claire)" },
+        { address=0XD482A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Extreme Battle Mode Level (Leon)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCFD06, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (Claire) (Full = C8) decreased" },
+        { address=0XCFD06, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (Claire) (Full = C8) increased" },
+        { address=0XCFD4E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (Leon) (Full = C8) decreased" },
+        { address=0XCFD4E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (Leon) (Full = C8) increased" },
+        { address=0X1215CA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="G-Adult Health (Maybe not Static?) (Claire) decreased" },
+        { address=0X1215CA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="G-Adult Health (Maybe not Static?) (Claire) increased" },
+        { address=0X122632, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="G Adult Health (Leon-A maybe not static?) decreased" },
+        { address=0X122632, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="G Adult Health (Leon-A maybe not static?) increased" },
+        { address=0X12747E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="G-Type 3-4 Health (Lab Cargo Room) (Claire) (Possibly not static?) decreased" },
+        { address=0X12747E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="G-Type 3-4 Health (Lab Cargo Room) (Claire) (Possibly not static?) increased" },
+        { address=0X1274FA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="G-Type 3-4 Health (Lab Cargo Room) (Leon) (Maybe not static?) decreased" },
+        { address=0X1274FA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="G-Type 3-4 Health (Lab Cargo Room) (Leon) (Maybe not static?) increased" },
+        { address=0X12FA12, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="G-Type 2 Health (Leon) (Possibly not static?) decreased" },
+        { address=0X12FA12, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="G-Type 2 Health (Leon) (Possibly not static?) increased" },
+        { address=0X12FA16, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="G-Type 2 Health (Claire) (Possibly not static?) decreased" },
+        { address=0X12FA16, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="G-Type 2 Health (Claire) (Possibly not static?) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XD5BB2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon (Claire)" },
+        { address=0XD5BFA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon (Leon)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC3BD9, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Equipped Weapon Ammo Display? (Leon)" },
+        { address=0XD4686, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Infinite Ammo Cheat Activated=FFFF (16-Bit) (Claire)" },
+        { address=0XD46CE, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Infinite Ammo Cheat Activated=FFFF (16-Bit) (Leon)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XDF348, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCFB84, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 1 Time (Claire Disc)" },
+        { address=0XCFB88, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 2 Time (Claire Disc)" },
+        { address=0XCFB8C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 3 Time (Claire Disc)" },
+        { address=0XCFBCC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 1 Time (Leon Disc)" },
+        { address=0XCFBD0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 2 Time (Leon Disc)" },
+        { address=0XCFBD4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 3 Time (Leon Disc)" },
+        { address=0XD47EA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Final Boss Timer (Claire)" },
+        { address=0XD4832, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Final Boss Timer (Leon)" },
+        { address=0XD4BE0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 1 Time (Claire Disc)" },
+        { address=0XD4BE4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 2 Time (Claire Disc)" },
+        { address=0XD4BE8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 3 Time (Claire Disc)" },
+        { address=0XD4C28, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 1 Time (Leon Disc)" },
+        { address=0XD4C2C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 2 Time (Leon Disc)" },
+        { address=0XD4C30, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extreme Battle Mode Stage 3 Time (Leon Disc)" },
+      },
+    },
+  },
+}

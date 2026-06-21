@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Michael Jackson's Moonwalker",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "michael-jacksons-moonwalker",
+    file = "michael-jacksons-moonwalker.zip",
+    hashes = {
+      { hash = "aa3bc8467e80a6aaab02051818ecb035", label = "Michael Jackson's Moonwalker (USA, Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0032, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 = Demo active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X01ED, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01 = Stage Clear" },
+      },
+      stage = {
+        { address=0X0009, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages and Sub-Stages" },
+        { address=0X1DF8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01 = Stage Select active (Bit3)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0067, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0X0067, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+      },
+      health = {
+        { address=0X0576, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Michael's HP decreased" },
+        { address=0X0576, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Michael's HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X009A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (HEX/BCD) 16-Bit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X01EE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Number of Enemies remaining (Boss fight only)" },
+      },
+    },
+  },
+}

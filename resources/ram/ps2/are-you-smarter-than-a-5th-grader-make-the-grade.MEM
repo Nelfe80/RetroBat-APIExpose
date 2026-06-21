@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Are You Smarter than a 5th Grader? Make the Grade",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Education, Quiz"
+  },
+
+  rom = {
+    name = "are-you-smarter-than-a-5th-grader-make-the-grade",
+    file = "are-you-smarter-than-a-5th-grader-make-the-grade.zip",
+    hashes = {
+      { hash = "a57eb50ccce2b4d1f4c86bc5b50e1b9d", label = "Are You Smarter than a 5th Grader Make the Grade (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XD402A4, type="u32le", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="yes" },
+        { address=0XD402A4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Peak (lifeline) used? - dynamic 1 increased" },
+        { address=0XD402A4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Peak (lifeline) used? - dynamic 1 decreased" },
+        { address=0XD40504, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Game - Save (cheat/lifeline) used? - dynamic 2 increased" },
+        { address=0XD40504, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game - Save (cheat/lifeline) used? - dynamic 2 decreased" },
+        { address=0XD42684, type="u32le", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="yes" },
+        { address=0XD42684, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Game - Save (cheat/lifeline) used? - dynamic 1 increased" },
+        { address=0XD42684, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game - Save (cheat/lifeline) used? - dynamic 1 decreased" },
+        { address=0XD42874, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Game - Save (cheat/lifeline) used? - dynamic 2 increased" },
+        { address=0XD42874, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game - Save (cheat/lifeline) used? - dynamic 2 decreased" },
+        { address=0XD43264, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Peak (lifeline) used? - dynamic 2 increased" },
+        { address=0XD43264, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Peak (lifeline) used? - dynamic 2 decreased" },
+        { address=0XD43394, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Copy (lifeline) used? - dynamic 2 increased" },
+        { address=0XD43394, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Copy (lifeline) used? - dynamic 2 decreased" },
+        { address=0XD43694, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Peak (lifeline) used? - dynamic 3 increased" },
+        { address=0XD43694, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Peak (lifeline) used? - dynamic 3 decreased" },
+        { address=0XD437C4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Copy (lifeline) - used? - dynamic 3 increased" },
+        { address=0XD437C4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Copy (lifeline) - used? - dynamic 3 decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD40174, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="How much money you're on/progression - Dynamic 1 increased" },
+        { address=0XD422F4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="How much money you're on/progression - Dynamic 2 increased" },
+        { address=0XD43134, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="2nd match in session - Money - Dynamic 1 increased" },
+      },
+    },
+  },
+}

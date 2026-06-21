@@ -1,0 +1,153 @@
+return {
+  game = {
+    title = "Shining Wisdom",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "shining-wisdom",
+    file = "shining-wisdom.zip",
+    hashes = {
+      { hash = "c0d0efd675b0e77731b38a66f5425a66", label = "Shining Wisdom (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10664F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01 = paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X106608, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Acceleration level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X106050, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal" },
+        { address=0X106050, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Creepy Cavern" },
+        { address=0X106050, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Sand Labyrinth" },
+        { address=0X106050, type="u8", condition="bit_true", bit=5, mask=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Milennium Tree" },
+        { address=0X106050, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Perilous Pass" },
+        { address=0X106050, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Light Labyrinth" },
+        { address=0X106051, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Fire Labyrinth" },
+        { address=0X106051, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Water Labyrinth" },
+        { address=0X106051, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Mirror Labyrinth" },
+        { address=0X106051, type="u8", condition="bit_true", bit=5, mask=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Mystic Forest" },
+        { address=0X106051, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Royal Crypt" },
+        { address=0X106051, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="life crystal in Gudo Cave" },
+        { address=0X106058, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in Odegan Castle" },
+        { address=0X106058, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in Milennial Tree" },
+        { address=0X106058, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in Mystic Wood" },
+        { address=0X106058, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in Gudo cave" },
+        { address=0X106058, type="u8", condition="bit_true", bit=5, mask=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in Odegan Castle" },
+        { address=0X106058, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in Perilous Pass" },
+        { address=0X106058, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in Light Labyrinth" },
+        { address=0X106059, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in water labyrinth" },
+        { address=0X106059, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in mirror labyrinth" },
+        { address=0X10605A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit 7: life-stock crystal in royal labyrinth increased" },
+        { address=0X10605A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 7: life-stock crystal in royal labyrinth decreased" },
+        { address=0X10605B, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal" },
+        { address=0X10605B, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal" },
+        { address=0X10605B, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal" },
+        { address=0X10605B, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal in creepy cavern" },
+        { address=0X10605B, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="life-stock crystal" },
+        { address=0X106125, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lifeblood medicines in inventory increased" },
+        { address=0X106125, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lifeblood medicines in inventory decreased" },
+        { address=0X10615A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X10615A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0X10615E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max life increased" },
+        { address=0X10615E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max life decreased" },
+      },
+      health = {
+        { address=0X171D88, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP? decreased" },
+        { address=0X171D88, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP? increased" },
+        { address=0X171D89, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="High Byte of Enemy 1 HP decreased" },
+        { address=0X171D89, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="High Byte of Enemy 1 HP increased" },
+        { address=0X171E24, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mushroom Forest: Spider's health decreased" },
+        { address=0X171E24, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mushroom Forest: Spider's health increased" },
+        { address=0X171EC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's HP decreased" },
+        { address=0X171EC0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's HP increased" },
+        { address=0X171F5C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sand labyrinth: sand worm's head's HP decreased" },
+        { address=0X171F5C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sand labyrinth: sand worm's head's HP increased" },
+        { address=0X172094, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gudo cave: yellow cloud's HP decreased" },
+        { address=0X172094, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gudo cave: yellow cloud's HP increased" },
+        { address=0X172304, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gudo cave: yellow cloud's HP decreased" },
+        { address=0X172304, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gudo cave: yellow cloud's HP increased" },
+        { address=0X172748, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's HP decreased" },
+        { address=0X172748, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's HP increased" },
+        { address=0X1727E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's HP decreased" },
+        { address=0X1727E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's HP increased" },
+        { address=0X17291C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's HP decreased" },
+        { address=0X17291C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's HP increased" },
+        { address=0X172A54, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's HP decreased" },
+        { address=0X172A54, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's HP increased" },
+        { address=0X172AF0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's HP decreased" },
+        { address=0X172AF0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's HP increased" },
+        { address=0X172B8B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's HP decreased" },
+        { address=0X172B8B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's HP increased" },
+        { address=0X172C28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy's HP decreased" },
+        { address=0X172C28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy's HP increased" },
+        { address=0X19F7DA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Odegan castle: Karry's pet's HP decreased" },
+        { address=0X19F7DA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Odegan castle: Karry's pet's HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X106044, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="monkey suit chest" },
+        { address=0X10604C, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="angel's wing chest" },
+        { address=0X10604C, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="angel's wing chest" },
+      },
+      weapon = {
+        { address=0X106536, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon equipped" },
+        { address=0X106537, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Unequipped weapon 1" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X106114, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X171E5C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gudo Cave: boss' part" },
+        { address=0X171EF8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gudo Cave: Boss' part" },
+        { address=0X171F94, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gudo Cave: Boss' part" },
+        { address=0X172030, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gudo Cave: Boss' part" },
+        { address=0X1720CC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gudo Cave: Boss' part" },
+        { address=0X172168, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gudo Cave: Boss' part" },
+        { address=0X172204, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gudo Cave: Boss' part" },
+        { address=0X1722A0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gudo Cave: Boss' part" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X10604A, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="dazzle orb chest" },
+        { address=0X10604A, type="u8", condition="bit_true", bit=2, mask=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="miracle diary chest" },
+        { address=0X10604A, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="record book chest" },
+        { address=0X10604A, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="angel's wing chest" },
+        { address=0X10604A, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="healing herb chest" },
+        { address=0X10604A, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="medicine chest" },
+        { address=0X10612F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of shield orbs in inventory" },
+      },
+      player = {
+        { address=0X106050, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=false, no_survey=false, desc="life crystal in Air Labyrinth" },
+        { address=0X106053, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=false, no_survey=false, desc="life crystal" },
+        { address=0X106053, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="life crystal" },
+        { address=0X106053, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="life crystal" },
+        { address=0X106053, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="life crystal" },
+        { address=0X106059, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=false, no_survey=false, desc="life-stock crystal in jump labyrinth" },
+        { address=0X10605B, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="life-stock crystal in air labyrinth" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X106028, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="sand labyrinth switch 1 pressed" },
+        { address=0X106028, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="sand labyrinth switch 2 pressed" },
+      },
+    },
+  },
+}

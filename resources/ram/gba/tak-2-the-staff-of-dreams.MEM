@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Tak 2: The Staff of Dreams",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "tak-2-the-staff-of-dreams",
+    file = "tak-2-the-staff-of-dreams.zip",
+    hashes = {
+      { hash = "05b2267bdf77e3d36d0b96c22d3af844", label = "Tak 2 - The Staff of Dreams (USA).gba" },
+      { hash = "c7174179fdb9d5dca2a150351adc3a58", label = "Tak 2 - The Staff of Dreams (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA6A5, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="false" },
+        { address=0XA6A5, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="true" },
+        { address=0X26B34, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X26B34, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen moving out" },
+        { address=0X26B34, type="u8", condition="eq", value=0X04, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/New game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X7C24, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[160-bit][ASCII] Level selection bottom text" },
+        { address=0X8BEC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rift level countdown in seconds" },
+        { address=0XA788, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tutorial" },
+        { address=0XA788, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Swamp 1" },
+        { address=0XA788, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Swamp 2" },
+        { address=0XA788, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Swamp 3" },
+        { address=0XA788, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Swamp 4" },
+        { address=0XA788, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Swamp 5" },
+        { address=0XA788, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planetarium 1" },
+        { address=0XA788, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planetarium 2" },
+        { address=0XA789, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planetarium 3" },
+        { address=0XA789, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planetarium 4" },
+        { address=0XA789, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planetarium 5" },
+        { address=0XA789, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Woodlands 1" },
+        { address=0XA789, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Woodlands 2" },
+        { address=0XA789, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Woodlands 3" },
+        { address=0XA789, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Woodlands 4" },
+        { address=0XA789, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Woodlands 5" },
+        { address=0XA78A, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Swamp Rift" },
+        { address=0XA78A, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Planetarium Rift" },
+        { address=0XA78A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Woodlands Rift" },
+        { address=0XA78A, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Dream Fortress 1" },
+        { address=0XA78A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Dream Fortress 2" },
+        { address=0XA798, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bitflags] Cleared levels - Part 1 (Europe)" },
+        { address=0XA799, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bitflags] Cleared levels - Part 2 (Europe)" },
+        { address=0XA79A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bitflags] Cleared levels - Part 3 (Europe)" },
+        { address=0XA79C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last entered level (Europe)" },
+        { address=0XA910, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected level on map" },
+        { address=0XA930, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected level on map (Europe)" },
+      },
+      zone = {
+        { address=0X8BF4, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="false" },
+        { address=0X8BF4, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="true" },
+        { address=0X8BF4, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="In Dream World" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA770, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Potion" },
+        { address=0XE22B, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Planetarium 4-1 - Thief enemy 2 health decreased" },
+        { address=0XE22B, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Planetarium 4-1 - Thief enemy 2 health increased" },
+        { address=0XE544, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Swamp 1-1 - Thief enemy health decreased" },
+        { address=0XE544, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Swamp 1-1 - Thief enemy health increased" },
+        { address=0XE92B, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Planetarium 4-1 - Thief enemy 1 health decreased" },
+        { address=0XE92B, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Planetarium 4-1 - Thief enemy 1 health increased" },
+        { address=0X26C48, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health Potion" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA6A6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Yorbels (Money) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA759, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="false" },
+        { address=0XA759, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="true" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA770, type="u8", condition="eq", value=0X06, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dream Shield" },
+        { address=0X26C48, type="u8", condition="eq", value=0X06, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dream Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA6A5, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="First time booting the game / Disable 'Continue' option" },
+      },
+    },
+  },
+}

@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Star Wars",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "star-wars",
+    file = "star-wars.zip",
+    hashes = {
+      { hash = "25496df74d7e25bb0daff1adcc40cadc", label = "Star Wars (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0311, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode: 01" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0300, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Another level adress (more stable?)" },
+        { address=0X048C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="On Ground Flag" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00BD, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="cockpit of the millenium after death star" },
+        { address=0X0487, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Is Dead" },
+        { address=0X06DF, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives increased" },
+        { address=0X06DF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives decreased" },
+        { address=0X06E0, type="u8", condition="eq", value=0X73, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Star Stage" },
+        { address=0X0729, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Luke's Health: max is 40, dead is 00" },
+      },
+      health = {
+        { address=0X072A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Han Solo Health decreased" },
+        { address=0X072A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Han Solo Health increased" },
+        { address=0X072B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Princess Leia Health decreased" },
+        { address=0X072B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Princess Leia Health increased" },
+        { address=0X69F4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shield health in Falcon (16 bits) decreased" },
+        { address=0X69F4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shield health in Falcon (16 bits) increased" },
+        { address=0X7BD9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tractor Beam health decreased" },
+        { address=0X7BD9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tractor Beam health increased" },
+        { address=0X7BDA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Stormtrooper's health: max is 2d decreased" },
+        { address=0X7BDA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Stormtrooper's health: max is 2d increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0737, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of shield icons" },
+        { address=0X69F5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inside Falcon Millenium, shield remaining" },
+      },
+      player = {
+        { address=0X0485, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump button is pressed" },
+      },
+    },
+  },
+}

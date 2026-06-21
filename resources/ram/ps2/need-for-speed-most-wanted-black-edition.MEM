@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Need for Speed: Most Wanted - Black Edition",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "need-for-speed-most-wanted-black-edition",
+    file = "need-for-speed-most-wanted-black-edition.zip",
+    hashes = {
+      { hash = "cb41d9fc2e2a206bf6a0684700ba0a0a", label = "Need for Speed - Most Wanted - Black Edition (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X56DC24, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X56E450, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Current Pursuit - Damaged Police Vehicles" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X56E464, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Pursuit - Bounty (Reputation score)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X536924, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Initial value" },
+        { address=0X536924, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="In a Race Event" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X56E45C, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Current Pursuit - Roadblocks Dodged" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X56E44C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Current Pursuit - Timer" },
+      },
+    },
+  },
+}

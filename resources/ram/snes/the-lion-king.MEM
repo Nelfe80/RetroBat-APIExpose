@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "The Lion King",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-lion-king",
+    file = "the-lion-king.zip",
+    hashes = {
+      { hash = "036beed13a2c8c8f7a99f0dbf33ffdc1", label = "Lion King, The (USA) (MSU-1) (Film OST) (Kurrono) (2.0).sfc" },
+      { hash = "18c4ea37118850c18084c9993ef93165", label = "Lion King, The (USA) (MSU-1) (Film OST) (Kurrono) (3.0).sfc" },
+      { hash = "6a5b2f9bde72f7d72db7dfe9afd0f47a", label = "Lion King, The (USA).sfc" },
+      { hash = "f674143b37cc0f7914d6858d864394b0", label = "Lion King, The (USA) (Fr).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0AC5, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen = 5f" },
+        { address=0X1E04, type="u8", condition="eq", value=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Active" },
+        { address=0X1E04, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Not Active" },
+        { address=0XB241, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="8-bit -> Cursor in Title Screen and Options" },
+        { address=0X1FFA8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0ACD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Conclus????o de stage" },
+        { address=0X1FF9E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1FFAA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1FFAA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X2004, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Lion decreased" },
+        { address=0X2004, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Lion increased" },
+        { address=0XB259, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Instant damage" },
+        { address=0X1FFAC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Simba Maximum Health decreased" },
+        { address=0X1FFAC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Simba Maximum Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1E03, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="8-bit -> AI Input during Demo increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0A8B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle" },
+        { address=0X0AAB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="01 = Boss Battle" },
+        { address=0X0AC1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Active" },
+        { address=0X1FF0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss active 3" },
+        { address=0XB43D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP (Hyena)" },
+        { address=0XB53D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Hyena HP [Normal]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1FF9C, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="On" },
+        { address=0X1FF9C, type="u8", condition="eq", value=0X02, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Easy" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB265, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8-bit -> Partial Timer - Demo Countdown" },
+        { address=0XB266, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8-bit -> Partial Timer - Demo Countdown" },
+      },
+    },
+  },
+}

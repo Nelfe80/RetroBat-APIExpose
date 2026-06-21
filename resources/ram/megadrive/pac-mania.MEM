@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Pac-Mania",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "pac-mania",
+    file = "pac-mania.zip",
+    hashes = {
+      { hash = "2256f31ff48f93a5e2f1d03f13c0f024", label = "Pac-Mania (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XFF36, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select (Cheat Inputted)" },
+        { address=0XFF36, type="u8", condition="eq", value=0XC0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select (Normal)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X015C, type="u8", condition="eq", value=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Block Town Death Screen" },
+        { address=0X015C, type="u8", condition="eq", value=0X44, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Park Death Screen" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X015C, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Town" },
+      },
+    },
+  },
+}

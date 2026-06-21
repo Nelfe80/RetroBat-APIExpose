@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Super Puyo Puyo 2",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "super-puyo-puyo-2",
+    file = "super-puyo-puyo-2.zip",
+    hashes = {
+      { hash = "15892783cf2bc369935b3b3d4dc3c4a2", label = "Super Puyo Puyo 2 (USA, Europe) (Ja) (Switch Online).sfc" },
+      { hash = "50d3c9b6c0fb1abcfc254425976b25ea", label = "Super Puyo Puyo Tsuu (Japan) (En) (v1.1) (J2E Translations).sfc" },
+      { hash = "d19486b22c8a4f11aa969671ae1967b2", label = "Super Puyo Puyo Tsuu (Japan).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

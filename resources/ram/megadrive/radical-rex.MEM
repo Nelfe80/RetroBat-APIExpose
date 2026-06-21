@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Radical Rex",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "radical-rex",
+    file = "radical-rex.zip",
+    hashes = {
+      { hash = "41b34e2f22ca4cfffb2d6190fad878e4", label = "Radical Rex (USA).md" },
+    }
+  },
+
+  events = {
+  },
+}

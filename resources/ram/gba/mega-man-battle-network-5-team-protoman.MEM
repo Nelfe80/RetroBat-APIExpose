@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Mega Man Battle Network 5: Team Protoman",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "mega-man-battle-network-5-team-protoman",
+    file = "mega-man-battle-network-5-team-protoman.zip",
+    hashes = {
+      { hash = "71b00ba406c522d3cec48311bd7bc760", label = "Megaman - Battle Network 5 - Team Protoman (USA).gba" },
+      { hash = "a1b8d71fa43915d37b955a2b1a0ed80a", label = "Megaman - Battle Network 5 - Team Protoman (Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA940, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="<8-bit> Value changes depending on game state. I.e., whether you are in the menu, on the title s" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD2E8, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[MegaMan Actual Life Outside The Battle] [16-Bits] increased" },
+        { address=0XD2E8, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[MegaMan Actual Life Outside The Battle] [16-Bits] decreased" },
+        { address=0XD2EA, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Mega Man Max Life Outside Battle] increased" },
+        { address=0XD2EA, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Mega Man Max Life Outside Battle] decreased" },
+      },
+      health = {
+        { address=0XA944, type="u16le", condition="eq", value=0X0088, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Lan's HP" },
+        { address=0XA944, type="u16le", condition="eq", value=0X0288, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Dex's HP" },
+        { address=0XA944, type="u16le", condition="eq", value=0X0388, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Yai's HP" },
+        { address=0XA944, type="u16le", condition="eq", value=0X0188, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mayl's HP" },
+        { address=0XA944, type="u16le", condition="eq", value=0X0588, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Garg Castle HP" },
+        { address=0XA944, type="u16le", condition="eq", value=0X0488, action="HEALTH_STATE", no_log=false, no_survey=false, desc="SciLab HP" },
+        { address=0XBE10, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[HP Memory Collected] [8-Bits] decreased" },
+        { address=0XBE10, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[HP Memory Collected] [8-Bits] increased" },
+        { address=0X432FC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP decreased" },
+        { address=0X432FC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP increased" },
+        { address=0X432FE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Max HP decreased" },
+        { address=0X432FE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Max HP increased" },
+        { address=0X433D4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy Actual HP] [16-Bits] decreased" },
+        { address=0X433D4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy Actual HP] [16-Bits] increased" },
+        { address=0X433D6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy Max HP] [16-Bits] decreased" },
+        { address=0X433D6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy Max HP] [16-Bits] increased" },
+        { address=0X434AC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy Actual HP] [16-Bits] decreased" },
+        { address=0X434AC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy Actual HP] [16-Bits] increased" },
+        { address=0X434AE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy Max HP] [16-Bits] decreased" },
+        { address=0X434AE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy Max HP] [16-Bits] increased" },
+        { address=0X43584, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy Actual HP] [16-Bits] decreased" },
+        { address=0X43584, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy Actual HP] [16-Bits] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XAA3B, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Reg Up1 in Sci Lab Trash Bin" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X43300, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy 1 ID" },
+      },
+    },
+  },
+}

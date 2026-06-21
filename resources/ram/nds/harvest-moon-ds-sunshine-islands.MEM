@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Harvest Moon DS: Sunshine Islands",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation, Role-Playing"
+  },
+
+  rom = {
+    name = "harvest-moon-ds-sunshine-islands",
+    file = "harvest-moon-ds-sunshine-islands.zip",
+    hashes = {
+      { hash = "401a6f449c2d11b9f58f1ec5d3846b3c", label = "Harvest Moon DS - Sunshine Islands (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEC902, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDC0D0, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XEA48E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Mine Level" },
+        { address=0XEA48F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Medium" },
+        { address=0XEA48F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Large" },
+        { address=0XEA48F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rucksack Level" },
+        { address=0XEA4D1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mine Info - Lowest level reached" },
+      },
+      stage = {
+        { address=0X3B8FEC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID to load" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEABE4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Cap" },
+        { address=0XEC380, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Candied Potato" },
+      },
+      health = {
+        { address=0XEA444, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="Yoghurt Maker" },
+        { address=0XEBD90, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Yoghurt" },
+        { address=0XEBD98, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Superb Yoghurt" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XEAB1C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pirate's Treasure" },
+        { address=0XEBBE8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald" },
+        { address=0XEC618, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald" },
+        { address=0XEC6B8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Pirate Treasure" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XDC11C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money/Gold increased" },
+        { address=0XE56C2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="1st Animal - Gold Prizes increased" },
+        { address=0XEA49B, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XEA80C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Round Herring increased" },
+        { address=0XEBBBC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0XEC5C0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XEAC04, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroying Angel" },
+      },
+    },
+  },
+}

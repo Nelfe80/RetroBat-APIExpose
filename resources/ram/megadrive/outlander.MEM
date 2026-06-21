@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Outlander",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Racing"
+  },
+
+  rom = {
+    name = "outlander",
+    file = "outlander.zip",
+    hashes = {
+      { hash = "34dcdc7f7c33ce7ef58687a43c5c548f", label = "Outlander (USA).md" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XEA90, type="u16be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="16bit gun ammo" },
+      },
+    },
+  },
+}

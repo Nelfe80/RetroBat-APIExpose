@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "The Adventures of Batman & Robin",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-adventures-of-batman-robin",
+    file = "the-adventures-of-batman-robin.zip",
+    hashes = {
+      { hash = "5b1bcb3793262d2d0282b49e0c2ee053", label = "Adventures of Batman & Robin, The (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF602, type="u8", condition="eq", value=0X10, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue? Screen" },
+        { address=0XF602, type="u8", condition="eq", value=0X11, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen" },
+        { address=0XFFD4, type="u8", condition="eq", value=0XB, action="PAUSE_ON", no_log=false, no_survey=false, desc="DD" },
+        { address=0XFFD4, type="u8", condition="eq", value=0XA, action="PAUSE_ON", no_log=false, no_survey=false, desc="DE" },
+        { address=0XFFD4, type="u8", condition="eq", value=0XC, action="PAUSE_ON", no_log=false, no_survey=false, desc="E5" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF602, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Entering Level 2 Cutscene" },
+        { address=0XF602, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Entering Level 3 Cutscene" },
+        { address=0XF602, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Entering Level 4 Cutscene" },
+        { address=0XF602, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Entering Level 5 Cutscene" },
+      },
+      stage = {
+        { address=0XF603, type="u32be", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0XF603, type="u32be", condition="eq", value=0X11, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1-1: Happy Birthday to Me" },
+        { address=0XF603, type="u32be", condition="eq", value=0X13, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1-2: Happy Birthday to Me" },
+        { address=0XF603, type="u32be", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1-3: Happy Birthday to Me" },
+        { address=0XF603, type="u32be", condition="eq", value=0X21, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2-1: A Two Sided Story" },
+        { address=0XF603, type="u32be", condition="eq", value=0X22, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2-2: A Two Sided Story" },
+        { address=0XF603, type="u32be", condition="eq", value=0X23, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2-3: A Two Sided Story" },
+        { address=0XF603, type="u32be", condition="eq", value=0X24, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2-4: A Two Sided Story" },
+        { address=0XF603, type="u32be", condition="eq", value=0X31, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3-1: Tea Time!" },
+        { address=0XF603, type="u32be", condition="eq", value=0X32, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3-2: Tea Time!" },
+        { address=0XF603, type="u32be", condition="eq", value=0X33, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3-3: Tea Time!" },
+        { address=0XF603, type="u32be", condition="eq", value=0X34, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3-4: Tea Time!" },
+        { address=0XF603, type="u32be", condition="eq", value=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 4-1: Snow in July?" },
+        { address=0XF603, type="u32be", condition="eq", value=0X43, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 4-2: Snow in July?" },
+        { address=0XF603, type="u32be", condition="eq", value=0X44, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 4-3: Snow in July?" },
+        { address=0XF603, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF602, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Opening Cutscene & Boss Fights" },
+        { address=0XF6B3, type="u8", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Time?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF6B3, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="0x0F=Normal Play?" },
+      },
+    },
+  },
+}

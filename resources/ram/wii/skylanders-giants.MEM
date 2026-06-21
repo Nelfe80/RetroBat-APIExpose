@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Skylanders: Giants",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "skylanders-giants",
+    file = "skylanders-giants.zip",
+    hashes = {
+      { hash = "f7416e9a250ac4540615a84188232bac", label = "Skylanders - Giants (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X6E2B80, type="u32be", condition="eq", value=0XC9, action="TREASURE", no_log=false, no_survey=false, desc="Hidden Treasure" },
+        { address=0X7F7C7D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[8-bit bitflags] Legendary Treasure 1" },
+        { address=0X7F7C7E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[8-bit bitflags] Legendary Treasure 2" },
+        { address=0X805D10, type="u32be", condition="eq", value=0XC9, action="TREASURE", no_log=false, no_survey=false, desc="Hidden Treasure" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6E2B80, type="u32be", condition="eq", value=0XCD, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Sky-Iron Shield" },
+        { address=0X805D10, type="u32be", condition="eq", value=0XCD, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Sky-Iron Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6E2B80, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Slot 1 active Skylander ID" },
+        { address=0X805D10, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Slot 2 active Skylander ID" },
+      },
+    },
+  },
+}

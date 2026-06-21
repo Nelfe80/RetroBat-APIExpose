@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Conflict: Vietnam",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "conflict-vietnam",
+    file = "conflict-vietnam.zip",
+    hashes = {
+      { hash = "7ac9ac8634104ae4eb2e7b14df09d809", label = "Conflict - Vietnam (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X42837C, type="u16le", condition="eq", value=0X15, action="PAUSE_ON", no_log=false, no_survey=false, desc="In Game: Paused" },
+      },
+    },
+  },
+}

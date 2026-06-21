@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Stitch Jam",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "stitch-jam",
+    file = "stitch-jam.zip",
+    hashes = {
+      { hash = "8e605ca9edd2250b263e228d07eca197", label = "Stitch Jam (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA22A4, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XA22A4, type="u8", condition="eq", value=0X07, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="In Level" },
+        { address=0XA22A4, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XA22A4, type="u8", condition="eq", value=0X11, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="opening logos" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA2250, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+        { address=0XA2250, type="u16le", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Cleared" },
+        { address=0XA2250, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Status?" },
+        { address=0XA2298, type="u32be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Becomes 01 when 'Congrats! You Cleared the Stage!' pops up" },
+        { address=0XA22E4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Challenge Mode Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X97844, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Stitch's Date!" },
+        { address=0X97848, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Trouble in Town!" },
+        { address=0X9784C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Underground Chase!" },
+        { address=0X97850, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Better not Fall!" },
+        { address=0X97854, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Underwater Chase!" },
+        { address=0X97858, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Hunger Strikes!" },
+        { address=0X9785C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: What's that Sound?" },
+        { address=0X97860, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Follow the Trail!" },
+        { address=0X97864, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Intergalactic Chase!" },
+        { address=0X97868, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Get the Bad Guys!" },
+        { address=0X9786C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Where's Angel Going?" },
+        { address=0X97870, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: A Dangerous Hike!" },
+        { address=0X97874, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: A Happy Date!" },
+        { address=0X97878, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Special Stage 1" },
+        { address=0X9787C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Special Stage 2" },
+        { address=0X97880, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Special Stage 3" },
+        { address=0X9788C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Stitch's Date! Challenge Level 1" },
+        { address=0X97890, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Trouble in Town! Challenge Level 1" },
+        { address=0X978B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Stitch's Date! Challenge Level 2" },
+        { address=0X978B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Trouble in Town! Challenge Level 2" },
+        { address=0X978DC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Stitch's Date! Challenge Level 3" },
+        { address=0X978E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score: Trouble in Town! Challenge Level 3" },
+      },
+    },
+  },
+}

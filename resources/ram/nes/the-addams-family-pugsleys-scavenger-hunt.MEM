@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "The Addams Family: Pugsley's Scavenger Hunt",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-addams-family-pugsleys-scavenger-hunt",
+    file = "the-addams-family-pugsleys-scavenger-hunt.zip",
+    hashes = {
+      { hash = "67d870aaa3fd90109383a52be3887c6e", label = "Addams Family, The - Pugsley's Scavenger Hunt (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0526, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loot bits (The underground)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0437, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (High dec) increased" },
+        { address=0X0437, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (High dec) decreased" },
+        { address=0X0438, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (Low dec) increased" },
+        { address=0X0438, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (Low dec) decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X053E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Loot bits (The Money Box) increased" },
+        { address=0X0563, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Loot bank (Chain of Coins - 1) increased" },
+        { address=0X0564, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Loot bank (Chain of Coins - 2) increased" },
+        { address=0X0565, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Loot bank (Chain of Coins - 3) increased" },
+        { address=0X0566, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Loot bank (Chain of Coins - 4) increased" },
+        { address=0X0567, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Loot bank (Chain of Coins - 5) increased" },
+        { address=0X0568, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Loot bank (Chain of Coins - 6) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X043C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current boss bits (0 - Wacky Scientist, 1 - Nasty Judge, 2 - Witch, 3 - Fire Dragon, 4 - Ghastly" },
+        { address=0X06A3, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss HP ( 07, 06, .., 00, ff - dead)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00F0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Frame switcher (0/1)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Joe & Mac",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "joe-mac",
+    file = "joe-mac.zip",
+    hashes = {
+      { hash = "9800244038a6235c6d437582aa75f52f", label = "Joe & Mac (USA).md" },
+      { hash = "cb1b06b1560fd816e9ab7fe0ce7a2a11", label = "Joe & Mac (USA) (Enhanced Colors) (v3.0) (Pyron).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X21B2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x01=Demo" },
+        { address=0X21C2, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Up" },
+        { address=0X21C2, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Down" },
+        { address=0X21C2, type="u8", condition="bit_true", bit=2, mask=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Left" },
+        { address=0X21C2, type="u8", condition="bit_true", bit=3, mask=0X08, action="PAUSE_ON", no_log=false, no_survey=false, desc="Right" },
+        { address=0X21C2, type="u8", condition="bit_true", bit=4, mask=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="B" },
+        { address=0X21C2, type="u8", condition="bit_true", bit=5, mask=0X20, action="PAUSE_ON", no_log=false, no_survey=false, desc="C" },
+        { address=0X21C2, type="u8", condition="bit_true", bit=6, mask=0X40, action="PAUSE_ON", no_log=false, no_survey=false, desc="A" },
+        { address=0X21C2, type="u8", condition="bit_true", bit=7, mask=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="Start" },
+        { address=0X21C3, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Up" },
+        { address=0X21C3, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Down" },
+        { address=0X21C3, type="u8", condition="bit_true", bit=2, mask=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Left" },
+        { address=0X21C3, type="u8", condition="bit_true", bit=3, mask=0X08, action="PAUSE_ON", no_log=false, no_survey=false, desc="Right" },
+        { address=0X21C3, type="u8", condition="bit_true", bit=4, mask=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="B" },
+        { address=0X21C3, type="u8", condition="bit_true", bit=5, mask=0X20, action="PAUSE_ON", no_log=false, no_survey=false, desc="C" },
+        { address=0X21C3, type="u8", condition="bit_true", bit=6, mask=0X40, action="PAUSE_ON", no_log=false, no_survey=false, desc="A" },
+        { address=0X21C3, type="u8", condition="bit_true", bit=7, mask=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="Start" },
+        { address=0X21E6, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x01=Paused" },
+        { address=0X220A, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="1P Continues" },
+        { address=0X2226, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="2P Continues" },
+        { address=0X2396, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Settings" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X223E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01 = Stage Clear" },
+      },
+      stage = {
+        { address=0X22A2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01=Used Stage Skip in the Current Stage" },
+        { address=0X22DA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01=Stage Skip Cheat Activated" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X21FE, type="u8", condition="eq", value=0XFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="P1 is Inactive" },
+        { address=0X21FE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1P Lives increased" },
+        { address=0X21FE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1P Lives decreased" },
+        { address=0X221A, type="u8", condition="eq", value=0XFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="P2 is Inactive" },
+        { address=0X221A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="2P Lives increased" },
+        { address=0X221A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P Lives decreased" },
+        { address=0X2394, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Settings increased" },
+        { address=0X2394, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Settings decreased" },
+      },
+      health = {
+        { address=0X2200, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P Health decreased" },
+        { address=0X2200, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P Health increased" },
+        { address=0X221C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P Health decreased" },
+        { address=0X221C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2208, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fire" },
+        { address=0X2208, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dinosaur Teeth" },
+        { address=0X2208, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Stone Whell" },
+        { address=0X2208, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Boomerang" },
+        { address=0X2224, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fire" },
+        { address=0X2224, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Dinosaur Teeth" },
+        { address=0X2224, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Stone Whell" },
+        { address=0X2224, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Boomerang" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X21F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] 1P Score" },
+        { address=0X2214, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] 2P Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X21BC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0X21BF, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="00 = Boss Defeated" },
+      },
+    },
+  },
+}

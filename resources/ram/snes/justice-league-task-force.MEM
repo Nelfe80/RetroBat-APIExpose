@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Justice League Task Force",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "justice-league-task-force",
+    file = "justice-league-task-force.zip",
+    hashes = {
+      { hash = "2078b064bdf300eb656971946c26430f", label = "Justice League Task Force (USA).sfc" },
+      { hash = "4e8c8b8b547e20453520d6eec0d5b610", label = "Justice League Task Force (USA) (MSU-1) (Kurrono) (2.0).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0CB6, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="02 = Demo" },
+        { address=0X0CB8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0547, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="When P1 Win a Round" },
+        { address=0X0549, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="When P2 Win a Round" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0539, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="2P Life increased" },
+        { address=0X0539, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P Life decreased" },
+        { address=0X0543, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1P Life increased" },
+        { address=0X0543, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1P Life decreased" },
+        { address=0X0545, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="2P Life increased" },
+        { address=0X0545, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P Life decreased" },
+        { address=0X0CF7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1P Life increased" },
+        { address=0X0CF7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1P Life decreased" },
+        { address=0X0CF9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="2P Life increased" },
+        { address=0X0CF9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P Life decreased" },
+      },
+      health = {
+        { address=0X0537, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X0537, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0335, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

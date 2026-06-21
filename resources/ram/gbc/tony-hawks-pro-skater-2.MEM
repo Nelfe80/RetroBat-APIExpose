@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Tony Hawk's Pro Skater 2",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "tony-hawks-pro-skater-2",
+    file = "tony-hawks-pro-skater-2.zip",
+    hashes = {
+      { hash = "0454b25266d645990b63b5b406672dc2", label = "Tony Hawk's Pro Skater 2 (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XC28D, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="- Best Combo" },
+        { address=0XC353, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="The next 49 bytes incrementally change with each trick that is performed in a single combo move." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC5F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Level Selected" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC27F, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] - Score" },
+        { address=0XC282, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Best Score in Free Skate" },
+        { address=0XC285, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Points for last landed trick - Career Mode" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC6D1, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="- Time - Milliseconds" },
+        { address=0XC6D2, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="- Time - Seconds" },
+        { address=0XC6D3, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="- Time - Minutes" },
+      },
+    },
+  },
+}

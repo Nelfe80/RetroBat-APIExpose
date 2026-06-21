@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Jet Li: Rise to Honor",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Beat 'em Up, Shooter"
+  },
+
+  rom = {
+    name = "jet-li-rise-to-honor",
+    file = "jet-li-rise-to-honor.zip",
+    hashes = {
+      { hash = "404a2306ca6c08544a8d45f3a2f6a09e", label = "Jet Li - Rise to Honor (USA) (En,Zh)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2DD730, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="US [bitflag] Pause Game without overlay" },
+        { address=0X2DD738, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="US [bitflag] Cutscene Flag - pauses controls (in game it reverses controls)" },
+        { address=0X2DE0EC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[bitflag] Pause Overlay" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2DCF6C, type="u32le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="US [32bit] Current Hit Counter - counts how many hits in the hit combo, minus 1." },
+      },
+    },
+  },
+}

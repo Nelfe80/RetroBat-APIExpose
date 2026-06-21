@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Loppi Puzzle Magazine: Hirameku Puzzle Soukangou",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "loppi-puzzle-magazine-hirameku-puzzle-soukangou",
+    file = "loppi-puzzle-magazine-hirameku-puzzle-soukangou.zip",
+    hashes = {
+      { hash = "68e0db3785bc843790d6de9c3877003f", label = "Loppi Puzzle Magazine - Hirameku Puzzle Soukangou (Japan) (Rev 1) (SGB Enhanced, GB Compatible) (NP).gbc" },
+      { hash = "de3c7f4b7df2d8c95ea1c5c622c332e8", label = "Loppi Puzzle Magazine - Hirameku Puzzle Soukangou (Japan) (SGB Enhanced, GB Compatible) (NP).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

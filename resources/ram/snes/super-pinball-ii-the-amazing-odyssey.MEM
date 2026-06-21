@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Super Pinball II: The Amazing Odyssey",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "super-pinball-ii-the-amazing-odyssey",
+    file = "super-pinball-ii-the-amazing-odyssey.zip",
+    hashes = {
+      { hash = "6b840c23b83c4675f25618acbaf2cb43", label = "Super Pinball II - The Amazing Odyssey (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X197A, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X197A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Balls remaining increased" },
+        { address=0X197A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Balls remaining decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0275, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Table selected" },
+      },
+    },
+  },
+}

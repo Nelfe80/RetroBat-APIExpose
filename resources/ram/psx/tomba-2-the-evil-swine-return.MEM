@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Tomba! 2: The Evil Swine Return",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "tomba-2-the-evil-swine-return",
+    file = "tomba-2-the-evil-swine-return.zip",
+    hashes = {
+      { hash = "7b3a17821458f4ee7bc54d0d1391c960", label = "Tomba! 2 - The Evil Swine Return (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XBF8AA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Events Clear" },
+        { address=0XBF8B5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Find Tabby (01 = found / ff = clear)" },
+        { address=0XC18B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kujara washing level (J)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC01E2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Füttere die Küken (De)" },
+      },
+      health = {
+        { address=0XFCAEE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Evil pig's health (J) decreased" },
+        { address=0XFCAEE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Evil pig's health (J) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XBF8D4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="device guards the treasure" },
+        { address=0XBF8D7, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="use pig suit to talk" },
+        { address=0XBF8EC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="a red treasure chest" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBF874, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-bit Adventure Points" },
+      },
+      collectibles = {
+        { address=0XBF93B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Precious Ring (US) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBF8E0, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="the broken up mermaid harp" },
+        { address=0XBF90A, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Laughing Door" },
+        { address=0XBF90B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="The Crying Door" },
+        { address=0XBF932, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch with Donglin" },
+        { address=0XBF93E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Crystal Panel Blocks a Hole" },
+        { address=0XC0391, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint actual? (Es)" },
+        { address=0XC1932, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of gems collected from switch in donglin forest (J)" },
+      },
+    },
+  },
+}

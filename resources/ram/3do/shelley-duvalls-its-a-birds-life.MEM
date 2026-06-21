@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Shelley Duvall's It's a Bird's Life",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "shelley-duvalls-its-a-birds-life",
+    file = "shelley-duvalls-its-a-birds-life.zip",
+    hashes = {
+      { hash = "e1a98c71e85e3db717339b607739bac4", label = "Shelley Duvall's It's a Bird's Life (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

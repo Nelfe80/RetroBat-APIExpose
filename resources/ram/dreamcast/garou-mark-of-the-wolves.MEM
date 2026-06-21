@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Garou: Mark of the Wolves",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "garou-mark-of-the-wolves",
+    file = "garou-mark-of-the-wolves.zip",
+    hashes = {
+      { hash = "8b3166e1f96be84e14072a2f9d876feb", label = "Garou - Mark of the Wolves (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1B64F2, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X1B64F2, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration" },
+        { address=0X1B64F2, type="u8", condition="eq", value=0X16, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Service" },
+        { address=0X1B64F2, type="u8", condition="eq", value=0X19, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Roll" },
+        { address=0X1B64F2, type="u8", condition="eq", value=0X1A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1B97F6, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Max Power" },
+        { address=0X1B97F6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CPU Level Down" },
+        { address=0X1B97F6, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="1/4 CPU Health" },
+        { address=0X1B98E2, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1B98E2, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1B98E3, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1B98E3, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1C363E, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Off (Default)" },
+        { address=0X1C363E, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+      },
+      events = {
+        { address=0X1C4228, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Hit Combo [8 bits BCD]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1B26D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Ground Flag [8 bits]" },
+        { address=0X1B9766, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First round" },
+        { address=0X1B9766, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Match - Current Round [8 bits]" },
+        { address=0X1B97A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Won [8 bits]" },
+        { address=0X1B97A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds Won [8 bits]" },
+        { address=0X1B9832, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X1B9832, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Special Move" },
+        { address=0X1B9832, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Desperation Move" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Miracle" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SSS" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SS" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="S" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="AAA" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="AA" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="A" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="B" },
+        { address=0X1B986A, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="C" },
+        { address=0X1B986A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Fighting Level [8 bits]" },
+        { address=0X1B986B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Fighting Level [8 bits]" },
+        { address=0X1C363B, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="45" },
+        { address=0X1C363B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60 (Default)" },
+        { address=0X1C363B, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="90" },
+        { address=0X1C363B, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Infinite" },
+        { address=0X1C363B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Round Timer [8 bits]" },
+        { address=0X1C363C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0X1C363C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 (Default)" },
+        { address=0X1C363C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0X1C363C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Rounds [8 bits]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1B269E, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1B279E, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X1B269E, type="u8", condition="eq", value=0X78, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full Health" },
+        { address=0X1B269E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 - Health [8 bits]" },
+        { address=0X1B279E, type="u8", condition="eq", value=0X78, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full Health" },
+        { address=0X1B279E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 - Health [8 bits]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B9848, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade - Total Grade Score [16 bits] // 420 or higher = Fight Kain" },
+        { address=0X1B984A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Match Score [16 bits] // sum of value from both rounds" },
+        { address=0X1B987C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score [32 bits BCD]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1B97C6, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round - Timer [8 bits BCD]" },
+        { address=0X1B97C8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round - Best Time [16 bits] // used for grades" },
+      },
+    },
+  },
+}

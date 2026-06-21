@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Puzzle - Echter Puzzlespass für Unterwegs: Underwater",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-echter-puzzlespass-fur-unterwegs-underwater",
+    file = "puzzle-echter-puzzlespass-fur-unterwegs-underwater.zip",
+    hashes = {
+      { hash = "bb27c9010cd7c66052577d11c7afde6e", label = "Underwater Puzzle - Echter Puzzlespass fuer Unterwegs (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X73BE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - Background selected" },
+      },
+    },
+  },
+}

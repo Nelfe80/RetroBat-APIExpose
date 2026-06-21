@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Shinsetsu Samurai Spirits: Bushidou Retsuden",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shinsetsu-samurai-spirits-bushidou-retsuden",
+    file = "shinsetsu-samurai-spirits-bushidou-retsuden.zip",
+    hashes = {
+      { hash = "bfbbb30ac11b076bb2ce84180a92ccf1", label = "Shinsetsu Samurai Spirits - Bushidou Retsuden (Japan)" },
+      { hash = "bd30e236546a8579f182a2b8cb7f0a5c", label = "Shinsetsu Samurai Spirits - Bushidou Retsuden (Japan) (En) (v1.1) (Deuce)" },
+    }
+  },
+
+  events = {
+  },
+}

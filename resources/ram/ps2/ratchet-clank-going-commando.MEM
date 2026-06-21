@@ -1,0 +1,122 @@
+return {
+  game = {
+    title = "Ratchet & Clank: Going Commando",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "ratchet-clank-going-commando",
+    file = "ratchet-clank-going-commando.zip",
+    hashes = {
+      { hash = "8b2100df5d372fc69be6f41ba4c70de7", label = "Ratchet & Clank - Going Commando (USA) (v2.00)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A7A6A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8bit] skillpoint speed demon" },
+        { address=0X1A8F00, type="u16le", condition="eq", value=0X3, action="PAUSE_ON", no_log=false, no_survey=false, desc="pause menus" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1A7A4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Cheat: Mirrored Levels" },
+        { address=0X1999CF0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] sheep shooting current level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1A73D8, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32bit] total deaths" },
+      },
+      health = {
+        { address=0X18C2EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ratchet's Health decreased" },
+        { address=0X18C2EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ratchet's Health increased" },
+        { address=0X1A7A08, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] maximum HP decreased" },
+        { address=0X1A7A08, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] maximum HP increased" },
+        { address=0X1A7A14, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ratchet's HP XP decreased" },
+        { address=0X1A7A14, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ratchet's HP XP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1A7B06, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[8bit] standard commando suit item flag" },
+      },
+      weapon = {
+        { address=0X18B068, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] current equipped weapon id" },
+        { address=0X1A7A82, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] skillpoint weapon envy" },
+        { address=0X1A7B09, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] clank zapper weapon flag" },
+        { address=0X1A7B0C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] bomb glove weapon flag" },
+        { address=0X1A7B0E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] visibomb weapon flag" },
+        { address=0X1A7B10, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] sheepinator weapon flag" },
+        { address=0X1A7B11, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] decoy glove weapon flag" },
+        { address=0X1A7B16, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] chopper weapon flag" },
+        { address=0X1A7B17, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] pulse rifle weapon flag" },
+        { address=0X1A7B18, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] seeker gun weapon flag" },
+        { address=0X1A7B19, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] hoverbomb gun weapon flag" },
+        { address=0X1A7B1A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] blitz cannon weapon flag" },
+        { address=0X1A7B1B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] minirocket tube weapon flag" },
+        { address=0X1A7B1C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] plasma coil weapon flag" },
+        { address=0X1A7B1D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] lava gun weapon flag" },
+        { address=0X1A7B1E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] heavy lancer weapon flag" },
+        { address=0X1A7B1F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] synthnoid weapon flag" },
+        { address=0X1A7B20, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] spiderbot glove weapon flag" },
+        { address=0X1A7B25, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] bouncer weapon flag" },
+        { address=0X1A7B29, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] miniturret glove weapon flag" },
+        { address=0X1A7B2A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] mini-nuke weapon flag" },
+        { address=0X1A7B2B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] zodiac weapon flag" },
+        { address=0X1A7B2C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] ryno 2 weapon flag" },
+        { address=0X1A7B35, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8bit] walloper weapon flag" },
+        { address=0X1A8F00, type="u16le", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapons shop" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1999CE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] sheep shooting game score" },
+      },
+      collectibles = {
+        { address=0X1396B8, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Bomb Glove ammo" },
+        { address=0X1396C0, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Visibomb gun ammo" },
+        { address=0X1396E0, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Chopper Ammo" },
+        { address=0X1396E4, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Pulse Rifle Ammo" },
+        { address=0X1396E8, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] HK22 Gun ammo" },
+        { address=0X1396EC, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Hoverbomb gun ammo" },
+        { address=0X1396F0, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Blitz Gun Ammo" },
+        { address=0X1396F8, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Plasma Storm ammo" },
+        { address=0X1396FC, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Meteor Gun ammo" },
+        { address=0X139700, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Lancer Ammo" },
+        { address=0X139704, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Synthenoid ammo" },
+        { address=0X139708, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Spiderbot ammo" },
+        { address=0X13972C, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Miniture Gun Ammo" },
+        { address=0X139738, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Ryno II ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X28C6EC, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[32bit] [yeedil mission] does not change after killing boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X13973C, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[32bit] shield ammo" },
+        { address=0X1A7B2D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8bit] shield charger weapon flag" },
+      },
+      player = {
+        { address=0X18C2C0, type="u8", condition="eq", value=0X5, action="JUMPING", no_log=false, no_survey=false, desc="in air" },
+        { address=0X18C2C0, type="u8", condition="eq", value=0X0, action="JUMPING", no_log=false, no_survey=false, desc="on ground" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1A7A7D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8bit] skillpoint destroy all breakables" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X18860C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] how many times final boss is defeated" },
+      },
+    },
+  },
+}

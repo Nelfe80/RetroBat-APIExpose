@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Digital Monster Ver. S: Digimon Tamers",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Construction and Management Simulation, Life Simulation, Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "digital-monster-ver-s-digimon-tamers",
+    file = "digital-monster-ver-s-digimon-tamers.zip",
+    hashes = {
+      { hash = "9da94aed874023e1a749c4adbff29a96", label = "Digital Monster Ver. S - Digimon Tamers (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X14EAEA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Data [8-Bit] [Bitflag]" },
+        { address=0X14EAEB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Data [8-Bit] [Bitflag]" },
+        { address=0X14EC6C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Folder Background Data [8-Bit] [Bitflag]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1962DC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle Health - Opponent Hacker decreased" },
+        { address=0X1962DC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle Health - Opponent Hacker increased" },
+        { address=0X1963BC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle Health - Player Against Hacker decreased" },
+        { address=0X1963BC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle Health - Player Against Hacker increased" },
+        { address=0X1BDBEC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle Health - Opponent Arena decreased" },
+        { address=0X1BDBEC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle Health - Opponent Arena increased" },
+        { address=0X1BDCCC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle Health - Player in Arena decreased" },
+        { address=0X1BDCCC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle Health - Player in Arena increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X159040, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X14EAEE, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jump Rope & Sand Bag [8-Bit] [Bitflag]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X159224, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="1st slot - Death Timer" },
+        { address=0X159274, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="2nd slot - Death Timer" },
+        { address=0X1592C4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="3rd slot - Death Timer" },
+        { address=0X159314, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="4th slot - Death Timer" },
+      },
+    },
+  },
+}

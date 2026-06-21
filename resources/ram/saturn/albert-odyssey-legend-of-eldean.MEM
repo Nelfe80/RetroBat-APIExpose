@@ -1,0 +1,131 @@
+return {
+  game = {
+    title = "Albert Odyssey: Legend of Eldean",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "albert-odyssey-legend-of-eldean",
+    file = "albert-odyssey-legend-of-eldean.zip",
+    hashes = {
+      { hash = "4dcb5872499a6a9286a9b1b15f867f74", label = "Albert Odyssey - Legend of Eldean (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X13668D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pike's level" },
+        { address=0X13684F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Round Shield in inventory" },
+      },
+      stage = {
+        { address=0X136945, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bit 0 - find third group of hostages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1367BA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Life Root in inventory increased" },
+        { address=0X1367BA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Life Root in inventory decreased" },
+        { address=0X1368C3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit 0 - 56 Gold (Balan's Fort) increased" },
+        { address=0X1368C3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 0 - 56 Gold (Balan's Fort) decreased" },
+        { address=0X1368D9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit 0 - Life Root (Mycent) increased" },
+        { address=0X1368D9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 0 - Life Root (Mycent) decreased" },
+      },
+      health = {
+        { address=0X136694, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pike's max HP decreased" },
+        { address=0X136694, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pike's max HP increased" },
+        { address=0X136696, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pike's current HP decreased" },
+        { address=0X136696, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pike's current HP increased" },
+        { address=0X1366C8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Eka's Max HP decreased" },
+        { address=0X1366C8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Eka's Max HP increased" },
+        { address=0X1366CA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Eka's current HP decreased" },
+        { address=0X1366CA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Eka's current HP increased" },
+        { address=0X1366FC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Leos'/Kia's max HP decreased" },
+        { address=0X1366FC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Leos'/Kia's max HP increased" },
+        { address=0X1366FE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Leos/Kia's current HP decreased" },
+        { address=0X1366FE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Leos/Kia's current HP increased" },
+        { address=0X136730, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gryzz's max HP decreased" },
+        { address=0X136730, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gryzz's max HP increased" },
+        { address=0X136732, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gryzz's current HP decreased" },
+        { address=0X136732, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gryzz's current HP increased" },
+        { address=0X136764, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Amon's max HP decreased" },
+        { address=0X136764, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Amon's max HP increased" },
+        { address=0X136766, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Amon's current HP decreased" },
+        { address=0X136766, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Amon's current HP increased" },
+        { address=0X1E8F04, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pike's current HP in battle decreased" },
+        { address=0X1E8F04, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pike's current HP in battle increased" },
+        { address=0X1E8F30, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Eka's HP in battle decreased" },
+        { address=0X1E8F30, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Eka's HP in battle increased" },
+        { address=0X1E8F5C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Leos/Kia's HP in battle decreased" },
+        { address=0X1E8F5C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Leos/Kia's HP in battle increased" },
+        { address=0X1E8F88, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gryzz's current HP in battle decreased" },
+        { address=0X1E8F88, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gryzz's current HP in battle increased" },
+        { address=0X1E8FB4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Amon's HP in battle decreased" },
+        { address=0X1E8FB4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Amon's HP in battle increased" },
+        { address=0X1E9002, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy max HP decreased" },
+        { address=0X1E9002, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy max HP increased" },
+        { address=0X1E9004, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X1E9004, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X1E903C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X1E903C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X1E9074, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X1E9074, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X1E90AA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy max HP decreased" },
+        { address=0X1E90AA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy max HP increased" },
+        { address=0X1E90AC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X1E90AC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X1E90E4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X1E90E4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X136826, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Number of Knight Suit in invenotry" },
+      },
+      weapon = {
+        { address=0X1366B6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pike's equipped weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1367C3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Eerie Ring in inventory increased" },
+        { address=0X136823, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Ring Mail in inventory increased" },
+        { address=0X13685F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Protect Ring in inventory increased" },
+        { address=0X136861, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Overlord's Ring in inventory increased" },
+        { address=0X136862, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Force Ring in invenotyr increased" },
+        { address=0X1368B4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 12 Gold (Chestoria) increased" },
+        { address=0X1368B9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 36 Gold (South Tower) increased" },
+        { address=0X1368BE, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Protect Ring (Dragon Shrine) increased" },
+        { address=0X1368C2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - 64 Gold (Balan's Fort) increased" },
+        { address=0X1368D5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 0 - Overlord's Ring (Fargasta) increased" },
+        { address=0X136934, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Overflow increased" },
+        { address=0X136936, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1366B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Pike's equipped shield" },
+        { address=0X1367C7, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of Magic Shield in invenotry" },
+        { address=0X13684A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of Small Shield in inventory" },
+        { address=0X13684C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of Kite Shield in invntory" },
+        { address=0X13684D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of Large Shield in inventory" },
+        { address=0X13684E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of Tower Shield in inventory" },
+        { address=0X136850, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of Hero Shield in inventory" },
+        { address=0X136852, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Number of Phoenix Shield in inventory" },
+        { address=0X1368B8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 0 - Hero Shield (South Tower)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X13694F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 0 - find Novia inside the door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E9072, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy max HP" },
+      },
+    },
+  },
+}

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Quick Kick</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Strong Kick</text>
+			<color>${white}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>Strong Punch</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button4" extra="true">
+			<text>Jab Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Fierce Punch</text>
+			<color>${green}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Fierce Kick</text>
+			<color>${orange}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Quick Kick</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Strong Kick</text>
+			<color>${white}</color>
+		</text>
+		<text name="p2button3" extra="true">
+			<text>Strong Punch</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button4" extra="true">
+			<text>Jab Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button5" extra="true">
+			<text>Fierce Punch</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Fierce Kick</text>
+			<color>${orange}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

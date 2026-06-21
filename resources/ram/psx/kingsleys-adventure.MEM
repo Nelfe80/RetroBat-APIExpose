@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Kingsley's Adventure",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "kingsleys-adventure",
+    file = "kingsleys-adventure.zip",
+    hashes = {
+      { hash = "111689fa2a26cf5f2557dda3b289e795", label = "Kingsley's Adventure (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XE85B0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (US) increased" },
+        { address=0XE85B0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (US) decreased" },
+      },
+      health = {
+        { address=0XE851A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (US) decreased" },
+        { address=0XE851A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (US) increased" },
+        { address=0XE856A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (EU) decreased" },
+        { address=0XE856A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (EU) increased" },
+        { address=0X1FA156, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gallagher's current HP (EU) decreased" },
+        { address=0X1FA156, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gallagher's current HP (EU) increased" },
+        { address=0X1FA772, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gallagher's current HP (US) decreased" },
+        { address=0X1FA772, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gallagher's current HP (US) increased" },
+        { address=0X1FB90E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Castle: trainer's current HP (US) decreased" },
+        { address=0X1FB90E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Castle: trainer's current HP (US) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XE8574, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of coins in inventory (US) increased" },
+        { address=0XE85C4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of coins collected (EU) increased" },
+      },
+    },
+  },
+}

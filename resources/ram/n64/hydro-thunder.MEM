@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Hydro Thunder",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "hydro-thunder",
+    file = "hydro-thunder.zip",
+    hashes = {
+      { hash = "54f43e6b68782e98caabea5e7976b2be", label = "Hydro Thunder (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X27B41C, type="u32be", condition="eq", value=0X11C0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Thunder Park" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0XBF20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lost Island" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0X47E0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arctic Circle" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0XD8C0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Far East" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0X1BA0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lake Powell" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0X83E0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Greek Isles" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0XA840, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ship Graveyard" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0X5320, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Venice Canals" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0X1380, action="NEW_LEVEL", no_log=false, no_survey=false, desc="NY Disaster" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0X79E0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Catacombs" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0X6B60, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hydrospeedway" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0XE460, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Castle Von Dandy" },
+        { address=0X27B41C, type="u32be", condition="eq", value=0X8B60, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Nile Adventure" },
+        { address=0X27B41C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Current Level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2C4C84, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Midway" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X28315A, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Timer Seconds in current state" },
+        { address=0X2B084C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Timer" },
+      },
+    },
+  },
+}

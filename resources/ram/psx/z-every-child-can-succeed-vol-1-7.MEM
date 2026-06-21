@@ -1,0 +1,18 @@
+return {
+  game = {
+    title = "~Z~ Every Child Can Succeed [Vol. 1-7]",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-every-child-can-succeed-vol-1-7",
+    file = "z-every-child-can-succeed-vol-1-7.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+  },
+}

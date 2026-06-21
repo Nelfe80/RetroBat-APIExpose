@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Samurai Shodown",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "samurai-shodown",
+    file = "samurai-shodown.zip",
+    hashes = {
+      { hash = "4898db4b63c7024842e748fb81c95a55", label = "Samurai Shodown (USA).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0068, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Setting" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0082, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2nd Round against Amakusa" },
+        { address=0X0083, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+        { address=0X0084, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player won Rounds" },
+        { address=0X0085, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy won Rounds" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0090, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X0090, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X0093, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Health decreased" },
+        { address=0X0093, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0069, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Setting" },
+        { address=0X0200, type="u8", condition="eq", value=0X63, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="99" },
+        { address=0X0200, type="u8", condition="eq", value=0X3C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="60" },
+        { address=0X0200, type="u8", condition="eq", value=0X2D, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="45" },
+        { address=0X0200, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Unlimited Time" },
+        { address=0X0200, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="In-match timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sitio do Picapau Amarelo",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "sitio-do-picapau-amarelo",
+    file = "sitio-do-picapau-amarelo.zip",
+    hashes = {
+      { hash = "85ea52a2cbcae078dc3a04f8db1304a9", label = "Sitio do Picapau Amarelo (Brazil).sms" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Formula One 2003",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "formula-one-2003",
+    file = "formula-one-2003.zip",
+    hashes = {
+      { hash = "fdc65d636b038b5c7610a0a849740bd6", label = "Formula One 2003 (Europe) (En,Fr,De,Es,It,Fi)" },
+    }
+  },
+
+  events = {
+  },
+}

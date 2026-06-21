@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "102 Dalmatians: Puppies to the Rescue",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "102-dalmatians-puppies-to-the-rescue",
+    file = "102-dalmatians-puppies-to-the-rescue.zip",
+    hashes = {
+      { hash = "2b7e2442d503ce368fc93a9ebf0f70ef", label = "102 Dalmatians - Puppies to the Rescue (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC008, type="u8", condition="eq", value=0X45, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XC009, type="u8", condition="eq", value=0X50, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XC0D5, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XC0D6, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[Bit 4] is Game Over Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC0AF, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0XC0AF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 In-Game Flag" },
+        { address=0XC409, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XC409, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Does the Player Have the Key for the Level?" },
+        { address=0XC410, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0XC410, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0XC410, type="u8", condition="eq", value=0X06, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0XC410, type="u8", condition="eq", value=0X09, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0XC410, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0XC410, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Puppies Saved in Current Level" },
+        { address=0X14063, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X14063, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Animation for Golden Bone in Level 16" },
+        { address=0X142E3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Animation for collecting Golden Bone on Level 7" },
+        { address=0X14323, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X14323, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Animation for Golden Bone in Level 3" },
+        { address=0X143A3, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X143A3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Animation for grabbing Golden Bone in Levels 1 & 8" },
+        { address=0X14463, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X14463, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Animation for Golden Bone in Level 9" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC0D5, type="u8", condition="eq", value=0X07, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Counter Enters" },
+        { address=0XC0D5, type="u8", condition="eq", value=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Counter" },
+        { address=0XC0D5, type="u8", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Counter Leaves" },
+        { address=0XC0D7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives (Max is 5) increased" },
+        { address=0XC0D7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives (Max is 5) decreased" },
+        { address=0XC40F, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead/Lose Life" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC0D8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Hundred Thousands and Millions)" },
+        { address=0XC0D9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Thousands and Ten Thousands)" },
+        { address=0XC0DA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Tens & Hundreds)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC0E0, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bone" },
+        { address=0XC0E0, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Key" },
+        { address=0XC0E0, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Domino" },
+        { address=0XC0E0, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dog Bowl" },
+        { address=0XC0E0, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tank? (hard to make out)" },
+        { address=0XC0E0, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Puppy" },
+        { address=0XC0E0, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Toy Crate" },
+        { address=0XC0E0, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Paw Print" },
+        { address=0XC0E1, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bone" },
+        { address=0XC0E1, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Key" },
+        { address=0XC0E1, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Domino" },
+        { address=0XC0E1, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dog Bowl" },
+        { address=0XC0E1, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tank? (hard to make out)" },
+        { address=0XC0E1, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Puppy" },
+        { address=0XC0E1, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Toy Crate" },
+        { address=0XC0E1, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Paw Print" },
+        { address=0XC0E2, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bone" },
+        { address=0XC0E2, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Key" },
+        { address=0XC0E2, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Domino" },
+        { address=0XC0E2, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dog Bowl" },
+        { address=0XC0E2, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tank? (hard to make out)" },
+        { address=0XC0E2, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Puppy" },
+        { address=0XC0E2, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Toy Crate" },
+        { address=0XC0E2, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Paw Print" },
+        { address=0XC0E3, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bone" },
+        { address=0XC0E3, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Key" },
+        { address=0XC0E3, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Domino" },
+        { address=0XC0E3, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dog Bowl" },
+        { address=0XC0E3, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Tank? (hard to make out)" },
+        { address=0XC0E3, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Puppy" },
+        { address=0XC0E3, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Toy Crate" },
+        { address=0XC0E3, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Paw Print" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC0D5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game State" },
+      },
+    },
+  },
+}

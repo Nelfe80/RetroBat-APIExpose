@@ -1,0 +1,135 @@
+return {
+  game = {
+    title = "Wiz 'n' Liz: The Frantic Wabbit Wescue",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "wiz-n-liz-the-frantic-wabbit-wescue",
+    file = "wiz-n-liz-the-frantic-wabbit-wescue.zip",
+    hashes = {
+      { hash = "01c9742b0a83a7c135f9ed6948dc7576", label = "Wiz 'N' Liz (USA).md" },
+      { hash = "8c0a97a07867e5a9406d45e682d0cde8", label = "Wiz 'n' Liz - The Frantic Wabbit Wescue (Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00FE, type="u8", condition="eq", value=0XCA, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X13B8, type="u8", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits!" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X13B8, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X13E2, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Apprentice" },
+        { address=0X13E2, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wizard" },
+        { address=0X13E2, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sorcerer" },
+        { address=0X13E2, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Super Wizard" },
+        { address=0X13E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit -> Level" },
+        { address=0X13E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit -> Level Unlocked" },
+        { address=0X33C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit -> current level (Starts at 0x00)" },
+        { address=0X447A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit -> Round in Wabbitoids Mini Game" },
+      },
+      stage = {
+        { address=0X071C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stars/stages" },
+        { address=0X0836, type="u16be", condition="eq", value=0XFFFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hit Boxes Disabled" },
+        { address=0X0836, type="u16be", condition="eq", value=0X0001, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hit Boxes Enabled" },
+        { address=0X0836, type="u16be", condition="eq", value=0X0000, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Moving not enabled" },
+        { address=0X0836, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="16-bit -> Enables hit boxes in several mini games and in stages/Bonus Rounds" },
+        { address=0X33CA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit -> Total rounds in current stage" },
+        { address=0X33CC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit -> Value of the bonus round in current stage (Will always be total rounds + 01 for the cur" },
+        { address=0X33D8, type="u16be", condition="eq", value=0XFFFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="When in stage and counter is not active" },
+        { address=0X43D8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit -> Stage in Letter Basher Mini Game" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0706, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="8-bit -> Lives Left increased" },
+        { address=0X0706, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="8-bit -> Lives Left decreased" },
+        { address=0X0708, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rabbits per Stage without death" },
+        { address=0X31E2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="8-bit -> Lives left in Mini Games, and in boss fights increased" },
+        { address=0X31E2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="8-bit -> Lives left in Mini Games, and in boss fights decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3186, type="u16be", condition="eq", value=0X0000, action="TREASURE", no_log=false, no_survey=false, desc="Not Discovered" },
+        { address=0X3186, type="u16be", condition="eq", value=0XFFFF, action="TREASURE", no_log=false, no_survey=false, desc="Discovered" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X06FE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit -> Score [Bcd]-- 3 Upper digits" },
+        { address=0X0700, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit -> Score [Bcd] -- 4 Lower digits" },
+        { address=0X443E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit BCD -> Last score increase in 'Bouncing Wabbits' Minigame [Upper 3-digits]" },
+        { address=0X4440, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit BCD -> Last score increase in 'Bouncing Wabbits' Minigame [Lower 4-digits]" },
+      },
+      collectibles = {
+        { address=0X00F7, type="u8", condition="eq", value=0XAF, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rush (Mini Game)" },
+        { address=0X31CA, type="u16le", condition="eq", value=0XAD96, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Rush" },
+        { address=0X43E2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="8-bit -> Height on current line in 'Gold Rush' Mini Game increased" },
+        { address=0X43E4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="8-bit -> Counter for increasing height in current line in 'Gold Rush' Mini Game increased" },
+        { address=0X43EC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lower4 -> Result on fifth line in 'Gold Rush' Mini Game increased" },
+        { address=0X43EE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lower4 -> Result on first line in 'Gold Rush' Mini Game increased" },
+        { address=0X43EF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lower4 -> Result on third line in 'Gold Rush' Mini Game increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X31E4, type="u16be", condition="eq", value=0X0000, action="BOSS_HIT", no_log=false, no_survey=false, desc="Acrivated" },
+        { address=0X31E4, type="u16be", condition="eq", value=0XFFFF, action="BOSS_HIT", no_log=false, no_survey=false, desc="Not Activated" },
+        { address=0X31E8, type="u16be", condition="eq", value=0X7444, action="BOSS_HIT", no_log=false, no_survey=false, desc="The Freaky Flower" },
+        { address=0X31F4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="8-bit -> Partial Health - Bosses" },
+        { address=0X3202, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="8-bit -> Partial Boss Health" },
+        { address=0X3210, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="8-bit -> Partial Boss Health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0A9E, type="u8", condition="eq", value=0X6B, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0DF0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="door" },
+        { address=0X300C, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[276bytes] Array of 16-bit pointers pointing to different memory blocks used in minigames etc." },
+        { address=0X316C, type="u16be", condition="eq", value=0X0000, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not Discovered" },
+        { address=0X316C, type="u16be", condition="eq", value=0XFFFF, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Discovered" },
+        { address=0X3172, type="u16be", condition="eq", value=0X0000, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not Discovered" },
+        { address=0X3172, type="u16be", condition="eq", value=0XFFFF, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Discovered" },
+        { address=0X3174, type="u16be", condition="eq", value=0X0000, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not Discovered" },
+        { address=0X3174, type="u16be", condition="eq", value=0XFFFF, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Discovered" },
+        { address=0X3176, type="u16be", condition="eq", value=0X0000, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not Discovered" },
+        { address=0X3176, type="u16be", condition="eq", value=0XFFFF, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Discovered" },
+        { address=0X3178, type="u16be", condition="eq", value=0X0000, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not Discovered" },
+        { address=0X3178, type="u16be", condition="eq", value=0XFFFF, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Discovered" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X3586, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Finders Keepers" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X4040, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Tube Skiing" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X4A02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Take A Chance" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X53C6, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Waining Wabbits" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X5A08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Wabbit Invaders" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X64E8, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Letter Basher" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X762C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Snakes Alive" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X6F62, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Pong" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X82F8, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Splat" },
+        { address=0X31CA, type="u16le", condition="eq", value=0X9912, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Guess Those Words" },
+        { address=0X31CA, type="u16le", condition="eq", value=0XA4A2, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Wabbitoids" },
+        { address=0X31CA, type="u16le", condition="eq", value=0XB27E, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Wheelspin" },
+        { address=0X31CA, type="u16le", condition="eq", value=0XB85C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bouncing Bunnies" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0A9E, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Last Action" },
+        { address=0X33D8, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="16-bit -> Time Orb Counter" },
+        { address=0X3402, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="16-bit -> In Stage Timer [Hex]" },
+        { address=0X3406, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="16-bit -> Timer Seconds -- Bonus Rounds" },
+        { address=0X447C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="8-bit -> Counter for how many collectables are left in a round in Wabbitoids Mini Game" },
+      },
+    },
+  },
+}

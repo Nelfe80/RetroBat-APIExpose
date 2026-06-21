@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Naruto: Ninja Council 3",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "naruto-ninja-council-3",
+    file = "naruto-ninja-council-3.zip",
+    hashes = {
+      { hash = "36a81978b0e897ca22f0b2f0b9214709", label = "Naruto - Ninja Council 3 (USA).nds" },
+    }
+  },
+
+  events = {
+  },
+}

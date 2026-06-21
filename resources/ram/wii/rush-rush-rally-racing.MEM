@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Rush Rush Rally Racing",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "rush-rush-rally-racing",
+    file = "rush-rush-rally-racing.zip",
+    hashes = {
+      { hash = "6b37c65da1c9bd76d54347155199b2a0", label = "Rush Rush Rally Racing (Europe) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Blue Dragon Plus",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "blue-dragon-plus",
+    file = "blue-dragon-plus.zip",
+    hashes = {
+      { hash = "9dcc9307456c8d583db45cfddede3971", label = "Blue Dragon Plus (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X146500, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Maro Level" },
+        { address=0X14659E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zola Level" },
+        { address=0X14663C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="King Jibral Level" },
+        { address=0X1466DA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Szabo Level" },
+        { address=0X146778, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jiro Level" },
+        { address=0X146816, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kluke Level" },
+        { address=0X1468B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fushira Level" },
+        { address=0X146952, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tora Level" },
+        { address=0X1469F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sahlia Level" },
+        { address=0X146A8E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mira Level" },
+        { address=0X146B2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Toripo Level" },
+        { address=0X146BCA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yasato Level" },
+        { address=0X146C68, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Poo Snake Level" },
+        { address=0X146D06, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Nene Level" },
+        { address=0X146DA4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Himiko Level" },
+      },
+      stage = {
+        { address=0X146462, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shu Level (add 9e for subsequent character levels or just use their code notes)" },
+        { address=0X14648D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shu Rank (add 9e for subsequent character ranks, add 2b from the character's level, or just use" },
+        { address=0X1480E0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mecha Block. The flags for robo existence will be under a value, around 30-50, which is the last" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X2ACFB2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yellow Balaur HP decreased" },
+        { address=0X2ACFB2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yellow Balaur HP increased" },
+        { address=0X2B2A32, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Final Nene HP decreased" },
+        { address=0X2B2A32, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Final Nene HP increased" },
+        { address=0X317052, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Moody Dragon HP decreased" },
+        { address=0X317052, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Moody Dragon HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X147019, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Diamond Ring increased" },
+        { address=0X14701B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Color Rings increased" },
+        { address=0X147170, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X147171, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold High Byte increased" },
+        { address=0X14B804, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Mecha Robo Exists increased" },
+        { address=0X14B805, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Mecha Robo Activated (00 false 01 true) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X82BBA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="End of Quest Block" },
+        { address=0X146F35, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Items Block" },
+        { address=0X1528C8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="End of Monster Block" },
+      },
+    },
+  },
+}

@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Johnny Test",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "johnny-test",
+    file = "johnny-test.zip",
+    hashes = {
+      { hash = "5fd3b3992c785e20e26086b61806b6df", label = "Johnny Test (USA) (En,Fr,Es).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9A444, type="u8", condition="eq", value=0XB4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X9A444, type="u8", condition="eq", value=0X4C, action="GAME_PLAYING", no_log=false, no_survey=false, desc="level select/startup" },
+        { address=0X9A444, type="u8", condition="eq", value=0X58, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="level cleared/game over/credits" },
+        { address=0XA17E8, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8bit] Johnny's health (set to 0 in level select/title)" },
+        { address=0XAEB6D, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[Bit0] 1 while the game is paused" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X8EF60, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8bit] Current world, only changes when a new level is loaded" },
+        { address=0X8EF6C, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8bit] Current level of world, only changes when a new level is loaded" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA9576, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XC5705, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit]1st save slot lives increased" },
+        { address=0XC5705, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit]1st save slot lives decreased" },
+        { address=0XC5735, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] 2nd save slot lives increased" },
+        { address=0XC5735, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] 2nd save slot lives decreased" },
+        { address=0XC5765, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] 3rd save slot lives increased" },
+        { address=0XC5765, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] 3rd save slot lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC5704, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[bitflag] 1st file max health powerup collection, bits 0-6 are used" },
+        { address=0XC5734, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[bitflag] 2nd file max health powerup collection, bits 0-6 correspond to a pickup" },
+        { address=0XC5764, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[bit] 3rd file max health powerup collection, bits 0-6 correspond to a pickup" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA17EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Score (set to 0 in level select/title)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA9576, type="u8", condition="eq", value=0X16, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+      },
+    },
+  },
+}

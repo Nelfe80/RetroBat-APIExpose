@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Tokyo Bus Guide 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tokyo-bus-guide-2",
+    file = "tokyo-bus-guide-2.zip",
+    hashes = {
+      { hash = "f98393ffcd617fc3b64c8bac7dc2bc87", label = "SuperLite 2000 Vol. 41 - Tokyo Bus Guide 2 (Japan)" },
+      { hash = "6fcc5d3fdc198dd6552a1034841dc792", label = "SuperLite 2000 Vol. 41 - Tokyo Bus Guide 2 (Japan) (En) (v0.1) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E54740, type="u16le", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Splash/Title menus" },
+        { address=0X1E54740, type="u16le", condition="eq", value=0X2, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-Game/Demo" },
+      },
+    },
+  },
+}

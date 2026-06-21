@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Hyper Dimension",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-ball-z-hyper-dimension",
+    file = "dragon-ball-z-hyper-dimension.zip",
+    hashes = {
+      { hash = "13cb6c337b29254fdeae278bc2457234", label = "Dragon Ball Z - Hyper Dimension (Japan) (En).sfc" },
+      { hash = "ed18b3c3b148bcafdbe228e27e89bd2d", label = "Dragon Ball Z - Hyper Dimension (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0001, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Screen ID (80=for title detection in addition to $1A55)" },
+        { address=0X1A55, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen detection (f3 = in game, 00 = menu)" },
+        { address=0X1B15, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1AD5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Versus COM level" },
+      },
+      stage = {
+        { address=0X1A9B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X170C2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player life first digit (3f = 0) increased" },
+        { address=0X170C2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player life first digit (3f = 0) decreased" },
+        { address=0X170C4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player life second digit (3f = 0) increased" },
+        { address=0X170C4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player life second digit (3f = 0) decreased" },
+        { address=0X170C6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player life third digit (3f = 0) increased" },
+        { address=0X170C6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player life third digit (3f = 0) decreased" },
+        { address=0X170F8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy life first digit (3f = 0) increased" },
+        { address=0X170F8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy life first digit (3f = 0) decreased" },
+        { address=0X170FA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy life second digit (3f = 0) increased" },
+        { address=0X170FA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy life second digit (3f = 0) decreased" },
+        { address=0X170FC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy life third digit (3f = 0) increased" },
+        { address=0X170FC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy life third digit (3f = 0) decreased" },
+      },
+      health = {
+        { address=0X1AC9, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 starting health (16 bits) decreased" },
+        { address=0X1AC9, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 starting health (16 bits) increased" },
+        { address=0X1ACF, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 starting health (16 bits) decreased" },
+        { address=0X1ACF, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 starting health (16 bits) increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "Street Fighter EX3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "street-fighter-ex3",
+    file = "street-fighter-ex3.zip",
+    hashes = {
+      { hash = "ce47cf5b968e2240fa9aea800834916d", label = "Street Fighter EX3 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X308604, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode Check (0x01 in Demo Mode, 0x00 otherwise)" },
+        { address=0X3C52DC, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Minigame - KO Count (maxes at 999)" },
+        { address=0X70EBF8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Flag" },
+      },
+      events = {
+        { address=0X4E5A3D, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Edit Mode - Equipped Move ID - Meteor Combo; for values see 0x004e5a38" },
+        { address=0X70EC0F, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Training Option - Super Combo Gauge" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4E5A03, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Edit Mode - Move EXP - Ground Tiger Cannon (0x00-0xc8); for values see 0x004e59bd" },
+        { address=0XE5938B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Original Mode - Stage Cleared (0x00-0x06)" },
+      },
+      stage = {
+        { address=0X4E544A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Medal Flags (Stage 3); for values see 0x004e5449" },
+        { address=0X4E544B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Medal Flags (Stage 4); for values see 0x004e5449" },
+        { address=0X4E544C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Medal Flags (Stage 5); for values see 0x004e5449" },
+        { address=0X4E544D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Lower4] Medal Flags (Stage 6); for values see 0x004e5448" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4E5458, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Training Display - Current Damage" },
+        { address=0X4E545C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Training Display - Max Damage" },
+        { address=0X70EC28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - 1st Character - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0X70EC28, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - 1st Character - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0X70EC2B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - 1st Character - Total Health (0x00-0xc8) decreased" },
+        { address=0X70EC2B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - 1st Character - Total Health (0x00-0xc8) increased" },
+        { address=0X70EC34, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - 2nd Character - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0X70EC34, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - 2nd Character - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0X70EC37, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - 2nd Character - Total Health (0x00-0xc8) decreased" },
+        { address=0X70EC37, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - 2nd Character - Total Health (0x00-0xc8) increased" },
+        { address=0X70EC40, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - 3rd Character - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0X70EC40, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - 3rd Character - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0X70EC43, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - 3rd Character - Total Health (0x00-0xc8) decreased" },
+        { address=0X70EC43, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - 3rd Character - Total Health (0x00-0xc8) increased" },
+        { address=0X70EC4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - 1st Character - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0X70EC4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - 1st Character - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0X70EC4F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - 1st Character - Total Health (0x00-0xc8) decreased" },
+        { address=0X70EC4F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - 1st Character - Total Health (0x00-0xc8) increased" },
+        { address=0X70EC58, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - 2nd Character - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0X70EC58, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - 2nd Character - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0X70EC5B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - 2nd Character - Total Health (0x00-0xc8) decreased" },
+        { address=0X70EC5B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - 2nd Character - Total Health (0x00-0xc8) increased" },
+        { address=0X70EC64, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - 3rd Character - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0X70EC64, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - 3rd Character - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0X70EC67, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - 3rd Character - Total Health (0x00-0xc8) decreased" },
+        { address=0X70EC67, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - 3rd Character - Total Health (0x00-0xc8) increased" },
+        { address=0XC1D40D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0XC1D40D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0XC1D40E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 - Recoverable Health (0x00-0xc8) decreased" },
+        { address=0XC1D40E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 - Recoverable Health (0x00-0xc8) increased" },
+        { address=0XC209BD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 2 - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0XC209BD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 2 - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0XC209BE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 2 - Recoverable Health (0x00-0xc8) decreased" },
+        { address=0XC209BE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 2 - Recoverable Health (0x00-0xc8) increased" },
+        { address=0XC23F6D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 3 - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0XC23F6D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 3 - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0XC23F6E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 3 - Recoverable Health (0x00-0xc8) decreased" },
+        { address=0XC23F6E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 3 - Recoverable Health (0x00-0xc8) increased" },
+        { address=0XC2751D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 4 - Solid Health (0x00-0xc8, 0xff when KO'ed) decreased" },
+        { address=0XC2751D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 4 - Solid Health (0x00-0xc8, 0xff when KO'ed) increased" },
+        { address=0XC2751E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 4 - Recoverable Health (0x00-0xc8) decreased" },
+        { address=0XC2751E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 4 - Recoverable Health (0x00-0xc8) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4E5460, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Training Display - Current Score" },
+        { address=0X4E5464, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Training Display - Max Score" },
+        { address=0XE5936C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Earned" },
+      },
+      collectibles = {
+        { address=0X4E5448, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Lower4] Medal Flags (Stage 1) increased" },
+        { address=0X4E5449, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Medal Flags (Stage 2) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC19AB8, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Player 2 Combo Counter" },
+        { address=0XC19CC0, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Player 1 Combo Counter" },
+        { address=0XC1D404, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Character 1 - Hit By Combo Counter" },
+        { address=0XC209B4, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Character 2 - Hit By Combo Counter" },
+        { address=0XC23F64, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Character 3 - Hit By Combo Counter" },
+        { address=0XC27514, type="u16le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Character 4 - Hit By Combo Counter" },
+        { address=0XE59496, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16-bit BE] Match Timer (0x0000-0x635a)" },
+      },
+    },
+  },
+}

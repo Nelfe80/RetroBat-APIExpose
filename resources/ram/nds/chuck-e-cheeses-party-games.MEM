@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Chuck E. Cheese's Party Games",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "chuck-e-cheeses-party-games",
+    file = "chuck-e-cheeses-party-games.zip",
+    hashes = {
+      { hash = "0fda256913a63190a82ddba78f911942", label = "Chuck E. Cheese's Party Games (USA).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XC481F, type="u8", condition="eq", value=0XB7, action="SCORE_STATE", no_log=false, no_survey=false, desc="earn 60 points in lucky drop" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDC828, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="time remaining" },
+      },
+    },
+  },
+}

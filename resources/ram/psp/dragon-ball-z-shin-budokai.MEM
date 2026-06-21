@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Shin Budokai",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dragon-ball-z-shin-budokai",
+    file = "dragon-ball-z-shin-budokai.zip",
+    hashes = {
+      { hash = "8c86349972d11db42f4cfe0bd32f31b5", label = "Dragon Ball Z - Shin Budokai (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA2A2A4, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Training Mode/Title Screen" },
+        { address=0XA64BF8, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Dragon Road/Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA26414, type="u8", condition="eq", value=0X0A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+      },
+      stage = {
+        { address=0XA26414, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA273A4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Rank" },
+        { address=0XA64C06, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Arcade Mode Time" },
+        { address=0XA64C0A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack Course" },
+      },
+    },
+  },
+}

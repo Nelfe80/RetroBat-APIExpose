@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Ontamarama",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "ontamarama",
+    file = "ontamarama.zip",
+    hashes = {
+      { hash = "4fa5e52befa66348d6ced044abf0e163", label = "Ontamarama (USA).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X6CE04, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

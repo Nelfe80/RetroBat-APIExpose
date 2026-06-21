@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Columns",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Puzzle-Game, Action, Tomber"
+  },
+
+  rom = {
+    name = "columns",
+    file = "columns.zip",
+    hashes = {
+      { hash = "6e0c2c5ebb0caf13a4ba59b653ab55ef", label = "pce/columns.7z <Columns>" },
+      { hash = "a3a1be9fc3baef5e7bc6554962aea55b", label = "Columns (Japan).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X033F, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo mode" },
+      },
+    },
+  },
+}

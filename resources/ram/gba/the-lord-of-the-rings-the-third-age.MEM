@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "The Lord of the Rings: The Third Age",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "the-lord-of-the-rings-the-third-age",
+    file = "the-lord-of-the-rings-the-third-age.zip",
+    hashes = {
+      { hash = "39d7f5579beafc2d3cfb0485c5be3bdf", label = "Lord of the Rings, The - The Third Age (USA, Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XB2AE, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1" },
+        { address=0XB2AE, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2" },
+        { address=0XB2AE, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3" },
+        { address=0XB2AE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 bit] Which Act is selected" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3434, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Left Lane Command Points - Values of higher than 0x00ff corrupt visuals but do seem to" },
+        { address=0X3490, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Center Lane Command Points - Values of higher than 0x00ff corrupt visuals but do seem t" },
+        { address=0X34EC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Right Lane Command Points - Values of higher than 0x00ff corrupt visuals but do seem to" },
+        { address=0X3522, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 bit] Signed - Spirit Points" },
+      },
+    },
+  },
+}

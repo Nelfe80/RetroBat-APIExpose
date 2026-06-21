@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Devil Man",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "devil-man",
+    file = "devil-man.zip",
+    hashes = {
+      { hash = "4d3a78f36cb28c1f94d577e75e91c6f1", label = "Devil Man (Japan) (En) (v1.0) (snark).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00F7, type="u16le", condition="eq", value=0X32, action="DEMO_MODE", no_log=false, no_survey=false, desc="demon killing scene" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X04CD, type="u8", condition="eq", value=0XFE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0616, type="u8", condition="eq", value=0X0F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 dead" },
+        { address=0X0616, type="u8", condition="eq", value=0X0E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="2 dead" },
+      },
+      health = {
+        { address=0X04CD, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="dosuroku health miki battle" },
+        { address=0X04FD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="dr's health miki fight decreased" },
+        { address=0X04FD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="dr's health miki fight increased" },
+        { address=0X0617, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health decreased" },
+        { address=0X0617, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health increased" },
+        { address=0X061C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health if player changes to an ncp decreased" },
+        { address=0X061C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health if player changes to an ncp increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X00B7, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="akira" },
+        { address=0X00B7, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="devilman/giant devilman" },
+        { address=0X00C8, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="akira" },
+        { address=0X00C8, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="devilman" },
+        { address=0X00C8, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="giant devilman" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0067, type="u8", condition="eq", value=0X0A, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0073, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X045E, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X045F, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X0461, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X052D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss health" },
+        { address=0X0612, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="player power level - counts as bosses beat" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X04B2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="secret lab switch" },
+        { address=0X04E2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="secret lab switch 2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0619, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="fireball counter" },
+      },
+    },
+  },
+}

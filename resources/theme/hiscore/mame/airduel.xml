@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1  R.SHOBU  231500</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 A N D O H 200100</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3  HIYAMUTA 175000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 TSUMI NAG 102400</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MATSUE    89600</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6  TAKAHARA 64000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7  ZVEA ACD 60100</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 AAAAAAAAA 51200</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9   MR. M   22000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10           16200</text>
+		</text>
+	</view>
+</theme>

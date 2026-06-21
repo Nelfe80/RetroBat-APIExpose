@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Gadget and the Gadgetinis",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "gadget-and-the-gadgetinis",
+    file = "gadget-and-the-gadgetinis.zip",
+    hashes = {
+      { hash = "2569836ef4c7ff98efa8fef9b6552909", label = "Gadget & the Gadgetinis (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+  },
+}

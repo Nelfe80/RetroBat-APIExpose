@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Farm Frenzy",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "farm-frenzy",
+    file = "farm-frenzy.zip",
+    hashes = {
+      { hash = "6a60522c4b88c34d8f9143e46417b0aa", label = "Farm Frenzy (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X1FFF3E8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (0-based)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF4DF1C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins in Bank increased" },
+        { address=0XF650D8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+      },
+    },
+  },
+}

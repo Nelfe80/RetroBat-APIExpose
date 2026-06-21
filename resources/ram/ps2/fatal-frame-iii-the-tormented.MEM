@@ -1,0 +1,128 @@
+return {
+  game = {
+    title = "Fatal Frame III: The Tormented",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "fatal-frame-iii-the-tormented",
+    file = "fatal-frame-iii-the-tormented.zip",
+    hashes = {
+      { hash = "4cc5acdbbc8bbb51fc0fb91b88dd6ce6", label = "Fatal Frame III - The Tormented (USA)" },
+      { hash = "b035cf7ab26c17d09e350ca45e94e0d6", label = "Project Zero 3 (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X3E5233, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[NTSC] [8-bit] Current Combo" },
+        { address=0X42106C, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Mission Combos" },
+        { address=0X424AEC, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[PAL] [32-bit] Mission Combos" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3DDACC, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruri running around the corner" },
+        { address=0X3E056C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruri running around the corner" },
+        { address=0X3E4CF8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 2 Missions Unlock Flag" },
+        { address=0X3E4CFC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 3 Missions Unlock Flag" },
+        { address=0X3E4D00, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 4 Missions Unlock Flag" },
+        { address=0X3E4D04, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 5 Missions Unlock Flag" },
+        { address=0X3E4D08, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 6 Missions Unlock Flag" },
+        { address=0X3E4D0C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 7 Missions Unlock Flag" },
+        { address=0X3E4D10, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 8 Missions Unlock Flag" },
+        { address=0X3E4D14, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 9 Missions Unlock Flag" },
+        { address=0X3E4D18, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Level 10 Missions Unlock Flag" },
+        { address=0X3E7798, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 2 Missions Unlock Flag" },
+        { address=0X3E779C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 3 Missions Unlock Flag" },
+        { address=0X3E77A0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 4 Missions Unlock Flag" },
+        { address=0X3E77A4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 5 Missions Unlock Flag" },
+        { address=0X3E77A8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 6 Missions Unlock Flag" },
+        { address=0X3E77AC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 7 Missions Unlock Flag" },
+        { address=0X3E77B0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 8 Missions Unlock Flag" },
+        { address=0X3E77B4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 9 Missions Unlock Flag" },
+        { address=0X3E77B8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] [32-bit] Level 10 Missions Unlock Flag" },
+        { address=0X421078, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Mission Clear Flag" },
+        { address=0X424AF8, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[PAL] [32-bit] Mission Clear Flag" },
+      },
+      zone = {
+        { address=0X322EAA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[NTSC] [8-bit] Files - Texts - 'The Other World'" },
+        { address=0X322EE3, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[NTSC] [8-bit] Files - Data - The 'Spirit World'" },
+        { address=0X32519A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[PAL] [8-bit] Files - Texts - 'The Other World'" },
+        { address=0X3251D3, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[PAL] [8-bit] Files - Data - The 'Spirit World'" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3E8946, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[NTSC] [2-byte] Ghost List #28 - Abyss Dead" },
+        { address=0X3E8982, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[NTSC] [2-byte] Ghost List #58 - Man Stopped Dead" },
+        { address=0X3EB3E6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[PAL] [2-byte] Ghost List #28 - Abyss Dead" },
+        { address=0X3EB422, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[PAL] [2-byte] Ghost List #58 - Man Stopped Dead" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X421098, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Extras: Rei - Suit" },
+        { address=0X424B18, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[PAL] [32-bit] Extras: Rei - Suit" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X325278, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Photo Points" },
+        { address=0X327568, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[PAL] [32-bit] Photo Points" },
+        { address=0X421058, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Mission mode total score" },
+        { address=0X42105C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[NTSC] [32-bit] Mission High Score (use e.g. in Best Shot missions)" },
+        { address=0X424AD8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[PAL] [32-bit] Mission Total Score" },
+        { address=0X424ADC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[PAL] [32-bit] Mission High Score (use e.g. in Best Shot missions)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3F6110, type="u8", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rei enters the abyss (Before Reika boss fight during Hour 14)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3DDAD0, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Not triggered" },
+        { address=0X3DDAD0, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Opened Closet Door" },
+        { address=0X3DDAD0, type="u8", condition="eq", value=0X05, action="JUMPING", no_log=false, no_survey=false, desc="Event ended" },
+        { address=0X3E0570, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Not triggered" },
+        { address=0X3E0570, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Opened Closet Door" },
+        { address=0X3E0570, type="u8", condition="eq", value=0X05, action="JUMPING", no_log=false, no_survey=false, desc="Event ended" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X322F09, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[NTSC] [8-bit] Files - Other - Equipment 'Switch'" },
+        { address=0X3251F9, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[PAL] [8-bit] Files - Other - Equipment 'Switch'" },
+        { address=0X3E0BDC, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not triggered" },
+        { address=0X3E0BDC, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Checking Door" },
+        { address=0X3E0BDC, type="u8", condition="eq", value=0X03, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Fight started" },
+        { address=0X3E0BDC, type="u8", condition="eq", value=0X05, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hidden Face Man defeated" },
+        { address=0X3E0BDD, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not triggered" },
+        { address=0X3E0BDD, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Triggered" },
+        { address=0X3E0E5C, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not triggered" },
+        { address=0X3E0E5C, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Triggered" },
+        { address=0X3E0E5C, type="u8", condition="eq", value=0X05, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Finished" },
+        { address=0X3E0E64, type="u8", condition="eq", value=0X00, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Not triggered" },
+        { address=0X3E0E64, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Triggered" },
+        { address=0X3E0E64, type="u8", condition="eq", value=0X05, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Finished" },
+        { address=0X3E8974, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[NTSC] [2-byte] Ghost List #51 - Daughter at Door" },
+        { address=0X3E89A2, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[NTSC] [2-byte] Ghost List #74 - Girl at Door" },
+        { address=0X3E89E6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[NTSC] [2-byte] Ghost List #108 - Door Woman" },
+        { address=0X3EB414, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[PAL] [2-byte] Ghost List #51 - Daughter at Door" },
+        { address=0X3EB442, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[PAL] [2-byte] Ghost List #74 - Girl at Door" },
+        { address=0X3EB486, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[PAL] [2-byte] Ghost List #108 - Door Woman" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3E0B38, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[PAL] [8-bit] Event Flag - Hour 8 - Great Hall Encounter with Rope Man" },
+        { address=0X3F6110, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[PAL] [8-bit] Cutscene ID" },
+      },
+    },
+  },
+}

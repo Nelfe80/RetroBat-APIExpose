@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Rockman",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rockman",
+    file = "rockman.zip",
+    hashes = {
+      { hash = "92b3849833b7e3d10825db4bc1617ef6", label = "Rockman (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAC500, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x01 = Demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X694A7, type="u8", condition="eq", value=0X50, action="NEW_LEVEL", no_log=false, no_survey=false, desc="cutman" },
+        { address=0X694A7, type="u8", condition="eq", value=0X70, action="NEW_LEVEL", no_log=false, no_survey=false, desc="gutsman" },
+        { address=0X694A7, type="u8", condition="eq", value=0XB0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="fireman" },
+        { address=0X694A7, type="u8", condition="eq", value=0X90, action="NEW_LEVEL", no_log=false, no_survey=false, desc="bombman" },
+        { address=0X694A7, type="u8", condition="eq", value=0XF0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="elecman" },
+        { address=0X694A7, type="u8", condition="eq", value=0XD0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="iceman" },
+        { address=0X694A7, type="u8", condition="eq", value=0XC0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="devil" },
+        { address=0X694A7, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="fake" },
+        { address=0X694A7, type="u8", condition="eq", value=0X58, action="NEW_LEVEL", no_log=false, no_survey=false, desc="cwuop" },
+        { address=0X694A7, type="u8", condition="eq", value=0X60, action="NEW_LEVEL", no_log=false, no_survey=false, desc="wily" },
+        { address=0X694A7, type="u8", condition="eq", value=0XA8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="magnet beam room 8-bit" },
+        { address=0X694A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="NOT level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAC85C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Selector 8-bit increased" },
+        { address=0XAC85C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Selector 8-bit decreased" },
+      },
+      health = {
+        { address=0X5CE97, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Element spawn, first frame is 40 8-bit decreased" },
+        { address=0X5CE97, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Element spawn, first frame is 40 8-bit increased" },
+        { address=0XAC5BE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (in navi) 8-bit decreased" },
+        { address=0XAC5BE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (in navi) 8-bit increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAAFE8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="equipped weapon check" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1E3DB6, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="220-weapon ammo=this (navi only) 8-bit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4E37E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="0x21-boss attack results screen" },
+        { address=0X55C98, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss attack minutes 8-bit" },
+        { address=0X5CF39, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP 8-bit" },
+        { address=0X1E3DBA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="in navi mode and boss attack, HUD number 8-bit" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAC2E8, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="boss attack timer third digit 8-bit" },
+        { address=0XAC2EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="boss attack timer fourth digit 8-bit" },
+      },
+    },
+  },
+}

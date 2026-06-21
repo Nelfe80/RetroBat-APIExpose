@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Rayman Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "rayman-advance",
+    file = "rayman-advance.zip",
+    hashes = {
+      { hash = "616f80f482ade86d88021b41587aa600", label = "Rayman Advance (USA) (En,Fr,De,Es,It).gba" },
+      { hash = "f2391ba88f816726e5a2ce4d321c5abf", label = "Rayman Advance (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X38320, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X36520, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="00=Dark Rayman level complete" },
+        { address=0X36524, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level Ting Count [hex]" },
+        { address=0X38014, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="02=level win 01=protoon medallion" },
+      },
+      zone = {
+        { address=0X37A94, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Level on World Map, World in level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2A714, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss health [death at 00] [Moskito, Sax, Space Momma, Skops]" },
+        { address=0X2A788, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mr. Stone Boss Health [Death at 00]" },
+        { address=0X2A870, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Opera Momma Health [death at 00]" },
+        { address=0X2B350, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss Health [Death at 00] [Bzzit]" },
+        { address=0X2C740, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mr. Dark Final Form Health [Death at 00 flash]" },
+        { address=0X324DA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit6543=AllegroLives increased" },
+        { address=0X324DA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit6543=AllegroLives decreased" },
+        { address=0X324E2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Event triggers by bit bit2=HardRock1LifeAlt bit3=HardRock2Life3 bit4=HardRock2Life2 bit5=HardRoc" },
+        { address=0X324E2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Event triggers by bit bit2=HardRock1LifeAlt bit3=HardRock2Life3 bit4=HardRock2Life2 bit5=HardRoc" },
+        { address=0X324E3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="bit0=HardRock3Life5 bit1=HardRock3Life4 bit2=HardRock3Life1 bit3=HardRock3Life2 bit4=HardRock3Li" },
+        { address=0X324E3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit0=HardRock3Life5 bit1=HardRock3Life4 bit2=HardRock3Life1 bit3=HardRock3Life2 bit4=HardRock3Li" },
+        { address=0X36EA0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives True increased" },
+        { address=0X36EA0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives True decreased" },
+        { address=0X36EA1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives x256 increased" },
+        { address=0X36EA1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives x256 decreased" },
+        { address=0X36EA2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [Tens] [Dec] increased" },
+        { address=0X36EA2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [Tens] [Dec] decreased" },
+        { address=0X36EA3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [Ones] [Dec] increased" },
+        { address=0X36EA3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [Ones] [Dec] decreased" },
+        { address=0X36EA5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current base health [first 4] [00=last hit, ff=death]" },
+      },
+      health = {
+        { address=0X2C658, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mr. Dark health decreased" },
+        { address=0X2C658, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mr. Dark health increased" },
+        { address=0X36EA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health from upgrade [02=max] decreased" },
+        { address=0X36EA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health from upgrade [02=max] increased" },
+        { address=0X36EA9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health - 03 without P, 05 with decreased" },
+        { address=0X36EA9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health - 03 without P, 05 with increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X33EE4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit0=PunchGet bit1=LedgeGrab bit2=Helicopter bit3=Supercopter bit7=Rings increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X9180, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="01=Invincibility Cheat" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3651C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time spent in level" },
+        { address=0X3651D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time spent in level" },
+      },
+    },
+  },
+}

@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Mickey Mania: The Timeless Adventures of Mickey Mouse",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "mickey-mania-the-timeless-adventures-of-mickey-mouse",
+    file = "mickey-mania-the-timeless-adventures-of-mickey-mouse.zip",
+    hashes = {
+      { hash = "0de3f1c9f358f35eb589125d07b11f42", label = "Mickey Mania - The Timeless Adventures of Mickey Mouse (USA)" },
+      { hash = "54339f3c874613f830a49001098bc725", label = "Mickey Mania (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E730, type="u16be", condition="eq", value=0X3A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen / Main Menu" },
+        { address=0X90460, type="u16be", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X90460, type="u16be", condition="eq", value=0X0, action="DEMO_MODE", no_log=false, no_survey=false, desc="Player" },
+        { address=0X90468, type="u16le", condition="eq", value=0X2C, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X90474, type="u16be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Left" },
+        { address=0X90478, type="u16be", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X90478, type="u16be", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+        { address=0X9047A, type="u16be", condition="eq", value=0X7000, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X9048A, type="u16be", condition="eq", value=0X6C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen and Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9045A, type="u16le", condition="eq", value=0X1, action="LEVEL_TRUE", no_log=false, no_survey=false, desc="True" },
+        { address=0X9045C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select" },
+        { address=0X90468, type="u16le", condition="eq", value=0X30, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Band Concert 1935 (Bonus Level)" },
+        { address=0X90468, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID. increases by 2 for each new area entered." },
+      },
+      stage = {
+        { address=0X9045A, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level Select Active" },
+        { address=0X90468, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X90468, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X90466, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Extra Lives increased" },
+        { address=0X90466, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Extra Lives decreased" },
+        { address=0X9046E, type="u16be", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X9046A, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="When Mickey gets hurt this address goes up in value. (mirrors @0x09046c)" },
+        { address=0X9046E, type="u16be", condition="eq", value=0X4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full Health" },
+        { address=0X9046E, type="u16be", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X90458, type="u16be", condition="eq", value=0X0, action="JUMPING", no_log=false, no_survey=false, desc="Throw B | Jump A or C" },
+        { address=0X90458, type="u16be", condition="eq", value=0X1, action="JUMPING", no_log=false, no_survey=false, desc="Throw A or C | Jump B" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X90456, type="u16be", condition="eq", value=0X00, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Easy (has Restart Points / checkpoints, start with 3 continues)" },
+        { address=0X90456, type="u16be", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normal (has Restart Points / checkpoints, start with 1 continue)" },
+        { address=0X90456, type="u16be", condition="eq", value=0X02, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Hard (has no Restart Points / checkpoints, start with 1 continue)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Hachoo!",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "hachoo",
+    file = "hachoo.zip",
+    hashes = {
+      { hash = "d3af11dc423cfcd36be3d2a953031c5f", label = "hachoo.7z <Hachoo!>" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X0186, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="score" },
+      },
+    },
+  },
+}

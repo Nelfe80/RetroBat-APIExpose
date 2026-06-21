@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 H.M 57300</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 TOM 37500</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 Y.I 30000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 M.I 25000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MAI 20000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 RIE 15000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 T.M 10000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 J.K 9000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 S.F 8000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 T.S 7000</text>
+		</text>
+	</view>
+</theme>

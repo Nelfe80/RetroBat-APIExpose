@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Psikyo Shooting Collection Vol. 1: Strikers 1945 I & II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "psikyo-shooting-collection-vol-1-strikers-1945-i-ii",
+    file = "psikyo-shooting-collection-vol-1-strikers-1945-i-ii.zip",
+    hashes = {
+      { hash = "44f14782339c9cc6a8537134e156d16c", label = "Psikyo Shooting Collection Vol. 1 - Strikers 1945 I & II (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2707BB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Strikers II Demo Mode" },
+        { address=0X34417F, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Strikers I demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X270739, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers II Power Level" },
+      },
+      stage = {
+        { address=0X3375B2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Strikers I Stage Number" },
+        { address=0X3378F2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Strikers II Stage ID" },
+        { address=0X3388C0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Strikers II Location ID (used for identifying which random stages you roll into)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X22C2EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Strikers I Lives increased" },
+        { address=0X22C2EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Strikers I Lives decreased" },
+        { address=0X22C740, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Strikers I Lives Option increased" },
+        { address=0X22C740, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Strikers I Lives Option decreased" },
+        { address=0X270714, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Strikers II Lives increased" },
+        { address=0X270714, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Strikers II Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X22C2CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Strikers I Score" },
+        { address=0X270718, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Strikers II Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X338756, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Strikers I Stage 7 Boss" },
+      },
+    },
+  },
+}

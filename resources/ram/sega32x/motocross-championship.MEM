@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Motocross Championship",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "motocross-championship",
+    file = "motocross-championship.zip",
+    hashes = {
+      { hash = "2c4a934985021624d48725b8d7b039e8", label = "Motocross Championship (USA).32x" },
+      { hash = "6bc365808a00b8a640dd86ccb5a0ea24", label = "Motocross Championship (Europe).32x" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X34C1E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (Difficulty)" },
+      },
+    },
+  },
+}

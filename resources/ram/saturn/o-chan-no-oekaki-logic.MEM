@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "O-chan no Oekaki Logic",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "o-chan-no-oekaki-logic",
+    file = "o-chan-no-oekaki-logic.zip",
+    hashes = {
+      { hash = "e4a549f204b9ed27abf063438f8d7939", label = "Oh-chan no Oekaki Logic (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

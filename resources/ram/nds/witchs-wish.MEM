@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Witch's Wish",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "witchs-wish",
+    file = "witchs-wish.zip",
+    hashes = {
+      { hash = "7f232ba45197f5e0d3e9114ac3548ca3", label = "Witch's Wish (USA).nds" },
+    }
+  },
+
+  events = {
+  },
+}

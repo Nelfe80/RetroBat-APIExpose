@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Pocket Tennis Color",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pocket-tennis-color",
+    file = "pocket-tennis-color.zip",
+    hashes = {
+      { hash = "c7bfc59b4cb593409541d4ccffe083b4", label = "Pocket Tennis Color - Pocket Sports Series (World) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15CB, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen;" },
+      },
+    },
+  },
+}

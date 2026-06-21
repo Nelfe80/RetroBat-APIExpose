@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Fire Emblem: Thracia 776",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "fire-emblem-thracia-776",
+    file = "fire-emblem-thracia-776.zip",
+    hashes = {
+      { hash = "625ede0fee77213fe9d9242d55f74e5b", label = "Fire Emblem - Thracia 776 (Japan) (En - Lil' Manster) (v1.08) (Project Exile).sfc" },
+      { hash = "85e088d92b87ccb0c66fa80ebe2cee68", label = "Fire Emblem - Thracia 776 (Japan) (En) (Cirosan) (1.04) (Addendum) (Miacis) (1.07).sfc" },
+      { hash = "89b5cfee41894d42b5067655b95d38d5", label = "Fire Emblem - Thracia 776 (Japan) (En) (1.02) (LilManster).sfc" },
+      { hash = "c3fd1cad754256d7a013864d917f47fa", label = "Fire Emblem - Thracia 776 (Japan).sfc" },
+      { hash = "eb8f14b6900a8dbb0599f6fd564efe07", label = "Fire Emblem - Thracia 776 (Japan) (Es).sfc" },
+      { hash = "eedd67fdd73a5f6d761da46b9421efdf", label = "Fire Emblem - Thracia 776 (Japan) (En) (1.04) (ProjectExile).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0300, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen and Stats Menu" },
+        { address=0X0500, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Are on the Title Screen" },
+        { address=0X0E0D, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Activated" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0E76, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level of the person currently highlighted" },
+        { address=0X529F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Leif's Level" },
+        { address=0XA567, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level of defending party in combat (1)" },
+        { address=0XA5BF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level of defending party in combat (2)" },
+      },
+      zone = {
+        { address=0X0300, type="u8", condition="eq", value=0X0D, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map Cutscene" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5F0E, type="u8", condition="eq", value=0X41, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X52A1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Leif's Max HP decreased" },
+        { address=0X52A1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Leif's Max HP increased" },
+        { address=0X52A2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Leif's Current HP decreased" },
+        { address=0X52A2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Leif's Current HP increased" },
+        { address=0X52E2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unit 2 Max HP decreased" },
+        { address=0X52E2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unit 2 Max HP increased" },
+        { address=0X52E3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unit 2 Current HP decreased" },
+        { address=0X52E3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unit 2 Current HP increased" },
+        { address=0X5323, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unit slot 3 max HP decreased" },
+        { address=0X5323, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unit slot 3 max HP increased" },
+        { address=0X5324, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unit slot 3 current HP decreased" },
+        { address=0X5324, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unit slot 3 current HP increased" },
+        { address=0X5364, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unit slot 4 Max HP decreased" },
+        { address=0X5364, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unit slot 4 Max HP increased" },
+        { address=0X5ED2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP decreased" },
+        { address=0X5ED2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X52C5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Leif's Sword Weapon Rank" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4F93, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(24-bit) Money Amount increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5EC8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy 1 (Usually if not always the Boss) Unit ID" },
+        { address=0X5ECD, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fine" },
+        { address=0X5ECD, type="u8", condition="eq", value=0X41, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X5ECD, type="u8", condition="eq", value=0X50, action="BOSS_HIT", no_log=false, no_survey=false, desc="Captured" },
+      },
+    },
+  },
+}

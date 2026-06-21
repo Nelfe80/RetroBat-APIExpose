@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Oscar",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "oscar",
+    file = "oscar.zip",
+    hashes = {
+      { hash = "9cbba211206b477e31a45c3c2a122708", label = "Oscar (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0324, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Oscars Left in Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0320, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X0322, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Life Counter (Offset by +1) increased" },
+        { address=0X0322, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Life Counter (Offset by +1) decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0320, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Heart Counter:" },
+      },
+    },
+  },
+}

@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Bugs Bunny: Rabbit Rampage",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "bugs-bunny-rabbit-rampage",
+    file = "bugs-bunny-rabbit-rampage.zip",
+    hashes = {
+      { hash = "8c78204ddbc95caba8aa7ad0e81eb654", label = "Bugs Bunny - Rabbit Rampage (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X046A, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="AI in control [Demo mode]" },
+        { address=0X0478, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Active" },
+        { address=0X0478, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Inactive" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X02E4, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1.1" },
+        { address=0X02E4, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2.1" },
+        { address=0X02E4, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 400" },
+        { address=0X02E4, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3.1" },
+        { address=0X02E4, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2001" },
+        { address=0X02E4, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 9.1" },
+        { address=0X02E4, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 x (y/c-Z-10)" },
+        { address=0X02E4, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 42.759 3/8" },
+        { address=0X02E4, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 13" },
+        { address=0X02E4, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Is This Trip Really Necessary?" },
+        { address=0X02E4, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Trainer Screen" },
+        { address=0X02E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X02DA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Remaining Lives (8-bit) increased" },
+        { address=0X02DA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Remaining Lives (8-bit) decreased" },
+        { address=0X0410, type="u8", condition="eq", value=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X0410, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting Lives (8-bit) increased" },
+        { address=0X0410, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting Lives (8-bit) decreased" },
+      },
+      health = {
+        { address=0X02D6, type="u8", condition="eq", value=0X16, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X02D6, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player Health (8-bit)" },
+        { address=0X92B2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Elmer Fudd HP (8-bit) decreased" },
+        { address=0X92B2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Elmer Fudd HP (8-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X04B6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Style Score (16-bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X96EA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Cowboy Boss HP (8-bit)" },
+      },
+    },
+  },
+}

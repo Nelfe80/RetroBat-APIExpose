@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Spider-Man",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "spider-man",
+    file = "spider-man.zip",
+    hashes = {
+      { hash = "199eb0b8dce1408f3f7d46411b715ca9", label = "Spider-Man (USA).a26" },
+    }
+  },
+
+  events = {
+  },
+}

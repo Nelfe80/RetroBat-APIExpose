@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Future Tactics: The Uprising",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "future-tactics-the-uprising",
+    file = "future-tactics-the-uprising.zip",
+    hashes = {
+      { hash = "0d2ad40b38bf4b9a8124e3a465f72e6e", label = "Future Tactics - The Uprising (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

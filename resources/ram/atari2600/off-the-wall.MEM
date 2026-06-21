@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Off the Wall",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "off-the-wall",
+    file = "off-the-wall.zip",
+    hashes = {
+      { hash = "98f63949e656ff309cefa672146dc1b8", label = "Off the Wall (USA).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X005B, type="u8", condition="eq", value=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0000, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completely Broken" },
+        { address=0X0053, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Completely Broken" },
+      },
+    },
+  },
+}

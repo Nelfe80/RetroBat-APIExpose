@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Need for Speed: Carbon",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "need-for-speed-carbon",
+    file = "need-for-speed-carbon.zip",
+    hashes = {
+      { hash = "24d3880c8a55097bab365976ba0cda80", label = "Need for Speed - Carbon (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9154EC, type="u32be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Speed Demon" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9153D4, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Arcade Level 1" },
+        { address=0X915434, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Arcade Level 4" },
+        { address=0X915454, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Arcade Level 2" },
+        { address=0X91545C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Arcade Level 3" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X903F6C, type="u32be", condition="eq", value=0X5F1F3E6C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadfall Junction" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X8F2F3E6C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadfall Junction" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X5F1F2E6C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadfall Junction" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F1F3E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Canyon Duel Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F2F3E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Canyon Race Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F14F3E6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Canyon Drift Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F6F3E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="in Free Roam (Pursuit Evasion Gold)" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F7F3E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="in Free Roam (Trade Paint Gold)" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F8F3E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Circuit Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F9F3E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Sprint Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F10F6E6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Drift Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F11F3E6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Speedtrap Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F12F3E6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Race Wars Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X7F5F1E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="in Free Roam (CE Challenge Gold)" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F15F3E6, action="MONEY_STATE", no_log=false, no_survey=false, desc="CE Race Wars Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X4F1F2E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Valley Run" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X8F2F2E6C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Valley Run" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X3F455CE6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Valley Run" },
+        { address=0X90FFB7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Drift (Gold) increased" },
+        { address=0X9103C7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Checkpoint (Gold) increased" },
+        { address=0X9103F7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Canyon Duel (Gold) increased" },
+        { address=0X910467, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Canyon Race (Gold) increased" },
+        { address=0X9104D7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Sprint (Gold) increased" },
+        { address=0X910507, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Canyon Drift (Gold) increased" },
+        { address=0X9105F7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Circuit (Gold) increased" },
+        { address=0X910637, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Canyon Checkpoint (Gold) increased" },
+        { address=0X910767, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Race Wars (Gold) increased" },
+        { address=0X910917, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Trade Paint (Gold) increased" },
+        { address=0X910937, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Speedtrap (Gold) increased" },
+        { address=0X910967, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit0=Challenge Series - Pursuit Evasion (Gold) increased" },
+        { address=0X915224, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Makin' Money increased" },
+        { address=0X91541C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Gold Medal increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F3F1E6C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Bronze" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F3F2E6C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Silver" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F3F3E6C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F13F1E6, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Canyon Checkpoint Bronze" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F13F2E6, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Canyon Checkpoint Silver" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X6F1EF3E6, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Canyon Checkpoint Gold" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X7F4F1E6C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="CE Checkpoint Bronze" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X7F4F3E6C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="CE Checkpoint Silver" },
+        { address=0X903F6C, type="u32be", condition="eq", value=0X7F4F2E6C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="CE Checkpoint Gold" },
+        { address=0X90FFA7, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="bit0=Challenge Series - Checkpoint (Silver)" },
+        { address=0X9100D7, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="bit0=Challenge Series - Checkpoint (Bronze)" },
+        { address=0X910117, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="bit0=Challenge Series - Canyon Checkpoint (Bronze)" },
+        { address=0X9101C7, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="bit0=Challenge Series - Canyon Checkpoint (Silver)" },
+        { address=0X91533C, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Block Breaker" },
+        { address=0X915514, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Unblockable" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X915234, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Time Shift" },
+        { address=0X91531C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-Bit BE] Reward Card - Hard Time" },
+      },
+    },
+  },
+}

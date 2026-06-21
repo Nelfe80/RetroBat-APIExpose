@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Guzzler",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "guzzler",
+    file = "guzzler.zip",
+    hashes = {
+      { hash = "f3f1042745e96e29bfdf920d031b8cd5", label = "Guzzler (Japan) (Othello Multivision).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0008, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X000A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 - S1" },
+        { address=0X000A, type="u8", condition="eq", value=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 - S2" },
+      },
+    },
+  },
+}

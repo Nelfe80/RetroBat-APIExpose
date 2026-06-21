@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Carnage Heart",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "carnage-heart",
+    file = "carnage-heart.zip",
+    hashes = {
+      { hash = "57362f5923757e956994912cfead004f", label = "Carnage Heart (USA)" },
+      { hash = "e975ce1b1d61bc8fa13f7c6e05444ea6", label = "Carnage Heart (USA) (Mission Briefing)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDF388, type="u32le", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XDF388, type="u32le", condition="eq", value=0X05, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XDF388, type="u32le", condition="eq", value=0X07, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XDF388, type="u32le", condition="eq", value=0X09, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDFCEC, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+        { address=0X1351BA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Base 3, Production Line 1, Level" },
+        { address=0X1351C6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Base 3, Production Line 2, Level" },
+        { address=0X1351D2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Base 3, Production Line 3, Level" },
+        { address=0X1351DE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Base 3, Production Line 4, Level" },
+        { address=0X1351EA, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Base 3, Production Line 5, Level" },
+        { address=0X1351F6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Base 3, Production Line 6, Level" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X136270, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blue Prints - Main Weapon - Prowler Assault - Kawashina Corp" },
+        { address=0X136274, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blue Prints - Main Weapon - Jujuman Assault (Assault Rifle) - McMorell" },
+        { address=0X13627C, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blue Prints - Main Weapon - Livewire Assault (Assault Rifle) - AAC" },
+        { address=0X136280, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blue Prints - Main Weapon - Rogue Assault (Assault Rifle) - Kawashima Corp" },
+        { address=0X136284, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blue Prints - Main Weapon - Manticore Assault (Assault Rifle) - Brenan" },
+        { address=0X1362CC, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blueprint - Main Weapon - Kouger Laser - Brenan" },
+        { address=0X1363D0, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blueprint - Sub Weapon - 14 Floating Mine - Brenan" },
+        { address=0X1363EC, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blueprint - Sub Weapon - 14 Scatter Mine - Brenan" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X134B7E, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Unit 1, Ammo (Kilograms)" },
+        { address=0X1351AC, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Base 3, Current Ammo" },
+        { address=0X1351B5, type="u8", condition="eq", value=0X63, action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo" },
+        { address=0X1351B6, type="u16le", condition="eq", value=0X03E7, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max (999)" },
+        { address=0X1351B8, type="u16le", condition="eq", value=0X03E7, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max (999)" },
+        { address=0X1351C1, type="u8", condition="eq", value=0X63, action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo" },
+        { address=0X1351C2, type="u16le", condition="eq", value=0X03E7, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max (999)" },
+        { address=0X1351C4, type="u16le", condition="eq", value=0X03E7, action="AMMO_STATE", no_log=true, no_survey=false, desc="Max (999)" },
+        { address=0X13640C, type="u8", condition="bit_true", bit=1, mask=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Blue Prints - Munitions 140 AP Ammo (Assault Ammo) - Union Claude" },
+        { address=0X136410, type="u8", condition="bit_true", bit=1, mask=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Blue Prints - Munitions - 200 AP Ammo (Assault Ammo) - Union Claude" },
+      },
+    },
+  },
+}

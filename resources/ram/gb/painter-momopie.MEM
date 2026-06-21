@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Painter Momopie",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "painter-momopie",
+    file = "painter-momopie.zip",
+    hashes = {
+      { hash = "7a1db9950b7fb12499df822b32ef1ed9", label = "Painter Momopie (Japan).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC49B, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC43E, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XC520, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tiles remaining in current round." },
+        { address=0XC522, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current round." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC1A9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives. increased" },
+        { address=0XC1A9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives. decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC43E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Spell slot #1." },
+        { address=0XC49C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Appears to be used for options pertaining to the title screen. The [16-Bit] address is also used" },
+        { address=0XFFE0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time remaining." },
+      },
+    },
+  },
+}

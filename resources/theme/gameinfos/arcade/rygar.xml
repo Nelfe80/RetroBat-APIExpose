@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy4way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button 2</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button 2</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 FDC 88360</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 EHD 88110</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 PIE 35550</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 AAA 30000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 AAA 30000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 AAA 30000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 AAA 30000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 AAA 30000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 AAA 30000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 AAA 30000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 AAA 30000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 AAA 30000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 AAA 30000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 AAA 30000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 AAA 30000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 AAA 30000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 AAA 30000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 AAA 30000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 AAA 30000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 AAA 30000</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 AAA 30000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 AAA 30000</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 AAA 30000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 AAA 30000</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 AAA 30000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 AAA 30000</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 AAA 30000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 AAA 30000</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 AAA 30000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 AAA 30000</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 AAA 30000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 AAA 30000</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 AAA 30000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 AAA 30000</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 AAA 30000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 AAA 30000</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 AAA 30000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 AAA 30000</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 AAA 30000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 AAA 30000</text>
+		</text>
+		<text name="hiscoreline41" extra="true">
+			<text>#41 AAA 30000</text>
+		</text>
+		<text name="hiscoreline42" extra="true">
+			<text>#42 AAA 30000</text>
+		</text>
+		<text name="hiscoreline43" extra="true">
+			<text>#43 AAA 30000</text>
+		</text>
+		<text name="hiscoreline44" extra="true">
+			<text>#44 AAA 30000</text>
+		</text>
+		<text name="hiscoreline45" extra="true">
+			<text>#45 AAA 30000</text>
+		</text>
+		<text name="hiscoreline46" extra="true">
+			<text>#46 AAA 30000</text>
+		</text>
+		<text name="hiscoreline47" extra="true">
+			<text>#47 AAA 30000</text>
+		</text>
+		<text name="hiscoreline48" extra="true">
+			<text>#48 AAA 30000</text>
+		</text>
+		<text name="hiscoreline49" extra="true">
+			<text>#49 AAA 30000</text>
+		</text>
+		<text name="hiscoreline50" extra="true">
+			<text>#50 AAA 30000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

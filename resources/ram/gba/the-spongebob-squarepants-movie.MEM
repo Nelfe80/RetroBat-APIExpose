@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "The SpongeBob SquarePants Movie",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-spongebob-squarepants-movie",
+    file = "the-spongebob-squarepants-movie.zip",
+    hashes = {
+      { hash = "17dd0e3e76207e30614768482078cc3f", label = "SpongeBob SquarePants Movie, The (USA) (Beta 2).gba" },
+      { hash = "8d76ff1a5411fbd8ba0010dbcd0e5aa2", label = "SpongeBob SquarePants Movie, The (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X041A, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause - 02" },
+        { address=0X7818, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title option" },
+        { address=0X7821, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title selection" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X25C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0X75C0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete level 1" },
+      },
+      stage = {
+        { address=0X758C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Map stage select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7049, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifes increased" },
+        { address=0X7049, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifes decreased" },
+      },
+      health = {
+        { address=0X1D70, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage indicator" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X42B50, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss?" },
+      },
+    },
+  },
+}

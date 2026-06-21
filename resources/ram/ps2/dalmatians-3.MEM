@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Dalmatians 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "dalmatians-3",
+    file = "dalmatians-3.zip",
+    hashes = {
+      { hash = "8468bd82d8df733a480b4c7b833a746c", label = "Dalmatians 3 (Europe) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X15D39C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Painting Stage Selection" },
+        { address=0X18146C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal Puzzle Stage Selection" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X181764, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Picture Match Time" },
+        { address=0X182088, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Slider Puzzle Time" },
+        { address=0X1FFEC14, type="u32le", condition="eq", value=0X0000000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Not Active/Movie Ended" },
+        { address=0X1FFEC14, type="u32le", condition="eq", value=0X0000FB7B, action="GENERAL_TIMER", no_log=true, no_survey=true, desc="Last Frame of Movie" },
+      },
+    },
+  },
+}

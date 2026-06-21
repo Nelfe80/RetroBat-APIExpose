@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Barbie: The Princess and the Pauper",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "barbie-the-princess-and-the-pauper",
+    file = "barbie-the-princess-and-the-pauper.zip",
+    hashes = {
+      { hash = "64082d14d8a4abe32fb8b062d9c0b9ed", label = "Barbie - The Princess and the Pauper (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0098, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="mini game round complete?" },
+        { address=0X11C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mini games rounds" },
+        { address=0X2800, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="levels [8bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X10DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health [8bit] decreased" },
+        { address=0X10DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health [8bit] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6D70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bits) mini game score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1070, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Anneliese Shield used as a platform" },
+      },
+    },
+  },
+}

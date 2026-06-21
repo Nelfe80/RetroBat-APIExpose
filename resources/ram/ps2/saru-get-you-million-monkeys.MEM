@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Saru! Get You! Million Monkeys",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "saru-get-you-million-monkeys",
+    file = "saru-get-you-million-monkeys.zip",
+    hashes = {
+      { hash = "4e692bea4a855133df05ebe2150d485b", label = "Saru! Get You! Million Monkeys (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X65BD7C, type="u16le", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Skureen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6607A0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Koroshium Round" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X660770, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 1 Damage" },
+        { address=0X660774, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 2 Damage" },
+        { address=0X660778, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 3 Damage" },
+        { address=0X66077C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player 4 Damage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X660758, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Get You Points" },
+        { address=0X660780, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HP Points" },
+        { address=0X6607A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Round 1 Points" },
+        { address=0X6607A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Round 2 Points" },
+        { address=0X6607AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Round 3 Points" },
+        { address=0X6607C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Round 1 Points" },
+        { address=0X6607CC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Round 2 Points" },
+        { address=0X6607D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Round 3 Points" },
+        { address=0X6607EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 3 Round 1 Points" },
+        { address=0X6607F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 3 Round 2 Points" },
+        { address=0X6607F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 3 Round 3 Points" },
+        { address=0X660810, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 4 Round 1 Points" },
+        { address=0X660814, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 4 Round 2 Points" },
+        { address=0X660818, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 4 Round 3 Points" },
+      },
+      collectibles = {
+        { address=0X660784, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Koins increased" },
+      },
+    },
+  },
+}

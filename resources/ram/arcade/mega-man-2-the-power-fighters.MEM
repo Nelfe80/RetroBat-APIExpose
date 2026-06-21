@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Mega Man 2: The Power Fighters",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "mega-man-2-the-power-fighters",
+    file = "mega-man-2-the-power-fighters.zip",
+    hashes = {
+      { hash = "523555ae3bd12f5cc3ec406a4c8da0e9", label = "megaman2.7z <Mega Man 2 - the power fighters (960708 USA)>" },
+      { hash = "80a0ae02ca0e9905e9baae671be9eea2", label = "megaman2a.7z <Mega Man 2 - the power fighters (960708 Asia)>" },
+      { hash = "ccaa26b29d3e946fb6883710873df7fc", label = "rockman2j.7z <Rockman 2 - the power fighters (960708 Japan)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06B0, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues?" },
+        { address=0X8004, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="06 = continue screen" },
+        { address=0X8069, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues?" },
+        { address=0X8088, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="01 = continue screen" },
+        { address=0X838D, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Countdown" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XFF8351, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: energy" },
+        { address=0XFF8459, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: weapon energy" },
+        { address=0XFF8453, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: weapon energy" },
+        { address=0XFF8455, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: weapon energy" },
+        { address=0XFF845B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: weapon energy" },
+        { address=0XFF845D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: weapon energy" },
+        { address=0XFF8457, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player1_die: weapon energy" },
+        { address=0X8350, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X8350, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+        { address=0X8750, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 Health decreased" },
+        { address=0X8750, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFF8390, type="u32be", condition="change", action="TREASURE", min=200000, max=200000, no_log=false, no_survey=false, desc="Score delta 200000-200000: Dr Wily" },
+      },
+      weapon = {
+        { address=0X8432, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="0x3c when weapon is fully charged" },
+        { address=0X8434, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="0x04 when weapon is fully charged" },
+        { address=0X8444, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="01-Default Weapon active" },
+        { address=0X8446, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Buster/Default" },
+        { address=0X8446, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Shadow Blade, Rolling Cutter, Super Arm" },
+        { address=0X8446, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Plant Barrier, Power Stone, Pharaoh Shot" },
+        { address=0X8446, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Gyro Attack, Crush Noise, Air Shooter" },
+        { address=0X8446, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Centaur Arrow, Thunder Beam, Q. Boomerang" },
+        { address=0X8446, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Bubble Lead, Dive Missile, Gemini Laser" },
+        { address=0X8446, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Atomic Fire," },
+        { address=0X8448, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="01-Weapon Obtained" },
+        { address=0X844A, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="01-Weapon Obtained" },
+        { address=0X844B, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="01-Weapon Obtained" },
+        { address=0X844C, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="01-Weapon Obtained:" },
+        { address=0X844D, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="01-Weapon Obtained" },
+        { address=0X844F, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="01-Weapon Obtained" },
+        { address=0X8452, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Power Left" },
+        { address=0X8454, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Power Remaining" },
+        { address=0X8456, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Power Remaining:" },
+        { address=0X8458, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Power Remaining:" },
+        { address=0X845A, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Power Left" },
+        { address=0X845C, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Power Remaining" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFF8390, type="u32be", condition="change", action="SCORE_STATE", color="cyan", min=10, max=1000, no_log=false, no_survey=false, desc="Score delta 10-1000: General scoring band" },
+        { address=0XFF8390, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=50000, max=100000, no_log=false, no_survey=false, desc="Score delta 50000-100000: Robot Master" },
+        { address=0X802D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="01-high score screen?" },
+        { address=0X8390, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - dec - 16-bit - (first half)" },
+        { address=0X8392, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - dec - 16-bit - (second half)" },
+      },
+      collectibles = {
+        { address=0X027D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="01=no coins? demo? increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8102, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss?" },
+        { address=0X8127, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="end" },
+        { address=0X843A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage Number (Use for boss difficulty)" },
+        { address=0XCC8F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss?" },
+        { address=0XEF45, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage Number (Use for boss difficulty)" },
+        { address=0XEF60, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X811C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Daytona USA 2001",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "daytona-usa-2001",
+    file = "daytona-usa-2001.zip",
+    hashes = {
+      { hash = "02d78cda793af4743591446655573428", label = "Daytona USA 2001 (Europe) (En,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X265BFD, type="u8", condition="eq", value=0X16, action="PAUSE_ON", no_log=false, no_survey=false, desc="Visible" },
+        { address=0X265BFD, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0X265D08, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Gameplay" },
+        { address=0X265D08, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X265D0C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu: Highlighted option" },
+        { address=0X2B66DE, type="u16le", condition="eq", value=0X0025, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title and Demo, Rankings" },
+        { address=0X2B66DE, type="u16le", condition="eq", value=0X0012, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over after celebration and state after loading when exiting to menu mid-race" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X2B66DE, type="u16le", condition="eq", value=0X0051, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Welcome to the world of champions (image after new game in Championship)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2807DC, type="u32le", condition="eq", value=0X0006AAFA, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ladies & Gentlemen announcer VO" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X345BC2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1: Checkpoints passed" },
+        { address=0X345ECE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2: Checkpoints passed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X265BFD, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="HUD Status in Time Attack during Pause" },
+        { address=0X265C00, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time until current screen automatically updates" },
+        { address=0X265C30, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current race time" },
+        { address=0X265C34, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time remaining on countdown" },
+        { address=0X265D24, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X265D24, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game mode" },
+        { address=0X28F661, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Settings: Lap Time Display Off / On" },
+        { address=0X28F662, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Settings: Section Lap Time Display Off / On" },
+        { address=0X291FDC, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Total Playtime" },
+        { address=0X345BBC, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Player 1: Last lap time" },
+      },
+    },
+  },
+}

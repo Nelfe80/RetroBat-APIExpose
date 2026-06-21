@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Pengo",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Maze"
+  },
+
+  rom = {
+    name = "pengo",
+    file = "pengo.zip",
+    hashes = {
+      { hash = "7cdb5efe98f456512df2e90de54ac85e", label = "pengo.7z <Pengo (World, not encrypted, rev A)>" },
+      { hash = "b0bc7cc5cbb2c885c4713202a940a4c1", label = "pengoc.7z <Pengo (World, 315-5010 type, set 3)>" },
+      { hash = "faa432a099ad166025ee41835a797928", label = "pengoj.7z <Pengo (Japan, not encrypted)>" },
+      { hash = "644cc9639ba2c203c7baa1fbecda0792", label = "pengoja.7z <Pengo (Japan, 315-5010 type, rev C)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0008, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[8bit] Credits Count" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0012, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Round" },
+        { address=0X0013, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 Round" },
+        { address=0X0598, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nonte / Round Finished" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0014, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives increased" },
+        { address=0X0014, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives decreased" },
+        { address=0X0015, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives increased" },
+        { address=0X0015, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives decreased" },
+        { address=0X059E, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X000C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore" },
+        { address=0X000E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score" },
+        { address=0X0010, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X045F, type="u8", condition="eq", value=0X54, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="83 Blocks (Maximum During Gameplay)" },
+        { address=0X045F, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="0 Blocks Remaining" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X045C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Timer - Seconds" },
+        { address=0X045D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Timer - Minutes" },
+        { address=0X0592, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Finish Time - Seconds" },
+        { address=0X0593, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Finish Time - Minutes" },
+        { address=0X1773, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Game Screen : Intermission" },
+      },
+    },
+  },
+}

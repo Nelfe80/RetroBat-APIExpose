@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "VeggieTales: LarryBoy and the Bad Apple",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "veggietales-larryboy-and-the-bad-apple",
+    file = "veggietales-larryboy-and-the-bad-apple.zip",
+    hashes = {
+      { hash = "cb8e478696bbf9b68cc9fcbf9d1fdafb", label = "Big Idea's VeggieTales - LarryBoy and the Bad Apple (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3969BC, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause flag" },
+        { address=0X40FD91, type="u8", condition="eq", value=0X1F, action="GAME_OVER", no_log=false, no_survey=false, desc="Minigame over" },
+        { address=0X40FD91, type="u8", condition="eq", value=0X74, action="PAUSE_ON", no_log=false, no_survey=false, desc="Player paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3971B2, type="u32le", condition="eq", value=0X30303831, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mayor Blueberry's Temptation" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X65766163, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Larry Cave/Main Menu" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X69666373, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chef Lunt's Temptation" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X6D676476, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Petunia's Temptation" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X6F636F63, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Larryboy's Temptation" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X6F6D656D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Memory Minigame" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X6F747474, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tic Tac Toe minigame" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X73736F62, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Apply's Funhouse 2" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X73796F74, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire Marshall Grape's Temptation" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X74726164, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Darts minigame" },
+        { address=0X3971B2, type="u32le", condition="eq", value=0X79746963, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bumbliburg" },
+        { address=0X3971B2, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Index" },
+        { address=0X40FD91, type="u8", condition="eq", value=0XA5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round over" },
+      },
+    },
+  },
+}

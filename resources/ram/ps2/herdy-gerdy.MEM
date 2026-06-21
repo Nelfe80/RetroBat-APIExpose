@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Herdy Gerdy",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "herdy-gerdy",
+    file = "herdy-gerdy.zip",
+    hashes = {
+      { hash = "434e6b4a1819f30959751b5ff402428f", label = "Herdy Gerdy (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X352408, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Level Data - Bell Count - Gerdy's Hut" },
+      },
+    },
+  },
+}

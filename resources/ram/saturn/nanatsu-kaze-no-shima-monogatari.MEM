@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Nanatsu Kaze no Shima Monogatari",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "nanatsu-kaze-no-shima-monogatari",
+    file = "nanatsu-kaze-no-shima-monogatari.zip",
+    hashes = {
+      { hash = "0f4aa11aefbcad830997aaafb6634e09", label = "Nanatsu Kaze no Shima Monogatari (Japan) (Disc 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15EE72, type="u16le", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Soft reset goes to title." },
+      },
+    },
+  },
+}

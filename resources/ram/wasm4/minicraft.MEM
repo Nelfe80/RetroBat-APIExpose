@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Minicraft",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "minicraft",
+    file = "minicraft.zip",
+    hashes = {
+      { hash = "a75912e749113feee2f789230b11527b", label = "Minicraft (World) (WASM-4 Jam #2 Version) (thefloatingpixel).wasm" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X9FD0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tiles" },
+      },
+    },
+  },
+}

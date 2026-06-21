@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Star Wars: The Force Unleashed",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "star-wars-the-force-unleashed",
+    file = "star-wars-the-force-unleashed.zip",
+    hashes = {
+      { hash = "2281e4b3057f1db795c1f5e8ae808fd2", label = "Star Wars - The Force Unleashed (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X98013C, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="No Skill, Use to Pause If All Skills Cheat Used (03) [32-Bit BE]" },
+        { address=0X9805EC, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="No Skill, Use to Pause If All Skills Cheat Used (03) [32-Bit BE]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4CAA60, type="u24be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Cutscene ID [ASCII Text - 24 Bytes]" },
+        { address=0X4E2D50, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Save File 3: Level ID [32-Bit BE]" },
+        { address=0X522E0A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID [ASCII Text - 5 Bytes]" },
+        { address=0X97FE6C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dark Rage Level [32-Bit BE]" },
+        { address=0X98022C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lightning Level [32-Bit BE]" },
+        { address=0X98031C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Maelstrom Level [32-Bit BE]" },
+        { address=0X98040C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Force Push Level [32-Bit BE]" },
+        { address=0X9804FC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lightsaber Throw Level [32-Bit BE]" },
+        { address=0X9806DC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Choke Level [32-Bit BE]" },
+        { address=0X9807CC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Repulse Level [32-Bit BE]" },
+        { address=0X9808BC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aerial Shock Level [32-Bit BE]" },
+        { address=0X9809AC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sith Seeker Level [32-Bit BE]" },
+        { address=0X980A9C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Detonate Level [32-Bit BE]" },
+        { address=0X980B8C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sith Scorcher Level [32-Bit BE]" },
+        { address=0X980C7C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Storm Level [32-Bit BE]" },
+        { address=0X980D6C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sith Barrage Level [32-Bit BE]" },
+        { address=0X980E5C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aerial Assault Level [32-Bit BE]" },
+        { address=0X980F4C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Slam Level [32-Bit BE]" },
+        { address=0X98103C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Saber Assault Level [32-Bit BE]" },
+        { address=0X98112C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Saber Whirlwind Level [32-Bit BE]" },
+        { address=0X98121C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power Slam Level [32-Bit BE]" },
+        { address=0X98130C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sith Strike Level [32-Bit BE]" },
+        { address=0X9813FC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pummel Level [32-Bit BE]" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Training Gear" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Heavy Training Gear" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Light Training Gear" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sith Robe" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Kento's Robe" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Jungle Combat Gear" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Corellian Flight Suit" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Raxus Prime Survival Gear" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bounty Hunter Disguise" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X09, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ceremonial Jedi Robes" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Sith Stalker Armor" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Yavin Luke" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X0C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mace Windu" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X0D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Count Dooku" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X0E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Aayla Secura" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X0F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Anakin Skywalker" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Luke Skywalker" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Qui Gon Jinn" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X12, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Asajj Ventress" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X13, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="PROXY" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="General Rahm Kota" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X15, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Darth Vader" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X16, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Obi Wan Kenobi" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X17, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Maris Brood" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mara Jade" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X19, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shaak Ti" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X1B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lando Calrissian" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X1C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Chop'aa Notimo" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X1D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Emperor Palpatine" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X1E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Darth Desolous" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X1F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Juno Eclipse" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Heavy Trooper" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X21, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Twi'lek" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X22, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Drexl Roosh" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X23, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Admiral Ackbar" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X24, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Navy Commando" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X25, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Darth Phobos" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X26, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="501st Legion" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X27, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Classic Stormtrooper" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X28, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Kleef" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X29, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shadowtrooper" },
+        { address=0X97FAAC, type="u32be", condition="eq", value=0X2A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Han Solo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9814EC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Force Points [32-Bit BE]" },
+      },
+      collectibles = {
+        { address=0X982838, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Health Holocron Bit String increased" },
+        { address=0X982839, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Health Holocron Bit String increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA1CFA0, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss/Enemy Name [ASCII Text - 16 Bytes]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Sesame Street: Cookie's Counting Carnival",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "sesame-street-cookies-counting-carnival",
+    file = "sesame-street-cookies-counting-carnival.zip",
+    hashes = {
+      { hash = "a2b320793e75d9d8ef1058bda4eeaa68", label = "123 Sesame Street - Cookie's Counting Carnival - The Videogame (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1E5164, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Game Round" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XFF6A8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Ring Patterns - Times Played increased" },
+        { address=0X1E514C, type="u16le", condition="eq", value=0X2E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Patterns" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFF798, type="u16le", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Midway" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E5158, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32bit] Round Timer" },
+        { address=0X1E5184, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] Round 1 Wrong Answer Counter" },
+        { address=0X1E5186, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] Round 2 Wrong Answer Counter" },
+        { address=0X1E5188, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] Round 3 Wrong Answer Counter" },
+        { address=0X1E5460, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Falling Cans Wrong Answer Counter For Current Round" },
+      },
+    },
+  },
+}

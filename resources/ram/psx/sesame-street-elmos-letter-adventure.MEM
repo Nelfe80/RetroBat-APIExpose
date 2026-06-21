@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Sesame Street: Elmo's Letter Adventure",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "sesame-street-elmos-letter-adventure",
+    file = "sesame-street-elmos-letter-adventure.zip",
+    hashes = {
+      { hash = "8d032889a94f0e3203acabc32d27058c", label = "Sesame Street - Elmo's Letter Adventure (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7178C, type="u16le", condition="eq", value=0X00000001, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sesame Street (Elmo's Number Journey)" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X00000002, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sesame Street" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X00000004, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elmo's Playroom" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X00000007, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Garden Maze (Elmo's Number Journey)" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X0000000B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Round (Elmo's Number Journey)" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X0000000C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Vegetable Garden" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X0000000D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Apple Orchard" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X0000000E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alphabet Planet" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X0000000F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Space Ride" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X00000010, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mermaids Manor" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X00000011, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Aqua Shoot" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X00000012, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Round" },
+        { address=0X7178C, type="u16le", condition="eq", value=0X00000014, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Elmo's Playroom - Tutorial" },
+        { address=0X7178C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Level ID" },
+      },
+    },
+  },
+}

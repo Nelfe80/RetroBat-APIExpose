@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "ECW Anarchy Rulz",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "ecw-anarchy-rulz",
+    file = "ecw-anarchy-rulz.zip",
+    hashes = {
+      { hash = "32ed61ab58715020a0e5c26e593a7c02", label = "ECW Anarchy Rulz (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

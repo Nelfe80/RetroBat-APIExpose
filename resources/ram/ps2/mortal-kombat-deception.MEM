@@ -1,0 +1,125 @@
+return {
+  game = {
+    title = "Mortal Kombat: Deception",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-deception",
+    file = "mortal-kombat-deception.zip",
+    hashes = {
+      { hash = "55cb3d87d73d5968091acd0fa560c0e1", label = "Mortal Kombat - Deception (USA)" },
+      { hash = "6d672576c18248e1d1c7d1940f5a6998", label = "Mortal Kombat - Deception (USA) (Premium Pack Bonus Disc)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB6A196, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract Mode" },
+        { address=0XB6A196, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      events = {
+        { address=0X5E20DC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Hit Combo [8 bits]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5E4351, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Start" },
+        { address=0X5E4434, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Wins [32 bits]" },
+        { address=0X622809, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Training] - Mileena [8 bits]" },
+        { address=0X62280A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Training] - Baraka [8 bits]" },
+        { address=0X62280B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Training] - Li Mei [8 bits]" },
+        { address=0X62280C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Training] - Raiden [8 bits]" },
+        { address=0X62280E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Fight] - Jade [8 bits]" },
+        { address=0X62280F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Fight] - Baraka [8 bits]" },
+        { address=0X622810, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Bo' Rai Cho [8 bits]" },
+        { address=0X622811, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Smoke [8 bits]" },
+        { address=0X622812, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Tanya [8 bits]" },
+        { address=0X622813, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Hotaru [8 bits]" },
+        { address=0X622814, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Sub-Zero [8 bits]" },
+        { address=0X622815, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Scorpion [8 bits]" },
+        { address=0X622816, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Noob [8 bits]" },
+        { address=0X622817, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Kobra [8 bits]" },
+        { address=0X622818, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Kira [8 bits]" },
+        { address=0X622819, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Konquest [Outworld - Extra Fight] - Cage [8 bits]" },
+        { address=0X628F34, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 rounds (default)" },
+        { address=0X628F34, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Rounds to Win [8 bits]" },
+        { address=0X628F38, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 rounds (default)" },
+        { address=0X628F38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Puzzles Rounds [8 bits]" },
+        { address=0X628F3C, type="u8", condition="eq", value=0X3C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60 (default)" },
+        { address=0X628F3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings - Round Time [8 bits]" },
+        { address=0XB6A1CA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MK1 - P1 Round Wins [8 bits]" },
+        { address=0XBAAF48, type="u32le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Outworld" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5E4550, type="u32le", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Pool" },
+        { address=0X622774, type="u8", condition="eq", value=0X0D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Reached Nexus 8th time (Deadly Alliance Begins)" },
+        { address=0X62295A, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ERO: Gossiping Ladies" },
+        { address=0X622960, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ED: Reiko's note sent to ED soldier) // ignore" },
+        { address=0X622960, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ED: Soldier message" },
+        { address=0X622960, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ED: Edenian pie killed soldier" },
+        { address=0X622973, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ERO: Gossiping Ladies" },
+        { address=0X62298C, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ERO: Gossiping Ladies" },
+        { address=0X622992, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ED: Reiko's note (sent to ED soldier) // ignore" },
+        { address=0X622992, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ED: Soldier message" },
+        { address=0X622992, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="ED: Edenian pie killed soldier" },
+        { address=0X622A08, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Reiko's note to a SK soldier" },
+        { address=0X622A08, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Reiko's note to ED soldier" },
+        { address=0X733BA4, type="u32le", condition="eq", value=0X654, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hut with dead body of Sheeva" },
+      },
+      health = {
+        { address=0X5E2114, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="P1 - Damage % Combo [Float]" },
+        { address=0X5E4400, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - HP [Float] decreased" },
+        { address=0X5E4400, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - HP [Float] increased" },
+        { address=0X5E446C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 - HP [Float] decreased" },
+        { address=0X5E446C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 - HP [Float] increased" },
+        { address=0XB6A1C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="MK1 - P1 HP [16 bits] decreased" },
+        { address=0XB6A1C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="MK1 - P1 HP [16 bits] increased" },
+        { address=0XB6A220, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="MK1 - P2 HP [16 bits] decreased" },
+        { address=0XB6A220, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="MK1 - P2 HP [16 bits] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6225D4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Profile - Gold Koins [32 bits] increased" },
+        { address=0X622956, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="EV: Wedding ring" },
+        { address=0X62295A, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="ERO: Find the man’s lost promise ring" },
+        { address=0X62295F, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="ED: Kitana ring" },
+        { address=0X622973, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="ERO: Find the man’s lost promise ring" },
+        { address=0X622988, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="EV: Wedding ring" },
+        { address=0X62298C, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="ERO: Find the man’s lost promise ring" },
+        { address=0X622991, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="ED: Kitana ring" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X62295B, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="NR: Find a shield" },
+        { address=0X62298D, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="NR: Find a shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5D6508, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1" },
+        { address=0X5D6508, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2" },
+        { address=0X5D6508, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chess Kombat - Last Fight Encounter Winner [8 bits] [1]" },
+        { address=0X5E455C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Arcade - Timer [32 bits]" },
+        { address=0X5E458C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Chess Kombat - Last Fight Encounter Winner [8 bits] [2]" },
+        { address=0X622774, type="u8", condition="eq", value=0X0D, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reached Earthrealm 2nd time (MK1 Tournament)" },
+        { address=0X622774, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reached Netherrealm 1st time" },
+        { address=0X622774, type="u8", condition="eq", value=0X09, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reached Netherrealm 2nd time" },
+        { address=0X622774, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Nexus 2nd time (Netherrealm Kamidogu)" },
+        { address=0X622774, type="u8", condition="eq", value=0X06, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Nexus 3rd time (Chaosrealm Kamidogu)" },
+        { address=0X622774, type="u8", condition="eq", value=0X0A, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reached Nexus 5th time (Going to Lei Chen)" },
+        { address=0X622774, type="u8", condition="eq", value=0X0C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reached Nexus 7th time (Going to Earthrealm)" },
+        { address=0X622774, type="u8", condition="eq", value=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reached Nexus 9th time (Obtained Order Kamidogu)" },
+        { address=0X622774, type="u8", condition="eq", value=0X12, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Reached Nexus last time (Obtained Edenia Kamidogu)" },
+        { address=0X622774, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Konquest - Story Progression [8 bits]" },
+      },
+    },
+  },
+}

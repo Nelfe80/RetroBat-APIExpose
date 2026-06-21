@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Prince of Persia",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "prince-of-persia",
+    file = "prince-of-persia.zip",
+    hashes = {
+      { hash = "70e9b330dd6a91e7310f3c8d9a934ecc", label = "Prince of Persia (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0262, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0292, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player life increased" },
+        { address=0X0292, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player life decreased" },
+        { address=0X0293, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player max life increased" },
+        { address=0X0293, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player max life decreased" },
+        { address=0X0294, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Guard life increased" },
+        { address=0X0294, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Guard life decreased" },
+      },
+      health = {
+        { address=0X10E2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Options health decreased" },
+        { address=0X10E2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Options health increased" },
+      },
+    },
+  },
+}

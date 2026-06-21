@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tengai Makyou: Karakuri Kakutoden",
+    system = "pcfx",
+    system_name = "PC-FX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tengai-makyou-karakuri-kakutoden",
+    file = "tengai-makyou-karakuri-kakutoden.zip",
+    hashes = {
+      { hash = "8cf787a9459f25def0245b5bcee16bfd", label = "Tengai Makyou - Dennou Karakuri Kakutouden (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

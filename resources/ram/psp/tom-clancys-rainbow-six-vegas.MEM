@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Tom Clancy's Rainbow Six: Vegas",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tom-clancys-rainbow-six-vegas",
+    file = "tom-clancys-rainbow-six-vegas.zip",
+    hashes = {
+      { hash = "aa5a5286708ab2b301d95456005567c6", label = "Tom Clancy's Rainbow Six - Vegas (USA) (En,Fr,Es) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X157B412, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[8bit] Player ammo clip/mag" },
+        { address=0X157B420, type="u32le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[32bit] Player ammo reserve" },
+        { address=0X15A8E42, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="ammo3" },
+      },
+    },
+  },
+}

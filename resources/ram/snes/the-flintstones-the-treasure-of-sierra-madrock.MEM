@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "The Flintstones: The Treasure of Sierra Madrock",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-flintstones-the-treasure-of-sierra-madrock",
+    file = "the-flintstones-the-treasure-of-sierra-madrock.zip",
+    hashes = {
+      { hash = "c7db2a255421554ba940099caad060ee", label = "Flintstones, The - The Treasure of Sierra Madrock (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1B46, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X1B46, type="u8", condition="eq", value=0XC0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1B13, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1B13, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level Flag?" },
+        { address=0X1C78, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of Signboard-Levels Complete x2 (will be using AddSource divided by 2 to give an accurate" },
+        { address=0X1C86, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-bit Last slot for Level Clears in Caverock Map-2" },
+        { address=0X1C90, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-bit Last slot for Level Clears in Caverock Map-1" },
+        { address=0X1C92, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-bit Last slot for Level Clears in Icerock and Junglerock" },
+        { address=0X1C9A, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-bit Last slot for Level Clears in Magmarock" },
+        { address=0X1CA2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-bit Last slot for Level Clears in Bedrock" },
+        { address=0X1D33, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+      },
+      zone = {
+        { address=0X0B6A, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0B6A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map Flag?" },
+        { address=0X1BF2, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="0x01 = Win World / Board" },
+        { address=0X1D08, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World-Map-ID, increases by 2 each world" },
+        { address=0X1D0E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Level-ID within a World (even numbers only)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1CF2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1P Lives increased" },
+        { address=0X1CF2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1P Lives decreased" },
+      },
+      health = {
+        { address=0X1CE2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P Max Health decreased" },
+        { address=0X1CE2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P Max Health increased" },
+        { address=0X1CE4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fred Max HP decreased" },
+        { address=0X1CE4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fred Max HP increased" },
+        { address=0X1CE6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Barney Max HP decreased" },
+        { address=0X1CE6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Barney Max HP increased" },
+        { address=0X1CE8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P Health decreased" },
+        { address=0X1CE8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P Health increased" },
+        { address=0X1CEA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fred Current HP decreased" },
+        { address=0X1CEA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fred Current HP increased" },
+        { address=0X1CEC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Barney Current HP decreased" },
+        { address=0X1CEC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Barney Current HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1CD2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Current Player's Score" },
+        { address=0X1CD4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Fred Score (only updates when switching characters)" },
+        { address=0X1CD6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-bit Barney Score (only updates when switching characters)" },
+      },
+      collectibles = {
+        { address=0X1CE0, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Clam Swapper - helper address to swap Active and Inactive character clams, but becomes 16-bit 0x" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1D06, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Number of Allowed Jumps(starts at 1, goes to 2 and 3 when beating Stadiums, but drops when you g" },
+      },
+    },
+  },
+}

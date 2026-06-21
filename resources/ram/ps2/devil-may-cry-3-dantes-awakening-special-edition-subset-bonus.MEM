@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Devil May Cry 3: Dante's Awakening - Special Edition [Subset - Bonus]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "devil-may-cry-3-dantes-awakening-special-edition-subset-bonus",
+    file = "devil-may-cry-3-dantes-awakening-special-edition-subset-bonus.zip",
+    hashes = {
+      { hash = "899559e002b683988ed412bfac4488e7", label = "Devil May Cry 3 (USA) (Special Edition) [Subset - Bonus].iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X78F7AC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blood Palace Level 16 bits" },
+        { address=0X78F7AE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Previous Blood Palace Level 16 bits" },
+        { address=0X1E58604, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="can be used as level ID in blood Palace 16 bits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1D0D73C, type="u16le", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dante Must Die" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1D0D738, type="u16le", condition="eq", value=0X006B, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ice Guardian's Chamber - Destroyed" },
+      },
+    },
+  },
+}

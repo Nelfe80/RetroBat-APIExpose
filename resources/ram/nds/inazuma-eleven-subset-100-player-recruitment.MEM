@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "Inazuma Eleven [Subset - 100% Player Recruitment]",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Sports"
+  },
+
+  rom = {
+    name = "inazuma-eleven-subset-100-player-recruitment",
+    file = "inazuma-eleven-subset-100-player-recruitment.zip",
+    hashes = {
+      { hash = "b52079a5b9511815f7c71e0822eea4c3", label = "Inazuma Eleven (Europe) [Subset - 100% Player Recruitment]" },
+      { hash = "91ae7f675dd3f004603ee04c30ded6b4", label = "Inazuma Eleven (France) [Subset - 100% Player Recruitment]" },
+      { hash = "875709f9adcb0af90e88701de8d11cc7", label = "Inazuma Eleven (Germany) [Subset - 100% Player Recruitment]" },
+      { hash = "00ffce995bda9ac05d547031518336b3", label = "Inazuma Eleven (Spain) [Subset - 100% Player Recruitment]" },
+      { hash = "1f5c718b70a57b184141637324db3198", label = "Inazuma Eleven (Italy) [Subset - 100% Player Recruitment]" },
+    }
+  },
+
+  events = {
+  },
+}

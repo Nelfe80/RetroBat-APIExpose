@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Bust-A-Move 2: Arcade Edition",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "bust-a-move-2-arcade-edition",
+    file = "bust-a-move-2-arcade-edition.zip",
+    hashes = {
+      { hash = "f705f203ca39bd9515af523e686ca3d9", label = "Bust-A-Move 2 - Arcade Edition (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A6E88, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1BD772, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+      },
+      zone = {
+        { address=0X1A6D8B, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1A6BB4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Higher Portion)" },
+        { address=0X1A6BB6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Lower Portion)" },
+      },
+      collectibles = {
+        { address=0X1CC8D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Credits increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1BD76C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Counter" },
+      },
+    },
+  },
+}

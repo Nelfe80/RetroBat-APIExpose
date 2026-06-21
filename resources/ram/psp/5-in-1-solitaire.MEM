@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "5-in-1 Solitaire",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "5-in-1-solitaire",
+    file = "5-in-1-solitaire.zip",
+    hashes = {
+      { hash = "0eed6c075c85318e9ae85f1df130ee15", label = "5-in-1 Solitaire (Europe) (minis) (PSN).iso" },
+      { hash = "69f525ee1a1faf67c46e2f65b3321b38", label = "5-in-1 Solitaire (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X866C38, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X866C38, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X866CB8, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X866CB8, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X866F50, type="u32le", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game On" },
+        { address=0X866F50, type="u32le", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X867788, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X867788, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X8679E0, type="u32le", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game On" },
+        { address=0X8679E0, type="u32le", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X865654, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Spider Best Score (US)" },
+        { address=0X865780, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Spider Current Score (US)" },
+        { address=0X86578C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Golf Current Score (US)" },
+        { address=0X865FD4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Klondike Best Score (EU)" },
+        { address=0X867CF4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Game Current Score (US)" },
+        { address=0X868784, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Game Current Score (EU)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X865808, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Klondike Timed Game (US)" },
+        { address=0X865818, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Freecell Timed Game (US)" },
+        { address=0X865828, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Spider Timed Game (US)" },
+        { address=0X865838, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Golf Timed Game (US)" },
+        { address=0X865848, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Gaps Timed Game (US)" },
+        { address=0X866248, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Klondike Timed Game (EU)" },
+        { address=0X866258, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Freecell Timed Game (EU)" },
+        { address=0X866268, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Spider Timed Game (EU)" },
+        { address=0X866278, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Golf Timed Game (EU)" },
+        { address=0X866288, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Gaps Timed Game (EU)" },
+      },
+    },
+  },
+}

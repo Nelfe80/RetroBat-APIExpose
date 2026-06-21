@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Death Note: Kira Game",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "death-note-kira-game",
+    file = "death-note-kira-game.zip",
+    hashes = {
+      { hash = "2ac7e97a252626768cb307c2dff35547", label = "Death Note - Kira Game (Japan).nds" },
+      { hash = "8dd58bc23ab5af71d482ea70922a9aff", label = "Death Note - Kira Game (En) (1.2) (Anime Game Translations Team).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB285C, type="u8", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+  },
+}

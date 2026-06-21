@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Zendoku: Sudoku Battle Action",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "zendoku-sudoku-battle-action",
+    file = "zendoku-sudoku-battle-action.zip",
+    hashes = {
+      { hash = "0e6bcb223e062827eb3d3d0db4b89f80", label = "Zendoku (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fear Factor Unleashed",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "fear-factor-unleashed",
+    file = "fear-factor-unleashed.zip",
+    hashes = {
+      { hash = "63bc29511f80b9ea2e5cd6daa9e76970", label = "Fear Factor - Unleashed (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

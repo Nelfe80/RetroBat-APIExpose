@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Peter Pan",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "peter-pan",
+    file = "peter-pan.zip",
+    hashes = {
+      { hash = "b6aff389a037b4200791d43cbd1b8609", label = "Peter Pan (Europe) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+  },
+}

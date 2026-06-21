@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Super Solitaire",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "super-solitaire",
+    file = "super-solitaire.zip",
+    hashes = {
+      { hash = "2810c6f1191e23ed158ae4237d0519fe", label = "Super Solitaire (USA) (En,Fr,De,Es,It).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X139D, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="the dead king is on" },
+        { address=0X139D, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="the dead king is off" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1381, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer seconds" },
+        { address=0X1382, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer minutes" },
+      },
+    },
+  },
+}

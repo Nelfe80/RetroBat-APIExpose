@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pucca: Noodle Rush",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pucca-noodle-rush",
+    file = "pucca-noodle-rush.zip",
+    hashes = {
+      { hash = "688a16b14ae7fa46de6f9f7989986d97", label = "Pucca - Noodle Rush (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

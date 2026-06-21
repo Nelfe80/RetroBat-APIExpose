@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Castlevania: Lament of Innocence",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "castlevania-lament-of-innocence",
+    file = "castlevania-lament-of-innocence.zip",
+    hashes = {
+      { hash = "6f0610cb661492e59df282e1543288a8", label = "Castlevania - Lament of Innocence (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB35BB0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo 0/1" },
+        { address=0XB7B618, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Flame Demon N016" },
+        { address=0XB7B624, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Frost Demon N040" },
+        { address=0XB7B630, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Lesser Demon N057" },
+        { address=0XB7B63C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Thunder Demon N048" },
+      },
+      events = {
+        { address=0XBB70D0, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 bit] Combo -1" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB7B1BC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Skeleton Soldier N034" },
+        { address=0XB7B2F4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ghost Soldier N013" },
+        { address=0XB7B4EC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death N081" },
+        { address=0XB7B564, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead Parasite N074" },
+        { address=0XB7B60C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Reaper N059" },
+        { address=0XB8E896, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="B0 - Death Fight Visited Pagoda of the Misty Moon" },
+      },
+      health = {
+        { address=0XB64AE8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 bit Float] HP decreased" },
+        { address=0XB64AE8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 bit Float] HP increased" },
+        { address=0XB8DA6C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="b1 - HP Max UP House of Sacred Remains decreased" },
+        { address=0XB8DA6C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="b1 - HP Max UP House of Sacred Remains increased" },
+        { address=0XB8DD18, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - HP Max UP House of Sacred Remains decreased" },
+        { address=0XB8DD18, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - HP Max UP House of Sacred Remains increased" },
+        { address=0XB8DE8C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - HP Max Up Anti-Soul Mysteries Lab decreased" },
+        { address=0XB8DE8C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - HP Max Up Anti-Soul Mysteries Lab increased" },
+        { address=0XB8E0D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - HP Max Up Dark Palace of Waterfalls decreased" },
+        { address=0XB8E0D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - HP Max Up Dark Palace of Waterfalls increased" },
+        { address=0XB8E1EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - Hp Max Up Dark Palace of Waterfalls decreased" },
+        { address=0XB8E1EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - Hp Max Up Dark Palace of Waterfalls increased" },
+        { address=0XB8E870, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B2 - HP Max Up Pagoda of the Misty Moon decreased" },
+        { address=0XB8E870, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B2 - HP Max Up Pagoda of the Misty Moon increased" },
+        { address=0XB8E9F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - HP Max Up Ghostly Theatre decreased" },
+        { address=0XB8E9F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - HP Max Up Ghostly Theatre increased" },
+        { address=0XB8EA20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="B1 - HP Max Up Ghostly Theatre decreased" },
+        { address=0XB8EA20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="B1 - HP Max Up Ghostly Theatre increased" },
+        { address=0XBB70D4, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Total Combo Damage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XB64820, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit HEX] Money increased" },
+        { address=0XB8DF04, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B1 - Arctic Ring Anti-Soul Mysteries Lab increased" },
+        { address=0XB8E324, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B1 - Ring of Fire Garden Forgotten By Time increased" },
+        { address=0XB8E4EC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="B1 - Ring of Thunder Garden Forgotten By Time increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB36874, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8 bit] Some Boss Rush Indicator" },
+        { address=0XB8DA1A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="B0 - Teleport Boss Room House of Sacred Remains" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB8DBA0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="B0 - Button Triangle Door House of Sacred Remains R" },
+        { address=0XB8DBD0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="B0 - 1st Button Line Door in House of Sacred Remains" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB8E314, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="B0 - Door 1 Switch Garden Forgotten By Time" },
+        { address=0XB8E384, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="B1 - HP Max Up Garden Forgotten By Time" },
+        { address=0XB8E4E8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="B0 - Door 2 Switch Garden Forgotten By Time" },
+      },
+    },
+  },
+}

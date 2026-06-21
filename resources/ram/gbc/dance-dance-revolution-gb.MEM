@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Dance Dance Revolution GB",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dance-dance-revolution-gb",
+    file = "dance-dance-revolution-gb.zip",
+    hashes = {
+      { hash = "c7cf1e919682b3ee613dd155cc12a15a", label = "Dance Dance Revolution GB (Japan).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0B6, type="u8", condition="eq", value=0X3C, action="DEMO_MODE", no_log=false, no_survey=false, desc="listening to demo tune on selecting music" },
+        { address=0XC0B6, type="u8", condition="eq", value=0XA6, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="credits for beating arcade" },
+        { address=0XC0BA, type="u8", condition="eq", value=0X9A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="end credits" },
+        { address=0XC55A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x01 = Demo mode" },
+      },
+      events = {
+        { address=0XC5CD, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="current combo without missing note" },
+        { address=0XC5FF, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="largest combo recorded in song" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC0BA, type="u8", condition="eq", value=0X6F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear screen" },
+        { address=0XC0C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level value 1" },
+        { address=0XC0CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level value in the level" },
+      },
+      stage = {
+        { address=0XC55F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="arcade stages, 1=easy,2=normal,3=hard" },
+        { address=0XE52C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="max stages easy." },
+        { address=0XE52D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="max stages normal" },
+        { address=0XE52E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="max stages hard" },
+        { address=0XE52F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="free play stage level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC5A5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health decreased" },
+        { address=0XC5A5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC59E, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score for Current Song [32-bit BCD]" },
+        { address=0XC5F6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16 bit score field" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC0A4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Incrementing Counter" },
+        { address=0XC5D1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Consecutive Miss Counter?" },
+        { address=0XE530, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="tough mode on or off, 1= pass levels without doing anything. Set to 0 at all times." },
+      },
+    },
+  },
+}

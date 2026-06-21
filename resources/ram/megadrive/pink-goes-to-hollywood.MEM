@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Pink Goes To Hollywood",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "pink-goes-to-hollywood",
+    file = "pink-goes-to-hollywood.zip",
+    hashes = {
+      { hash = "d05bb061ee9f5880bbbe330843bb4079", label = "Pink Goes to Hollywood (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XBFC8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting Lives increased" },
+        { address=0XBFC8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting Lives decreased" },
+        { address=0XBFCA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XBFCA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XBFCE, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Hard mode" },
+        { address=0XBFCE, type="u8", condition="eq", value=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Normal mode" },
+        { address=0XBFCE, type="u8", condition="eq", value=0X0C, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Easy Mode" },
+        { address=0XBFCE, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Starting/Max HP" },
+        { address=0XC0C3, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max value in Hard mode" },
+        { address=0XC0C3, type="u8", condition="eq", value=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max value in Normal mode" },
+        { address=0XC0C3, type="u8", condition="eq", value=0X0C, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max value in Easy Mode" },
+        { address=0XC0C3, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="HP" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBFC2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

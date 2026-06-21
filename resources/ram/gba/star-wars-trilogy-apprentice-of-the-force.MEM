@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Star Wars Trilogy: Apprentice of the Force",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "star-wars-trilogy-apprentice-of-the-force",
+    file = "star-wars-trilogy-apprentice-of-the-force.zip",
+    hashes = {
+      { hash = "6b423fd7f0b4cc280a6208f66671a9c1", label = "Star Wars Trilogy - Apprentice of the Force (USA) (En,Fr,Es).gba" },
+      { hash = "d02b4e547e916a20bc7cebcb41cba8ab", label = "Star Wars Trilogy - Apprentice of the Force (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X77A7, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending and Credits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X77A6, type="u8", condition="eq", value=0X07, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the TIE Fighters (0x00)" },
+        { address=0X77A6, type="u8", condition="eq", value=0X11, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Find a Way to Destroy the Rancor" },
+        { address=0X77A6, type="u8", condition="eq", value=0X12, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Main Barge [+]" },
+      },
+    },
+  },
+}

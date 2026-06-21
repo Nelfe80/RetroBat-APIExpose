@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Tetris Worlds",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tetris-worlds",
+    file = "tetris-worlds.zip",
+    hashes = {
+      { hash = "65417a9f170dd1a30152be1ed4412cad", label = "Tetris Worlds (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X1B9B758, type="u16le", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Deneb / Tetris" },
+        { address=0X1B9B758, type="u16le", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mira / Square Tetris" },
+        { address=0X1B9B758, type="u16le", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Aludra / Cascade Tetris" },
+        { address=0X1B9B758, type="u16le", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Antares / Sticky Tetris" },
+        { address=0X1B9B758, type="u16le", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Talitha / Hotline Tetris" },
+        { address=0X1B9B758, type="u16le", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Unukalhai / Fusion Tetris" },
+        { address=0X1B9B758, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Story Mode - Current World/Mode" },
+      },
+    },
+  },
+}

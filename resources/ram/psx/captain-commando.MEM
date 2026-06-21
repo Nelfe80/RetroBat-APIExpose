@@ -1,0 +1,153 @@
+return {
+  game = {
+    title = "Captain Commando",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "captain-commando",
+    file = "captain-commando.zip",
+    hashes = {
+      { hash = "84d7810ff6e872b438f7dcac19e60350", label = "Captain Commando (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X112E0, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not playing the game (Demo/Menu Screen)" },
+        { address=0X18EFA2, type="u8", condition="eq", value=0X30, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1 (Starting Credit)" },
+        { address=0X18EFA2, type="u8", condition="eq", value=0X31, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="2" },
+        { address=0X18EFA2, type="u8", condition="eq", value=0X32, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="3" },
+        { address=0X197C90, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X197D06, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue countdown" },
+        { address=0X197DEE, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue countdown" },
+        { address=0X197ED6, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue countdown" },
+        { address=0X1980CE, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X19E77A, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Countdown" },
+        { address=0X19E79C, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Free" },
+        { address=0X19E79C, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="01" },
+        { address=0X19E79C, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="02" },
+        { address=0X19E79C, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="03" },
+        { address=0X19E79C, type="u8", condition="eq", value=0X04, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="04" },
+        { address=0X19E79C, type="u8", condition="eq", value=0X05, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="05" },
+        { address=0X1A1BF1, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Credits (Continues)" },
+        { address=0X1A1BF1, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Sound" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19E79A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Very Easy" },
+        { address=0X19E79A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X19E79A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X19E79A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X19E79A, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Very Hard" },
+        { address=0X19E79A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level" },
+        { address=0X1A1BF1, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level (Difficult)" },
+      },
+      stage = {
+        { address=0X197CC1, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="City" },
+        { address=0X197CC1, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Museum" },
+        { address=0X197CC1, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ninja House" },
+        { address=0X197CC1, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Circus Camp" },
+        { address=0X197CC1, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sea Port" },
+        { address=0X197CC1, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Aquarium" },
+        { address=0X197CC1, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Underground Base" },
+        { address=0X197CC1, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Enemy's Spaceship" },
+        { address=0X197CC1, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Callisto" },
+        { address=0X197CC1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+        { address=0X197CC2, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="First Section" },
+        { address=0X197CC2, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Second Section" },
+        { address=0X197CC2, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Third Section" },
+        { address=0X197CC2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Section" },
+        { address=0X1980B6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of ninjas defeated in Stage 4 first section" },
+        { address=0X19C959, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tree in the stage 3" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X18EF9C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="In Game Lives increased" },
+        { address=0X18EF9C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="In Game Lives decreased" },
+        { address=0X197D06, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="when losed a life, the time blinking dead" },
+        { address=0X197D44, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X197DEE, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="when losed a life, the time blinking dead" },
+        { address=0X197ED6, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="when losed a life, the time blinking dead" },
+        { address=0X1980CC, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="04" },
+        { address=0X1980CC, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="03" },
+        { address=0X1980CC, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="02" },
+        { address=0X1980CC, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="01" },
+        { address=0X1980CC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="In Game Lives (Just Counter) increased" },
+        { address=0X1980CC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="In Game Lives (Just Counter) decreased" },
+        { address=0X19E79B, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="01" },
+        { address=0X19E79B, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="02" },
+        { address=0X19E79B, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="03" },
+        { address=0X19E79B, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="04" },
+        { address=0X19E79B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Players (Lives) increased" },
+        { address=0X19E79B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Players (Lives) decreased" },
+        { address=0X1A1BF1, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Players (Lives)" },
+      },
+      health = {
+        { address=0X16D4D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Hp decreased" },
+        { address=0X16D4D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Hp increased" },
+        { address=0X197D3B, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Hp [16-Bits] decreased" },
+        { address=0X197D3B, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Hp [16-Bits] increased" },
+        { address=0X197D44, type="u8", condition="eq", value=0X48, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X197D44, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player HP" },
+        { address=0X19C21C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Red Robot Hp decreased" },
+        { address=0X19C21C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Red Robot Hp increased" },
+        { address=0X19C4D6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Green Robot HP decreased" },
+        { address=0X19C4D6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Green Robot HP increased" },
+        { address=0X19C874, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Blue Robot Hp decreased" },
+        { address=0X19C874, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Blue Robot Hp increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X19D1AC, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Not holding" },
+        { address=0X19D1AC, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Holding" },
+        { address=0X19D1E8, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gun" },
+        { address=0X19D1E8, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="M-Gun" },
+        { address=0X19D1E8, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile" },
+        { address=0X19D1E8, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Paralizer" },
+        { address=0X19D1E8, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shuriken" },
+        { address=0X19D1E8, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser" },
+        { address=0X19D1E8, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hammer" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1980C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X1A1BED, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Ranking" },
+      },
+      collectibles = {
+        { address=0X18EFA8, type="u16le", condition="eq", value=0X201A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X18EFA8, type="u16le", condition="eq", value=0X201E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X197D0A, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Running + Jump" },
+        { address=0X197D0A, type="u8", condition="eq", value=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Attack while running + jump" },
+        { address=0X197D0A, type="u8", condition="eq", value=0X05, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X197D0A, type="u8", condition="eq", value=0X07, action="JUMPING", no_log=false, no_survey=false, desc="Attack while jumping (stand still)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X18EFA8, type="u16le", condition="eq", value=0X4003, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block" },
+        { address=0X19C21D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Red Robot Destroyed" },
+        { address=0X19C875, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blue Robot Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X197D06, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 1" },
+        { address=0X197DEE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2" },
+        { address=0X197ED6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 3" },
+        { address=0X19A5B0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer from stage 4 section 2" },
+      },
+    },
+  },
+}

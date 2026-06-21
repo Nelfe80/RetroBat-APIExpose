@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Cocoron",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "cocoron",
+    file = "cocoron.zip",
+    hashes = {
+      { hash = "618e8f72bd2fd80c67d5ec1e6fa238b2", label = "Cocoron (Japan) (En) (v1.0) (Akujin).nes" },
+      { hash = "f753dc8fcbd92c25687dafdcaedc6862", label = "Cocoron (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0050, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression" },
+        { address=0X007F, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X007F, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Milk Sea" },
+        { address=0X007F, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Trump Castle" },
+        { address=0X007F, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ice-Fire Mountain" },
+        { address=0X007F, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Star Hill" },
+        { address=0X007F, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fairy Forest" },
+        { address=0X007F, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The End" },
+        { address=0X007F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X003D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X003D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X007A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X007A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0078, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Power" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0026, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Defeated Flashing Sprite 0F" },
+        { address=0X008D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stages Beaten/Bosses Beaten? (Previously: Amount of Characters)" },
+        { address=0X0780, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0C - Defeated Boss" },
+        { address=0X07B8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X008B, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="FF = Jumping 0 = Falling" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X001B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Boss Defeated Flashing Sprite Timer" },
+      },
+    },
+  },
+}

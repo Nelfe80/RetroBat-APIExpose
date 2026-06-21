@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Lingword",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lingword",
+    file = "lingword.zip",
+    hashes = {
+      { hash = "ecf202c3fea60d1b645d37462245e315", label = "Lingword (World) (Jonathan Derque).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA316, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XA316, type="u8", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Go to menu" },
+      },
+    },
+  },
+}

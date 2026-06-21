@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sky Kid",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "sky-kid",
+    file = "sky-kid.zip",
+    hashes = {
+      { hash = "37ed0da809b7d115458709e9e0749976", label = "Sky Kid (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

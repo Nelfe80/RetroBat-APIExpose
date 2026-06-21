@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Aerobiz",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Construction and Management Simulation"
+  },
+
+  rom = {
+    name = "aerobiz",
+    file = "aerobiz.zip",
+    hashes = {
+      { hash = "b51bbaa7644dd8b432a66d11352e9c68", label = "Aerobiz (USA).sfc" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X065E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Fare Money increased" },
+        { address=0X0C9E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Planes quant? , Year Thousand Number, Hotel Contruction Price First Number(Hotel Screen) , When" },
+        { address=0X0C9F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sales Data(Routes), Year Hundred Number, Hotel Contruction Price Second Number(Hotel Screen), Wh" },
+        { address=0X0CA0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Year Decimal number - When in Change Route Screen is Slaes Data Money(Thousands Unit) increased" },
+        { address=0X0CA1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Year unit number - When in Change Route Screen is Slaes Data Money(hundreds) increased" },
+        { address=0X0CA2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="When in Change Route Screen is Slaes Data Money(Decimals) increased" },
+        { address=0X0CA3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Cash Money in route Scree(Decimal) increased" },
+      },
+    },
+  },
+}

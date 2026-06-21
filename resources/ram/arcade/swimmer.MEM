@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Swimmer",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Water"
+  },
+
+  rom = {
+    name = "swimmer",
+    file = "swimmer.zip",
+    hashes = {
+      { hash = "57755ffc6b7096567d17e10f4c26d4ce", label = "swimmer.7z <Swimmer (set 1)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0571, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X02FE, type="u8", condition="eq", value=0X41, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Got an Extra Life" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0017, type="u8", condition="eq", value=0XB0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Crab Boss in Round 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0083, type="u8", condition="bit_true", bit=7, mask=0X80, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Power Pellet Invincibility" },
+      },
+    },
+  },
+}

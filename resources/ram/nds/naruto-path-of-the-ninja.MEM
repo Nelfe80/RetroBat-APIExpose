@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Naruto: Path of the Ninja",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "naruto-path-of-the-ninja",
+    file = "naruto-path-of-the-ninja.zip",
+    hashes = {
+      { hash = "c45fbe0bba8ecd26a0d74b6f993c73ce", label = "Naruto - Path of the Ninja (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XAA2B4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Naruto - Level [16bit]" },
+        { address=0XAA310, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sasuke - Level [16bit]" },
+        { address=0XAA36C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sakura - Level [16bit]" },
+        { address=0XAA3C8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="kakashi level? [16bit]" },
+        { address=0XAA424, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shikamaru - Level [16bit]" },
+        { address=0XAA480, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Neji - Level [16bit]" },
+        { address=0XAA4DC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lee - Level [16bit]" },
+        { address=0XAA538, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jiraiya - Level [16bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAA2B0, type="u32le", condition="eq", value=0X34, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest of Death" },
+        { address=0XAA2B0, type="u32le", condition="eq", value=0X35, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest of Death" },
+        { address=0XAA2B0, type="u32le", condition="eq", value=0X36, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest of Death" },
+        { address=0XAA2B0, type="u32le", condition="eq", value=0X37, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest of Death" },
+        { address=0XAA2B0, type="u32le", condition="eq", value=0X38, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest of Death" },
+        { address=0XAA2B0, type="u32le", condition="eq", value=0X39, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest of Death Tower" },
+        { address=0XAA2B0, type="u32le", condition="eq", value=0X57, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest of Death Tower" },
+      },
+      health = {
+        { address=0XAA2E0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Naruto - HP [16bit] decreased" },
+        { address=0XAA2E0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Naruto - HP [16bit] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XAA6DD, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags / Ramen Flags" },
+        { address=0XAA6DF, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6E1, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6E2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6E3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6E6, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6E8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6EA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6EB, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6ED, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6F2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+        { address=0XAA6FB, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chest Flags" },
+      },
+      weapon = {
+        { address=0XAA2E4, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Naruto - Weapon ID [16bit]" },
+        { address=0XAA63C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon - Hexagonal Stick" },
+        { address=0XAA648, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon - Battle Fan" },
+        { address=0XAA64F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon - Arare Pellets" },
+        { address=0XAA653, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon - Eight-Edged Shuriken" },
+        { address=0XAA65D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon - Winged Nail" },
+        { address=0XAA661, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon - Falcon Claw" },
+        { address=0XAA68D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon - The 4th Hokage's Sword" },
+        { address=0XAA68E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon - Fujin Fan" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X23A4D4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame - Score [16bit signed]" },
+      },
+      collectibles = {
+        { address=0XAA656, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Weapon - Steel Ring increased" },
+        { address=0XAA700, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money / Ryo [32bit] increased" },
+        { address=0X2354F8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Battle - Money Gained [32bit] increased" },
+      },
+    },
+  },
+}

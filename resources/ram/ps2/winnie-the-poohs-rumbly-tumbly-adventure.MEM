@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Winnie the Pooh's Rumbly Tumbly Adventure",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "winnie-the-poohs-rumbly-tumbly-adventure",
+    file = "winnie-the-poohs-rumbly-tumbly-adventure.zip",
+    hashes = {
+      { hash = "f72fddd3150b0343daebb62926ace619", label = "Disney's Winnie the Pooh's Rumbly Tumbly Adventure (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

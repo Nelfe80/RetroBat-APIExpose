@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Spinball",
+    system = "vectrex",
+    system_name = "Vectrex",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "spinball",
+    file = "spinball.zip",
+    hashes = {
+      { hash = "ecc143f87a702af7a1786b58a78ace01", label = "Spinball (USA).vec" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="bit 0 - pause" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0183, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score hundred thousands - Player 1" },
+        { address=0X0184, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score ten thousands - Player 1" },
+        { address=0X0185, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score thousands - Player 1" },
+        { address=0X0186, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score hundreds - Player 1" },
+        { address=0X0187, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score tens - Player 1" },
+        { address=0X0188, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score ones - Player 1" },
+        { address=0X018C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score hundred thousands - Player 2" },
+        { address=0X018D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score ten thousands - Player 2" },
+        { address=0X018E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score thousands - Player 2" },
+        { address=0X018F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score hundreds - Player 2" },
+        { address=0X0190, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score tens - Player 2" },
+        { address=0X0191, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower 4] Score ones - Player 2" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon FireRed Version [Subset - Carcinisation]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "pokemon-firered-version-subset-carcinisation",
+    file = "pokemon-firered-version-subset-carcinisation.zip",
+    hashes = {
+      { hash = "c75b0134db376129763942364fdcff30", label = "Pokémon - FireRed Version [Subset - Carcinisation].gba" },
+    }
+  },
+
+  events = {
+  },
+}

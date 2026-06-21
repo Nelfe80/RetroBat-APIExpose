@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Toy Story Racer",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "toy-story-racer",
+    file = "toy-story-racer.zip",
+    hashes = {
+      { hash = "c2814b741f8ec561fd344e1523b29960", label = "Disney-Pixar Toy Story Racer (USA)" },
+      { hash = "5a40a6b6327ac2069a055cb494559383", label = "Disney-Pixar Toy Story Racer (USA) (60fps) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA8D8D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode = 1" },
+        { address=0XA9200, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit] Pause Check" },
+        { address=0XA95AC, type="u16le", condition="eq", value=0X13, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits/Sliding Puzzle" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBD6F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Race: Which round 8-bit" },
+        { address=0XBD6F5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Race: Round numbers 8-bit" },
+      },
+      stage = {
+        { address=0XA8D18, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Race: Current Stage 16-bit" },
+        { address=0XD7990, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Buzz Lightyear 8-bit (Bits)" },
+        { address=0XD7991, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Buzz Lightyear 8-bit (Bits)" },
+        { address=0XD7992, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Buzz Lightyear 8-bit (Bits)" },
+        { address=0XD7998, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Little Green Man 8-bit (Bits)" },
+        { address=0XD7999, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Little Green Man 8-bit (Bits)" },
+        { address=0XD79A0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Hamm 8-bit (Bits)" },
+        { address=0XD79A1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Hamm 8-bit (Bits)" },
+        { address=0XD79A2, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XD79A2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Hamm 8-bit (Bits)" },
+        { address=0XD79A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Wood 8-bit (Bits)" },
+        { address=0XD79A9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Wood 8-bit (Bits)" },
+        { address=0XD79AA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Wood 8-bit (Bits)" },
+        { address=0XD79B0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: RC 8-bit (Bits)" },
+        { address=0XD79B1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: RC 8-bit (Bits)" },
+        { address=0XD79B2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: RC 8-bit (Bits)" },
+        { address=0XD79B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Mr. Potato Head 8-bit (Bits)" },
+        { address=0XD79B9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Mr. Potato Head 8-bit (Bits)" },
+        { address=0XD79BA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Mr. Potato Head 8-bit (Bits)" },
+        { address=0XD79C0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Slinky Dog 8-bit (Bits)" },
+        { address=0XD79C1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Slinky Dog 8-bit (Bits)" },
+        { address=0XD79C2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Slinky Dog 8-bit (Bits)" },
+        { address=0XD79C8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Bo Peep 8-bit (Bits)" },
+        { address=0XD79C9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Bo Peep 8-bit (Bits)" },
+        { address=0XD79D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Rex 8-bit (Bits)" },
+        { address=0XD79D1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Rex 8-bit (Bits)" },
+        { address=0XD79D2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Rex 8-bit (Bits)" },
+        { address=0XD79D8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Rocky Gibraltar 8-bit (Bits)" },
+        { address=0XD79D9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Rocky Gibraltar 8-bit (Bits)" },
+        { address=0XD79E0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Babyface 8-bit (Bits)" },
+        { address=0XD79E8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages: Lenny 8-bit (Bits)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD79F4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldiers 8-bit" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC0D2C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Paused Timer Check" },
+      },
+    },
+  },
+}

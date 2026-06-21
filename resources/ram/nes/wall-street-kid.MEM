@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Wall Street Kid",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Simulation"
+  },
+
+  rom = {
+    name = "wall-street-kid",
+    file = "wall-street-kid.zip",
+    hashes = {
+      { hash = "9c82ab408b77c29c2a2469879c6384b7", label = "Wall Street Kid (USA).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X03E6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="healthiness decreased" },
+        { address=0X03E6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="healthiness increased" },
+      },
+    },
+  },
+}

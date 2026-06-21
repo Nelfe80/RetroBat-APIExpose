@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Frogger Returns",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "frogger-returns",
+    file = "frogger-returns.zip",
+    hashes = {
+      { hash = "402b487c14217f65d40a12b2ac85cca9", label = "Frogger Returns (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

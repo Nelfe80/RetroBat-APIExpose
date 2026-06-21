@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Sam & Max: Season One",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "sam-max-season-one",
+    file = "sam-max-season-one.zip",
+    hashes = {
+      { hash = "d8c67a43062fea2895bbb95ffc96cbef", label = "Sam & Max - Season One (Europe) (En,Fr,De,Es,It) (Rev 1)" },
+      { hash = "dd03a964a774b0afdde73be0610e94ff", label = "Sam & Max - Season One (USA) (En,Fr,Es)" },
+      { hash = "ec7193828bcbc5ad8b72d7cf156ecd9b", label = "Sam & Max - Season One (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X59E0F1, type="u32be", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE/ACII] Ep title." },
+      },
+    },
+  },
+}

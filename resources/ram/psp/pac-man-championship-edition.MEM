@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Pac-Man: Championship Edition",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pac-man-championship-edition",
+    file = "pac-man-championship-edition.zip",
+    hashes = {
+      { hash = "771d85d44ecd770c096945dec2e3ae30", label = "Pac-Man Championship Edition (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8057A0, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X8AB37C, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X8AB37C, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not in demo" },
+        { address=0X8C90B0, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X8C90F2, type="u8", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X1FFF19D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Functioning Demo flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9508A4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fruits cleared on left side of the maze" },
+        { address=0X981EE8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total fruits cleared" },
+        { address=0X1FFF1A0, type="u8", condition="eq", value=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X98F0EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X98F0EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X957E4C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit Hex] Score" },
+        { address=0X957E54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit Hex] Hi-Score" },
+        { address=0X1FFF17C, type="u8", condition="eq", value=0X9F, action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores, Awards" },
+      },
+    },
+  },
+}

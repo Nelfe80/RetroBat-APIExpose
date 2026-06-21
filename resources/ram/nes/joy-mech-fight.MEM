@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Joy Mech Fight",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "joy-mech-fight",
+    file = "joy-mech-fight.zip",
+    hashes = {
+      { hash = "19a27b8211feb72685d7225a8a25d35f", label = "Joy Mech Fight (Japan).nes" },
+      { hash = "1cf9557073a07acab3fb7f9f562c0b1c", label = "Joy Mech Fight (Japan) (En) (v1.0) (AlanMidas).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0536, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc=">= 0x01 computer input/demo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X00A9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (Fernando used that)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0529, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P HP decreased" },
+        { address=0X0529, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P HP increased" },
+        { address=0X0629, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="CPU HP decreased" },
+        { address=0X0629, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="CPU HP increased" },
+        { address=0X0D29, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P HP decreased" },
+        { address=0X0D29, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P HP increased" },
+      },
+    },
+  },
+}

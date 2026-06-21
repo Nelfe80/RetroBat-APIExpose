@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Spud's Adventure",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "spuds-adventure",
+    file = "spuds-adventure.zip",
+    hashes = {
+      { hash = "c9e8c196d57aab17c4c171816fcd6492", label = "Spud's Adventure (USA).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8803, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0xff on title screen" },
+        { address=0XC000, type="u8", condition="eq", value=0X68, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XC002, type="u8", condition="eq", value=0X7F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="'Adventure', 'VS', 'Password' Screen" },
+        { address=0XC002, type="u8", condition="eq", value=0X7E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Password Screen" },
+        { address=0XC119, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x47 = title screen" },
+        { address=0XC368, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0XC368, type="u8", condition="eq", value=0X1E, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XDFEB, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-Bits] Used for credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC14D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power Level?" },
+        { address=0XC3CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0x06 = Player's Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC3CE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XC3CE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XC3D1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1 UP Card (Need 3 for 1 extra life) increased" },
+        { address=0XC3D1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 UP Card (Need 3 for 1 extra life) decreased" },
+      },
+      health = {
+        { address=0XFFEA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="0x08 = Max HP decreased" },
+        { address=0XFFEA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="0x08 = Max HP increased" },
+        { address=0XFFEB, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="1=Heart Card" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC368, type="u8", condition="eq", value=0X6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fights" },
+        { address=0XDDF2, type="u8", condition="eq", value=0XFA, action="BOSS_HIT", no_log=false, no_survey=false, desc="when killed by carrot" },
+        { address=0XDDF2, type="u8", condition="eq", value=0XFC, action="BOSS_HIT", no_log=false, no_survey=false, desc="when killed by eggplant" },
+        { address=0XDDF2, type="u8", condition="eq", value=0XFF, action="BOSS_HIT", no_log=false, no_survey=false, desc="when killed by Spud" },
+      },
+    },
+  },
+}

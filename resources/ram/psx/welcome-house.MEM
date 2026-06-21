@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Welcome House",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "welcome-house",
+    file = "welcome-house.zip",
+    hashes = {
+      { hash = "062cbd5e81339b78dd301664149b345e", label = "Welcome House (Japan) (En) (Alpha 05FEB2023) (nikita600)" },
+      { hash = "76af9bffaf469603b560a6d09bbf9c1f", label = "Welcome House (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1FFFD4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0x03 | exit door from goal room ends game" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XB1BEC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Doors Unlocked" },
+        { address=0XB1BED, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Doors Unlocked" },
+      },
+    },
+  },
+}

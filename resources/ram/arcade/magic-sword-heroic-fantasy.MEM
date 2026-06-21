@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Magic Sword: Heroic Fantasy",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "magic-sword-heroic-fantasy",
+    file = "magic-sword-heroic-fantasy.zip",
+    hashes = {
+      { hash = "c1dc271028e86c212584b3a0510b3157", label = "msword.7z <Magic Sword - heroic fantasy (25.07.1990 other country)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA850, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA8A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Floor/Level" },
+        { address=0XB7A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mercenary Level" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA9EB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Keys increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD00D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA85E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[bitflags] Dip Switches" },
+      },
+    },
+  },
+}

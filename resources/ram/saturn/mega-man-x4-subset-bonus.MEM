@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Mega Man X4 [Subset - Bonus]",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "mega-man-x4-subset-bonus",
+    file = "mega-man-x4-subset-bonus.zip",
+    hashes = {
+      { hash = "69a8883226481c092e7954bc700a0fe9", label = "Mega Man X4 [Subset - Bonus]" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0X154926, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Final Weapon unlocked, after the cutscene go to 09" },
+        { address=0X1549BE, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Aim Laser" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X36, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Final Weapon 1" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X44, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Final Weapon 2" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X84, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Leanerd Weapons" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X154920, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Web Spider" },
+        { address=0X154920, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Frost Walrus" },
+        { address=0X154920, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Split Mushroom" },
+        { address=0X154920, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Magma Dragon" },
+        { address=0X154920, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Jet Stingray" },
+        { address=0X154920, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Cyber Peacock" },
+        { address=0X154920, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Storm Owl" },
+        { address=0X154920, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Slash Beast" },
+        { address=0X154926, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush unlocked" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X5B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X5F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Victory - X" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X9A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Double Boss Preparation" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X56, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Intro Stage" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X60, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Victory - Zero" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X62, action="BOSS_HIT", no_log=false, no_survey=false, desc="Iris Boss Fight" },
+        { address=0X16A0B3, type="u8", condition="eq", value=0X69, action="BOSS_HIT", no_log=false, no_survey=false, desc="Duble Boss Fight" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X15ED8D, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X154930, type="u8", condition="eq", value=0X13, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door transition" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X16A0B3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Music ID" },
+      },
+    },
+  },
+}

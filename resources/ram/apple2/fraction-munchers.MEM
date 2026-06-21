@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Fraction Munchers",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fraction-munchers",
+    file = "fraction-munchers.zip",
+    hashes = {
+      { hash = "7ed0c718a8798062b9774e2c6e230a10", label = "Fraction Munchers.woz" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8F9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[BCD] Current level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X08C0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - Actual increased" },
+        { address=0X08C0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - Actual decreased" },
+        { address=0X8FAD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives remaining - Display increased" },
+        { address=0X8FAD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives remaining - Display decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X8FA7, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] [BCD] Score ones and tens" },
+      },
+    },
+  },
+}

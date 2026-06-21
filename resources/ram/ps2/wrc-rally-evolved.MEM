@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "WRC Rally Evolved",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "wrc-rally-evolved",
+    file = "wrc-rally-evolved.zip",
+    hashes = {
+      { hash = "3ff22473a4ed67ee0e72771b18dc492f", label = "WRC - Rally Evolved (Europe, Australia) (En,Fr,De,Es,It,Pt,No,Fi) (v2.00)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X589B20, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time left for repairs without penalty, 60000 equals 10 mins" },
+        { address=0X589B28, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time spent on repairs, 60000 equals 10 mins" },
+      },
+    },
+  },
+}

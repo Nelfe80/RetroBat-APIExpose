@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Monopoly",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Board Game, Puzzle, Strategy"
+  },
+
+  rom = {
+    name = "monopoly",
+    file = "monopoly.zip",
+    hashes = {
+      { hash = "3ee697082b61cfc85612e532a02c0a41", label = "Monopoly (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB85F1, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode Active" },
+        { address=0XB85F1, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Game" },
+      },
+    },
+  },
+}

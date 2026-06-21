@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Hercules",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "hercules",
+    file = "hercules.zip",
+    hashes = {
+      { hash = "abd4baa57f0b90b402c2e56090394f9e", label = "Hercules (USA, Europe) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XFFEB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0XFFEB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+      },
+    },
+  },
+}

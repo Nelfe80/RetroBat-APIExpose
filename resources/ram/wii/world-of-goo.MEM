@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "World of Goo",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "world-of-goo",
+    file = "world-of-goo.zip",
+    hashes = {
+      { hash = "c08989b1ff47feea89b7af07c0160181", label = "World of Goo (USA) (WiiWare)" },
+      { hash = "22773f3927f06f5122e5877ae92d533d", label = "World of Goo (Europe) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

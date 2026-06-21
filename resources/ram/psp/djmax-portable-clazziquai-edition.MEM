@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "DJMax Portable Clazziquai Edition",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "djmax-portable-clazziquai-edition",
+    file = "djmax-portable-clazziquai-edition.zip",
+    hashes = {
+      { hash = "06dc2b1963c6d29939e2a315ac802e58", label = "DJ Max Portable Emotional Sense - Clazziquai Edition (Korea) (En,Ja,Ko) (v1.04).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X9A3E3C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player Gold increased" },
+      },
+    },
+  },
+}

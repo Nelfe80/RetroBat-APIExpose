@@ -1,0 +1,119 @@
+return {
+  game = {
+    title = "Earthworm Jim 3D",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "earthworm-jim-3d",
+    file = "earthworm-jim-3d.zip",
+    hashes = {
+      { hash = "980dfb38ad9a883119de135f45b7db36", label = "Earthworm Jim 3D (USA).z64" },
+      { hash = "bf2df4b86faa2181a7acfe2643fa2293", label = "Earthworm Jim 3D (Europe) (En,Fr,De,Es,It).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC6182, type="u16be", condition="eq", value=0XFFFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Null Save (Demo)" },
+        { address=0XC7FE2, type="u16be", condition="eq", value=0XFFFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0XD9C7F, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Open" },
+        { address=0XD9C7F, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XDBADF, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Open" },
+        { address=0XDBADF, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Closed" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC62A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Memory Hub (Boolean)" },
+        { address=0XC62A9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Brain (Boolean)" },
+        { address=0XC62AC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Happiness Hub (Boolean)" },
+        { address=0XC62AD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Psycrow (Boolean)" },
+        { address=0XC62AE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Barn to be Wild (Boolean)" },
+        { address=0XC62AF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Coop D'Etat (Boolean)" },
+        { address=0XC62B0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Fear Hub (Boolean)" },
+        { address=0XC62B1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Fatty Roswell (Boolean)" },
+        { address=0XC62B2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Are You Hungry Tonite? (Boolean)" },
+        { address=0XC62B3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Lord of the Fries (Boolean)" },
+        { address=0XC62B7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Mansion Lobby (Boolean)" },
+        { address=0XC62B9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Fantasy Hub (Boolean)" },
+        { address=0XC62BA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Monkey for a Head (Boolean)" },
+        { address=0XC62BE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Bob and No.4 (Boolean)" },
+        { address=0XC62BF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Good, Bad, Elderly (Boolean)" },
+        { address=0XE03E1, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="On" },
+        { address=0XE03E1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-Stage-Load Next Area (8-Bit)" },
+        { address=0XE03E4, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-System-Next stage to be loaded (32-Bit)" },
+        { address=0XE9EFA, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="USA-System-Stage ID 2 (32-Bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC61B8, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Steps-Death Wormed Up (32-Bit)" },
+        { address=0XC61C8, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Steps-Violent Death Valley (32-Bit)" },
+        { address=0XC61EE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Marbles Count-Death Wormed Up (8-Bit)" },
+        { address=0XC61F2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Marbles Count-Violent Death Valley (8-Bit)" },
+        { address=0XC6200, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Golden Udders Count-Death Wormed Up (8-Bit)" },
+        { address=0XC6204, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Golden Udders Count-Violent Death Valley (8-Bit)" },
+        { address=0XC621A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Golden Udders Total-Death Wormed Up (8-Bit)" },
+        { address=0XC621E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Golden Udders Total-Violent Death Valley (8-Bit)" },
+        { address=0XC62B4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Death Wormed Up (Boolean)" },
+        { address=0XC62B8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Violent Death Valley (Boolean)" },
+        { address=0XC6910, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="USA-Game-Lives (32-Bit) increased" },
+        { address=0XC6910, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="USA-Game-Lives (32-Bit) decreased" },
+        { address=0XC8018, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Steps-Death Wormed Up (32-Bit)" },
+        { address=0XC8028, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Steps-Violent Death Valley (32-Bit)" },
+        { address=0XC804E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Marbles Count-Death Wormed Up (8-Bit)" },
+        { address=0XC8052, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Marbles Count-Violent Death Valley (8-Bit)" },
+        { address=0XC8060, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Golden Udders Count-Death Wormed Up (8-Bit)" },
+        { address=0XC8064, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Golden Udders Count-Violent Death Valley (8-Bit)" },
+        { address=0XC807A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Golden Udders Total-Death Wormed Up (8-Bit)" },
+        { address=0XC807E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Golden Udders Total-Violent Death Valley (8-Bit)" },
+        { address=0XC8770, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Lives (32-Bit) increased" },
+        { address=0XC8770, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EUR-Game-Lives (32-Bit) decreased" },
+      },
+      health = {
+        { address=0XC690C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="USA-Game-HP (32-Bit) decreased" },
+        { address=0XC690C, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="USA-Game-HP (32-Bit) increased" },
+        { address=0XC876C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="EUR-Game-HP (32-Bit) decreased" },
+        { address=0XC876C, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="EUR-Game-HP (32-Bit) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC88EC, type="u32be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="EUR-Game-Current Weapon (32-Bit)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC6914, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Standa-da-da-da-da-dard Blaster Ammo (32-Bit)" },
+        { address=0XC6944, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Apollo 13 Ammo (32-Bit)" },
+        { address=0XC6974, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Bananamite Ammo (32-Bit)" },
+        { address=0XC698C, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Laser Ammo (32-Bit)" },
+        { address=0XC69A4, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Peashooter Ammo (32-Bit)" },
+        { address=0XC69BC, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Egg Chucker Ammo (32-Bit)" },
+        { address=0XC69EC, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Magnum Ammo (32-Bit)" },
+        { address=0XC6A04, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Funky Gun Ammo (32-Bit)" },
+        { address=0XC6A1C, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Cleaver Gun Ammo (32-Bit)" },
+        { address=0XC6A34, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="USA-Game-Gnome Gun Ammo (32-Bit)" },
+        { address=0XC8774, type="u32be", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="EUR-Game-Standa-da-da-da-da-dard Blaster Ammo (32-Bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA9D5D, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Narrative" },
+        { address=0XA9D5D, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Battle" },
+        { address=0XC62BD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="USA-Game-Stage Entered-Final Boss (Boolean)" },
+        { address=0XC6DDE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="USA-Final Boss-Bodyswap (Boolean)" },
+        { address=0XC8C3E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="EUR-Final Boss-Bodyswap (Boolean)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE03E2, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="USA-Stage-Walk Forward Animation (16-Bit)" },
+      },
+    },
+  },
+}

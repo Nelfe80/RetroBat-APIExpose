@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "Astérix & Obélix XXL",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "asterix-obelix-xxl",
+    file = "asterix-obelix-xxl.zip",
+    hashes = {
+      { hash = "a59ad20569353a736c768d77dc178c0c", label = "Asterix & Obelix XXL (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X734050, type="u32le", condition="eq", value=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="first block completed" },
+        { address=0X734050, type="u32le", condition="eq", value=0X10, action="COMBO_HIT", no_log=false, no_survey=false, desc="second block completed" },
+        { address=0X734050, type="u32le", condition="eq", value=0X20, action="COMBO_HIT", no_log=false, no_survey=false, desc="COMBO" },
+        { address=0X734390, type="u8", condition="bit_true", bit=0, mask=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Massue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6BCABC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flag ending of level?" },
+        { address=0X72C074, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Golden Laurels (US) Level 1" },
+        { address=0X734394, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal Complete" },
+        { address=0X7343D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Golden Laurels (Eu) Level 1" },
+        { address=0X7343D5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Golden Laurels (Eu) Level 2" },
+        { address=0X7343D6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Golden Laurels (Eu) Level 3" },
+        { address=0X7343D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Golden Laurels (Eu) Level 4" },
+        { address=0X7343D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Golden Laurels (Eu) Level 5" },
+        { address=0X7343D9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Golden Laurels (Eu) Level 6" },
+      },
+      stage = {
+        { address=0X73445C, type="u32le", condition="eq", value=0XFFFFFFFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X73445C, type="u32le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X73445C, type="u32le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X73445C, type="u32le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0X73445C, type="u32le", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0X73445C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32bit] Current stage (change onces the player wakes up a druid during first playthrough) (EU)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X734394, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="trigger the normandie map event" },
+      },
+      health = {
+        { address=0X7343D0, type="u16le", condition="eq", value=0X61E, action="HEALTH_STATE", no_log=true, no_survey=false, desc="max health with 6 shields" },
+        { address=0X7343D0, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Health" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X733FFC, type="u8", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="in battle (or boss battle)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X6EC96C, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=true, no_survey=false, desc="when on ground or falling" },
+        { address=0X6EC96C, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=true, no_survey=false, desc="Asterix Jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X51C88C, type="u32le", condition="eq", value=0X372315BC, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="map" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X381466EE, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy 1" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X383F24A6, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy 2" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X3823530F, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy 3" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X380DE735, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy 4" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X38BBE4DA, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy 5" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X38884AB4, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy 6" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X37FC07BA, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Greece 1" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X3808D94C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Greece 3" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X38578B6B, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helvetia level 4" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X382C6CD7, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helvetia Level 6" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X38B11539, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helvetia Boss" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X380ED5D9, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Rome Level 1" },
+        { address=0X51C88C, type="u32le", condition="eq", value=0X383675EA, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Rome Level 2" },
+        { address=0X734398, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Gaul - Stage 2" },
+        { address=0X734398, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy - Stage 2" },
+        { address=0X734398, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy - Stage 3" },
+        { address=0X734398, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy - Stage 4" },
+        { address=0X734398, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy - Stage 5" },
+        { address=0X734398, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Normandy - Stage 6" },
+        { address=0X734398, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Greece - Stage 2" },
+        { address=0X734398, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Greece - Stage 3" },
+        { address=0X734399, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Greece - Stage 4" },
+        { address=0X734399, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Greece - Stage 5" },
+        { address=0X734399, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helvertia - Stage 2" },
+        { address=0X734399, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helvertia - Stage 3" },
+        { address=0X734399, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helvertia - Stage 4" },
+        { address=0X734399, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helvertia - Stage 5" },
+        { address=0X734399, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Helvertia - Stage 6" },
+        { address=0X734399, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Egypt - Stage 2" },
+        { address=0X73439A, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Egypt - Stage 3" },
+        { address=0X73439A, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Egypt - Stage 4" },
+        { address=0X73439A, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Egypt - Stage 5" },
+        { address=0X73439A, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Egypt - Stage 6" },
+        { address=0X73439A, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Rome - Stage 2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X539F94, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Float - Timer current zone (eu)" },
+        { address=0X734048, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[Float] - Timer for the combo, the combo value will decrease by 1 every second from this adress" },
+      },
+    },
+  },
+}

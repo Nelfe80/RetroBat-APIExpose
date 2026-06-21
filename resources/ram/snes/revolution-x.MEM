@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Revolution X",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "revolution-x",
+    file = "revolution-x.zip",
+    hashes = {
+      { hash = "b4745109dfb032675c6a0cb83598607f", label = "Revolution X (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0042, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X00A9, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues (Editável no Cheat Menu)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X022B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health of P1 decreased" },
+        { address=0X022B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health of P1 increased" },
+        { address=0X1C0F8, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Bonus P1" },
+      },
+    },
+  },
+}

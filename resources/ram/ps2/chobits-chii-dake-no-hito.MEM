@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Chobits: Chii dake no Hito",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "chobits-chii-dake-no-hito",
+    file = "chobits-chii-dake-no-hito.zip",
+    hashes = {
+      { hash = "10e56fa83f0fae988a1855ce93624f92", label = "Chobits - Chii dake no Hito (Japan)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X411904, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player money increased" },
+        { address=0X411908, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Chii money increased" },
+      },
+    },
+  },
+}

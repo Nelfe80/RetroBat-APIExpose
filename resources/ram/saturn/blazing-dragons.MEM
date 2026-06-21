@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Blazing Dragons",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "blazing-dragons",
+    file = "blazing-dragons.zip",
+    hashes = {
+      { hash = "e3539a9f048e7ab4d9239991f887a4b3", label = "Blazing Dragons (USA)" },
+      { hash = "41ec78cbf95da243d0740334277b9ee5", label = "Blazing Dragons (France)" },
+      { hash = "60f247b23e0ba872d51b7b767d1cfb27", label = "Blazing Dragons (Germany)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2EB94, type="u16le", condition="eq", value=0X37, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X2EB94, type="u16le", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4BF98, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ribbon around gift" },
+        { address=0X4C1F8, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ribbon around gift" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X11EBAA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="MINIGAME FR : Cat-a-Pult Score (16-bit)" },
+        { address=0X11EBAE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="MINIGAME : Cat-a-Pult Score (16-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2EB92, type="u16le", condition="eq", value=0XC9, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0XB7, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Flicker's Room Door" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0XD5, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0XD7, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Backdoor" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X43, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door to Kitchen" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X44, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door to royal bedrooms" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X45, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door to Entrance" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0XA4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door to King's Hall" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X50, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door to King's Hall" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X51, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Entrance door" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X52, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Chancelor's room door" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X6C, action="DOOR_OPENED", no_log=false, no_survey=false, desc="King's Room door" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X6D, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Princess' Room door" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X6E, action="DOOR_OPENED", no_log=false, no_survey=false, desc="King's Hall door" },
+        { address=0X2EB92, type="u16le", condition="eq", value=0X8E, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door" },
+        { address=0X2EB94, type="u16le", condition="eq", value=0X28, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Castle Back door" },
+        { address=0X3001C, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="GAME : In-Hand Object ID (16-bit)" },
+        { address=0X30072, type="u16le", condition="eq", value=0X5, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Use Object" },
+        { address=0X30C90, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="GAME : Interaction Object ID A (16-bit)" },
+        { address=0X30C92, type="u16le", condition="eq", value=0X5, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Use Object" },
+        { address=0X30C9C, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="GAME : Interaction Object ID B (16-bit)" },
+        { address=0X4A067, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Black Dragon with the catapult" },
+        { address=0X4BF9F, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Black Dragon with the catapult" },
+        { address=0X4C1FF, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the Black Dragon with the catapult" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4BAB6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="CLICKER : Clicker count (16-bit)" },
+        { address=0X4D9EE, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="CLICKER GER : Clicker count (16-bit)" },
+        { address=0X4DC4E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="CLICKER FR : Clicker count (16-bit)" },
+      },
+    },
+  },
+}

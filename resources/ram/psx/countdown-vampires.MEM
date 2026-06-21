@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Countdown Vampires",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Horror, Puzzle"
+  },
+
+  rom = {
+    name = "countdown-vampires",
+    file = "countdown-vampires.zip",
+    hashes = {
+      { hash = "c416c0855771238314d1d09e1f770403", label = "Countdown Vampires (USA) (Disc 2)" },
+      { hash = "d8d81d78dde670fcb25c6abeacea5534", label = "Countdown Vampires (USA) (Disc 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB470C, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attraction key" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB470E, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="[File] Administration Level 5" },
+        { address=0XB4715, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Key to campground vehicle" },
+      },
+      stage = {
+        { address=0XB47CC, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Show Stage Key" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB3F2E, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Bar (16-bit) increased" },
+        { address=0XB3F2E, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Bar (16-bit) decreased" },
+        { address=0XE388C, type="u8", condition="eq", value=0X64, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max Life Sprite" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X8EC1C, type="u8", condition="eq", value=0X65, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Glooves" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB47B0, type="u8", condition="bit_true", bit=3, mask=0X08, action="SCORE_STATE", no_log=false, no_survey=false, desc="[File] Music Score for Organ" },
+      },
+      collectibles = {
+        { address=0XB47B1, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Evil House Coin" },
+        { address=0XB47B1, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Fear Moon Coin" },
+        { address=0XB47B1, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="La Luna Dam Coin" },
+        { address=0XB47B1, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mobil Grave coin" },
+        { address=0XB47B1, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Screaming Moon Coin" },
+      },
+    },
+  },
+}

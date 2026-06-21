@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Dance Dance Revolution: Best Hits",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dance-dance-revolution-best-hits",
+    file = "dance-dance-revolution-best-hits.zip",
+    hashes = {
+      { hash = "e5a936d467ada8efd0fc4eb6e0af9294", label = "Dance Dance Revolution - Best Hits (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD3030, type="u8", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XD3030, type="u8", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XD3030, type="u8", condition="eq", value=0X1D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XECB6E, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[8 Bit] Options - Game Over" },
+      },
+      events = {
+        { address=0XD30E0, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P1 Max Combo" },
+        { address=0XD3A40, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P1 Combo" },
+        { address=0XD9BE0, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P2 Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD305B, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0XD305B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2" },
+        { address=0XD305B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Nonstop Level" },
+        { address=0XECB68, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Options - Game Level" },
+      },
+      stage = {
+        { address=0XD303A, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Current Stage" },
+        { address=0XECB6A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Options - Max Stage (Beginner)" },
+        { address=0XECB6B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Options - Max Stage (Normal)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X101A8, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diet" },
+        { address=0XECB90, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Options - Diet - Measurement" },
+        { address=0XECB91, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Options - Diet - Calorie Display" },
+        { address=0XECB92, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Options - Diet - Exercise Display" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD3070, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Visual Current Score" },
+        { address=0XD3074, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Previous Score" },
+        { address=0XD3078, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Current Score" },
+        { address=0XD9210, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Visual Current Score" },
+        { address=0XD9214, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Previous Score" },
+        { address=0XD9218, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Current Score" },
+      },
+    },
+  },
+}

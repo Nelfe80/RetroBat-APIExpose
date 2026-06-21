@@ -1,0 +1,123 @@
+return {
+  game = {
+    title = "Tobal 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "tobal-2",
+    file = "tobal-2.zip",
+    hashes = {
+      { hash = "9ca65e224bf94d43a34c39e28081e3f0", label = "Tobal 2 (Japan) (Rev 1)" },
+      { hash = "c3c342ccd9d7a9ffe3882d5454be130b", label = "Tobal 2 (Japan) (Rev 1) (En) (v1.01b) (Infinite Lupine Translations,r4dius)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF908C, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XF9181, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Boolean] Demo" },
+        { address=0XF9285, type="u8", condition="bit_true", bit=7, mask=0X80, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue/Transition to Next Stage" },
+        { address=0XF931C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of Continues" },
+        { address=0XF95A4, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="VS/Demo" },
+        { address=0X125C48, type="u8", condition="eq", value=0X5D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Rotten Demon Meat (Poison)" },
+        { address=0X12A45C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+      events = {
+        { address=0X126400, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Player 1: Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF90E0, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round in Progress" },
+        { address=0XF9285, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round End" },
+        { address=0XF9285, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Method" },
+        { address=0XF9285, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round -> Replay Micro-Transition" },
+        { address=0XF960C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round" },
+        { address=0X101291, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Set" },
+        { address=0X101291, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 Set" },
+        { address=0X101291, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Set" },
+        { address=0X101291, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4 Set" },
+        { address=0X101291, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Set" },
+        { address=0X101291, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Setup: Rounds" },
+        { address=0X101292, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="15" },
+        { address=0X101292, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="30" },
+        { address=0X101292, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="40" },
+        { address=0X101292, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60" },
+        { address=0X101292, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="99" },
+        { address=0X101292, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Setup: Round Time" },
+        { address=0X124FF3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1: Rounds Won" },
+        { address=0X125C28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Head Level" },
+        { address=0X125C29, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Body Level" },
+        { address=0X125C2A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Left Hand Level" },
+        { address=0X125C2B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Right Hand Level" },
+        { address=0X125C2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Left Foot Level" },
+        { address=0X125C2D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Right Foot Level" },
+        { address=0X125C2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grab Level" },
+        { address=0X125C2F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Guard Level" },
+        { address=0X12723B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU: Rounds Won" },
+      },
+      stage = {
+        { address=0XF95E0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tournament Stage Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X125C48, type="u8", condition="eq", value=0X1F, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life" },
+        { address=0X125C48, type="u8", condition="eq", value=0X27, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life (Store?)" },
+        { address=0X125C48, type="u8", condition="eq", value=0X28, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life (Return?)" },
+      },
+      health = {
+        { address=0X1243C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1: HP decreased" },
+        { address=0X1243C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1: HP increased" },
+        { address=0X125C1E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1: Max HP decreased" },
+        { address=0X125C1E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1: Max HP increased" },
+        { address=0X12660C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="CPU: HP decreased" },
+        { address=0X12660C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="CPU: HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF90E0, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Out" },
+        { address=0X1012B6, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ape" },
+        { address=0X125C48, type="u8", condition="eq", value=0X07, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X128836, type="u24le", condition="eq", value=0X019D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ape" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1012BF, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miner Boss" },
+        { address=0X1236DC, type="u8", condition="eq", value=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sealed Maze (Boss Arena)" },
+        { address=0X128836, type="u24le", condition="eq", value=0X0209, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miner Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1012C3, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Spike Shield" },
+        { address=0X125CC0, type="u32le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Quest Mode: Muteki Time Remaining (Invincible)" },
+        { address=0X128836, type="u24le", condition="eq", value=0X0233, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Spike Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF842C, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Match Timer" },
+        { address=0XF9068, type="u32le", condition="eq", value=0X5A00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="06'00'00" },
+        { address=0XF9068, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tournament Total Time" },
+        { address=0XF90E0, type="u8", condition="eq", value=0X03, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Out" },
+        { address=0XF9111, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: (Time: Seconds)" },
+        { address=0XF9112, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: (Time: Minutes)" },
+        { address=0XF9113, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: (Time: Hours)" },
+        { address=0X125CBC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: Hyper Time Remaining" },
+        { address=0X125CC4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: Sleep Status Time Remaining" },
+        { address=0X125CC8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: Tetsujin Time Remaining (Unblockable)" },
+        { address=0X125CCC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: Invisible Time Remaining" },
+        { address=0X125CD0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: Guard x2 Time Remaining" },
+        { address=0X125CD8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quest Mode: Poisoned Status Time Remaining" },
+        { address=0X127F20, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="CPU: Poisoned Status Time Remaining" },
+      },
+    },
+  },
+}

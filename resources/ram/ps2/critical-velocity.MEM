@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Critical Velocity",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "critical-velocity",
+    file = "critical-velocity.zip",
+    hashes = {
+      { hash = "cfc6d99f7b4b741ec4fd1105ef733aa0", label = "Critical Velocity (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

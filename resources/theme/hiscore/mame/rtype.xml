@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ABIKO.. 174500</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 SUMITA  168600</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 AKIO.O  159700</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 SHINJI. 117900</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MISAKO! 100500</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 MASATO  98900</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 HAMA... 92000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 KENT.K  80000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 JIJEE.. 76000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 IREM .  75000</text>
+		</text>
+	</view>
+</theme>

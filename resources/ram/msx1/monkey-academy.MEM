@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Monkey Academy",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Education, Platform"
+  },
+
+  rom = {
+    name = "monkey-academy",
+    file = "monkey-academy.zip",
+    hashes = {
+      { hash = "ad8f1b9ba57345e38020bc0df4aabc41", label = "Monkey Academy (Japan).rom" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2016, type="u8", condition="eq", value=0X0D, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X2051, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round [8 bit]" },
+        { address=0X2054, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Sub-Round [8 bit]" },
+        { address=0X2153, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Addition" },
+        { address=0X2153, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Multiplication" },
+        { address=0X2153, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Division" },
+        { address=0X2153, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Algebra" },
+        { address=0X2153, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (P1) [8 bit]" },
+        { address=0X2154, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (P2) [8 bit]" },
+      },
+      stage = {
+        { address=0X2016, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X2016, type="u8", condition="eq", value=0X0E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shade Falling" },
+        { address=0X2016, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage State [8 bit]" },
+        { address=0X2153, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Subtraction" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2050, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [8 bit] increased" },
+        { address=0X2050, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [8 bit] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2040, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi Score [24 bit BCD]" },
+        { address=0X2043, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score [24 bit BCD]" },
+        { address=0X2046, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score [24 bit BCD]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,136 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Buu's Fury",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-ball-z-buus-fury",
+    file = "dragon-ball-z-buus-fury.zip",
+    hashes = {
+      { hash = "3a74fce97f1ea2b28c2a50ec3df0acee", label = "Dragon Ball Z - Buu's Fury (USA).gba" },
+      { hash = "15213777d023172ae282eed0482d09d6", label = "Dragon Ball Z - Buu's Fury (USA) (Pt) (v1.0) (Breno).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X10BD, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Olibu let you pass to the trainignsground" },
+        { address=0X10BD, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Trainingsground 1 - opponents talked with you" },
+        { address=0X10BE, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Trainingsground 2 - opponents talked with you" },
+        { address=0X10BE, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Trainingsground 3 - opponents talked with you" },
+        { address=0X1589, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="goku power at level 77 = 27.don't mess with it" },
+        { address=0X1729, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="vegeta pow = 32 in game at level 77" },
+      },
+      stage = {
+        { address=0X197C, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Intro/Stores/Worldmap" },
+        { address=0X197C, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Afterlife/Grand Kai's Planet" },
+        { address=0X197C, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hercule City" },
+        { address=0X197C, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="West City" },
+        { address=0X197C, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Roshi's Island" },
+        { address=0X197C, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kami's Lookout" },
+        { address=0X197C, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Papaya Island" },
+        { address=0X197C, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Southwest Forest" },
+        { address=0X197C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1130, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="DeathMachine, bit7=Dende" },
+        { address=0X1131, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="EliteMajinFighter, bit4=EliteMajinSoldier" },
+        { address=0X1136, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="GrandMechanoid2, bit6=Gregory, bit7=Grenadier" },
+        { address=0X1138, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="HumanWoman, bit6=HumanSoldier, bit7=HumanMan3" },
+        { address=0X113C, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="LivingDead, bit4=MadBomber" },
+        { address=0X113D, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="MajinSoldier, bit5=MajinVegeta, bit6=Marauder" },
+        { address=0X113D, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Marron" },
+        { address=0X1145, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="SupremeKai, bit6=Tank, bit7=Thug" },
+        { address=0X197C, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="East District 439/Title Screen(after died)" },
+      },
+      health = {
+        { address=0X1576, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="goku current hp decreased" },
+        { address=0X1576, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="goku current hp increased" },
+        { address=0X1578, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="goku max hp decreased" },
+        { address=0X1578, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="goku max hp increased" },
+        { address=0X15DE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="gohan current hp decreased" },
+        { address=0X15DE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="gohan current hp increased" },
+        { address=0X15E0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="gohan max hp decreased" },
+        { address=0X15E0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="gohan max hp increased" },
+        { address=0X1646, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="goten current hp decreased" },
+        { address=0X1646, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="goten current hp increased" },
+        { address=0X1648, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="goten max hp decreased" },
+        { address=0X1648, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="goten max hp increased" },
+        { address=0X16AE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="trunks current hp decreased" },
+        { address=0X16AE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="trunks current hp increased" },
+        { address=0X16B0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="trunks max hp decreased" },
+        { address=0X16B0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="trunks max hp increased" },
+        { address=0X1716, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="vegeta current hp decreased" },
+        { address=0X1716, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="vegeta current hp increased" },
+        { address=0X1718, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="vegeta max hp decreased" },
+        { address=0X1718, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="vegeta max hp increased" },
+        { address=0X177E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="gotenks current hp decreased" },
+        { address=0X177E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="gotenks current hp increased" },
+        { address=0X1780, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="gotenks max hp decreased" },
+        { address=0X1780, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="gotenks max hp increased" },
+        { address=0X17E6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="vegito current hp decreased" },
+        { address=0X17E6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="vegito current hp increased" },
+        { address=0X17E8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="vegito max hp decreased" },
+        { address=0X17E8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="vegito max hp increased" },
+        { address=0X184E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="gogeta current hp decreased" },
+        { address=0X184E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="gogeta current hp increased" },
+        { address=0X1850, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="gogeta max hp decreased" },
+        { address=0X1850, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="gogeta max hp increased" },
+        { address=0X18B6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="videl current hp decreased" },
+        { address=0X18B6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="videl current hp increased" },
+        { address=0X18B8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="videl max hp decreased" },
+        { address=0X18B8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="videl max hp increased" },
+        { address=0X37B16, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pikkon 1 Health, part 2 decreased" },
+        { address=0X37B16, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pikkon 1 Health, part 2 increased" },
+        { address=0X45652, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Majin Buu Health (before stomach area) decreased" },
+        { address=0X45652, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Majin Buu Health (before stomach area) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X10BD, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="opened treasure (Ton Armbands)" },
+        { address=0X10BD, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="opened treasure (Ton Boots)" },
+        { address=0X10C0, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="delivered the capsule to bulma and got the saiyaman suit" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X158C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="total points goku" },
+        { address=0X15F4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="gohan points" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X10C4, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="miniboss after the 1st puzzle defeated" },
+        { address=0X113F, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ninja, bit4=NinjaBoss, bit5=NosferatuHuman" },
+        { address=0X398C6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="giant airship boss hp (VBA)" },
+        { address=0X45792, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="giant airship boss hp (display value)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X108F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Story Items - Switch Count" },
+        { address=0X10BE, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="opened the door (cave [Olibu])" },
+        { address=0X10BF, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="world map checkpoint appeared in satan city" },
+        { address=0X10C5, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1st door in the 3rd puzzle opened (0 if closed again)" },
+        { address=0X10C5, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="2nd door in the 3rd puzzle opened (0 if closed again)" },
+        { address=0X10C5, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="3rd door in the 3rd puzzle opened (0 if closed again)" },
+        { address=0X10C5, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1st switch in the 3rd puzzle obtained" },
+        { address=0X10C5, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="2nd switch in the 3rd puzzle obtained" },
+        { address=0X10C5, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="3rd switch in the 3rd puzzle obtained" },
+        { address=0X113B, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="KingYemma, bit5=KnightDestroyer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X153D, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="timer for count down for 5 star ball" },
+      },
+    },
+  },
+}

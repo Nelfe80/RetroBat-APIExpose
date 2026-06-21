@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Tengai Makyou Zero",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "tengai-makyou-zero",
+    file = "tengai-makyou-zero.zip",
+    hashes = {
+      { hash = "29998124a67deda111d5aca8aaf5dca5", label = "Tengai Makyou Zero (Japan).sfc" },
+      { hash = "a1dc8da46fd30dd7fc20359494f35011", label = "Tengai Makyou Zero (Japan) (En) (v7.0) (Tom).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X169A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16-Bits Monster ID 1 HP decreased" },
+        { address=0X169A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16-Bits Monster ID 1 HP increased" },
+        { address=0X19E2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Higan's Status ~ Max Health decreased" },
+        { address=0X19E2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Higan's Status ~ Max Health increased" },
+        { address=0X19EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Higan's Status ~ Current Health decreased" },
+        { address=0X19EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Higan's Status ~ Current Health increased" },
+        { address=0X19EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Higans Health Overflow decreased" },
+        { address=0X19EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Higans Health Overflow increased" },
+      },
+    },
+  },
+}

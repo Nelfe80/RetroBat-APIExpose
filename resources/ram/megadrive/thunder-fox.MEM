@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Thunder Fox",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "thunder-fox",
+    file = "thunder-fox.zip",
+    hashes = {
+      { hash = "ca6f52b094db8bb2c5a4deaebe6b56ce", label = "Thunder Fox (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9836, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x01 - Demo Mode" },
+        { address=0XA02C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Remaining" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA014, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+      stage = {
+        { address=0XA030, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage select stage" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XB026, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Currently Held Weapon" },
+      },
+    },
+  },
+}

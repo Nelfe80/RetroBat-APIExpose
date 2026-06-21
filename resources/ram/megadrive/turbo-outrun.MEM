@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Turbo OutRun",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "turbo-outrun",
+    file = "turbo-outrun.zip",
+    hashes = {
+      { hash = "32fb1f12205e350cfe2bb66616043b59", label = "Turbo OutRun (Japan, Europe) (En).md" },
+    }
+  },
+
+  events = {
+  },
+}

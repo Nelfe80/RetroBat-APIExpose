@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Herzog Zwei",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "herzog-zwei",
+    file = "herzog-zwei.zip",
+    hashes = {
+      { hash = "e812002daafb264fc2ab1dff9bd06ac2", label = "Herzog Zwei (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF924, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Level" },
+        { address=0XF924, type="u8", condition="eq", value=0XFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF84A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="difficulty level" },
+        { address=0XF84E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completed levels - type B" },
+        { address=0XF84F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completed levels type A" },
+        { address=0XF850, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completed levels TYPE D" },
+        { address=0XF851, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completed levels TYPE C" },
+        { address=0XF926, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X8BFA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="energy decreased" },
+        { address=0X8BFA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="energy increased" },
+        { address=0X8CF7, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="blue player damage" },
+        { address=0X8D9E, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="unit 1 damage" },
+        { address=0X8DAE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="unit 1 energy decreased" },
+        { address=0X8DAE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="unit 1 energy increased" },
+        { address=0X8DEE, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="unit 2 damage" },
+        { address=0X8DFE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="unit 2 energy decreased" },
+        { address=0X8DFE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="unit 2 energy increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8BAC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="gun ammo" },
+        { address=0X8BE8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money increased" },
+        { address=0X8DAC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="unit 1 gun / missiles ammo" },
+        { address=0X8DFC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="unit 2 gun / missiles ammo" },
+      },
+    },
+  },
+}

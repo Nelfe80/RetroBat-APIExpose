@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Snapper",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Maze"
+  },
+
+  rom = {
+    name = "snapper",
+    file = "snapper.zip",
+    hashes = {
+      { hash = "9d630db6fcf053cd0b15e4ca69068579", label = "snapper.7z <Snapper (Korea)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X30D1, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [8-bit BCD]" },
+        { address=0X30E2, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode = 0xff" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X280E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Pellets Remaining In Stage" },
+        { address=0X30DC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2814, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (FF = Game Over) increased" },
+        { address=0X2814, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (FF = Game Over) decreased" },
+        { address=0X30E7, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 starting lives" },
+        { address=0X30E7, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="6 starting lives" },
+        { address=0X30E7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting lives dipswitch increased" },
+        { address=0X30E7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting lives dipswitch decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2870, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score in 10,000s [16-bit BCD]" },
+        { address=0X2872, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score lower half [16-bit BCD]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X281C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Continue Timer (FF = Game Over)" },
+      },
+    },
+  },
+}

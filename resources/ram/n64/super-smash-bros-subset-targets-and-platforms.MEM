@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Super Smash Bros. [Subset - Targets and Platforms]",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "super-smash-bros-subset-targets-and-platforms",
+    file = "super-smash-bros-subset-targets-and-platforms.zip",
+    hashes = {
+      { hash = "95be169289c1a62b541d7e536232491c", label = "Super Smash Bros. (USA) [Subset - Targets and Platforms] (v1.1) (SubliminalSiren).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA4AD2, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0XA4AD3, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen and during P1 mode" },
+        { address=0XA4B2A, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused (Or freezes if you didn't KO any character before changing anything)" },
+        { address=0XA4B2A, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused (Same as above)" },
+        { address=0X1313D3, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1313D3, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Normally" },
+        { address=0X26923C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Suspected Pause/Status Byte" },
+        { address=0X2B8C8C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Suspected Pause/Status Byte" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA4AD3, type="u8", condition="eq", value=0X33, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage clear" },
+        { address=0XA4D9F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU 1 Level [VS Mode]?" },
+        { address=0XA4E13, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU 2 Level [VS Mode]?" },
+        { address=0XA4E87, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU 3 Level [VS Mode]?" },
+      },
+      stage = {
+        { address=0XA4AD3, type="u8", condition="eq", value=0XE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage intro screen" },
+        { address=0XA4AE4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+        { address=0XA4D0A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8bit stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA4B40, type="u8", condition="eq", value=0XFF, action="LIVES_STATE", no_log=false, no_survey=false, desc="Defeated" },
+        { address=0XA4B40, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0XA4B40, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0XA4BB4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lives increased" },
+        { address=0XA4BB4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lives decreased" },
+        { address=0XA4C28, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P3 Lives increased" },
+        { address=0XA4C28, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P3 Lives decreased" },
+        { address=0XA4C9C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P4 Lives increased" },
+        { address=0XA4C9C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P4 Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA493C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mario 1P Best score. Each character best score is following in 0x20 increments" },
+        { address=0XA4AF0, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bits] 1P Game Score?" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2F171E, type="u16be", condition="eq", value=0X3C20, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0X2F171E, type="u16be", condition="eq", value=0XBC40, action="JUMPING", no_log=false, no_survey=false, desc="Double Jump" },
+        { address=0X2F46AE, type="u16be", condition="eq", value=0X3C20, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0X2F46AE, type="u16be", condition="eq", value=0XBC40, action="JUMPING", no_log=false, no_survey=false, desc="Double Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA2913, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[JP] Mario, Most Targets Destroyed (8-bit)" },
+        { address=0XA4934, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Unlockables? Bit0- Luigi; Bit1- Ness; Bit2- Captain Falcon; Bit3- Jigglypuff; Bit5- Sound Test;" },
+        { address=0XA4953, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mario, Most Targets Destroyed (8-bit)" },
+        { address=0XA4AD2, type="u8", condition="eq", value=0XB, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Item switch" },
+        { address=0XA4AD3, type="u8", condition="eq", value=0XB, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Item switch" },
+      },
+    },
+  },
+}

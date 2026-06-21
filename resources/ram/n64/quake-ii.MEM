@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Quake II",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter, 1ere Personne"
+  },
+
+  rom = {
+    name = "quake-ii",
+    file = "quake-ii.zip",
+    hashes = {
+      { hash = "cc93c30c633ff461c29b54ceabefd701", label = "Quake II (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X84B98, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Playing" },
+        { address=0X84B98, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Active Gameplay" },
+        { address=0X85988, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X85988, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission Completed Screen / Level Transition" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X85988, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Restarting after Death" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X760FD, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[Cheat] 02=infinite ammo, multiplayer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7A448, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Pause Counter (+1 on pause, +2 on unpause)" },
+        { address=0X85950, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float] Level Time" },
+      },
+    },
+  },
+}

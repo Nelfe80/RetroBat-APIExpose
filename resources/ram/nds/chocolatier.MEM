@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Chocolatier",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "chocolatier",
+    file = "chocolatier.zip",
+    hashes = {
+      { hash = "b23b538c96284d6707dbec176e658ddd", label = "Chocolatier (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X1F00F8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (read-only) increased" },
+      },
+    },
+  },
+}

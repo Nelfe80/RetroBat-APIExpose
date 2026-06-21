@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Wonder Boy III: The Dragon's Trap",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "wonder-boy-iii-the-dragons-trap",
+    file = "wonder-boy-iii-the-dragons-trap.zip",
+    hashes = {
+      { hash = "3f780a4b30384578c27157dbf5c21713", label = "Wonder Boy III - The Dragon's Trap (USA, Europe, Korea) (Fr).sms" },
+      { hash = "56b3436304b8cecfe4e321ca029d5e80", label = "Turma da Monica em O Resgate (Brazil).sms" },
+      { hash = "c7e1464e9ac0805f08ae7151796f69da", label = "Wonder Boy III - The Dragon's Trap (USA, Europe) (SRAM and Pad Detect) (v1.2) (Ichigobankai).sms" },
+      { hash = "e7f86c049e4bd8b26844ff62bd067d57", label = "Wonder Boy III - The Dragon's Trap (USA, Europe).sms" },
+      { hash = "e91a4da4f53b214704b3a99c4982f58e", label = "Wonder Boy III - The Dragon's Trap (USA, Europe, Korea) (Sv) (Metalhead) (0.7b).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0F87, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="00 = DEMO 01 = Gameplay" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0240, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Normally 80, this becomes 83 when you die." },
+        { address=0X0F89, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Better Death-State" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0F55, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money, 1s place, followed by 10s, 100s, 1000s, 10,000s, and 100,000s increased" },
+        { address=0X0FE7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Currently Acquired Gold, sticks around after acquired increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0F2A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Legendary Shield" },
+        { address=0X0F2B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Ivory Shield" },
+        { address=0X0F2C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Mithril Shield" },
+        { address=0X0F2D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shogun Shield" },
+        { address=0X0F2E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Crystal Shield" },
+        { address=0X0F2F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Knight Shield" },
+        { address=0X0F30, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Dancing Shield" },
+        { address=0X0F31, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Aqua Shield" },
+        { address=0X0F32, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Master Shield" },
+        { address=0X0F33, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Heavenly Shield" },
+      },
+    },
+  },
+}

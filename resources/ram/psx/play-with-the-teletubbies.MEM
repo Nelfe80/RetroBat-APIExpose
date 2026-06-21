@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Play with the Teletubbies",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Education, Strategy"
+  },
+
+  rom = {
+    name = "play-with-the-teletubbies",
+    file = "play-with-the-teletubbies.zip",
+    hashes = {
+      { hash = "b46358e11d0ce90d68cb9b47164a46db", label = "Play with the Teletubbies (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9E51C, type="u32le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X9E51C, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1DB368, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Minigame/Cutscene" },
+        { address=0X1DB368, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="00=At Overworld" },
+      },
+      stage = {
+        { address=0X9E5CC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="What's That? Current Stage" },
+        { address=0X9EA68, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hiding game current stage" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9E998, type="u8", condition="eq", value=0XFC, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="All objects found" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9E414, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer (16-bit)" },
+        { address=0X1E2144, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time playing a cutscene (16-bit)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Resident Evil",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Horror, Puzzle"
+  },
+
+  rom = {
+    name = "resident-evil",
+    file = "resident-evil.zip",
+    hashes = {
+      { hash = "d2425dd3e6b2110a928cc21b27ea7333", label = "Resident Evil (USA)" },
+      { hash = "58551afa6ec84163fcffb8e7a4a169c3", label = "Resident Evil (Europe)" },
+      { hash = "d873eaeb4d1fbe4cd2ab49301e818b61", label = "Resident Evil (France)" },
+      { hash = "26f2cca43a5994af18f08ad0e471e75a", label = "Resident Evil (Germany)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC866C, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XC866C, type="u8", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC5368, type="u16le", condition="eq", value=0XFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Standing" },
+        { address=0XC5368, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy 1 On Ground [16bits]" },
+        { address=0XC8660, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Courtyard/Underground" },
+        { address=0XC8697, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Barry gives you Acid Rounds from Terrace in the Main Hall" },
+        { address=0XC86DE, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Acid Rounds from Barry" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC532C, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XC8699, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Rebecca Dead" },
+        { address=0XC86A2, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Leave Library with Hunter alive (Rebecca dies)" },
+        { address=0XC86A3, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Richard dead (Chris)" },
+        { address=0XC86A3, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Richard dead (Jill)" },
+      },
+      health = {
+        { address=0XC51AC, type="u8", condition="eq", value=0X60, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Jill Max Original" },
+        { address=0XC51AC, type="u8", condition="eq", value=0X46, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Jill Max Arrange" },
+        { address=0XC51AC, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health [8bits]" },
+        { address=0XC5200, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Poison" },
+        { address=0XC5200, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Fine" },
+        { address=0XC5200, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Poison (Yawn)" },
+        { address=0XC532C, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Enemy 1 Health [16bits]" },
+        { address=0XC867E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health? [16bits] decreased" },
+        { address=0XC867E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health? [16bits] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC5126, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon equipped 3D" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC866D, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Flamethrower Ammo [8bits]" },
+        { address=0XC866E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Flamethrower 2 Ammo [8bits]" },
+        { address=0XC8693, type="u8", condition="eq", value=0X03, action="AMMO_STATE", no_log=true, no_survey=false, desc="Arrange (2x Ammo)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC8459, type="u8", condition="eq", value=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="End" },
+        { address=0XC8697, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Opened Main Hall door" },
+        { address=0XC86AB, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Piano Door Open" },
+        { address=0XC86B5, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="C Passage - East Stairway 2F" },
+        { address=0XC86B5, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Small Library - East Stairway 2F" },
+        { address=0XC86B5, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Back Passage - East Stairway 1F" },
+        { address=0XC86B5, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Central Corridor - Tea Room" },
+        { address=0XC86B6, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="C Passage - Armor Room" },
+        { address=0XC86B6, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="C Passage - Pillar Passage" },
+        { address=0XC86B6, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Central Corridor - Keeper's Bedroom" },
+        { address=0XC86B6, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="West Stairway 1F - Vacant Room" },
+        { address=0XC86B6, type="u8", condition="bit_true", bit=6, mask=0X40, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Art Room - 'L' Passage" },
+        { address=0XC86B7, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Tea Room - Bar" },
+        { address=0XC86B7, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Main Hall - Dressing Room" },
+        { address=0XC86DF, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Shotgun in Shotgun Room" },
+        { address=0XC86E1, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Shotgun" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC8660, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Main Location [8Bits]" },
+        { address=0XC867C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Event Timer (Not on pause) [16bits]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Dancing Stage Fever",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dancing-stage-fever",
+    file = "dancing-stage-fever.zip",
+    hashes = {
+      { hash = "2ea576f25e70b14b6afab0fdf8e17a4c", label = "Dancing Stage Fever (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBC3C0, type="u8", condition="eq", value=0X19, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XBC3C0, type="u8", condition="eq", value=0X22, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XBC3C0, type="u8", condition="eq", value=0X23, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XBC3C0, type="u8", condition="eq", value=0X3A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XDDF10, type="u8", condition="eq", value=0X05, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XDEE0D, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[8 Bit] Option - Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDEE08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Option - Game Level" },
+      },
+      stage = {
+        { address=0XBC3CE, type="u16le", condition="eq", value=0XFFFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="End" },
+        { address=0XBC3CE, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Current Stages" },
+        { address=0XDEE09, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Option - Number of Stages" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBC3F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Previous Total Score" },
+        { address=0XBC3F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Total Score" },
+        { address=0XBD654, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Previous Total Score" },
+        { address=0XBD658, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Total Score" },
+      },
+    },
+  },
+}

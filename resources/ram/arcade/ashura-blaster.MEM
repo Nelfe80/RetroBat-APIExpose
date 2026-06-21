@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Ashura Blaster",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "ashura-blaster",
+    file = "ashura-blaster.zip",
+    hashes = {
+      { hash = "00817723e1dd04363c48424ef90ade5e", label = "ashuraj.7z <Ashura Blaster (Japan)>" },
+      { hash = "135a1ebbc5980b8f0df74f8e421785de", label = "ashura.7z <Ashura Blaster (World)>" },
+      { hash = "dcbc9c95be2d57f518cb0023db15e405", label = "ashurau.7z <Ashura Blaster (US)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0858, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

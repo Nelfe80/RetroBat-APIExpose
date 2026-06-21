@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Board Game Classics",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Board Game, Compilation"
+  },
+
+  rom = {
+    name = "board-game-classics",
+    file = "board-game-classics.zip",
+    hashes = {
+      { hash = "871133b4e4e8b172f7538b0250c9bb45", label = "Board Game Classics (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

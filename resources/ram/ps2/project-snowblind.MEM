@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Project: Snowblind",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "project-snowblind",
+    file = "project-snowblind.zip",
+    hashes = {
+      { hash = "70d138e16ea5f063300c3d3a0b50602c", label = "Project - Snowblind (USA)" },
+      { hash = "e1eea65016c7d4cf94ed34ed76d3d61c", label = "Project - Snowblind (SLUS-21037) [2BDA8ADB]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4C55C4, type="u16le", condition="eq", value=0X0239, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End Credits" },
+        { address=0X4C5678, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="In-Gmae" },
+        { address=0X4C5678, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+        { address=0X4C67DC, type="u32le", condition="eq", value=0X000000A1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4C55C4, type="u16le", condition="eq", value=0X03C6, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mission 06 'Destroy'" },
+      },
+    },
+  },
+}

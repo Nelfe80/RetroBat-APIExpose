@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Put Up",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "put-up",
+    file = "put-up.zip",
+    hashes = {
+      { hash = "223189c6823f7376d133d44507068d19", label = "Put Up (1987) (BAS) (Yuichi Ago).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7451, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7456, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="The Number of Lifes increased" },
+        { address=0X7456, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Number of Lifes decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X744C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score * 100" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X33E8, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump-key status" },
+        { address=0X74C8, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jumping-Status" },
+      },
+    },
+  },
+}

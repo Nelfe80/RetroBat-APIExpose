@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "LEGO Bionicle",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "lego-bionicle",
+    file = "lego-bionicle.zip",
+    hashes = {
+      { hash = "0e86c0c284f2ce03ed28359a765a66ce", label = "LEGO Bionicle (USA) (En,Fr).gba" },
+      { hash = "6decd38b78a1aab5b895c85a1d380bcf", label = "LEGO Bionicle (Europe) (En,Fr,De,Es,It,Nl,Sv,Da).gba" },
+    }
+  },
+
+  events = {
+  },
+}

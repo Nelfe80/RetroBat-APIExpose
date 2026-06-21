@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Tom and Jerry in House Trap",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tom-and-jerry-in-house-trap",
+    file = "tom-and-jerry-in-house-trap.zip",
+    hashes = {
+      { hash = "708e047cf1940cd0c8bf08d92d9cca60", label = "Tom and Jerry in House Trap (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X32622, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X6BAFC, type="u16le", condition="eq", value=0X03E8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="full health" },
+        { address=0X6BAFC, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="(16bit) Jerry's health" },
+        { address=0X6BF24, type="u16le", condition="eq", value=0X03E8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="full health" },
+        { address=0X6BF24, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="(16bit) Tom's health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6BA59, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Heart" },
+        { address=0X6BE81, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Heart" },
+        { address=0X6BE86, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6BE86, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Spike's Counter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ninku Gaiden: Hiroyuki Daikatsugeki",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "ninku-gaiden-hiroyuki-daikatsugeki",
+    file = "ninku-gaiden-hiroyuki-daikatsugeki.zip",
+    hashes = {
+      { hash = "e9b45d6455e0753b8e0e825a36458253", label = "Ninku Gaiden - Hiroyuki Daikatsugeki (Japan).gg" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hyper Sports 3",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "hyper-sports-3",
+    file = "hyper-sports-3.zip",
+    hashes = {
+      { hash = "01a2c85070d987a1b83f591e83b5bcfe", label = "Hyper Sports 3 (Japan).rom" },
+    }
+  },
+
+  events = {
+  },
+}

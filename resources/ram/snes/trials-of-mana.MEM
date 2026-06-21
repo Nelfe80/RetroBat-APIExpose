@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Trials of Mana",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "trials-of-mana",
+    file = "trials-of-mana.zip",
+    hashes = {
+      { hash = "124efbbc96ed6c987e2e8c46d7c84dea", label = "Seiken Densetsu 3 (Japan) (En) (NCorlett,LNFT) (1.01) (3 Players) (Parlance) (1.0).sfc" },
+      { hash = "1ed584f4807ad62948eb82b7b5d5ca0d", label = "Seiken Densetsu 3 (Japan) (De) (G-Trans) (2.03).sfc" },
+      { hash = "2ef86d15f198f18fba109454b1bc1f3c", label = "Trials of Mana (World) (MSU-1) (Remastered OST) (RedScorpion) (6.0).sfc" },
+      { hash = "3523a3b3d9898a583f5b20c4a6416d20", label = "Seiken Densetsu 3 (Japan) (Es) (Traducciones Magno) (1.0.3).sfc" },
+      { hash = "3ca8d4f59367f906c911b9f76bcb30f9", label = "Seiken Densetsu 3 (Japan) (En) (NCorlett,LNFT) (1.01) (BugFix).sfc" },
+      { hash = "4de680bc7d4877a27b0f538b456b7994", label = "Seiken Densetsu 3 (Japan) (Fr) (RC Terminus).sfc" },
+      { hash = "5a0a3460ed4f02e649dbcd42089f9e03", label = "Seiken Densetsu 3 (Japan) (En) (NCorlett,LNFT) (1.01).sfc" },
+      { hash = "c9829d76e25f8c4bf459cf77a8306825", label = "Trials of Mana (World) (Collection of Mana).sfc" },
+      { hash = "d7fff8a9bae88417922419e40c003441", label = "Trials of Mana (World) (MSU-1) (Conn,RedScorpion) (1.0).sfc" },
+      { hash = "ec876e654a1358d1deb5a0d868680311", label = "Seiken Densetsu 3 (Japan) (Es) (Traducciones Magno) (1.0.2).sfc" },
+      { hash = "fd911993992a685d491440d59be009dc", label = "Seiken Densetsu 3 (Japan) (En) (NCorlett,LNFT) (1.00).sfc" },
+      { hash = "c7af221dc7645c2a1391602bdb8b0274", label = "Seiken Densetsu 3 (Japan) (Pt) (v1.03) (2024).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2E8B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="number of round drops in storage" },
+      },
+      zone = {
+        { address=0X1EDF0, type="u8", condition="eq", value=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Duran" },
+        { address=0X1EDF0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Character memory can chaneg based on fi player has been on world map or not." },
+      },
+      stage = {
+        { address=0X1EE11, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8 bit) main character - level (level 1 = 0)" },
+        { address=0X1F111, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8 bit) 2nd character - level (level 1 = 0)" },
+        { address=0X1F411, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8 bit) 3rd character - level (level 1 = 0)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2F68, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="=2 death jester dead" },
+        { address=0X2F70, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="jagan death=20" },
+        { address=0X2FA3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="=4 heath dead" },
+      },
+      health = {
+        { address=0X1EDF2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st slot character - current HP decreased" },
+        { address=0X1EDF2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st slot character - current HP increased" },
+        { address=0X1EE02, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 1st character - max HP decreased" },
+        { address=0X1EE02, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 1st character - max HP increased" },
+        { address=0X1F0F2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 2nd slot char - current HP decreased" },
+        { address=0X1F0F2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 2nd slot char - current HP increased" },
+        { address=0X1F3F2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 3rd slot character - current HP decreased" },
+        { address=0X1F3F2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 3rd slot character - current HP increased" },
+        { address=0X1F6F2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) 4th slot character current HP decreased" },
+        { address=0X1F6F2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) 4th slot character current HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2E38, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Storage - Item-by-item quantities" },
+        { address=0X61ED, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="(6 items 2 bytes each)" },
+      },
+      weapon = {
+        { address=0X2C39, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Stored - Start (Bronze Sword)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2C24, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(24 bit) Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1E1F2, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16 bit)first slot for boss hp" },
+        { address=0X1E202, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss max hp?" },
+        { address=0X1E2F2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="second slot for boss hp" },
+        { address=0X1E302, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss max hp?" },
+        { address=0X1E3F2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="third slot for boss hp" },
+        { address=0X1E402, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss max hp?" },
+        { address=0X1FAF2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss hp?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2F4D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(8 bit) events - 4=bill and bob defeated for last time" },
+      },
+    },
+  },
+}

@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Digimon World 4",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "digimon-world-4",
+    file = "digimon-world-4.zip",
+    hashes = {
+      { hash = "ac4b9b7e15524dd3d501006ea87331e2", label = "Digimon World 4 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4F2195, type="u32be", condition="eq", value=0X49533230, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="System - Credits" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X42533032, action="DEMO_MODE", no_log=false, no_survey=false, desc="Dry Land - Demon Shift" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30303031, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Practice Stage" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30313031, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Goblin Pass" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30316231, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Humid Cave B1" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30316232, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Humid Cave B2" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30313032, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Abyss of Grief" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30326231, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Cliff Dungeon B1" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30326232, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Cliff Dungeon B2" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30326233, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Cliff Dungeon B3" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X47463031, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Goblin Fortress" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X47463032, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Rotating Hall" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X47463033, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - X Digimon Lab" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X47463034, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - GobGob Room" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30313033, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Numenume River" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30313034, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Doom Dome" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30336631, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Doom Base F1" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X30336632, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Doom Base F2" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X42533031, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley - Apokarimon Space" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X32623165, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Machine Pit - Undead Yard B1" },
+        { address=0X4F2195, type="u32be", condition="eq", value=0X32623265, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Machine Pit - Undead Yard B2" },
+      },
+    },
+  },
+}

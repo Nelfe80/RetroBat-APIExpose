@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "Toy Story 2: Buzz Lightyear to the Rescue!",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "toy-story-2-buzz-lightyear-to-the-rescue",
+    file = "toy-story-2-buzz-lightyear-to-the-rescue.zip",
+    hashes = {
+      { hash = "b44e9c2d9d2f2de3af4793b824ccf936", label = "Toy Story 2 - Buzz Lightyear to the Rescue! (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB8718, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Activated" },
+        { address=0X3F9F69, type="u8", condition="eq", value=0XEA, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Result Screen/Ending/Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB0B68, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Inside a Level" },
+        { address=0XB0B68, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu, Level Select, Result Screen etc." },
+        { address=0XBB095, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slime Monster projectile hitting the ground" },
+        { address=0X1C8A70, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All 5 Items Delivered" },
+        { address=0X1C8A70, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Exclusive Item" },
+      },
+      stage = {
+        { address=0X1E2DD0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 Tokens" },
+        { address=0X1E449C, type="u24be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 Paint Can Height:" },
+        { address=0X24C164, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Text Box (Changes from stage to stage)" },
+        { address=0X3F9EBC, type="u8", condition="eq", value=0XC8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Briefing" },
+        { address=0X3F9EBC, type="u8", condition="eq", value=0X60, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Briefing" },
+        { address=0X3F9F69, type="u8", condition="eq", value=0XE7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBB104, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XBB108, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XBB108, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XC0C95, type="u8", condition="eq", value=0X10, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life still spawned" },
+        { address=0XC0C95, type="u8", condition="eq", value=0X00, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life already grabbed" },
+        { address=0XC0C95, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Construction Yard - Extra Life increased" },
+        { address=0XC0C95, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Construction Yard - Extra Life decreased" },
+        { address=0XC0C97, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Construction Yard - Extra Life | Size increased" },
+        { address=0XC0C97, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Construction Yard - Extra Life | Size decreased" },
+        { address=0XC492D, type="u8", condition="eq", value=0X10, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life still spawned" },
+        { address=0XC492D, type="u8", condition="eq", value=0X00, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life already grabbed" },
+        { address=0XC492D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Tarmac Trouble - Extra Life increased" },
+        { address=0XC492D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tarmac Trouble - Extra Life decreased" },
+        { address=0XCA46D, type="u8", condition="eq", value=0X10, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life still spawned" },
+        { address=0XCA46D, type="u8", condition="eq", value=0X00, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life already grabbed" },
+        { address=0XCA46D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Andy's House - Extra Life 1 increased" },
+        { address=0XCA46D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Andy's House - Extra Life 1 decreased" },
+        { address=0X360E18, type="u16be", condition="eq", value=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="Extra Lives Number on Screen" },
+      },
+      health = {
+        { address=0XBB104, type="u8", condition="eq", value=0X0E, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max Health" },
+        { address=0XBB104, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Buzz's Battery / HP" },
+        { address=0X1E95A4, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Green Laser Ammo: decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1E95A4, type="u16be", condition="eq", value=0X0000, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Normal Laser; 0x04b0 (1200) = Max Ammo" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBB10C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+        { address=0XBB4FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins? increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XACEC0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss UI" },
+        { address=0X1E2DD6, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="Construction Yard, Jackhammer Boss" },
+        { address=0X1EDB60, type="u8", condition="eq", value=0X36, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full Health" },
+        { address=0X3F9F69, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Booting Game/Boss Defeated/Want to Save?" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X322C, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Toy Dinosaur Invincible Frames" },
+        { address=0X346C, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Tin Robot Invincible Frames" },
+        { address=0XBB106, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Buzz Invincible Frames" },
+        { address=0X1CC449, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Could work as the dinosaur invincible frames?" },
+      },
+      player = {
+        { address=0XBB0FE, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="(8-bits) If you freeze this at 2, you can do infinite double jumps" },
+        { address=0XBB102, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0XBB102, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Double jump" },
+        { address=0X1C8A90, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Any time Buzz is moving (jumping, walking, moving the reticle in first-person view, etc.);" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X46AC, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Up" },
+        { address=0X46AC, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Middle" },
+        { address=0X46AC, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Down" },
+        { address=0X46D0, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Up" },
+        { address=0X46D0, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Middle" },
+        { address=0X46D0, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Down" },
+        { address=0X46EC, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Up" },
+        { address=0X46EC, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Middle" },
+        { address=0X46EC, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Down" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1C8A90, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Is Moving?" },
+      },
+    },
+  },
+}

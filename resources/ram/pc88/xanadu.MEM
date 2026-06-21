@@ -1,0 +1,34 @@
+return {
+  game = {
+    title = "Xanadu",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "xanadu",
+    file = "xanadu.zip",
+    hashes = {
+      { hash = "6108ac1bd2d86c899756a69693d7f230", label = "Xanadu [Set 1] (Disk A - Program).d88" },
+      { hash = "cbc04cb70d3410636b79af7c3d2d3d44", label = "Xanadu (Disk A - Program) [Alt 1].d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X608E, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Use Magician title" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X685D, type="u8", condition="eq", value=0X1, action="BOSS_HIT", no_log=false, no_survey=false, desc="KRAKEN Giant" },
+        { address=0X685D, type="u8", condition="eq", value=0X2, action="BOSS_HIT", no_log=false, no_survey=false, desc="GRELL Giant" },
+        { address=0X685D, type="u8", condition="eq", value=0X3, action="BOSS_HIT", no_log=false, no_survey=false, desc="KARTTIKEVA" },
+        { address=0X685D, type="u8", condition="eq", value=0X4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Silver Dragon" },
+        { address=0X685D, type="u8", condition="eq", value=0X5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Big KRAKEN (1st floor)" },
+      },
+    },
+  },
+}

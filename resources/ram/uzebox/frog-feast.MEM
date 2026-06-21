@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Frog Feast",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "frog-feast",
+    file = "frog-feast.zip",
+    hashes = {
+      { hash = "8680e6d9eb3ec06580fa220eef21ef14", label = "Frog Feast (World) (D3thAdd3r).uze" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0025, type="u8", condition="eq", value=0X04, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X0025, type="u8", condition="eq", value=0X29, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0ECC, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+  },
+}

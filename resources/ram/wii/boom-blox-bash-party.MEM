@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Boom Blox Bash Party",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "boom-blox-bash-party",
+    file = "boom-blox-bash-party.zip",
+    hashes = {
+      { hash = "6af02e369de4948d785ee0aadaa2706b", label = "Boom Blox Bash Party (Europe) (En,Fr,De,Es,It,Nl)" },
+      { hash = "4569b4278dc67d88ff1472fadd656b01", label = "Boom Blox Bash Party (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X12E74460, type="u32be", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+  },
+}

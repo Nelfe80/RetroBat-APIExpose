@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Riding Hero",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Motorcycle"
+  },
+
+  rom = {
+    name = "riding-hero",
+    file = "riding-hero.zip",
+    hashes = {
+      { hash = "212a09381bef3e8948890da8ec52f2db", label = "ridhero.7z <Riding Hero (NGM-006)(NGH-006)>" },
+      { hash = "47d06a81458ff7282610a34c0eeafe61", label = "ridheroh.7z <Riding Hero (set 2)>" },
+    }
+  },
+
+  events = {
+  },
+}

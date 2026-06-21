@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Demolition Man",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Fighting, Shooter"
+  },
+
+  rom = {
+    name = "demolition-man",
+    file = "demolition-man.zip",
+    hashes = {
+      { hash = "39f2a07ef946fa65dc2d268f5ed0c39e", label = "Demolition Man (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

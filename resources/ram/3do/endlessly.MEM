@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Endlessly",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "endlessly",
+    file = "endlessly.zip",
+    hashes = {
+      { hash = "bf35b77e06121760e417d98f94a0c131", label = "Endlessly (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X8EFB8, type="u8", condition="eq", value=0X50, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="The Vivid World of Adult Interactive" },
+      },
+    },
+  },
+}

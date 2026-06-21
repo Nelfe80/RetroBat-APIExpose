@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Karateka",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "karateka",
+    file = "karateka.zip",
+    hashes = {
+      { hash = "5adc2eaf216646ccba59e0a5c317a7db", label = "Karateka (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002D, type="u8", condition="eq", value=0XFB, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X002D, type="u8", condition="eq", value=0XF0, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X00EF, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="off (title/fanfarre)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0241, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first time" },
+        { address=0X0241, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="second time" },
+        { address=0X0241, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="thrid time" },
+        { address=0X0241, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="- Eagle appearance in 2nd stage" },
+        { address=0X028B, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="yes" },
+        { address=0X028B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="- Eagle on screen (2nd Stage)" },
+        { address=0X06E2, type="u8", condition="eq", value=0X18, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage/ final" },
+        { address=0X06E2, type="u8", condition="eq", value=0X1A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="second stage" },
+        { address=0X06E2, type="u8", condition="eq", value=0X29, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="third stage" },
+        { address=0X06E2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="- Stages" },
+        { address=0X06FE, type="u8", condition="eq", value=0X0F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage/ second stage" },
+        { address=0X06FE, type="u8", condition="eq", value=0X29, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="third stage" },
+        { address=0X06FE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="- Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X020A, type="u8", condition="eq", value=0X2E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0X0209, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player's Health decreased" },
+        { address=0X0209, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player's Health increased" },
+        { address=0X0229, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="opponent's health decreased" },
+        { address=0X0229, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="opponent's health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X06FE, type="u8", condition="eq", value=0X18, action="BOSS_HIT", no_log=false, no_survey=false, desc="last boss" },
+      },
+    },
+  },
+}

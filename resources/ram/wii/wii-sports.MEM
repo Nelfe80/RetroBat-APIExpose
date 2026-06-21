@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Wii Sports",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "wii-sports",
+    file = "wii-sports.zip",
+    hashes = {
+      { hash = "e036ae4290296d94cdc14c578d124ee4", label = "Wii Sports (Europe) (En,Fr,De,Es,It) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X57DBC0, type="u32be", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+  },
+}

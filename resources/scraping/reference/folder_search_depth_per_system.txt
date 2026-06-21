@@ -1,0 +1,14 @@
+# tell per system how deep to search roms files in folders (file mode)
+# 1: indicates that the search is only done in the first level of the system folder
+# Any other value indicates the number of sublevels in which the roms will be searched
+# If a system is not found in this file, the search will be done on all the subfolders
+# lines beginning with # are ignored
+#
+# The line syntax is as follows
+#
+# system_folder_name|search_depth
+#
+# example :
+#
+#switch|1
+#

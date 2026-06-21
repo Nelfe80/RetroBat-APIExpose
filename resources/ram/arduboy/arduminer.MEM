@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Arduminer",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "arduminer",
+    file = "arduminer.zip",
+    hashes = {
+      { hash = "801b00d363215ee39921db752d127cc1", label = "Arduminer (World) (v1.1).hex" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0225, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health decreased" },
+        { address=0X0225, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0155, type="u8", condition="eq", value=0X11, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ore" },
+        { address=0X0155, type="u8", condition="eq", value=0X39, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ingot" },
+        { address=0X022B, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Ingot" },
+        { address=0X022B, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Apple" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X021E, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="[8bit] Jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X01A3, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8bit] Bit7=Exit Door" },
+        { address=0X0217, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8bit] Dirt blocks" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0222, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Action Switch Timer" },
+      },
+    },
+  },
+}

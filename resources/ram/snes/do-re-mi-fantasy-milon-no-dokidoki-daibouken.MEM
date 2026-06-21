@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Do-Re-Mi Fantasy: Milon no Dokidoki Daibouken",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "do-re-mi-fantasy-milon-no-dokidoki-daibouken",
+    file = "do-re-mi-fantasy-milon-no-dokidoki-daibouken.zip",
+    hashes = {
+      { hash = "193fbbe49b52fc485981b9f0d0450b8d", label = "Do-Re-Mi Fantasy - Milon no Dokidoki Daibouken (Japan) (En) (1.2NE) (RPGone).sfc" },
+      { hash = "19b64f594ffd4c312ffee6af1102ec7d", label = "DoReMi Fantasy - Milon no Dokidoki Daibouken (Japan).sfc" },
+      { hash = "ca8bb57936611e92596fbf63952d008d", label = "Do-Re-Mi Fantasy - Milon no Dokidoki Daibouken (Japan) (En).sfc" },
+      { hash = "cb5937aca40197fba1e8c4802d0962b0", label = "Do-Re-Mi Fantasy - Milon no Dokidoki Daibouken (Japan) (En) (1.1) (RPGone).sfc" },
+      { hash = "d6e65b76e6248c1beb45932c7c995f8f", label = "Do-Re-Mi Fantasy - Milon no Dokidoki Daibouken (Japan) (En) (1.3NE) (RPGone).sfc" },
+      { hash = "f39faabb923f1688b96a4e8ee4b333ca", label = "Do-Re-Mi Fantasy - Milon no Dokidoki Daibouken (Japan) (En) (RPGone).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0030, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0030, type="u8", condition="eq", value=0X3, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0030, type="u8", condition="eq", value=0X8, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X0516, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not Paused" },
+        { address=0X0516, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X0517, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game paused or not" },
+        { address=0X0518, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Item highlighted in pause menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0030, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X0030, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+        { address=0X008A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Progress Horizontal" },
+        { address=0X00FC, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level cleared" },
+        { address=0X00FC, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Normally" },
+        { address=0X0680, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Toy Birds Count Level" },
+        { address=0X0F19, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0= On overworld 01=In Level" },
+        { address=0X1FB7, type="u8", condition="eq", value=0X9, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0X1FB8, type="u8", condition="eq", value=0X9, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0X1FBA, type="u8", condition="eq", value=0X9, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0X1FBB, type="u8", condition="eq", value=0X9, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+        { address=0X1FBC, type="u8", condition="eq", value=0X9, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+      },
+      zone = {
+        { address=0X00EE, type="u8", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Forest Journey" },
+        { address=0X00EE, type="u8", condition="eq", value=0X1, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Candy World" },
+        { address=0X00EE, type="u8", condition="eq", value=0X2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Concert Hall" },
+        { address=0X00EE, type="u8", condition="eq", value=0X3, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fairy Village" },
+        { address=0X00EE, type="u8", condition="eq", value=0X4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ice World" },
+        { address=0X00EE, type="u8", condition="eq", value=0X5, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fire Peak" },
+        { address=0X00EE, type="u8", condition="eq", value=0X6, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Toy Town" },
+        { address=0X00EE, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+        { address=0X00EF, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Area number within a world" },
+        { address=0X1FB7, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 (Forest) Progress" },
+        { address=0X1FB8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2 (Candy) Progress" },
+        { address=0X1FB9, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 3 (Music) Progress" },
+        { address=0X1FBA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 4 (Fairy) Progress" },
+        { address=0X1FBB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 5 (Ice) Progress" },
+        { address=0X1FBC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 6 (Fire) Progress" },
+        { address=0X1FBD, type="u8", condition="eq", value=0X0A, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Last level open" },
+        { address=0X1FBD, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 7 (Toy & Castle) Progress" },
+        { address=0X1FD0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World Progress" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00F1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X00F1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0E5B, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Suit Power (Health)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X05FF, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points in shooting minigame" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1EE6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health" },
+        { address=0X1EE7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0E62, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility timer - 2 Bytes" },
+      },
+      player = {
+        { address=0X0EB0, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Number of jumps (times the character hits the" },
+      },
+    },
+  },
+}

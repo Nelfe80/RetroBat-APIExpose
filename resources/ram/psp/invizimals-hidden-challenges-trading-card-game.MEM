@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "InviZimals: Hidden Challenges - Trading Card Game",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "invizimals-hidden-challenges-trading-card-game",
+    file = "invizimals-hidden-challenges-trading-card-game.zip",
+    hashes = {
+      { hash = "3be086cd02c5efdfabd134c3ddf05737", label = "inviZimals - Collectible Card Game - Hidden Challenges (Europe) (En,Fr,De,It,Pt) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X958040, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Combat Zone - Game State [32bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9B555C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card Data - Energy Cut decreased" },
+        { address=0X9B555C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card Data - Energy Cut increased" },
+        { address=0X9B55FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card Data - Energy Teeth decreased" },
+        { address=0X9B55FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card Data - Energy Teeth increased" },
+        { address=0X9B57A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card Data - Invizimal Energy decreased" },
+        { address=0X9B57A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card Data - Invizimal Energy increased" },
+        { address=0X9B586C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card Data - Energy Bubble decreased" },
+        { address=0X9B586C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card Data - Energy Bubble increased" },
+        { address=0X9B5D0C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Card Data - Energy Stone decreased" },
+        { address=0X9B5D0C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Card Data - Energy Stone increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9B574C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Card Data - Gold Dragon increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X9B53FC, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Avenger Shield" },
+        { address=0X9B54F4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Researcher Shield" },
+        { address=0X9B5584, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Student Shield" },
+        { address=0X9B56F4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Tracker Shield" },
+        { address=0X9B56FC, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Hunter Shield" },
+        { address=0X9B5854, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Paladin Shield" },
+        { address=0X9B59FC, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Rookie Shield" },
+        { address=0X9B5B4C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Sonic Shield" },
+        { address=0X9B5BB4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Shaman Shield" },
+        { address=0X9B5F7C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Shield" },
+        { address=0X9B5FF4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Card Data - Collector Shield" },
+      },
+      player = {
+        { address=0X9B553C, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Card Data - Evolutionary Jump" },
+      },
+    },
+  },
+}

@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Quest for the Shaven Yak Starring Ren Hoëk & Stimpy",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "quest-for-the-shaven-yak-starring-ren-hoek-stimpy",
+    file = "quest-for-the-shaven-yak-starring-ren-hoek-stimpy.zip",
+    hashes = {
+      { hash = "42854dd79bf57019a26ddd73e12b68ac", label = "Quest for the Shaven Yak Starring Ren Hoek & Stimpy (USA, Europe).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C27, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (1)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X02F2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ren Lives increased" },
+        { address=0X02F2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ren Lives decreased" },
+        { address=0X02F3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stimpy Lives increased" },
+        { address=0X02F3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stimpy Lives decreased" },
+      },
+      health = {
+        { address=0X02F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ren Health decreased" },
+        { address=0X02F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ren Health increased" },
+        { address=0X02F5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Stimpy Health decreased" },
+        { address=0X02F5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Stimpy Health increased" },
+        { address=0X18B3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power Up. decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X18B3, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Toast Bread" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1C60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (32 Bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1C2A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="1st Boss Health" },
+      },
+    },
+  },
+}

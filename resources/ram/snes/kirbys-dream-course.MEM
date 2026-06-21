@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Kirby's Dream Course",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports, Golf"
+  },
+
+  rom = {
+    name = "kirbys-dream-course",
+    file = "kirbys-dream-course.zip",
+    hashes = {
+      { hash = "3f2ee922cd23c9c211777be1d26ea2a8", label = "Kirby's Dream Course (USA).sfc" },
+      { hash = "b757f3031fb7698925cf9eb8d3b343a1", label = "Kirby's Dream Course (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00C2, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="No Demo Playing" },
+        { address=0X00C2, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDA4A, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Value when playing the hole" },
+        { address=0XDA4A, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Enterng the hole" },
+        { address=0XDA4A, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hole cleared" },
+      },
+    },
+  },
+}

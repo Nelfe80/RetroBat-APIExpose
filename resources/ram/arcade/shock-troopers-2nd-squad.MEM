@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Shock Troopers: 2nd Squad",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "shock-troopers-2nd-squad",
+    file = "shock-troopers-2nd-squad.zip",
+    hashes = {
+      { hash = "4af54168a800f0ff32f7f9377d5329a9", label = "shocktr2.7z <Shock Troopers - 2nd Squad>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8F92, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Transition/Title Screen" },
+        { address=0X8FCA, type="u16le", condition="eq", value=0X2021, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Game" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8FCA, type="u16le", condition="eq", value=0X2025, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear" },
+        { address=0X9014, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Charger" },
+      },
+      stage = {
+        { address=0X8FC8, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Unknown" },
+        { address=0X8FC8, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1st Mission" },
+        { address=0X8FC8, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2nd Mission" },
+        { address=0X8FC8, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3rd Mission" },
+        { address=0X8FC8, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4th Mission" },
+        { address=0X8FC8, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Mission" },
+        { address=0X8FC8, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Endig Game" },
+        { address=0X8FC8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGES IN GAME" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9020, type="u24le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - POWER UP W. decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X9020, type="u24le", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv1 - 1P" },
+        { address=0X9020, type="u24le", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv1 - 2P" },
+        { address=0X9020, type="u24le", condition="eq", value=0X0C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv2" },
+        { address=0X9020, type="u24le", condition="eq", value=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv2 - 1P" },
+        { address=0X9020, type="u24le", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv2 - 2P" },
+        { address=0X9020, type="u24le", condition="eq", value=0X18, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv3" },
+        { address=0X9020, type="u24le", condition="eq", value=0X1C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv3 - 1P" },
+        { address=0X9020, type="u24le", condition="eq", value=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv3 - 2P" },
+        { address=0X9020, type="u24le", condition="eq", value=0X24, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Lv4" },
+      },
+      weapon = {
+        { address=0X9014, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal W;" },
+        { address=0X9014, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Thrower" },
+        { address=0X9014, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile Launcher" },
+        { address=0X9014, type="u8", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Boomerang Gun" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8F84, type="u8", condition="eq", value=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fighting Final Boss" },
+        { address=0X8FCA, type="u16le", condition="eq", value=0X0AE8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Alert" },
+        { address=0X8FCA, type="u16le", condition="eq", value=0X2031, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 - 1st Mission" },
+        { address=0X8FCA, type="u16le", condition="eq", value=0X2032, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 - Route A: 2nd Mission" },
+        { address=0X8FCA, type="u16le", condition="eq", value=0X2033, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2 - Route B: 2nd Mission" },
+        { address=0X8FCA, type="u16le", condition="eq", value=0X2034, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 3 - Route A: 3rd Mission" },
+        { address=0X8FCA, type="u16le", condition="eq", value=0X2036, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 4 - 4th Mission" },
+        { address=0X8FCA, type="u16le", condition="eq", value=0X2039, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 5 - Final Mission" },
+      },
+    },
+  },
+}

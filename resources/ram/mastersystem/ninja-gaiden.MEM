@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Ninja Gaiden",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "ninja-gaiden",
+    file = "ninja-gaiden.zip",
+    hashes = {
+      { hash = "2cd25b3d9a1ced329a551d7fc3c0f01e", label = "Ninja Gaiden (Europe, Brazil) (En).sms" },
+      { hash = "b070dc2ba3f106e89d1e9551f49a0027", label = "Ninja Gaiden (Europe, Brazil) (En) (Beta).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06E0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1 = paused" },
+        { address=0X1FF2, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game part 00=Reset 01=Game Intro 02=Title 03=Demo 04=Mode Select 05=Stage Intro 06=Stage Prologu" },
+        { address=0X1FFA, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="ff=Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1FC1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mode Select - Round Number" },
+        { address=0X1FC6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mode Select - Sound id (clear)" },
+        { address=0X1FFB, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level load" },
+      },
+      stage = {
+        { address=0X1FD0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X1FD1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage part" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1FC7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(hex) Lives (1 based, 0=Game Over) increased" },
+        { address=0X1FC7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(hex) Lives (1 based, 0=Game Over) decreased" },
+      },
+      health = {
+        { address=0X0B7A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy health decreased" },
+        { address=0X0B7A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy health increased" },
+        { address=0X1FC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(hex) Ryu's health decreased" },
+        { address=0X1FC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(hex) Ryu's health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X06C0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(2 bytes) Stage progress (2nd byte advances while entering next room) increased" },
+        { address=0X06C1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(2 bytes) Stage progress (2nd byte advances while entering next room) increased" },
+      },
+    },
+  },
+}

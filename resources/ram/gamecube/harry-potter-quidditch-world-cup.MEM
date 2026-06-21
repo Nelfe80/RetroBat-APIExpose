@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Harry Potter: Quidditch World Cup",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "harry-potter-quidditch-world-cup",
+    file = "harry-potter-quidditch-world-cup.zip",
+    hashes = {
+      { hash = "3dd062455a6bb7443a729be9876c4484", label = "Harry Potter - Quidditch World Cup (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "300: March to Glory",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "300-march-to-glory",
+    file = "300-march-to-glory.zip",
+    hashes = {
+      { hash = "cc2cc3cad201cca38b607cffdc205599", label = "300 - March to Glory (Europe) (En,Fr,De,Es,It).iso" },
+      { hash = "f93d4ac0ca886e102de13d22274bd67f", label = "300 - March to Glory (USA) (En,Fr,De,Es,It) (v1.01) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Alien Storm",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat 'em Up, Shooter"
+  },
+
+  rom = {
+    name = "alien-storm",
+    file = "alien-storm.zip",
+    hashes = {
+      { hash = "b63052973d5d550087d6b36ce8487fb1", label = "Alien Storm (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF313, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of Credits" },
+        { address=0XFF0E, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Starting Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFF04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Energy Level, 00, 01, 02=hard" },
+        { address=0XFF17, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit, Current Level 00-09" },
+      },
+      stage = {
+        { address=0XFF16, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sub Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCE0A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 Life Amount increased" },
+        { address=0XCE0A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 Life Amount decreased" },
+      },
+      health = {
+        { address=0XCE0C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 energy amount decreased" },
+        { address=0XCE0C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 energy amount increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD872, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health, not guaranteed" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XFEF8, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Next Jump Table offset? Set to 01, causes 'next event'?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF335, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Demo Counter Properties" },
+        { address=0XF336, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Time" },
+      },
+    },
+  },
+}

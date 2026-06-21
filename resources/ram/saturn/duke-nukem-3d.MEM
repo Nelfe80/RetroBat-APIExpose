@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Duke Nukem 3D",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "duke-nukem-3d",
+    file = "duke-nukem-3d.zip",
+    hashes = {
+      { hash = "34f591b72e8e97ef76ba0645027af01f", label = "Duke Nukem 3D (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X170AB1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Flag" },
+        { address=0X17EAB0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X17E8B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Number of Monsters in Current Level" },
+        { address=0X17FAEE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Monster's Killed in Level" },
+        { address=0X17FAF2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Number of Secrets in Current Level" },
+      },
+      stage = {
+        { address=0X170AC5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Cheat" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X17ECAE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X17ECAE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X17EAB7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="All Weapons Cheat" },
+        { address=0X17ECA0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[bitflags] Carrying Weapons" },
+        { address=0X17ECA3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[bitflags] Carrying Weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X17ECB6, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Pistol Ammo" },
+        { address=0X17ECBA, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shotgun Ammo" },
+        { address=0X17ECBE, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Chaingun Cannon Ammo" },
+        { address=0X17ECC2, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="RPG Ammo" },
+        { address=0X17ECC6, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Pipe Bomb Ammo" },
+        { address=0X17ECCA, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Shrinker Ammo" },
+        { address=0X17ECCE, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Devastator Ammo" },
+        { address=0X17ECD2, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Laser Tripbomb Ammo" },
+        { address=0X17ECD6, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Freezethrower Ammo" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X17EABD, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Cheat" },
+      },
+    },
+  },
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 GMC.NYAM 876000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 OKUJIZO 765000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 NYAE.    654000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 KYOKU    543000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 YOSHIIE  432000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 SCRAP    321000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 0·9      299830</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 KIMURA   210000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 CM.SAVAG 198000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 NOOOOOOO 150000</text>
+		</text>
+	</view>
+</theme>

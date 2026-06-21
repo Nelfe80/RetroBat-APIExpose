@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "SkyGunner",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "skygunner",
+    file = "skygunner.zip",
+    hashes = {
+      { hash = "cab5c1a7a393af5e1690aeabc25c02e7", label = "SkyGunner (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X17E6E6, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X17F890, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 enemies shot down" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1669BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Surival score" },
+        { address=0X166A9C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Survival score" },
+        { address=0X17E30C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current score multiplier" },
+      },
+      collectibles = {
+        { address=0X166AA0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Prize money increased" },
+      },
+    },
+  },
+}

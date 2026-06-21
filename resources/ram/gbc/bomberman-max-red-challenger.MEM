@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Bomberman Max: Red Challenger",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "bomberman-max-red-challenger",
+    file = "bomberman-max-red-challenger.zip",
+    hashes = {
+      { hash = "1757723cf346be2cea58d0fc4ed4cfa9", label = "Bomberman Max - Red Challenger (USA).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC000, type="u8", condition="eq", value=0X88, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XC000, type="u8", condition="eq", value=0X90, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Percentage Completed Screen/Continue?" },
+        { address=0XC000, type="u8", condition="eq", value=0X98, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA030, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-01: Playable" },
+        { address=0XA031, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 1-01: Cleared" },
+        { address=0XA032, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-02: Playable" },
+        { address=0XA034, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-03: Playable" },
+        { address=0XA036, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-04: Playable" },
+        { address=0XA038, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-05: Playable" },
+        { address=0XA03A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-06: Playable" },
+        { address=0XA03C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-07: Playable" },
+        { address=0XA03E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1-08: Playable" },
+        { address=0XA056, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2-01: Playable" },
+        { address=0XA07C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3-01: Playable" },
+        { address=0XA0A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4-01: Playable" },
+        { address=0XA0C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5-01: Playable" },
+        { address=0XA0F6, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5-24: Playable" },
+        { address=0XA0F7, type="u24le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 5-24: Cleared" },
+        { address=0XA112, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1st Charabomb (Draco): Level" },
+        { address=0XA11A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2nd Charabomb (Shell): Level" },
+        { address=0XC2D1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (0 based)" },
+      },
+      zone = {
+        { address=0XC2D0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World (0 based)" },
+      },
+      stage = {
+        { address=0XC632, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Challenge (Cross bridge, Defeat X enemy, etc.)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC000, type="u8", condition="eq", value=0X97, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Took A Death" },
+        { address=0XC2F7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XC2F7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC000, type="u8", condition="eq", value=0X86, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle!" },
+        { address=0XC000, type="u8", condition="eq", value=0X9F, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss Defeated!" },
+        { address=0XCE19, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC304, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+        { address=0XC751, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[2 Byte] Invincibility frames (safety vest)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC000, type="u8", condition="eq", value=0X8D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mission Objective" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC000, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Music ID" },
+        { address=0XC750, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Abilities: b0=Bomb Walk, b1=Timed bombs, b3=Spike Bombs (goes through blocks), b4=Walk through w" },
+      },
+    },
+  },
+}

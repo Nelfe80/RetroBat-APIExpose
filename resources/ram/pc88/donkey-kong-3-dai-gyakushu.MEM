@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Donkey Kong 3: Dai Gyakushu",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "donkey-kong-3-dai-gyakushu",
+    file = "donkey-kong-3-dai-gyakushu.zip",
+    hashes = {
+      { hash = "2c371a4e9085410c6b457e0db5e68e88", label = "Donkey Kong 3 - The Great Counterattack {V1 mode}.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD66B, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="01=Title Screen?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00FF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0x03=Stage Clear" },
+        { address=0X3772, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="10=Stage Clear" },
+      },
+      stage = {
+        { address=0X1079, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+        { address=0X107B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="01=Is in a Bonus Stage?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1062, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x01=Dead" },
+        { address=0X1FB2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1FB2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X107E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-Bits] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1063, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bonus Stage Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Antcopter",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "antcopter",
+    file = "antcopter.zip",
+    hashes = {
+      { hash = "f4d55cbcb51b2c11010b7999fd913cec", label = "Antcopter (World) (Eduwardo Bart).wasm" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6352, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LevelID" },
+        { address=0X6355, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fruits Collected in Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6350, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Count" },
+      },
+    },
+  },
+}

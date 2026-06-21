@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Mortal Kombat: Tournament Edition",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-tournament-edition",
+    file = "mortal-kombat-tournament-edition.zip",
+    hashes = {
+      { hash = "4ee4b6a61d28573502010df522a6ba91", label = "Mortal Kombat - Tournament Edition (USA) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X10BE, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo" },
+        { address=0X235A, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Scorpion" },
+        { address=0X235B, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Cage" },
+        { address=0X235C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Quan Chi" },
+        { address=0X235D, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Bo Rat Cho" },
+        { address=0X235E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Raiden" },
+        { address=0X235F, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Shang Tsung" },
+        { address=0X2360, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Nitara" },
+        { address=0X2361, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Cyrax" },
+        { address=0X2362, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Sareena" },
+        { address=0X2363, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Hsu Hao" },
+        { address=0X2364, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Drahmin" },
+        { address=0X2365, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Reptile" },
+        { address=0X2366, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Mavado" },
+        { address=0X2367, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Noob Saibot" },
+        { address=0X2368, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Profile 1] Max Combo | Sektor" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1DFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds to Win" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0761, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Left Player Health decreased" },
+        { address=0X0761, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Left Player Health increased" },
+        { address=0X07A5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Right Player Health decreased" },
+        { address=0X07A5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Right Player Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X22D4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Profile 1] Gold Koins [1] increased" },
+        { address=0X22D6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Profile 1] Gold Koins [2] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0E60, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="In-Match Timer" },
+        { address=0X20CC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Timer" },
+      },
+    },
+  },
+}

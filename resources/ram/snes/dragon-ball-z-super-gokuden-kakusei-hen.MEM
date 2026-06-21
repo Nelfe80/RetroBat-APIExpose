@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Super Gokuden Kakusei-Hen",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dragon-ball-z-super-gokuden-kakusei-hen",
+    file = "dragon-ball-z-super-gokuden-kakusei-hen.zip",
+    hashes = {
+      { hash = "ae946c9cb5aecefa9bc6599600f2d022", label = "Dragon Ball Z - Super Gokuu Den - Kakusei Hen (Japan) (En) (v1.0) (Commando Ginyu).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0E66, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] - Player HP decreased" },
+        { address=0X0E66, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] - Player HP increased" },
+        { address=0X0E68, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] - Opponent HP decreased" },
+        { address=0X0E68, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] - Opponent HP increased" },
+      },
+    },
+  },
+}

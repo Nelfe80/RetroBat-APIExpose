@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Chuck Rock",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "chuck-rock",
+    file = "chuck-rock.zip",
+    hashes = {
+      { hash = "1d82340d7ce33385951b16fe1f5ad4c1", label = "Chuck Rock (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X32962, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X32968, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00030007, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X33646, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X33534, type="u32be", condition="eq", value=0X00050001, action="BOSS_HIT", no_log=false, no_survey=false, desc="1-Boss" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00050002, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chuck Beat the 1st Boss!" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00040002, action="BOSS_HIT", no_log=false, no_survey=false, desc="2-Boss" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00040003, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chuck Beat the 2nd Boss!" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00030003, action="BOSS_HIT", no_log=false, no_survey=false, desc="3-Boss" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00030004, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chuck Beat the 3rd Boss!" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00040004, action="BOSS_HIT", no_log=false, no_survey=false, desc="4-Boss" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00040005, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chuck Beat the 4th Boss!" },
+        { address=0X33534, type="u32be", condition="eq", value=0X00030005, action="BOSS_HIT", no_log=false, no_survey=false, desc="5-Boss" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3295C, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Jump A" },
+        { address=0X3295C, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jump B" },
+        { address=0X3295C, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Jump C (default)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Karateka",
+    system = "atari7800",
+    system_name = "Atari 7800",
+    genre = "Platform, Fighting, Beat 'em Up"
+  },
+
+  rom = {
+    name = "karateka",
+    file = "karateka.zip",
+    hashes = {
+      { hash = "c3a5a8692a423d43d9d28dd5b7d109d9", label = "Karateka (USA).a78" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X189A, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X18AA, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="First" },
+        { address=0X18AA, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last" },
+        { address=0X18AA, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Princess saved" },
+        { address=0X18AA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+  },
+}

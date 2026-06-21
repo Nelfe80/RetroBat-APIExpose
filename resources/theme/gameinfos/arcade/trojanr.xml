@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 TOSHI..... 23600</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 YOUICHI... 20000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 YUMIKO.... 18000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 HIROYUKI.. 16000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MIDORI.... 12000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 HATSUMI... 10000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 ATSUSI.... 8000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

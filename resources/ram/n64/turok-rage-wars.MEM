@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Turok: Rage Wars",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "turok-rage-wars",
+    file = "turok-rage-wars.zip",
+    hashes = {
+      { hash = "9b2ffe72080b03a5f92eb87ea849cac4", label = "Turok - Rage Wars (USA) (Rev 1).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF3A04, type="u8", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="new game/continue" },
+        { address=0X14694C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="<8-bit> demo running = 1" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X102B49, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<bits> Medals 0=achiev on proving grounds 1=achiev on basic training 2=achiev on crossroads 3=ac" },
+        { address=0X102B4C, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Defeat Bastille 4=not being killed in round" },
+        { address=0X102B4C, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="sniping 10 people in round 2=total being killed" },
+        { address=0X102B7C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<bits> levels 0=prey 1=warehouse 2=water temple 3=bomb shelter 4=tempered 5=earth temple 6=fire" },
+        { address=0X102B7D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="<bits> trials levels cleared 0=proving grounds 1=basic training 2=crossroads 3=grim retreat 4=ca" },
+        { address=0X102B81, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<bits> levels 0=spirit temple 1=stronghold 6=courtyard" },
+        { address=0X102B82, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<bits> levels 0=crypts 1=breakdown 2=retaliation 3=hopeless 4=matrix 5=fathom 6=pedestal 7=defco" },
+        { address=0X102B83, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<bits> levels 0=bottleneck 1=tightrope 2=the pit 3=leap of faith 4=wicked dance 5=bunker 6=amphi" },
+        { address=0X102B8C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<bits> frag fest levels 0=bottleneck 1=tightrope 2=the pit 3=leap of faith 4=wicked dance 5=bunk" },
+        { address=0X102B8D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--<8-bit> frag fest levels completed - 0=prey 1=warehouse 2=water temple 3=bomb shelter 4=temper" },
+        { address=0X102B8E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="--<8-bit> frag fest levels completed - 0=proving grounds 1=basic training 2=crossroads 3=grim re" },
+        { address=0X102B92, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<bits> frag fest levels 0=spirit temple 1=stronghold 2=courtyard 3=tal set" },
+        { address=0X102B93, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<bits> frag fest levels 0=crypts 1=breakdown 2=retaliation 3=hopeless 4=matrix 5=fathom 6=pedest" },
+      },
+      stage = {
+        { address=0XF3A04, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1P mode stage select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X102B52, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="<bits> characters unlocked 0=turok 1=mantid drone 2=campaigner 3=fireborn 4=mantid soldier 5=ada" },
+        { address=0X102B57, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="<bits> campaigns completed 0=turok 1=mantid drone 2=campaigner 3=fireborn 4=mantid soldier 5=ado" },
+        { address=0X13B838, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="<8-bit> bastille death =FF" },
+        { address=0X14641B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="<8-bit> character 0=turok 1=mantid drone 2=campaigner 3=fireborn 4=mantid soldier 5=adon 6=lord" },
+        { address=0X6929DC, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 lives increased" },
+        { address=0X6929DC, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 lives decreased" },
+        { address=0X692B85, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="<8-bit> P1 mantid soldier campaign health" },
+        { address=0X69353C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="---<bits> fireborn Powerups regeneration=2 petrify=3 damage reversal=4 invisibility=5 life force" },
+        { address=0X69353C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="---<bits> fireborn Powerups regeneration=2 petrify=3 damage reversal=4 invisibility=5 life force" },
+        { address=0X6936FC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="---<bits> turok Powerups regeneration=2 petrify=3 damage reversal=4 invisibility=5 life force va" },
+        { address=0X6936FC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="---<bits> turok Powerups regeneration=2 petrify=3 damage reversal=4 invisibility=5 life force va" },
+        { address=0X6937CC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="---<bits> adon Powerups - regeneration=2 petrify=3 damage reversal=4 invisibility=5 life force v" },
+        { address=0X6937CC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="---<bits> adon Powerups - regeneration=2 petrify=3 damage reversal=4 invisibility=5 life force v" },
+      },
+      health = {
+        { address=0X13B844, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> bastille health display decreased" },
+        { address=0X13B844, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> bastille health display increased" },
+        { address=0X692AB5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> P1 turok health decreased" },
+        { address=0X692AB5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> P1 turok health increased" },
+        { address=0X69353D, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="---<bits> fireborn powerups teleportation=0 massive damage=1 blast shield=2 bullet shield=3" },
+        { address=0X6936FD, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="---<bits> turok powerups teleportation=0 massive damage=1 blast shield=2 bullet shield=3" },
+        { address=0X6937CD, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="---<bits> adon powerups teleportation=0 massive damage=1 blast shield=2 bullet shield=3" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6928CC, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="--powerups" },
+      },
+      weapon = {
+        { address=0X102B7A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="<8-bit> bits are campaign weapon unlocks" },
+        { address=0X1462CB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="---<bits> all weapons=bit4 all characters=bit3 extra modes=bit5" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1462C8, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="---<8-bit> cheats bit3=unlimited ammo" },
+        { address=0X692B96, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="<8-bit> bullet ammo --2 parts" },
+        { address=0X693404, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="<8-bit> bullet ammo -- 1 parts" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X146940, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="<8-bit> bastille shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X102B4D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="<bits> Medals 0=achieve on spirit temple" },
+        { address=0X102B88, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="<bits> time trial levels 0=crypts 1=breakdown 2=retaliation 3=hopeless 4=matrix 5=fathom 6=pedes" },
+        { address=0X102B89, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="<bits> time trial levels 0=bottleneck 1=tightrope 2=the pit 3=leap of faith 4=wicked dance 5=bun" },
+        { address=0X102B8A, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="--<8-bit> time trial levels completed - 0=prey 1=warehouse 2=water temple 3=bomb shelter 4=tempe" },
+        { address=0X102B8B, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="--<8-bit> time trial levels completed - 0=proving grounds 1=basic training 2=crossroads 3=grim r" },
+        { address=0X102B8F, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="<bits> time trial levels 0=spirit temple 1=stronghold 2=courtyard 3=tal set" },
+      },
+    },
+  },
+}

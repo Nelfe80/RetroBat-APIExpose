@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Tekken Card Challenge",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "tekken-card-challenge",
+    file = "tekken-card-challenge.zip",
+    hashes = {
+      { hash = "1e8bca5c31f62a9dd1121884351a2885", label = "Tekken Card Challenge (Japan).ws" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X1A02, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Combo Card 1 Flag" },
+        { address=0X1A03, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Combo Card 2 Flag" },
+        { address=0X1A04, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Combo Card 3 Flag" },
+        { address=0X10234, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Save data Xiaoyu Adventure Combo Card 1" },
+        { address=0X10235, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Save data Xiaoyu Adventure Combo Card 2" },
+        { address=0X10236, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Save data Xiaoyu Adventure Combo Card 3" },
+        { address=0X10256, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Save data Hwoarang Adventure Combo Card 1" },
+        { address=0X10257, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Save data Hwoarang Adventure Combo Card 2" },
+        { address=0X10258, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Save data Hwoarang Adventure Combo Card 3" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Adventure Level" },
+        { address=0X19F1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Adventure Star Level" },
+        { address=0X1A4E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Adventure Overworld Health" },
+        { address=0X1A50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Adventure Mode Overworld Sprite" },
+        { address=0X10242, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Save data Xiaoyu Adventure Level" },
+        { address=0X10244, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Save data Hwoarang Adventure Level" },
+        { address=0X10266, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Save data Eddy Adventure Level" },
+        { address=0X10288, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Save data Law Adventure Level" },
+      },
+      zone = {
+        { address=0X1D80, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[256 Byte] World Map Data Start" },
+      },
+      stage = {
+        { address=0X1A76, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Adventure Stage ID" },
+        { address=0X10185, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Character Unlocks (Update on 'Go To Next Stage')" },
+        { address=0X10264, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Save data Hwoarang Adventure Stage" },
+        { address=0X102A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Save data Law Adventure Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X19D3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] P1 Health decreased" },
+        { address=0X19D3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] P1 Health increased" },
+        { address=0X1A11, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] P2 Health decreased" },
+        { address=0X1A11, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] P2 Health increased" },
+      },
+    },
+  },
+}

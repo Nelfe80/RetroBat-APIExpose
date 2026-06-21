@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Bomberman Hardball",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "bomberman-hardball",
+    file = "bomberman-hardball.zip",
+    hashes = {
+      { hash = "2a1d5447cff0d7e90abb562f7cd7053d", label = "Bomberman Hardball (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X497970, type="u16le", condition="eq", value=0X4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X497970, type="u16le", condition="eq", value=0X23, action="PAUSE_ON", no_log=false, no_survey=false, desc="baseball, paused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X497970, type="u16le", condition="eq", value=0XB, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life mode" },
+      },
+    },
+  },
+}

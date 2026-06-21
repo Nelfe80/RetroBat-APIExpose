@@ -1,0 +1,116 @@
+return {
+  game = {
+    title = "Forbidden Siren 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Horror, Stealth"
+  },
+
+  rom = {
+    name = "forbidden-siren-2",
+    file = "forbidden-siren-2.zip",
+    hashes = {
+      { hash = "1ad230ba0c30827bf47a9a34edffbe8d", label = "Forbidden Siren 2 (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X59901C, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X598B99, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Takeaki Misawa 07:00 Single Mission Cleared" },
+        { address=0X598B9A, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shu Mikami -03:00 Mission 1 Cleared (Easy)" },
+        { address=0X598B9A, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shu Mikami -03:00 Mission 2 Cleared (Easy)" },
+        { address=0X598B9A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shu Mikami -03:00 Mission 1 Cleared (Normal)" },
+        { address=0X598B9A, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shu Mikami -03:00 Mission 2 Cleared (Normal)" },
+        { address=0X598B9A, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shu Mikami -03:00 Mission 1 Cleared (Hard)" },
+        { address=0X598B9A, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shu Mikami -03:00 Mission 2 Cleared (Hard)" },
+        { address=0X598B9B, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kanae -01:00 Mission 1 Cleared" },
+        { address=0X598B9B, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kanae -01:00 Mission 2 Cleared" },
+        { address=0X598B9C, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shigeru Fujita -05:00 Mission 1 Cleared" },
+        { address=0X598B9C, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shigeru Fujita -05:00 Mission 2 Cleared" },
+        { address=0X598B9D, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki -03:00 Mission 1 Cleared (Normal)" },
+        { address=0X598B9D, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki -03:00 Mission 2 Cleared (Normal)" },
+        { address=0X598B9D, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki -03:00 Mission 1 Cleared (Hard)" },
+        { address=0X598B9D, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki -03:00 Mission 2 Cleared (Hard)" },
+        { address=0X598B9E, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai -01:00 Mission 1 Cleared" },
+        { address=0X598B9E, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai -01:00 Mission 2 Cleared" },
+        { address=0X598B9F, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shu Mikami -02:00 Mission 1 Cleared" },
+        { address=0X598B9F, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shu Mikami -02:00 Mission 2 Cleared" },
+        { address=0X598BA0, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Akiko Kiyota 00:00 Mission 1 Cleared" },
+        { address=0X598BA0, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Akiko Kiyota 00:00 Mission 2 Cleared" },
+        { address=0X598BA1, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 00:00 Mission 1 Cleared" },
+        { address=0X598BA1, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 00:00 Mission 2 Cleared" },
+        { address=0X598BA2, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ichiko Yagura 01:00 Mission 1 Cleared" },
+        { address=0X598BA2, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ichiko Yagura 01:00 Mission 2 Cleared" },
+        { address=0X598BA3, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 02:00 Mission 1 Cleared" },
+        { address=0X598BA3, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 02:00 Mission 2 Cleared" },
+        { address=0X598BA4, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 03:00 Mission 1 Cleared" },
+        { address=0X598BA4, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 03:00 Mission 2 Cleared" },
+        { address=0X598BA5, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Soji Abe 03:00 Mission 1 Cleared" },
+        { address=0X598BA5, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Soji Abe 03:00 Mission 2 Cleared" },
+        { address=0X598BA6, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shigeru Fujita 05:00 Mission 1 Cleared" },
+        { address=0X598BA6, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Shigeru Fujita 05:00 Mission 2 Cleared" },
+        { address=0X598BA7, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Takeaki Misawa 04:00 Mission 1 Cleared" },
+        { address=0X598BA7, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Takeaki Misawa 04:00 Mission 2 Cleared" },
+        { address=0X598BA8, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ikuko Kifune 08:00 Mission 1 Cleared" },
+        { address=0X598BA8, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ikuko Kifune 08:00 Mission 2 Cleared" },
+        { address=0X598BA9, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ichiko Yagura 08:00 Mission 1 Cleared" },
+        { address=0X598BA9, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ichiko Yagura 08:00 Mission 2 Cleared" },
+        { address=0X598BAA, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Takeaki Misawa 13:00 Mission 1 Cleared" },
+        { address=0X598BAA, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Takeaki Misawa 13:00 Mission 2 Cleared" },
+        { address=0X598BAB, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Soji Abe 12:00 Mission 1 Cleared" },
+        { address=0X598BAB, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Soji Abe 12:00 Mission 2 Cleared" },
+        { address=0X598BAC, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 15:00 Mission 1 Cleared" },
+        { address=0X598BAC, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 15:00 Mission 2 Cleared" },
+        { address=0X598BAD, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 14:00 Mission 1 Cleared" },
+        { address=0X598BAD, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 14:00 Mission 2 Cleared" },
+        { address=0X598BAE, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Akiko Kiyota 15:00 Mission 1 Cleared" },
+        { address=0X598BAE, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Akiko Kiyota 15:00 Mission 2 Cleared" },
+        { address=0X598BAF, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 18:00 Mission 1 Cleared" },
+        { address=0X598BAF, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 18:00 Mission 2 Cleared" },
+        { address=0X598BB0, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ikuko Kifune 20:00 Mission 1 Cleared" },
+        { address=0X598BB0, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ikuko Kifune 20:00 Mission 2 Cleared" },
+        { address=0X598BB1, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Soji Abe 19:00 Mission 1 Cleared" },
+        { address=0X598BB1, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Soji Abe 19:00 Mission 2 Cleared" },
+        { address=0X598BB2, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 22:00 Mission 1 Cleared" },
+        { address=0X598BB2, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 22:00 Mission 2 Cleared" },
+        { address=0X598BB3, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 22:00 Mission 1 Cleared" },
+        { address=0X598BB3, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 22:00 Mission 2 Cleared" },
+        { address=0X598BB4, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mamoru Itsuki 22:00 Single Mission Cleared" },
+        { address=0X598BB5, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 23:00 Mission 1 Cleared" },
+        { address=0X598BB5, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai 23:00 Mission 2 Cleared" },
+        { address=0X598BB6, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Annihilation Time Attack Cleared" },
+        { address=0X598BC1, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yorito Nagai -02:00 Movie Cleared - Unlocked Yorito Nagai -01 Stage" },
+        { address=0X598BDD, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Soji Abe 24:00 Cleared" },
+      },
+      stage = {
+        { address=0X598B00, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Custom Note] addresses below related to the 100 game files and right next to it is something re" },
+        { address=0X598FEC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Can be usable as stage id" },
+        { address=0X5995E4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Can be used as stage id?" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X598B7F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="No. 075 - The Story Treasure Chest" },
+      },
+      weapon = {
+        { address=0X1635998, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="current weapon?" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5997A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Kyoya Mission - Current Points on Screen 32bits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X598B82, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="No. 078 - Security Monitor" },
+      },
+    },
+  },
+}

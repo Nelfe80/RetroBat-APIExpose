@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "~Z~ Puzzle Series Vol. 3: Sudoku",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-puzzle-series-vol-3-sudoku",
+    file = "z-puzzle-series-vol-3-sudoku.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF2944, type="u32le", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared!" },
+        { address=0X10971C, type="u32le", condition="eq", value=0X0B, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF2944, type="u32le", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="On Gold" },
+        { address=0XF2E00, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Gold Rank Test Record Frame Timer increased" },
+        { address=0X1124C8, type="u32le", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+  },
+}

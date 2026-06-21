@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "~Z~ BS The Legend of Zelda: Ancient Stone Tablets - Chapter 2",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-bs-the-legend-of-zelda-ancient-stone-tablets-chapter-2",
+    file = "z-bs-the-legend-of-zelda-ancient-stone-tablets-chapter-2.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X040A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="link's overworld location" },
+      },
+    },
+  },
+}

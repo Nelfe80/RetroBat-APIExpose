@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Choro Q 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "choro-q-64",
+    file = "choro-q-64.zip",
+    hashes = {
+      { hash = "518b14054a667a3b9e0b72d3bf784e41", label = "Penny Racers (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X21B0C3, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Select" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X21E1A6, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+      },
+    },
+  },
+}

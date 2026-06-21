@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Snail Maze | Sega Master System BIOS",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "snail-maze-sega-master-system-bios",
+    file = "snail-maze-sega-master-system-bios.zip",
+    hashes = {
+      { hash = "4f47e48248f6498bff9018789f26c9f8", label = "Snail Maze - SMS BIOS (v1.3) (USA, Europe).sms" },
+      { hash = "840481177270d5642a14ca71ee72844c", label = "[BIOS] Sega Master System (USA, Europe) (v1.3).sms" },
+      { hash = "ffcb0fedde6b7f8377ca99232c123597", label = "Snail Maze - Music Demo (USA, Europe).sms" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0230, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+      },
+    },
+  },
+}

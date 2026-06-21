@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Paper Airplane Chase",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "paper-airplane-chase",
+    file = "paper-airplane-chase.zip",
+    hashes = {
+      { hash = "c1308667040f474c56969ff3e59f26c4", label = "Paper Airplane Chase (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA3144, type="u8", condition="bit_true", bit=3, mask=0X08, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X555B8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32 Bit] Context ID" },
+      },
+    },
+  },
+}

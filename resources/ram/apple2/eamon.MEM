@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Eamon",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "eamon",
+    file = "eamon.zip",
+    hashes = {
+      { hash = "28f6c1441dfea996109c4ab873b62f21", label = "Eamon 001 - Main Hall & Beginners Cave (1990)(-).do" },
+      { hash = "cd9606608fe597756ed837539abc15d2", label = "Eamon Adventure - 001 - Main Hall & Beginners Cave (1979) (Donald Brown).dsk" },
+      { hash = "d0547f0598246d18e59b64d42b9742bb", label = "Eamon 002 - The Lair of the Minotaur (1984)(Brown, D.)[no boot].do" },
+      { hash = "3d593e026bd24e69d1ad69d0407475e6", label = "Eamon 003 - The Cave of the Mind (1984)(-)[no boot].do" },
+      { hash = "5b615c94e389f34f593c2cbd97799474", label = "Eamon Adventure #006 - The Death Star (198x)(Brown, Donald)(US).dsk" },
+      { hash = "cceba6ca3466b9b0f810bbba0e6e496f", label = "Eamon Adventure #061 - The Harpy Cloud (1986-05-27)(Porter, Allan)(US)[Eamon Adventurer's Guild].dsk" },
+      { hash = "87626d7c0a8df6ab4835e016664dfc46", label = "Eamon Adventure #007 - The Devil's Tomb (1989-07-06)(Jacobson, Jim)(US)[Eamon Adventurer's Guild].dsk" },
+      { hash = "9ac9538d6a05c356fb6f17b9b904f13d", label = "Eamon Adventure - 044 - Escape From the Orc Lair (1990-05-03) (Hinkelman, Jay).dsk" },
+      { hash = "fa24a35a016658170d6ed68f68c40771", label = "Eamon Adventure - 006 - The Death Star (1985) (Donald Brown).dsk" },
+      { hash = "97f2e02ff4235abd2df7426c0b8aa438", label = "Eamon Adventure - 096 - The Chamber of the Dragons (1984-07-15) (Kondalski, Brian).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

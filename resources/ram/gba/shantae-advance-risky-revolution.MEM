@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Shantae Advance: Risky Revolution",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "shantae-advance-risky-revolution",
+    file = "shantae-advance-risky-revolution.zip",
+    hashes = {
+      { hash = "a82bd152baf314b0d69a12a47c38e60f", label = "Shantae Advance - Risky Revolution (World) (Limited Run Games).gba" },
+      { hash = "d791ac71aca5dfb8725a0668d3757a41", label = "Shantae Advance - Risky Revolution (EEPROM & SRAM Save Fix) (v1.0) (Wokann).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001B, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="squid found in Haunted Grove - Abandoned Prison 3rd floor room with red demons (0x0b100e00)" },
+        { address=0X0EFE, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="not own" },
+        { address=0X0EFE, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract up bought" },
+        { address=0X0F6C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Completion % after the end credits" },
+        { address=0X3055, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Shantae Advance title screen / Destination select / Last part of the credits" },
+        { address=0X3055, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X3057, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0015, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Classic game tape in Haunted Grove - Cave with ground pound rock blocks (0x0a300cb0)" },
+        { address=0X0017, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Orc Orchard - Overworld (0x02001800)" },
+        { address=0X0017, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Orc Orchard - Overworld (0x02001800)" },
+        { address=0X0018, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Naga Cliffs - Overworld (0x03201000)" },
+        { address=0X0019, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Naga Cliffs - Overworld (0x03201000)" },
+        { address=0X0019, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Naga Cliffs - Overworld in the background (0x03201000)" },
+        { address=0X001A, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Haunted Grove - Overworld in the background (0x02b01800)" },
+        { address=0X001A, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Haunted Grove - Overworld (0x02b01800)" },
+        { address=0X001A, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Haunted Grove - Overworld (0x02b01800)" },
+        { address=0X001C, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="squid found in Haunted Grove - Cave with ground pound rock blocks (0x0a300cb0)" },
+        { address=0X0FAC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="looking around" },
+        { address=0X6418, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="flying in circles around FlimFlam" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0EE3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Exit candies" },
+        { address=0X0F8C, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Exit candies" },
+      },
+      health = {
+        { address=0X3057, type="u8", condition="eq", value=0X18, action="HIT", no_log=false, no_survey=false, desc="hurt" },
+        { address=0X62E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X62E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0F18, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="default, not one" },
+        { address=0X0F18, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="first hit on any sword" },
+        { address=0X0F18, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="second hit on any sword" },
+        { address=0X0F18, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="last hit on the last sword, Crypt Guardian awakes" },
+        { address=0X3326, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="FlimFLam and HogsWoggle boss health:" },
+        { address=0X342D, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="first life" },
+        { address=0X342D, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="second life" },
+        { address=0X342D, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="third life" },
+        { address=0X342D, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="winged phase" },
+        { address=0X342E, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="MishMash boss health:" },
+        { address=0X36EE, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Crypt boss health:" },
+        { address=0X646C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Tinkerworm final boss health:" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X000D, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed ice block with maiden on it" },
+        { address=0X000D, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed ice block with maiden on it" },
+        { address=0X000D, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed ice block with maiden on it" },
+        { address=0X000D, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed ice block with maiden on it" },
+        { address=0X000D, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed ice block with maiden on it" },
+        { address=0X0011, type="u8", condition="bit_true", bit=2, mask=0X04, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Found cog in Royal Palace - Underwater cave (0x10480c60)" },
+        { address=0X0015, type="u8", condition="bit_true", bit=6, mask=0X40, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="Heart holder in Orc Orchard - Underwater passage cave (0x09600570)" },
+        { address=0X0015, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Heart holder in Naga Cliffs - Cave blocked with rocks with a heart holder (0x0b500620)" },
+        { address=0X0017, type="u8", condition="bit_true", bit=2, mask=0X04, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="squid found in Orc Orchard - Overworld underwater (0x02001800)" },
+        { address=0X001A, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="squid found in Naga Cliffs - FlimFlam Maze room with locked door and a squid above (0x13401490)" },
+        { address=0X001B, type="u8", condition="bit_true", bit=1, mask=0X02, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="squid found in Haunted Grove - Crypt underwater passage with mermaid (0x05e023f0)" },
+        { address=0X001B, type="u8", condition="bit_true", bit=7, mask=0X80, action="DOOR_OPENED", no_log=false, no_survey=false, desc="squid found in Haunted Grove - Abandoned Prison 4th floor room with two locked doors (0x09501130" },
+      },
+    },
+  },
+}

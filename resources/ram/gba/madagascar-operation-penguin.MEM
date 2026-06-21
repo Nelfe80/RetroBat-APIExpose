@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Madagascar: Operation Penguin",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "madagascar-operation-penguin",
+    file = "madagascar-operation-penguin.zip",
+    hashes = {
+      { hash = "87da43aaad7b9fd2b8af57e8e3c71283", label = "Madagascar - Operation Penguin (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBF75, type="u8", condition="bit_true", bit=0, mask=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="R pressed" },
+        { address=0XBF75, type="u8", condition="bit_true", bit=1, mask=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="L pressed" },
+        { address=0X101F4, type="u24le", condition="eq", value=0X7F34, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Main menu theme (also plays in credits)" },
+        { address=0X10241, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[Bit flag] Bit0: Briefly flashes from 0 -> 1 -> 0 when 'Restart Mission' is selected in the paus" },
+        { address=0X108F7, type="u8", condition="eq", value=0X0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="in-game" },
+        { address=0X108F7, type="u8", condition="eq", value=0X2, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="in main menu" },
+        { address=0X108F7, type="u8", condition="eq", value=0X73, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="in credits (both at the end of the game & in main menu area)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDF8D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 1] Bit 0: denotes if the player is in the first hub area (0) or second (1); als" },
+        { address=0XDF9B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 1] Bit 6: Mission 0: ('Christmas Fiasco') cleared/first Mr. Chew fight" },
+        { address=0XDF9F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 1] Bit 6: Mission 1 ('Trial By Ice') cleared" },
+        { address=0XDFA7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 1] Bit 6: Mission 2 ('Bunny 'Bogganing') cleared" },
+        { address=0XDFD4, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[24-bit] [SLOT 1] Medals Collected - Underground" },
+        { address=0XDFD7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 1] Bit 6: Missions 14 ('Zoosleepers') & 15 ('NYC Underground') completed" },
+        { address=0XE009, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 2] Bit 0: denotes if the player is in the first hub area (0) or second (1); als" },
+        { address=0XE017, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 2] Bit 6: Mission 0: ('Christmas Fiasco') cleared/first Mr. Chew fight" },
+        { address=0XE01B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 2] Bit 6: Mission 1 ('Trial By Ice') cleared" },
+        { address=0XE023, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 2] Bit 6: Mission 2 ('Bunny 'Bogganing') cleared" },
+        { address=0XE050, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[24-bit] [SLOT 2] Medals Collected - Underground" },
+        { address=0XE053, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 2] Bit 6: Missions 14 ('Zoosleepers') & 15 ('NYC Underground') completed" },
+        { address=0XE085, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 3] Bit 0: denotes if the player is in the first hub area (0) or second (1); als" },
+        { address=0XE093, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 3] Bit 6: Mission 0: ('Christmas Fiasco') cleared/first Mr. Chew fight" },
+        { address=0XE097, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 3] Bit 6: Mission 1 ('Trial By Ice') cleared" },
+        { address=0XE09F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 3] Bit 6: Mission 2 ('Bunny 'Bogganing') cleared" },
+        { address=0XE0CC, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[24-bit] [SLOT 3] Medals Collected - Underground" },
+        { address=0XE0CF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Bit flag] [SLOT 3] Bit 6: Missions 14 ('Zoosleepers') & 15 ('NYC Underground') completed" },
+        { address=0XE63C, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="L1" },
+        { address=0XE63C, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="L2/2nd area" },
+        { address=0XE63C, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="L3/3rd area" },
+        { address=0XE63C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sub-level indicator" },
+        { address=0XE640, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Medals Collected (current level)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XE660, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0XE660, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE63C, type="u8", condition="eq", value=0X3, action="BOSS_HIT", no_log=false, no_survey=false, desc="4th area (used in final boss at least, possibly elsewhere)" },
+        { address=0X101F4, type="u24le", condition="eq", value=0X43D8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss fight music (also used in individual Toboggan Courses)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE1D8, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Timer" },
+      },
+    },
+  },
+}

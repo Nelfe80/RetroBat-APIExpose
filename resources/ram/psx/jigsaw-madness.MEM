@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Jigsaw Madness",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "jigsaw-madness",
+    file = "jigsaw-madness.zip",
+    hashes = {
+      { hash = "ec7f1de6e4dcfc4cb3d2cbd42455e5ed", label = "Jigsaw Madness (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

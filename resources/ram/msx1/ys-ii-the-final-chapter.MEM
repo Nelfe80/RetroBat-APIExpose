@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Ys II: The Final Chapter",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ys-ii-the-final-chapter",
+    file = "ys-ii-the-final-chapter.zip",
+    hashes = {
+      { hash = "6e6c8b09af1209aab773661b50344188", label = "Ancient Ys Vanished II - The Final Chapter (Japan) (En) (v1.0) (Oasis) (Disk 2) (Data Disk).dsk" },
+      { hash = "3c6dce5438ef82689a1c23465596e318", label = "Ancient Ys Vanished II - The Final Chapter (1988)(Falcom)(JP)(Disk 1 of 2)(Game Disk)[a2].dsk" },
+      { hash = "28b348c771d677f4446cc6a5dff8080b", label = "Ancient Ys Vanished II - The Final Chapter (1988)(Falcom)(JP)(Disk 2 of 2)(Data Disk)[a].dsk" },
+      { hash = "5590e4ac85bce19077dce51dd7496390", label = "Ancient Ys Vanished II - The Final Chapter (1988)(Falcom)(User Disk).dsk" },
+      { hash = "bc8f210689c69a1663df4f6baeb97b31", label = "Ancient Ys Vanished II - The Final Chapter (Japan) (En) (v1.0) (Oasis) (Disk 1) (Game Disk).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC193, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC18C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player - Current HP decreased" },
+        { address=0XC18C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player - Current HP increased" },
+        { address=0XC18D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player - Max HP decreased" },
+        { address=0XC18D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player - Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC196, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+  },
+}

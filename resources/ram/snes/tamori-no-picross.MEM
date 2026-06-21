@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Tamori no Picross",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tamori-no-picross",
+    file = "tamori-no-picross.zip",
+    hashes = {
+      { hash = "16c01d30d842496fd8cec31c48cdabff", label = "Tamori no Picross (Japan) (8-13) [b].bs" },
+      { hash = "269d47792f93fb7b8448cd99b08e02ab", label = "Tamori no Picross (6-13) (Japan).bs" },
+      { hash = "7a165aae06e675eb9a569bd1935b4816", label = "Tamori no Picross (8-13) + Bakushow Mondai no Houkago Ousama - Kayoubi (Japan) (Game, Magazine) [b].bs" },
+      { hash = "9f778366e16e46ed0906c90de76a61f2", label = "Tamori no Picross (Japan) (6-26).bs" },
+      { hash = "ef07ba497f0e7e6ae63dca3143e37e6c", label = "Tamori no Picross (7-14) (Japan).bs" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X07D0, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07EC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07EE, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07F0, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07F2, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07F4, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07F6, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07F8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07FA, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07FC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X07FE, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0800, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0802, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0804, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0806, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0808, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X080A, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X080C, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X080E, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0810, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0812, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0814, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0816, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X0818, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X082E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Todays picross selected level" },
+      },
+    },
+  },
+}

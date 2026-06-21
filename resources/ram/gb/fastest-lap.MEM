@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Fastest Lap",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "fastest-lap",
+    file = "fastest-lap.zip",
+    hashes = {
+      { hash = "e8db5b611f9bb6da2fffd9fc5a880472", label = "Fastest Lap (Japan) (En).gb" },
+      { hash = "ef2f6c817d762dab848362c4cf7c1c32", label = "Fastest Lap (USA).gb" },
+    }
+  },
+
+  events = {
+  },
+}

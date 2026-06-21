@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Gekido Advance: Kintaro's Revenge",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "gekido-advance-kintaros-revenge",
+    file = "gekido-advance-kintaros-revenge.zip",
+    hashes = {
+      { hash = "cdde24e4b71ac0cb1cf32bab1374f64a", label = "Gekido Advance - Kintaro's Revenge (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0BE0, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X7DF4, type="u16le", condition="eq", value=0X0008, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="GameOver" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X16E0, type="u16le", condition="eq", value=0X0005, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Password? Not when dying in stage then opening PW screen" },
+        { address=0X16E0, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[16bit] World" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X21A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X21A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+        { address=0X2314, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP ID decreased" },
+        { address=0X2314, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP ID increased" },
+        { address=0X23CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Another enemy HP ID decreased" },
+        { address=0X23CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Another enemy HP ID increased" },
+        { address=0X3044, type="u32le", condition="eq", value=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Lantern Icon under HP Bar" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7DF4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16bit] Counterdown timer on continue screen" },
+      },
+    },
+  },
+}

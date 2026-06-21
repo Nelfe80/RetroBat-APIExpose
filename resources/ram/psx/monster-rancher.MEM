@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Monster Rancher",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "monster-rancher",
+    file = "monster-rancher.zip",
+    hashes = {
+      { hash = "689f91d0cec71816a4981aaee73cef0d", label = "Monster Rancher (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XB88CC, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Remaining Lifespan of Monster increased" },
+        { address=0XB88CC, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Remaining Lifespan of Monster decreased" },
+        { address=0XB88CE, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max lifespan of monster. increased" },
+        { address=0XB88CE, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max lifespan of monster. decreased" },
+        { address=0XF6F4C, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ladies and Gentlemen, we will now begin the battle." },
+      },
+      health = {
+        { address=0XC05C4, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Last instance of damage taken" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XE8B74, type="u8", condition="eq", value=0X31, action="TREASURE", no_log=false, no_survey=false, desc="Emerald Cup" },
+        { address=0X195D18, type="u32le", condition="eq", value=0X28, action="TREASURE", no_log=false, no_survey=false, desc="Emerald" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X16188, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[48 bytes] Spaced out letters that form the string 'Emerald Cup'. increased" },
+        { address=0X161B8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[42 bytes] Spaced out letters that form the string 'Gold Cup'. increased" },
+        { address=0X16644, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[4 bytes] End of the block of long Tournament displayed strings. increased" },
+        { address=0XB88BC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Active Monster Total Prize Money increased" },
+        { address=0XB8B70, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Previous Money Total increased" },
+        { address=0XD567F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Flag for whether the Gold Cup Tournament is active. increased" },
+        { address=0XE857C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total prize money earned by player increased" },
+        { address=0XE8B74, type="u8", condition="eq", value=0X32, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Cup" },
+        { address=0X195D18, type="u32le", condition="eq", value=0X26, action="MONEY_STATE", no_log=false, no_survey=false, desc="Pure Gold" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD5660, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[100 bytes]ff'd out block of memory with a single 0x00 stored away in it." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB899E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Monster was Hurt" },
+        { address=0XEB2E8, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="State change" },
+        { address=0X1BAC14, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="After time-out in a Tournament Battle, displays player's remaining health percentage." },
+        { address=0X1BAC18, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="After time-out in a Tournament Battle, displays enemy's remaining health percentage." },
+      },
+    },
+  },
+}

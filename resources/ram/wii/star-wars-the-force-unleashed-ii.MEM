@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Star Wars: The Force Unleashed II",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "star-wars-the-force-unleashed-ii",
+    file = "star-wars-the-force-unleashed-ii.zip",
+    hashes = {
+      { hash = "601673da8ce9648adebd138475460695", label = "Star Wars - The Force Unleashed II (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

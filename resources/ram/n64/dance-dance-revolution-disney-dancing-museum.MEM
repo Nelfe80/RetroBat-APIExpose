@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Dance Dance Revolution: Disney Dancing Museum",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dance-dance-revolution-disney-dancing-museum",
+    file = "dance-dance-revolution-disney-dancing-museum.zip",
+    hashes = {
+      { hash = "0b86fa9259e2b751111a1701091644b1", label = "Dance Dance Revolution - Disney Dancing Museum (Japan).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X8A24C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current ongoing Combo" },
+        { address=0X8A254, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Highest Combo in current song?" },
+        { address=0X129357, type="u24be", condition="eq", value=0X12, action="COMBO_HIT", no_log=false, no_survey=false, desc="Mickey Mouse March (Norm 112 / Hard 148 combo)" },
+        { address=0X256060, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Best Combo for Song X Normal Difficulty" },
+      },
+    },
+  },
+}

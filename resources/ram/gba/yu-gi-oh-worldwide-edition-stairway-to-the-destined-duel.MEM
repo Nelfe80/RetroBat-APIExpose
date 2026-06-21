@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Worldwide Edition: Stairway to the Destined Duel",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-worldwide-edition-stairway-to-the-destined-duel",
+    file = "yu-gi-oh-worldwide-edition-stairway-to-the-destined-duel.zip",
+    hashes = {
+      { hash = "1e52d66f5f8a7c4f207d80ba4fccf55e", label = "Yu-Gi-Oh! - Worldwide Edition - Stairway to the Destined Duel (USA) (En,Ja,Fr,De,Es,It).gba" },
+      { hash = "15dbde22ef467c503e09f75b233da539", label = "Yu-Gi-Oh! - Worldwide Edition - Stairway to the Destined Duel (Europe) (En,Ja,Fr,De,Es,It).gba" },
+      { hash = "9a8abbb9e95ad1ead235e3ade9b7b429", label = "Yu-Gi-Oh! Duel Monsters International - Worldwide Edition (Japan) (En,Ja,Fr,De,Es,It).gba" },
+      { hash = "9bc1ee3d43963364ad25e687ec867d26", label = "Yu-Gi-Oh! Duel Monsters International - Worldwide Edition (Japan) (En,Ja,Fr,De,Es,It) (Rev 1).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X48C9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1BDF2, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Black Luster Soldier" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1BD7C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game points, if you add a zero to the decimal value (16-bit)" },
+      },
+      collectibles = {
+        { address=0X1BDF3, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Millennium Eye" },
+      },
+    },
+  },
+}

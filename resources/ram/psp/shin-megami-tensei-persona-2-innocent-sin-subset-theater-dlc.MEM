@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Shin Megami Tensei: Persona 2: Innocent Sin [Subset - Theater DLC]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-persona-2-innocent-sin-subset-theater-dlc",
+    file = "shin-megami-tensei-persona-2-innocent-sin-subset-theater-dlc.zip",
+    hashes = {
+      { hash = "e9cdda3fdb86f74337226b191245ca5a", label = "Shin Megami Tensei - Persona 2 - Innocent Sin (USA) [Subset - Theater DLC].iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCCC860, type="u8", condition="eq", value=0X06, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XD0CD9C, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="The truth of the Demon Gentleman" },
+        { address=0XD0DB78, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="The truth of the Demon Gentleman" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCCC860, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XE6856C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0XE6856C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0XE685C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0XE685C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0XE68614, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0XE68614, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE3D50E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Theater Points" },
+      },
+      collectibles = {
+        { address=0XE35AE8, type="u8", condition="eq", value=0X0B, action="MONEY_STATE", no_log=false, no_survey=false, desc="GOLD" },
+      },
+    },
+  },
+}

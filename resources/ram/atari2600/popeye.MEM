@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Popeye",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "popeye",
+    file = "popeye.zip",
+    hashes = {
+      { hash = "c7f13ef38f61ee2367ada94fdcc6d206", label = "Popeye (USA).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0001, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+  },
+}

@@ -1,0 +1,123 @@
+return {
+  game = {
+    title = "Sonic & Sega All-Stars Racing",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "sonic-sega-all-stars-racing",
+    file = "sonic-sega-all-stars-racing.zip",
+    hashes = {
+      { hash = "db073a661eb222093f013020211bea89", label = "Sonic & Sega All-Stars Racing (Europe) (En,Fr,De,Es,It)" },
+      { hash = "24475c3b81408ae76405fdd96d56718a", label = "Sonic & Sega All-Stars Racing (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA5500B, type="u8", condition="eq", value=0X2, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XA78AFC, type="u32be", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Exit to Menu" },
+        { address=0XA78AFC, type="u32be", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0XA78AFC, type="u32be", condition="eq", value=0X2, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XA78B14, type="u32be", condition="eq", value=0X0, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Standard Brightness While Unpaused" },
+        { address=0XA78B14, type="u32be", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Darkening Effect That Occurs While Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB2F1A7, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0XB2F1A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Challenges - Welcome to the Next Level!" },
+        { address=0XB2F1B9, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0XB2F1BD, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed" },
+        { address=0XB2F1BD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Challenges - Gaining Ground" },
+      },
+      zone = {
+        { address=0XB2F1B9, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Challenges - SEGA World Challenge" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X54E837, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X54E837, type="u8", condition="eq", value=0X8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Purchased" },
+        { address=0XA6056C, type="u32be", condition="eq", value=0X12, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Curien Mansion - Deadly Route" },
+        { address=0XB2F1B5, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Not Completed" },
+        { address=0XB2F1B5, type="u8", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Completed" },
+      },
+      health = {
+        { address=0XA5E448, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bit BE] Options - Weapons & Power-ups decreased" },
+        { address=0XC0309C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bit BE] Player 1 - Currently Held Power-up decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA5E448, type="u32be", condition="eq", value=0X0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off" },
+        { address=0XA5E448, type="u32be", condition="eq", value=0X1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Basic" },
+        { address=0XA5E448, type="u32be", condition="eq", value=0X2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="All" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X85D1E53C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power--up held, but undergoing roulette; cannot be used yet" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0XB678E022, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="All-Star (Ultimate)" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X9A67CB42, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Remote Bomb Projectile" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0XD045A8CA, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Remote Bomb Controller (Used to detonate the bomb)" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X53EB2F26, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Single Speed Boost" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X26E96DA5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Triple Speed Boost" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X7711877D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Single Homing Rocket" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X11A9BC48, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Triple Homing Rockets" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X84418B5F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Single K.O. Glove" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X5F724DA9, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Triple K.O. Glove" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0XEEC55D13, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Single Bomb" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X3EBCDDED, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Triple Bombs" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0XD8AE59CB, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Horn" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X805C3C3B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Single Traffic Cone" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X0F6A6E94, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Triple Traffic Cone" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X953D2512, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shield" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X84917C21, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rainbow" },
+        { address=0XC0309C, type="u32be", condition="eq", value=0X0053F395, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Shooting Star" },
+        { address=0XC030A0, type="u32be", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[32-Bit BE] Player 1 - Power-up Ammo Count" },
+        { address=0XC030A4, type="u32be", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[32-Bit BE] Player 1 - Power-up Ammo Used" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X550C74, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-Bit BE] Grand Prix - Total GP Points Obtained" },
+      },
+      collectibles = {
+        { address=0X7D2768, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit BE] Gold SEGA License Challenge Name increased" },
+        { address=0X7D276C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit BE] Gold SEGA License Challenge Description increased" },
+        { address=0X7D2770, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit BE] Gold SEGA License Challenge Icon increased" },
+        { address=0X7D277C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit BE] Gold SEGA License Challenge Goal Amount increased" },
+        { address=0XC04298, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit BE] Missions - Number of Rings Grabbed increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5506D3, type="u8", condition="eq", value=0X0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X5506D3, type="u8", condition="eq", value=0X8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Purchased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X54E07B, type="u8", condition="eq", value=0X0, action="JUMPING", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X54E07B, type="u8", condition="eq", value=0X8, action="JUMPING", no_log=false, no_survey=false, desc="Purchased" },
+        { address=0X550CA4, type="u32be", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[32-Bit BE] Records - Longest Jump (M)" },
+        { address=0XC04278, type="u32be", condition="eq", value=0X0, action="JUMPING", no_log=false, no_survey=false, desc="No Trick Performed" },
+        { address=0XC0427C, type="u32be", condition="eq", value=0X0, action="JUMPING", no_log=false, no_survey=false, desc="No Trick Performed" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X550CB8, type="u32be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32-Bit BE] Records - Total Gimmicks Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X505A20, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[32-Bit BE] Timer Capacity" },
+        { address=0XA5471B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Main Menu - Single Player Mode Selection" },
+        { address=0XA6056C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32-Bit BE] Time Trial - Course Selection" },
+        { address=0XB2F1AA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenges - Time Stalker" },
+        { address=0XB2F1AB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenges - Clock Work" },
+      },
+    },
+  },
+}

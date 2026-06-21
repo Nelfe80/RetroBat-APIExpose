@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Beatmania The Sound of Tokyo",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "beatmania-the-sound-of-tokyo",
+    file = "beatmania-the-sound-of-tokyo.zip",
+    hashes = {
+      { hash = "7d1864671427a58ee15522717e2e8655", label = "Beat Mania - The Sound of Tokyo (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X96AB4, type="u16le", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X96AB4, type="u16le", condition="eq", value=0X09, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X96AB4, type="u16le", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue screen" },
+        { address=0X96AB4, type="u16le", condition="eq", value=0X0D, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+      events = {
+        { address=0XA7900, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Max Combo" },
+        { address=0XA7902, type="u16le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[16 Bit] P2 Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDCFA4, type="u16le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Cleared" },
+        { address=0XDCFA8, type="u16le", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Cleared" },
+      },
+      stage = {
+        { address=0X96ADE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Current Stage" },
+        { address=0XA8E00, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Max Stages, only for Fixed Course" },
+        { address=0XDCFA4, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Failed" },
+        { address=0XDCFA8, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Failed" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X96AB4, type="u16le", condition="eq", value=0X0B, action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score Ranking" },
+        { address=0XA7870, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Total Score" },
+        { address=0XA7874, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Total Score" },
+        { address=0XA7A20, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Result - Score" },
+        { address=0XA7A24, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Result - Score" },
+      },
+    },
+  },
+}

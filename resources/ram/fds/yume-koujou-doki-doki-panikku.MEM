@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Yume Koujou: Doki Doki Panikku",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "yume-koujou-doki-doki-panikku",
+    file = "yume-koujou-doki-doki-panikku.zip",
+    hashes = {
+      { hash = "dde8a651a7a57d58f1a0e6ad576f99c5", label = "Yume Koujou - Doki Doki Panic (Japan) (DV 2).fds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00F3, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X0100, type="u8", condition="eq", value=0X40, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Slot machine or level title screen" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X062D, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 beaten" },
+        { address=0X062D, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2 beaten" },
+        { address=0X062E, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 beaten" },
+        { address=0X062E, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2 beaten" },
+        { address=0X062F, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 beaten" },
+        { address=0X062F, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2 beaten" },
+        { address=0X0630, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 beaten" },
+        { address=0X0630, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2 beaten" },
+      },
+      stage = {
+        { address=0X04E7, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 of current chapter" },
+        { address=0X04E7, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 of current chapter" },
+        { address=0X04E7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage number:" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0466, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X0467, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X046A, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X04C2, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="0 HP (dead)" },
+        { address=0X04C3, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="No additional life points" },
+        { address=0X04C3, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 additional life point" },
+        { address=0X04C3, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 additional life points" },
+        { address=0X04C3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Additional life points increased" },
+        { address=0X04C3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Additional life points decreased" },
+        { address=0X04ED, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives increased" },
+        { address=0X04ED, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives decreased" },
+      },
+      health = {
+        { address=0X0466, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Little Fryguy health:" },
+        { address=0X0467, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Little Fryguy health:" },
+        { address=0X046A, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Little Fryguy health:" },
+        { address=0X04C2, type="u8", condition="eq", value=0X0F, action="HEALTH_STATE", no_log=true, no_survey=false, desc="1 HP" },
+        { address=0X04C2, type="u8", condition="eq", value=0X1F, action="HEALTH_STATE", no_log=true, no_survey=false, desc="2 HP" },
+        { address=0X04C2, type="u8", condition="eq", value=0X2F, action="HEALTH_STATE", no_log=true, no_survey=false, desc="3 HP" },
+        { address=0X04C2, type="u8", condition="eq", value=0X3F, action="HEALTH_STATE", no_log=true, no_survey=false, desc="4 HP" },
+        { address=0X04C2, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Current health:" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0622, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of collected coins in current/last subcon increased" },
+        { address=0X062B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total collected coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0468, type="u8", condition="eq", value=0XFF, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X0469, type="u8", condition="eq", value=0XFF, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X0545, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X04E0, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Timer for invincibility:" },
+      },
+      player = {
+        { address=0X0099, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="On the ground" },
+        { address=0X0099, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="In the air" },
+        { address=0X00C7, type="u8", condition="eq", value=0X06, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X04CA, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Super Jump charge." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X04E8, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Area of stage/checkpoint number" },
+      },
+    },
+  },
+}

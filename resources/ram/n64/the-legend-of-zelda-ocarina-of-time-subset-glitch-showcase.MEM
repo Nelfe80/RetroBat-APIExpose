@@ -1,0 +1,126 @@
+return {
+  game = {
+    title = "The Legend of Zelda: Ocarina of Time [Subset - Glitch Showcase]",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "the-legend-of-zelda-ocarina-of-time-subset-glitch-showcase",
+    file = "the-legend-of-zelda-ocarina-of-time-subset-glitch-showcase.zip",
+    hashes = {
+      { hash = "9cdbc307c9b154a381f176ffe49575f9", label = "Legend of Zelda, The - Ocarina of Time [Subset - Gltich Showcase] USA.z64" },
+      { hash = "b4f903fb716616ac009c120c71b83be1", label = "Legend of Zelda, The - Ocarina of Time [Subset - Glitch Showcase] Japan.z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11B92C, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X11B9D9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="00:Stereo 01:Mono 02:Headset 03:Surround" },
+        { address=0X1CA1CB, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skull Open" },
+        { address=0X1CA1CB, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Water Temple Gem Shot" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1CA1C8, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bean plant on death mountian trail" },
+        { address=0X1CA1E5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 0 = HP in Death Mountain Crater (8-bit)" },
+        { address=0X2A3720, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="possible number of deaths" },
+      },
+      health = {
+        { address=0X11A5FC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Hero HP - Total decreased" },
+        { address=0X11A5FC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Hero HP - Total increased" },
+        { address=0X11A602, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16 bit) Hero HP - Current (upper left for full hearts - lower left for parts of a heart) decrea" },
+        { address=0X11A602, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16 bit) Hero HP - Current (upper left for full hearts - lower left for parts of a heart) increa" },
+        { address=0X11A60E, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="(8 bit) 0=normal defence 1=improved defence (half damage taken)" },
+        { address=0X1CA1D9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bit 2 Potential Chest Mini-Game HP decreased" },
+        { address=0X1CA1D9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bit 2 Potential Chest Mini-Game HP increased" },
+        { address=0X1CA1E4, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Graveyard HP" },
+        { address=0X1CA1E7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bit 6 = HP above dodongo obtained. decreased" },
+        { address=0X1CA1E7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bit 6 = HP above dodongo obtained. increased" },
+        { address=0X1E25FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Iron Knuckle HP (young link) decreased" },
+        { address=0X1E25FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Iron Knuckle HP (young link) increased" },
+        { address=0X1E3C4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Iron Knuckle HP (adult link) decreased" },
+        { address=0X1E3C4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Iron Knuckle HP (adult link) increased" },
+        { address=0X1E592C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Shadow Link HP decreased" },
+        { address=0X1E592C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Shadow Link HP increased" },
+        { address=0X1E6C6C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 2nd Iron Knuckle HP (adult link) decreased" },
+        { address=0X1E6C6C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 2nd Iron Knuckle HP (adult link) increased" },
+        { address=0X1E71FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Goron Shadow HP decreased" },
+        { address=0X1E71FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Goron Shadow HP increased" },
+        { address=0X1E840C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma HP decreased" },
+        { address=0X1E840C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma HP increased" },
+        { address=0X1E84F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 1st monster HP decreased" },
+        { address=0X1E84F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 1st monster HP increased" },
+        { address=0X1E84F6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 2nd monster HP decreased" },
+        { address=0X1E84F6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 2nd monster HP increased" },
+        { address=0X1E84FA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 3rd monster HP decreased" },
+        { address=0X1E84FA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 3rd monster HP increased" },
+        { address=0X1EA2EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Volvagia HP decreased" },
+        { address=0X1EA2EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Volvagia HP increased" },
+        { address=0X1ECB76, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) King Dodongo HP decreased" },
+        { address=0X1ECB76, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) King Dodongo HP increased" },
+        { address=0X1F253C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Morpha HP decreased" },
+        { address=0X1F253C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Morpha HP increased" },
+        { address=0X1F9A4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Sorceress Sisters Twinrova HP - final form decreased" },
+        { address=0X1F9A4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Sorceress Sisters Twinrova HP - final form increased" },
+        { address=0X1FA2DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Ganon HP (last battle) decreased" },
+        { address=0X1FA2DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Ganon HP (last battle) increased" },
+        { address=0X20B5CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Ganondorf HP decreased" },
+        { address=0X20B5CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Ganondorf HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X11B48C, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bit) points obtained from Poes" },
+        { address=0X11B9D4, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bit) Fish weight (during fishing)/ score at horseback archery game" },
+      },
+      collectibles = {
+        { address=0X11A671, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Scale" },
+        { address=0X11A6A2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Skulltula Tokens increased" },
+        { address=0X11B46C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 3 = Gold Skulltula in the Compass Room of Deku Tree increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X11A67C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8 bit) Shadow Temple 7 = map - compass - boss key" },
+        { address=0X11A67D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8 bit) Spirit Temple 7 = map - compass - boss key" },
+        { address=0X11A67F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8 bit) Fire Temple 7 = map - compass - boss key" },
+        { address=0X1C8546, type="u8", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="Forrest Temple Boss Room" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X11A642, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Equipped Weapon and Shield" },
+        { address=0X11A66E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Unlocked Swords and Shields" },
+      },
+      player = {
+        { address=0X1B0228, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=true, no_survey=false, desc="After jumping the fence remains 00 until you get off Epona" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X11A63B, type="u8", condition="eq", value=0X55, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Giant's Knife" },
+        { address=0X11B4A8, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moved" },
+        { address=0X11B4AF, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Rainbow bridge" },
+        { address=0X11B9DF, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hold Targeting" },
+        { address=0X1CA1C8, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blockage" },
+        { address=0X1CA1CA, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Statue in Dariunia's Room" },
+        { address=0X1CA1CA, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bean Planted at Deku Theater" },
+        { address=0X1CA1DC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 1 = Deku Scrub Leading to Slingshot and locked door raised." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11B9A2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8 bit) timer on Lon Lon Ranch mini game / death mountain crater / diving game/ horse racing" },
+      },
+    },
+  },
+}

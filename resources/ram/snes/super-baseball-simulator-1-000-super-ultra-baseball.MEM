@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Super Baseball Simulator 1.000 | Super Ultra Baseball",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "super-baseball-simulator-1-000-super-ultra-baseball",
+    file = "super-baseball-simulator-1-000-super-ultra-baseball.zip",
+    hashes = {
+      { hash = "e0c88e127a60c7d90b1ebd545ff856ff", label = "Super Baseball Simulator 1.000 (USA).sfc" },
+      { hash = "f4f6166fec263cf7562466fa9398fbae", label = "Super Ultra Baseball (Japan).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

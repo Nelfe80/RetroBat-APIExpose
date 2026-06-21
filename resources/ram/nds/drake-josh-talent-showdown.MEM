@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Drake & Josh: Talent Showdown",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "drake-josh-talent-showdown",
+    file = "drake-josh-talent-showdown.zip",
+    hashes = {
+      { hash = "a415d0f914f0cf82aad576d7e3f5adc5", label = "Drake & Josh - Talent Showdown (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Crash of the Titans",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "crash-of-the-titans",
+    file = "crash-of-the-titans.zip",
+    hashes = {
+      { hash = "3a12a9e8b1854cff6c67e04505fb5be4", label = "Crash of the Titans (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1428D0, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="yes" },
+        { address=0X1428D0, type="u8", condition="eq", value=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="no" },
+        { address=0X1487C0, type="u16le", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X1487C0, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Start Game" },
+        { address=0X1487C0, type="u16le", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Select" },
+        { address=0X1487C0, type="u16le", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Delete" },
+        { address=0X1487C0, type="u16le", condition="eq", value=0X09, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Copy" },
+        { address=0X1487C0, type="u16le", condition="eq", value=0X0B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Extras" },
+        { address=0X1487C0, type="u16le", condition="eq", value=0X0E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Enter Name" },
+        { address=0X14E40C, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="(32-bit) Different Values for lines of subtitles" },
+        { address=0X2B6278, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32 Bit] Sound Test Selection (Title Screen)" },
+        { address=0X2B72A0, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[32 Bit] Music Test Selection (Title Screen)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X148A92, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(16-bit) Level Goal" },
+        { address=0X14E508, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="buzz toot or landing on the ground" },
+        { address=0X21839C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(ASCII) Extra Level IDs" },
+        { address=0X2183A1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(ASCII Text) Level ID" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X14E508, type="u8", condition="eq", value=0X0E, action="JUMPING", no_log=false, no_survey=false, desc="double jump" },
+        { address=0X14E508, type="u8", condition="eq", value=0X07, action="JUMPING", no_log=false, no_survey=false, desc="single jump or kick or double jump" },
+        { address=0X14E508, type="u8", condition="eq", value=0X0B, action="JUMPING", no_log=false, no_survey=false, desc="double jump" },
+        { address=0X14E508, type="u8", condition="eq", value=0X0A, action="JUMPING", no_log=false, no_survey=false, desc="double jump or block" },
+        { address=0X14E508, type="u8", condition="eq", value=0X06, action="JUMPING", no_log=false, no_survey=false, desc="double jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2B04D8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(32-bit) Animals Mutated Counter in Nina stages" },
+      },
+    },
+  },
+}

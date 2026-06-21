@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Batsu and Terii: Makyou no Tetsujin Race",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "batsu-and-terii-makyou-no-tetsujin-race",
+    file = "batsu-and-terii-makyou-no-tetsujin-race.zip",
+    hashes = {
+      { hash = "7a7f5ed7d0c5ecbea77452b7f37d6900", label = "Batsu & Terry - Makyou no Tetsujin Race (Russia) (Pirate).nes" },
+      { hash = "80c2087288cfff241ec38f21051abb6a", label = "Batsu & Terry - Makyou no Tetsujin Race (Japan) (En) (v1.0) (Zynk Oxhyde).nes" },
+      { hash = "fbc46d607ee554c8388d2903138ce7ee", label = "Batsu & Terry - Makyou no Tetsujin Race (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0088, type="u32le", condition="eq", value=0X24232221, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0088, type="u32le", condition="eq", value=0X00232221, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Loading first stage" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0056, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ball Power Level" },
+        { address=0X0057, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bat Power Level" },
+      },
+      stage = {
+        { address=0X00B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select cheat" },
+        { address=0X00B9, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="active when loading into first stage" },
+        { address=0X00BA, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="active when loading into first stage" },
+        { address=0X00BB, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="active when loading into first stage" },
+        { address=0X00BC, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="active when loading into first stage" },
+        { address=0X00BD, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="active when loading into first stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0051, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0051, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X00BD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="99 Lives cheat increased" },
+        { address=0X00BD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="99 Lives cheat decreased" },
+      },
+      health = {
+        { address=0X0052, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0052, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X00B9, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Extra Energy cheat" },
+      },
+    },
+  },
+}

@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Blomby Car",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Driving"
+  },
+
+  rom = {
+    name = "blomby-car",
+    file = "blomby-car.zip",
+    hashes = {
+      { hash = "e6b39337564b2e9538c5b4143bcff3b0", label = "blmbycar.zip" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2403, type="u8", condition="eq", value=0X1B, action="GAME_PLAYING", no_log=false, no_survey=false, desc="stage map" },
+        { address=0X2403, type="u8", condition="eq", value=0X1C, action="GAME_PLAYING", no_log=false, no_survey=false, desc="stage loaded" },
+        { address=0X2403, type="u8", condition="eq", value=0X2B, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="game over, continue?" },
+        { address=0X2403, type="u8", condition="eq", value=0XEB, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo play" },
+        { address=0X2EDF, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits [8 bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2403, type="u8", condition="eq", value=0X0C, action="SCORE_STATE", no_log=false, no_survey=false, desc="high score name entry" },
+        { address=0X2403, type="u8", condition="eq", value=0XFE, action="SCORE_STATE", no_log=false, no_survey=false, desc="high score" },
+        { address=0X301E, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32 bit]" },
+      },
+      collectibles = {
+        { address=0XFECEDE, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3111, type="u8", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X3111, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X3111, type="u8", condition="eq", value=0X2, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X3111, type="u8", condition="eq", value=0X3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hardest" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2403, type="u8", condition="eq", value=0X26, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time limit exceeded" },
+        { address=0X2403, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game State [8 bit]" },
+        { address=0X3010, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock Time (in tenths) [16 bit]" },
+        { address=0X30A6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Track #1 Time [16 bit]" },
+        { address=0X30AA, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Track #2 Time [16 bit]" },
+        { address=0X30AE, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Track #3 Time [16 bit]" },
+        { address=0X30B2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Track #4 Time [16 bit]" },
+        { address=0X30D6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Checkpoint Time Bonus [16 bit]" },
+      },
+    },
+  },
+}

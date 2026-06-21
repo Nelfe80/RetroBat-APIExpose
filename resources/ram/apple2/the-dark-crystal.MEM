@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "The Dark Crystal",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-dark-crystal",
+    file = "the-dark-crystal.zip",
+    hashes = {
+      { hash = "6e530176714c4accaa0975fc127f767b", label = "The Dark Crystal disk 1A.woz" },
+      { hash = "64d7c44540c341832213258d4e9d099e", label = "The Dark Crystal disk 1B.woz" },
+      { hash = "c119adee8fe46f45c03b1e4fbdfea059", label = "The Dark Crystal disk 2A.woz" },
+      { hash = "59b0d152c4fcfcf064c9488af3f444f3", label = "The Dark Crystal disk 2B.woz" },
+      { hash = "8c419c88edf6f36cc3c60061997dbb60", label = "The Dark Crystal (4am and san inc crack) disk 1A.dsk" },
+      { hash = "133277cd78897f0a9a3c3c76c4919e5b", label = "The Dark Crystal (4am and san inc crack) disk 1B.dsk" },
+      { hash = "d587819b395b331434ec083b6cc56a04", label = "The Dark Crystal (4am and san inc crack) disk 2A.dsk" },
+      { hash = "c325ea40e0b8864f121c1d35d90f3534", label = "The Dark Crystal (4am and san inc crack) disk 2B.dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X89B4, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screens" },
+        { address=0X89B5, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screens" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0944, type="u8", condition="eq", value=0X17, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On ground in original location in forest" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0083, type="u8", condition="eq", value=0XD2, action="LIVES_STATE", no_log=false, no_survey=false, desc="Wilderness / Far side of chasm / Chamber of Life" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0083, type="u8", condition="eq", value=0X0E, action="JUMPING", no_log=true, no_survey=false, desc="Valley of the Stones - clearing / Forest near Pod village / Jumping down ravine" },
+      },
+    },
+  },
+}

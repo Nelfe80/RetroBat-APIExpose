@@ -1,0 +1,122 @@
+return {
+  game = {
+    title = "Gradius V",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "gradius-v",
+    file = "gradius-v.zip",
+    hashes = {
+      { hash = "ab6264f532bedcde88d438a5cae695a4", label = "Gradius V (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4A0B23, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Starting Credits" },
+        { address=0X160721E, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Opening Movie playing (Title Screen Wait)" },
+        { address=0X2000040, type="u8", condition="bit_true", bit=7, mask=0X80, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Free Play" },
+        { address=0X2000041, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen / Demo Flag" },
+        { address=0X2000045, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Flag" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X20000EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Levels You've used a cheat code on. Anything higher than 0 should lock cheevs" },
+      },
+      stage = {
+        { address=0X4A0B24, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select - Last Loop Unlocked" },
+        { address=0X4A0B25, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select - Last Stage Unlocked" },
+        { address=0X4A0B26, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select - Last Substage Unlocked" },
+        { address=0X4BB5FF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="02 = Stage Select" },
+        { address=0X2000044, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X200004D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Substage ID" },
+        { address=0X2000050, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (If starting from stage select)" },
+        { address=0X2000051, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Substage (If starting from stage select)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2000121, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - 1P increased" },
+        { address=0X2000121, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - 1P decreased" },
+        { address=0X2000141, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives - 2P increased" },
+        { address=0X2000141, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives - 2P decreased" },
+      },
+      health = {
+        { address=0X4A0B28, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Config - Button Setting - Player 1 - Power Up decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X4A0B28, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="No Use" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="X" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Circle" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Square" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Triangle" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="L1" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="L2" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="R1" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="R2" },
+        { address=0X4A0B28, type="u8", condition="eq", value=0X09, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="All" },
+        { address=0X4A0B29, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Config - Button Setting - Player 2 - Power Up" },
+      },
+      weapon = {
+        { address=0X4A0B3C, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Edit Unlocked" },
+        { address=0X200012A, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile" },
+        { address=0X200012A, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="2-Way" },
+        { address=0X200012A, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Eagle Wind" },
+        { address=0X200012A, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="2-Way Back" },
+        { address=0X200012A, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spread Bomb" },
+        { address=0X200012A, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Photon Torpedo" },
+        { address=0X200012A, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flying Torpedo" },
+        { address=0X200012B, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Double" },
+        { address=0X200012B, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tailgun" },
+        { address=0X200012B, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Vertical" },
+        { address=0X200012B, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Freeway" },
+        { address=0X200012B, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spread Gun" },
+        { address=0X200012C, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser" },
+        { address=0X200012C, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ripple" },
+        { address=0X200012C, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="E-Laser" },
+        { address=0X200012C, type="u8", condition="eq", value=0X09, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fire Blaster" },
+        { address=0X200012D, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Freeze" },
+        { address=0X200012D, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Direction" },
+        { address=0X200012D, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Spacing" },
+        { address=0X200012D, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rotate" },
+        { address=0X200012E, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Force Field" },
+        { address=0X200012E, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mega Crush" },
+        { address=0X200014A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missile Weapon Slot - 2P" },
+        { address=0X200014B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Double Weapon Slot - 2P" },
+        { address=0X200014C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Weapon Slot - 2P" },
+        { address=0X200014D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Multiple Weapon Slot - 2P" },
+        { address=0X200014E, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="? Weapon Slot - 2P" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2000044, type="u8", condition="bit_true", bit=0, mask=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Attack" },
+        { address=0X2000118, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit Unsigned] Score - 1P" },
+        { address=0X2000138, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit Unsigned] Score - 2P" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X200008C, type="u16le", condition="eq", value=0X0000, action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="No slot" },
+        { address=0X200008C, type="u16le", condition="eq", value=0X1258, action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="1st slot" },
+        { address=0X200008C, type="u16le", condition="eq", value=0X13E8, action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="2nd slot" },
+        { address=0X200008C, type="u16le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="IDs whether the 1P ship is on the first slot or second slot of the data structure list that save" },
+        { address=0X200012E, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield" },
+        { address=0X2001364, type="u16le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility Timer - Slot 1" },
+        { address=0X20014F4, type="u16le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility Timer - Slot 2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2000042, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="How many times demo played" },
+      },
+    },
+  },
+}

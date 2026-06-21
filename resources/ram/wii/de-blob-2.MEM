@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "de Blob 2",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "de-blob-2",
+    file = "de-blob-2.zip",
+    hashes = {
+      { hash = "75306d67c7c5f300fc3c6e9f5ad1713a", label = "De Blob 2 (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5CA6AC, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="disabled" },
+        { address=0X5CA6AC, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="enabled" },
+        { address=0X5E8574, type="u32be", condition="eq", value=0X8A, action="GAME_OVER", no_log=false, no_survey=false, desc="progress menu/game over screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5E8574, type="u32be", condition="eq", value=0X85, action="NEW_LEVEL", no_log=false, no_survey=false, desc="in level" },
+        { address=0X5E8574, type="u32be", condition="eq", value=0X8E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level completion screen" },
+        { address=0X5E8574, type="u32be", condition="eq", value=0X8F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="saving on level complete screen" },
+        { address=0X5E8574, type="u32be", condition="eq", value=0X91, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="save successful on level complete screen" },
+        { address=0X5E8574, type="u32be", condition="eq", value=0X92, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level completion screen - alt" },
+        { address=0XA2E208, type="u32be", condition="eq", value=0X0002000C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="complete" },
+        { address=0XA2E208, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Level Completion State" },
+        { address=0X105DEE38, type="u32be", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level overworld" },
+        { address=0X107F9B7C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-byte bitfield] Current Level - Collected Inspiration" },
+        { address=0X107F9B84, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Current Level - Maximum Styles" },
+        { address=0X107F9B88, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Current Level - Maximum Inspiration" },
+        { address=0X107F9B90, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Current Level - Number of Art Collectables Collected in Current Level" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X0000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="null" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3031, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'01' Paradise Island" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3032, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'02' Downtown" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3033, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'03' Blanctown" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3034, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'04' The Senate" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3035, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'05' Comrade Black U/State College" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3037, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'07' Blanc Cola Cannery/Soda Falls" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3039, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'09' Inktron Collider/Hydro Station" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3036, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'06' Prison Zoo/Orbital Habitats" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3130, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'10' Inky Fabricator/Railyards" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3131, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'11' Rocket Range" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3132, action="NEW_LEVEL", no_log=false, no_survey=false, desc="'12' Hypno Ray" },
+        { address=0X10B0EC6E, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII 16-bit BE] Level ID" },
+      },
+      stage = {
+        { address=0XA2E208, type="u32be", condition="eq", value=0X0001000C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="active" },
+        { address=0XA6831A, type="u16be", condition="eq", value=0X0055, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="destruction stage 1" },
+        { address=0XA6831A, type="u16be", condition="eq", value=0X002B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="destruction stage 2" },
+        { address=0XA68FFA, type="u16be", condition="eq", value=0X0055, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="destruction stage 1" },
+        { address=0XA68FFA, type="u16be", condition="eq", value=0X002B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="destruction stage 2" },
+        { address=0XA69B7A, type="u16be", condition="eq", value=0X0055, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="destruction stage 1" },
+        { address=0XA69B7A, type="u16be", condition="eq", value=0X002B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="destruction stage 2" },
+        { address=0X10B0EC6E, type="u16be", condition="eq", value=0X3038, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="'08' Blanc TV Factory/House of Fun" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X107F9FE4, type="u32be", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="default starting value" },
+        { address=0X107F9FE4, type="u32be", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="maximum starting value with upgrades" },
+        { address=0X107F9FE4, type="u32be", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="maximum overall value with upgrades" },
+        { address=0X107F9FE4, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Current Player Lives Count increased" },
+        { address=0X107F9FE4, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32-bit BE] Current Player Lives Count decreased" },
+      },
+      health = {
+        { address=0XA1E676, type="u8", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="not being damaged" },
+        { address=0XA1E676, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="taking damage" },
+        { address=0XA6831A, type="u16be", condition="eq", value=0X0080, action="HEALTH_STATE", no_log=false, no_survey=false, desc="maximum health" },
+        { address=0XA6831A, type="u16be", condition="eq", value=0X0000, action="HEALTH_STATE", no_log=false, no_survey=false, desc="total destruction" },
+        { address=0XA6831A, type="u16be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monster Fight - Blue Pillar Health" },
+        { address=0XA68FFA, type="u16be", condition="eq", value=0X0080, action="HEALTH_STATE", no_log=false, no_survey=false, desc="maximum health" },
+        { address=0XA68FFA, type="u16be", condition="eq", value=0X0000, action="HEALTH_STATE", no_log=false, no_survey=false, desc="total destruction" },
+        { address=0XA68FFA, type="u16be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monster Fight - Red Pillar Health" },
+        { address=0XA69B7A, type="u16be", condition="eq", value=0X0080, action="HEALTH_STATE", no_log=false, no_survey=false, desc="maximum health" },
+        { address=0XA69B7A, type="u16be", condition="eq", value=0X0000, action="HEALTH_STATE", no_log=false, no_survey=false, desc="total destruction" },
+        { address=0XA69B7A, type="u16be", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Monster Fight - Yellow Pillar Health" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA6509A, type="u16be", condition="eq", value=0X0080, action="BOSS_HIT", no_log=false, no_survey=false, desc="starting health" },
+        { address=0XA6509A, type="u16be", condition="eq", value=0X0054, action="BOSS_HIT", no_log=false, no_survey=false, desc="after first hit" },
+        { address=0XA6509A, type="u16be", condition="eq", value=0X0033, action="BOSS_HIT", no_log=false, no_survey=false, desc="after second hit" },
+        { address=0XA6509A, type="u16be", condition="eq", value=0X0000, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="after final hit, boss is defeated" },
+        { address=0XA6AB0A, type="u16be", condition="eq", value=0X0080, action="BOSS_HIT", no_log=false, no_survey=false, desc="max value, phase 1" },
+        { address=0XA6AB0A, type="u16be", condition="eq", value=0X006E, action="BOSS_HIT", no_log=false, no_survey=false, desc="phase 2" },
+        { address=0XA6AB0A, type="u16be", condition="eq", value=0X005C, action="BOSS_HIT", no_log=false, no_survey=false, desc="phase 3" },
+        { address=0XA6AB0A, type="u16be", condition="eq", value=0X004A, action="BOSS_HIT", no_log=false, no_survey=false, desc="phase 4" },
+        { address=0XA6AB0A, type="u16be", condition="eq", value=0X0037, action="BOSS_HIT", no_log=false, no_survey=false, desc="phase 5" },
+        { address=0XA6AB0A, type="u16be", condition="eq", value=0X0025, action="BOSS_HIT", no_log=false, no_survey=false, desc="phase 6" },
+        { address=0XA6AB0A, type="u16be", condition="eq", value=0X0013, action="BOSS_HIT", no_log=false, no_survey=false, desc="phase 7" },
+        { address=0X105DEE38, type="u32be", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="monster arena fight on level 10, sub-area before boss fight on level 12" },
+        { address=0X105DEE38, type="u32be", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="factory before boss on level 10, Comrade Black fight arena on level 12" },
+        { address=0X1231A340, type="u32be", condition="eq", value=0X47543130, action="BOSS_HIT", no_log=false, no_survey=false, desc="Tranquil, 'IGT10_BOSSA'" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X10B0DCC0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32-bit BE] Mission/Challenge Counter" },
+      },
+    },
+  },
+}

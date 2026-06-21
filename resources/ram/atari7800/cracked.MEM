@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Crack'ed",
+    system = "atari7800",
+    system_name = "Atari 7800",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "cracked",
+    file = "cracked.zip",
+    hashes = {
+      { hash = "db691469128d9a4217ec7e315930b646", label = "Crack'ed (USA).a78" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2667, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="L Round" },
+      },
+    },
+  },
+}

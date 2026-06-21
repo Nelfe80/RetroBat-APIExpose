@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Turok: Evolution",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "turok-evolution",
+    file = "turok-evolution.zip",
+    hashes = {
+      { hash = "04524b68642568798af10a69fc199aad", label = "Turok - Evolution (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4F18, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level: 00 = Normal, 01 = Pro" },
+      },
+    },
+  },
+}

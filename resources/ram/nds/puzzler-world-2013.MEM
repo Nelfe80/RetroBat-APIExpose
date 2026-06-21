@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Puzzler World 2013",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzler-world-2013",
+    file = "puzzler-world-2013.zip",
+    hashes = {
+      { hash = "4d783101f26ca469c968c1b632a4088d", label = "Puzzler World 2013 (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA9739, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="main menu, saving, forced trophy room, pause menu" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X9F1C8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure hunter trophy" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9EBEC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32 bit; file 1 hint coin count (caps at 99999 or 1869f) increased" },
+        { address=0X9F34C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32 bit; file 2 hint coin count (caps at 99999 or 1869f) increased" },
+        { address=0X9FAAC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32 bit; file 3 hint coin count (caps at 99999 or 1869f) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9E694, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer (XX:00)" },
+        { address=0X9E698, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer (00:XX)" },
+      },
+    },
+  },
+}

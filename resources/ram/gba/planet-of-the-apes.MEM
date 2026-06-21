@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Planet of the Apes",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "planet-of-the-apes",
+    file = "planet-of-the-apes.zip",
+    hashes = {
+      { hash = "18a0f7cfe44de29feff9efb2f18634f9", label = "Planet of the Apes (Europe) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "23a5cf12dda1bd5ef4d3e03fa6112c19", label = "Planet of the Apes (USA) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "f6ec916da3da65f9ddd094503e98ecfc", label = "Planet of the Apes (USA) (Pt) (v1.0) (LortRade).gba" },
+    }
+  },
+
+  events = {
+  },
+}

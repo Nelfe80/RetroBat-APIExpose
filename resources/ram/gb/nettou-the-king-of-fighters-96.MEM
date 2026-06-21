@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Nettou The King of Fighters '96",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "nettou-the-king-of-fighters-96",
+    file = "nettou-the-king-of-fighters-96.zip",
+    hashes = {
+      { hash = "16ee9b10c27c136d2959ae87105a8a2e", label = "Nettou The King of Fighters '96 (Japan) (SGB Enhanced).gb" },
+      { hash = "5a763c7a8c6f2ee9e6464512ca2d672e", label = "Nettou The King of Fighters '96 (Japan) (SGB Enhanced) (En) (Uppercase).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XDA37, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 Count Combo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD94E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Life increased" },
+        { address=0XD94E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Life decreased" },
+        { address=0XDA4E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 life increased" },
+        { address=0XDA4E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 life decreased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC000, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Select+A/B for powerful attacks" },
+        { address=0XC000, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Power Gauge always increase" },
+        { address=0XC000, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sound Test (SGB)" },
+        { address=0XC000, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Same Character at Team Play" },
+        { address=0XC000, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Goenitz" },
+        { address=0XC000, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mr. Karate, Iori, Leona and Chizuru" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC169, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Time" },
+      },
+    },
+  },
+}

@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "One Piece: Chopper no Daibouken",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "one-piece-chopper-no-daibouken",
+    file = "one-piece-chopper-no-daibouken.zip",
+    hashes = {
+      { hash = "f19436970509e5e97b5fd96752aadb8a", label = "From TV Animation One Piece - Chopper no Daibouken (Japan).wsc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0432, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chopper - Level [8bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0430, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Chopper - Max Health [16bit] decreased" },
+        { address=0X0430, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Chopper - Max Health [16bit] increased" },
+        { address=0X0438, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Chopper - Current Health [16bit] decreased" },
+        { address=0X0438, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Chopper - Current Health [16bit] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X044C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chopper - Experience Points [16bit]" },
+      },
+    },
+  },
+}

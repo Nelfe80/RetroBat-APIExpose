@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Muppets Party Cruise",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Party"
+  },
+
+  rom = {
+    name = "muppets-party-cruise",
+    file = "muppets-party-cruise.zip",
+    hashes = {
+      { hash = "1db71ce557c78865a750b1287eb56735", label = "Muppets - Party Cruise (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X324EFC, type="u32be", condition="eq", value=0X27, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X6504E0, type="u32be", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X6504E8, type="u32be", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X6504F8, type="u32be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32-bit BE] Game Paused" },
+        { address=0X650A24, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Player 1 - Cruise Credits" },
+        { address=0X650AE4, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Player 2 - Cruise Credits" },
+        { address=0X650BA4, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Player 3 - Cruise Credits" },
+        { address=0X650C64, type="u32be", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Player 4 - Cruise Credits" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6505F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 1 - Game Points Bought with Cruise Credits" },
+        { address=0X6505FC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 2 - Game Points Bought with Cruise Credits" },
+        { address=0X650600, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 3 - Game Points Bought with Cruise Credits" },
+        { address=0X650604, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 4 - Game Points Bought with Cruise Credits" },
+        { address=0XAE3148, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 1 - Cruise Credits/Mini-Game Points" },
+        { address=0XAE314C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 2 - Cruise Credits/Mini-Game Points" },
+        { address=0XAE3150, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 3 - Cruise Credits/Mini-Game Points" },
+        { address=0XAE3154, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 4 - Cruise Credits/Mini-Game Points" },
+      },
+    },
+  },
+}

@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Resident Evil Outbreak: File #2 [Subset - Online Multiplayer]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "resident-evil-outbreak-file-2-subset-online-multiplayer",
+    file = "resident-evil-outbreak-file-2-subset-online-multiplayer.zip",
+    hashes = {
+      { hash = "5faa8c7b62bff020d5c7ca752d0a8f37", label = "BioHazard Outbreak - File #2 [Subset - Online Multiplayer]" },
+      { hash = "06e870bea69005e081c226fdea1d7511", label = "BioHazard Outbreak - File #2 (SLPM-65692) (En) (v2.1) (REfan988 & Silent Hell) [70C1FE97]" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X311EB0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Wild Things (Easy) - Clear Rate - Clear" },
+        { address=0X311EB2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Wild Things (Normal) - Clear Rate - Clear" },
+        { address=0X311EB4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Wild Things (Hard) - Clear Rate - Clear" },
+        { address=0X311EB6, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Wild Things (Very Hard) - Clear Rate - Clear" },
+        { address=0X311F40, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Underbelly (Easy) - Clear Rate - Clear" },
+        { address=0X311F42, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Underbelly (Normal) - Clear Rate - Clear" },
+        { address=0X311F44, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Underbelly (Hard) - Clear Rate - Clear" },
+        { address=0X311F46, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Underbelly (Very Hard) - Clear Rate - Clear" },
+        { address=0X311FD0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Flashback (Easy) - Clear Rate - Clear" },
+        { address=0X311FD2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Flashback (Normal) - Clear Rate - Clear" },
+        { address=0X311FD4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Flashback (Hard) - Clear Rate - Clear" },
+        { address=0X311FD6, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Flashback (Very Hard) - Clear Rate - Clear" },
+        { address=0X3120F0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - End of the Road (Easy) - Clear Rate - Clear" },
+        { address=0X3120F2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - End of the Road (Normal) - Clear Rate - Clear" },
+        { address=0X3120F4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - End of the Road (Hard) - Clear Rate - Clear" },
+        { address=0X3120F6, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - End of the Road (Very Hard) - Clear Rate - Clear" },
+        { address=0X312180, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 1 (Easy) - Clear Rate - Clear" },
+        { address=0X312182, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 1 (Normal) - Clear Rate - Clear" },
+        { address=0X312184, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 1 (Hard) - Clear Rate - Clear" },
+        { address=0X312186, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 1 (Very Hard) - Clear Rate - Clear" },
+        { address=0X312210, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 2 (Easy) - Clear Rate - Clear" },
+        { address=0X312212, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 2 (Normal) - Clear Rate - Clear" },
+        { address=0X312214, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 2 (Hard) - Clear Rate - Clear" },
+        { address=0X312216, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 2 (Very Hard) - Clear Rate - Clear" },
+        { address=0X3122A0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 3 (Easy) - Clear Rate - Clear" },
+        { address=0X3122A2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 3 (Normal) - Clear Rate - Clear" },
+        { address=0X3122A4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 3 (Hard) - Clear Rate - Clear" },
+        { address=0X3122A6, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Elimination 3 (Very Hard) - Clear Rate - Clear" },
+        { address=0X312330, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 1 (Easy) - Clear Rate - Clear" },
+        { address=0X312332, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 1 (Normal) - Clear Rate - Clear" },
+        { address=0X312334, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 1 (Hard) - Clear Rate - Clear" },
+        { address=0X312336, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 1 (Very Hard) - Clear Rate - Clear" },
+        { address=0X3123C0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 2 (Easy) - Clear Rate - Clear" },
+        { address=0X3123C2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 2 (Normal) - Clear Rate - Clear" },
+        { address=0X3123C4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 2 (Hard) - Clear Rate - Clear" },
+        { address=0X3123C6, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 2 (Very Hard) - Clear Rate - Clear" },
+        { address=0X312450, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 3 (Easy) - Clear Rate - Clear" },
+        { address=0X312452, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 3 (Normal) - Clear Rate - Clear" },
+        { address=0X312454, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 3 (Hard) - Clear Rate - Clear" },
+        { address=0X312456, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="{JP} Network Play Data - Scenario - Showdown 3 (Very Hard) - Clear Rate - Clear" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X38ADD4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="{JP} Results - Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X312060, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="{JP} Network Play Data - Scenario - Desperate Times (Easy) - Clear Rate - Clear" },
+        { address=0X312062, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="{JP} Network Play Data - Scenario - Desperate Times (Normal) - Clear Rate - Clear" },
+        { address=0X312064, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="{JP} Network Play Data - Scenario - Desperate Times (Hard) - Clear Rate - Clear" },
+        { address=0X312066, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="{JP} Network Play Data - Scenario - Desperate Times (Very Hard) - Clear Rate - Clear" },
+      },
+    },
+  },
+}

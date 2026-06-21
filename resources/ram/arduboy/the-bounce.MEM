@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "The Bounce",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-bounce",
+    file = "the-bounce.zip",
+    hashes = {
+      { hash = "f557ab3e1ab9a3b6a6b550ff3b6a3d52", label = "Bounce, The (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0AE2, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title [Bit0]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0108, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select" },
+        { address=0X0148, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Furthest Level" },
+        { address=0X03B7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X002C, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Jump Button [Bit6]" },
+        { address=0X0804, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Air Jump Remaining [Bit0]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X03B1, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint grabbed [Bit0]" },
+      },
+    },
+  },
+}

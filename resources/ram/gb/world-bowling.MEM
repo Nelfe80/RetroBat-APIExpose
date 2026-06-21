@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "World Bowling",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "world-bowling",
+    file = "world-bowling.zip",
+    hashes = {
+      { hash = "e8d2a7833fd082f8cc62277d02e84a30", label = "World Bowling (USA).gb" },
+    }
+  },
+
+  events = {
+  },
+}

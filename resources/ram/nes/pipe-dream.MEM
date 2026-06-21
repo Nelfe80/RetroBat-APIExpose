@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Pipe Dream",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "pipe-dream",
+    file = "pipe-dream.zip",
+    hashes = {
+      { hash = "6ff5c5da9f7ff2600e18f0f168cd8389", label = "Pipe Dream (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00E2, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="state [2=in game, 9=game over, C=push button]" },
+        { address=0X06B9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="00=not cheating,01=flowing, ff=paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="state (0=before level, 1=before flooz, 2=flooz flowing)" },
+        { address=0X0444, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+        { address=0X0445, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="sublevel" },
+        { address=0X0453, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 = bonus level" },
+        { address=0X053B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="crosses crossed (carries over between levels)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X002B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="screen: 02=main board, 04=logo, 05=bonus, 06=paused, 07=select, 08=title/score" },
+        { address=0X0064, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] points for next cross scored" },
+        { address=0X006A, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit] bonus just scored" },
+        { address=0X048C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="score [lower 8 bytes]" },
+        { address=0X048E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="score [middle 8 bytes]" },
+        { address=0X0490, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="score [upper 8 bytes]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Time Zone",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "time-zone",
+    file = "time-zone.zip",
+    hashes = {
+      { hash = "15f0390bb59ae0ee1b05c8a3549f9136", label = "Time Zone v1.1 disk A.woz" },
+      { hash = "97175de30b2c232eac3a4cd281194787", label = "Time Zone v1.1 disk B.woz" },
+      { hash = "a6512ace8ae19d68452e393a37273896", label = "Time Zone v1.1 disk C.woz" },
+      { hash = "8b43e21a6bbefe126c9a25d0cf79311c", label = "Time Zone v1.1 disk D.woz" },
+      { hash = "b38299459778943bd504870277547738", label = "Time Zone v1.1 disk E.woz" },
+      { hash = "42113d37e9be4db9e87a7ff0de37bcf1", label = "Time Zone v1.1 disk F.woz" },
+      { hash = "48d54c62f5fac4b3b4e5661d60e4cac0", label = "Time Zone v1.1 disk G.woz" },
+      { hash = "05fea0fa803ef62bede527772c8f6cd5", label = "Time Zone v1.1 disk H.woz" },
+      { hash = "8ea8f8bb7cfb30e23430445736f49ea6", label = "Time Zone v1.1 disk I.woz" },
+      { hash = "543840d1ac12097de2bb21b31ec61283", label = "Time Zone v1.1 disk J.woz" },
+      { hash = "357df1fd3cbfc808c7c48d5a2d11a49b", label = "Time Zone v1.1 disk K.woz" },
+      { hash = "bfa5c0df411c2cc599e6db0fd55632f1", label = "Time Zone v1.1 disk L.woz" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X89BE, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="1A (disk 1, side A) - Title screen and main menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0C29, type="u8", condition="eq", value=0XFD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Used/consumed or not removed from ground (50 B.C. Australia)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0083, type="u8", condition="eq", value=0XC4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pyramid interior - tunnel dead-end" },
+        { address=0X0083, type="u8", condition="eq", value=0XEE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pyramid interior - tunnel dead-end" },
+        { address=0X0083, type="u8", condition="eq", value=0X8C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bushlands with dead kangaroo" },
+        { address=0X0083, type="u8", condition="eq", value=0XE0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="City - dead-end street (wallet, id)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0083, type="u8", condition="eq", value=0X14, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bathing room with Cleopatra (Egyptian money)" },
+        { address=0X0083, type="u8", condition="eq", value=0X1C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Cave large room (gold)" },
+        { address=0X09B8, type="u8", condition="eq", value=0XFD, action="MONEY_STATE", no_log=false, no_survey=false, desc="Used/consumed (given to Robin Hood 1000 A.D. Europe) or not obtained" },
+        { address=0X09B8, type="u8", condition="eq", value=0XFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0A6E, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="At original location (1400 A.D. Africa)" },
+        { address=0X0A6E, type="u8", condition="eq", value=0XFD, action="MONEY_STATE", no_log=false, no_survey=false, desc="Used/consumed" },
+        { address=0X0A6E, type="u8", condition="eq", value=0XFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="In inventory" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0083, type="u8", condition="eq", value=0X7A, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Pyramid interior - empty tomb (shield)" },
+        { address=0X099E, type="u8", condition="eq", value=0XC5, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="At original location (50 B.C. Africa)" },
+        { address=0X099E, type="u8", condition="eq", value=0XFD, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Used/consumed" },
+        { address=0X099E, type="u8", condition="eq", value=0XFE, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="In inventory" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0083, type="u8", condition="eq", value=0XA4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Castle door (pin)" },
+        { address=0X0083, type="u8", condition="eq", value=0X62, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Palace side door" },
+        { address=0X0083, type="u8", condition="eq", value=0XE2, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="City - alley with cement block" },
+        { address=0X0083, type="u8", condition="eq", value=0X2A, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Maze of hallways (finish - giant ray room door)" },
+        { address=0X0083, type="u8", condition="eq", value=0XB8, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Military installation - front door" },
+        { address=0X8929, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[8-bit Boolean] Destroyed Giant Ray Gun Machine (0 = no, 1 = yes)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0083, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current Room/Screen" },
+        { address=0X89B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Region" },
+        { address=0X89B9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Time Period" },
+      },
+    },
+  },
+}

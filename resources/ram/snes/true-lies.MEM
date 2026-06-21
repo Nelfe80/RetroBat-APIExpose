@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "True Lies",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "true-lies",
+    file = "true-lies.zip",
+    hashes = {
+      { hash = "39f967af37382588a517d7a1b3ce6262", label = "True Lies (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X04A4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number" },
+        { address=0X08A2, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X08A2, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Infinite Lives" },
+        { address=0X1A57, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0X1A57, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+      },
+      health = {
+        { address=0X08A2, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Infinite Energy" },
+        { address=0X2D38, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP decreased" },
+        { address=0X2D38, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X00BF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Weapon" },
+        { address=0X08A2, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Infinite Weapons" },
+      },
+    },
+  },
+}

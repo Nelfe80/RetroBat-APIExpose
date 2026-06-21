@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Donald Duck's Playground",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "donald-ducks-playground",
+    file = "donald-ducks-playground.zip",
+    hashes = {
+      { hash = "60f45339fbe46f408592bca103cfe39a", label = "Donald Duck's Playground (1986)(Sierra - Walt Disney Personal Computer Software)(Side A).do" },
+      { hash = "5eec6a88baa3f36a219a13125f6e2163", label = "Donald Duck's Playground (1986)(Sierra - Walt Disney Personal Computer Software)(Side B)[unk filesys].do" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X02C2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 bit] - playground item you are using (ladders, mobkey bars, slides, old box etc)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X02CB, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 bit] - playground item you are playing with, working for Rings, Swing, Toy Horse, Trampoline" },
+        { address=0X9181, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Earned in cents during current job increased" },
+        { address=0X91E9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] money earned in dollars during current job increased" },
+        { address=0X91EB, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Money in cents increased" },
+        { address=0X9323, type="u16le", condition="eq", value=0XB107, action="MONEY_STATE", no_log=false, no_survey=false, desc="Rings" },
+        { address=0X9443, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] - money in 1 cents coins earned overall increased" },
+        { address=0X9444, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] - money in 5 cents coins earned overall increased" },
+        { address=0X9445, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] - money in 10 cents coins earned overall increased" },
+        { address=0X9446, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] - money in 25 cents coins earned overall increased" },
+        { address=0X9447, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] - money in 1 dollar bills earned overall increased" },
+        { address=0X9448, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] - money in 5 dollar bills earned overall increased" },
+      },
+    },
+  },
+}

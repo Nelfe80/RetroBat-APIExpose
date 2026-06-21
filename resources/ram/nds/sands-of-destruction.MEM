@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Sands of Destruction",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "sands-of-destruction",
+    file = "sands-of-destruction.zip",
+    hashes = {
+      { hash = "ca47cb3538642bc0102be408e92f001f", label = "Sands of Destruction (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA7D83, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Story flags (continues from the previous byte)" },
+        { address=0X153E65, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="The option that is selected on the Title Screen" },
+        { address=0X157EF6, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Music volume setting in the Options menu when accessed from the Title Screen" },
+        { address=0X157FE8, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="The option that is selected in the Options menu when accessed from the Title Screen" },
+      },
+      events = {
+        { address=0X158BA3, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current combo of battle member 1" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAA8AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kyrie's level" },
+        { address=0XAA8B4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kyrie's EXP requirement to level up - 16-bit" },
+        { address=0X1585E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle member 1's level" },
+        { address=0X1585E8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle member 1's acquired EXP since last level up - 32-bit" },
+        { address=0X1585EC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle member 1's EXP requirement for leveling up - 16-bit" },
+      },
+      zone = {
+        { address=0X153DD9, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Location selected on the world map screen?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XAA8BC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kyrie's current HP on the field - 16-bit decreased" },
+        { address=0XAA8BC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kyrie's current HP on the field - 16-bit increased" },
+        { address=0XAA8C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kyrie's max HP - 16-bit decreased" },
+        { address=0XAA8C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kyrie's max HP - 16-bit increased" },
+        { address=0X1585F4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle member 1's current HP - 16-bit decreased" },
+        { address=0X1585F4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle member 1's current HP - 16-bit increased" },
+        { address=0X1585F8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle member 1's max HP - 16-bit decreased" },
+        { address=0X1585F8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle member 1's max HP - 16-bit increased" },
+        { address=0X159854, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle member 2's current HP - 16-bit decreased" },
+        { address=0X159854, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle member 2's current HP - 16-bit increased" },
+        { address=0X159858, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle member 2's max HP - 16-bit decreased" },
+        { address=0X159858, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle member 2's max HP - 16-bit increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAA954, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Item ID of Kyrie's equipped weapon - 16-bit" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAA888, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money - 32-bit increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XAD080, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time played in hours (does not display beyond 99, but it still continues to count up) - 32-bit" },
+      },
+    },
+  },
+}

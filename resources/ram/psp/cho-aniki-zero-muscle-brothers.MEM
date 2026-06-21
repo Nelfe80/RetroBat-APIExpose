@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Cho Aniki Zero: Muscle Brothers",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cho-aniki-zero-muscle-brothers",
+    file = "cho-aniki-zero-muscle-brothers.zip",
+    hashes = {
+      { hash = "982cd909faf27eb4355ff83eac252d73", label = "Cho Aniki Zero (USA) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9EF338, type="u32le", condition="eq", value=0X002AB1C0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X100AE8C, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Ingame" },
+        { address=0X100AE8C, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Gameplay" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X9EE432, type="u16le", condition="eq", value=0XFFFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Menu/Stage Transition/Cutscenes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9E2CA6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X9E2CA6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9E2CB0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+        { address=0X9E2CB4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+        { address=0X9EF338, type="u32le", condition="eq", value=0X00191580, action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore" },
+        { address=0X100BF00, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 1st Place" },
+        { address=0X100BF04, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 1st Place" },
+        { address=0X100BF10, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 2nd Place" },
+        { address=0X100BF14, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 2nd Place" },
+        { address=0X100BF20, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 3rd Place" },
+        { address=0X100BF24, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 3rd Place" },
+        { address=0X100BF30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 4th Place" },
+        { address=0X100BF34, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 4th Place" },
+        { address=0X100BF40, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 5th Place" },
+        { address=0X100BF44, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 5th Place" },
+        { address=0X100BF50, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 6th Place" },
+        { address=0X100BF54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 6th Place" },
+        { address=0X100BF60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 7th Place" },
+        { address=0X100BF64, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 7th Place" },
+        { address=0X100BF70, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 8th Place" },
+        { address=0X100BF74, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 8th Place" },
+        { address=0X100BF80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 9th Place" },
+        { address=0X100BF84, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 9th Place" },
+        { address=0X100BF90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 10th Place" },
+        { address=0X100BF94, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - 10th Place" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9E2D14, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush - Score Attack" },
+        { address=0X9E2D14, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush - Time Attack" },
+        { address=0X100BD88, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush" },
+        { address=0X1056960, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9E2CF8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Rush - Time Attack Timer" },
+        { address=0X9E2D14, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Game Mode" },
+      },
+    },
+  },
+}

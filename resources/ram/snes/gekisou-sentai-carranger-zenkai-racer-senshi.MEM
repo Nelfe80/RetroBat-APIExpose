@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Gekisou Sentai Carranger: Zenkai! Racer Senshi",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "gekisou-sentai-carranger-zenkai-racer-senshi",
+    file = "gekisou-sentai-carranger-zenkai-racer-senshi.zip",
+    hashes = {
+      { hash = "1a882cd6f4aec52fcd75716eaf93213d", label = "Gekisou Sentai Car Rangers (ST) (GTConversion) [o1].sfc" },
+      { hash = "1b7b514d0d10aec6e92d529f5f3ecd62", label = "SD Gundam Generation C - Axis Senki (ST) (GTConversion) [o3].sfc" },
+      { hash = "540b4aefd31867bbe7a242ee97d40d1e", label = "Gekisou Sentai Car Rangers (ST) (GTConversion) [o5].sfc" },
+      { hash = "5464d5ab17d2d2a4f5d72ee3c8734c7f", label = "Gekisou Sentai Car Rangers (ST) (GTConversion) [o4].sfc" },
+      { hash = "b873640466329a8f61d55a5f96aa41de", label = "Gekisou Sentai Car Rangers (ST) (GTConversion) [o2].sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0102, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="60 = Stage Clear (macacocareca used that)" },
+      },
+      stage = {
+        { address=0X0048, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x01 Start Menu, 0x02 Selecting char, 0x03 ingame Stage1," },
+        { address=0X004C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages Sections (16bit)" },
+        { address=0X0480, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1A40, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (8bit HEX) decreased" },
+        { address=0X1A40, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (8bit HEX) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1A03, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 7 = Boss Defeated" },
+        { address=0X1A50, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP (8bit HEX)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1A00, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="4bit upper = attack input, 4bit lower: jump" },
+      },
+    },
+  },
+}

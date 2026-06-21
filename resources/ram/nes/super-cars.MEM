@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Super Cars",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "super-cars",
+    file = "super-cars.zip",
+    hashes = {
+      { hash = "b7cbb7f9126f3b6f987ba5324f50b22c", label = "Super Cars (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

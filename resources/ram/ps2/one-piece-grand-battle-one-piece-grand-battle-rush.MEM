@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "One Piece: Grand Battle! | One Piece: Grand Battle! Rush!",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Fighting"
+  },
+
+  rom = {
+    name = "one-piece-grand-battle-one-piece-grand-battle-rush",
+    file = "one-piece-grand-battle-one-piece-grand-battle-rush.zip",
+    hashes = {
+      { hash = "2b32bb9f8e263b0313ffe5f67d6b9ed3", label = "Shonen Jump's One Piece - Grand Battle (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1CEE3F0, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X1CEF330, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Story Mode - Remaining Continues (8-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CEEA04, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60" },
+        { address=0X1CEEA04, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="99" },
+        { address=0X1CEEA04, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Infinite" },
+        { address=0X1CEEA04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grand Tourney - Round Timer (8-bit)" },
+      },
+      zone = {
+        { address=0X1CEEA00, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="1" },
+        { address=0X1CEEA00, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="2" },
+        { address=0X1CEEA00, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="3" },
+        { address=0X1CEEA00, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tourney - Number of Wins (8-bit)" },
+      },
+      stage = {
+        { address=0X1CEF32C, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1CEF2C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Custom Battle - P1 Handicap (8-bit) decreased" },
+        { address=0X1CEF2C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Custom Battle - P2/CPU Handicap (8-bit) decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1CED73E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Luffy - Treasure - Gallery - Player Character (unlocked) [4bit]" },
+        { address=0X1CED746, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Luffy - Treasure - Gallery - Player Character (seen) [4bit]" },
+        { address=0X1CED75A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Zolo - Treasure - Gallery - Player Character (unlocked) [4bit]" },
+        { address=0X1CED762, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Zolo - Treasure - Gallery - Player Character (seen) [4bit]" },
+        { address=0X1CED776, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Nami - Treasure - Gallery - Player Character (unlocked) [4bit]" },
+        { address=0X1CED77E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Nami - Treasure - Gallery - Player Character (seen) [4bit]" },
+        { address=0X1CED792, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Usopp - Treasure - Gallery - Player Character (unlocked) [4bit]" },
+        { address=0X1CED79A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Usopp - Treasure - Gallery - Player Character (seen) [4bit]" },
+        { address=0X1CED7AE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Sanji - Treasure - Gallery - Player Character (unlocked) [4bit]" },
+        { address=0X1CED7B6, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Sanji - Treasure - Gallery - Player Character (seen) [4bit]" },
+        { address=0X1CED7E6, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chaser - Treasure - Gallery - Player Character (unlocked) [2bit]" },
+        { address=0X1CED7EE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chaser - Treasure - Gallery - Player Character (seen) [2bit]" },
+        { address=0X1CED838, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chaser - Treasure - Gallery - Player Character (unlocked) [34bit]" },
+        { address=0X1CED840, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Chaser - Treasure - Gallery - Player Character (unlocked) [34bit]" },
+        { address=0X1CED872, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Buggy - Treasure - Gallery - Player Character (unlocked) [2bit]" },
+        { address=0X1CED87A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Buggy - Treasure - Gallery - Player Character (seen) [2bit]" },
+        { address=0X1CED88E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Kuro - Treasure - Gallery - Player Character (unlocked) [2bit]" },
+        { address=0X1CED896, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Kuro - Treasure - Gallery - Player Character (seen) [2bit]" },
+        { address=0X1CED8AA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Don Krieg - Treasure - Gallery - Player Character [2bit](unlocked)" },
+        { address=0X1CED8B2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Don Krieg - Treasure - Gallery - Player Character (seen) [2bit]" },
+        { address=0X1CED8E2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Arlong - Treasure - Gallery - Player Character (unlocked) [2bit]" },
+        { address=0X1CED8EA, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Arlong - Treasure - Gallery - Player Character (seen) [2bit]" },
+        { address=0X1CEDA14, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures - Movies (unlocked) [18bit]" },
+        { address=0X1CEDA18, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures - Movies (seen) [18bit]" },
+        { address=0X1CEF2C0, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Big Power Down" },
+        { address=0X1CEF2C0, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Small Power Down" },
+        { address=0X1CEF2C0, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="None" },
+        { address=0X1CEF2C0, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Small Power Up" },
+        { address=0X1CEF2C0, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Big Power Up" },
+        { address=0X1CEF2C4, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Big Power Down" },
+        { address=0X1CEF2C4, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Small Power Down" },
+        { address=0X1CEF2C4, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="None" },
+        { address=0X1CEF2C4, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Small Power Up" },
+        { address=0X1CEF2C4, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Big Power Up" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1CEF2C0, type="u8", condition="eq", value=0X04, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Big Power Down" },
+        { address=0X1CEF2C0, type="u8", condition="eq", value=0X00, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Big Power Up" },
+        { address=0X1CEF2C4, type="u8", condition="eq", value=0X04, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Big Power Down" },
+        { address=0X1CEF2C4, type="u8", condition="eq", value=0X00, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Big Power Up" },
+      },
+      player = {
+        { address=0X1CEE5D1, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Jump Battle" },
+      },
+    },
+  },
+}

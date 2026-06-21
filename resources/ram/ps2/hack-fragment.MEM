@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = ".hack//Fragment",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hack-fragment",
+    file = "hack-fragment.zip",
+    hashes = {
+      { hash = "b169ab478dc1bb5b56673e202fc5307b", label = "Dot Hack Fraegment (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA5AC6A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Offline] Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA5AC80, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Offline] Max HP decreased" },
+        { address=0XA5AC80, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Offline] Max HP increased" },
+        { address=0X18E7A50, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Online] Current HP decreased" },
+        { address=0X18E7A50, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Online] Current HP increased" },
+        { address=0X18E7A54, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Online] Max HP decreased" },
+        { address=0X18E7A54, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Online] Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA5AC70, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Offline] Money increased" },
+        { address=0XC46510, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Online] Money increased" },
+      },
+    },
+  },
+}

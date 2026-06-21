@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Chrono Cross",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "chrono-cross",
+    file = "chrono-cross.zip",
+    hashes = {
+      { hash = "3205c5e7677dbf23184e9c25f250aeb9", label = "Chrono Cross (USA) (Fr) (v1.1b) (Disc 2)" },
+      { hash = "3e4bbb093dc7a0de8120c3136cd9b808", label = "Chrono Cross (USA) (Pt) (Disc 1)" },
+      { hash = "4639202c4b261cbe32e96baa63bed493", label = "Chrono Cross (USA) (Fr) (v1.1b) (Disc 1)" },
+      { hash = "6f89a01fd2a2ddbc04e23e836f808a2e", label = "Chrono Cross (USA) (Disc 1)" },
+      { hash = "768ebd2c0f10650c521ba3a642e8118c", label = "Chrono Cross (USA) (It) (v1.2) (SadNES cITy Translations) (Disc 1)" },
+      { hash = "7af3815e2d153fcc0447230f5d64e2ae", label = "Chrono Cross (USA) (Pt) (Disc 2)" },
+      { hash = "82597be85af023c03f914cef4f089e16", label = "Chrono Cross (USA) (Es) (v3.1) (Chrono Traducciones) (Disc 1)" },
+      { hash = "c70860d8ae34d6d6e4267860ad5bbd2e", label = "Chrono Cross (USA) (It) (v1.2) (SadNES cITy Translations) (Disc 2)" },
+      { hash = "d53dce448595e8db0329cb77d16c3160", label = "Chrono Cross (USA) (Es) (v3.1) (Chrono Traducciones) (Disc 2)" },
+      { hash = "f1a039e053930537af3bf7970c1e551b", label = "Chrono Cross (USA) (Disc 2)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X70F60, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="finishing waitress quest" },
+        { address=0XDB1E6, type="u16le", condition="eq", value=0XFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 0=1 1=2 etc" },
+        { address=0XDB1E6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16 bit) 1st char - power levels" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X71069, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lavos report" },
+        { address=0X71081, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="failed to save Rosetta" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X70F61, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="fight last boss" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDB021, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="(8 bit) char selected (in combat)" },
+      },
+    },
+  },
+}

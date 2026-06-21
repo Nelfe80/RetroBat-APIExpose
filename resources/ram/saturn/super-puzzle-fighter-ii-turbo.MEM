@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Super Puzzle Fighter II Turbo",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "super-puzzle-fighter-ii-turbo",
+    file = "super-puzzle-fighter-ii-turbo.zip",
+    hashes = {
+      { hash = "5bb435df088432df15cb9527b18d60c2", label = "Super Puzzle Fighter II Turbo (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X15CE65, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Flag" },
+        { address=0X15CFA7, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[16 Bit] Continues Used" },
+        { address=0X15CFA9, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8 Bit] Demo Flag" },
+        { address=0X160B01, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Soft reset goes to title." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X15CE42, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="VS Round Adjust in Options" },
+        { address=0X15CE43, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU Round Adjust in Options" },
+        { address=0X15CE7A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X15CE10, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="0x03 - Goodies Menu" },
+      },
+      health = {
+        { address=0X15CE40, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage Level Adjust in Options" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X15D23A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Score - 16-bit Hex" },
+        { address=0X17D170, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score Overflow" },
+        { address=0X17D172, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X15D156, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] 1P Block Rotation" },
+        { address=0X15D166, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of blocks P1 is about to drop on P2" },
+        { address=0X15D412, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of blocks P2 is about to drop on P1" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15D12C, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Match Timer" },
+        { address=0X15D4A4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 1 - Character Select Timer" },
+        { address=0X15D590, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2 Character Select Timer" },
+      },
+    },
+  },
+}

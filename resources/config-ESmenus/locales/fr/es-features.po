@@ -1,0 +1,2489 @@
+# APIExpose es_features translations - fr
+# This file is merged into RetroBat es_features.locale/<locale>/es-features.po by APIExpose.
+# Media naming terms such as SCREENSHOT, TITLESHOT, THUMBNAIL and MARQUEE are intentionally kept stable.
+
+msgctxt "game_options"
+msgid "10"
+msgstr "10"
+
+msgctxt "game_options"
+msgid "16:10"
+msgstr "16:10"
+
+msgctxt "game_options"
+msgid "16:9"
+msgstr "16:9"
+
+msgctxt "game_options"
+msgid "2 BUTTONS"
+msgstr "2 BOUTONS"
+
+msgctxt "game_options"
+msgid "20"
+msgstr "20"
+
+msgctxt "game_options"
+msgid "4 BUTTONS"
+msgstr "4 BOUTONS"
+
+msgctxt "game_options"
+msgid "4:3"
+msgstr "4:3"
+
+msgctxt "game_options"
+msgid "5"
+msgstr "5"
+
+msgctxt "game_options"
+msgid "50"
+msgstr "50"
+
+msgctxt "game_options"
+msgid "6 BUTTONS"
+msgstr "6 BOUTONS"
+
+msgctxt "game_options"
+msgid "8 BUTTONS"
+msgstr "8 BOUTONS"
+
+msgctxt "game_options"
+msgid "ADVANCED SETTINGS"
+msgstr "OPTIONS AVANCEES"
+
+msgctxt "game_options"
+msgid "ALL"
+msgstr "TOUS"
+
+msgctxt "game_options"
+msgid "Allows remote manual downloads. Disabled by default because these files are large."
+msgstr "Autorise le telechargement distant des manuels. Desactive par defaut car les fichiers sont lourds."
+
+msgctxt "game_options"
+msgid "Allows remote marquee downloads as enrichment. If MARQUEE is selected as the visible source, it remains priority."
+msgstr "Autorise le telechargement distant des marquees en enrichissement. Si MARQUEE est choisi comme source visible, il reste prioritaire."
+
+msgctxt "game_options"
+msgid "Allows remote mix downloads as enrichment. If MIX is selected as the visible source, it remains priority."
+msgstr "Autorise le telechargement distant des mix en enrichissement. Si MIX est choisi comme source visible, il reste prioritaire."
+
+msgctxt "game_options"
+msgid "Allows remote normalized video downloads. Disabled by default."
+msgstr "Autorise le telechargement distant des videos normalisees. Desactive par defaut."
+
+msgctxt "game_options"
+msgid "Allows remote screen marquee and small screen marquee downloads as enrichment."
+msgstr "Autorise le telechargement distant des screen marquees et screen marquees small en enrichissement."
+
+msgctxt "game_options"
+msgid "Allows remote SteamGrid downloads as enrichment. If STEAMGRID is selected as the visible source, it remains priority."
+msgstr "Autorise le telechargement distant des steamgrid en enrichissement. Si STEAMGRID est choisi comme source visible, il reste prioritaire."
+
+msgctxt "game_options"
+msgid "Allows remote video downloads. Disabled by default because these files are large."
+msgstr "Autorise le telechargement distant des videos. Desactive par defaut car les fichiers sont lourds."
+
+msgctxt "game_options"
+msgid "Allows scraping, installation and automatic deployment of themes declared by APIExpose."
+msgstr "Autorise le scrap, l'installation et le deploiement automatique des themes declares par APIExpose."
+
+msgctxt "game_options"
+msgid "Allows ScreenScraper to fill the canonical media store when local scraping is not enough."
+msgstr "Autorise ScreenScraper a alimenter la base media canonique quand le scraping local ne suffit pas."
+
+msgctxt "game_options"
+msgid "Translates English descriptions after ScreenScraper when the current language has no localized description."
+msgstr "Traduit les descriptions anglaises apres ScreenScraper quand la langue courante n'a pas de description localisee."
+
+msgctxt "game_options"
+msgid "API FILTER"
+msgstr "FILTRE API"
+
+msgctxt "game_options"
+msgid "API SETTINGS"
+msgstr "PARAMETRES API"
+
+msgctxt "game_options"
+msgid "CONTROL PANEL"
+msgstr "CONTROL PANEL"
+
+msgctxt "game_options"
+msgid "Applies a collection system theme to games from its families when no dedicated game theme exists."
+msgstr "Applique le theme systeme d'une collection aux jeux de ses familles quand aucun theme jeu dedie n'existe."
+
+msgctxt "game_options"
+msgid "ARCADE HANDLING"
+msgstr "GESTION ARCADE"
+
+msgctxt "game_options"
+msgid "AUTO"
+msgstr "AUTO"
+
+msgctxt "game_options"
+msgid "AUTO SCRAPING MANAGER"
+msgstr "GESTIONNAIRE D'AUTO SCRAPING"
+
+msgctxt "game_options"
+msgid "BEST CLONE"
+msgstr "MEILLEUR CLONE"
+
+msgctxt "game_options"
+msgid "BEZEL MODE"
+msgstr "MODE BEZELS"
+
+msgctxt "game_options"
+msgid "BOX 2D"
+msgstr "BOX 2D"
+
+msgctxt "game_options"
+msgid "BOX 3D"
+msgstr "BOX 3D"
+
+msgctxt "game_options"
+msgid "CAPTURE CONSOLE HIGH SCORE"
+msgstr "CAPTURE HIGH SCORE CONSOLE"
+
+msgctxt "game_options"
+msgid "Captures in-game SCORE signals for compatible consoles."
+msgstr "Capture les signaux SCORE ingame pour les consoles compatibles."
+
+msgctxt "game_options"
+msgid "CARBON"
+msgstr "CARBONE"
+
+msgctxt "game_options"
+msgid "Choose the panel layout used for this system. AUTO uses the cabinet button count."
+msgstr "Choisit le layout panel utilise pour ce systeme. AUTO utilise le nombre de boutons de la borne."
+
+msgctxt "game_options"
+msgid "COLLECTION"
+msgstr "COLLECTION"
+
+msgctxt "game_options"
+msgid "COLLECTION PACK INSTALLER"
+msgstr "INSTALLATEUR DE PACKS COLLECTIONS"
+
+msgctxt "game_options"
+msgid "COLLECTIONS PACK MANAGER"
+msgstr "GESTIONNAIRE DE PACKS COLLECTIONS"
+
+msgctxt "game_options"
+msgid "CONTROLS"
+msgstr "CONTROLES"
+
+msgctxt "game_options"
+msgid "Controls automatic selection of the best variant of the same game. DISPLAY ONLY analyzes without writing."
+msgstr "Controle le choix automatique de la meilleure variante d'un meme jeu. DISPLAY ONLY analyse sans ecrire."
+
+msgctxt "game_options"
+msgid "Controls parent/clone handling for arcade systems."
+msgstr "Controle le traitement parent/clone pour les systemes arcade."
+
+msgctxt "game_options"
+msgid "Controls remote bezel priority. SELECTED FIRST favors the bezel selected in ES, then allows other variants later."
+msgstr "Controle la priorite des bezels distants. SELECTED FIRST privilegie le bezel choisi dans ES puis autorise les autres variantes plus tard."
+
+msgctxt "game_options"
+msgid "Controls whether a translation can become the main variant."
+msgstr "Controle si une traduction peut devenir la variante principale."
+
+msgctxt "game_options"
+msgid "CPO CONTROL PANEL MANAGER"
+msgstr "GESTIONNAIRE CPO CONTROL PANEL"
+
+msgctxt "game_options"
+msgid "DISABLED"
+msgstr "DESACTIVE"
+
+msgctxt "game_options"
+msgid "DISPLAY ONLY"
+msgstr "ANALYSE SEULE"
+
+msgctxt "game_options"
+msgid "DYNAMIC COLLECTIONS"
+msgstr "COLLECTIONS DYNAMIQUES"
+
+msgctxt "game_options"
+msgid "ENABLE API EXPOSE"
+msgstr "ACTIVER L'API EXPOSE"
+
+msgctxt "game_options"
+msgid "ENABLE ARCADE EVENT LISTENER"
+msgstr "ACTIVER L'ECOUTEUR D'EVENEMENTS ARCADE"
+
+msgctxt "game_options"
+msgid "ENABLE AUTO SCRAPING MANAGER"
+msgstr "ACTIVER LE GESTIONNAIRE D'AUTO SCRAPING"
+
+msgctxt "game_options"
+msgid "ENABLE COLLECTIONS PACK MANAGER"
+msgstr "ACTIVER LE GESTIONNAIRE DE PACKS COLLECTIONS"
+
+msgctxt "game_options"
+msgid "ENABLE CPO CONTROL PANEL MANAGER"
+msgstr "ACTIVER LE GESTIONNAIRE CPO CONTROL PANEL"
+
+msgctxt "game_options"
+msgid "ENABLE FOR THEMES"
+msgstr "ACTIVER POUR LES THEMES"
+
+msgctxt "game_options"
+msgid "ENABLE GAME EVENTS MANAGER"
+msgstr "ACTIVER LE GESTIONNAIRE D'EVENEMENTS DE JEU"
+
+msgctxt "game_options"
+msgid "ENABLE HIGH SCORE EXPOSE"
+msgstr "ACTIVER HIGH SCORE EXPOSE"
+
+msgctxt "game_options"
+msgid "ENABLE IN-GAME EVENT LISTENER"
+msgstr "ACTIVER L'ECOUTEUR D'EVENEMENTS INGAME"
+
+msgctxt "game_options"
+msgid "ENABLE LOCAL MEDIA MANAGER"
+msgstr "ACTIVER LE GESTIONNAIRE DE MEDIAS LOCAUX"
+
+msgctxt "game_options"
+msgid "ENABLE MARQUEE MANAGER"
+msgstr "ACTIVER LE GESTIONNAIRE MARQUEE"
+
+msgctxt "game_options"
+msgid "ENABLE ROMS MANAGER"
+msgstr "ACTIVER LE GESTIONNAIRE DE ROMS"
+
+msgctxt "game_options"
+msgid "ENABLE SCRAPING QUEUE"
+msgstr "ACTIVER LA FILE DE SCRAPING"
+
+msgctxt "game_options"
+msgid "ENABLE SCREENSCRAPER"
+msgstr "ACTIVER SCREENSCRAPER"
+
+msgctxt "game_options"
+msgid "TRANSLATE DESCRIPTIONS"
+msgstr "TRADUIRE LES DESCRIPTIONS"
+
+msgctxt "game_options"
+msgid "ENABLE SWAGGER"
+msgstr "ACTIVER SWAGGER"
+
+msgctxt "game_options"
+msgid "ENABLE THEME DEPLOYMENTS"
+msgstr "ACTIVER LES DEPLOIEMENTS DE THEMES"
+
+msgctxt "game_options"
+msgid "ENABLE THEMES MANAGER"
+msgstr "ACTIVER LE GESTIONNAIRE DE THEMES"
+
+msgctxt "game_options"
+msgid "ENABLE WEBSOCKET STREAM"
+msgstr "ACTIVER LE FLUX WEBSOCKET"
+
+msgctxt "game_options"
+msgid "Enables consolidated .gameinfos theme exports for CPO panels and high scores."
+msgstr "Active les exports theme consolides .gameinfos pour panels CPO et high scores."
+
+msgctxt "game_options"
+msgid "Enables in-game event listening for compatible systems."
+msgstr "Active l'ecoute des evenements ingame pour les systemes compatibles."
+
+msgctxt "game_options"
+msgid "Enables listening to game events, including RetroArch. If disabled, console high scores cannot be captured."
+msgstr "Active l'ecoute des evenements de jeu, dont RetroArch. Si desactive, les hi-scores console ne peuvent pas etre recuperes."
+
+msgctxt "game_options"
+msgid "Enables local media management, ROM projections and gamelist updates."
+msgstr "Active la gestion locale des medias, des projections roms et des mises a jour gamelist."
+
+msgctxt "game_options"
+msgid "Enables local then remote scraping and updates the game view in real time when an actual change is found."
+msgstr "Active le scraping local puis distant et met a jour la fiche du jeu en temps reel quand un vrai changement est trouve."
+
+msgctxt "game_options"
+msgid "Enables or disables the advanced features of the local plugin."
+msgstr "Active ou desactive les fonctions avancees du plugin local."
+
+msgctxt "game_options"
+msgid "Enables Swagger access at http://127.0.0.1:12345/swagger/index.html."
+msgstr "Active l'acces a Swagger sur http://127.0.0.1:12345/swagger/index.html."
+
+msgctxt "game_options"
+msgid "Enables the collection pack installer for deployable themes."
+msgstr "Active le gestionnaire d'installation de packs collections pour les themes deployables."
+
+msgctxt "game_options"
+msgid "Enables the future manager for data used by marquee clients."
+msgstr "Active le futur gestionnaire des donnees utiles aux clients marquee."
+
+msgctxt "game_options"
+msgid "Enables the future romset management and filtering module."
+msgstr "Active le futur module de gestion et filtrage des romsets."
+
+msgctxt "game_options"
+msgid "Enables the low-priority scraping queue. It pauses during live scraping and resumes from the latest added media."
+msgstr "Active la file de scraping basse priorite. Elle se met en pause pendant le scrap live et reprend sur les derniers medias ajoutes."
+
+msgctxt "game_options"
+msgid "Enables the real-time stream available at ws://127.0.0.1:12345/ws."
+msgstr "Active le flux temps reel a ecouter sur ws://127.0.0.1:12345/ws."
+
+msgctxt "game_options"
+msgid "ENGLISH"
+msgstr "ANGLAIS"
+
+msgctxt "game_options"
+msgid "EUROPE"
+msgstr "EUROPE"
+
+msgctxt "game_options"
+msgid "EXPORT .HISCORE"
+msgstr "EXPORTER .HISCORE"
+
+msgctxt "game_options"
+msgid "EXPORT SCORE ON GAME-END"
+msgstr "EXPORT SCORE AU GAME-END"
+
+msgctxt "game_options"
+msgid "EXTENDED OPTIONS"
+msgstr "OPTIONS ETENDUES"
+
+msgctxt "game_options"
+msgid "FANART"
+msgstr "FANART"
+
+msgctxt "game_options"
+msgid "FRANCE"
+msgstr "FRANCE"
+
+msgctxt "game_options"
+msgid "FRENCH"
+msgstr "FRANCAIS"
+
+msgctxt "game_options"
+msgid "GAME EVENTS MANAGER"
+msgstr "GESTIONNAIRE D'EVENEMENTS DE JEU"
+
+msgctxt "game_options"
+msgid "GAMELIST HIDDEN"
+msgstr "MASQUE DANS GAMELIST"
+
+msgctxt "game_options"
+msgid "GENERAL PANEL"
+msgstr "PANEL GENERAL"
+
+msgctxt "game_options"
+msgid "Generates .xcc collections automatically fed by the canonical family tag detected in gamelists. Recommended mode."
+msgstr "Genere des collections .xcc auto-alimentees par la balise family canonique detectee dans les gamelists. Mode recommande."
+
+msgctxt "game_options"
+msgid "Generates a JSON report with decisions, scores and hiding reasons."
+msgstr "Genere un rapport JSON avec les decisions, scores et raisons de masquage."
+
+msgctxt "game_options"
+msgid "Generates custom-*.cfg collections with exact paths for games already present. Compatibility mode, not self-feeding."
+msgstr "Genere des collections custom-*.cfg avec les chemins exacts des jeux deja presents. Mode compatibilite, non auto-alimente."
+
+msgctxt "game_options"
+msgid "HIDE"
+msgstr "MASQUER"
+
+msgctxt "game_options"
+msgid "HIDE VARIANTS"
+msgstr "MASQUER LES VARIANTES"
+
+msgctxt "game_options"
+msgid "Installs collection packs found in package-installer/collections/theme-name at startup (.7z, .zip or .rar), using a hash index."
+msgstr "Installe au demarrage les packs collections presents dans package-installer/collections/theme-name (.7z, .zip ou .rar), avec index hash."
+
+msgctxt "game_options"
+msgid "Installs ROM, media and gamelist packs found in the package-installer folder at startup (.7z, .zip or .rar), using a hash index."
+msgstr "Installe au demarrage les packs ROMs, medias et gamelist presents dans le dossier package-installer (.7z, .zip ou .rar), avec index hash."
+
+msgctxt "game_options"
+msgid "JAPAN"
+msgstr "JAPON"
+
+msgctxt "game_options"
+msgid "KEEP"
+msgstr "CONSERVER"
+
+msgctxt "game_options"
+msgid "LANGUAGE PROFILE"
+msgstr "PROFIL LANGUE"
+
+msgctxt "game_options"
+msgid "Listens to arcade events exposed by compatible emulators."
+msgstr "Ecoute les evenements arcade exposes par les emulateurs compatibles."
+
+msgctxt "game_options"
+msgid "LOCAL MEDIA MANAGER"
+msgstr "GESTIONNAIRE DE MEDIAS LOCAUX"
+
+msgctxt "game_options"
+msgid "LOGO"
+msgstr "LOGO"
+
+msgctxt "game_options"
+msgid "LOGO / MARQUEE"
+msgstr "LOGO / MARQUEE"
+
+msgctxt "game_options"
+msgid "MAIN IMAGE"
+msgstr "IMAGE PRINCIPALE"
+
+msgctxt "game_options"
+msgid "MARQUEE"
+msgstr "MARQUEE"
+
+msgctxt "game_options"
+msgid "MARQUEE MANAGER"
+msgstr "GESTIONNAIRE MARQUEE"
+
+msgctxt "game_options"
+msgid "MAX HIGH SCORES"
+msgstr "MAX HIGH SCORES"
+
+msgctxt "game_options"
+msgid "Maximum number of high score rows kept during console exports."
+msgstr "Nombre maximal de lignes high score conservees lors des exports console."
+
+msgctxt "game_options"
+msgid "MIX"
+msgstr "MIX"
+
+msgctxt "game_options"
+msgid "MULTILINGUAL"
+msgstr "MULTILINGUE"
+
+msgctxt "game_options"
+msgid "OFF"
+msgstr "DESACTIVE"
+
+msgctxt "game_options"
+msgid "NEVER"
+msgstr "JAMAIS"
+
+msgctxt "game_options"
+msgid "ON-THE-FLY ROM INSTALLER"
+msgstr "EXTRACTION ROM A LA DEMANDE"
+
+msgctxt "game_options"
+msgid "ON-THE-FLY EXTRACTION"
+msgstr "EXTRACTION A LA DEMANDE"
+
+msgctxt "game_options"
+msgid "GAME START"
+msgstr "AU LANCEMENT DU JEU"
+
+msgctxt "game_options"
+msgid "GAME SELECTED"
+msgstr "A LA SELECTION DU JEU"
+
+msgctxt "game_options"
+msgid "Chooses when a missing on-the-fly ROM is extracted. Game start waits for extraction before the emulator launches; game selected preloads after selection."
+msgstr "Choisit quand une ROM manquante est extraite a la demande. Au lancement, l'emulateur attend la fin de l'extraction; a la selection, la ROM est prechargee apres la selection du jeu."
+
+msgctxt "game_options"
+msgid "PARENT CLONE GROUP"
+msgstr "GROUPE PARENT / CLONES"
+
+msgctxt "game_options"
+msgid "PARENT ONLY"
+msgstr "PARENT UNIQUEMENT"
+
+msgctxt "game_options"
+msgid "PREFER IF LANGUAGE MATCH"
+msgstr "PREFERER SI LA LANGUE CORRESPOND"
+
+msgctxt "game_options"
+msgid "PREFERRED BEZEL FORMAT"
+msgstr "FORMAT BEZEL PRIORITAIRE"
+
+msgctxt "game_options"
+msgid "Produces button colors, button functions and controller types for themes and LED panels."
+msgstr "Produit la couleur des boutons, leurs fonctions et les types de controllers pour les themes et les panels LED."
+
+msgctxt "game_options"
+msgid "PUSH MARQUEE DATA TO WS STREAM"
+msgstr "POUSSER LES DATAS MARQUEE DANS LE FLUX WS"
+
+msgctxt "game_options"
+msgid "PUSH PANEL CONFIGS TO WS STREAM"
+msgstr "POUSSER LES CONFIGS PANEL DANS LE FLUX WS"
+
+msgctxt "game_options"
+msgid "Pushes the panel configuration resolved from resources/dynpanels into the WebSocket stream when a system or arcade game is selected."
+msgstr "Pousse dans le flux WebSocket la configuration panel resolue depuis resources/dynpanels lors de la selection d'un systeme ou d'un jeu arcade."
+
+msgctxt "game_options"
+msgid "REFRESH GAME VIEW AFTER INSTALL"
+msgstr "RAFRAICHIR LA FICHE APRES INSTALL"
+
+msgctxt "game_options"
+msgid "REFRESH GAME VIEW AFTER SCRAPE"
+msgstr "RAFRAICHIR LA FICHE APRES SCRAP"
+
+msgctxt "game_options"
+msgid "Refreshes the current game view after a successful collection or theme installation."
+msgstr "Rafraichit la fiche courante apres une installation de collection/theme reussie."
+
+msgctxt "game_options"
+msgid "Refreshes the current game view after a successful remote scrape with a real change."
+msgstr "Rafraichit la fiche courante apres un scrap distant reussi avec vrai changement."
+
+msgctxt "game_options"
+msgid "REGION PROFILE"
+msgstr "PROFIL REGION"
+
+msgctxt "game_options"
+msgid "Remote bezel format processed first by ScreenScraper."
+msgstr "Format de bezel distant traite en priorite par ScreenScraper."
+
+msgctxt "game_options"
+msgid "REMOTE SCRAPE AFTER LOCAL"
+msgstr "SCRAP DISTANT APRES LOCAL"
+
+msgctxt "game_options"
+msgid "REPORT ONLY"
+msgstr "RAPPORT UNIQUEMENT"
+
+msgctxt "game_options"
+msgid "Reserves WebSocket delivery of marquee, logo, fanart and game context data to generate a marquee on the fly."
+msgstr "Reserve l'envoi WebSocket des donnees marquee, logo, fanart et contexte jeu pour generer un marquee a la volee."
+
+msgctxt "game_options"
+msgid "ROM INSTALLER"
+msgstr "INSTALLATEUR DE ROMS"
+
+msgctxt "game_options"
+msgid "ROM SET DEBUG REPORT"
+msgstr "RAPPORT DEBUG ROM SET"
+
+msgctxt "game_options"
+msgid "ROM SET OUTPUT"
+msgstr "SORTIE ROM SET"
+
+msgctxt "game_options"
+msgid "ROMS MANAGER"
+msgstr "GESTIONNAIRE DE ROMS"
+
+msgctxt "game_options"
+msgid "SCRAPE MAPS"
+msgstr "SCRAPER LES CARTES"
+
+msgctxt "game_options"
+msgid "SCRAPE MANUALS"
+msgstr "SCRAPER LES MANUELS"
+
+msgctxt "game_options"
+msgid "SCRAPE MARQUEES"
+msgstr "SCRAPER LES MARQUEES"
+
+msgctxt "game_options"
+msgid "SCRAPE MIX"
+msgstr "SCRAPER LES MIX"
+
+msgctxt "game_options"
+msgid "SCRAPE NORMALIZED VIDEOS"
+msgstr "SCRAPER LES VIDEOS NORMALISEES"
+
+msgctxt "game_options"
+msgid "SCRAPE SCREEN MARQUEES"
+msgstr "SCRAPER LES SCREEN MARQUEES"
+
+msgctxt "game_options"
+msgid "SCRAPE STEAMGRID"
+msgstr "SCRAPER STEAMGRID"
+
+msgctxt "game_options"
+msgid "SCRAPE VIDEOS"
+msgstr "SCRAPER LES VIDEOS"
+
+msgctxt "game_options"
+msgid "SCREEN MARQUEE"
+msgstr "SCREEN MARQUEE"
+
+msgctxt "game_options"
+msgid "SCREEN MARQUEE SMALL"
+msgstr "SCREEN MARQUEE SMALL"
+
+msgctxt "game_options"
+msgid "SCREENSHOT"
+msgstr "SCREENSHOT"
+
+msgctxt "game_options"
+msgid "SELECTED FIRST"
+msgstr "SELECTIONNE EN PRIORITE"
+
+msgctxt "game_options"
+msgid "SELECTED ONLY"
+msgstr "SELECTIONNE UNIQUEMENT"
+
+msgctxt "game_options"
+msgid "Selects how the Roms Manager applies its decisions."
+msgstr "Choisit comment le Gestionnaire de ROMs applique ses decisions."
+
+msgctxt "game_options"
+msgid "Selects the local media projected into the gamelist image tag."
+msgstr "Choisit le media local projete dans la balise image des gamelists."
+
+msgctxt "game_options"
+msgid "Selects the local media projected into the gamelist marquee tag."
+msgstr "Choisit le media local projete dans la balise marquee des gamelists."
+
+msgctxt "game_options"
+msgid "Selects the local media projected into the gamelist thumbnail tag."
+msgstr "Choisit le media local projete dans la balise thumbnail des gamelists."
+
+msgctxt "game_options"
+msgid "Selects which wheel variant to use when LOGO / MARQUEE is set to WHEEL HD."
+msgstr "Choisit quelle variante wheel utiliser quand LOGO / MARQUEE vaut WHEEL HD."
+
+msgctxt "game_options"
+msgid "Sets the central user language profile used by ROM filters, metadata localization and services that need a language preference."
+msgstr "Definit la priorite de langue pour choisir une variante principale."
+
+msgctxt "game_options"
+msgid "Sets the central user region profile used by ROM filters, media localization and services that need a region preference."
+msgstr "Definit la priorite de region pour choisir une variante principale."
+
+msgctxt "game_options"
+msgid "Sets the number of buttons on your panel for generic layouts. System variants remain in system options."
+msgstr "Indique le nombre de boutons de votre panel pour les layouts generiques. Les variantes systeme restent dans les options du systeme."
+
+msgctxt "game_options"
+msgid "SHOW ADULT GAMES"
+msgstr "AFFICHER LES JEUX ADULTES"
+
+msgctxt "game_options"
+msgid "SHOW API NOTIFICATIONS"
+msgstr "AFFICHER LES NOTIFICATIONS API"
+
+msgctxt "game_options"
+msgid "SHOW API SPLASHSCREEN"
+msgstr "AFFICHER LE SPLASHSCREEN API"
+
+msgctxt "game_options"
+msgid "SHOW CASINO AND GAMBLING"
+msgstr "AFFICHER CASINO ET GAMBLING"
+
+msgctxt "game_options"
+msgid "SHOW CLONES AND VARIANTS"
+msgstr "AFFICHER LES CLONES ET VARIANTES"
+
+msgctxt "game_options"
+msgid "SHOW HACKS AND BOOTLEGS"
+msgstr "AFFICHER LES HACKS ET BOOTLEGS"
+
+msgctxt "game_options"
+msgid "SHOW HORIZONTAL GAMES"
+msgstr "AFFICHER LES JEUX HORIZONTAUX"
+
+msgctxt "game_options"
+msgid "SHOW MAHJONG"
+msgstr "AFFICHER MAHJONG"
+
+msgctxt "game_options"
+msgid "SHOW NON-ARCADE"
+msgstr "AFFICHER LES NON-ARCADE"
+
+msgctxt "game_options"
+msgid "SHOW NON-GAMES"
+msgstr "AFFICHER LES NON-JEUX"
+
+msgctxt "game_options"
+msgid "SHOW PROTOTYPES"
+msgstr "AFFICHER LES PROTOTYPES"
+
+msgctxt "game_options"
+msgid "SHOW TOAST NOTIFICATIONS"
+msgstr "AFFICHER LES NOTIFICATIONS TOAST"
+
+msgctxt "game_options"
+msgid "SHOW TOAST PROGRESS BARS"
+msgstr "AFFICHER LES BARRES DE PROGRESSION TOAST"
+
+msgctxt "game_options"
+msgid "SHOW VERTICAL GAMES"
+msgstr "AFFICHER LES JEUX VERTICAUX"
+
+msgctxt "game_options"
+msgid "Shows APIExpose toast notifications over EmulationStation."
+msgstr "Affiche les notifications toast APIExpose au-dessus d'EmulationStation."
+
+msgctxt "game_options"
+msgid "Shows APIExpose toast progress bars during long operations."
+msgstr "Affiche les barres toast de progression APIExpose pendant les operations longues."
+
+msgctxt "game_options"
+msgid "Shows native notifications sent to EmulationStation through its notify API on :1234."
+msgstr "Affiche les notifications natives envoyees a EmulationStation via son API notify sur :1234."
+
+msgctxt "game_options"
+msgid "Shows the APIExpose startup overlay during initialization."
+msgstr "Affiche l'overlay de demarrage APIExpose pendant l'initialisation."
+
+msgctxt "game_options"
+msgid "Simply writes hiscores to the folder expected by legacy themes."
+msgstr "Ecrit simplement les hiscores dans le dossier attendu par les themes legacy."
+
+msgctxt "game_options"
+msgid "STATIC COLLECTIONS"
+msgstr "COLLECTIONS STATIQUES"
+
+msgctxt "game_options"
+msgid "STEAMGRID"
+msgstr "STEAMGRID"
+
+msgctxt "game_options"
+msgid "STEEL"
+msgstr "ACIER"
+
+msgctxt "game_options"
+msgid "THEMES MANAGER"
+msgstr "GESTIONNAIRE DE THEMES"
+
+msgctxt "game_options"
+msgid "THUMBNAIL"
+msgstr "THUMBNAIL"
+
+msgctxt "game_options"
+msgid "TITLESHOT"
+msgstr "TITLESHOT"
+
+msgctxt "game_options"
+msgid "Toggle this option to update gamelists from local media and text data. APIExpose does not reset the value after execution."
+msgstr "Changez cette option pour mettre a jour les gamelists depuis les medias et textes locaux. APIExpose ne modifie pas la valeur apres execution."
+
+msgctxt "game_options"
+msgid "TRANSLATIONS"
+msgstr "TRADUCTIONS"
+
+msgctxt "game_options"
+msgid "UNZIP ROMS"
+msgstr "DECOMPRESSER LES ROMS"
+
+msgctxt "game_options"
+msgid "UPDATE MEDIA"
+msgstr "METTRE A JOUR LES MEDIAS"
+
+msgctxt "game_options"
+msgid "Updates high score rows in the .gameinfos XML without replacing panels."
+msgstr "Met a jour les lignes de high score dans le XML .gameinfos sans remplacer les panels."
+
+msgctxt "game_options"
+msgid "USA"
+msgstr "USA"
+
+msgctxt "game_options"
+msgid "VARIANT MODE"
+msgstr "MODE VARIANTES"
+
+msgctxt "game_options"
+msgid "WHEEL HD"
+msgstr "WHEEL HD"
+
+msgctxt "game_options"
+msgid "WHEEL HD STYLE"
+msgstr "STYLE WHEEL HD"
+
+msgctxt "game_options"
+msgid "When disabled, hides clones and variants identified in the local database."
+msgstr "Si desactive, masque les clones et variantes identifies dans la base locale."
+
+msgctxt "game_options"
+msgid "When disabled, hides games marked as horizontal."
+msgstr "Si desactive, masque les jeux signales horizontaux."
+
+msgctxt "game_options"
+msgid "When disabled, hides games marked as vertical."
+msgstr "Si desactive, masque les jeux signales verticaux."
+
+msgctxt "game_options"
+msgid "When disabled, hides identified adult games."
+msgstr "Si desactive, masque les jeux adultes identifies."
+
+msgctxt "game_options"
+msgid "When disabled, hides identified BIOS, devices, samples and non-game entries."
+msgstr "Si desactive, masque les BIOS, devices, samples et entrees non-jeu identifiees."
+
+msgctxt "game_options"
+msgid "When disabled, hides identified casino, gambling and slot machine games."
+msgstr "Si desactive, masque les jeux casino, gambling et slot machines identifies."
+
+msgctxt "game_options"
+msgid "When disabled, hides identified hacks, bootlegs, homebrews, pirates and unlicensed entries."
+msgstr "Si desactive, masque les hacks, bootlegs, homebrews, pirates et unlicensed identifies."
+
+msgctxt "game_options"
+msgid "When disabled, hides identified mahjong games."
+msgstr "Si desactive, masque les jeux mahjong identifies."
+
+msgctxt "game_options"
+msgid "When disabled, hides identified non-arcade or computer entries in arcade sets."
+msgstr "Si desactive, masque les entrees non-arcade ou computer identifiees dans les sets arcade."
+
+msgctxt "game_options"
+msgid "When disabled, hides prototypes identified in the local database."
+msgstr "Si desactive, masque les prototypes identifies dans la base locale."
+
+msgctxt "game_options"
+msgid "When enabled, extracts internal ROM archives into the system roms folder. By default, ROM .zip/.7z files are kept as-is."
+msgstr "Si active, decompresse les archives ROM internes dans le dossier roms du systeme. Par defaut les ROMs .zip/.7z restent conservees."
+
+msgctxt "game_options"
+msgid "When enabled, indexes package-installer packs (.7z, .zip or .rar), creates gamelist entries and media without installing ROMs; a missing ROM is extracted when the game is selected."
+msgstr "Si active, indexe les packs (.7z, .zip ou .rar) de package-installer, cree la gamelist et les medias sans installer les ROMs; une ROM manquante est extraite selon le declencheur choisi."
+
+msgctxt "game_options"
+msgid "When enabled, remote scraping starts only if the local pass still leaves missing media or text data."
+msgstr "Si actif, le distant ne demarre que si la passe locale laisse des medias ou textes manquants."
+
+msgctxt "game_options"
+msgid "WORLD"
+msgstr "MONDE"
+
+msgctxt "game_options"
+msgid "RESET ROM AFTER GAME END"
+msgstr "REINITIALISER LA ROM APRES GAME-END"
+
+msgctxt "game_options"
+msgid "When enabled, an on-the-fly ROM extracted at game start is replaced by its lightweight placeholder after game-end."
+msgstr "Si actif, une ROM on-the-fly extraite au lancement du jeu est remplacee par son placeholder leger apres le game-end."
+
+msgctxt "game_options"
+msgid "Writes the captured score into .gameinfos at game-end."
+msgstr "Ecrit le score capture dans .gameinfos au game-end."
+
+
+
+# APIExpose es_features additions
+
+msgctxt "game_options"
+msgid "BEZEL ASPECT"
+msgstr "FORMAT BEZEL"
+
+msgctxt "game_options"
+msgid "BEZEL ORIENTATION"
+msgstr "ORIENTATION BEZEL"
+
+msgctxt "game_options"
+msgid "BR"
+msgstr "BR"
+
+msgctxt "game_options"
+msgid "CLEAN LEGACY ROMS MEDIA"
+msgstr "NETTOYER LES MEDIAS ROMS LEGACY"
+
+msgctxt "game_options"
+msgid "COCKTAIL"
+msgstr "COCKTAIL"
+
+msgctxt "game_options"
+msgid "EU"
+msgstr "EU"
+
+msgctxt "game_options"
+msgid "global.apiexpose.api_notifications.enabled"
+msgstr "global.apiexpose.api_notifications.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.collections_auto_installer.hyperbat_theme.enabled"
+msgstr "global.apiexpose.collections_auto_installer.hyperbat_theme.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.collections_auto_installer.refresh_current_after_success"
+msgstr "global.apiexpose.collections_auto_installer.refresh_current_after_success"
+
+msgctxt "game_options"
+msgid "global.apiexpose.collections_pack_manager.apply_collection_theme_to_games.enabled"
+msgstr "global.apiexpose.collections_pack_manager.apply_collection_theme_to_games.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.collections_pack_manager.dynamic_collections.enabled"
+msgstr "global.apiexpose.collections_pack_manager.dynamic_collections.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.collections_pack_manager.enabled"
+msgstr "global.apiexpose.collections_pack_manager.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.collections_pack_manager.pack_installer.enabled"
+msgstr "global.apiexpose.collections_pack_manager.pack_installer.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.collections_pack_manager.static_collections.enabled"
+msgstr "global.apiexpose.collections_pack_manager.static_collections.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.datas_theme_expose.cpo.general_panel_buttons"
+msgstr "global.apiexpose.datas_theme_expose.cpo.general_panel_buttons"
+
+msgctxt "game_options"
+msgid "global.apiexpose.datas_theme_expose.cpo.websocket_push.enabled"
+msgstr "global.apiexpose.datas_theme_expose.cpo.websocket_push.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.datas_theme_expose.cpo_control_panel.enabled"
+msgstr "global.apiexpose.datas_theme_expose.cpo_control_panel.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.datas_theme_expose.enabled"
+msgstr "global.apiexpose.datas_theme_expose.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.datas_theme_expose.high_score.enabled"
+msgstr "global.apiexpose.datas_theme_expose.high_score.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.datas_theme_expose.legacy_hiscore_theme.enabled"
+msgstr "global.apiexpose.datas_theme_expose.legacy_hiscore_theme.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.enabled"
+msgstr "global.apiexpose.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.game_events.console_high_score_capture.enabled"
+msgstr "global.apiexpose.game_events.console_high_score_capture.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.game_events.export_scores_on_game_end.enabled"
+msgstr "global.apiexpose.game_events.export_scores_on_game_end.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.game_events.mame_outputs.enabled"
+msgstr "global.apiexpose.game_events.mame_outputs.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.game_events.max_high_scores"
+msgstr "global.apiexpose.game_events.max_high_scores"
+
+msgctxt "game_options"
+msgid "global.apiexpose.game_events.retroarch_wrapper.enabled"
+msgstr "global.apiexpose.game_events.retroarch_wrapper.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.game_events_manager.enabled"
+msgstr "global.apiexpose.game_events_manager.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.local_media_manager.enabled"
+msgstr "global.apiexpose.local_media_manager.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.local_media_manager.populate_all_requested"
+msgstr "global.apiexpose.local_media_manager.populate_all_requested"
+
+msgctxt "game_options"
+msgid "global.apiexpose.marquee_manager.enabled"
+msgstr "global.apiexpose.marquee_manager.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.marquee_manager.websocket_assets.enabled"
+msgstr "global.apiexpose.marquee_manager.websocket_assets.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.media_allocation.image_source"
+msgstr "global.apiexpose.media_allocation.image_source"
+
+msgctxt "game_options"
+msgid "global.apiexpose.media_allocation.logo_source"
+msgstr "global.apiexpose.media_allocation.logo_source"
+
+msgctxt "game_options"
+msgid "global.apiexpose.media_allocation.region_mode"
+msgstr "global.apiexpose.media_allocation.region_mode"
+
+msgctxt "game_options"
+msgid "global.apiexpose.media_allocation.thumb_source"
+msgstr "global.apiexpose.media_allocation.thumb_source"
+
+msgctxt "game_options"
+msgid "global.apiexpose.media_allocation.user_region"
+msgstr "global.apiexpose.media_allocation.user_region"
+
+msgctxt "game_options"
+msgid "global.apiexpose.media_allocation.wheel_style"
+msgstr "global.apiexpose.media_allocation.wheel_style"
+
+msgctxt "game_options"
+msgid "global.apiexpose.rom_set_manager.enabled"
+msgstr "global.apiexpose.rom_set_manager.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.arcade_handling"
+msgstr "global.apiexpose.romset.arcade_handling"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.debug_report"
+msgstr "global.apiexpose.romset.debug_report"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.defaults_initialized"
+msgstr "global.apiexpose.romset.defaults_initialized"
+
+msgctxt "game_options"
+msgid "global.apiexpose.api.language_profile"
+msgstr "global.apiexpose.api.language_profile"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.output_mode"
+msgstr "global.apiexpose.romset.output_mode"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.pack_installer.enabled"
+msgstr "global.apiexpose.romset.pack_installer.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.pack_installer.on_the_fly.enabled"
+msgstr "global.apiexpose.romset.pack_installer.on_the_fly.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.pack_installer.on_the_fly.reset_after_game_end"
+msgstr "global.apiexpose.romset.pack_installer.on_the_fly.reset_after_game_end"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.pack_installer.on_the_fly.trigger"
+msgstr "global.apiexpose.romset.pack_installer.on_the_fly.trigger"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.pack_installer.unzip_roms"
+msgstr "global.apiexpose.romset.pack_installer.unzip_roms"
+
+msgctxt "game_options"
+msgid "global.apiexpose.api.region_profile"
+msgstr "global.apiexpose.api.region_profile"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_adult"
+msgstr "global.apiexpose.romset.show_adult"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_bootlegs_hacks"
+msgstr "global.apiexpose.romset.show_bootlegs_hacks"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_casino"
+msgstr "global.apiexpose.romset.show_casino"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_clones"
+msgstr "global.apiexpose.romset.show_clones"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_horizontal"
+msgstr "global.apiexpose.romset.show_horizontal"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_mahjong"
+msgstr "global.apiexpose.romset.show_mahjong"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_non_arcade"
+msgstr "global.apiexpose.romset.show_non_arcade"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_non_games"
+msgstr "global.apiexpose.romset.show_non_games"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_prototypes"
+msgstr "global.apiexpose.romset.show_prototypes"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.show_vertical"
+msgstr "global.apiexpose.romset.show_vertical"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.translations"
+msgstr "global.apiexpose.romset.translations"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.variant_mode"
+msgstr "global.apiexpose.romset.variant_mode"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.auto_enabled"
+msgstr "global.apiexpose.scraping.auto_enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.bezel_aspect"
+msgstr "global.apiexpose.scraping.bezel_aspect"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.bezel_orientation"
+msgstr "global.apiexpose.scraping.bezel_orientation"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.bezels.enabled"
+msgstr "global.apiexpose.scraping.bezels.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.magazines.enabled"
+msgstr "global.apiexpose.scraping.magazines.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.maps.enabled"
+msgstr "global.apiexpose.scraping.maps.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.manuals.enabled"
+msgstr "global.apiexpose.scraping.manuals.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.marquee.enabled"
+msgstr "global.apiexpose.scraping.marquee.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.mix.enabled"
+msgstr "global.apiexpose.scraping.mix.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.notify_media.enabled"
+msgstr "global.apiexpose.scraping.notify_media.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.queue.enabled"
+msgstr "global.apiexpose.scraping.queue.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.refresh_current_after_success"
+msgstr "global.apiexpose.scraping.refresh_current_after_success"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.remote_after_local_only"
+msgstr "global.apiexpose.scraping.remote_after_local_only"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.screen_marquee.enabled"
+msgstr "global.apiexpose.scraping.screen_marquee.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.screen_marquee_small.enabled"
+msgstr "global.apiexpose.scraping.screen_marquee_small.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.screenscraper.enabled"
+msgstr "global.apiexpose.scraping.screenscraper.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.description_translation.enabled"
+msgstr "global.apiexpose.scraping.description_translation.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.steamgrid.enabled"
+msgstr "global.apiexpose.scraping.steamgrid.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.video_normalized.enabled"
+msgstr "global.apiexpose.scraping.video_normalized.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.scraping.videos.enabled"
+msgstr "global.apiexpose.scraping.videos.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.startup_overlay.enabled"
+msgstr "global.apiexpose.startup_overlay.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.swagger.enabled"
+msgstr "global.apiexpose.swagger.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.task_progress.enabled"
+msgstr "global.apiexpose.task_progress.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.toast_notifications.enabled"
+msgstr "global.apiexpose.toast_notifications.enabled"
+
+msgctxt "game_options"
+msgid "global.apiexpose.websocket.enabled"
+msgstr "global.apiexpose.websocket.enabled"
+
+msgctxt "game_options"
+msgid "HORIZONTAL"
+msgstr "HORIZONTAL"
+
+msgctxt "game_options"
+msgid "JP"
+msgstr "JP"
+
+msgctxt "game_options"
+msgid "LOCAL"
+msgstr "LOCAL"
+
+msgctxt "game_options"
+msgid "MEDIA REGION MODE"
+msgstr "MODE REGION MEDIA"
+
+msgctxt "game_options"
+msgid "NOTIFY MEDIA SCRAPE"
+msgstr "NOTIFIER LE SCRAP MEDIA"
+
+msgctxt "game_options"
+msgid "REGION"
+msgstr "REGION"
+
+msgctxt "game_options"
+msgid "SCRAPE BEZELS"
+msgstr "SCRAPER LES BEZELS"
+
+msgctxt "game_options"
+msgid "SCRAPE MAGAZINES"
+msgstr "SCRAPER LES MAGAZINES"
+
+msgctxt "game_options"
+msgid "SCRAPE SMALL SCREEN MARQUEES"
+msgstr "SCRAPER LES SMALL SCREEN MARQUEES"
+
+msgctxt "game_options"
+msgid "US"
+msgstr "US"
+
+msgctxt "game_options"
+msgid "USER MEDIA REGION"
+msgstr "REGION MEDIA UTILISATEUR"
+
+msgctxt "game_options"
+msgid "VERTICAL"
+msgstr "VERTICAL"
+
+
+msgctxt "game_options"
+msgid "Allows remote bezel downloads using the selected aspect ratio and orientation."
+msgstr "Autorise le telechargement distant des bezels avec le ratio et l'orientation selectionnes."
+
+msgctxt "game_options"
+msgid "Allows remote magazine downloads into the canonical documents store."
+msgstr "Autorise le telechargement distant des magazines dans le store canonique de documents."
+
+msgctxt "game_options"
+msgid "Allows remote map downloads as enrichment."
+msgstr "Autorise le telechargement distant des maps en enrichissement."
+
+msgctxt "game_options"
+msgid "Allows remote screen marquee downloads as enrichment."
+msgstr "Autorise le telechargement distant des screen marquees en enrichissement."
+
+msgctxt "game_options"
+msgid "Allows remote small screen marquee downloads as enrichment."
+msgstr "Autorise le telechargement distant des small screen marquees en enrichissement."
+
+msgctxt "game_options"
+msgid "At API startup, asks for Windows confirmation before migrating legacy roms media to the canonical media store and cleaning only hash-safe duplicates."
+msgstr "Au demarrage de l'API, demande une confirmation Windows avant de migrer les medias roms legacy vers le store media canonique et de nettoyer uniquement les doublons valides par hash."
+
+msgctxt "game_options"
+msgid "Controls localized media selection. LOCAL uses the user locale, REGION uses the selected region, ALL also stores localized media variants."
+msgstr "Controle la selection des medias localises. LOCAL utilise la locale utilisateur, REGION utilise la region selectionnee, ALL stocke aussi les variantes localisees."
+
+msgctxt "game_options"
+msgid "Enables local media management, canonical media links and gamelist updates."
+msgstr "Active la gestion locale des medias, les liens medias canoniques et les mises a jour gamelist."
+
+msgctxt "game_options"
+msgid "Notifies when a heavy media scrape completes: manual, magazine or video."
+msgstr "Notifie quand un scrap de media lourd se termine : manuel, magazine ou video."
+
+msgctxt "game_options"
+msgid "Preferred media region when region mode is REGION, or first priority when mode is ALL."
+msgstr "Region media preferee quand le mode region est REGION, ou premiere priorite quand le mode est ALL."
+
+msgctxt "game_options"
+msgid "ScreenScraper bezel aspect ratio used for the active bezel slot."
+msgstr "Ratio de bezel ScreenScraper utilise pour le slot bezel actif."
+
+msgctxt "game_options"
+msgid "ScreenScraper bezel orientation used for the active bezel slot."
+msgstr "Orientation de bezel ScreenScraper utilisee pour le slot bezel actif."
+
+msgctxt "game_options"
+msgid "Selects how the Roms Pack Manager applies its decisions."
+msgstr "Choisit comment le Roms Manager applique ses decisions."
+
+msgctxt "game_options"
+msgid "Selects the canonical local media linked into the gamelist image tag."
+msgstr "Choisit le media local canonique lie a la balise image de la gamelist."
+
+msgctxt "game_options"
+msgid "Selects the canonical local media linked into the gamelist marquee tag."
+msgstr "Choisit le media local canonique lie a la balise marquee de la gamelist."
+
+msgctxt "game_options"
+msgid "Selects the canonical local media linked into the gamelist thumbnail tag."
+msgstr "Choisit le media local canonique lie a la balise thumbnail de la gamelist."
+
+msgctxt "game_options"
+msgid "Stores raw ScreenScraper game responses under APIExpose media scrap-cache for diagnostics."
+msgstr "Stocke les reponses brutes ScreenScraper sous le scrap-cache media APIExpose pour diagnostic."
+
+msgctxt "game_options"
+msgid "SHOW ONLY RETROACHIEVEMENTS GAMES"
+msgstr "AFFICHER UNIQUEMENT LES JEUX RETROACHIEVEMENTS"
+
+msgctxt "game_options"
+msgid "When enabled, hides games without a valid cheevosId in the gamelist."
+msgstr "Si active, masque les jeux sans cheevosId valide dans la gamelist."
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.only_retroachievements"
+msgstr "global.apiexpose.romset.only_retroachievements"
+
+
+msgctxt "game_options"
+msgid "NEVER HIDE FAVORITES"
+msgstr "NE JAMAIS CACHER LES FAVORIS"
+
+msgctxt "game_options"
+msgid "When enabled, favorite games are never hidden by Roms Manager filters."
+msgstr "Si active, les jeux favoris ne sont jamais caches par les filtres du Roms Manager."
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.never_hide_favorites"
+msgstr "global.apiexpose.romset.never_hide_favorites"
+
+msgctxt "game_options"
+msgid "SCREENTITLE"
+msgstr "SCREENTITLE"
+
+msgctxt "game_options"
+msgid "MIX 1"
+msgstr "MIX 1"
+
+msgctxt "game_options"
+msgid "MIX 2"
+msgstr "MIX 2"
+
+msgctxt "game_options"
+msgid "FIGURINE"
+msgstr "FIGURINE"
+
+msgctxt "game_options"
+msgid "CARTRIDGE"
+msgstr "CARTRIDGE"
+
+msgctxt "game_options"
+msgid "LABEL"
+msgstr "LABEL"
+
+msgctxt "game_options"
+msgid "SCREEN ORIENTATION"
+msgstr "ORIENTATION ECRAN"
+
+
+msgctxt "game_options"
+msgid "ONLY COCKTAIL"
+msgstr "PREFERER HORIZONTAL"
+
+msgctxt "game_options"
+msgid "HIDE COCKTAIL"
+msgstr "PREFERER VERTICAL"
+
+msgctxt "game_options"
+msgid "ONLY HORIZONTAL"
+msgstr "HORIZONTAL UNIQUEMENT"
+
+msgctxt "game_options"
+msgid "ONLY VERTICAL"
+msgstr "VERTICAL UNIQUEMENT"
+
+msgctxt "game_options"
+msgid "COCKTAIL GAMES"
+msgstr "JEUX COCKTAIL"
+
+msgctxt "game_options"
+msgid "PREFER"
+msgstr "PREFERER"
+
+msgctxt "game_options"
+msgid "ONLY"
+msgstr "UNIQUEMENT"
+
+msgctxt "game_options"
+msgid "MULTI-SCREEN GAMES"
+msgstr "JEUX MULTI-ECRANS"
+
+msgctxt "game_options"
+msgid "FUNCTIONAL SECOND SCREEN"
+msgstr "SECOND ECRAN GAMEPLAY"
+
+msgctxt "game_options"
+msgid "WIDE OR SURROUND DISPLAY"
+msgstr "AFFICHAGE LARGE OU SURROUND"
+
+msgctxt "game_options"
+msgid "PORTABLE LINK GAMEPLAY"
+msgstr "GAMEPLAY AVEC LIEN PORTABLE"
+
+msgctxt "game_options"
+msgid "HIDE REQUIRED LINKS"
+msgstr "MASQUER LES LIENS REQUIS"
+
+msgctxt "game_options"
+msgid "CABINET CONTROL COMPATIBILITY"
+msgstr "COMPATIBILITE CONTROLES BORNE"
+
+msgctxt "game_options"
+msgid "ONLY COMPATIBLE"
+msgstr "COMPATIBLES UNIQUEMENT"
+
+msgctxt "game_options"
+msgid "PLAYER COUNT COMPATIBILITY"
+msgstr "COMPATIBILITE NOMBRE DE JOUEURS"
+
+msgctxt "game_options"
+msgid "BUTTON COMPATIBILITY"
+msgstr "COMPATIBILITE NOMBRE DE BOUTONS"
+
+msgctxt "game_options"
+msgid "CABINET PROFILE"
+msgstr "PROFIL BORNE"
+
+msgctxt "game_options"
+msgid "GENERIC ARCADE"
+msgstr "ARCADE GENERIQUE"
+
+msgctxt "game_options"
+msgid "FIGHTING CABINET"
+msgstr "BORNE COMBAT"
+
+msgctxt "game_options"
+msgid "NEO GEO CABINET"
+msgstr "BORNE NEO GEO"
+
+msgctxt "game_options"
+msgid "COCKTAIL TABLE"
+msgstr "TABLE COCKTAIL"
+
+msgctxt "game_options"
+msgid "DRIVING CABINET"
+msgstr "BORNE CONDUITE"
+
+msgctxt "game_options"
+msgid "LIGHTGUN CABINET"
+msgstr "BORNE LIGHTGUN"
+
+msgctxt "game_options"
+msgid "RHYTHM CABINET"
+msgstr "BORNE RYTHME"
+
+msgctxt "game_options"
+msgid "DANCE CABINET"
+msgstr "BORNE DANSE"
+
+msgctxt "game_options"
+msgid "TWIN STICK CABINET"
+msgstr "BORNE DOUBLE JOYSTICK"
+
+msgctxt "game_options"
+msgid "TRACKBALL CABINET"
+msgstr "BORNE TRACKBALL"
+
+msgctxt "game_options"
+msgid "SPINNER CABINET"
+msgstr "BORNE SPINNER"
+
+msgctxt "game_options"
+msgid "MULTI-SCREEN CABINET"
+msgstr "BORNE MULTI-ECRANS"
+
+msgctxt "game_options"
+msgid "CUSTOM"
+msgstr "PERSONNALISE"
+
+msgctxt "game_options"
+msgid "CONTROL PANELS"
+msgstr "PANELS JOUEURS"
+
+msgctxt "game_options"
+msgid "1 PLAYER"
+msgstr "1 JOUEUR"
+
+msgctxt "game_options"
+msgid "2 PLAYERS"
+msgstr "2 JOUEURS"
+
+msgctxt "game_options"
+msgid "3 PLAYERS"
+msgstr "3 JOUEURS"
+
+msgctxt "game_options"
+msgid "4 PLAYERS"
+msgstr "4 JOUEURS"
+
+msgctxt "game_options"
+msgid "6 PLAYERS"
+msgstr "6 JOUEURS"
+
+msgctxt "game_options"
+msgid "BUTTONS PER PLAYER"
+msgstr "BOUTONS PAR JOUEUR"
+
+msgctxt "game_options"
+msgid "0 BUTTON"
+msgstr "0 BOUTON"
+
+msgctxt "game_options"
+msgid "1 BUTTON"
+msgstr "1 BOUTON"
+
+msgctxt "game_options"
+msgid "3 BUTTONS"
+msgstr "3 BOUTONS"
+
+msgctxt "game_options"
+msgid "5 BUTTONS"
+msgstr "5 BOUTONS"
+
+msgctxt "game_options"
+msgid "12 BUTTONS"
+msgstr "12 BOUTONS"
+
+msgctxt "game_options"
+msgid "ARCADE JOYSTICK"
+msgstr "JOYSTICK ARCADE"
+
+msgctxt "game_options"
+msgid "ANALOG JOYSTICK"
+msgstr "JOYSTICK ANALOGIQUE"
+
+msgctxt "game_options"
+msgid "ROTARY JOYSTICK"
+msgstr "ROTARY JOYSTICK"
+
+msgctxt "game_options"
+msgid "SPINNERS"
+msgstr "SPINNERS"
+
+msgctxt "game_options"
+msgid "NONE"
+msgstr "AUCUN"
+
+msgctxt "game_options"
+msgid "1"
+msgstr "1"
+
+msgctxt "game_options"
+msgid "2"
+msgstr "2"
+
+msgctxt "game_options"
+msgid "4"
+msgstr "4"
+
+msgctxt "game_options"
+msgid "TRACKBALLS"
+msgstr "TRACKBALLS"
+
+msgctxt "game_options"
+msgid "WHEELS"
+msgstr "VOLANTS"
+
+msgctxt "game_options"
+msgid "PEDALS"
+msgstr "PEDALES"
+
+msgctxt "game_options"
+msgid "LIGHTGUNS"
+msgstr "LIGHTGUNS"
+
+msgctxt "game_options"
+msgid "DANCE MATS"
+msgstr "TAPIS DE DANSE"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.screen_orientation"
+msgstr "global.apiexpose.romset.screen_orientation"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.cocktail_games"
+msgstr "global.apiexpose.romset.cocktail_games"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.multi_screen_games"
+msgstr "global.apiexpose.romset.multi_screen_games"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.functional_second_screen"
+msgstr "global.apiexpose.romset.functional_second_screen"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.wide_surround_display"
+msgstr "global.apiexpose.romset.wide_surround_display"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.portable_link_gameplay"
+msgstr "global.apiexpose.romset.portable_link_gameplay"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.cabinet_controls_compatibility"
+msgstr "global.apiexpose.romset.cabinet_controls_compatibility"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.player_count"
+msgstr "global.apiexpose.romset.player_count"
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.button_compatibility"
+msgstr "global.apiexpose.romset.button_compatibility"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.cabinet_profile"
+msgstr "global.apiexpose.control_manager.cabinet_profile"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.player_count"
+msgstr "global.apiexpose.control_manager.player_count"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.buttons_per_player"
+msgstr "global.apiexpose.control_manager.buttons_per_player"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.arcade_joystick"
+msgstr "global.apiexpose.control_manager.arcade_joystick"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.analog_joystick"
+msgstr "global.apiexpose.control_manager.analog_joystick"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.rotary_joystick"
+msgstr "global.apiexpose.control_manager.rotary_joystick"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.spinner"
+msgstr "global.apiexpose.control_manager.spinner"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.trackball"
+msgstr "global.apiexpose.control_manager.trackball"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.wheel"
+msgstr "global.apiexpose.control_manager.wheel"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.pedals"
+msgstr "global.apiexpose.control_manager.pedals"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.lightgun"
+msgstr "global.apiexpose.control_manager.lightgun"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.dance_mat"
+msgstr "global.apiexpose.control_manager.dance_mat"
+
+msgctxt "game_options"
+msgid "Filters games by display orientation using horizontal, vertical and cocktail metadata."
+msgstr "Filtre les jeux selon les donnees horizontal, vertical et cocktail."
+
+msgctxt "game_options"
+msgid "Controls games tagged for cocktail arcade cabinets."
+msgstr "Controle les jeux marques pour bornes arcade cocktail."
+
+msgctxt "game_options"
+msgid "Controls games with multiple screens or display outputs."
+msgstr "Controle les jeux avec plusieurs ecrans ou sorties video."
+
+msgctxt "game_options"
+msgid "Keeps only games where a second screen is used for gameplay when set to ONLY."
+msgstr "En mode UNIQUEMENT, conserve les jeux ou un second ecran sert au gameplay."
+
+msgctxt "game_options"
+msgid "Keeps only games needing a wide, surround or extended display when set to ONLY."
+msgstr "En mode UNIQUEMENT, conserve les jeux necessitant un affichage large, surround ou etendu."
+
+msgctxt "game_options"
+msgid "Controls games using VMU, GBA link, DS link or portable second-screen gameplay."
+msgstr "Controle les jeux utilisant VMU, GBA link, DS link ou un second ecran portable."
+
+msgctxt "game_options"
+msgid "Uses the Control Panel Manager profile to hide games that require missing controls when set to ONLY."
+msgstr "En mode UNIQUEMENT, utilise le profil Control Panel Manager pour masquer les jeux demandant des controles absents."
+
+msgctxt "game_options"
+msgid "Uses the declared panel count to hide games that require more players when set to ONLY."
+msgstr "En mode UNIQUEMENT, masque les jeux demandant plus de panels joueurs que la borne declaree."
+
+msgctxt "game_options"
+msgid "Uses the declared button count to hide games that require more buttons when set to ONLY."
+msgstr "En mode UNIQUEMENT, masque les jeux demandant plus de boutons que le panel declare."
+
+msgctxt "game_options"
+msgid "Declares the physical cabinet profile used by compatibility filters."
+msgstr "Declare le profil materiel de la borne utilise par les filtres de compatibilite."
+
+msgctxt "game_options"
+msgid "Number of active player panels available on the cabinet."
+msgstr "Nombre de panels joueurs actifs disponibles sur la borne."
+
+msgctxt "game_options"
+msgid "Maximum number of buttons available per player panel."
+msgstr "Nombre maximum de boutons disponibles par panel joueur."
+
+msgctxt "game_options"
+msgid "Declares whether a digital arcade joystick is available."
+msgstr "Declare si un joystick arcade numerique est disponible."
+
+msgctxt "game_options"
+msgid "Declares whether an analog stick, yoke or throttle-like control is available."
+msgstr "Declare si un stick analogique, yoke ou controle similaire est disponible."
+
+msgctxt "game_options"
+msgid "Declares whether a rotary joystick is available."
+msgstr "Declare si un joystick rotary est disponible."
+
+msgctxt "game_options"
+msgid "Number of spinners available."
+msgstr "Nombre de spinners disponibles."
+
+msgctxt "game_options"
+msgid "Number of trackballs available."
+msgstr "Nombre de trackballs disponibles."
+
+msgctxt "game_options"
+msgid "Number of wheels available."
+msgstr "Nombre de volants disponibles."
+
+msgctxt "game_options"
+msgid "Number of pedal sets available."
+msgstr "Nombre de jeux de pedales disponibles."
+
+msgctxt "game_options"
+msgid "Number of lightguns available."
+msgstr "Nombre de lightguns disponibles."
+
+msgctxt "game_options"
+msgid "Number of dance mats available."
+msgstr "Nombre de tapis de danse disponibles."
+
+msgctxt "game_options"
+msgid "global.apiexpose.local_media_manager.remove_roms_media_after_canonical_migration"
+msgstr "global.apiexpose.local_media_manager.remove_roms_media_after_canonical_migration"
+
+msgctxt "game_options"
+msgid "SHIFTERS"
+msgstr "SHIFTERS"
+
+msgctxt "game_options"
+msgid "GUITARS"
+msgstr "GUITARES"
+
+msgctxt "game_options"
+msgid "DRUMS"
+msgstr "BATTERIES"
+
+msgctxt "game_options"
+msgid "TURNTABLES"
+msgstr "PLATINES"
+
+msgctxt "game_options"
+msgid "MICROPHONE"
+msgstr "MICROPHONE"
+
+msgctxt "game_options"
+msgid "KEYBOARD"
+msgstr "CLAVIER"
+
+msgctxt "game_options"
+msgid "MOUSE"
+msgstr "SOURIS"
+
+msgctxt "game_options"
+msgid "TOUCHSCREEN"
+msgstr "ECRAN TACTILE"
+
+msgctxt "game_options"
+msgid "MOTION CONTROLLER"
+msgstr "CONTROLEUR DE MOUVEMENT"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.shifter"
+msgstr "global.apiexpose.control_manager.shifter"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.guitar"
+msgstr "global.apiexpose.control_manager.guitar"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.drums"
+msgstr "global.apiexpose.control_manager.drums"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.turntable"
+msgstr "global.apiexpose.control_manager.turntable"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.microphone"
+msgstr "global.apiexpose.control_manager.microphone"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.keyboard"
+msgstr "global.apiexpose.control_manager.keyboard"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.mouse"
+msgstr "global.apiexpose.control_manager.mouse"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.touchscreen"
+msgstr "global.apiexpose.control_manager.touchscreen"
+
+msgctxt "game_options"
+msgid "global.apiexpose.control_manager.motion_controller"
+msgstr "global.apiexpose.control_manager.motion_controller"
+
+msgctxt "game_options"
+msgid "Number of shifters available."
+msgstr "Nombre de shifters disponibles."
+
+msgctxt "game_options"
+msgid "Number of rhythm guitars available."
+msgstr "Nombre de guitares rythme disponibles."
+
+msgctxt "game_options"
+msgid "Number of rhythm drum kits available."
+msgstr "Nombre de batteries rythme disponibles."
+
+msgctxt "game_options"
+msgid "Number of turntables available."
+msgstr "Nombre de platines disponibles."
+
+msgctxt "game_options"
+msgid "Declares whether a microphone is available."
+msgstr "Declare si un microphone est disponible."
+
+msgctxt "game_options"
+msgid "Declares whether a keyboard or keypad-compatible input is available."
+msgstr "Declare si un clavier ou une entree compatible keypad est disponible."
+
+msgctxt "game_options"
+msgid "Declares whether a mouse or pointer-compatible input is available."
+msgstr "Declare si une souris ou une entree pointeur compatible est disponible."
+
+msgctxt "game_options"
+msgid "Declares whether a touchscreen is available."
+msgstr "Declare si un ecran tactile est disponible."
+
+msgctxt "game_options"
+msgid "Declares whether a motion controller is available."
+msgstr "Declare si un controleur de mouvement est disponible."
+
+msgctxt "game_options"
+msgid "ENABLE CONTROL PANEL DISPLAY"
+msgstr "ACTIVER L'AFFICHAGE DU PANEL"
+
+msgctxt "game_options"
+msgid "PUSH CONTROL PANEL TO WS STREAM"
+msgstr "POUSSER LE PANEL DANS LE FLUX WS"
+
+msgctxt "game_options"
+msgid "Publishes the resolved control panel layout for themes and LED panels using the Control Panel Manager profile."
+msgstr "Publie le layout du panel resolu pour les themes et panels LED en utilisant le profil Control Panel Manager."
+
+msgctxt "game_options"
+msgid "Pushes the resolved control panel layout into the WebSocket stream when a system or arcade game is selected."
+msgstr "Pousse le layout du panel resolu dans le flux WebSocket quand un systeme ou un jeu arcade est selectionne."
+
+
+msgctxt "game_options"
+msgid "ROMS PROFILE"
+msgstr "PROFIL ROMS"
+
+msgctxt "game_options"
+msgid "Selects the global Roms Manager intention. AUTO options inherit this profile."
+msgstr "Choisit l intention globale du Roms Manager. Les options AUTO heritent de ce profil."
+
+msgctxt "game_options"
+msgid "CASUAL GAMER"
+msgstr "JOUEUR OCCASIONNEL"
+
+msgctxt "game_options"
+msgid "GAMER"
+msgstr "JOUEUR"
+
+msgctxt "game_options"
+msgid "HARD-GAMER"
+msgstr "JOUEUR EXPERIMENTE"
+
+msgctxt "game_options"
+msgid "PRO-GAMER"
+msgstr "JOUEUR PRO"
+
+msgctxt "game_options"
+msgid "RETROACHIEVER"
+msgstr "RETROACHIEVER"
+
+msgctxt "game_options"
+msgid "LOCALIZED PLAYER"
+msgstr "JOUEUR LOCALISE"
+
+msgctxt "game_options"
+msgid "ARCADE PURIST"
+msgstr "PURISTE ARCADE"
+
+msgctxt "game_options"
+msgid "ARCADE GAMER"
+msgstr "JOUEUR ARCADE"
+
+msgctxt "game_options"
+msgid "HISTORIAN"
+msgstr "HISTORIEN"
+
+msgctxt "game_options"
+msgid "PRESERVATIONIST"
+msgstr "PRESERVATIONNISTE"
+
+msgctxt "game_options"
+msgid "HOMEBREW PLAYER"
+msgstr "JOUEUR HOMEBREW"
+
+msgctxt "game_options"
+msgid "MODDER"
+msgstr "MODDEUR"
+
+msgctxt "game_options"
+msgid "HACKER"
+msgstr "HACKER"
+
+msgctxt "game_options"
+msgid "RETROACHIEVEMENTS GAMES"
+msgstr "JEUX RETROACHIEVEMENTS"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide. ALWAYS SHOW protects RA-compatible games. SHOW ONLY hides games without cheevosId."
+msgstr "AUTO laisse le profil decider. TOUJOURS AFFICHER protege les jeux compatibles RA. UNIQUEMENT masque les jeux sans cheevosId."
+
+msgctxt "game_options"
+msgid "ALWAYS SHOW"
+msgstr "TOUJOURS AFFICHER"
+
+msgctxt "game_options"
+msgid "SHOW ONLY"
+msgstr "UNIQUEMENT"
+
+msgctxt "game_options"
+msgid "LANGUAGE"
+msgstr "LANGUE"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide. SHOW ONLY MY LANGUAGE hides other languages when a matching version exists."
+msgstr "AUTO laisse le profil decider. UNIQUEMENT MA LANGUE masque les autres langues quand une version correspondante existe."
+
+msgctxt "game_options"
+msgid "SHOW ONLY MY LANGUAGE"
+msgstr "UNIQUEMENT MA LANGUE"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide. SHOW ONLY MY REGION hides other regions when a matching version exists."
+msgstr "AUTO laisse le profil decider. UNIQUEMENT MA REGION masque les autres regions quand une version correspondante existe."
+
+msgctxt "game_options"
+msgid "SHOW ONLY MY REGION"
+msgstr "UNIQUEMENT MA REGION"
+
+msgctxt "game_options"
+msgid "ROM VERSION"
+msgstr "VERSION ROM"
+
+msgctxt "game_options"
+msgid "Controls how variants are scored: stable, latest, original or enhanced."
+msgstr "Controle le score des variantes : stable, recente, originale ou amelioree."
+
+msgctxt "game_options"
+msgid "STABLE"
+msgstr "STABLE"
+
+msgctxt "game_options"
+msgid "LATEST"
+msgstr "RECENTE"
+
+msgctxt "game_options"
+msgid "ORIGINAL"
+msgstr "ORIGINALE"
+
+msgctxt "game_options"
+msgid "ENHANCED"
+msgstr "AMELIOREE"
+
+msgctxt "game_options"
+msgid "SHOW CLONES"
+msgstr "AFFICHER LES CLONES"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide. SHOW keeps variants; HIDE keeps the best version according to the profile."
+msgstr "AUTO laisse le profil decider. AFFICHER conserve les variantes ; MASQUER garde la meilleure version selon le profil."
+
+msgctxt "game_options"
+msgid "SHOW"
+msgstr "AFFICHER"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether prototypes remain visible."
+msgstr "AUTO laisse le profil decider si les prototypes restent visibles."
+
+msgctxt "game_options"
+msgid "SHOW DEMOS"
+msgstr "AFFICHER LES DEMOS"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether demos remain visible."
+msgstr "AUTO laisse le profil decider si les demos restent visibles."
+
+msgctxt "game_options"
+msgid "SHOW BETA / ALPHA VERSIONS"
+msgstr "AFFICHER LES VERSIONS BETA / ALPHA"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether beta and alpha versions remain visible."
+msgstr "AUTO laisse le profil decider si les versions beta et alpha restent visibles."
+
+msgctxt "game_options"
+msgid "SHOW LOCATION TEST VERSIONS"
+msgstr "AFFICHER LES VERSIONS LOCATION TEST"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether arcade location test versions remain visible."
+msgstr "AUTO laisse le profil decider si les versions arcade location test restent visibles."
+
+msgctxt "game_options"
+msgid "SHOW USEFUL PATCHES"
+msgstr "AFFICHER LES PATCHS UTILES"
+
+msgctxt "game_options"
+msgid "Controls bugfix, QoL, restoration, widescreen, uncensored and compatibility patches."
+msgstr "Controle les patchs correctifs, confort, restauration, widescreen, non censures et compatibilite."
+
+msgctxt "game_options"
+msgid "SHOW HACKS AND MODS"
+msgstr "AFFICHER LES HACKS ET MODS"
+
+msgctxt "game_options"
+msgid "Controls romhacks, randomizers, total conversions and gameplay mods."
+msgstr "Controle les romhacks, randomizers, conversions totales et mods de gameplay."
+
+msgctxt "game_options"
+msgid "SHOW CHEATS AND TRAINERS"
+msgstr "AFFICHER LES CHEATS ET TRAINERS"
+
+msgctxt "game_options"
+msgid "Controls trainer, cheat, debug menu, infinite lives and level select versions."
+msgstr "Controle les versions trainer, cheat, menu debug, vies infinies et selection de niveau."
+
+msgctxt "game_options"
+msgid "SHOW BOOTLEGS AND PIRATES"
+msgstr "AFFICHER LES BOOTLEGS ET PIRATES"
+
+msgctxt "game_options"
+msgid "Controls bootleg arcade sets, pirate console games and unauthorized copies."
+msgstr "Controle les sets arcade bootleg, jeux console pirates et copies non autorisees."
+
+msgctxt "game_options"
+msgid "SHOW UNLICENSED GAMES"
+msgstr "AFFICHER LES JEUX SANS LICENCE"
+
+msgctxt "game_options"
+msgid "Controls unlicensed games separately from bootlegs and homebrews."
+msgstr "Controle les jeux sans licence separement des bootlegs et homebrews."
+
+msgctxt "game_options"
+msgid "SHOW HOMEBREWS AND AFTERMARKET"
+msgstr "AFFICHER LES HOMEBREWS ET AFTERMARKET"
+
+msgctxt "game_options"
+msgid "Controls homebrew, aftermarket and modern retro releases."
+msgstr "Controle les homebrews, aftermarket et sorties retro modernes."
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether adult games remain visible."
+msgstr "AUTO laisse le profil decider si les jeux adultes restent visibles."
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether casino, gambling and slot games remain visible."
+msgstr "AUTO laisse le profil decider si les jeux de casino, argent et machines a sous restent visibles."
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether mahjong games remain visible."
+msgstr "AUTO laisse le profil decider si les jeux de mahjong restent visibles."
+
+msgctxt "game_options"
+msgid "SHOW QUIZ GAMES"
+msgstr "AFFICHER LES JEUX DE QUIZ"
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether quiz games remain visible."
+msgstr "AUTO laisse le profil decider si les jeux de quiz restent visibles."
+
+msgctxt "game_options"
+msgid "AUTO lets the profile decide whether BIOS, devices, samples and non-game entries remain visible."
+msgstr "AUTO laisse le profil decider si les BIOS, peripheriques, samples et entrees non-jeux restent visibles."
+
+msgctxt "game_options"
+msgid "SHOW ARCADE TESTS AND DIAGNOSTICS"
+msgstr "AFFICHER LES TESTS ET DIAGNOSTICS ARCADE"
+
+msgctxt "game_options"
+msgid "Controls arcade input, monitor, sound, service and diagnostic programs."
+msgstr "Controle les programmes arcade de test entree, ecran, son, service et diagnostic."
+
+msgctxt "game_options"
+msgctxt "game_options"
+msgid "CONTROL PANEL MANAGER"
+msgstr "GESTIONNAIRE DE CONTROLES"
+
+msgid "SHOW ALL"
+msgstr "TOUT AFFICHER"
+
+msgid "MATCH CABINET"
+msgstr "CORRESPONDRE A LA BORNE"
+
+msgid "KR"
+msgstr "KR"
+
+msgid "AU"
+msgstr "AU"
+
+msgid "ASIA"
+msgstr "ASIA"
+
+msgid "CN"
+msgstr "CN"
+
+msgid "AUTO lets the profile decide. SHOW ALL disables language filtering. SHOW ONLY MY LANGUAGE hides other languages when a matching version exists."
+msgstr "AUTO laisse le profil decider. TOUT AFFICHER desactive le filtrage par langue. UNIQUEMENT MA LANGUE masque les autres langues quand une version correspondante existe."
+
+msgid "AUTO lets the profile decide. SHOW ALL disables region filtering. SHOW ONLY MY REGION hides other regions when a matching version exists."
+msgstr "AUTO laisse le profil decider. TOUT AFFICHER desactive le filtrage par region. UNIQUEMENT MA REGION masque les autres regions quand une version correspondante existe."
+
+msgid "AUSTRALIA"
+msgstr "AUSTRALIA"
+
+msgid "BRAZIL"
+msgstr "BRAZIL"
+
+msgid "CANADA"
+msgstr "CANADA"
+
+msgid "CHINA"
+msgstr "CHINA"
+
+msgid "CHINESE"
+msgstr "CHINOIS"
+
+msgid "DANISH"
+msgstr "DANOIS"
+
+msgid "DUTCH"
+msgstr "NEERLANDAIS"
+
+msgid "FINNISH"
+msgstr "FINNOIS"
+
+msgid "GERMAN"
+msgstr "ALLEMAND"
+
+msgid "GERMANY"
+msgstr "ALLEMAGNE"
+
+msgid "ITALIAN"
+msgstr "ITALIEN"
+
+msgid "ITALY"
+msgstr "ITALY"
+
+msgid "JAPANESE"
+msgstr "JAPONAIS"
+
+msgid "KOREA"
+msgstr "KOREA"
+
+msgid "KOREAN"
+msgstr "COREEN"
+
+msgid "NETHERLANDS"
+msgstr "NETHERLANDS"
+
+msgid "OCEANIA"
+msgstr "OCEANIA"
+
+msgid "POLISH"
+msgstr "POLONAIS"
+
+msgid "PORTUGUESE"
+msgstr "PORTUGAIS"
+
+msgid "RUSSIA"
+msgstr "RUSSIA"
+
+msgid "RUSSIAN"
+msgstr "RUSSE"
+
+msgid "SPAIN"
+msgstr "SPAIN"
+
+msgid "SPANISH"
+msgstr "ESPAGNOL"
+
+msgid "SWEDEN"
+msgstr "SWEDEN"
+
+msgid "SWEDISH"
+msgstr "SUEDOIS"
+
+msgid "TAIWAN"
+msgstr "TAIWAN"
+
+msgid "UNITED KINGDOM"
+msgstr "ROYAUME-UNI"
+
+
+
+
+msgctxt "game_options"
+msgid "CLONES"
+msgstr "CLONES"
+
+msgctxt "game_options"
+msgid "PROTOTYPES"
+msgstr "PROTOTYPES"
+
+msgctxt "game_options"
+msgid "DEMOS"
+msgstr "DEMOS"
+
+msgctxt "game_options"
+msgid "BETA / ALPHA VERSIONS"
+msgstr "VERSIONS BETA / ALPHA"
+
+msgctxt "game_options"
+msgid "LOCATION TEST VERSIONS"
+msgstr "VERSIONS LOCATION TEST"
+
+msgctxt "game_options"
+msgid "USEFUL PATCHES"
+msgstr "PATCHS UTILES"
+
+msgctxt "game_options"
+msgid "HACKS AND MODS"
+msgstr "HACKS ET MODS"
+
+msgctxt "game_options"
+msgid "CHEATS AND TRAINERS"
+msgstr "CHEATS ET TRAINERS"
+
+msgctxt "game_options"
+msgid "BOOTLEGS AND PIRATES"
+msgstr "BOOTLEGS ET PIRATES"
+
+msgctxt "game_options"
+msgid "UNLICENSED GAMES"
+msgstr "JEUX SANS LICENCE"
+
+msgctxt "game_options"
+msgid "HOMEBREWS AND AFTERMARKET"
+msgstr "HOMEBREWS ET AFTERMARKET"
+
+msgctxt "game_options"
+msgid "ADULT GAMES"
+msgstr "JEUX ADULTES"
+
+msgctxt "game_options"
+msgid "CASINO AND GAMBLING"
+msgstr "CASINO ET JEUX D ARGENT"
+
+msgctxt "game_options"
+msgid "MAHJONG"
+msgstr "MAHJONG"
+
+msgctxt "game_options"
+msgid "QUIZ GAMES"
+msgstr "JEUX DE QUIZ"
+
+msgctxt "game_options"
+msgid "NON-GAMES"
+msgstr "NON-JEUX"
+
+msgctxt "game_options"
+msgid "ARCADE TESTS AND DIAGNOSTICS"
+msgstr "TESTS ET DIAGNOSTICS ARCADE"
+
+
+
+msgid "SCREEN / COCKTAIL ORIENTATION"
+msgstr "ORIENTATION ECRAN / COCKTAIL"
+
+msgid "ROMS FILTERS"
+msgstr "FILTRES ROMS"
+
+msgid "CABINET FILTERS"
+msgstr "FILTRES BORNE"
+
+msgid "Controls arcade location tests, input tests, monitor tests, sound tests, service and diagnostic programs."
+msgstr "Controle les location tests arcade, tests entree, ecran, son, service et diagnostics."
+
+msgid "Filters arcade games by display orientation, including cocktail table metadata."
+msgstr "Filtre les jeux arcade par orientation d affichage, y compris les metadonnees table cocktail."
+
+msgid "CABINET SETTINGS"
+msgstr "PARAMETRES BORNE"
+
+msgctxt "game_options"
+msgid "OFFICIAL GAMES"
+msgstr "JEUX OFFICIELS"
+
+msgctxt "game_options"
+msgid "Controls standard official games and clones without special tags, so special categories can be isolated."
+msgstr "Controle les jeux officiels standards et clones sans tag special, afin d isoler les categories speciales."
+
+msgctxt "game_options"
+msgid "global.apiexpose.romset.official_games_mode"
+msgstr "global.apiexpose.romset.official_games_mode"
+
+
+msgid "MATCH ROM REGION"
+msgstr "CORRESPONDRE A LA REGION ROM"
+
+msgid "CONTENT REGION PROFILE"
+msgstr "PROFIL REGION CONTENU"
+
+msgid "INTERFACE LANGUAGE"
+msgstr "LANGUE INTERFACE"
+
+msgid "LOGO / WHEEL LOCALIZATION"
+msgstr "LOCALISATION LOGO / WHEEL"
+
+msgid "USER LANGUAGE"
+msgstr "LANGUE UTILISATEUR"
+
+msgid "Controls localized original media selection. By default, APIExpose tries the ROM region first, then safe readable fallbacks."
+msgstr "Controle la selection des medias originaux localises. Par defaut, APIExpose essaie la region de la ROM puis des fallbacks lisibles."
+
+msgid "Controls whether logos and wheels favor user-readable language or the original ROM region."
+msgstr "Controle si les logos et wheels privilegient une langue lisible par l utilisateur ou la region originale de la ROM."
+
+msgid "global.apiexpose.media_allocation.logo_region_mode"
+msgstr "global.apiexpose.media_allocation.logo_region_mode"
+
+msgid "SCRAPE EXACT LOCAL MEDIA"
+msgstr "SCRAPER LE MEDIA LOCAL EXACT"
+
+msgid "Scrapes the exact prioritized regional media when a visible slot is only satisfied by a local fallback."
+msgstr "Scrape le media regional prioritaire exact quand un slot visible est seulement satisfait par un fallback local."
+
+msgid "global.apiexpose.scraping.exact_local_media.enabled"
+msgstr "global.apiexpose.scraping.exact_local_media.enabled"
+
+msgctxt "game_options"
+msgid "REPAIR GAMELISTS ON STARTUP"
+msgstr "REPARER LES GAMELISTS AU DEMARRAGE"
+
+msgctxt "game_options"
+msgid "Runs the startup pass that realigns visible gamelist media slots and localized text metadata. Manual reallocations still work when disabled."
+msgstr "Realigne au demarrage les medias visibles et les textes localises des gamelists. Les reallocations manuelles restent disponibles si cette option est desactivee."
+
+msgctxt "game_options"
+msgid "global.apiexpose.api.repair_gamelists_on_startup"
+msgstr "global.apiexpose.api.repair_gamelists_on_startup"
+msgctxt "game_options"
+msgid "SYNC GAMELISTS WITH SYSTEM LANGUAGE"
+msgstr "SYNCHRONISER LES GAMELISTS AVEC LA LANGUE SYSTEME"
+
+msgctxt "game_options"
+msgid "When the EmulationStation system language changes, APIExpose updates gamelists with localized metadata for the new language."
+msgstr "Quand la langue systeme EmulationStation change, APIExpose met a jour les gamelists avec les metadonnees localisees dans la nouvelle langue."
+
+msgctxt "game_options"
+msgid "global.apiexpose.api.sync_gamelists_with_system_language"
+msgstr "global.apiexpose.api.sync_gamelists_with_system_language"
+
+
+msgctxt "game_options"
+msgid "UNKNOWN ROMS"
+msgstr "ROMS INCONNUES"
+
+msgid "Controls ROM entries that cannot be matched to local Roms Manager data and do not have useful scraped metadata."
+msgstr "Controle les entrees ROM impossibles a faire correspondre aux donnees Roms Manager locales et sans metadata scrapee utile."
+
+msgctxt "game_options"
+msgid "MARQUEE AUTOGEN"
+msgstr "GENERATION MARQUEE"
+
+msgctxt "game_options"
+msgid "NO"
+msgstr "NON"
+
+msgctxt "game_options"
+msgid "XL 1920x360"
+msgstr "XL 1920x360"
+
+msgctxt "game_options"
+msgid "L 1280x400"
+msgstr "L 1280x400"
+
+msgctxt "game_options"
+msgid "M 920x360"
+msgstr "M 920x360"
+
+msgctxt "game_options"
+msgid "Generates a custom marquee after scraping when no real marquee is available, using fanart and logo only."
+msgstr "Genere un marquee personnalise apres scraping quand aucun vrai marquee n'est disponible, en utilisant uniquement fanart et logo."
+
+msgctxt "game_options"
+msgid "global.apiexpose.marquee_manager.autogen_profile"
+msgstr "global.apiexpose.marquee_manager.autogen_profile"
+
+msgctxt "game_options"
+msgid "MARQUEE AUTOGEN NOTIFY"
+msgstr "NOTIFICATION GENERATION MARQUEE"
+
+msgctxt "game_options"
+msgid "Shows an EmulationStation notification when a marquee is generated automatically."
+msgstr "Affiche une notification EmulationStation quand un marquee est genere automatiquement."
+
+msgctxt "game_options"
+msgid "global.apiexpose.marquee_manager.autogen_notify.enabled"
+msgstr "global.apiexpose.marquee_manager.autogen_notify.enabled"
+
+msgctxt "game_options"
+msgid "SYSTEM MARQUEE BACKGROUND"
+msgstr "FOND MARQUEE SYSTEME"
+
+msgctxt "game_options"
+msgid "Uses the theme fanart or background when generating a system marquee. If disabled, generated system marquees use a black background."
+msgstr "Utilise le fanart ou background du theme lors de la generation d'un marquee systeme. Si desactive, les marquees systeme generes utilisent un fond noir."
+
+msgctxt "game_options"
+msgid "global.apiexpose.marquee_manager.system_marquee_theme_background.enabled"
+msgstr "global.apiexpose.marquee_manager.system_marquee_theme_background.enabled"
+
+msgctxt "game_options"
+msgid "DMD AUTOGEN"
+msgstr "GENERATION DMD"
+
+msgctxt "game_options"
+msgid "Generates a system or game DMD image when no dmd.png exists, using the selected target matrix size."
+msgstr "Genere une image DMD systeme ou jeu quand aucun dmd.png n'existe, selon la taille de matrice selectionnee."
+
+msgctxt "game_options"
+msgid "64x32"
+msgstr "64x32"
+
+msgctxt "game_options"
+msgid "128x32"
+msgstr "128x32"
+
+msgctxt "game_options"
+msgid "128x64"
+msgstr "128x64"
+
+msgctxt "game_options"
+msgid "256x64"
+msgstr "256x64"
+
+msgctxt "game_options"
+msgid "global.apiexpose.marquee_manager.dmd_autogen_profile"
+msgstr "global.apiexpose.marquee_manager.dmd_autogen_profile"

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Tsumu",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tsumu",
+    file = "tsumu.zip",
+    hashes = {
+      { hash = "5026dd950aebb58288a33f8edd87ae43", label = "Tsumu (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9F540, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+      stage = {
+        { address=0X9F544, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+  },
+}

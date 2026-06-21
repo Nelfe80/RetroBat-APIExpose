@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Xiaolin Showdown",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure, Fighting, Role-Playing"
+  },
+
+  rom = {
+    name = "xiaolin-showdown",
+    file = "xiaolin-showdown.zip",
+    hashes = {
+      { hash = "04993a2decb8ceee2ece58346cb12d35", label = "Xiaolin Showdown (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X58AD3A, type="u8", condition="eq", value=0XC8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0X58AD3A, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy (Player 1)" },
+      },
+    },
+  },
+}

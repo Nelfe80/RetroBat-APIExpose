@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Prisoner of Ice: Jashin Kourin | Call of Cthulhu: Prisoner of Ice",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "prisoner-of-ice-jashin-kourin-call-of-cthulhu-prisoner-of-ice",
+    file = "prisoner-of-ice-jashin-kourin-call-of-cthulhu-prisoner-of-ice.zip",
+    hashes = {
+      { hash = "30d61f3da869c0b414730c2153f991e8", label = "Prisoner of Ice - Jashin Kourin (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

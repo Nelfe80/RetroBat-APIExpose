@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Over Top",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Driving"
+  },
+
+  rom = {
+    name = "over-top",
+    file = "over-top.zip",
+    hashes = {
+      { hash = "875c9d92832d5cd76c418c9edb3d473c", label = "overtop.7z <Over Top>" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XB005, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0XE080, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap time" },
+        { address=0XE098, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap time" },
+      },
+    },
+  },
+}

@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Lufia II: Rise of the Sinistrals [Subset - Ancient Cave]",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "lufia-ii-rise-of-the-sinistrals-subset-ancient-cave",
+    file = "lufia-ii-rise-of-the-sinistrals-subset-ancient-cave.zip",
+    hashes = {
+      { hash = "1e5ed4a520339747ba827535dec266e3", label = "Lufia II - Rise of the Sinistrals [Subset - Bonus].sfc" },
+      { hash = "5f5d097df9c3501ab05fdcb1f30bb8e5", label = "Lufia II - Rise of the Sinistrals - Frue Lufia (v4.0) (Artemis) [Subset - Bonus].sfc" },
+      { hash = "12a57acafc4b7cd93fc849bcc20b7a24", label = "Lufia II - Rise of the Sinistrals - Frue Lufia (v6.0) (Artemis) [Subset - Bonus]" },
+      { hash = "31c76879c33a0220561edb369522e9dc", label = "Lufia II - Rise of the Sinistrals - Frue Lufia (v5.2) (Artemis) [Subset - Bonus]" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X11BB, type="u8", condition="eq", value=0XC, action="NEW_LEVEL", no_log=false, no_survey=false, desc="final 'M' class upgrade" },
+        { address=0X11BB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 1st capsule monster's - class level" },
+      },
+      zone = {
+        { address=0X05AC, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map;" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XE001, type="u32le", condition="eq", value=0X0, action="TREASURE", no_log=false, no_survey=false, desc="30;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X1, action="TREASURE", no_log=false, no_survey=false, desc="31;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X2, action="TREASURE", no_log=false, no_survey=false, desc="32;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X3, action="TREASURE", no_log=false, no_survey=false, desc="33;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X4, action="TREASURE", no_log=false, no_survey=false, desc="34;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X5, action="TREASURE", no_log=false, no_survey=false, desc="35;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X6, action="TREASURE", no_log=false, no_survey=false, desc="36;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X7, action="TREASURE", no_log=false, no_survey=false, desc="37;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X8, action="TREASURE", no_log=false, no_survey=false, desc="38;" },
+        { address=0XE001, type="u32le", condition="eq", value=0X9, action="TREASURE", no_log=false, no_survey=false, desc="39;" },
+        { address=0XE002, type="u8", condition="eq", value=0XA, action="TREASURE", no_log=false, no_survey=false, desc="41;" },
+        { address=0XE002, type="u8", condition="eq", value=0XB, action="TREASURE", no_log=false, no_survey=false, desc="42;" },
+        { address=0XE002, type="u8", condition="eq", value=0XC, action="TREASURE", no_log=false, no_survey=false, desc="43;" },
+        { address=0XE002, type="u8", condition="eq", value=0XD, action="TREASURE", no_log=false, no_survey=false, desc="44;" },
+        { address=0XE002, type="u8", condition="eq", value=0XE, action="TREASURE", no_log=false, no_survey=false, desc="45;" },
+        { address=0XE002, type="u8", condition="eq", value=0XF, action="TREASURE", no_log=false, no_survey=false, desc="46;" },
+        { address=0XE003, type="u8", condition="eq", value=0XA, action="TREASURE", no_log=false, no_survey=false, desc="61;" },
+        { address=0XE003, type="u8", condition="eq", value=0XB, action="TREASURE", no_log=false, no_survey=false, desc="62;" },
+        { address=0XE003, type="u8", condition="eq", value=0XC, action="TREASURE", no_log=false, no_survey=false, desc="63;" },
+        { address=0XE003, type="u8", condition="eq", value=0XD, action="TREASURE", no_log=false, no_survey=false, desc="64;" },
+        { address=0XE003, type="u8", condition="eq", value=0XE, action="TREASURE", no_log=false, no_survey=false, desc="65;" },
+        { address=0XE003, type="u8", condition="eq", value=0XF, action="TREASURE", no_log=false, no_survey=false, desc="66;" },
+      },
+    },
+  },
+}

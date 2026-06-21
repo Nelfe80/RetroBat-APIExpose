@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "flOw",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "flow",
+    file = "flow.zip",
+    hashes = {
+      { hash = "4dd1eaeabcf2041092fcc4bfc713fe06", label = "flOw (USA) (PSP) (PSN).iso" },
+      { hash = "697bd174fb37c7c2b3241463803c17ce", label = "flOw (Europe) (En,Ja,Fr,De,Es,It,Nl,Pt) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X144F1F4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="32-Bit - Floating Point - Zoom Level?" },
+      },
+    },
+  },
+}

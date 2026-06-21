@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Shining Force III: Scenario 2 - Nerawareta Miko",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shining-force-iii-scenario-2-nerawareta-miko",
+    file = "shining-force-iii-scenario-2-nerawareta-miko.zip",
+    hashes = {
+      { hash = "8f3e34e22104d06903ef2447ec8d02f5", label = "Shining Force III - Scenario 2 - Nerawareta Miko (Japan) (En) (v24) (SF3TP)" },
+      { hash = "0edd2b16ecf8f7440eb88821872096b4", label = "Shining Force III - Scenario 2 - Nerawareta Miko (Japan)" },
+      { hash = "91ed28554cae7e90d6d3582e9f878ebd", label = "Shining Force III - Scenario 2 - Nerawareta Miko (Japan) (Rev A)" },
+    }
+  },
+
+  events = {
+  },
+}

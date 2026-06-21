@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Monster Hunter Portable 3rd [Subset - Multiplayer]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "monster-hunter-portable-3rd-subset-multiplayer",
+    file = "monster-hunter-portable-3rd-subset-multiplayer.zip",
+    hashes = {
+      { hash = "8d07cb3e23ee2c8e1579b11587222095", label = "Monster Hunter Portable 3rd  [Subset - Multiplayer]" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1BA7A64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PSP} Stats - Polar Zone (1)" },
+        { address=0X1BA7A9D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PSP} Stats - Polar Zone (2)" },
+        { address=0X1BA7AD6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PSP} Stats - Polar Zone (3)" },
+        { address=0X1BA7B0F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PSP} Stats - Polar Zone (4)" },
+        { address=0X1FAE514, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PS3} Stats - Polar Zone (1)" },
+        { address=0X1FAE54D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PS3} Stats - Polar Zone (2)" },
+        { address=0X1FAE586, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PS3} Stats - Polar Zone (3)" },
+        { address=0X1FAE5BF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{PS3} Stats - Polar Zone (4)" },
+      },
+    },
+  },
+}

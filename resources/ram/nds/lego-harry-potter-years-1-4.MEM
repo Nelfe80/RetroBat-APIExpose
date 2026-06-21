@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "LEGO Harry Potter: Years 1-4",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "lego-harry-potter-years-1-4",
+    file = "lego-harry-potter-years-1-4.zip",
+    hashes = {
+      { hash = "b7c65012ad2563db2cf55ded03d074ff", label = "LEGO Harry Potter - Years 1-4 (Europe) (En,Fr,De,Es,It,Da).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X131004, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X131004, type="u8", condition="eq", value=0X01, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ingame/Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X144C5D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total Golden Wizard Hats in Level" },
+        { address=0X146D07, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Storage for task completion for each level." },
+        { address=0X146D08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Storage for task completion for each level." },
+        { address=0X16447C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit 0] = Flag for True Wizard Status in Current Level" },
+      },
+      zone = {
+        { address=0X146C80, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Chapter 1, Year 4] [The Quidditch World Cup]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X146C6F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Chapter 4, Year 2] [Collecting Ingredients]" },
+      },
+      health = {
+        { address=0X144DB1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X144DB1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X146C9E, type="u8", condition="bit_true", bit=3, mask=0X08, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X146D06, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Storage for task completion for each level." },
+      },
+    },
+  },
+}

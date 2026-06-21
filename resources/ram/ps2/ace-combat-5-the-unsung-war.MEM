@@ -1,0 +1,114 @@
+return {
+  game = {
+    title = "Ace Combat 5: The Unsung War",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "ace-combat-5-the-unsung-war",
+    file = "ace-combat-5-the-unsung-war.zip",
+    hashes = {
+      { hash = "4bd0d47c6010ed0250bcb6a6c9e89d10", label = "Ace Combat 5 - The Unsung War (USA) (En,Ja)" },
+      { hash = "09232e8bfe8f628237deb8f377bd33f3", label = "Ace Combat - Squadron Leader (Europe, Australia) (En,Fr,De,Es,It)" },
+      { hash = "0764a8a77c0e61b53bca42b946cbde24", label = "Ace Combat 5 - The Unsung War (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5C8640, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="English without subtitles" },
+        { address=0X5C8640, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Japanese without subtitles" },
+        { address=0X8D3242, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue**" },
+        { address=0X92D947, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X9873D0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+        { address=0X9873D7, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu closed" },
+        { address=0X9873D7, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu open" },
+        { address=0X988560, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+        { address=0X988567, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu closed" },
+        { address=0X988567, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu open" },
+        { address=0X996E10, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+        { address=0X996E17, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu closed" },
+        { address=0X996E17, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu open" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5C8633, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Default Brightness Level" },
+        { address=0X5C8CC6, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game not finished" },
+        { address=0X5C8CC6, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game clear and Free Mission unlocked" },
+        { address=0X5C8CC6, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game clear and Free Mission unlocked. Possibly also means that SP New Game was cleared, not enti" },
+        { address=0X5C94C6, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game not finished" },
+        { address=0X5C94C6, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game clear and Free Mission unlocked" },
+        { address=0X5CA4E4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Squadron Data - Ground Target Kills - Player" },
+        { address=0X5CA4F4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Squadron Data - Ground Target Kills - Nagase" },
+        { address=0X5CA504, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Squadron Data - Ground Target Kills - Chopper" },
+        { address=0X5CA514, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Squadron Data - Ground Target Kills - Grimm" },
+        { address=0X5CA524, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Squadron Data - Ground Target Kills - Snow" },
+        { address=0X5CB5C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Possibly ground-based kills from player" },
+        { address=0X5D6CC6, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game not finished" },
+        { address=0X5D6CC6, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game clear and Free Mission unlocked" },
+        { address=0X6DE064, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level / Screen ID" },
+        { address=0X9885D0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arcade Info - Level Played" },
+        { address=0X996E80, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arcade Info - Level Played" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9CDEA5, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Failure / Death cam" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5CB924, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 01 (Route A)" },
+        { address=0X5CB92C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 02 (Route B)" },
+        { address=0X5CB934, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 03 (Route C)" },
+        { address=0X5CB93C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 04 (Route D)" },
+        { address=0X5CC124, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 01 (Route A)" },
+        { address=0X5CC12C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 02 (Route B)" },
+        { address=0X5CC134, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 03 (Route C)" },
+        { address=0X5CC13C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 04 (Route D)" },
+        { address=0X5D9924, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 01 (Route A)" },
+        { address=0X5D992C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 02 (Route B)" },
+        { address=0X5D9934, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 03 (Route C)" },
+        { address=0X5D993C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade Leaderboard Top Score - Level 04 (Route D)" },
+        { address=0X9324B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Campaign Results screen - Points Added From Kills" },
+        { address=0X9324B8, type="u16le", condition="eq", value=0X4E20, action="SCORE_STATE", no_log=false, no_survey=false, desc="20,000 Points awarded for S-Rank (Mission 18+)" },
+        { address=0X9324B8, type="u16le", condition="eq", value=0X2710, action="SCORE_STATE", no_log=false, no_survey=false, desc="10,000 Points awarded for A-Rank (Mission 18+)" },
+        { address=0X9324B8, type="u16le", condition="eq", value=0X1388, action="SCORE_STATE", no_log=false, no_survey=false, desc="5,000 Points awarded for B-Rank (Mission 18+)" },
+        { address=0X9324B8, type="u16le", condition="eq", value=0X01F4, action="SCORE_STATE", no_log=false, no_survey=false, desc="500 Points awarded for C-Rank (Mission 18+)" },
+        { address=0X933640, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Campaign Results screen - Points Added From Kills" },
+        { address=0X933648, type="u16le", condition="eq", value=0X4E20, action="SCORE_STATE", no_log=false, no_survey=false, desc="20,000 Points awarded for S-Rank (Mission 18+)" },
+        { address=0X933648, type="u16le", condition="eq", value=0X2710, action="SCORE_STATE", no_log=false, no_survey=false, desc="10,000 Points awarded for A-Rank (Mission 18+)" },
+        { address=0X933648, type="u16le", condition="eq", value=0X1388, action="SCORE_STATE", no_log=false, no_survey=false, desc="5,000 Points awarded for B-Rank (Mission 18+)" },
+        { address=0X933648, type="u16le", condition="eq", value=0X01F4, action="SCORE_STATE", no_log=false, no_survey=false, desc="500 Points awarded for C-Rank (Mission 18+)" },
+        { address=0X941EF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Campaign Results screen - Points Added From Kills" },
+        { address=0X941EF8, type="u16le", condition="eq", value=0X4E20, action="SCORE_STATE", no_log=false, no_survey=false, desc="20,000 Points awarded for S-Rank (Mission 18+)" },
+        { address=0X941EF8, type="u16le", condition="eq", value=0X2710, action="SCORE_STATE", no_log=false, no_survey=false, desc="10,000 Points awarded for A-Rank (Mission 18+)" },
+        { address=0X941EF8, type="u16le", condition="eq", value=0X1388, action="SCORE_STATE", no_log=false, no_survey=false, desc="5,000 Points awarded for B-Rank (Mission 18+)" },
+        { address=0X941EF8, type="u16le", condition="eq", value=0X01F4, action="SCORE_STATE", no_log=false, no_survey=false, desc="500 Points awarded for C-Rank (Mission 18+)" },
+      },
+      collectibles = {
+        { address=0X5C8CB0, type="u32le", condition="eq", value=0X3B9AC9FF, action="MONEY_STATE", no_log=false, no_survey=false, desc="999,999,999 Maximum value" },
+        { address=0X5C8CBB, type="u8", condition="eq", value=0X39, action="AMMO_STATE", no_log=false, no_survey=false, desc="Hawk (Mission 19 Exclusive variant which has no ammo)" },
+        { address=0X5D6CB0, type="u32le", condition="eq", value=0X3B9AC9FF, action="MONEY_STATE", no_log=false, no_survey=false, desc="999,999,999 Maximum value" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5CB0DD, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X5CB0DD, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X5D88DD, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X5D88DD, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X9CDEA5, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Triggers the next mission checkpoint/ Completes the mission if no mission checkpoints remain (ca" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6CD6A0, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Achieved (Mission Results)" },
+      },
+    },
+  },
+}

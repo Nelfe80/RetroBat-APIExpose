@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Akiba's Trip",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "akibas-trip",
+    file = "akibas-trip.zip",
+    hashes = {
+      { hash = "0db666cfb749e91c173920ab3fc5067d", label = "Akiba's Trip Plus (Japan) (v1.02).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XAB9AC0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

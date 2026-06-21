@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Monopoly",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "monopoly",
+    file = "monopoly.zip",
+    hashes = {
+      { hash = "40794bbfc3f9a73df5255fe6d10b5107", label = "Monopoly (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9735, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X84E4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 Money 16 bit increased" },
+        { address=0X8500, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 2 Money 16 bit increased" },
+        { address=0X851C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 3 Money 16 bit increased" },
+        { address=0X8538, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 4 Money 16 bit increased" },
+        { address=0X8554, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 5 Money 16 bit increased" },
+        { address=0X8570, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 6 Money 16 bit increased" },
+        { address=0X858C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 7 Money 16 bit increased" },
+        { address=0X85A8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 8 Money 16 bit increased" },
+        { address=0X86FA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade Player Left Money 16bit increased" },
+        { address=0X86FC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade Player Right Money 16bit increased" },
+      },
+    },
+  },
+}

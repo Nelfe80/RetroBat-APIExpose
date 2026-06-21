@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Tokyo Xtreme Racer Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "tokyo-xtreme-racer-advance",
+    file = "tokyo-xtreme-racer-advance.zip",
+    hashes = {
+      { hash = "51664a136b5c9383258e58b384a8d9a8", label = "Tokyo Xtreme Racer Advance (USA).gba" },
+      { hash = "540379fc48a27baafbd1571dea34c9da", label = "Tokyo Xtreme Racer Advance (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5746, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="100 - Wanderer - Demon Weird" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5724, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="83 - Wingz - Landing Zone" },
+      },
+      stage = {
+        { address=0X66D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage in Quick Race" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X56B0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="25 - Jesters - Silent Death" },
+        { address=0X56B4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="27 - Jesters - Quick Death" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X14A4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X01CC, type="u8", condition="eq", value=0X4E, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X1B14, type="u8", condition="eq", value=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X5788, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Fadeout Timer" },
+        { address=0X5790, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack - x0.00.0" },
+        { address=0X5791, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack - 0x.00.0" },
+        { address=0X5792, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack - 00.x0.0" },
+        { address=0X5793, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack - 00.0x.0" },
+        { address=0X5794, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack - 00.00.x" },
+      },
+    },
+  },
+}

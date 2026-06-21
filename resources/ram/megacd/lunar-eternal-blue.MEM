@@ -1,0 +1,116 @@
+return {
+  game = {
+    title = "Lunar: Eternal Blue",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "lunar-eternal-blue",
+    file = "lunar-eternal-blue.zip",
+    hashes = {
+      { hash = "9f173a8aedd5cca2667dba81ddaddae5", label = "Lunar - Eternal Blue (USA) (RE)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X193E2, type="u16be", condition="eq", value=0X0000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screens/saved game list" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3ED04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit - Hiro's current Level" },
+        { address=0X3ED40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit - Gywn's current Level" },
+        { address=0X3ED7C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit - Ronfar's current Level" },
+        { address=0X3EDB8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit - Jean's current level" },
+        { address=0X3EDF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit - Lemina's current Level" },
+        { address=0X3EE30, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8bit - Leo's current level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3E4B9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="8bit - In battle, the number of party deaths (stone considered 'death')" },
+      },
+      health = {
+        { address=0X3ED06, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Hiro's current HP decreased" },
+        { address=0X3ED06, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Hiro's current HP increased" },
+        { address=0X3ED08, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Hiro's max HP decreased" },
+        { address=0X3ED08, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Hiro's max HP increased" },
+        { address=0X3ED42, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Gywn's current HP decreased" },
+        { address=0X3ED42, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Gywn's current HP increased" },
+        { address=0X3ED44, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Gwyn's total HP decreased" },
+        { address=0X3ED44, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Gwyn's total HP increased" },
+        { address=0X3ED7E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Ronfar's current HP decreased" },
+        { address=0X3ED7E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Ronfar's current HP increased" },
+        { address=0X3ED7F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ronfar's current HP decreased" },
+        { address=0X3ED7F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ronfar's current HP increased" },
+        { address=0X3ED80, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Ronfar's max HP decreased" },
+        { address=0X3ED80, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Ronfar's max HP increased" },
+        { address=0X3EDBA, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Jean's current HP decreased" },
+        { address=0X3EDBA, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Jean's current HP increased" },
+        { address=0X3EDBC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Jean's max HP decreased" },
+        { address=0X3EDBC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Jean's max HP increased" },
+        { address=0X3EDF6, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Lemina's current HP decreased" },
+        { address=0X3EDF6, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Lemina's current HP increased" },
+        { address=0X3EDF8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Lemina's total HP decreased" },
+        { address=0X3EDF8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Lemina's total HP increased" },
+        { address=0X3EE32, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Leo's current HP decreased" },
+        { address=0X3EE32, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Leo's current HP increased" },
+        { address=0X3EE34, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Leo's max HP decreased" },
+        { address=0X3EE34, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Leo's max HP increased" },
+        { address=0X3EFCC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Lucia's current HP decreased" },
+        { address=0X3EFCC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Lucia's current HP increased" },
+        { address=0X3EFCE, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - Lucia's max HP decreased" },
+        { address=0X3EFCE, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - Lucia's max HP increased" },
+        { address=0X41E76, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _2 current HP decreased" },
+        { address=0X41E76, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _2 current HP increased" },
+        { address=0X41E78, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _2 total HP decreased" },
+        { address=0X41E78, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _2 total HP increased" },
+        { address=0X41F9C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _3 current HP decreased" },
+        { address=0X41F9C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _3 current HP increased" },
+        { address=0X41F9E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _3 total HP decreased" },
+        { address=0X41F9E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _3 total HP increased" },
+        { address=0X420C2, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _4 current HP decreased" },
+        { address=0X420C2, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _4 current HP increased" },
+        { address=0X420C4, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _4 total HP decreased" },
+        { address=0X420C4, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _4 total HP increased" },
+        { address=0X421E8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _5 current HP decreased" },
+        { address=0X421E8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _5 current HP increased" },
+        { address=0X421EA, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _5 max HP decreased" },
+        { address=0X421EA, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _5 max HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X3ED2F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="8bit - Hiro's weapon equipped" },
+        { address=0X3ED6B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gywn's equipped weapon" },
+        { address=0X3EDA7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="8bit - Ronfar's equipped weapon" },
+        { address=0X3EDE3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="8bit - Jean's equipped weapon" },
+        { address=0X3EE1F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="8bit - Lemina's equipped weapon" },
+        { address=0X3EE5B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="8bit - Leo's equipped weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3E51D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="8bit - During battle, counts how many rounds have passed. Holds value after battle and resets up" },
+        { address=0X3EFFA, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="16-bit - Party's total silver/money increased" },
+        { address=0X3EFFC, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="16 bit - Party's total silver/money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X41D50, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _1 current HP (used for bosses) [health can possibly overflow when fina" },
+        { address=0X41D52, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="16bit - In battle, Enemy _1 total HP (used for bosses)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X3ED2E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="8bit - Hiro's shield equipped" },
+        { address=0X3EE5A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="8bit - Leo's equipped shield" },
+      },
+    },
+  },
+}

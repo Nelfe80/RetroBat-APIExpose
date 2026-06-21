@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Captain Skyhawk",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "captain-skyhawk",
+    file = "captain-skyhawk.zip",
+    hashes = {
+      { hash = "10e8581f578531495dc00ee62528776e", label = "Captain Skyhawk (USA).nes" },
+      { hash = "44beb044f7c2df6ed784ce4a60146c3c", label = "Captain Skyhawk (USA) (Rev 1).nes" },
+      { hash = "b801e0fca499d14231be90216ea96180", label = "Captain Skyhawk (Europe).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000D, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X0585, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over / Mission Briefing Screen (?)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0047, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal Stage" },
+        { address=0X0047, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Transition to next mission" },
+        { address=0X0047, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Indicator" },
+        { address=0X0585, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Docking Station Stage" },
+        { address=0X0585, type="u8", condition="eq", value=0X0F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Regular Stage" },
+        { address=0X0585, type="u8", condition="eq", value=0X16, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Enter name on High Score screen" },
+        { address=0X0585, type="u8", condition="eq", value=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Result Screen (After completing a stage)" },
+        { address=0X0585, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="More screen/stage flags" },
+        { address=0X069C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of enemies killed in a stage." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0002, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0002, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X007E, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hovering on Aim54" },
+        { address=0X007E, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hovering on Maverick AGM" },
+        { address=0X007E, type="u8", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hovering on Cannon" },
+        { address=0X007E, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hovering on Hawk Bombs" },
+        { address=0X007E, type="u8", condition="eq", value=0X7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hovering on Next Mission" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0004, type="u8", condition="eq", value=0X6, action="SCORE_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0X0004, type="u8", condition="eq", value=0X7, action="SCORE_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X0004, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score Digit" },
+        { address=0X0005, type="u8", condition="eq", value=0X6, action="SCORE_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0X0005, type="u8", condition="eq", value=0X7, action="SCORE_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X0005, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score Digit" },
+        { address=0X0006, type="u8", condition="eq", value=0X6, action="SCORE_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0X0006, type="u8", condition="eq", value=0X7, action="SCORE_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X0006, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score Digit" },
+        { address=0X0007, type="u8", condition="eq", value=0X6, action="SCORE_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0X0007, type="u8", condition="eq", value=0X7, action="SCORE_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X0007, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score Digit" },
+        { address=0X0008, type="u8", condition="eq", value=0X6, action="SCORE_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0X0008, type="u8", condition="eq", value=0X7, action="SCORE_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X0008, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score Digit" },
+        { address=0X0009, type="u8", condition="eq", value=0X6, action="SCORE_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0X0009, type="u8", condition="eq", value=0X7, action="SCORE_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X0009, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score Digit" },
+        { address=0X000A, type="u8", condition="eq", value=0X6, action="SCORE_STATE", no_log=false, no_survey=false, desc="0" },
+        { address=0X000A, type="u8", condition="eq", value=0X7, action="SCORE_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X000A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower4] Score Digit" },
+        { address=0X04B8, type="u8", condition="eq", value=0X80, action="SCORE_STATE", no_log=false, no_survey=false, desc="A" },
+        { address=0X04B8, type="u8", condition="eq", value=0X84, action="SCORE_STATE", no_log=false, no_survey=false, desc="B" },
+        { address=0X04B8, type="u8", condition="eq", value=0X88, action="SCORE_STATE", no_log=false, no_survey=false, desc="C, etc." },
+        { address=0X04B8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Used to identify the digits when you're on the 'Enter your name' screen for High Scores." },
+        { address=0X069D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Checks number of enemies killed on Score Result screen after a mission. (This will be writing th" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0585, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Stage" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X000C, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Disabled" },
+        { address=0X000C, type="u8", condition="eq", value=0XFE, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Enabled" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0047, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Docking / Destroy Enemy Fighter Planes Stage" },
+      },
+    },
+  },
+}

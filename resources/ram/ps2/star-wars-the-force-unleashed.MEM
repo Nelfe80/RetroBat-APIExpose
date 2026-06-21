@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Star Wars: The Force Unleashed",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "star-wars-the-force-unleashed",
+    file = "star-wars-the-force-unleashed.zip",
+    hashes = {
+      { hash = "aa93355b55d17fcfc21a1640cad15838", label = "Star Wars - The Force Unleashed (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7700F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ASCII Current Level (Can force load level with this address, but doesn't update objectives)" },
+        { address=0X770130, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ASCII Previous Level" },
+        { address=0X7B1312, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[ASCII] Level .bpk loaded" },
+        { address=0XA49E30, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Force Powers | Ground Slam (Default)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X7B084C, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Cheats | Amplified Lightsaber Damage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA4A3D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Force Points" },
+      },
+    },
+  },
+}

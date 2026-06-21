@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Pokémon Yellow Version: Special Pikachu Edition [Subset - "Shiny" Pokémon]",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-yellow-version-special-pikachu-edition-subset-shiny-pokemon",
+    file = "pokemon-yellow-version-special-pikachu-edition-subset-shiny-pokemon.zip",
+    hashes = {
+      { hash = "a12f78a4c7842b82f42a2512add7373d", label = "Pokemon Yellow Version - Special Pikachu Edition [Subset - Shiny Pokemon].gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCFF2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy Pokemon Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCFE5, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-bit BE] Enemy Pokemon HP decreased" },
+        { address=0XCFE5, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-bit BE] Enemy Pokemon HP increased" },
+      },
+    },
+  },
+}

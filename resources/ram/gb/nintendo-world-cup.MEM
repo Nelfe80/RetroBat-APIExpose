@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Nintendo World Cup",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "nintendo-world-cup",
+    file = "nintendo-world-cup.zip",
+    hashes = {
+      { hash = "c9200b1be878f079cee6cbebbeaa27ea", label = "Nintendo World Cup (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC3D6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals P1" },
+        { address=0XC3D7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals P2" },
+      },
+    },
+  },
+}

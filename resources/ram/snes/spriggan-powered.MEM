@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Spriggan Powered",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "spriggan-powered",
+    file = "spriggan-powered.zip",
+    hashes = {
+      { hash = "06940ef9bb2ed5340a37951831323468", label = "Spriggan Powered (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C806, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Remaining" },
+        { address=0X1CEC8, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1CEC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level: 00 = Easy, 01 = Normal, 02 = Hard, 03 = Super" },
+      },
+      stage = {
+        { address=0X1CA8C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number!!!" },
+        { address=0X1CED0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1ABBE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0X1ABBE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+        { address=0X1CECE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Mode increased" },
+        { address=0X1CECE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Mode decreased" },
+        { address=0X1CEE8, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Change Lives Unlocked" },
+      },
+      health = {
+        { address=0X1ABC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Shield Energy decreased" },
+        { address=0X1ABC0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Shield Energy increased" },
+      },
+    },
+  },
+}

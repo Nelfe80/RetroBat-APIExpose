@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Dexter's Laboratory: Chess Challenge",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Board Game, Strategy"
+  },
+
+  rom = {
+    name = "dexters-laboratory-chess-challenge",
+    file = "dexters-laboratory-chess-challenge.zip",
+    hashes = {
+      { hash = "2a0d1bb21640a97228f334853b0289c3", label = "Dexter's Laboratory - Chess Challenge (Europe) (En,Fr,De,Es).gba" },
+      { hash = "da1471e76473766f201ead7c9c9e3595", label = "Dexter's Laboratory - Chess Challenge (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

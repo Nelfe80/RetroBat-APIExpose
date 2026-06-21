@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Red Steel",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Shooter"
+  },
+
+  rom = {
+    name = "red-steel",
+    file = "red-steel.zip",
+    hashes = {
+      { hash = "40eba56fa0680865b4773ea66ad2bbc5", label = "Red Steel (USA) (En,Fr,Es)" },
+      { hash = "c06ce95fac27e86fb88eb7491bc0927a", label = "Red Steel (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

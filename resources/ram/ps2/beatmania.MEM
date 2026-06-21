@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Beatmania",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "beatmania",
+    file = "beatmania.zip",
+    hashes = {
+      { hash = "4044fa6b08fbd98be27ec1f9aaff6b09", label = "Beatmania (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1425B20, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Type B (always assume versus, similar to modern titles today)" },
+        { address=0X14FFDC0, type="u8", condition="eq", value=0X09, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1425D70, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Internal Game Difficulty Level" },
+        { address=0X1425D94, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Level" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1E1BA4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Score UI In-Stage increased" },
+        { address=0X1ECAC4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Score Talley on Evaluation Screen (UI) increased" },
+        { address=0X1425D9C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Time Since Hovering on Option? increased" },
+        { address=0X1425DA0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Time Since Entering Options Menu? increased" },
+        { address=0X14FFE44, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Score For Level increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1ECA94, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Evaluation Screen?" },
+        { address=0X1ECA98, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Evaluation Screen?" },
+        { address=0X1ECAA0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Evaluation Screen?" },
+        { address=0X1ECB20, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Evaluation Screen?" },
+        { address=0X1425B00, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Display Settings Timer: How Long On Option?" },
+        { address=0X1425B04, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Display Settings Timer: How Long On Option?" },
+        { address=0X1425B60, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Extra Settings Specific Option Runtime" },
+        { address=0X1425B64, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Extra Settings Runtime" },
+        { address=0X1425B90, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Movie Settings Specific Option Runtime" },
+        { address=0X1425B94, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Movie Settings Runtime" },
+        { address=0X1425BC0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Options Timer: How Long on Vibration Screen Specific Option?" },
+        { address=0X1425BC4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Options Timer: How Long on Vibration Screen?" },
+        { address=0X1425D60, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Unknown Timer" },
+        { address=0X1425D64, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Unknown Timer" },
+        { address=0X14FF974, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Save & Load Options?" },
+        { address=0X14FF978, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Save & Load Options?" },
+        { address=0X14FF9C8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Training Mode?" },
+        { address=0X14FF9CC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer: Training Mode?" },
+      },
+    },
+  },
+}

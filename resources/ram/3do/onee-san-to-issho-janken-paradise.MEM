@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Onee-san to Issho! Janken Paradise",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "onee-san-to-issho-janken-paradise",
+    file = "onee-san-to-issho-janken-paradise.zip",
+    hashes = {
+      { hash = "d902e9258441bc01d81dc15f2a39d1d7", label = "Onee-san to Issho! Janken Paradise (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

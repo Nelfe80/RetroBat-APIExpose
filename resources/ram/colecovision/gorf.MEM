@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Gorf",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Action, Shooter, Space Invaders Like"
+  },
+
+  rom = {
+    name = "gorf",
+    file = "gorf.zip",
+    hashes = {
+      { hash = "e751e5d60a2259334b80ce63d2b69c3a", label = "Gorf (USA, Europe).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X004E, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X004F, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X004B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Skill level" },
+      },
+      stage = {
+        { address=0X002E, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Enemy flying out of center in Space Warp" },
+        { address=0X002E, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="UFO onscreen (any kind)" },
+        { address=0X002E, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="UFO direction (OFF=left, ON=right)" },
+        { address=0X002E, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="UFO stopped (if Bit 4 was high it remains high during stop)" },
+        { address=0X002E, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="UFO Up/down flag (OFF=Down, ON=Up, used for mini-Gorf UFO)" },
+        { address=0X002E, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="UFO flying away after stop" },
+        { address=0X0040, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of required enemies remaining in stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X002F, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Flips on and off during player death (while lives are lieft)" },
+        { address=0X002F, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Flips on after player death, resets on respawn or game over" },
+        { address=0X004E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 lives remaining increased" },
+        { address=0X004E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 lives remaining decreased" },
+        { address=0X004F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 lives remaining increased" },
+        { address=0X004F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 lives remaining decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01D8, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] P1 Score" },
+        { address=0X01DB, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BCD] P2 Score" },
+      },
+    },
+  },
+}

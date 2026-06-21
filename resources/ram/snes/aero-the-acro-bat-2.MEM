@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Aero the Acro-Bat 2",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Action"
+  },
+
+  rom = {
+    name = "aero-the-acro-bat-2",
+    file = "aero-the-acro-bat-2.zip",
+    hashes = {
+      { hash = "85b449f98af752e3255a256b6a89bb16", label = "Aero the Acro-Bat 2 (USA).sfc" },
+      { hash = "8cdae9f521e26ebecdff4148ad3d0c88", label = "Aero the Acro-Bat 2 (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X02FC, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="0 Off" },
+        { address=0X1DC2, type="u16le", condition="eq", value=0X021C, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo started" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0056, type="u8", condition="eq", value=0X6A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level completed" },
+        { address=0X192E, type="u8", condition="eq", value=0XFF, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Password/Stage complete screens" },
+        { address=0X192E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Related to level 1 8 Bits" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0EF1, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X0EF1, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4C49, type="u8", condition="eq", value=0XA8, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="On" },
+        { address=0X4C57, type="u8", condition="eq", value=0XA8, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="On" },
+        { address=0X4C65, type="u8", condition="eq", value=0XA8, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="On" },
+        { address=0X4C73, type="u8", condition="eq", value=0XA8, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="On" },
+        { address=0X4C81, type="u8", condition="eq", value=0XA8, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="On" },
+        { address=0X4C8F, type="u8", condition="eq", value=0XA8, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0E86, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Fly mode time begin 8 Bits" },
+        { address=0X1DC2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="16 Bit - Timer before demo starts" },
+      },
+    },
+  },
+}

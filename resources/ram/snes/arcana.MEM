@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Arcana",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "arcana",
+    file = "arcana.zip",
+    hashes = {
+      { hash = "cefe028852135a1695ed9f6e692bc0ca", label = "Arcana (USA).sfc" },
+      { hash = "16953ee13696216c402cc173a8469b2f", label = "Arcana (USA) (Es) (v1.2) (Andre Mena Calavia,Lukas).sfc" },
+      { hash = "b5f794116be109bd68b9d4458978268c", label = "Arcana (USA) (Gl) (v1.0) (Andre Mena Calavia).sfc" },
+      { hash = "e506ae74c43107b7ea811b99c6116331", label = "Arcana (USA) (Pt) (v1.0) (Hexagon).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X137B, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Only on boot, reset, or game over. Can be used as in-game check" },
+        { address=0X18CB, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1363, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rooks - EXP needed to level" },
+        { address=0X137B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Min" },
+        { address=0X137B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rooks level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0657, type="u16le", condition="eq", value=0X34, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead" },
+      },
+      health = {
+        { address=0X12F3, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rooks current HP decreased" },
+        { address=0X12F3, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rooks current HP increased" },
+        { address=0X12F5, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spirit current HP decreased" },
+        { address=0X12F5, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spirit current HP increased" },
+        { address=0X12F7, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Guest 1 current HP decreased" },
+        { address=0X12F7, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Guest 1 current HP increased" },
+        { address=0X12FB, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-byte Array] Enemy 1-8 HP decreased" },
+        { address=0X12FB, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-byte Array] Enemy 1-8 HP increased" },
+        { address=0X1309, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 8 HP decreased" },
+        { address=0X1309, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 8 HP increased" },
+        { address=0X1393, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rooks max HP decreased" },
+        { address=0X1393, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rooks max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X18E3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[6-byte Array] Treasure Collected Bitflags - Current Chapter" },
+        { address=0X11B9, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="page# in item list" },
+      },
+      weapon = {
+        { address=0X1283, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rooks Currently Equipped Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1559, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0657, type="u16le", condition="eq", value=0X23, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stone Guardian (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X24, action="BOSS_HIT", no_log=false, no_survey=false, desc="Iron Guardian (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X2C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Cyclops (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X2D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Efrite (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X2E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Zerel (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X3F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hydra (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sauza (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X50, action="BOSS_HIT", no_log=false, no_survey=false, desc="Darah (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X51, action="BOSS_HIT", no_log=false, no_survey=false, desc="Barah (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X52, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ariel (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X53, action="BOSS_HIT", no_log=false, no_survey=false, desc="Teefa (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X63, action="BOSS_HIT", no_log=false, no_survey=false, desc="Karul (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X64, action="BOSS_HIT", no_log=false, no_survey=false, desc="Galeeon 1st form (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X65, action="BOSS_HIT", no_log=false, no_survey=false, desc="Galneon 2nd form (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X66, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rimsala 1st form (Boss)" },
+        { address=0X0657, type="u16le", condition="eq", value=0X67, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rimsala 2nd form (Boss)" },
+        { address=0X18DF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Bitflags - Current Chapter" },
+      },
+    },
+  },
+}

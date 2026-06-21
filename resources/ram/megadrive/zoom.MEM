@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Zoom!",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "zoom",
+    file = "zoom.zip",
+    hashes = {
+      { hash = "dcb24422572d9acf8dc158aa734ebb79", label = "Zoom! (World).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF601, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game (not demo check)" },
+        { address=0XF601, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="play demo (sticks while in game after continue)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD500, type="u8", condition="eq", value=0XFE, action="NEW_LEVEL", no_log=false, no_survey=false, desc="filled out (yellow)" },
+        { address=0XD500, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="filled out [orange]" },
+        { address=0XD500, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit/bitCount] Level grid - Square 2 data" },
+        { address=0XD501, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="square not in level?" },
+        { address=0XD501, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="square not in level? but some of it is filled out?" },
+        { address=0XD501, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="secret square filled in?" },
+        { address=0XD501, type="u8", condition="eq", value=0XFE, action="NEW_LEVEL", no_log=false, no_survey=false, desc="filled out (light) = double fill in?" },
+        { address=0XD501, type="u8", condition="eq", value=0XFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="filled out [dark) = single fill in?" },
+        { address=0XD501, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit/bitCount] Level grid - Square 1 data" },
+      },
+      stage = {
+        { address=0XF034, type="u16be", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1st loop (Green text - stage 1)" },
+        { address=0XF034, type="u16be", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2nd loop (Red text - stage 1)" },
+      },
+    },
+  },
+}

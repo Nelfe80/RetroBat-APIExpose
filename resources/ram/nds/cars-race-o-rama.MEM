@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cars: Race-O-Rama",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cars-race-o-rama",
+    file = "cars-race-o-rama.zip",
+    hashes = {
+      { hash = "279487cdde931f6627030105b3cccadb", label = "Cars - Race-O-Rama (Europe) (En,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

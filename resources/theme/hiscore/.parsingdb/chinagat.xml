@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE hi2txt SYSTEM "hi2txt.dtd">
+<hi2txt label="China Gate">
+    <!--
+      tested with mame 0.229 and embedded hiscore.dat
+      source: GreatStone
+    //-->
+    <structure file=".hi">
+        <check>
+            <!-- optional: if defined and hiscore.dat provided, it allows to select the good structure versus the provided file //-->
+            <definition>@:maincpu,program,c83,23,00,21</definition>
+            <!-- optional: if defined, it allows to select the good structure versus the provided file
+                         useful if multiple structures are defined but hiscore.dat not provided //-->
+            <size>35</size>
+        </check>
+        <loop count="10">
+            <elt id="SCORE" size="4" type="int"  base="16"/>
+            <elt id="NAME"  size="3" type="text" ascii-offset="32"/>
+        </loop>
+    </structure>
+    <output>
+        <table>
+            <column id="SCORE"/>
+            <column id="NAME"/>
+        </table>
+    </output>
+</hi2txt>

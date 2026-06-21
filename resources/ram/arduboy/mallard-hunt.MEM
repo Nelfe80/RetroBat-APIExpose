@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "MallARD Hunt",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mallard-hunt",
+    file = "mallard-hunt.zip",
+    hashes = {
+      { hash = "1f97890993d9fb44ccf9bf033122a1f2", label = "MallARD Hunt (World).hex" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X010C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0106, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X0106, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0163, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

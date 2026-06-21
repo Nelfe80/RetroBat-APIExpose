@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Take the Money and Run",
+    system = "o2em",
+    system_name = "Magnavox Odyssey 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "take-the-money-and-run",
+    file = "take-the-money-and-run.zip",
+    hashes = {
+      { hash = "b2d810dcb97e38192a6dd3d213dbce10", label = "Take the Money and Run (USA, Europe).bin" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X0084, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] Left player money hundred thousands and ten thousands increased" },
+        { address=0X0085, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] Left player money thousands and hundreds increased" },
+        { address=0X0086, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] left player money tens and ones increased" },
+        { address=0X0088, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] Right player money hundred thousands and ten thousands increased" },
+        { address=0X0089, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] Right player money thousands and hundreds increased" },
+        { address=0X008A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] Right player money tens and ones increased" },
+        { address=0X008C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Lower4] Money timer ten thousands increased" },
+        { address=0X008D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] Money timer thousands and hundreds increased" },
+        { address=0X008E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[BCD] Money timer tens and hundreds increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Power Golf",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Sports, Golf"
+  },
+
+  rom = {
+    name = "power-golf",
+    file = "power-golf.zip",
+    hashes = {
+      { hash = "8a524c7491bd6614e9c92bb7117a57f3", label = "Power Golf (USA).pce" },
+    }
+  },
+
+  events = {
+  },
+}

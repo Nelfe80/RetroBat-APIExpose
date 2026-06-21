@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Auto Modellista",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "auto-modellista",
+    file = "auto-modellista.zip",
+    hashes = {
+      { hash = "c66cef351eb69f16761a2ea9442f2ee5", label = "Auto Modellista (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4AD93B, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 1 Cleared" },
+        { address=0X4AD93C, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level 2 Cleared" },
+        { address=0X4AD950, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X4AD950, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Incomplete" },
+        { address=0X4AD950, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Race Completion Flags - Level 1 - Rokko Hill (8-bit)" },
+        { address=0X51061F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X51061F, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X51061F, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X51061F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CPU Level (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X51061A, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Garage Life" },
+      },
+    },
+  },
+}

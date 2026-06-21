@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Checkers",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Board Game, Strategy"
+  },
+
+  rom = {
+    name = "checkers",
+    file = "checkers.zip",
+    hashes = {
+      { hash = "8122bb07816acdcb3f0a037b72f02142", label = "Checkers (USA, Europe) (Intellivision Lives!).int" },
+    }
+  },
+
+  events = {
+  },
+}

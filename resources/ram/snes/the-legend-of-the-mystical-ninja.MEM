@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "The Legend of the Mystical Ninja",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-legend-of-the-mystical-ninja",
+    file = "the-legend-of-the-mystical-ninja.zip",
+    hashes = {
+      { hash = "605208d037c654524b8d5484c2c73d8d", label = "Legend of The Mystical Ninja, The (USA) (Es) (v0.9c) (jackic).sfc" },
+      { hash = "8596eebaad7ac1d0da3772628e436d72", label = "Legend of the Mystical Ninja, The (USA) (English Improvement) (FlashPV) (1.02).sfc" },
+      { hash = "bf6da6f13729c8925d8725d7dd25b420", label = "Legend of the Mystical Ninja, The (USA).sfc" },
+      { hash = "ec25ba881050baae5261ce82ebad8277", label = "Legend of the Mystical Ninja, The (USA) (MSU-1) (Conn,Kurrono) (1.0).sfc" },
+      { hash = "4fd0ba2e996afb5e022e6b31145c5015", label = "Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Japan) (De) (v1.1) (Poe).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X059A, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="at ground," },
+        { address=0X18E0, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cutscenes(between levels);" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X059A, type="u8", condition="eq", value=0X8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead," },
+      },
+      health = {
+        { address=0X059A, type="u8", condition="eq", value=0X3, action="HIT", no_log=false, no_survey=false, desc="damage taken," },
+      },
+    },
+  },
+}

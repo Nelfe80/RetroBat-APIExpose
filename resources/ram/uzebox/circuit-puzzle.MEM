@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Circuit Puzzle",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "circuit-puzzle",
+    file = "circuit-puzzle.zip",
+    hashes = {
+      { hash = "3554678c7668db469c667d3588268146", label = "Circuit Puzzle (World) (Artcfox).uze" },
+    }
+  },
+
+  events = {
+  },
+}

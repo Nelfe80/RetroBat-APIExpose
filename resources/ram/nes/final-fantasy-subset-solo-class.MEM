@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Final Fantasy [Subset - Solo Class]",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "final-fantasy-subset-solo-class",
+    file = "final-fantasy-subset-solo-class.zip",
+    hashes = {
+      { hash = "ae37bf58e37dfc6301d42ae95db53c1a", label = "Final Fantasy (USA) [Subset - Solo Class].nes" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X6021, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="('which key item a handler involves, as the flags for whether you have each key item are stored" },
+      },
+    },
+  },
+}

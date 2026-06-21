@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Micro Machines V3",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "micro-machines-v3",
+    file = "micro-machines-v3.zip",
+    hashes = {
+      { hash = "7530a70971143a2f00259e4d2c99a23a", label = "Micro Machines V3 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X100E8, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X104CA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Dune Buggy Level" },
+        { address=0X104D6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Locust Level" },
+        { address=0X104E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Flying Wedge Level" },
+        { address=0X104EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Surf Wagon Level" },
+        { address=0X104FA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] 60s F1 Level" },
+        { address=0X10506, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Hovercraft Level" },
+        { address=0X10512, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Speedboat Level" },
+        { address=0X1051E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Tester Roadster Level" },
+        { address=0X1052A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Cor! Level" },
+        { address=0X10536, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Rig Level" },
+        { address=0X10542, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Night Boat Level" },
+        { address=0X1054E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] F1 Level" },
+        { address=0X1055A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Emergency Level" },
+        { address=0X10566, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Super Snail Level" },
+        { address=0X10572, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Tank Level" },
+        { address=0X1057E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] APC Level" },
+        { address=0X1058A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Willys Level" },
+        { address=0X10596, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Duck Level" },
+        { address=0X105A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Micro Level" },
+        { address=0X105AE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Peace Wagon Level" },
+        { address=0X105BA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Dumper Level" },
+        { address=0X105C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Barbarian Level" },
+        { address=0X105D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Jam Jar Level" },
+        { address=0X105DE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Hot Rod Level" },
+        { address=0X105EA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Cone Master Level" },
+        { address=0X105F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] GT Racer Level" },
+        { address=0X10602, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Beamer Level" },
+        { address=0X1060E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Rattler Level" },
+        { address=0X1061A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Ultra Level" },
+        { address=0X10626, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] ADV Level" },
+        { address=0X10632, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Vehicle Collection] Extreme Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X100ED, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] [Cheats] Catlives increased" },
+        { address=0X100ED, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] [Cheats] Catlives decreased" },
+        { address=0X100F2, type="u8", condition="eq", value=0X24, action="LIVES_STATE", no_log=false, no_survey=false, desc="Pond Life" },
+        { address=0X101CC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 Bit] [Time Trial Stats] 1 Lap - Pond Life increased" },
+        { address=0X101CC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] [Time Trial Stats] 1 Lap - Pond Life decreased" },
+        { address=0X10278, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 Bit] [Time Trial Stats] 3 Laps - Pond Life increased" },
+        { address=0X10278, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] [Time Trial Stats] 3 Laps - Pond Life decreased" },
+        { address=0X10324, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 Bit] [Test Drive Stats] 1 Lap - Pond Life increased" },
+        { address=0X10324, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] [Test Drive Stats] 1 Lap - Pond Life decreased" },
+        { address=0X103D0, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32 Bit] [Test Drive Stats] 3 Laps - Pond Life increased" },
+        { address=0X103D0, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32 Bit] [Test Drive Stats] 3 Laps - Pond Life decreased" },
+        { address=0X129DA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Challenge Mode Lives increased" },
+        { address=0X129DA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Challenge Mode Lives decreased" },
+        { address=0X13A6D8, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X13A7C4, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Grabber" },
+        { address=0X13A7C4, type="u8", condition="eq", value=0X07, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hammer" },
+        { address=0X13A7C4, type="u8", condition="eq", value=0X0A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Missles" },
+        { address=0X13A7C4, type="u8", condition="eq", value=0X0B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mines" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X100F2, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Cheesey Jumps" },
+        { address=0X10294, type="u32le", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[32 Bit] [Test Drive Stats] 1 Lap - Cheesey Jumps" },
+        { address=0X10340, type="u32le", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[32 Bit] [Test Drive Stats] 3 Laps - Cheesey Jumps" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBB1BC, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Standard Car" },
+      },
+    },
+  },
+}

@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Andre Panza: Kickboxing",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "andre-panza-kickboxing",
+    file = "andre-panza-kickboxing.zip",
+    hashes = {
+      { hash = "307403e27f10ccd6cf191f9dda26b77a", label = "tg16/panzakb.7z <Panza Kick Boxing>" },
+      { hash = "f9fdabcefa6e69aba547b1a5113a133f", label = "Andre Panza Kick Boxing (USA).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0208, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X0208, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Preview" },
+        { address=0X0981, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo check?" },
+        { address=0X0A2E, type="u8", condition="eq", value=0X30, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End Credits" },
+        { address=0X0A2E, type="u8", condition="eq", value=0X8A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0004, type="u8", condition="eq", value=0X30, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round sign" },
+        { address=0X0992, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0004, type="u8", condition="eq", value=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="End of match" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0201, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Time?" },
+        { address=0X0D4A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

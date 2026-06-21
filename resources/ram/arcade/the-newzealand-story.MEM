@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "The NewZealand Story",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-newzealand-story",
+    file = "the-newzealand-story.zip",
+    hashes = {
+      { hash = "b66fea7a9d1df4ecc1b80377debaaea6", label = "tnzsjo.7z <The NewZealand Story (Japan, old version) (older PCB)>" },
+      { hash = "ed04fef824534f2b8e0aef0ba765a811", label = "tnzs.7z <The NewZealand Story (World, newer)>" },
+      { hash = "fe88df538b400a9195abd35b9faff812", label = "tnzsoa.7z <The NewZealand Story (World, unknown version) (older PCB)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0431, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen copyright text [37-byte ASCII]" },
+        { address=0X2831, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen copyright text [37-byte ASCII]" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X2ABA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2822, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives logos increased" },
+        { address=0X2822, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives logos decreased" },
+        { address=0X2AB7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (Starts at 3, 1 is the last life, 0 is game over) increased" },
+        { address=0X2AB7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (Starts at 3, 1 is the last life, 0 is game over) decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X332C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current weapon:" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2805, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score text (ASCII)" },
+        { address=0X281B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score text (ASCII)" },
+        { address=0X281C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (thousands) [Lower4]" },
+        { address=0X281D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (hundreds) [Lower4]" },
+        { address=0X281E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (tens) [Lower4]" },
+        { address=0X281F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (ones) [Lower4]" },
+        { address=0X2AB4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (xx00000) [BCD]" },
+        { address=0X2AB5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (00xx000) [BCD]" },
+        { address=0X2AB6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (0000xx0) [BCD]" },
+        { address=0X2F31, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1 if score up text is displayed, 0 otherwise" },
+      },
+      collectibles = {
+        { address=0X3305, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins inserted (Max of 9) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X307A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2BC4, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="FF = Invincible" },
+      },
+      player = {
+        { address=0X2BDA, type="u8", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="Oxygen meter when swimming (counts up, drown at 26)" },
+        { address=0X332B, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Bit0 = 0 if player is jumping, 1 otherwise" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2ABB, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level timer" },
+      },
+    },
+  },
+}

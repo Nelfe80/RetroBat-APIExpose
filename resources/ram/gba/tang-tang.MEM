@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Tang Tang",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tang-tang",
+    file = "tang-tang.zip",
+    hashes = {
+      { hash = "4f6d310cc67afaa9424269904229ea3b", label = "Tang Tang (Europe) (En,Fr,De,Es,It,Fi).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA650, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Gameplay - Number of Continues Remaining [EU]" },
+        { address=0XBB70, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode - Disable Player Movement [EU]" },
+        { address=0XF114, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Options - Show the Demo Mode [EU]" },
+        { address=0XF124, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="SaveState - Selected Character on continue [EU]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF110, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="SaveData - Current Level [EU]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X9430, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Gameplay - Current Lives. increased" },
+        { address=0X9430, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gameplay - Current Lives. decreased" },
+        { address=0XA6DC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Animation Counter - Lives Heart [EU] increased" },
+        { address=0XA6DC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Animation Counter - Lives Heart [EU] decreased" },
+        { address=0XF120, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Options - Number of Lives on New Game [EU] increased" },
+        { address=0XF120, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Options - Number of Lives on New Game [EU] decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC0E0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Structure - Slot 1 [EU]" },
+        { address=0XC0E8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Structure - Slot 2 [EU]" },
+        { address=0XC0F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Structure - Slot 3 [EU]" },
+        { address=0XC0F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Structure - Slot 4 [EU]" },
+        { address=0XC100, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Structure - Slot 5 [EU]" },
+        { address=0XF128, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SaveState - Saved Score [EU]" },
+        { address=0XF320, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Gameplay - Current Score [EU]" },
+      },
+      collectibles = {
+        { address=0XA6E8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gameplay - Rings to collect [EU] increased" },
+        { address=0XB940, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gameplay - Global Ring Animation Frame. [EU] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XBB0C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gameplay - Boss Shot 1" },
+        { address=0XBB0D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gameplay - Boss Shot 2" },
+        { address=0XBB0E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gameplay - Boss Shot 3" },
+        { address=0XBB0F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Gameplay - Boss Shot 4" },
+        { address=0XBB28, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Top of the screen." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA714, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Gameplay - Block Placement Flag" },
+        { address=0XB544, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="No Animation (Regular character animation)" },
+        { address=0XB778, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Gameplay - Exit Door Animation Frame" },
+        { address=0XB7CC, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Gameplay - Exit Door [EU]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7EC0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Pause Wind up/Down counter." },
+        { address=0X86C4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Continue Countdown Timer Tick [EU]" },
+        { address=0X879C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Gameplay - World counter [EU]" },
+        { address=0XB550, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Boss Mode. [EU]" },
+        { address=0XBB34, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Boss Health major tick [EU]" },
+        { address=0XBB3C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Boss Health minor tick [eu]" },
+        { address=0XC080, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Main Menu - Continues [EU]" },
+      },
+    },
+  },
+}

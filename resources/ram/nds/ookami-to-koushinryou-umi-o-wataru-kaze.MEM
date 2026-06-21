@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Ookami to Koushinryou: Umi o Wataru Kaze",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ookami-to-koushinryou-umi-o-wataru-kaze",
+    file = "ookami-to-koushinryou-umi-o-wataru-kaze.zip",
+    hashes = {
+      { hash = "7a68886d7fc7ad919f81f1c1675a38f9", label = "Ookami to Koushinryou - Umi o Wataru Kaze (Japan).nds" },
+      { hash = "0e4343a0b76fc719cdf5d8f0b49a3b37", label = "Ookami to Koushinryou - Umi o Wataru Kaze (Japan) (En) (v1.0) (AGTT).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XDF0B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mid-level Merchant [8-bit] [bitboolean]" },
+        { address=0XDF0C6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Contract Completed [8-bit] [bitboolean]" },
+        { address=0XDF534, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Merchant Level Trading EXP [32-bit[z" },
+        { address=0XDF53C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Merchant Level" },
+      },
+      zone = {
+        { address=0XDEF94, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDF0BB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Livestock Master [8-bit] [bitboolean] increased" },
+        { address=0XDF0BB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Livestock Master [8-bit] [bitboolean] decreased" },
+        { address=0XDF540, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Livestock Sold increased" },
+        { address=0XDF540, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Livestock Sold decreased" },
+      },
+    },
+  },
+}

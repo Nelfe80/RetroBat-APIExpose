@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Opoona",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "opoona",
+    file = "opoona.zip",
+    hashes = {
+      { hash = "921d2e2835dbce37eb6cfeab9cb88c06", label = "Opoona (USA)" },
+      { hash = "d5d04d08f982963e524a4afe390f3d89", label = "Opoona (Europe) (En,Fr,De)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X2D0678, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Shop Points" },
+      },
+      collectibles = {
+        { address=0X2D0668, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Money increased" },
+        { address=0X2D0670, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Money Banked increased" },
+      },
+    },
+  },
+}

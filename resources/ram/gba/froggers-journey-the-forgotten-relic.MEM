@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Frogger's Journey: The Forgotten Relic",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "froggers-journey-the-forgotten-relic",
+    file = "froggers-journey-the-forgotten-relic.zip",
+    hashes = {
+      { hash = "16ae239c819d0a772307e3193d593860", label = "Frogger's Journey - The Forgotten Relic (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

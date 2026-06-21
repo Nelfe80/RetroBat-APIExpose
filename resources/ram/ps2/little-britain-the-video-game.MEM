@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Little Britain: The Video Game",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Puzzle"
+  },
+
+  rom = {
+    name = "little-britain-the-video-game",
+    file = "little-britain-the-video-game.zip",
+    hashes = {
+      { hash = "0b011a7282be1b5157713ea3f87a6bb7", label = "Little Britain - The Video Game (Europe)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X292984, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tour - Total Score [32bit]" },
+        { address=0X2929B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Darkley Noone [32bit]" },
+        { address=0X2929B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Herby [32bit]" },
+        { address=0X2929B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Sessex [32bit]" },
+        { address=0X2929BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Slut [32bit]" },
+        { address=0X2929C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Old Haven [32bit]" },
+        { address=0X2929C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Pox [32bit]" },
+        { address=0X2929C8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Llandewi Breffi [32bit]" },
+        { address=0X292A28, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Vicky Pollard [180 Bytes; 36 Bytes each]" },
+        { address=0X292ADC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Lou & Andy [180 Bytes; 36 Bytes each]" },
+        { address=0X292B90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Marjorie Dawes [180 Bytes; 36 Bytes each]" },
+        { address=0X292C44, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Letty Bell [180 Bytes; 36 Bytes each]" },
+        { address=0X292CF8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Emily & Florence [180 Bytes; 36 Bytes each]" },
+        { address=0X292DAC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Maggie & Judy [180 Bytes; 36 Bytes each]" },
+        { address=0X292E60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Daffyd [180 Bytes; 36 Bytes each]" },
+        { address=0X292F14, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores - Mr Mann [180 Bytes; 36 Bytes each]" },
+      },
+    },
+  },
+}

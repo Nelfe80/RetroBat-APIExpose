@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Narc",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "narc",
+    file = "narc.zip",
+    hashes = {
+      { hash = "d89658cc648d08594c86ac4505084d3a", label = "narc.zip <Narc (rev 7.00)>" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X856FC, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X856FC, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+      },
+      health = {
+        { address=0X856E0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X856E0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X856DA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] [Right 4 Digits] P1 Score" },
+        { address=0X856DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] [Left 4 Digits] P1 Score" },
+      },
+      collectibles = {
+        { address=0X856F0, type="u16le", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="P1 Ammo" },
+      },
+    },
+  },
+}

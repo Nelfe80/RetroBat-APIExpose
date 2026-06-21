@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Animaniacs",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "animaniacs",
+    file = "animaniacs.zip",
+    hashes = {
+      { hash = "4d82461e69cf47dc958569af58b732cd", label = "Animaniacs (Europe) (De) (v1.0) (Star).sfc" },
+      { hash = "5201a8e19a029734e5f720bc7a5134e5", label = "Animaniacs (USA) (Pt).sfc" },
+      { hash = "ce41fb926db8fcaad4665774f3731b7a", label = "Animaniacs (Europe).sfc" },
+      { hash = "ff08ca993882bfe2ab860865897bfe77", label = "Animaniacs (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0032, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game mode 00=reset 01=title (loading) 02=title 04=option/password (activated) 06=ingame 08=optio" },
+        { address=0X10020, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0436, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Controlled character: 00=standing on the ground 01=in air" },
+        { address=0X10010, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Water Tower" },
+        { address=0X10010, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Intro Stage I" },
+        { address=0X10010, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Intro Stage II" },
+        { address=0X10010, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sci-Fi Studio I" },
+        { address=0X10010, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage/sub stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0C32, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Pinky and the Brain hp decreased" },
+        { address=0X0C32, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Pinky and the Brain hp increased" },
+        { address=0X1110, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gorilla hands hp decreased" },
+        { address=0X1110, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gorilla hands hp increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X044A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Active character action: 00=nothing 01=walking 02=dashing 03=jumping/falling 05=bouncing on/slid" },
+        { address=0X044A, type="u8", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Active character action: 00=nothing 01=walking 02=dashing 03=jumping/falling 05=bouncing on/slid" },
+        { address=0X10016, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+        { address=0X10018, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins (Display only) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X04B6, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="invincibility counter" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0C90, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch for terminator" },
+      },
+    },
+  },
+}

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy4way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Jump</text>
+			<color>${white}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Jump</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 JON 61756</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 MOR 53157</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 GAN 42237</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 EVY 33157</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 KJE 22528</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 MAB 14868</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 RJH 12599</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 DLP 8723</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 PJR 7578</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 CDS 6383</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 RRP 5833</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 RJP 4729</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 DAN 4294</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 LUP 3955</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 REX 3428</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 GJL 2755</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 RAE 2228</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 TGF 1845</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 BFM 1748</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 WLM 1305</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

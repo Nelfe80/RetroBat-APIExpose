@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Legend of Zelda: Ocarina of Time - Master Quest",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Adventure, Role-Playing"
+  },
+
+  rom = {
+    name = "the-legend-of-zelda-ocarina-of-time-master-quest",
+    file = "the-legend-of-zelda-ocarina-of-time-master-quest.zip",
+    hashes = {
+      { hash = "29d3c366bf3143b251986e99a0964cdb", label = "Legend of Zelda, The - Ocarina of Time & Master Quest (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

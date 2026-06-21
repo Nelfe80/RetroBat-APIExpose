@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Mulan",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "mulan",
+    file = "mulan.zip",
+    hashes = {
+      { hash = "314ca1610e00861bc97611c8f874503a", label = "Mulan (Europe) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD3F4, type="u8", condition="eq", value=0X0, action="GAME_OVER", no_log=false, no_survey=false, desc="0 Hearts (Game Over)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFFC6, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XFFC6, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0XFFC6, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0XFFC6, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0XFFC6, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0XFFC6, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0XFFC6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+      stage = {
+        { address=0XFFC7, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XFFC7, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0XFFC7, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0XFFC7, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 4" },
+        { address=0XFFC7, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0XFFC7, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0XFFC7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Level (Activates on Password Screen)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD3F4, type="u8", condition="eq", value=0X1, action="HEALTH_STATE", no_log=false, no_survey=false, desc="1 Heart" },
+        { address=0XD3F4, type="u8", condition="eq", value=0X2, action="HEALTH_STATE", no_log=false, no_survey=false, desc="2 Hearts" },
+        { address=0XD3F4, type="u8", condition="eq", value=0X3, action="HEALTH_STATE", no_log=false, no_survey=false, desc="3 Hearts" },
+        { address=0XD3F4, type="u8", condition="eq", value=0X4, action="HEALTH_STATE", no_log=false, no_survey=false, desc="4 Hearts" },
+        { address=0XD3F4, type="u8", condition="eq", value=0X5, action="HEALTH_STATE", no_log=false, no_survey=false, desc="5 Hearts" },
+        { address=0XD3F4, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[8 bit] Health" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFFC6, type="u8", condition="eq", value=0X6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+        { address=0XFFC7, type="u8", condition="eq", value=0X6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+      },
+    },
+  },
+}

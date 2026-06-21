@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Ecco Jr.",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Adventure, Education"
+  },
+
+  rom = {
+    name = "ecco-jr",
+    file = "ecco-jr.zip",
+    hashes = {
+      { hash = "ca7fa198e67d77b348111d57a6ad9df1", label = "Ecco Jr. (USA, Australia).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9A28, type="u32be", condition="eq", value=0XE0, action="DEMO_MODE", no_log=false, no_survey=false, desc="in game" },
+        { address=0X9A28, type="u32be", condition="eq", value=0X4E, action="DEMO_MODE", no_log=false, no_survey=false, desc="reading dolphin facts" },
+        { address=0X9A28, type="u32be", condition="eq", value=0X32, action="DEMO_MODE", no_log=false, no_survey=false, desc="parents optionn screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA860, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level | Level Select Level" },
+      },
+    },
+  },
+}

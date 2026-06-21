@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Frogger: Helmet Chaos",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "frogger-helmet-chaos",
+    file = "frogger-helmet-chaos.zip",
+    hashes = {
+      { hash = "ed1d585e1c33eb3fe1ec285e8aafddaf", label = "Frogger - Helmet Chaos (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XB23968, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Life increased" },
+        { address=0XB23968, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Life decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB23954, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Points" },
+      },
+      collectibles = {
+        { address=0XB23950, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] Frog Coins increased" },
+      },
+    },
+  },
+}

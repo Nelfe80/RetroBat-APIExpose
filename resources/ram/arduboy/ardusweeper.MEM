@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ardusweeper",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ardusweeper",
+    file = "ardusweeper.zip",
+    hashes = {
+      { hash = "56eb9ab3af384d4cbb2aa74b1d2cbe2d", label = "Ardusweeper (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+  },
+}

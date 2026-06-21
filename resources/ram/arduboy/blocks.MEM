@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Blocks",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "blocks",
+    file = "blocks.zip",
+    hashes = {
+      { hash = "f73f4f6714539fa8ae5a55ef32d420ca", label = "Blocks (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+  },
+}

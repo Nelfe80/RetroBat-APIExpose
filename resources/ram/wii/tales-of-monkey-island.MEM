@@ -1,0 +1,23 @@
+return {
+  game = {
+    title = "Tales of Monkey Island",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "tales-of-monkey-island",
+    file = "tales-of-monkey-island.zip",
+    hashes = {
+      { hash = "a169143caf19fd6c2c24b06b4ba0e0b1", label = "Tales of Monkey Island - Chapter 1 - Launch of the Screaming Narwhal (USA) (WiiWare)" },
+      { hash = "7f60176e3868859e3484ea6092fb3a18", label = "Tales of Monkey Island - Chapter 2 - The Siege of Spinner Cay (USA) (WiiWare)" },
+      { hash = "f571f64af4818c003677d1b034489a04", label = "Tales of Monkey Island - Chapter 3 - Lair of the Leviathan (USA) (WiiWare)" },
+      { hash = "11787391b0e3caba8ee7e980d03625db", label = "Tales of Monkey Island - Chapter 4 - The Trial and Execution of Guybrush Threepwood (USA) (WiiWare)" },
+      { hash = "542c96ea2252661bdb1842a12b49aa28", label = "Tales of Monkey Island - Chapter 5 - Rise of the Pirate God (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

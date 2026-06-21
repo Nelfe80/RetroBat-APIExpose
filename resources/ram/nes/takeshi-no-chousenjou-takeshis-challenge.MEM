@@ -1,0 +1,125 @@
+return {
+  game = {
+    title = "Takeshi no Chousenjou | Takeshi's Challenge",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "takeshi-no-chousenjou-takeshis-challenge",
+    file = "takeshi-no-chousenjou-takeshis-challenge.zip",
+    hashes = {
+      { hash = "2c22f510f0561f442ba0e282c6940832", label = "Takeshi no Chousenjou (Japan).nes" },
+      { hash = "49173cb8f31113fb1ec0e7e8119cdbe1", label = "Takeshi no Chousenjou (Japan) (Virtual Console).nes" },
+      { hash = "c9ad801b4ca7b3d60efa22ba25fde7ca", label = "Takeshi no Chousenjou (Japan) (En) (v1.0) (KingMike).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000B, type="u16le", condition="eq", value=0XA078, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0X000B, type="u16le", condition="eq", value=0XA438, action="GAME_OVER", no_log=false, no_survey=false, desc="GAME OVER" },
+        { address=0X005C, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen before starting the game" },
+        { address=0X005C, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X005C, type="u8", condition="eq", value=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X000B, type="u16le", condition="eq", value=0XAFA0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Secret Japanese Soldier Area" },
+        { address=0X0055, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X00FE, type="u16le", condition="eq", value=0X8C17, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hahaha! Fool! I've Been Following You. The Treasure Is Mine. Die!" },
+        { address=0X00FE, type="u16le", condition="eq", value=0X8D3D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="3 Times If You Die." },
+        { address=0X054E, type="u16le", condition="eq", value=0X0311, action="LOSE_LIFE", no_log=false, no_survey=false, desc="3 Times If You Die (Temper 2)" },
+      },
+      health = {
+        { address=0X00E9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Salary Man Health decreased" },
+        { address=0X00E9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Salary Man Health increased" },
+        { address=0X0548, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Npc 1 Health decreased" },
+        { address=0X0548, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Npc 1 Health increased" },
+        { address=0X0568, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Npc 2 Health decreased" },
+        { address=0X0568, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Npc 2 Health increased" },
+        { address=0X0588, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Npc 3 Health decreased" },
+        { address=0X0588, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Npc 3 Health increased" },
+        { address=0X05A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Npc 4 Health decreased" },
+        { address=0X05A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Npc 4 Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X000B, type="u16le", condition="eq", value=0XA050, action="TREASURE", no_log=false, no_survey=false, desc="Blank Treasure Map" },
+        { address=0X000B, type="u16le", condition="eq", value=0XA000, action="TREASURE", no_log=false, no_survey=false, desc="Revealed Treasure Map" },
+        { address=0X0043, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Found the Secret heart in the jungle" },
+        { address=0X00FE, type="u16le", condition="eq", value=0X8B7F, action="TREASURE", no_log=false, no_survey=false, desc="I've Finally Found The Treasure" },
+        { address=0X00FE, type="u16le", condition="eq", value=0X8CD8, action="TREASURE", no_log=false, no_survey=false, desc="I'm Poor. Is There A Treasure Map Anywhere?" },
+        { address=0X00FE, type="u16le", condition="eq", value=0X8D52, action="TREASURE", no_log=false, no_survey=false, desc="The People Of Chabarin Island Think Poetry Is A Treasure." },
+        { address=0X05C3, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Entered the treasure cave" },
+        { address=0X05C3, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="On the Polynesian Island of Chobarin." },
+        { address=0X05C4, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Learned how to speak Hintabo" },
+        { address=0X05CB, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Treasure Box Obtained" },
+      },
+      weapon = {
+        { address=0X0550, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Punch" },
+        { address=0X0550, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gun" },
+        { address=0X0550, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rock" },
+        { address=0X0550, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Coconut" },
+        { address=0X0570, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Punch" },
+        { address=0X0570, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gun" },
+        { address=0X0570, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rock" },
+        { address=0X0570, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Coconut" },
+        { address=0X0590, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Punch" },
+        { address=0X0590, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gun" },
+        { address=0X0590, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rock" },
+        { address=0X0590, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Coconut" },
+        { address=0X05B0, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Punch" },
+        { address=0X05B0, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gun" },
+        { address=0X05B0, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rock" },
+        { address=0X05B0, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Coconut" },
+        { address=0X06FD, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Fists" },
+        { address=0X06FD, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gun" },
+        { address=0X06FD, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rock" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X000B, type="u16le", condition="eq", value=0XA2A8, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bar Gold" },
+        { address=0X00FE, type="u16le", condition="eq", value=0X8895, action="MONEY_STATE", no_log=false, no_survey=false, desc="That's Not Enough Money." },
+        { address=0X00FE, type="u16le", condition="eq", value=0X8AC3, action="MONEY_STATE", no_log=false, no_survey=false, desc="Congratulations! Here's Double Your Money." },
+        { address=0X00FE, type="u16le", condition="eq", value=0X8CB1, action="MONEY_STATE", no_log=false, no_survey=false, desc="They Have an Amazing Drink At Gold's" },
+        { address=0X05C4, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Exchanged money at the Bank in the South Pacific" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X000B, type="u16le", condition="eq", value=0XA460, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bosses Office" },
+        { address=0X05C0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit2=Bonus cash from boss received" },
+        { address=0X06F9, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Took a sick day" },
+        { address=0X06F9, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Took a vacation" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X00E5, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X0544, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X0564, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X0584, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X05A4, type="u8", condition="eq", value=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X06F7, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="[8bit] Numbe of Karaoke songs succesfully preformed (Increases by 1 when a song is succesfully p" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00FE, type="u16le", condition="eq", value=0X8B21, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Was That A Terrorist Act? An Accident? A Mysterious Explosion Destroyed The Plane." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0060, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] Titlescreen punch counter" },
+        { address=0X00FE, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[16bit] Text ID" },
+        { address=0X054E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] Npc 1 Special Message:" },
+      },
+    },
+  },
+}

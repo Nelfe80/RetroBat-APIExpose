@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Time Trax",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "time-trax",
+    file = "time-trax.zip",
+    hashes = {
+      { hash = "35054bf29fa226e4de211fc7957f1725", label = "Time Trax (Europe).sfc" },
+      { hash = "ada1adbf0155ea67fd25a9c88645180a", label = "Time Trax (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

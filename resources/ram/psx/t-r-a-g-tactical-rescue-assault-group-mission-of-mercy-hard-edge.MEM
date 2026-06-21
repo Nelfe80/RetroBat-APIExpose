@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "T.R.A.G.: Tactical Rescue Assault Group - Mission of Mercy | Hard Edge",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "t-r-a-g-tactical-rescue-assault-group-mission-of-mercy-hard-edge",
+    file = "t-r-a-g-tactical-rescue-assault-group-mission-of-mercy-hard-edge.zip",
+    hashes = {
+      { hash = "ca447ecc306bb8039602f399b7e9820b", label = "T.R.A.G. - Mission of Mercy (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

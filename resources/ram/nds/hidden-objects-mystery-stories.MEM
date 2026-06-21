@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Hidden Objects: Mystery Stories",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "hidden-objects-mystery-stories",
+    file = "hidden-objects-mystery-stories.zip",
+    hashes = {
+      { hash = "07fd71bd80dbc8d68a224e8ff317a9ba", label = "Hidden Objects - Mystery Stories (USA) (En,Fr,Es).nds" },
+      { hash = "70959f143428a380fe8265fee222bb2d", label = "Mystery Stories (Europe) (En,Fr,De,Nl) (Rev 1).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5B878, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (EU) [ASCII, 512-bit?]" },
+        { address=0X5B938, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (US) [ASCII, 512-bit?)" },
+        { address=0X66F04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Tries on Level 4 (EU)" },
+      },
+      stage = {
+        { address=0X5B914, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage beaten/unlocked" },
+        { address=0X5B914, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all 40 stages beaten/unlocked" },
+        { address=0X5B914, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Profile 1 Stages Unlocked (EU)" },
+        { address=0X5B984, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage beaten/unlocked" },
+        { address=0X5B984, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all 40 stages beaten/unlocked" },
+        { address=0X5B984, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Profile 2 Stages Unlocked (EU)" },
+        { address=0X5B9D4, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage beaten/unlocked" },
+        { address=0X5B9D4, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all 40 stages beaten/unlocked" },
+        { address=0X5B9D4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Profile 1 Stages Unlocked (US)" },
+        { address=0X5B9F4, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage beaten/unlocked" },
+        { address=0X5B9F4, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all 40 stages beaten/unlocked" },
+        { address=0X5B9F4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Profile 3 Stages Unlocked (EU)" },
+        { address=0X5BA44, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage beaten/unlocked" },
+        { address=0X5BA44, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all 40 stages beaten/unlocked" },
+        { address=0X5BA44, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Profile 2 Stages Unlocked (US)" },
+        { address=0X5BA64, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage beaten/unlocked" },
+        { address=0X5BA64, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all 40 stages beaten/unlocked" },
+        { address=0X5BA64, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Profile 4 Stages Unlocked (EU)" },
+        { address=0X5BAB4, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage beaten/unlocked" },
+        { address=0X5BAB4, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all 40 stages beaten/unlocked" },
+        { address=0X5BAB4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Profile 3 Stages Unlocked (US)" },
+        { address=0X5BB24, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage beaten/unlocked" },
+        { address=0X5BB24, type="u8", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="all 40 stages beaten/unlocked" },
+        { address=0X5BB24, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Profile 4 Stages Unlocked (US)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5B918, type="u24le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Profile 1 Free Play Object Bitflags (EU) [24-bit]" },
+        { address=0X5B9D8, type="u24le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Profile 1 Free Play Object Bitflags (US) [24-bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5B94B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Profile 1 Time Stops Remaining (EU)" },
+        { address=0X5B9BB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Profile 2 Time Stops Remaining (EU)" },
+        { address=0X5BA0B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Profile 1 Time Stops Remaining (US)" },
+        { address=0X5BB22, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Free Play Time Stops Remaining (EU)" },
+        { address=0X5BBE2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Free Play Time Stops Remaining (US)" },
+      },
+    },
+  },
+}

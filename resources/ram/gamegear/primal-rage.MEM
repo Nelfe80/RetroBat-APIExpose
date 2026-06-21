@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Primal Rage",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "primal-rage",
+    file = "primal-rage.zip",
+    hashes = {
+      { hash = "1ce6a2d5b50098cbcc9f166f2cc44fba", label = "Primal Rage (USA, Europe).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1D99, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1D9A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round time" },
+      },
+    },
+  },
+}

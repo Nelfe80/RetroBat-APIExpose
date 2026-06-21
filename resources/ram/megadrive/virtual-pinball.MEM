@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Virtual Pinball",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "virtual-pinball",
+    file = "virtual-pinball.zip",
+    hashes = {
+      { hash = "5a100639ee92435eab75105a7568f15d", label = "Virtual Pinball (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0004, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="What is the background/board like?" },
+      },
+    },
+  },
+}

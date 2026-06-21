@@ -1,0 +1,140 @@
+return {
+  game = {
+    title = "Holy Umbrella: Dondera no Mubou!!",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform, Role-Playing"
+  },
+
+  rom = {
+    name = "holy-umbrella-dondera-no-mubou",
+    file = "holy-umbrella-dondera-no-mubou.zip",
+    hashes = {
+      { hash = "0f85400d016a5e22764c2d66ff6894d5", label = "Holy Umbrella - Dondera no Mubo!! (Japan) (En) (Aeon Genesis) (1.0).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0140, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="teste ground y" },
+      },
+      zone = {
+        { address=0X011E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Screen id (it changes on the world map and cities as progress)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X018F, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Orb" },
+        { address=0X0263, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Marmaid dead" },
+        { address=0X1676, type="u8", condition="eq", value=0X2D, action="LOSE_LIFE", no_log=false, no_survey=false, desc="invencibility active 2c = dead" },
+      },
+      health = {
+        { address=0X0161, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Hp decreased" },
+        { address=0X0161, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Hp increased" },
+        { address=0X0162, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hp decreased" },
+        { address=0X0162, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hp increased" },
+        { address=0X051A, type="u8", condition="eq", value=0XC8, action="HIT", no_log=false, no_survey=false, desc="Hero took damage l bc = Hero died" },
+        { address=0X051A, type="u8", condition="eq", value=0XC4, action="HIT", no_log=false, no_survey=false, desc="Bonto took damage l c8 = Bonto died" },
+        { address=0X051A, type="u8", condition="eq", value=0XE8, action="HIT", no_log=false, no_survey=false, desc="Saki took damage l f0 = Saki died" },
+        { address=0X1630, type="u8", condition="eq", value=0X1F, action="HIT", no_log=false, no_survey=false, desc="use potion/get heart l 34 = harm an enemy" },
+        { address=0X1630, type="u8", condition="eq", value=0X35, action="HIT", no_log=false, no_survey=false, desc="kill an enemy l 1d = Get coin" },
+        { address=0X1630, type="u8", condition="eq", value=0X14, action="HIT", no_log=false, no_survey=false, desc="spring bang" },
+        { address=0X6A13, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy hp ? decreased" },
+        { address=0X6A13, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy hp ? increased" },
+        { address=0X6A53, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy hp 2 ? decreased" },
+        { address=0X6A53, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy hp 2 ? increased" },
+        { address=0X6A93, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="enemy hp 3 ? decreased" },
+        { address=0X6A93, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="enemy hp 3 ? increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X01EB, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure] Vegette Town" },
+        { address=0X01EC, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Makashigi Village" },
+        { address=0X01ED, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Thurgical City" },
+        { address=0X01EE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Bonboropolis" },
+        { address=0X01EF, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Pritt Village" },
+        { address=0X01F0, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure] Tritol" },
+        { address=0X01F4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Thurgical City" },
+        { address=0X01F6, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Pickle express" },
+        { address=0X01F7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Bonboropolis" },
+        { address=0X01F8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Oasis" },
+        { address=0X01FB, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Sutelulla Village" },
+        { address=0X01FC, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Thurgical City" },
+        { address=0X01FD, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Vegette Town" },
+        { address=0X01FE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Tritol" },
+        { address=0X0200, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Sutelulla Village" },
+        { address=0X0201, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Tritol" },
+        { address=0X0203, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Pritt Village" },
+        { address=0X020B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Mt. Osashimi" },
+        { address=0X020C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Mt. Apex" },
+        { address=0X020D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Royal Tomb" },
+        { address=0X020E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Gilligiza Valley" },
+        { address=0X0210, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Ribcage Valley" },
+        { address=0X0215, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Gilligiza Valley" },
+        { address=0X0216, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Fox tower" },
+        { address=0X0217, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Control Tower" },
+        { address=0X0218, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Royal Tomb" },
+        { address=0X0219, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Gilligiza Valley" },
+        { address=0X021A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Fox Tower" },
+        { address=0X021B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Mt. Osashimi" },
+        { address=0X021C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Royal Tomb" },
+        { address=0X021D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] vulcan" },
+        { address=0X021E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Fox Tower" },
+        { address=0X021F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Ribcage Valley" },
+        { address=0X0220, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Cotomen Caverns" },
+        { address=0X0221, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Cotomen Caverns" },
+        { address=0X0222, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] vulcan" },
+        { address=0X0223, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Mt. Apex" },
+        { address=0X0224, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Control Tower" },
+        { address=0X0225, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Huge Falls 2" },
+        { address=0X0226, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] vulcan" },
+        { address=0X0228, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="[Treasure] Fox Tower" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0165, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+        { address=0X0166, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="coins 2 increased" },
+        { address=0X0C84, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="use to coin coletor increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X024B, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Numbers of boss dead on boss rush" },
+        { address=0X025E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss tank - Gilligiza Valley" },
+        { address=0X0261, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Monkey boss = dead 80" },
+        { address=0X0262, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fox - Fox Tower" },
+        { address=0X0264, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Maid 2 - Control Tower" },
+        { address=0X0265, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Medusa 1- Huge Falls" },
+        { address=0X0266, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Medusa 2 - Mt. Apex" },
+        { address=0X0268, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Donderassaurus- Inside Dondera Castle 2" },
+        { address=0X026A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Dondera Phinx - Royl Tomb" },
+        { address=0X026B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Dondera Empress - Vulcano" },
+        { address=0X026C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Dondera curse - Vulcano" },
+        { address=0X026F, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dondera Fox l 02 = Dondera Medusa" },
+        { address=0X026F, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dondera Magoon l 04 = Dondera Phinx" },
+        { address=0X026F, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dondera Kong l 00 = Dondera Maid" },
+        { address=0X0C89, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="tank hp boss 2 (use it)" },
+        { address=0X14D6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="tank hp boss 2" },
+        { address=0X14D8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Hits 1ts boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0247, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility timer after taking damage" },
+      },
+      player = {
+        { address=0X051B, type="u8", condition="change", action="SWIMMING", no_log=false, no_survey=false, desc="1a = Normal ken / 1b = Clinb-swing-swim / 1c = Glide-rpg mode" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0258, type="u16le", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="16-bit teste door" },
+        { address=0X026D, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="changes in events doors" },
+        { address=0X6F19, type="u8", condition="eq", value=0X60, action="DOOR_OPENED", no_log=false, no_survey=false, desc="lock l a0 open" },
+      },
+    },
+  },
+}

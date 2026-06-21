@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Umihara Kawase Shun: Second Edition Kanzenban",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "umihara-kawase-shun-second-edition-kanzenban",
+    file = "umihara-kawase-shun-second-edition-kanzenban.zip",
+    hashes = {
+      { hash = "8063acbe54b646528f2bcdc605c64fef", label = "Umihara Kawase Shun - Second Edition Kanzen Ban (Japan).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X184BD4, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[UKS] [16-bit] Continues" },
+        { address=0X187F5D, type="u8", condition="eq", value=0X6, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X187F5D, type="u8", condition="eq", value=0X46, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending Credits" },
+        { address=0X187F62, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X188442, type="u8", condition="eq", value=0X2, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X188444, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X188510, type="u8", condition="eq", value=0X5, action="GAME_OVER", no_log=false, no_survey=false, desc="Loading Game Over" },
+        { address=0X188510, type="u8", condition="eq", value=0X6, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X188510, type="u8", condition="eq", value=0X9, action="DEMO_MODE", no_log=false, no_survey=false, desc="Loading Demo" },
+        { address=0X188510, type="u8", condition="eq", value=0XA, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7E5DE, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[UKS] [16-bit] F0 Deaths" },
+        { address=0X184BFC, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[UKS] [16-bit] Final Deaths" },
+        { address=0X187F50, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[UKS] [16-bit] Lives increased" },
+        { address=0X187F50, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[UKS] [16-bit] Lives decreased" },
+        { address=0X187F54, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[UKS] [16-bit] Deaths" },
+        { address=0X187F5D, type="u8", condition="eq", value=0X4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die/Reload Current Field" },
+        { address=0X187F5D, type="u8", condition="eq", value=0XC, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die/Load Field Select Menu" },
+        { address=0X188434, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[UK] [16-bit] Lives increased" },
+        { address=0X188434, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[UK] [16-bit] Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X184BF4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[UKS] [32-bit] Final Score" },
+        { address=0X187F4C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[UKS] [32-bit] Score" },
+        { address=0X188430, type="u32le", condition="eq", value=0X6158, action="SCORE_STATE", no_log=false, no_survey=false, desc="Default High Score" },
+        { address=0X188430, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[UK] [32-bit] Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1840CD, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[UK] Exit Door" },
+        { address=0X1863E6, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[UKS] Exit Door" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7EB38, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[UKS] Goldfish" },
+        { address=0X1840CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[UK] Exit Timer" },
+        { address=0X1863E4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[UKS] Exit Timer" },
+      },
+    },
+  },
+}

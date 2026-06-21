@@ -1,0 +1,119 @@
+return {
+  game = {
+    title = "Lost Kingdoms II",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "lost-kingdoms-ii",
+    file = "lost-kingdoms-ii.zip",
+    hashes = {
+      { hash = "6bb0049d7c3573428764b746460f5962", label = "Lost Kingdoms II (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X258D59, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Card Collection Flag - 037 Demon Hound [WOOD] [INDEPENDENT]" },
+        { address=0X258F75, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Card Collection Flag - 064 Demon Fox [FIRE] [SUMMONS]" },
+        { address=0X258FB1, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Card Collection Flag - 067 Great Demon [FIRE] [WEAPON]" },
+        { address=0X2591F5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Card Collection Flag - 093 Demon Skeleton [WATER] [INDEPENDENT]" },
+      },
+      events = {
+        { address=0X25D071, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Discovery Bitflags" },
+        { address=0X25D072, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Discovery Bitflags" },
+        { address=0X25D073, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Discovery Bitflags" },
+        { address=0X25D074, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Discovery Bitflags" },
+        { address=0X25D075, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Discovery Bitflags" },
+        { address=0X25D076, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Discovery Bitflags" },
+        { address=0X25D077, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Discovery Bitflags" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X25D02C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+        { address=0X2B0183, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Current/Previous mission clear rating. Updates when reaching mission results screen. Value refle" },
+      },
+      stage = {
+        { address=0X170E14, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="possible stage ID" },
+        { address=0X25DBC0, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16-Bit BE] Stage Results - Cards Used" },
+        { address=0X25DBC2, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16-Bit BE] Stage Results - Monsters Defeated" },
+        { address=0X25DC0E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Nobleman's Residence" },
+        { address=0X25DC4E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Bhasea High Road" },
+        { address=0X25DC8E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Kadishu" },
+        { address=0X25DCCE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Kendarie Fortress" },
+        { address=0X25DD0E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Runestone Caverns" },
+        { address=0X25DD8E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Ruldo Forest" },
+        { address=0X25DDCE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Sarvan" },
+        { address=0X25DE0E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Holzogh Town" },
+        { address=0X25DE4E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Plains of Rowahl" },
+        { address=0X25DE8E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Alanjeh" },
+        { address=0X25DF0E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Krasheen Mountains" },
+        { address=0X25DF4E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Grenfoel Cathedral" },
+        { address=0X25E00E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Fossil Boneyard" },
+        { address=0X25E0CE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Isamat Urbur" },
+        { address=0X25E10E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Bhashea Castle" },
+        { address=0X25E14E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Gromtull Desert" },
+        { address=0X25E18E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Sacred Battle Arena" },
+        { address=0X25E28E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Temple of Sarcacia" },
+        { address=0X25E84E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select Bitflag - Proving Grounds" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X204730, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Current Health (number displayed on health bar) decreased" },
+        { address=0X204730, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Current Health (number displayed on health bar) increased" },
+        { address=0X204734, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float BE] Current Health (display for percentage of health bar filled) decreased" },
+        { address=0X204734, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float BE] Current Health (display for percentage of health bar filled) increased" },
+        { address=0X223C98, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-Bit BE] Current Health decreased" },
+        { address=0X223C98, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-Bit BE] Current Health increased" },
+        { address=0X25DBC6, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="[16-Bit BE] Stage Results - Damage Suffered" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2589C1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 002 Ghost Armor [WOOD] [WEAPON]" },
+        { address=0X2589FD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 004 Lizardman [EARTH] [WEAPON]" },
+        { address=0X258A75, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 007 Red Lizard [FIRE] [WEAPON]" },
+        { address=0X258B3D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 014 Mummy [EARTH] [WEAPON]" },
+        { address=0X258B51, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 015 Cockatrice [WOOD] [WEAPON]" },
+        { address=0X258B79, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 017 Wraith [WATER] [WEAPON]" },
+        { address=0X258B8D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 018 Orc [FIRE] [WEAPON]" },
+        { address=0X258C2D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 023 Water Reaper [WATER] [WEAPON]" },
+        { address=0X258C55, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 025 Lich [EARTH] [WEAPON]" },
+        { address=0X258C91, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 027 Flayer Spawn [FIRE] [WEAPON]" },
+        { address=0X258D09, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 033 Banshee [WOOD] [WEAPON]" },
+        { address=0X258D45, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 036 Flying Ray [WATER] [WEAPON]" },
+        { address=0X258DBD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 042 Lycanthrope [WOOD] [WEAPON]" },
+        { address=0X258E21, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 047 Ghoul [WOOD] [WEAPON]" },
+        { address=0X258E71, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 052 Crystal Rose [WATER] [WEAPON]" },
+        { address=0X258E85, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 053 Dark Raven [FIRE] [WEAPON]" },
+        { address=0X258EC1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 055 Dragonoid [EARTH] [WEAPON]" },
+        { address=0X258F11, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 059 Archer Tree [WOOD] [WEAPON]" },
+        { address=0X258F39, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 061 Blood Bush [FIRE] [WEAPON]" },
+        { address=0X258F4D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 062 Efreet [FIRE] [WEAPON]" },
+        { address=0X258F61, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 063 Dragon Knight [WATER] [WEAPON]" },
+        { address=0X259065, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 078 Scythe Beast [WOOD] [WEAPON]" },
+        { address=0X2590F1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 086 Sphinx [EARTH] [WEAPON]" },
+        { address=0X2591B9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 039 Basilisk [WATER] [WEAPON]" },
+        { address=0X25926D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 101 Chaos Knight [NEUT] [WEAPON]" },
+        { address=0X2592BD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Card Collection Flag - 071 Venom Lizard [WOOD] [WEAPON]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X258E0D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Card Collection Flag - 046 Gold Butterfly [WOOD] [HELPER] increased" },
+        { address=0X25D020, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bit BE] Gold increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X25D070, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo Discovery Bitflags" },
+        { address=0X25DC0C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage Completion Bitflag" },
+      },
+    },
+  },
+}

@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "X-Men Origins: Wolverine",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "x-men-origins-wolverine",
+    file = "x-men-origins-wolverine.zip",
+    hashes = {
+      { hash = "29277e09fb589d901eb541ca6deb55d5", label = "X-Men Origins - Wolverine (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1828619, type="u16le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Level Select in Title Screen [16-bits]" },
+        { address=0X182861D, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X182861D, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X182861D, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Hard" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X182861C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level flag?" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC6E52A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (Write-Only) decreased" },
+        { address=0XC6E52A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (Write-Only) increased" },
+        { address=0X1B2F002, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1B2F002, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC7087C, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon X" },
+      },
+    },
+  },
+}

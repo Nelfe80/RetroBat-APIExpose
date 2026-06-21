@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "The X-Files",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-x-files",
+    file = "the-x-files.zip",
+    hashes = {
+      { hash = "5e4771bc8c4300be63f9eea5a9f9bcdf", label = "X-Files, The (Europe) (Disc 1)" },
+      { hash = "38526ed4db47874d3b4ec5564d497b02", label = "X-Files, The (Europe) (Disc 2)" },
+      { hash = "ac86cef3466c5f80b448907ac4c289d3", label = "X-Files, The (Europe) (Disc 3)" },
+      { hash = "487a531445a09ed2cc80c4c2ced5992b", label = "X-Files, The (Europe) (Disc 4)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF1F20, type="u32le", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="Player cannot act (paused, in cutscene, etc)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XF1F20, type="u32le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Player can act" },
+        { address=0XF1F20, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[EU] Player Can Act" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X128B8C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[ASCII][EU] cAIWongsBoatWhereAreWe" },
+        { address=0X18CE94, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="PTR to Video Object" },
+      },
+    },
+  },
+}

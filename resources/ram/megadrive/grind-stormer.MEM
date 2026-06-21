@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Grind Stormer",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "grind-stormer",
+    file = "grind-stormer.zip",
+    hashes = {
+      { hash = "0b11fadd7c858144c5b9f890b711b77d", label = "Grind Stormer (USA).md" },
+      { hash = "af4bdc10f0eda16eda979d1353faa04b", label = "V-V (Japan).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD93C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Valkyrie Profile 2: Silmeria",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "valkyrie-profile-2-silmeria",
+    file = "valkyrie-profile-2-silmeria.zip",
+    hashes = {
+      { hash = "d2d5be92e9009530db18ed11fadbaa11", label = "Valkyrie Profile 2 - Silmeria (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1C8D24, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Music (32-bit)" },
+        { address=0X1C8D40, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Music (32-bit)" },
+        { address=0X692E94, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background Music (32-bit)" },
+      },
+    },
+  },
+}

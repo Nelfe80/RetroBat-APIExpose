@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Cool Boarders 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "cool-boarders-2",
+    file = "cool-boarders-2.zip",
+    hashes = {
+      { hash = "e37fcb3a3b81a12505a10030879a6f1d", label = "Cool Boarders 2 (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X570DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9CB48, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="USA - Big Air Master COOL Counter" },
+        { address=0X9CB4C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="USA - Big Air Master UNCOOL Counter" },
+      },
+    },
+  },
+}

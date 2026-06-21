@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Pop'n TwinBee",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shoot'em Up, Action, Shoot'em up, Vertical"
+  },
+
+  rom = {
+    name = "popn-twinbee",
+    file = "popn-twinbee.zip",
+    hashes = {
+      { hash = "2af0c506a851d0810ec77e11486e9ad0", label = "Pop'n TwinBee (Europe) (NTSC) (1.0) (GhostlyDark).sfc" },
+      { hash = "38888b0cb0609e19b09abc2a1adfbfef", label = "Pop'n TwinBee (Japan).sfc" },
+      { hash = "ed9c32231cd480448f355c4ed54b1bae", label = "Pop'n TwinBee (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0056, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X0056, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Options Menu" },
+        { address=0X006A, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X0070, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Name Screen" },
+        { address=0X0070, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Wingmen Mode Screen" },
+        { address=0X0070, type="u8", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Playing a Stage/Credits" },
+        { address=0X0070, type="u8", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stage Completed" },
+        { address=0X0070, type="u8", condition="eq", value=0X0B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Dying animation" },
+        { address=0X0070, type="u8", condition="eq", value=0X0C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Continue screen" },
+        { address=0X1B30, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1CCA, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Counts button presses while paused (P1+P2)" },
+        { address=0X1FF6, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Credits/Continues (0-8)" },
+        { address=0X4391, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Addresses in this area track button presses while paused (P1+P2)." },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X008A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID (00-06)" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="start" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X14, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="start" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="start" },
+        { address=0X00C0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="-stage 1" },
+        { address=0X1FEC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stored Stage value for the (not working) stage select in the options menu" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X009C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lifebar (00-1d) increased" },
+        { address=0X009C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lifebar (00-1d) decreased" },
+        { address=0X009E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 Lifebar (00-1d) increased" },
+        { address=0X009E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 Lifebar (00-1d) decreased" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="boss dies" },
+      },
+      health = {
+        { address=0X0432, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="No Shield" },
+        { address=0X0432, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="P1 Shield HP" },
+        { address=0X0482, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="No Shield" },
+        { address=0X0482, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="P2 Shield HP" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1F00, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HiScore P1 (16-bit)" },
+        { address=0X1F02, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HiScore P1 (16-bit)" },
+        { address=0X1F04, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HiScore P2 (16-bit)" },
+        { address=0X1F06, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="HiScore P2 (16-bit)" },
+        { address=0X1F08, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P1 (16-bit) - 0000xxxx" },
+        { address=0X1F0A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P1 (16-bit) - xxxx0000" },
+        { address=0X1F0C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P2 (16-bit) - 0000xxxx" },
+        { address=0X1F0E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score P2 (16-bit) - xxxx0000" },
+      },
+      collectibles = {
+        { address=0X0072, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="0x03=cheat screen (stage select / inv), also during one frame on stage transition. increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X00C0, type="u16le", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="right after start (miniboss)" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X10, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X18, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="start (miniboss)" },
+        { address=0X00C0, type="u16le", condition="eq", value=0X12, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0X1898, type="u8", condition="eq", value=0XFF, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1A0B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="02=Boss Fight (consistent)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0086, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="1 - Invincibility enabled (Mutek)" },
+        { address=0X0416, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="P1 Shield Active (0-1)" },
+        { address=0X0432, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Full" },
+        { address=0X0466, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="P2 Shield Active (0-1)" },
+        { address=0X0482, type="u8", condition="eq", value=0X00, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Full" },
+      },
+    },
+  },
+}

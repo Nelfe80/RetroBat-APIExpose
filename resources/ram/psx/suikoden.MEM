@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Suikoden",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "suikoden",
+    file = "suikoden.zip",
+    hashes = {
+      { hash = "18b43be49e69cd9de1891c5afae48c62", label = "Suikoden (USA) (Rev 1)" },
+      { hash = "1cf50cc263c064757698569ff51c4e7e", label = "Suikoden (Europe) (Es) (v1.0) (Vagrant Traducciones)" },
+      { hash = "1e60651932e59d705f89d466de57427b", label = "Suikoden (USA) (It) (v1.1) (SadNES cITy Translations)" },
+      { hash = "3544359ecdc0d4037e47f523bfb468cf", label = "Gensou Suikoden (Japan) (PlayStation the Best)" },
+      { hash = "3a9d602530b5073574b153886dc516ec", label = "Suikoden (USA) (Bug Fix) (v1.00.002) (Pyriel)" },
+      { hash = "a17f64f724dc6a414b76d3bcc90fde00", label = "Gensou Suikoden (Japan)" },
+      { hash = "ce2641722a8cbd3e7301dbabfb33ca6f", label = "Suikoden (Europe)" },
+      { hash = "ef046ead448119490ce4c0640cdcb393", label = "Suikoden (USA)" },
+      { hash = "f0c5ec0696aa2ec2d6e5b731fbe07491", label = "Suikoden (Europe) (De) (v1.01) (Twisted Phoenix Game Translation)" },
+      { hash = "5105daac7fb60ea7b895a49a88578170", label = "Suikoden (Europe) (Es) (v1.0) (Vagrant Traducciones) (Addendum) (v1.0.4) (foldo)" },
+      { hash = "0322349a0f161ffc61a49658ab9cd194", label = "Suikoden (Europe) (Fr) (v1.2) (Chaos Romhack Traduction)" },
+      { hash = "5f806d53b557f009494ea3b4f026aa0f", label = "Suikoden (USA) (Id) (v1.0) (Pi-Man)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1B9BBC, type="u8", condition="eq", value=0X63, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X1B9BBC, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+  },
+}

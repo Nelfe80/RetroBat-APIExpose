@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Smurfs Travel the World",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-smurfs-travel-the-world",
+    file = "the-smurfs-travel-the-world.zip",
+    hashes = {
+      { hash = "348ca8eaa37d5f468915b0cb5a558d21", label = "Smurfs Travel the World, The (Europe) (En,Fr,De,Es).gg" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X183F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Music on/off Switch.. 00=on; ff=off" },
+      },
+    },
+  },
+}

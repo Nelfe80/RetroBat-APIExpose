@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 GEN 375</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 TAC 312</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 MOR 248</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 INA 206</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 KIT 172</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FUR 151</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 OGU 138</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 IZU 117</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 TUR 105</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 TLE 101</text>
+		</text>
+	</view>
+</theme>

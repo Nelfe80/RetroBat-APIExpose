@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Mansion of Hidden Souls",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "mansion-of-hidden-souls",
+    file = "mansion-of-hidden-souls.zip",
+    hashes = {
+      { hash = "51b18d3e4a6581d667a467bf1c9fc406", label = "Mansion of Hidden Souls (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19608, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1967C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="death/ending video = 11" },
+        { address=0X1967E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="death video = 1" },
+      },
+    },
+  },
+}

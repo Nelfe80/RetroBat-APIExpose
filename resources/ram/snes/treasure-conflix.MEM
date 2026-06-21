@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Treasure Conflix",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "treasure-conflix",
+    file = "treasure-conflix.zip",
+    hashes = {
+      { hash = "17f83573fed14f3e6968d068581eb52e", label = "Treasure Conflix (Japan) (En) (v1.1) (Krokodyl).sfc" },
+      { hash = "534de4685ed6a099a31717826ad8ad8b", label = "Treasure Conflix (Japan).bs" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C93, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1D1C, type="u8", condition="eq", value=0X11, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue with Auction" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1DD0, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="bonus level" },
+        { address=0X1DD0, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="discount after bonus level" },
+      },
+      stage = {
+        { address=0X1DD1, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="can enter stage 1" },
+        { address=0X1DD1, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="can enter stage 2" },
+        { address=0X1DD1, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="can enter stage 3" },
+        { address=0X1DD1, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="can enter stage 4" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1C7F, type="u8", condition="eq", value=0X0F, action="TREASURE", no_log=false, no_survey=false, desc="Treasure found" },
+        { address=0X1DD0, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="1 : airship, treasure caves, temple, hidden village" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1C7F, type="u8", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss theme" },
+      },
+    },
+  },
+}

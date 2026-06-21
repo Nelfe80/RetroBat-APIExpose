@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "PHANTOM SHIFT",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "phantom-shift",
+    file = "phantom-shift.zip",
+    hashes = {
+      { hash = "266d6132276257ded0298b6348dcbfb3", label = "Phantom Shift (World) (Sergey Poznyak).wasm" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X64C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+  },
+}

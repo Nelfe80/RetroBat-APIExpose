@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Fire 'n Ice",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "fire-n-ice",
+    file = "fire-n-ice.zip",
+    hashes = {
+      { hash = "aadba1c594c5c08fafd6bcc6f466b2b4", label = "Solomon no Kagi 2 - Coolmintou Kyuushutsu Sakusen (Japan).nes" },
+      { hash = "d2181fab244df1e472c21acde28bab2f", label = "Fire 'n Ice (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X00B5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level selected" },
+        { address=0X0400, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level's complete in World 1" },
+        { address=0X0402, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level's Complete in World 2" },
+        { address=0X0404, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level's Complete in World 3" },
+        { address=0X0406, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Levels Complete in World 4" },
+        { address=0X0408, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="World 5's Levels Complete" },
+        { address=0X040A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="World 6's Levels Complete" },
+        { address=0X040C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="World 7's Levels Complete" },
+        { address=0X040E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="World 8's Levels Complete" },
+        { address=0X0410, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="World 9's Levels Complete" },
+        { address=0X0412, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="World 10's Levels Complete" },
+        { address=0X0701, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1=stage complete (flashed)" },
+      },
+      zone = {
+        { address=0X00B6, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World selected" },
+        { address=0X0401, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1's Level Round 10" },
+        { address=0X0403, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2's Round 10" },
+        { address=0X0405, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 3's Round 10" },
+        { address=0X0407, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 4's Round 10" },
+        { address=0X0409, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 5's Round 10" },
+        { address=0X040B, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 6's Round 10" },
+        { address=0X040D, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 7's Round 10" },
+        { address=0X040F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 8's Round 10" },
+        { address=0X0411, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 9's Round 10" },
+      },
+      stage = {
+        { address=0X00B4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage number" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0002, type="u8", condition="eq", value=0X15, action="BOSS_HIT", no_log=false, no_survey=false, desc="transition into map/boss cutscenes" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X000C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer to restart attract" },
+      },
+    },
+  },
+}

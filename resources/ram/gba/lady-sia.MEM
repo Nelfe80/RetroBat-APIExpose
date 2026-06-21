@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Lady Sia",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "lady-sia",
+    file = "lady-sia.zip",
+    hashes = {
+      { hash = "94b847814fee8e4e5d9fdbf1d3d25107", label = "Lady Sia (USA) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "f4ac2d26605ebbb0d390e07810f12484", label = "Lady Sia (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0DB4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Currently Selected Pause Menu Option" },
+        { address=0X6CA8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Is game paused? (0x0 = Game isn't paused, 0x1 = Dialogue pause, 0x3 = Player triggered pause)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1A4C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Castle (Bonus Level): Timing" },
+        { address=0X1A50, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Castle (Bonus Level): Perfect Timing" },
+        { address=0X1A54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Castle (Bonus Level): Level Rating" },
+        { address=0X1A60, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Water Kingdom: Level Rating" },
+        { address=0X1A6C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Fire Realm: Level Rating" },
+        { address=0X1A78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Air Kingdom: Level Rating" },
+        { address=0X1A84, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Snowy Mountain: Level Rating" },
+        { address=0X1A9C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Snowy Mountain (Bonus): Level Rating" },
+        { address=0X1AA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Elven Forest: Level Rating" },
+        { address=0X1AB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Gremlins Machine: Level Rating" },
+        { address=0X1AC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Library: Level Rating" },
+        { address=0X1ACC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sia's Palace: Level Rating" },
+        { address=0X1AE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Library (Bonus): Level Rating" },
+        { address=0X1AF0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Turtle Village: Level Rating" },
+        { address=0X1AFC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Seaport: Level Rating" },
+        { address=0X1B08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The T'soa Camp: Level Rating" },
+        { address=0X1B14, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Fortifications: Level Rating" },
+        { address=0X1B2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Seaport (Bonus): Level Rating" },
+        { address=0X1BA0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Bitfields for Athorre (Bit 0 = Castle, Bit 1 = Algambiade, ...)" },
+        { address=0X1BB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Bitfields for The Peripheral Realms (Bit 0 = Water Kingdom, Bit 1 = Fire Realm," },
+        { address=0X1BC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Bitfields for Myriade (Bit 0 = Elven Forest, Bit 1 = Gremlins Machine, ...)" },
+        { address=0X1BD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Bitfields for Callyge (Bit 0 = Turtle Village, Bit 1 = Seaport, ...)" },
+      },
+      zone = {
+        { address=0X0078, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="when clean all stages, this appear next world" },
+        { address=0X007A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Select world" },
+      },
+      stage = {
+        { address=0X00B8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Select Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1DE0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X1DE0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1E0C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emeralds" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1CB8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="String index of most recently completed level increased" },
+        { address=0X1D2C, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Unlocked" },
+        { address=0X1D58, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Energy Ring increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1DE4, type="u32le", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility Timer" },
+      },
+      player = {
+        { address=0X2FC4, type="u8", condition="eq", value=0X78, action="JUMPING", no_log=false, no_survey=false, desc="Jumping to Side" },
+        { address=0X2FC4, type="u8", condition="eq", value=0X80, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+        { address=0X2FC4, type="u8", condition="eq", value=0XAC, action="JUMPING", no_log=false, no_survey=false, desc="Jumping to Side" },
+        { address=0X2FC4, type="u8", condition="eq", value=0XB4, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+      },
+    },
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! Duel Monsters 4: Battle of Great Duelist - Kaiba Deck",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "yu-gi-oh-duel-monsters-4-battle-of-great-duelist-kaiba-deck",
+    file = "yu-gi-oh-duel-monsters-4-battle-of-great-duelist-kaiba-deck.zip",
+    hashes = {
+      { hash = "19b1085c7c17a8123a7ec59f4033e92c", label = "Yu-Gi-Oh! Duel Monsters 4 - Battle of Great Duelist - Kaiba Deck (Japan).gbc" },
+      { hash = "4bcbc2d3b173c5f53fba3a6c4c2b9920", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Kaiba Deck (De).gbc" },
+      { hash = "bd7ff710b645110cfda420694019ec71", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Kaiba Deck (Es).gbc" },
+      { hash = "2c00464dcac758c6428cf5f61717c51e", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Kaiba Deck (Fr).gbc" },
+      { hash = "97f6e15e24d95dbd17ba6c924ec2a6c1", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Kaiba Deck (It).gbc" },
+      { hash = "7d817adcce9ecb3ad270dc053781f3d6", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Kaiba Deck (En).gbc" },
+      { hash = "2b1da77b7c41afab3558cf364cfeb8b3", label = "Yu-Gi-Oh! Early Days Collection - Duel Monsters 4 - Battle of Great Duelist - Kaiba Deck (Ja).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

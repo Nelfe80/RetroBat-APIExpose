@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Golden Sun: The Lost Age",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "golden-sun-the-lost-age",
+    file = "golden-sun-the-lost-age.zip",
+    hashes = {
+      { hash = "370cc3b832f905a2b5511c1665e4a8bc", label = "Golden Sun - La Edad Perdida (Spain).gba" },
+      { hash = "8b0fe9b5156781d1686b0add2a31b9b3", label = "Golden Sun - Die Vergessene Epoche (Germany).gba" },
+      { hash = "8efe8b2aaed97149e897570cd123ff6e", label = "Golden Sun - The Lost Age (USA, Europe).gba" },
+      { hash = "9b067d0ee54caad2171a00c50e3c35cd", label = "Golden Sun - L'Age Perdu (France).gba" },
+      { hash = "9d84ad590d1dffa33b1b1e2e1d64fb4d", label = "Ougon no Taiyou - Ushinawareshi Toki (Japan).gba" },
+      { hash = "a1be57cb0f1acc812f46657bbfe5904b", label = "Golden Sun - L'Era Perduta (Italy).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X8436, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle Background" },
+        { address=0X8A5F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Felix's Level" },
+        { address=0X8BAB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jenna's Level" },
+        { address=0X8CF7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sheba's Level" },
+        { address=0X8E43, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Piers' Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X8A84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Felix's Max HP decreased" },
+        { address=0X8A84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Felix's Max HP increased" },
+        { address=0X8A88, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Felix's Current HP decreased" },
+        { address=0X8A88, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Felix's Current HP increased" },
+        { address=0X8BAC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jenna's Max HP decreased" },
+        { address=0X8BAC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jenna's Max HP increased" },
+        { address=0X8BD0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jenna's Max HP decreased" },
+        { address=0X8BD0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jenna's Max HP increased" },
+        { address=0X8BD4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jenna's Current HP decreased" },
+        { address=0X8BD4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jenna's Current HP increased" },
+        { address=0X8D1C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sheba's Max HP decreased" },
+        { address=0X8D1C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sheba's Max HP increased" },
+        { address=0X8D20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sheba's Current Health decreased" },
+        { address=0X8D20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sheba's Current Health increased" },
+        { address=0X38900, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health Slot 1? decreased" },
+        { address=0X38900, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health Slot 1? increased" },
+        { address=0X38A4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health Slot 2? decreased" },
+        { address=0X38A4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health Slot 2? increased" },
+        { address=0X38B98, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health Slot 3? decreased" },
+        { address=0X38B98, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health Slot 3? increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8250, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Coins - 32-bit increased" },
+        { address=0X84CC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Isaac's Party Coins? increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X810E, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 2 - Boss atop Jupiter Lighthouse Defeated" },
+        { address=0X812F, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 0 - Final Boss Defeated" },
+        { address=0X8149, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit 1 - Boss Before Lash Pebble" },
+      },
+    },
+  },
+}

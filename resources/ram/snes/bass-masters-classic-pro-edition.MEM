@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bass Masters Classic: Pro Edition",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "bass-masters-classic-pro-edition",
+    file = "bass-masters-classic-pro-edition.zip",
+    hashes = {
+      { hash = "7200b3e05b334201b33e174f487ff021", label = "BASS Masters Classic - Pro Edition (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

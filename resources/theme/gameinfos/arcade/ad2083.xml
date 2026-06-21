@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 BRU 60000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 NO  59000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 DE  58000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 GEO 57000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 R   56000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 GIO 55000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7     54000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8     53000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9     52000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10     51000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11     50000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12     49000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13     48000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14     47000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15     46000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16     45000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17     44000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18     43000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19     42000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20     41000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

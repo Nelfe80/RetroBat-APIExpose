@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Maniac Mansion",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "maniac-mansion",
+    file = "maniac-mansion.zip",
+    hashes = {
+      { hash = "2717773e0fe484f15ea0fe679606d03a", label = "Maniac Mansion (USA) (Fr) (v0.1) (HIEI).nes" },
+      { hash = "3905799e081b80a61d4460b7b733c206", label = "Maniac Mansion (USA).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X60B8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Characters Dead" },
+        { address=0X6638, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="upper=DaveCDPlayer lowerbits=kidID[f if not picked, 0=death]" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6717, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="75=radiation suit" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6692, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 6 - Phone Broken, repairing deactivates increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6109, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Last object interacted with" },
+        { address=0X610A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Last secondary object interacted with" },
+        { address=0X6116, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Last object interacted with [nongeneric response]" },
+        { address=0X611B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Interact Object ID [Hover]" },
+        { address=0X611C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Interact Object 2 ID [Hover]" },
+        { address=0X619D, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="What song is recorded on tape 46=Tentacle 32=razor/syd 19=EEEEE 2c=broken" },
+        { address=0X6640, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 7 - Door Mat Pulled" },
+        { address=0X6641, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="FrontDoorKey" },
+        { address=0X6647, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 7 - Front Door Opened" },
+        { address=0X66A5, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 7 - Door to dungeon Opened" },
+        { address=0X66A9, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="7=Dungeondoor" },
+        { address=0X66AA, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="7=outerlabdoor" },
+        { address=0X66B0, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="7=innerlabdoor" },
+        { address=0X66B2, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 7 - Door to lab opened" },
+        { address=0X66DE, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit 7 - Short-Wave Radio Broken (Deactivates when repaired)" },
+      },
+    },
+  },
+}

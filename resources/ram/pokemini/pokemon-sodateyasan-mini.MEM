@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Pokémon Sodateyasan mini",
+    system = "pokemini",
+    system_name = "Pokemon Mini",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-sodateyasan-mini",
+    file = "pokemon-sodateyasan-mini.zip",
+    hashes = {
+      { hash = "0eb5e7e191ce056f3ee2c6572bc61906", label = "Pokemon Sodateyasan Mini (Japan).min" },
+      { hash = "0f78ee2c193fc8d0c129f051f262dcdf", label = "Pokemon Sodateyasan Mini (Japan) (En) (Mr. Blinky) (1.0).min" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0ADA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Egg hatch/Hp meter decreased" },
+        { address=0X0ADA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Egg hatch/Hp meter increased" },
+      },
+    },
+  },
+}

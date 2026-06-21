@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Worms Pinball",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "worms-pinball",
+    file = "worms-pinball.zip",
+    hashes = {
+      { hash = "f94c2455ce95c3ce0bcedd68c2d5608b", label = "Worms Pinball (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1FD7ED, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="8Bit - InGame Pause?" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X1FD5C0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="00 - World Rally Fever table" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1DE588, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="16-bit - Balls Remaining increased" },
+        { address=0X1DE588, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="16-bit - Balls Remaining decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1DE578, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Score" },
+        { address=0X1DE57C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Score overflow" },
+      },
+    },
+  },
+}

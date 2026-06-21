@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Cosmic Avenger",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Action, Shoot'em up, Horizontal, Shoot'em Up"
+  },
+
+  rom = {
+    name = "cosmic-avenger",
+    file = "cosmic-avenger.zip",
+    hashes = {
+      { hash = "cfbd4a478e7019422c306837444d2e46", label = "Cosmic Avenger (USA, Europe).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u16le", condition="eq", value=0X9090, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title and Menu" },
+        { address=0X0006, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="When starting over after a game over" },
+        { address=0X0022, type="u8", condition="eq", value=0X9A, action="GAME_OVER", no_log=false, no_survey=false, desc="High pitched tone which means Game Over" },
+        { address=0X002A, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0047, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ships Remaining (Lives) increased" },
+        { address=0X0047, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ships Remaining (Lives) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0040, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] BCD Score" },
+      },
+    },
+  },
+}

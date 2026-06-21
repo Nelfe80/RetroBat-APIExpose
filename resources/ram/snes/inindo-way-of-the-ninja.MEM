@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Inindo: Way of the Ninja",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "inindo-way-of-the-ninja",
+    file = "inindo-way-of-the-ninja.zip",
+    hashes = {
+      { hash = "cd46a61f34f818f23bb23cdc7c7a7e99", label = "Inindo - Way of the Ninja (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF0C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Char Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9606, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp main character(Battle) decreased" },
+        { address=0X9606, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp main character(Battle) increased" },
+        { address=0XF0B8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Main Char Current HP(16-bit) - non battle decreased" },
+        { address=0XF0B8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Main Char Current HP(16-bit) - non battle increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF01B, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money(16-bit) increased" },
+      },
+    },
+  },
+}

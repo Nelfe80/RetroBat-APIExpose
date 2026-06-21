@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Lucky Luke: Wanted!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "lucky-luke-wanted",
+    file = "lucky-luke-wanted.zip",
+    hashes = {
+      { hash = "2ab4cafacf54e34053b34527539b7e5b", label = "Lucky Luke - Wanted! (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1EB8, type="u16le", condition="eq", value=0X802A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="City (Level 1)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X635A, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0X635A, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Sherif Gold Stars (HP)" },
+      },
+    },
+  },
+}

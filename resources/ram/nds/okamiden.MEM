@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Ōkamiden",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "okamiden",
+    file = "okamiden.zip",
+    hashes = {
+      { hash = "e2a1224c08658ddf3eb38e8d60fc40c0", label = "Okamiden (Europe).nds" },
+      { hash = "fea948901690f8d6dd74f9eb9a24a048", label = "Okamiden (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3A8EB0, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Inventory - Demon Bones (16bit)" },
+        { address=0X3A8EB2, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Inventory - Demon Skins (16bit)" },
+        { address=0X3A8EB4, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Inventory - Demon Livers (16bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3A8F26, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Inventory - Life Tree Branch (16bit) increased" },
+        { address=0X3A8F26, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Inventory - Life Tree Branch (16bit) decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3A8ED8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory - Gold Pot (16bit) increased" },
+      },
+    },
+  },
+}

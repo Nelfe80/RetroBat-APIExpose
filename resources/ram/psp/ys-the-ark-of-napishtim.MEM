@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Ys: The Ark of Napishtim",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ys-the-ark-of-napishtim",
+    file = "ys-the-ark-of-napishtim.zip",
+    hashes = {
+      { hash = "8f9fae6b37e8d35c44d46e3dd791ac79", label = "Ys - The Ark of Napishtim (USA).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X964E08, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Livart Sword Level" },
+        { address=0X964E18, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blirante Level" },
+        { address=0X964E28, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ericcil Level" },
+        { address=0X964E68, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X964E90, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total EXP to Next Level [Float]" },
+        { address=0X964EB0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Shield in Inventory" },
+        { address=0X965024, type="u32le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Shield" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X964E3C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health [Float] decreased" },
+        { address=0X964E3C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health [Float] increased" },
+        { address=0X964E40, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health [Float] decreased" },
+        { address=0X964E40, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health [Float] increased" },
+        { address=0X964E70, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health [Float] decreased" },
+        { address=0X964E70, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health [Float] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X96501C, type="u32le", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Long Sword" },
+        { address=0X96501C, type="u32le", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Livart" },
+        { address=0X96501C, type="u32le", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Blirante" },
+        { address=0X96501C, type="u32le", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Ericcil" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X964DE4, type="u32le", condition="eq", value=0X1F, action="MONEY_STATE", no_log=false, no_survey=false, desc="Lucky Silver Coin" },
+        { address=0X964E64, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X964EC8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring Mail in Inventory increased" },
+        { address=0X964F18, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Lucky Silver Coin in Inventory increased" },
+        { address=0X964F74, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Tabula in Inventory increased" },
+        { address=0X964FA4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Locket in Inventory increased" },
+        { address=0X965020, type="u32le", condition="eq", value=0X0B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring Mail" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X95B2A4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP [Float]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X964EB4, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rehdan Shield in Inventory" },
+        { address=0X964EB8, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Kite Shield in Inventory" },
+        { address=0X964EBC, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Galba Shield in Inventory" },
+        { address=0X964EC0, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Emelas Shield in Inventory" },
+        { address=0X965024, type="u32le", condition="eq", value=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Buckler" },
+        { address=0X965024, type="u32le", condition="eq", value=0X06, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rehdan Shield" },
+        { address=0X965024, type="u32le", condition="eq", value=0X07, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Kite Shield" },
+        { address=0X965024, type="u32le", condition="eq", value=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Galba Shield" },
+        { address=0X965024, type="u32le", condition="eq", value=0X09, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Emelas Shield" },
+      },
+    },
+  },
+}

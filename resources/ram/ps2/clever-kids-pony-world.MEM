@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Clever Kids: Pony World",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "clever-kids-pony-world",
+    file = "clever-kids-pony-world.zip",
+    hashes = {
+      { hash = "9d2dc48de96889467223145a89ac52e9", label = "Clever Kids - Pony World (Europe, Australia) (En,Fr,De,Es,It,Pt)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X26D294, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Time remaining (Read only)" },
+      },
+    },
+  },
+}

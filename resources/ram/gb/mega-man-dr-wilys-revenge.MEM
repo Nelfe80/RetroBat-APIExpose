@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Mega Man: Dr. Wily's Revenge",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "mega-man-dr-wilys-revenge",
+    file = "mega-man-dr-wilys-revenge.zip",
+    hashes = {
+      { hash = "2c1358474573c9dd38d6a128f4714a86", label = "Mega Man - Dr. Wily's Revenge (Europe).gb" },
+      { hash = "4ba4398181d98958fa7434ba7716f11a", label = "Mega Man - Dr. Wily's Revenge (USA).gb" },
+      { hash = "d0b1c550250c859f4563165eb29033d6", label = "Rockman World (Japan).gb" },
+      { hash = "fed695d2bc3e1801aeeab1c8e573096e", label = "Mega Man - Dr. Wily's Revenge (USA) (Fr) (Terminus).gb" },
+      { hash = "76f8d3ed7a22ec9815ad3c5c00a9f9c0", label = "Mega Man World - Dr. Wily's Revenge (v1.02) (Specialagentape).gbc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XD97D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="// Original by Thoreau decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XD97D, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="very short transition when entering stage" },
+        { address=0XD97D, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="elec man stage" },
+        { address=0XD97D, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="boss animation when stage selected/wily 1/2" },
+        { address=0XD97D, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="select stage screen" },
+        { address=0XD97D, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="game over/password screen/boss beaten" },
+        { address=0XD97D, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="cut/ice/fire man stage/initial screen" },
+        { address=0XD97D, type="u8", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="you got power-up" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD97D, type="u8", condition="eq", value=0X06, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into cut/ice/fire man stage/initial screen" },
+      },
+    },
+  },
+}

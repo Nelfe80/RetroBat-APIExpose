@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 .-Z 109600</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2  09 81630</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 !?· 60490</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 GTV 50000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MRO 49270</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 NWK 48380</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 TSU 47860</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 RYU 46900</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 YOS 45220</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 INA 44760</text>
+		</text>
+	</view>
+</theme>

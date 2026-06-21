@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "Tintin in Tibet",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tintin-in-tibet",
+    file = "tintin-in-tibet.zip",
+    hashes = {
+      { hash = "082dbe19bcfb1a9d16423bc79e940826", label = "Tintin in Tibet (Europe) (En,Fr,De,Es,Nl,Sv).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0010, type="u8", condition="eq", value=0XD, action="GAME_OVER", no_log=false, no_survey=false, desc="Cutscene, Game Over" },
+        { address=0X0010, type="u8", condition="eq", value=0XE, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Copyrights Screens, Title Screen, Options" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X05ED, type="u8", condition="eq", value=0X00, action="LEVEL_INACTIVE", no_log=false, no_survey=false, desc="Inactive" },
+        { address=0X05ED, type="u8", condition="eq", value=0X01, action="LEVEL_ACTIVE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X05ED, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select Flag" },
+        { address=0X1F71, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Train" },
+        { address=0X1F71, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="River saving Chang" },
+        { address=0X1F71, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hotel" },
+        { address=0X1F71, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Street" },
+        { address=0X1F71, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Street chasing Snowy" },
+        { address=0X1F71, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mountain" },
+        { address=0X1F71, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mountain saving Snowy" },
+        { address=0X1F71, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Moutain Rapid" },
+        { address=0X1F71, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Running down mountain" },
+        { address=0X1F71, type="u8", condition="eq", value=0X19, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yeti's Cavern" },
+        { address=0X1F71, type="u8", condition="eq", value=0XF0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cymbal Minigame" },
+        { address=0X1F71, type="u8", condition="eq", value=0XF1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Symbol Sort Minigame" },
+        { address=0X1F71, type="u8", condition="eq", value=0XF2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Book Sort Minigame" },
+        { address=0X1F71, type="u8", condition="eq", value=0XF3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bell Minigame" },
+        { address=0X1F71, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+      stage = {
+        { address=0X05ED, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X01F9, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Tintin fall and lose a life" },
+        { address=0X029B, type="u8", condition="eq", value=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Collected" },
+        { address=0X029B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Market (Level ID 0x03) increased" },
+        { address=0X029B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Market (Level ID 0x03) decreased" },
+        { address=0X029C, type="u8", condition="eq", value=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Collected" },
+        { address=0X029C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Snowy chase in Market (Level ID 0x04) increased" },
+        { address=0X029C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Snowy chase in Market (Level ID 0x04) decreased" },
+        { address=0X029D, type="u8", condition="eq", value=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Collected" },
+        { address=0X029D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Highlands increased" },
+        { address=0X029D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Highlands decreased" },
+        { address=0X029F, type="u8", condition="eq", value=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Collected" },
+        { address=0X029F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1UP Flag - River increased" },
+        { address=0X029F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1UP Flag - River decreased" },
+        { address=0X02A4, type="u8", condition="eq", value=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Collected" },
+        { address=0X02A4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Mountains (Level ID 0x0c) increased" },
+        { address=0X02A4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Mountains (Level ID 0x0c) decreased" },
+        { address=0X02A6, type="u8", condition="eq", value=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="Collected" },
+        { address=0X02A6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Climbing Section (Level ID 0x0e) increased" },
+        { address=0X02A6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1UP Flag - Climbing Section (Level ID 0x0e) decreased" },
+        { address=0X04E6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X04E6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X04E5, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max value" },
+        { address=0X04E5, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X01F9, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Climb Timer" },
+      },
+    },
+  },
+}

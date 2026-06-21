@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Guilty Gear X [Subset - Omni Survivalist]",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "guilty-gear-x-subset-omni-survivalist",
+    file = "guilty-gear-x-subset-omni-survivalist.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X11FCDD, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Latest P1 Combo Hit" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XEFB4D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Round Configuration" },
+        { address=0XF0910, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Background Level ID" },
+        { address=0X110958, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] P2 First Round Flag" },
+        { address=0X110959, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] P2 Second Round Flag" },
+        { address=0X110960, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] P1 First Round Flag" },
+        { address=0X110961, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] P1 Second Round Flag" },
+        { address=0X18305C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Survival Mode Level" },
+        { address=0X183F6C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Round Configuration (Option Menu duplicate)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X11FC50, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Health (Display) decreased" },
+        { address=0X11FC50, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P1 Health (Display) increased" },
+        { address=0X29A446, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P1 Health decreased" },
+        { address=0X29A446, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P1 Health increased" },
+        { address=0X29A55E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] P2 Health decreased" },
+        { address=0X29A55E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] P2 Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1109AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEFB4C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Time Limit" },
+        { address=0X183F54, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Time Limit (Option Menu duplicate)" },
+      },
+    },
+  },
+}

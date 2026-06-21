@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Dizzy II: Treasure Island Dizzy",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dizzy-ii-treasure-island-dizzy",
+    file = "dizzy-ii-treasure-island-dizzy.zip",
+    hashes = {
+      { hash = "33419125178257c187724a4ed7bd7914", label = "Dizzy II - Treasure Island Dizzy (UK) (1989) [Original].dsk" },
+      { hash = "c7b0b3f78f73b5795cfed0abbfea921d", label = "Dizzy II - Treasure Island Dizzy (1988)(Codemasters).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

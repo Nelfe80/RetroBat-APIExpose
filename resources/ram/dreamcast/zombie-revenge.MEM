@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Zombie Revenge",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Beat 'em Up, Horror"
+  },
+
+  rom = {
+    name = "zombie-revenge",
+    file = "zombie-revenge.zip",
+    hashes = {
+      { hash = "6bf49b7f3511b5dda3cf8aa9e3528676", label = "Zombie Revenge (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X23E8C8, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo ID / Game Progress" },
+        { address=0X23E8E4, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X522538, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues left" },
+        { address=0X5228EC, type="u32le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Settings: Continue (Arcade)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X24710C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP decreased" },
+        { address=0X24710C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP increased" },
+        { address=0X247110, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 HP decreased" },
+        { address=0X247110, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 HP increased" },
+        { address=0X247114, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Max HP decreased" },
+        { address=0X247114, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Max HP increased" },
+        { address=0X247118, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 Max HP decreased" },
+        { address=0X247118, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 Max HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2470FC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Points" },
+        { address=0X247100, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Points" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X239D2C, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="VS Boss Mode: Boss" },
+        { address=0X239D30, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="VS Boss Mode: Boss Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X522D74, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Left (outdoors)" },
+        { address=0X522D78, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Left (indoors)" },
+      },
+    },
+  },
+}

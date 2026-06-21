@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Smurfs: Rescue in Gargamel's Castle",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-smurfs-rescue-in-gargamels-castle",
+    file = "the-smurfs-rescue-in-gargamels-castle.zip",
+    hashes = {
+      { hash = "c29e282c81ce9b40f39f493f51725d3c", label = "Smurf - Rescue in Gargamel's Castle (USA, Europe).col" },
+    }
+  },
+
+  events = {
+  },
+}

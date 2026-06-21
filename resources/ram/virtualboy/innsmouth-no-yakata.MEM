@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Innsmouth no Yakata",
+    system = "virtualboy",
+    system_name = "Virtual Boy",
+    genre = "Lightgun Shooter"
+  },
+
+  rom = {
+    name = "innsmouth-no-yakata",
+    file = "innsmouth-no-yakata.zip",
+    hashes = {
+      { hash = "1eb964d0eaa3223cfefdcc99a6265c88", label = "Insmouth no Yakata (Japan).vb" },
+      { hash = "4698a0b151d95bbbb833e2a523a12be7", label = "Innsmouth no Yakata (Japan) (En) (v1.0) (Thunderstruck).vb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X6B02, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0x03 - Stage Clear?" },
+        { address=0X6B0E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="0x01 - Stage Clear?" },
+      },
+      stage = {
+        { address=0X3CF6, type="u24le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STARTING STAGE" },
+        { address=0X3CF8, type="u24le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="CURRENT STAGE" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3CF0, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6B14, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Actual Stage Timer - 16-bit Hex" },
+        { address=0X6B18, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage Timer Display - 8-bit - Hex" },
+      },
+    },
+  },
+}

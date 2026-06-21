@@ -1,0 +1,137 @@
+return {
+  game = {
+    title = "Saturn Bomberman",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "saturn-bomberman",
+    file = "saturn-bomberman.zip",
+    hashes = {
+      { hash = "f0f679839738044dcaebc3bde3e28925", label = "Saturn Bomberman (USA) (1S)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C17DC, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="1." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C065E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C0660, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C0662, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 3 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C0664, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 4 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C0666, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 5 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C0668, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 6 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C066A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 7 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C066C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 8 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C066E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 9 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C0670, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 10 qty of rounds win in Battle Mode 8bits" },
+        { address=0X1C0682, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Qty of rounds Battle Mode 8bits" },
+        { address=0X1C179A, type="u8", condition="eq", value=0X09, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mr. Meanie;" },
+        { address=0X1C179B, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="None;" },
+        { address=0X1C179B, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Amusement World;" },
+        { address=0X1C179B, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Samurai World;" },
+        { address=0X1C179B, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Wild West World;" },
+        { address=0X1C179B, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Dino World." },
+        { address=0X1C179C, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mr. Meanie;" },
+        { address=0X1C179C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal game levels 8bits" },
+        { address=0X1D7E6A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battle Mode levels 8bits" },
+        { address=0X1DFBAA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Items in level 2 8bits" },
+        { address=0X1DFBBA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Items in level 4 8bits" },
+        { address=0X1DFBC2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Items in level 5 8bits" },
+        { address=0X1DFBCA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Items in level 6 8bits" },
+        { address=0X1F08B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Related to items in level begin 8bits" },
+        { address=0X1F28AF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Related to items in level finish 8bits" },
+      },
+      stage = {
+        { address=0X1D7E6A, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Wide stage." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1B2E85, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1C063F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifes 8bits increased" },
+        { address=0X1C063F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifes 8bits decreased" },
+        { address=0X1C0FC5, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X1C0FC6, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X1C0FC7, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X1C0FC8, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X1C0FC9, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X1C0FCA, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X1C0FCB, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X1C0FCC, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+        { address=0X1C0FCD, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead;" },
+      },
+      health = {
+        { address=0X1C0FFD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Clock Power Up 8bits decreased" },
+        { address=0X1D5F3C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Speed Power Up 8bits decreased" },
+        { address=0X1D5F57, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Vest Power Up 8bits decreased" },
+        { address=0X1D5F7E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fire power up 8bits decreased" },
+        { address=0X1D648A, type="u16le", condition="eq", value=0X000A, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full HP." },
+        { address=0X1D648A, type="u16le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Dr. Mechado HP 16bits" },
+        { address=0X1DFBA2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Items in level 1 8bits decreased" },
+        { address=0X1DFBB2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Items in level 3 8bits decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1C0FFD, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off;" },
+        { address=0X1C0FFD, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="On." },
+        { address=0X1D5F3C, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off;" },
+        { address=0X1D5F3C, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Max speed." },
+        { address=0X1D5F42, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="0 Soft Block Pass;" },
+        { address=0X1D5F42, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="0 Bomb Pass;" },
+        { address=0X1D5F57, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off;" },
+        { address=0X1D5F57, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="On." },
+        { address=0X1D5F6E, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Number of bombs available to use? (from bomb powerup; starts at 1 end in A)" },
+        { address=0X1D5F70, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Ruber Bomb Power Up;" },
+        { address=0X1D5F71, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Bomb Kick;" },
+        { address=0X1D5F71, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Power Glove." },
+        { address=0X1D5F71, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="1 Line Bomb;" },
+        { address=0X1D5F71, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="2 Bomb Kick;" },
+        { address=0X1D5F7E, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Normal;" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1C0690, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Overall Score 16bits" },
+        { address=0X1C0692, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Overall Score 16bits" },
+        { address=0X1C069A, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (Current Level) 32bits" },
+        { address=0X1C0FDE, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total score 32bits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1C029C, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Giant Bomber Bomjin boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated Bomber Bomjin boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Debugon Bomber boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated Debugon Bomber boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X0B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Tankard Bomber boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X0C, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated Tankard Bomber boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X0F, action="BOSS_HIT", no_log=false, no_survey=false, desc="Miyagi Bomber boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated Miyagi Bomber boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dragon Bomber boss;" },
+        { address=0X1C029C, type="u8", condition="eq", value=0X14, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeated Dragon Bomber boss." },
+        { address=0X1C179D, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="None/Amusement World;" },
+        { address=0X1C179D, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Castle Robot/Samurai World;" },
+        { address=0X1C179D, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="J Ninja/Wild West World;" },
+        { address=0X1C179D, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Rodeon/Dino World;" },
+        { address=0X1C179D, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mr. Meanie/Mr. Meanie's Future World;" },
+        { address=0X1C179D, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dr. Mechado;" },
+        { address=0X1D640E, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="J Ninja/Rodeon/Bomber Bomjin/Debugon Bomber/Tankard Bomber/Miyagi Bomber/Dragon Bomber;" },
+        { address=0X1D640E, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Egg Birdon/Crator/Mr. Meanie." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1C0FFC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer Clock Power Up 16bits" },
+      },
+    },
+  },
+}

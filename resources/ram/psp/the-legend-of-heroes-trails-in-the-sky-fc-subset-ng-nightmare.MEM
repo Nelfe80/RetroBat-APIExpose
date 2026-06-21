@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "The Legend of Heroes: Trails in the Sky FC [Subset - NG Nightmare]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-legend-of-heroes-trails-in-the-sky-fc-subset-ng-nightmare",
+    file = "the-legend-of-heroes-trails-in-the-sky-fc-subset-ng-nightmare.zip",
+    hashes = {
+      { hash = "f8d124795c9c591a1e8492e54bc2fda2", label = "Legend of Heroes, The - Trails in the Sky [Subset - NG Nightmare].iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBB9510, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Switches to 0x1adc when credits start" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBE86A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Estelle - Level" },
+        { address=0XBE86DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Joshua - Level" },
+        { address=0XBE8710, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Scherazard - Level" },
+        { address=0XBE8744, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Olivier - Level" },
+        { address=0XBE8778, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kloe - Level" },
+        { address=0XBE87AC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Agate - Level" },
+        { address=0XBE87E0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tita - Level" },
+        { address=0XBE8814, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zane - Level" },
+        { address=0X1FE83A8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Data" },
+        { address=0X1FE83A9, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Data" },
+        { address=0X1FE83AA, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Data" },
+        { address=0X1FE83AB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Data" },
+        { address=0X1FE83AC, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Data" },
+      },
+      stage = {
+        { address=0XBEA882, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Quest - Hostage Liberation" },
+        { address=0XBEA88E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Quest - Hostage Liberation 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBEA55E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Quest - Soldier Training" },
+        { address=0XBEA560, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Quest - Soldier Training" },
+        { address=0XBEA5D6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Quest - Ingredient Seeker" },
+        { address=0XBEA702, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Quest - Potent Ingredient" },
+      },
+      health = {
+        { address=0XBE86AA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Estelle - Max HP decreased" },
+        { address=0XBE86AA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Estelle - Max HP increased" },
+        { address=0XBE86AC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Estelle - Current HP decreased" },
+        { address=0XBE86AC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Estelle - Current HP increased" },
+        { address=0XBE86DE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Joshua - Max HP decreased" },
+        { address=0XBE86DE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Joshua - Max HP increased" },
+        { address=0XBE86E0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Joshua - Current HP decreased" },
+        { address=0XBE86E0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Joshua - Current HP increased" },
+        { address=0XBE8712, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Scherazard - Max HP decreased" },
+        { address=0XBE8712, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Scherazard - Max HP increased" },
+        { address=0XBE8714, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Scherazard - Current HP decreased" },
+        { address=0XBE8714, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Scherazard - Current HP increased" },
+        { address=0XBE8746, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Olivier - Max HP decreased" },
+        { address=0XBE8746, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Olivier - Max HP increased" },
+        { address=0XBE8748, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Olivier - Current HP decreased" },
+        { address=0XBE8748, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Olivier - Current HP increased" },
+        { address=0XBE877A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kloe - Max HP decreased" },
+        { address=0XBE877A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kloe - Max HP increased" },
+        { address=0XBE877C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kloe - Current HP decreased" },
+        { address=0XBE877C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kloe - Current HP increased" },
+        { address=0XBE87AE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Agate - Max HP decreased" },
+        { address=0XBE87AE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Agate - Max HP increased" },
+        { address=0XBE87B0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Agate - Current HP decreased" },
+        { address=0XBE87B0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Agate - Current HP increased" },
+        { address=0XBE87E2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tita - Max HP decreased" },
+        { address=0XBE87E2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tita - Max HP increased" },
+        { address=0XBE87E4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Tita - Current HP decreased" },
+        { address=0XBE87E4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Tita - Current HP increased" },
+        { address=0XBE8816, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Zane - Max HP decreased" },
+        { address=0XBE8816, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Zane - Max HP increased" },
+        { address=0XBE8818, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Zane - Current HP decreased" },
+        { address=0XBE8818, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Zane - Current HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XBE84A1, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Chests" },
+      },
+      weapon = {
+        { address=0XBE8848, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Estelle - Equipped Weapon" },
+        { address=0XBE8852, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Joshua - Equipped Weapon" },
+        { address=0XBE885C, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Schera - Equipped Weapon" },
+        { address=0XBE8866, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Olivier - Equipped Weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBEA4DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Bracer Points" },
+      },
+      collectibles = {
+        { address=0XBEA5E2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Quest - Stolen Ring increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBEA792, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Main Quest - South Block Burglary" },
+        { address=0XBEA79E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Main Quest - South Block Burglary 2" },
+        { address=0XBEA7AA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Main Quest - South Block Burglary 3" },
+      },
+    },
+  },
+}

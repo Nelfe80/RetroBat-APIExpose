@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Lucky Luke: Desperado Train",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "lucky-luke-desperado-train",
+    file = "lucky-luke-desperado-train.zip",
+    hashes = {
+      { hash = "31770f7197ea4a7ff99cad7cef5c58b8", label = "Lucky Luke - Desperado Train (Europe) (En,Fr,De,Es,It,Nl).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCB86, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="00 on the ingame display, game over doesnt flip it to ff or anything" },
+        { address=0XCB88, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continues" },
+        { address=0XCCF1, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="option hovered over in pause menu (super useful, trust me)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC3C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level address 2.0" },
+        { address=0XC3E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="best in-gameplay check [ still sucks, only works in levels 1,2,4,7,10]" },
+        { address=0XC3F9, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="X-positions relative to level" },
+        { address=0XC9EF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="levels unlocked" },
+        { address=0XC9F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level selected on map, persists into gameplay" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCB86, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0XCB86, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+      health = {
+        { address=0XCB8A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hearts/health decreased" },
+        { address=0XCB8A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hearts/health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCB87, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="the shadow duel coin increased" },
+        { address=0XCB8F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="amount of money increased" },
+      },
+    },
+  },
+}

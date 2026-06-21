@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Gothik",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "gothik",
+    file = "gothik.zip",
+    hashes = {
+      { hash = "1a7d67203b81dc0dd9928225867ca285", label = "Gothik (1987)(Firebird).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X86F5, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 bit] - Title screen" },
+        { address=0X8E6A, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[8 bit] - Title screen = 00" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X90F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 bit] - Level Room" },
+        { address=0X90F8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 bit] - Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8E6F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 bit] - Life 00 to 80 increased" },
+        { address=0X8E6F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 bit] - Life 00 to 80 decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8E6D, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="1 - Ring of invisibility" },
+        { address=0X8E6E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bit] - Gold : 00 to 80 increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X8E74, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8 bit] - Shield number" },
+      },
+    },
+  },
+}

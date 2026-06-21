@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Sword</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Jump</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Sword</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Jump</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 CAP  20000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 COM  19000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 CAP  18000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 09♥  17550</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 COM  17000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 CAP  16000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 COM  15000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 CAP  14000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 COM  13000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 09.  2000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

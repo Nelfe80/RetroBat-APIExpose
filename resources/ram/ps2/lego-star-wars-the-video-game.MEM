@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "LEGO Star Wars: The Video Game",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "lego-star-wars-the-video-game",
+    file = "lego-star-wars-the-video-game.zip",
+    hashes = {
+      { hash = "11aa67d0999d4d6cdc9f073ba639ac41", label = "LEGO Star Wars - The Video Game (Japan)" },
+      { hash = "24baa017dbf019bc3f091d1eb6ed93f2", label = "LEGO Star Wars - The Video Game (USA) (v2.00) (Greatest Hits)" },
+      { hash = "49cc3b8e0ae6c48213fb24f2a916c6ff", label = "LEGO Star Wars - The Video Game (Europe) (En,Fr,De,Es,It,Nl,Da)" },
+      { hash = "53a7ab71e6ee8ab1fed05761fd72c37a", label = "LEGO Star Wars - The Video Game (USA) (v1.01)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X36704C, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X57FB94, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="the position/index of the menu item highlighted at Dexter's Diner. 0 = hints, 1 = characters, 2" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X35F890, type="u16le", condition="eq", value=0XD1, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="red shield?" },
+        { address=0X547918, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+        { address=0X547B18, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+        { address=0X549F18, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+        { address=0X54A918, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+      },
+    },
+  },
+}

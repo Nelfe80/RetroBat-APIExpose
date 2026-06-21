@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "aerofgt",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "aero-fighters",
+    file = "aero-fighters.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XFF60DD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFF60E8, type="u32be", condition="change", action="TREASURE", color="blue", min=5000, max=5000, no_log=false, no_survey=false, desc="Score delta 5000-5000: Various medium" },
+        { address=0XFF60E8, type="u32be", condition="change", action="TREASURE", color="white", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Various high" },
+        { address=0XFF60E8, type="u32be", condition="change", action="TREASURE", color="white", min=20000, max=20000, no_log=false, no_survey=false, desc="Score delta 20000-20000: Bamboo Sprout" },
+        { address=0XFF60E8, type="u32be", condition="change", action="TREASURE", color="white", min=50000, max=50000, no_log=false, no_survey=false, desc="Score delta 50000-50000: Holstein" },
+        { address=0XFF60E8, type="u32be", condition="change", action="TREASURE", color="green", min=80000, max=80000, no_log=false, no_survey=false, desc="Score delta 80000-80000: Strawberry" },
+        { address=0XFF60E8, type="u32be", condition="change", action="TREASURE", color="blue", min=100000, max=100000, no_log=false, no_survey=false, desc="Score delta 100000-100000: Dragonfly" },
+      },
+      weapon = {
+        { address=0XFF60E1, type="u8", condition="decrease", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player1_die: select fire power" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFF60E8, type="u32be", condition="change", action="SCORE_STATE", color="white", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Various 1" },
+        { address=0XFF60E8, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Various 2" },
+      },
+      collectibles = {
+        { address=0XFF8B94, type="u32be", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFF60E8, type="u32be", condition="change", action="BOSS_HIT", color="red", min=3000, max=3000, no_log=false, no_survey=false, desc="Score delta 3000-3000: Dome" },
+        { address=0XFF60DF, type="u8", condition="decrease", action="BOMB_FIRED", no_log=false, no_survey=false, desc="bomb: smart bombs" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFF60E8, type="u32be", condition="change", action="OBJECT_DESTROYED", color="blue", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Destroy simple plane" },
+        { address=0XFF60E8, type="u32be", condition="change", action="OBJECT_DESTROYED", color="orange", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Destroy tank,helicopter,orange planes" },
+        { address=0XFF60E8, type="u32be", condition="change", action="OBJECT_DESTROYED", color="yellow", min=300, max=300, no_log=false, no_survey=false, desc="Score delta 300-300: Destroy green helicopter, Big green plane" },
+        { address=0XFF60E8, type="u32be", condition="change", action="OBJECT_DESTROYED", color="red", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Destroy antiaerial" },
+      },
+    },
+  },
+}

@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Picross NP Vol. 5",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picross-np-vol-5",
+    file = "picross-np-vol-5.zip",
+    hashes = {
+      { hash = "6b8b0ead545cbca03a26a3d9dc1b811a", label = "Picross NP Vol. 5 (Japan) (NP).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1EF6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="background music" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7563, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Left (Minutes)" },
+        { address=0X7565, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Left (Seconds)" },
+        { address=0X7567, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Left (Miniseconds)" },
+        { address=0X202BB, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Beginner A time" },
+        { address=0X202BC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Beginner A time (Seconds)" },
+      },
+    },
+  },
+}

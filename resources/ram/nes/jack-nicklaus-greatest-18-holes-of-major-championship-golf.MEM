@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Jack Nicklaus' Greatest 18 Holes of Major Championship Golf",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "jack-nicklaus-greatest-18-holes-of-major-championship-golf",
+    file = "jack-nicklaus-greatest-18-holes-of-major-championship-golf.zip",
+    hashes = {
+      { hash = "4f03a6eb4242e759fe783b44f01b387c", label = "Jack Nicklaus' Greatest 18 Holes of Major Championship Golf (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0018, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0024, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tee (0 = Ladies', 1 = Men's)" },
+        { address=0X0568, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1's number of birdies [BCD]" },
+        { address=0X0569, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2's number of birdies [BCD]" },
+        { address=0X056A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 3's number of birdies [BCD]" },
+        { address=0X056B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 4's number of birdies [BCD]" },
+        { address=0X0664, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie C" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0018, type="u8", condition="eq", value=0X0A, action="SCORE_STATE", no_log=false, no_survey=false, desc="Scorecard" },
+      },
+    },
+  },
+}

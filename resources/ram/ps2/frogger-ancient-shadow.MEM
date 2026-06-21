@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Frogger: Ancient Shadow",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "frogger-ancient-shadow",
+    file = "frogger-ancient-shadow.zip",
+    hashes = {
+      { hash = "11bacf8a4c2314335fad0d2a4fc73fdb", label = "Frogger - Ancient Shadow (USA) (En,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

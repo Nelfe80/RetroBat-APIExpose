@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Imperium | Kidou Soukou Dion",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "imperium-kidou-soukou-dion",
+    file = "imperium-kidou-soukou-dion.zip",
+    hashes = {
+      { hash = "c98c3f1b998dfbe2fa17fbc7e69834c9", label = "Imperium (USA).sfc" },
+      { hash = "eaace143d3dcf51b9848419ef07120ec", label = "Kidou Soukou Dion (Japan) (En).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0A1D, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues (Japan Version)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0950, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (American Version)" },
+        { address=0X0A1B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level (Japan version)" },
+        { address=0X0ACE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level for weapon 1 (American Version)" },
+        { address=0X0AD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level for weapon 2 (American Version)" },
+        { address=0X0AD2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level for laser (American Version)" },
+        { address=0X0AD4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level for weapon (American Version)" },
+        { address=0X0B6E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level for weapon 4 (Japan version)" },
+        { address=0X0B70, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level for weapon 1 (Japan version)" },
+        { address=0X0B72, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level for weapon 2 (Japan version)" },
+        { address=0X0B74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level for weapon 3 (Japan version)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0AA8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (American Version) decreased" },
+        { address=0X0AA8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (American Version) increased" },
+        { address=0X0B48, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP (Japan version) decreased" },
+        { address=0X0B48, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP (Japan version) increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Prehistorik Man",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "prehistorik-man",
+    file = "prehistorik-man.zip",
+    hashes = {
+      { hash = "6ce9bb835428a17300fd191c7b9d8ece", label = "Prehistorik Man (USA, Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+  },
+}

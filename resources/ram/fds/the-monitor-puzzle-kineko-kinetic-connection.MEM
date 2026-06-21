@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "The Monitor Puzzle Kineko: Kinetic Connection",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "the-monitor-puzzle-kineko-kinetic-connection",
+    file = "the-monitor-puzzle-kineko-kinetic-connection.zip",
+    hashes = {
+      { hash = "0c3315af1e2f666a5e1ad63764a45755", label = "Monitor Puzzle Kineko, The - Kinetic Connection (Japan).fds" },
+      { hash = "762aa5c2093344491e95b36c1e6b9166", label = "Monitor Puzzle Kineko, The - Kinetic Connection (Japan).fds" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0075, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time: Seconds 0X" },
+        { address=0X0076, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time: Seconds X0" },
+        { address=0X0077, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time: Minutes 0X" },
+        { address=0X0078, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time: Minutes X0" },
+        { address=0X0079, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time: Hours 0X" },
+        { address=0X007A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time: Hours X0" },
+        { address=0X6F42, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 1: Best Time (16 pieces)" },
+        { address=0X6F48, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 1: Best Time (24 pieces)" },
+        { address=0X6F4E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 1: Best Time (48 pieces)" },
+        { address=0X6FA2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 2: Best Time (16 pieces)" },
+        { address=0X6FA8, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 2: Best Time (24 pieces)" },
+        { address=0X6FAE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 2: Best Time (48 pieces)" },
+        { address=0X7002, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 3: Best Time (16 pieces)" },
+        { address=0X7008, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 3: Best Time (24 pieces)" },
+        { address=0X700E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 3: Best Time (48 pieces)" },
+        { address=0X7062, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 4: Best Time (16 pieces)" },
+        { address=0X7068, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 4: Best Time (24 pieces)" },
+        { address=0X706E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 4: Best Time (48 pieces)" },
+        { address=0X70C2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 5: Best Time (16 pieces)" },
+        { address=0X70C8, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 5: Best Time (24 pieces)" },
+        { address=0X70CE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 5: Best Time (48 pieces)" },
+        { address=0X7122, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 6: Best Time (16 pieces)" },
+        { address=0X7128, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 6: Best Time (24 pieces)" },
+        { address=0X712E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 6: Best Time (48 pieces)" },
+        { address=0X7182, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 7: Best Time (16 pieces)" },
+        { address=0X7188, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 7: Best Time (24 pieces)" },
+        { address=0X718E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 7: Best Time (48 pieces)" },
+        { address=0X71E2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 8: Best Time (16 pieces)" },
+        { address=0X71E8, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 8: Best Time (24 pieces)" },
+        { address=0X71EE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 8: Best Time (48 pieces)" },
+        { address=0X7242, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 9: Best Time (16 pieces)" },
+        { address=0X7248, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 9: Best Time (24 pieces)" },
+        { address=0X724E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 9: Best Time (48 pieces)" },
+        { address=0X72A2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 10: Best Time (16 pieces)" },
+        { address=0X72A8, type="u24le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 10: Best Time (24 pieces)" },
+        { address=0X72AE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[6 bytes] Picture Selection: Picture 10: Best Time (48 pieces)" },
+      },
+    },
+  },
+}

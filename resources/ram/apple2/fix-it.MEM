@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Fix It",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fix-it",
+    file = "fix-it.zip",
+    hashes = {
+      { hash = "fcf1978328dec5ddffcbeaa0c0d40209", label = "Fix It (1985) (Random House).dsk" },
+      { hash = "d0cdf48d06543609bb633fb51568b1ad", label = "Fix It.dsk" },
+    }
+  },
+
+  events = {
+  },
+}

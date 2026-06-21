@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Soul of Darkness",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "soul-of-darkness",
+    file = "soul-of-darkness.zip",
+    hashes = {
+      { hash = "1c7720fe169f414f2948323396b45fd8", label = "Soul of Darkness (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X1E2C90, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Sword Combo LV" },
+        { address=0X1E2C94, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Spear Combo LV -1" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1DD628, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1DD6C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X1DD6C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X1DD6C4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="MAX HP (3с - 78) decreased" },
+        { address=0X1DD6C4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="MAX HP (3с - 78) increased" },
+        { address=0X1DD6C8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Stones decreased" },
+        { address=0X1DD6C8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Stones increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1E2C84, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current Active Weapon" },
+      },
+    },
+  },
+}

@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Illusion of Gaia",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "illusion-of-gaia",
+    file = "illusion-of-gaia.zip",
+    hashes = {
+      { hash = "45ef39d209af53eb7abccd763445f202", label = "Illusion of Time (France).sfc" },
+      { hash = "a7c7a76b4d6f6df389bd631757b91b76", label = "Illusion of Gaia (USA).sfc" },
+      { hash = "a9d5368f701016d00003118a9616f1ce", label = "Illusion of Time (Europe).sfc" },
+      { hash = "b2a35f6f99d0cd44b5ca3fa71bd3145c", label = "Illusion of Gaia (USA) (MSU-1) (Remastered) (thepsynergist).sfc" },
+      { hash = "faf4d7c79daf445d2ca286d8b2f81cab", label = "Illusion of Time (Spain).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0644, type="u8", condition="eq", value=0XFC, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Misc - Title Screen / Obtain Mystic Statue Screen" },
+        { address=0X06A5, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01 = Paused" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X00B8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="zoom (world map)" },
+      },
+      stage = {
+        { address=0X0AEE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage, Number of Enemies" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0A1D, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Force (8)" },
+        { address=0X0AD6, type="u16le", condition="eq", value=0X100, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Life" },
+        { address=0X0AD6, type="u16le", condition="eq", value=0X200, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 Lives" },
+      },
+      health = {
+        { address=0X065A, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player, 16bit Damage=0F00, Dead=F0F0" },
+        { address=0X065B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Player, Damage" },
+        { address=0X09E6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Orcus Stock HP decreased" },
+        { address=0X09E6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Orcus Stock HP increased" },
+        { address=0X0ACA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X0ACA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X0ACE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP (0x28 max) decreased" },
+        { address=0X0ACE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP (0x28 max) increased" },
+        { address=0X0AE2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Orcus HP stock ! decreased" },
+        { address=0X0AE2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Orcus HP stock ! increased" },
+        { address=0X11091, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Orcus Stock Hptrue ? decreased" },
+        { address=0X11091, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Orcus Stock Hptrue ? increased" },
+        { address=0X11476, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Harpie HP decreased" },
+        { address=0X11476, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Harpie HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0AB4, type="u24le", condition="eq", value=0X1B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bag of Gold" },
+        { address=0X0AB4, type="u24le", condition="eq", value=0X27, action="MONEY_STATE", no_log=false, no_survey=false, desc="Crystal Ring" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0644, type="u8", condition="eq", value=0X67, action="BOSS_HIT", no_log=false, no_survey=false, desc="Vampire Boss Room" },
+        { address=0X0644, type="u8", condition="eq", value=0XDD, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pyramid - Mummy Queen Boss Room" },
+        { address=0X110B6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy/Boss HP" },
+        { address=0X110E6, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy/Boss HP" },
+        { address=0X11176, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy/Boss HP" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0AB4, type="u24le", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blue Block" },
+        { address=0X0AE4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Game, Switching Screens" },
+      },
+    },
+  },
+}

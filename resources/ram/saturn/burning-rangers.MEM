@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Burning Rangers",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "burning-rangers",
+    file = "burning-rangers.zip",
+    hashes = {
+      { hash = "d03df4f7cb76753fd6160b6c564a519a", label = "Burning Rangers (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C97CB, type="u8", condition="eq", value=0X0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo + Title Screen" },
+        { address=0X1C97CB, type="u8", condition="eq", value=0X1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Past Title Screen" },
+        { address=0X1FFC52, type="u16le", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="no" },
+        { address=0X1FFC52, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="yes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1AF7FD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="80 = Not in-level" },
+      },
+      stage = {
+        { address=0X1FFC14, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID Backup" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1FFC49, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X188B70, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score in Subgame x100" },
+        { address=0X1EE00A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 1 Best Limit Score" },
+        { address=0X1EE01A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mission 2 Best Limit Score" },
+        { address=0X1EE02A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(guess) Mission 2 Best Limit Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X10F4FD, type="u8", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X11E712, type="u16le", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1446EE, type="u8", condition="eq", value=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1D8AAE, type="u16le", condition="eq", value=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1D98D5, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X127CC4, type="u16le", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X137AF9, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Is this block where the survivor flags are kept?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X148266, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mission Result: Boss Time" },
+        { address=0X1FFC10, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (Overflow)" },
+      },
+    },
+  },
+}

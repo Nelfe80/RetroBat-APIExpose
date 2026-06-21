@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Midway Arcade Treasures",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "midway-arcade-treasures",
+    file = "midway-arcade-treasures.zip",
+    hashes = {
+      { hash = "b96432b223e6de1e419a77f18cfa6196", label = "Midway Arcade Treasures (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB42FB, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="720 - Options - Max continues" },
+        { address=0XDD6B3, type="u32be", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Check [32bit]" },
+        { address=0XDDDDB, type="u32be", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Active" },
+        { address=0X721199, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo/gameplay" },
+        { address=0XA26CF4, type="u32be", condition="eq", value=0X100, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1 credit inserted" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4464D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="720 Degrees - Board Level" },
+        { address=0X4464D5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="720 Degrees - Helmet Level" },
+        { address=0X4464D6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="720 Degrees - Pads Level" },
+        { address=0X4464D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="720 Degrees - Shoes Level" },
+        { address=0X721199, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level transition" },
+        { address=0XA262C5, type="u8", condition="eq", value=0X64, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 100" },
+        { address=0XA262C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gauntlet - Level [8bit Hex]" },
+        { address=0XA26DD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gauntlet - Treasures Collected in Level [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4464CC, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Skate or Die!" },
+        { address=0X721199, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="player died" },
+      },
+      health = {
+        { address=0XA2768B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gauntlet - Health (Ten Thousands) [Lower4] decreased" },
+        { address=0XA2768B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gauntlet - Health (Ten Thousands) [Lower4] increased" },
+        { address=0XA2768D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gauntlet - Health (Thousands) [Lower4] decreased" },
+        { address=0XA2768D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gauntlet - Health (Thousands) [Lower4] increased" },
+        { address=0XA2768F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gauntlet - Health (Hundreds) [Lower4] decreased" },
+        { address=0XA2768F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gauntlet - Health (Hundreds) [Lower4] increased" },
+        { address=0XA27691, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gauntlet - Health (Tens) [Lower4] decreased" },
+        { address=0XA27691, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gauntlet - Health (Tens) [Lower4] increased" },
+        { address=0XA27693, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gauntlet - Health (Ones) [Lower4] decreased" },
+        { address=0XA27693, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gauntlet - Health (Ones) [Lower4] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0000, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Midway Arcade Treasures ID 'GAKE5D' [ASCII 48bit BE]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA26BAE, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Gauntlet - Warrior's Score [32bit BE Hex]" },
+      },
+      collectibles = {
+        { address=0X43DBD5, type="u8", condition="eq", value=0XB8, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB4240, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Options - Defender II [8bit]" },
+        { address=0XB42CF, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Options - Spy Hunter [8bit]" },
+        { address=0X4464CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[720 Degrees]" },
+      },
+    },
+  },
+}

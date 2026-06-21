@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Funky Bee",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "funky-bee",
+    file = "funky-bee.zip",
+    hashes = {
+      { hash = "f2a9dca3455772593a712e9e30dafea3", label = "funkybee.7z <Funky Bee>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001A, type="u8", condition="bit_true", bit=6, mask=0X40, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X001A, type="u8", condition="bit_true", bit=7, mask=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+  },
+}

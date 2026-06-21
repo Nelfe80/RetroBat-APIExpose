@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mario & Sonic at the Olympic Winter Games",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "mario-sonic-at-the-olympic-winter-games",
+    file = "mario-sonic-at-the-olympic-winter-games.zip",
+    hashes = {
+      { hash = "67e58aa36abe18acaf00cafa171da4f6", label = "Mario & Sonic at the Olympic Winter Games (USA) (En,Ja,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "All Night Nippon Super Mario Bros.",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "all-night-nippon-super-mario-bros",
+    file = "all-night-nippon-super-mario-bros.zip",
+    hashes = {
+      { hash = "c8719692d0b9d9649492ffb1c2d26aa3", label = "All Night Nippon Super Mario Bros. (Japan) (Promo).fds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000E, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0770, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Demo" },
+        { address=0X0770, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X001D, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On ground level" },
+        { address=0X00CE, type="u8", condition="eq", value=0XB0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Floor on most levels." },
+      },
+      zone = {
+        { address=0X0770, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="End of World (Flips to 02 on defeating bowser)" },
+        { address=0X07FB, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Worlds 1-8" },
+        { address=0X07FB, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Worlds A-D" },
+        { address=0X07FB, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World set" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X000E, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lives screen/loading" },
+        { address=0X001E, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X0772, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="Exiting Pipe, Lives Screen" },
+      },
+      health = {
+        { address=0X0756, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Powerup State decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0756, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Small" },
+        { address=0X0756, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Big" },
+        { address=0X0756, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Fire" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0756, type="u8", condition="eq", value=0X01, action="TRANSFORMATION_SUPER", no_log=false, no_survey=false, desc="Transformed into Big" },
+        { address=0X0756, type="u8", condition="eq", value=0X02, action="TRANSFORMATION_FIRE", no_log=false, no_survey=false, desc="Transformed into Fire" },
+      },
+      player = {
+        { address=0X0016, type="u8", condition="eq", value=0X0A, action="SWIMMING", no_log=false, no_survey=false, desc="Green Cheep Cheep (swimming)" },
+        { address=0X0016, type="u8", condition="eq", value=0X0B, action="SWIMMING", no_log=false, no_survey=false, desc="Red Cheep Cheep (swimming)" },
+        { address=0X0016, type="u8", condition="eq", value=0X0E, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Winged Green Koopa Troopa" },
+        { address=0X0016, type="u8", condition="eq", value=0X14, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Red Cheep Cheep" },
+        { address=0X001D, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+      },
+    },
+  },
+}

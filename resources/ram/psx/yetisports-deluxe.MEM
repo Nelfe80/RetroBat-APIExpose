@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Yetisports Deluxe",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Sports"
+  },
+
+  rom = {
+    name = "yetisports-deluxe",
+    file = "yetisports-deluxe.zip",
+    hashes = {
+      { hash = "e6c208761247aca99ac0652f6ccf66f2", label = "Yetisports Deluxe (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

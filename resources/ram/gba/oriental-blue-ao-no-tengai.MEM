@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Oriental Blue: Ao no Tengai",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "oriental-blue-ao-no-tengai",
+    file = "oriental-blue-ao-no-tengai.zip",
+    hashes = {
+      { hash = "0fe6daf45e3460cc865ee50029988f3a", label = "Oriental Blue - Ao no Tengai (Japan) (En) (v1.0) (Kingcom, Tom).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF196, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level and gender" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XF198, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Main character's max HP decreased" },
+        { address=0XF198, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Main character's max HP increased" },
+        { address=0XF19A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Main character's current HP - Outside battle decreased" },
+        { address=0XF19A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Main character's current HP - Outside battle increased" },
+        { address=0X269F4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy current HP - dynamic decreased" },
+        { address=0X269F4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy current HP - dynamic increased" },
+        { address=0X269F8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy max HP - dynamic decreased" },
+        { address=0X269F8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy max HP - dynamic increased" },
+        { address=0X27EE4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP in battle - Dynamic decreased" },
+        { address=0X27EE4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP in battle - Dynamic increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1064C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="bit 0 - get treasure shell" },
+        { address=0X106E8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="bit 1 - see man in Daito get Treasure Shell" },
+      },
+    },
+  },
+}

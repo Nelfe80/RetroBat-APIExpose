@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Side Pocket VS",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "side-pocket-vs",
+    file = "side-pocket-vs.zip",
+    hashes = {
+      { hash = "3dbe9be772ca50da3a76d8860c7b08e2", label = "Side Pocket (World).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC1A8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Pocket - Stage ID [8bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC1A0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pocket - Points [16bit]" },
+      },
+    },
+  },
+}

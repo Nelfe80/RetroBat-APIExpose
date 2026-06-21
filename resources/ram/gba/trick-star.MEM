@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Trick Star",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "trick-star",
+    file = "trick-star.zip",
+    hashes = {
+      { hash = "4bfccb544dc5f02581cc574859a82bcb", label = "Trick Star (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+  },
+}

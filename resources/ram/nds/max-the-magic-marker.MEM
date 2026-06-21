@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Max & The Magic Marker",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "max-the-magic-marker",
+    file = "max-the-magic-marker.zip",
+    hashes = {
+      { hash = "2feaabbefc5fdc7a7a39d861d21bb1ed", label = "Max & the Magic Marker (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

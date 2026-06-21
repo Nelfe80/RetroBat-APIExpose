@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Rampage Puzzle Attack",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle-Game"
+  },
+
+  rom = {
+    name = "rampage-puzzle-attack",
+    file = "rampage-puzzle-attack.zip",
+    hashes = {
+      { hash = "580cc4c0a87dd4c40901ddadd90ca76f", label = "Rampage - Puzzle Attack (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X2028, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id - 32 opens final stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X21E9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="countdown until timer expires" },
+        { address=0X4F70, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer - 10 second intervals" },
+        { address=0X4F74, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="timer - up to 10 minutes" },
+        { address=0X4F7C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="timer - up to 10 seconds" },
+        { address=0X4F80, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="timer - every 10 minutes" },
+      },
+    },
+  },
+}

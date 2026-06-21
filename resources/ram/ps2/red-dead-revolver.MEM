@@ -1,0 +1,93 @@
+return {
+  game = {
+    title = "Red Dead Revolver",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "red-dead-revolver",
+    file = "red-dead-revolver.zip",
+    hashes = {
+      { hash = "1a9f22c6a88cd43b66934f5071d1dc52", label = "Red Dead Revolver (USA)" },
+      { hash = "c06c59490d239fb56ace0388ac2b2842", label = "Red Dead Revolver (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4F93DC, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[PAL][bit0 BitFlag:IsTitleMenuDisplayed(alt) |32-bit]" },
+        { address=0X501A38, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="1 => In-Game (Single Player & Showdown Mode), PauseMenu, RetryMenu, GameOver screen" },
+        { address=0X562A0C, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0 => In-game || Game Is Booting Up" },
+        { address=0X73AF0C, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[NTSCU][bit0 BitFlag:IsInPauseMenu |32-bit]" },
+        { address=0X73D68C, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[PAL][bit0 BitFlag:IsInPauseMenu |32-bit]" },
+        { address=0X1F7EC20, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[PAL][18-byte ASCIIFlag:IsEndingCreditsPlaying]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X562A10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL][8-bit:UserInterfaceRenderStackLevel |32-bit]" },
+        { address=0X7405D4, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="> Fairgrounds" },
+        { address=0X7405E0, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="> Fairground - Ruined Homestead" },
+        { address=0X7405E0, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="> Mansion Grounds - Tended Gardens" },
+      },
+      stage = {
+        { address=0X74F500, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[NTSCU][32-bit:SelectedPosterMenuShowdownStageID]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7405CD, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Dan" },
+        { address=0X7405CE, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Mr. Black" },
+        { address=0X7405CE, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Rico Pedrosa" },
+        { address=0X7405CE, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Roberto Pedrosa" },
+        { address=0X7405CF, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Bad Bessie" },
+        { address=0X7405D0, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Renegade Army - General Javier Diego" },
+        { address=0X7405D1, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Loaf Whitney" },
+        { address=0X7405D1, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Greg 'Big Oaf' Whitney" },
+        { address=0X7405D1, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Bloody Tom" },
+        { address=0X7405D2, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Harry 'Hatchet' Schultz" },
+        { address=0X7405D3, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Jesse Lynch" },
+        { address=0X7405D4, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Fort Diego" },
+        { address=0X7405D5, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Diego's Railroad" },
+        { address=0X7405DD, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Longhorn Luke" },
+        { address=0X7405DD, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Holstein Hal" },
+        { address=0X7405DD, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> Wanted Dead or Alive - Sam" },
+        { address=0X7405E3, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="> General Diego" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X7405CD, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Bayonet Rifle" },
+        { address=0X7405CE, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Breech Loader" },
+        { address=0X7405D0, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Thrown Weapons - Dynamite" },
+        { address=0X7405D0, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Escopeta" },
+        { address=0X7405D1, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Halcon Rifle" },
+        { address=0X7405D2, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - High Caliber" },
+        { address=0X7405D3, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Thrown Weapons - Knife" },
+        { address=0X7405D6, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Thrown Weapons - Fire Bottle" },
+        { address=0X7405D8, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Oppressor" },
+        { address=0X7405D8, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Owl Rifle" },
+        { address=0X7405DA, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Repeater Rifle" },
+        { address=0X7405DB, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Sawn Off" },
+        { address=0X7405DC, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Thrown Weapons - Snake Oil" },
+        { address=0X7405DD, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - The Lion" },
+        { address=0X7405DE, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Twelve Gauge" },
+        { address=0X7405DF, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="> Ranged Weapons - Zwei Fasser" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6B4634, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[NTSCJ][1024-byte ASCIIField:MultiplayerScoreboardDisplayText]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7405D4, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="> Broken Creek" },
+        { address=0X7405E1, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="> Broken Creek - Boyhood Home" },
+      },
+    },
+  },
+}

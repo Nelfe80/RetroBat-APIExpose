@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Shin Megami Tensei: Digital Devil Saga",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shin-megami-tensei-digital-devil-saga",
+    file = "shin-megami-tensei-digital-devil-saga.zip",
+    hashes = {
+      { hash = "02697949478c19c0840cca7f13299260", label = "Shin Megami Tensei - Digital Devil Saga (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X116FCE2, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Fury" },
+      },
+      events = {
+        { address=0X116FCDC, type="u8", condition="bit_true", bit=5, mask=0X20, action="COMBO_HIT", no_log=false, no_survey=false, desc="Maragi" },
+        { address=0X116FCDC, type="u8", condition="bit_true", bit=6, mask=0X40, action="COMBO_HIT", no_log=false, no_survey=false, desc="Maragion" },
+        { address=0X116FCDC, type="u8", condition="bit_true", bit=7, mask=0X80, action="COMBO_HIT", no_log=false, no_survey=false, desc="Magagidyne" },
+        { address=0X116FCE6, type="u8", condition="bit_true", bit=0, mask=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Dekunda" },
+        { address=0X116FCE6, type="u8", condition="bit_true", bit=1, mask=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Dekaja" },
+        { address=0X116FCE6, type="u8", condition="bit_true", bit=2, mask=0X04, action="COMBO_HIT", no_log=false, no_survey=false, desc="Megido" },
+        { address=0X116FCE6, type="u8", condition="bit_true", bit=3, mask=0X08, action="COMBO_HIT", no_log=false, no_survey=false, desc="Megidola" },
+        { address=0X116FCE6, type="u8", condition="bit_true", bit=4, mask=0X10, action="COMBO_HIT", no_log=false, no_survey=false, desc="Megidolaon" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1141BB4, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Obtained the Blue Key from the Vanguard member" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1156C70, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="HP Noise x2 at Embryon Base" },
+        { address=0X1156C77, type="u8", condition="bit_true", bit=6, mask=0X40, action="HIT", no_log=false, no_survey=false, desc="Damage Trap in The Citadel 2F" },
+        { address=0X1156C7B, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=false, no_survey=false, desc="HP Noise x2 in Brutes Base B1F" },
+        { address=0X1156C7F, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="HP Noise x2 in Karma Temple -328ft" },
+        { address=0X1156C83, type="u8", condition="bit_true", bit=1, mask=0X02, action="HIT", no_log=false, no_survey=false, desc="Damage Trap in Northern Samsara Tunnels 1" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1141BC8, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Controls the Second Switch in the Vanguards Base" },
+        { address=0X1141BC8, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Controls the Switch in the Vanguards Base" },
+        { address=0X1141BCB, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blue Wall in Vanguard Base destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3D62AC, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="(16-bit) Field Hunt Timer" },
+        { address=0X44A4AC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Times you listened to the HipHop Brothers" },
+      },
+    },
+  },
+}

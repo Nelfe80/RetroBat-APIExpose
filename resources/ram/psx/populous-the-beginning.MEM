@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Populous: The Beginning",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "populous-the-beginning",
+    file = "populous-the-beginning.zip",
+    hashes = {
+      { hash = "dff2662b2fa964ef5555b26694edb5df", label = "Populous - The Beginning (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1EFDE3, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0X1EFDE3, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Failed" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD84A0, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death From Above" },
+      },
+    },
+  },
+}

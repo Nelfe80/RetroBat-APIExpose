@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Melty Blood Actress Again",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "melty-blood-actress-again",
+    file = "melty-blood-actress-again.zip",
+    hashes = {
+      { hash = "eb7c9ef37db8a4269bdb55d7d37d2744", label = "mbaa.zip" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X167444, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+        { address=0X1D701E, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X1E3E32, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Across/Cinch!/Game Over" },
+      },
+      events = {
+        { address=0X21865A, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Hit Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X60E0E, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="50" },
+        { address=0X60E0E, type="u8", condition="eq", value=0X3C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60" },
+        { address=0X60E0E, type="u8", condition="eq", value=0X46, action="NEW_LEVEL", no_log=false, no_survey=false, desc="70" },
+        { address=0X60E0E, type="u8", condition="eq", value=0X50, action="NEW_LEVEL", no_log=false, no_survey=false, desc="80 (Default)" },
+        { address=0X60E0E, type="u8", condition="eq", value=0X5A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="90" },
+        { address=0X60E0E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Settings screen only] Round time setting" },
+        { address=0X60E10, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Decimal] [Settings screen only] CPU Round setting" },
+        { address=0X60E12, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Decimal] [Settings screen only] VS Round setting" },
+        { address=0X18BDB6, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="50" },
+        { address=0X18BDB6, type="u8", condition="eq", value=0X3C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="60" },
+        { address=0X18BDB6, type="u8", condition="eq", value=0X46, action="NEW_LEVEL", no_log=false, no_survey=false, desc="70" },
+        { address=0X18BDB6, type="u8", condition="eq", value=0X50, action="NEW_LEVEL", no_log=false, no_survey=false, desc="80 (Default)" },
+        { address=0X18BDB6, type="u8", condition="eq", value=0X5A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="90" },
+        { address=0X18BDB6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[In-Game only] Round time setting" },
+        { address=0X18BDB8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Decimal] [In-Game only] CPU Round setting" },
+        { address=0X18BDBA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Decimal] [In-Game only] VS Round setting" },
+        { address=0X21ACC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds won this match" },
+        { address=0X21ACC1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds won this match" },
+      },
+      stage = {
+        { address=0XEF6E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1/4 Addresses linked to Stage Number" },
+        { address=0X27A6A0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In-Game Displayed Stage Number" },
+        { address=0X287E56, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1/4 Addresses linked to Stage Number" },
+        { address=0X462594, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Actual Stage Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X217A3C, type="u16le", condition="eq", value=0X0000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X218530, type="u16le", condition="eq", value=0X0000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X217990, type="u8", condition="eq", value=0X17, action="HIT", no_log=false, no_survey=false, desc="Hurt" },
+        { address=0X217A3C, type="u16le", condition="eq", value=0X2C88, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X217A3C, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 - Health Bar" },
+        { address=0X218530, type="u16le", condition="eq", value=0X2C88, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full" },
+        { address=0X218530, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="P2 - Health Bar" },
+        { address=0X21A5D4, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="P1 - Damage dealt in last combo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X21A564, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score" },
+        { address=0X21A740, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2883FC, type="u8", condition="eq", value=0X28, action="BOSS_HIT", no_log=false, no_survey=false, desc="Dust of Osiris (Boss)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X18BDCC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Total all time number of continues used" },
+        { address=0X205F5C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round Timer" },
+      },
+    },
+  },
+}

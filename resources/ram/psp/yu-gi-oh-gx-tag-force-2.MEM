@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! GX Tag Force 2",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "yu-gi-oh-gx-tag-force-2",
+    file = "yu-gi-oh-gx-tag-force-2.zip",
+    hashes = {
+      { hash = "112933ed5b2c44523348edda230337e3", label = "Yu-Gi-Oh! GX - Tag Force 2 (Europe) (En,Fr,De,Es,It) (v2.00).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X90C8D0, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0XAB432C, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+  },
+}

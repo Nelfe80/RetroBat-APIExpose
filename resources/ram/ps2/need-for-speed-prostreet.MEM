@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Need for Speed: ProStreet",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "need-for-speed-prostreet",
+    file = "need-for-speed-prostreet.zip",
+    hashes = {
+      { hash = "3942d5584fb8194cb9f092177034c15c", label = "Need for Speed - ProStreet (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

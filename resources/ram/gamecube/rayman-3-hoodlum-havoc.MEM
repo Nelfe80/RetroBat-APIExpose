@@ -1,0 +1,99 @@
+return {
+  game = {
+    title = "Rayman 3: Hoodlum Havoc",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "rayman-3-hoodlum-havoc",
+    file = "rayman-3-hoodlum-havoc.zip",
+    hashes = {
+      { hash = "b14a68fec4c605bfc87e845d0b5aaabe", label = "Rayman 3 - Hoodlum Havoc (USA) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X49099F, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="active" },
+        { address=0X49099F, type="u8", condition="eq", value=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="inactive" },
+        { address=0X5D854B, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="inactive" },
+        { address=0X5D854B, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="active" },
+        { address=0X5D87A3, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="playing" },
+        { address=0X5D87A3, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+      },
+      events = {
+        { address=0XCBF194, type="u16be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="(16-bit BE) combo bonus" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X28C2EC, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="in control" },
+        { address=0X28C5EC, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="in control" },
+        { address=0X29EA07, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="on" },
+        { address=0X5D90E3, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="standby (missile command)" },
+        { address=0X5D90E3, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="aiming shock rocket" },
+        { address=0X5D90E3, type="u8", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="attack stopping/launched shock rocket" },
+        { address=0X5D90E3, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="attacking" },
+        { address=0X5D90E3, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="surface has been hit" },
+        { address=0X5D90E3, type="u8", condition="eq", value=0X09, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="target has been hit" },
+        { address=0X81A427, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(8-bit) targets in clearleaf forest 3" },
+        { address=0XC8E21E, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="4th teensie in clearleaf forest 3" },
+        { address=0XC8E21E, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="teensie in clearlead forest 4" },
+        { address=0XC8E21F, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1st teensie in clearleaf forest 1" },
+        { address=0XC8E21F, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="2nd teensie in clearleaf forest 1" },
+        { address=0XC8E21F, type="u8", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1st teensie in clearleaf forest 2" },
+        { address=0XC8E21F, type="u8", condition="eq", value=0X3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="2nd teensie in clearleaf forest 2" },
+        { address=0XC8E21F, type="u8", condition="eq", value=0X4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="3rd teensie in clearleaf forest 2" },
+        { address=0XC8E21F, type="u8", condition="eq", value=0X5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="1st teensie in clearleaf forest 3" },
+        { address=0XC8E21F, type="u8", condition="eq", value=0X6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="2nd teensie in clearleaf forest 3" },
+        { address=0XC8E21F, type="u8", condition="eq", value=0X7, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="3rd teensie in clearleaf forest 3" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC8E21C, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st teensie in the land of the livid dead 2" },
+        { address=0XC8E21C, type="u8", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd teensie in the land of the livid dead 3" },
+        { address=0XC8E21C, type="u8", condition="eq", value=0X2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd teensie in the land of the livid dead 3" },
+        { address=0XC8E21C, type="u8", condition="eq", value=0X3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st teensie in the land of the livid dead 3" },
+        { address=0XC8E21D, type="u8", condition="eq", value=0X3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd teensie in the land of the livid dead 1" },
+        { address=0XC8E21D, type="u8", condition="eq", value=0X4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd teensie in the land of the livid dead 1" },
+        { address=0XC8E21D, type="u8", condition="eq", value=0X5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd teensie in the land of the livid dead 1" },
+        { address=0XC8E21D, type="u8", condition="eq", value=0X6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1st teensie in the land of the livid dead 1" },
+        { address=0XC8E21D, type="u8", condition="eq", value=0X7, action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd teensie in the land of the livid dead 2" },
+      },
+      health = {
+        { address=0X56D64C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(32-bit BE) rayman's health decreased" },
+        { address=0X56D64C, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(32-bit BE) rayman's health increased" },
+        { address=0X11C6455, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) bégoniax's hp decreased" },
+        { address=0X11C6455, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) bégoniax's hp increased" },
+        { address=0X11FC23C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) master kaag's hp decreased" },
+        { address=0X11FC23C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) master kaag's hp increased" },
+        { address=0X1240C3C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) health pickups grabbed in the first section of fairy council decreased" },
+        { address=0X1240C3C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) health pickups grabbed in the first section of fairy council increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCBF1C8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(32-bit BE) score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC50687, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="inactive" },
+        { address=0XC50687, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="active" },
+      },
+      player = {
+        { address=0XC503BB, type="u8", condition="eq", value=0X0E, action="JUMPING", no_log=false, no_survey=false, desc="fully charged punch while jumping" },
+        { address=0XC503C7, type="u8", condition="eq", value=0X10, action="JUMPING", no_log=false, no_survey=false, desc="fully charged punch while jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2563E0, type="u16be", condition="eq", value=0X993F, action="DOOR_OPENED", no_log=false, no_survey=false, desc="trying to open the door" },
+      },
+    },
+  },
+}

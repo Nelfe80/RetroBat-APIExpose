@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "King's Valley",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "kings-valley",
+    file = "kings-valley.zip",
+    hashes = {
+      { hash = "dcd8d9508be4fd38fdb4c8f50b16dbe3", label = "King's Valley (Japan, Europe) (En).rom" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X2053, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player not yet Dead; best way to detect a Game Over since the last life 0x00 remains the same on" },
+        { address=0X2053, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game Starting" },
+      },
+    },
+  },
+}

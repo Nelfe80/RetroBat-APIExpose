@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Umihara Kawase Portable",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "umihara-kawase-portable",
+    file = "umihara-kawase-portable.zip",
+    hashes = {
+      { hash = "3a87478045ab8fab1fa557ce142ef0d7", label = "Umihara Kawase Portable (Japan).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Silent Hill: Shattered Memories",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "silent-hill-shattered-memories",
+    file = "silent-hill-shattered-memories.zip",
+    hashes = {
+      { hash = "ea3934ffcc0c9eae1407c66e8f75c1f1", label = "Silent Hill - Shattered Memories (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

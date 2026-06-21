@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Art Style: DIGIDRIVE",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "art-style-digidrive",
+    file = "art-style-digidrive.zip",
+    hashes = {
+      { hash = "cfba429a862171ae38ca0b73d422d08b", label = "Art Style - INTERSECT (Europe, Australia) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1BC35C, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC35F10, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Score post-demo" },
+        { address=0XC3DF90, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Endless Score pre-demo" },
+      },
+    },
+  },
+}

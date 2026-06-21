@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Myth Makers: Super Kart GP",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "myth-makers-super-kart-gp",
+    file = "myth-makers-super-kart-gp.zip",
+    hashes = {
+      { hash = "d3f7f86c7c3ad2d196889a35dec52d4f", label = "Myth Makers - Super Kart GP (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X751314, type="u16le", condition="eq", value=0X07, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="watching credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X751314, type="u16le", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Choosing a level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X45322C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="first player CUP Score" },
+        { address=0X453230, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="second player CUP Score" },
+        { address=0X453234, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="3rd CUP Score" },
+        { address=0X453238, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="4th cup score" },
+        { address=0X45323C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="5th cup score" },
+        { address=0X453240, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="6th cup score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X77A3A8, type="u16le", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X784738, type="u16le", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Worms",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy, Action"
+  },
+
+  rom = {
+    name = "worms",
+    file = "worms.zip",
+    hashes = {
+      { hash = "92bedcf89a0fd50f8a9e2bc956b50c48", label = "Worms (Europe).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

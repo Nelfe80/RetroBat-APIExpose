@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Jaguar XJ220",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "jaguar-xj220",
+    file = "jaguar-xj220.zip",
+    hashes = {
+      { hash = "3cdeb65218bf3434a6fd64ab062be44f", label = "Jaguar XJ220 (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

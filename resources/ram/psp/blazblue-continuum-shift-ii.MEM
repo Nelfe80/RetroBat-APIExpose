@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "BlazBlue: Continuum Shift II",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "blazblue-continuum-shift-ii",
+    file = "blazblue-continuum-shift-ii.zip",
+    hashes = {
+      { hash = "460af0346af126621645c636ec6bba68", label = "BlazBlue - Continuum Shift II (USA) (En,Ja,Zh,Ko) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XBAE753, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBAE754, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBAE755, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBAE756, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBAE757, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBAE758, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBAE759, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBAE75A, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBAE75D, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XBFFCB0, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 round to win" },
+        { address=0XBFFCB0, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 rounds to win" },
+        { address=0XBFFCB0, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 rounds to win" },
+        { address=0XBFFCB0, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4 rounds to win" },
+        { address=0XBFFCB0, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 rounds to win" },
+        { address=0XBFFCB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="NUMBER OF ROUNDS - Arcade (8-bit)" },
+        { address=0XBFFCB4, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 round to win" },
+        { address=0XBFFCB4, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2 rounds to win" },
+        { address=0XBFFCB4, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 rounds to win" },
+        { address=0XBFFCB4, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4 rounds to win" },
+        { address=0XBFFCB4, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 rounds to win" },
+        { address=0XBFFCB4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="NUMBER OF ROUNDS - Versus (8-bit)" },
+      },
+      stage = {
+        { address=0XC3AC20, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE SELECT (8-bit)" },
+        { address=0XC468E8, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0XC468E8, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0XC468E8, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0XC468E8, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0XC468E8, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0XC468E8, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0XCF796C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="LEGION - Choosing Stage (8-bit) 01" },
+        { address=0XCF83EC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="LEGION - Choosing Stage (8-bit) 02" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC2E2D8, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Attack" },
+        { address=0XC46E30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="ABYSS - Reward points (32-bit)" },
+      },
+      collectibles = {
+        { address=0XC2E010, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="MONEY P$ - Total (32-bit) increased" },
+        { address=0XC2E014, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="MONEY P$ - Partial (32-bit) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBFFCBC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Limit - Arcade (8-bit)" },
+        { address=0XBFFCC0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Limit - Versus (8-bit)" },
+      },
+    },
+  },
+}

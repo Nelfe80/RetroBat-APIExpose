@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pit Fighter",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "pit-fighter",
+    file = "pit-fighter.zip",
+    hashes = {
+      { hash = "d3794fd2a601aab217dae8928ef94438", label = "Pit-Fighter (World) (Beta).md" },
+    }
+  },
+
+  events = {
+  },
+}

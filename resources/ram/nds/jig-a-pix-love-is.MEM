@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Jig-A-Pix: Love Is...",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "jig-a-pix-love-is",
+    file = "jig-a-pix-love-is.zip",
+    hashes = {
+      { hash = "212ce2de4bef270dd0a7591ee5b74ff2", label = "Jigapix - Love is (Europe) (En,Fr,De,Es,It,Nl) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0XC28D0, type="u8", condition="eq", value=0X0C85, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sliding Block" },
+      },
+    },
+  },
+}

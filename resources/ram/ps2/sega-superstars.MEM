@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Sega Superstars",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Party"
+  },
+
+  rom = {
+    name = "sega-superstars",
+    file = "sega-superstars.zip",
+    hashes = {
+      { hash = "4a1ee3cb90f4c0b6f56b66d91b51e1d0", label = "Sega Superstars (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X19DBD80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Sonic the Hedgehog - Highscores - Easy" },
+        { address=0X19DC530, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Virtua Fighter - Highscores - Easy" },
+        { address=0X19DC560, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Virtua Fighter - Highscores - Normal" },
+      },
+      collectibles = {
+        { address=0X19DBD78, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total Rings [32bit] increased" },
+      },
+    },
+  },
+}

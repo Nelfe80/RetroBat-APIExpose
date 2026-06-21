@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Lingo",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "lingo",
+    file = "lingo.zip",
+    hashes = {
+      { hash = "cb66b804aea0db325d5f2dd795c71a6a", label = "Lingo (Europe) (En,Fr,De,Nl).gb" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XC0CB, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Team 1 - Score [24bit; BCD]" },
+        { address=0XC0CE, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Team 2 - Score [24bit; BCD]" },
+        { address=0XC521, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 1" },
+        { address=0XC52C, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 2" },
+        { address=0XC537, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 3" },
+        { address=0XC542, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 4" },
+        { address=0XC54D, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 5" },
+        { address=0XC558, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 6" },
+        { address=0XC563, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 7" },
+        { address=0XC56E, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 8" },
+        { address=0XC579, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 9" },
+        { address=0XC584, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 10" },
+        { address=0XC58F, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 11" },
+        { address=0XC59A, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscores - Slot 12" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFF8C, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Guessing - Time left [16bit BE]" },
+      },
+    },
+  },
+}

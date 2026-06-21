@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Bomberman Fantasy Race",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "bomberman-fantasy-race",
+    file = "bomberman-fantasy-race.zip",
+    hashes = {
+      { hash = "94e9de993eeda66641a9fea738a07d7f", label = "Bomberman Fantasy Race (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X148748, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="< POWER-UPS IN MENU > ( SLOT 1 ) decreased" },
+        { address=0X148749, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="< POWER-UPS IN MENU > ( SLOT 2 ) decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X148748, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="POWER BOMB" },
+        { address=0X148748, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="LINE BOMB" },
+        { address=0X148748, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="REMOTE CONTROL" },
+        { address=0X148748, type="u8", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="WING" },
+        { address=0X148748, type="u8", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="ROLLER SHOES" },
+        { address=0X148748, type="u8", condition="eq", value=0X17, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="MINI-HEART" },
+        { address=0X148749, type="u8", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="POWER BOMB" },
+        { address=0X148749, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="LINE BOMB" },
+        { address=0X148749, type="u8", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="REMOTE CONTROL" },
+        { address=0X148749, type="u8", condition="eq", value=0X11, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="WING" },
+        { address=0X148749, type="u8", condition="eq", value=0X14, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="ROLLER SHOES" },
+        { address=0X148749, type="u8", condition="eq", value=0X17, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="MINI-HEART" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X14E134, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="< JUMP FAST >" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1079F, type="u8", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME" },
+        { address=0X1079F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="< ITENS RANDOM >" },
+        { address=0X148738, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="< TIME FINAL > 16-BITS" },
+        { address=0X1487E0, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME TRIAL" },
+        { address=0X1487E0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="< GAME MODES >" },
+        { address=0X14AB20, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="< TIME LAP 1 > 16-BITS" },
+        { address=0X14AB24, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="< TIME LAP 2 > 16-BITS" },
+        { address=0X14AB28, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="< TIME LAP 3 > 16-BITS" },
+        { address=0X14AB38, type="u8", condition="eq", value=0X0E10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="2:00 Min" },
+        { address=0X14AB38, type="u8", condition="eq", value=0X0F3D, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="2:10 Min" },
+        { address=0X14AB38, type="u8", condition="eq", value=0X0FD3, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="2:15 Min" },
+        { address=0X14AB38, type="u8", condition="eq", value=0X1519, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="3:00 Min" },
+        { address=0X14AB38, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="< RESULT TIME LAPS >" },
+      },
+    },
+  },
+}

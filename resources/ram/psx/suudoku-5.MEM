@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Suudoku 5",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Board Game, Puzzle"
+  },
+
+  rom = {
+    name = "suudoku-5",
+    file = "suudoku-5.zip",
+    hashes = {
+      { hash = "deae8f7792dbd07867cb5bf2b25173a6", label = "SuperLite 1500 Series - Suudoku 5 (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X684FC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This tells what stage is selected." },
+        { address=0XCFCD8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="This is for determining if you are in the stage select game mode." },
+      },
+    },
+  },
+}

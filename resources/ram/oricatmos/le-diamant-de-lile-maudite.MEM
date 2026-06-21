@@ -1,0 +1,18 @@
+return {
+  game = {
+    title = "Le Diamant de l'île maudite",
+    system = "oricatmos",
+    system_name = "Oric",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "le-diamant-de-lile-maudite",
+    file = "le-diamant-de-lile-maudite.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+  },
+}

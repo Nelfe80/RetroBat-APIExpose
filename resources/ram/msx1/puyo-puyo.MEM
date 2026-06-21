@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Puyo Puyo",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puyo-puyo",
+    file = "puyo-puyo.zip",
+    hashes = {
+      { hash = "95739c625ce050c2d90cb98d1cd4cc59", label = "Puyo Puyo (1991)(Compile).dsk" },
+      { hash = "cebe5bfa4aeac4a1ef365175087c6a2b", label = "Puyo Puyo (Japan) (En) (v1.0) (232, BiFi).dsk" },
+      { hash = "245bf7b92ee79fb05975575f43e24a31", label = "Puyo Puyo (Japan) (En) (v1.0) (Moonsound) (232, BiFi).dsk" },
+      { hash = "dd3b5a76e81ca2c4c47c1698d3929ceb", label = "Puyo Puyo (Japan) (En) (v1.0) (Old Logo) (232, BiFi).dsk" },
+      { hash = "2cdfeb62120993eb64b9e1c40c5a65db", label = "Puyo Puyo (Japan) (En) (v1.0) (Old Logo) (Moonsound) (232, BiFi).dsk" },
+      { hash = "ed75392eb171db215fa03b5f19c54600", label = "Puyo Puyo (Japan) (En) (v1.0) (Old Logo) (Philips NMS-1205 or Toshiba HX-MU900) (232, BiFi).dsk" },
+      { hash = "a93bdedd8c93d9381aa93105ab701aa7", label = "Puyo Puyo (Japan) (En) (v1.0) (Philips NMS-1205 or Toshiba HX-MU900) (232, BiFi).dsk" },
+      { hash = "2bb19e118d6671b46ed631b637cc3ebe", label = "Puyo Puyo (Japan) (En) (v1.0) (Rainbow Logo) (232, BiFi).dsk" },
+      { hash = "530ecc6070bc155d3dd96a80556ba5ee", label = "Puyo Puyo (Japan) (En) (v1.0) (Rainbow Logo) (Moonsound) (232, BiFi).dsk" },
+      { hash = "cd63658e96d0652c9b7fb7fea666b7e3", label = "Puyo Puyo (Japan) (En) (v1.0) (Rainbow Logo) (Philips NMS-1205 or Toshiba HX-MU900) (232, BiFi).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

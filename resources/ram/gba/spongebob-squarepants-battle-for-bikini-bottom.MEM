@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "SpongeBob SquarePants: Battle for Bikini Bottom",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "spongebob-squarepants-battle-for-bikini-bottom",
+    file = "spongebob-squarepants-battle-for-bikini-bottom.zip",
+    hashes = {
+      { hash = "e84de432672187d3d0b8f4d4d654013b", label = "SpongeBob SquarePants - Battle for Bikini Bottom (Europe) (En,Fr,De).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7C7A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quit Level" },
+        { address=0X7C7A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level" },
+        { address=0X7C7A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Retry Level" },
+        { address=0XBBCC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID when entering a level" },
+        { address=0XBBE0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID when loaded into a level" },
+        { address=0XBBF8, type="u8", condition="eq", value=0X1C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="All 28 Levels unlocked" },
+        { address=0XBBF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tracks unlocked levels" },
+        { address=0XBC14, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max Amount of Krabby Patties in a Level (always 0x14)" },
+        { address=0X13FE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Spongebobs Postion on the current Chapter Overworld" },
+        { address=0X13FEC, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chapter Map, aswell as Level 1" },
+        { address=0X13FEC, type="u8", condition="eq", value=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Level Status" },
+        { address=0X240A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Swallowed an Object with Mystery (in Level 1-3)" },
+      },
+      stage = {
+        { address=0XBBCC, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Stage 1" },
+        { address=0XBBCC, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Stage 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBC08, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifes increased" },
+        { address=0XBC08, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifes decreased" },
+        { address=0XBC0C, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+      health = {
+        { address=0XBC0C, type="u8", condition="eq", value=0X03, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0XBC0C, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health" },
+        { address=0X1F18A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Robo Sandy Health decreased" },
+        { address=0X1F18A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Robo Sandy Health increased" },
+        { address=0X20158, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Robo Sponge Phase 2 Health decreased" },
+        { address=0X20158, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Robo Sponge Phase 2 Health increased" },
+        { address=0X209B8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Robo Sponge Phase 1 Health decreased" },
+        { address=0X209B8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Robo Sponge Phase 1 Health increased" },
+        { address=0X20A74, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Robo Squidward Health decreased" },
+        { address=0X20A74, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Robo Squidward Health increased" },
+        { address=0X2E074, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Robo Patrick Health decreased" },
+        { address=0X2E074, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Robo Patrick Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XBBCC, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Level" },
+        { address=0X13FE8, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hover over Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X205DE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Swallowed an Object with Mystery (in Phase 2 of Spongebot)" },
+        { address=0X20FBF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Swallowed an Object with Mystery (in Phase 1 of Spongebot)" },
+      },
+    },
+  },
+}

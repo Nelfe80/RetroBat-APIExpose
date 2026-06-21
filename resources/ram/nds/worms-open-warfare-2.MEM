@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Worms: Open Warfare 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "worms-open-warfare-2",
+    file = "worms-open-warfare-2.zip",
+    hashes = {
+      { hash = "4635b3b50d27160dc624ebdfa2edc53a", label = "Worms - Open Warfare 2 (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

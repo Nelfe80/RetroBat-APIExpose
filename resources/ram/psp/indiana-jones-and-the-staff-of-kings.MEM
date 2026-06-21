@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Indiana Jones and the Staff of Kings",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "indiana-jones-and-the-staff-of-kings",
+    file = "indiana-jones-and-the-staff-of-kings.zip",
+    hashes = {
+      { hash = "806aea021fab66943eca8ebe189e9884", label = "Indiana Jones and the Staff of Kings (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E700E9, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X1E700E9, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C7418A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Unlock Flag - San Francisco Skyline (8-bit)" },
+        { address=0X1C7418B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - San Francisco Skyline - Grad Student Difficulty (8-bit)" },
+        { address=0X1C7418C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - San Francisco Skyline - Archaeologist Difficulty (8-bit)" },
+        { address=0X1C7418D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - San Francisco Skyline - Adventurer Difficulty (8-bit)" },
+        { address=0X1C74211, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Unlock Flag - Panama (8-bit)" },
+        { address=0X1C74212, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Panama - Grad Student Difficulty (8-bit)" },
+        { address=0X1C74213, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Panama - Archaeologist Difficulty (8-bit)" },
+        { address=0X1C74214, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Completion Flag - Panama - Adventurer Difficulty (8-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1E70174, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (Float) decreased" },
+        { address=0X1E70174, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (Float) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1C74270, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Fortune Points (32-bit)" },
+      },
+      collectibles = {
+        { address=0X1CAE221, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Cheat Flag - Infinite Ammo (8-bit)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1CAE220, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Cheat Flag - Invincible Indy (8-bit)" },
+      },
+    },
+  },
+}

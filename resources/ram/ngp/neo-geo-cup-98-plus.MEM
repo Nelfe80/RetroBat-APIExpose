@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Neo Geo Cup '98 Plus",
+    system = "ngp",
+    system_name = "Neo Geo Pocket",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "neo-geo-cup-98-plus",
+    file = "neo-geo-cup-98-plus.zip",
+    hashes = {
+      { hash = "a6c3369f28558e4a9719dc54d50be713", label = "NeoGeo Cup '98 Plus Color - Pocket Sports Series (World) (En,Ja).ngc" },
+    }
+  },
+
+  events = {
+  },
+}

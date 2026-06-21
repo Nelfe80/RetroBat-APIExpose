@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Ribbit King",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "ribbit-king",
+    file = "ribbit-king.zip",
+    hashes = {
+      { hash = "dfe16c6dc6435b08920ed412b3fe7914", label = "Ribbit King (USA) (En,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X43D580, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Player 1 (You) has got the frog in the goal." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X20BB78, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Results Score" },
+        { address=0X20BB7C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Results Score" },
+        { address=0X3CC71C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score" },
+        { address=0X43D5F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player Score" },
+        { address=0X43D6D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Score" },
+      },
+      collectibles = {
+        { address=0X218A80, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X218A31, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Total amount of Item - Jump-Pump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X218A4C, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Pan-Pan 2 (Second time)" },
+        { address=0X218A4D, type="u8", condition="bit_true", bit=0, mask=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Pepe, Pappy, Papoo (Second Time)" },
+        { address=0X218A4D, type="u8", condition="bit_true", bit=1, mask=0X02, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sir Waddlelot 2 (Second Time)" },
+        { address=0X218A4D, type="u8", condition="bit_true", bit=2, mask=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gumbah-Goo (Second Time)" },
+        { address=0X218A4D, type="u8", condition="bit_true", bit=3, mask=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Kosmo 2 (Second Time)" },
+        { address=0X218A4D, type="u8", condition="bit_true", bit=4, mask=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Princess Tippi 2 (Second Time)" },
+        { address=0X218A4D, type="u8", condition="bit_true", bit=5, mask=0X20, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lunk 2 (Second Time)" },
+        { address=0X218A4D, type="u8", condition="bit_true", bit=6, mask=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sparky & Whoosh 2 (Second Time)" },
+        { address=0X218A94, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times saved" },
+      },
+    },
+  },
+}

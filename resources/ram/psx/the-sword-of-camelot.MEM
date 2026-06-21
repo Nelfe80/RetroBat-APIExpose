@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Sword of Camelot",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-sword-of-camelot",
+    file = "the-sword-of-camelot.zip",
+    hashes = {
+      { hash = "fa570d102f0b4cf0c47ea838dd51c03e", label = "Sword of Camelot, The (Europe) (En,Fr,De,Nl)" },
+    }
+  },
+
+  events = {
+  },
+}

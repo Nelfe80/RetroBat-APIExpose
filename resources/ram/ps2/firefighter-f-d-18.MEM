@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Firefighter F.D.18",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "firefighter-f-d-18",
+    file = "firefighter-f-d-18.zip",
+    hashes = {
+      { hash = "21c44d3028d1d9934ad4ccc3bf017a3f", label = "Firefighter F.D.18 (USA)" },
+      { hash = "b9842de18caf0895ae0b7e82c771c5e8", label = "Firefighter F.D.18 (Europe) (En,Fr,De,Es,It)" },
+      { hash = "17beb1762e88da46681b5bf0dddb232c", label = "Firefighter F.D.18 (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X5A530C, type="u16le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Test Level" },
+      },
+      stage = {
+        { address=0X5A513C, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X5A530C, type="u16le", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 (Tunnel)" },
+        { address=0X5A530C, type="u16le", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2-1" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5A530C, type="u16le", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[NTSCU]" },
+      },
+    },
+  },
+}

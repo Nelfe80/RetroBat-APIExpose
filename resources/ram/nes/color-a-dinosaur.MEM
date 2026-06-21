@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Color a Dinosaur",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Education, Sandbox"
+  },
+
+  rom = {
+    name = "color-a-dinosaur",
+    file = "color-a-dinosaur.zip",
+    hashes = {
+      { hash = "99dd1d23a46e68b7163dbc5bb69b9929", label = "Color a Dinosaur (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001F, type="u8", condition="eq", value=0X91, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Dino Select, opening, credits" },
+        { address=0X001F, type="u8", condition="eq", value=0XAD, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+  },
+}

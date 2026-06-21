@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Color Cross",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "color-cross",
+    file = "color-cross.zip",
+    hashes = {
+      { hash = "b2d210cf5ff98186fef74367bc1a2aed", label = "Colour Cross (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

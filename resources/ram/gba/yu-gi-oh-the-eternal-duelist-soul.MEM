@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Yu-Gi-Oh! The Eternal Duelist Soul",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "yu-gi-oh-the-eternal-duelist-soul",
+    file = "yu-gi-oh-the-eternal-duelist-soul.zip",
+    hashes = {
+      { hash = "ec3f000ffde5754cb164a05d2d6f9053", label = "Yu-Gi-Oh! - The Eternal Duelist Soul (USA).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X212E4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Life Points increased" },
+        { address=0X212E4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Life Points decreased" },
+        { address=0X22048, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy Life Points (16 bit) increased" },
+        { address=0X22048, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Life Points (16 bit) decreased" },
+      },
+    },
+  },
+}

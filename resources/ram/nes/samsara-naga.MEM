@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Samsara Naga",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "samsara-naga",
+    file = "samsara-naga.zip",
+    hashes = {
+      { hash = "39e824fb5c780b2cce2ee33d36f1066d", label = "Samsara Naga (Japan) (En) (v1.01) (Aishsha, Stardust Crusaders).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X050C, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Has seen title crawl" },
+        { address=0X7CDF, type="u8", condition="eq", value=0X55, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits playing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X7789, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dragon has grown bigger (Level 2)" },
+        { address=0X7789, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dragon has grown bigger (Level 3)" },
+        { address=0X7789, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dragon has grown bigger (Level 4)" },
+        { address=0X7789, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dragon has grown bigger (Level 5)" },
+      },
+      zone = {
+        { address=0X7795, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ala Singh spoke to you upon entering the Dragon World" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0388, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #1 Health decreased" },
+        { address=0X0388, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #1 Health increased" },
+        { address=0X03A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #2 Health decreased" },
+        { address=0X03A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #2 Health increased" },
+        { address=0X03C8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #3 Health decreased" },
+        { address=0X03C8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #3 Health increased" },
+        { address=0X03E8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #4 Health decreased" },
+        { address=0X03E8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #4 Health increased" },
+        { address=0X0408, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #5 Health decreased" },
+        { address=0X0408, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #5 Health increased" },
+        { address=0X0428, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #6 Health decreased" },
+        { address=0X0428, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #6 Health increased" },
+        { address=0X0448, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #7 Health decreased" },
+        { address=0X0448, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #7 Health increased" },
+        { address=0X0468, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #8 Health decreased" },
+        { address=0X0468, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #8 Health increased" },
+        { address=0X7720, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X7720, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X774C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dragon Health decreased" },
+        { address=0X774C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dragon Health increased" },
+        { address=0X7750, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dragon Health decreased" },
+        { address=0X7750, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dragon Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X032A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money Gambled in Melon Game increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6380, type="u8", condition="eq", value=0X54, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Snapper Shield" },
+        { address=0X6380, type="u8", condition="eq", value=0X55, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Falun Shield" },
+        { address=0X6380, type="u8", condition="eq", value=0X56, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Fire Shield" },
+        { address=0X6380, type="u8", condition="eq", value=0X57, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Rusted Shield" },
+        { address=0X6380, type="u8", condition="eq", value=0X58, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Mossy Shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X779B, type="u8", condition="bit_true", bit=1, mask=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Used Letter of Introduction on the door guard. Resets after leaving Hoverpool" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X000C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy Party Composition" },
+      },
+    },
+  },
+}

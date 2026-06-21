@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "SpongeBob SquarePants: Creature from the Krusty Krab",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "spongebob-squarepants-creature-from-the-krusty-krab",
+    file = "spongebob-squarepants-creature-from-the-krusty-krab.zip",
+    hashes = {
+      { hash = "37fd8b9f4a80cc4b1af5bb857b95d61d", label = "SpongeBob SquarePants - Creature from the Krusty Krab (Europe) (En,Fr,De,Nl).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X110B84, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Remaining Lives (8-bit) increased" },
+        { address=0X110B84, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Remaining Lives (8-bit) decreased" },
+      },
+      health = {
+        { address=0X110B94, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Remaining Health Blocks (8-bit) decreased" },
+        { address=0X110B94, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Remaining Health Blocks (8-bit) increased" },
+      },
+    },
+  },
+}

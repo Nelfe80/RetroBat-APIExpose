@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Xybots",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "xybots",
+    file = "xybots.zip",
+    hashes = {
+      { hash = "c145bfe904e5d56f479df44204b255da", label = "Xybots (USA, Europe).lnx" },
+    }
+  },
+
+  events = {
+  },
+}

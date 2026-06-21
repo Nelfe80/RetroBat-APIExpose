@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Dance Dance Revolution: 3rd Mix",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "dance-dance-revolution-3rd-mix",
+    file = "dance-dance-revolution-3rd-mix.zip",
+    hashes = {
+      { hash = "5f023b5876b6ce6ab8ea90bb072b4ac9", label = "Dance Dance Revolution 3rd Mix (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA47F0, type="u16le", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XA47F0, type="u16le", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XA47F0, type="u16le", condition="eq", value=0X1D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XA47F0, type="u16le", condition="eq", value=0X25, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XAA780, type="u16le", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XAA780, type="u16le", condition="eq", value=0X1D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XAF498, type="u16le", condition="eq", value=0X14, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XAF498, type="u16le", condition="eq", value=0X1D, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+      events = {
+        { address=0XA51F8, type="u32le", condition="eq", value=0X3E8, action="COMBO_HIT", no_log=false, no_survey=false, desc="1000" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBC188, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [DDR 3] Options - Game Level" },
+        { address=0XBC1A0, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 1" },
+        { address=0XBC1A0, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 2" },
+        { address=0XBC1A0, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 3" },
+        { address=0XBC1A0, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 4" },
+        { address=0XBC1A0, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 5" },
+        { address=0XBC1A0, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 6" },
+        { address=0XBC1A0, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 7" },
+        { address=0XBC1A0, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 8" },
+        { address=0XBC1A1, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 9" },
+        { address=0XBC1A1, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 10" },
+        { address=0XBC1A1, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 11" },
+        { address=0XBC1A1, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 12" },
+        { address=0XBC1A2, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 1 Selected" },
+        { address=0XBC1A2, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 2 Selected" },
+        { address=0XBC1A2, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 3 Selected" },
+        { address=0XBC1A2, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 4 Selected" },
+        { address=0XBC1A2, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 5 Selected" },
+        { address=0XBC1A2, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 6 Selected" },
+        { address=0XBC1A2, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 7 Selected" },
+        { address=0XBC1A2, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 8 Selected" },
+        { address=0XBC1A3, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 9 Selected" },
+        { address=0XBC1A3, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 10 Selected" },
+        { address=0XBC1A3, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 11 Selected" },
+        { address=0XBC1A3, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background 12 Selected" },
+        { address=0XBD584, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0XC1058, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [DDR 2] Options - Game Level" },
+        { address=0XC5D78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [DDR 1] Options - Game Level" },
+        { address=0XC5D79, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Soft (Default)" },
+        { address=0XC5D79, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [DDR 1] Options - Default Level" },
+      },
+      stage = {
+        { address=0XBC18A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] [DDR 3] Options - Max Stage (Soft)" },
+        { address=0XBC18B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] [DDR 3] Options - Max Stage (Medium/Tough)" },
+        { address=0XC5D7A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] [DDR 1] Options - Max Stage (Soft)" },
+        { address=0XC5D7B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] [DDR 1] Options - Max Stage (Medium)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X101A8, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diet Mode" },
+        { address=0X101A8, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diet" },
+        { address=0XA47F2, type="u8", condition="eq", value=0X31, action="LOSE_LIFE", no_log=false, no_survey=false, desc="DEAD END" },
+      },
+    },
+  },
+}

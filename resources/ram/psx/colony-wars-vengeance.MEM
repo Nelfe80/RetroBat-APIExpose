@@ -1,0 +1,121 @@
+return {
+  game = {
+    title = "Colony Wars: Vengeance",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Flight Simulator"
+  },
+
+  rom = {
+    name = "colony-wars-vengeance",
+    file = "colony-wars-vengeance.zip",
+    hashes = {
+      { hash = "58557a475c49839eae8d928bb4fe8cbf", label = "Colony Wars - Vengeance (Europe)" },
+      { hash = "695c9dcf3ed2654d9dbd029db7610a3e", label = "Colony Wars - Vengeance (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X34450, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x1 - In-game pause. Setting this value without pressing pause button disables HUD and controls" },
+        { address=0X34C8C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x2 - Demo playback is active." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X11B2C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[NTSC] Index of mission sub-level to load after being successful at current sub-level." },
+        { address=0X11B588, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[PAL] Index of mission sub-level to load after being successful at current sub-level." },
+      },
+      stage = {
+        { address=0X41411, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="For Act 1" },
+        { address=0X59D72, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act (set of missions) index selected in main menu, stays same while in-game" },
+        { address=0X59D74, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mission index of act selected, stays same while in-game" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X11CAD0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Selected primary weapon index" },
+        { address=0X11CAE0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Total amount of weapons" },
+        { address=0X11CD90, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Selected primary weapon index" },
+        { address=0X11CDA0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Total amount of weapons" },
+        { address=0X12E21C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 1 heat. 4 bytes" },
+        { address=0X12E224, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 1 icon" },
+        { address=0X12E228, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 1, shots left. 4 bytes" },
+        { address=0X12E274, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 2 heat. 4 bytes" },
+        { address=0X12E280, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 2, shots left. 4 bytes" },
+        { address=0X12E2CC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 3 heat. 4 bytes" },
+        { address=0X12E324, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 4 heat. 4 bytes" },
+        { address=0X12E330, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 4, shots left. 4 bytes" },
+        { address=0X12E388, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 5, shots left. 4 bytes" },
+        { address=0X12E3E0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 6, shots left. 4 bytes" },
+        { address=0X12E438, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 7, shots left. 4 bytes" },
+        { address=0X12E490, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 8, shots left. 4 bytes" },
+        { address=0X12E4DC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 1 heat. 4 bytes" },
+        { address=0X12E4E4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 1 icon" },
+        { address=0X12E4E8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 9, shots left. 4 bytes" },
+        { address=0X12E534, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 2 heat. 4 bytes" },
+        { address=0X12E58C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 3 heat. 4 bytes" },
+        { address=0X12E5E4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 4 heat. 4 bytes" },
+        { address=0X12E5F0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 4, shots left. 4 bytes" },
+        { address=0X12E648, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 5, shots left. 4 bytes" },
+        { address=0X12E6A0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 6, shots left. 4 bytes" },
+        { address=0X12E6F8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 7, shots left. 4 bytes" },
+        { address=0X12E750, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 8, shots left. 4 bytes" },
+        { address=0X12E7A8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[PAL] Player's weapon 9, shots left. 4 bytes" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X34444, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Infinite shields/hull cheat, activated by entering 'Vampire' as password increased" },
+        { address=0X34445, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Level select cheat, activated by entering 'Demon' as password increased" },
+        { address=0X34446, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Infinite secondary weapons cheat, activated by entering 'Chimera' as password increased" },
+        { address=0X34447, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="No weapon overheat cheat, activated by entering 'Dark*Angel' as password increased" },
+        { address=0X3444B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="All weapons cheat, activated by entering 'Tornado' as password increased" },
+        { address=0X12E220, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 1 cooldown until next firing, 4 bytes increased" },
+        { address=0X12E34C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[NTSC] Player's weapon 4 unknown counter. Increases during leach beam firing. 4 bytes increased" },
+        { address=0X12E4E0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[PAL] Player's weapon 1 cooldown until next firing, 4 bytes increased" },
+        { address=0X12E60C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[PAL] Player's weapon 4 unknown counter. Increases during leach beam firing. 4 bytes increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X45FB4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Player's shields. 4 bytes" },
+        { address=0X46734, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 01 - shields. 4 bytes" },
+        { address=0X469B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 02 - shields. 4 bytes" },
+        { address=0X46C34, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 03 - shields. 4 bytes" },
+        { address=0X46EB4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 04 - shields. 4 bytes" },
+        { address=0X47134, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 05 - shields. 4 bytes" },
+        { address=0X473B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 06 - shields. 4 bytes" },
+        { address=0X47634, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 07 - shields. 4 bytes" },
+        { address=0X478B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 08 - shields. 4 bytes" },
+        { address=0X47B34, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 09 - shields. 4 bytes" },
+        { address=0X47DB4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 10 - shields. 4 bytes" },
+        { address=0X48034, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 11 - shields. 4 bytes" },
+        { address=0X482B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 12 - shields. 4 bytes" },
+        { address=0X48534, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 13 - shields. 4 bytes" },
+        { address=0X487B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 14 - shields. 4 bytes" },
+        { address=0X48A34, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 15 - shields. 4 bytes" },
+        { address=0X48CB4, type="u16le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 16 - shields. 4 bytes" },
+        { address=0X48F34, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entity instance 17 - shields. 4 bytes" },
+        { address=0X5513A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Hex - shield upgrade tech tokens spent" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4CFF2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Entity ID 03 - objective count, 2 bytes" },
+        { address=0X4D0BE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Entity ID 06 - objective count, 2 bytes" },
+        { address=0X4D146, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Entity ID 08 - objective count, 2 bytes" },
+        { address=0X11A96C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[NTSC] 19-1, Alien weblock state" },
+        { address=0X11A994, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[NTSC] 19-1, Alien weblock state" },
+        { address=0X11AC2C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[PAL] 19-1, Alien weblock state" },
+        { address=0X11AC54, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[PAL] 19-1, Alien weblock state" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4CF6A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Entity ID 01 - objective count, 2 bytes" },
+      },
+    },
+  },
+}

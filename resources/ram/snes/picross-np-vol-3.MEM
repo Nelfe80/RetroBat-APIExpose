@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Picross NP Vol. 3",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picross-np-vol-3",
+    file = "picross-np-vol-3.zip",
+    hashes = {
+      { hash = "054ecba340b1e525bf276031c46f5421", label = "Picross NP Vol. 3 (Japan) (NP).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

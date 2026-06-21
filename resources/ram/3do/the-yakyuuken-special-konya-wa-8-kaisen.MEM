@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "The Yakyuuken Special: Kon'ya wa 8-kaisen!!",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-yakyuuken-special-konya-wa-8-kaisen",
+    file = "the-yakyuuken-special-konya-wa-8-kaisen.zip",
+    hashes = {
+      { hash = "cb4fa2a7d8b6c1750ef10cced6336885", label = "Yakyuuken Special, The (Japan)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X893F4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8-bits] Boy lives 05-00 increased" },
+        { address=0X893F4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-bits] Boy lives 05-00 decreased" },
+        { address=0X893F6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8-bits] Girl lives 05-00 increased" },
+        { address=0X893F6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8-bits] Girl lives 05-00 decreased" },
+      },
+    },
+  },
+}

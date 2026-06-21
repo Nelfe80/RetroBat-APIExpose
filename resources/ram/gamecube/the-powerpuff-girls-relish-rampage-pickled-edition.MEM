@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Powerpuff Girls: Relish Rampage: Pickled Edition",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-powerpuff-girls-relish-rampage-pickled-edition",
+    file = "the-powerpuff-girls-relish-rampage-pickled-edition.zip",
+    hashes = {
+      { hash = "26696771fd4452fc65127595aa82957e", label = "Powerpuff Girls, The - Relish Rampage - Pickled Edition (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

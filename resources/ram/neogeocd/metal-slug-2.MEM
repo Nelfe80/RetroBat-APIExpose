@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Metal Slug 2",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "metal-slug-2",
+    file = "metal-slug-2.zip",
+    hashes = {
+      { hash = "1122a5c4348616c4e94b1ba9eeb9c87d", label = "Metal Slug 2 (Japan, USA) (En,Ja)" },
+      { hash = "2da3c9c727df44e16a8c8a31ee7cb7e2", label = "Metal Slug 2 (World) (En,Ja) (Slowdown Reduction Patch) (v1.0) (system11, SmokeMonster)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X114E, type="u16be", condition="eq", value=0XFA06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X114E, type="u16be", condition="eq", value=0X4E08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonstration" },
+        { address=0XC18D, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="P1 - Continues Used [8 bits] [1]" },
+        { address=0XC315, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Combat School/Art Gallery menus" },
+        { address=0XC323, type="u8", condition="eq", value=0X06, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending Credits" },
+        { address=0XECE1, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="P1 - Continues Used [8 bits] [2, Main]" },
+        { address=0XF6F8, type="u8", condition="eq", value=0X16, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XF6F8, type="u8", condition="eq", value=0X18, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="End Title Again" },
+        { address=0XF6F8, type="u8", condition="eq", value=0X19, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Counter" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Counter" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1276, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 - Lives [8 bits] increased" },
+        { address=0X1276, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 - Lives [8 bits] decreased" },
+        { address=0XFD88, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="5 lives (default)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1525, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Normal - Carrying a Weapon" },
+        { address=0XC34E, type="u8", condition="eq", value=0XFF, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Handgun" },
+        { address=0XC34E, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0XC34E, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rocket Launcher" },
+        { address=0XC34E, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flame Shot" },
+        { address=0XC34E, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="H.Machine Gun" },
+        { address=0XC34E, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Gun" },
+        { address=0XC34E, type="u8", condition="eq", value=0X05, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Super Devil" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC18A, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score [32 bits BE]" },
+        { address=0XC194, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score [32 bits BE]" },
+        { address=0XE89B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="C.S - Previous Rank Points (Dialogue) [ASCII 4 bytes]" },
+        { address=0XE8A0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="C.S - New Rank Points (Dialogue) [ASCII 4 bytes]" },
+        { address=0XE9C0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="C.S [Slot 1] - Survival Finished [Bit7] // award 10 points to total score" },
+      },
+      collectibles = {
+        { address=0XC354, type="u16be", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="P1 - Ammo [16 bits BE]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF6F8, type="u8", condition="eq", value=0X15, action="BOSS_HIT", no_log=false, no_survey=false, desc="Steel Beast 6beets (Boss Fight)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XFDB6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 - Active State [8 bits]" },
+        { address=0XFDB7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 - Active State [8 bits]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Silent Hill: Shattered Memories",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "silent-hill-shattered-memories",
+    file = "silent-hill-shattered-memories.zip",
+    hashes = {
+      { hash = "4a4734848f30aee0ba1eb596a559cf4a", label = "Silent Hill - Shattered Memories (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBC4828, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitles 0x00 off 0x01 on" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF08858, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Screen flicker on a tv monitor" },
+        { address=0X181A709, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="0x01 - Video store back door unlocked" },
+      },
+    },
+  },
+}

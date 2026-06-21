@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Pucca: Power Up",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "pucca-power-up",
+    file = "pucca-power-up.zip",
+    hashes = {
+      { hash = "085b9016354ced56705aea71e9414bb9", label = "Pucca - Power Up (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X11923C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level number" },
+      },
+      stage = {
+        { address=0X117B38, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage intros bought in shop" },
+        { address=0X117B39, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage outros bought in shop" },
+        { address=0X117B3B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Extra stage bought in shop" },
+        { address=0X119238, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X117B1B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X117B1B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X11276C, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage animation?" },
+        { address=0X117B00, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health bar shows what your health is does not change health decreased" },
+        { address=0X117B00, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health bar shows what your health is does not change health increased" },
+        { address=0X117B19, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health decreased" },
+        { address=0X117B19, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health increased" },
+        { address=0X2E9A8C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health value that does affect your health decreased" },
+        { address=0X2E9A8C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health value that does affect your health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11792C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mini game timer" },
+      },
+    },
+  },
+}

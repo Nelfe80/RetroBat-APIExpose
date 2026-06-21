@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Kowai Shashin: Shinrei Shashin Kitan",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "kowai-shashin-shinrei-shashin-kitan",
+    file = "kowai-shashin-shinrei-shashin-kitan.zip",
+    hashes = {
+      { hash = "2bc6d35cdee7926e87a62b19a1d93a23", label = "Kowai Shashin - Shinrei Shashin Kitan (Japan) (En) (v1.1) (SnowyAria)" },
+      { hash = "924be31bba372e6c9c1f5bbad8bb3c5c", label = "Kowai Shashin - Shinrei Shashin Kitan (Japan) (En) (v1.0) (SnowyAria)" },
+      { hash = "ab690db3493fa932d7c7c3bbb9a1d6ef", label = "Kowai Shashin - Shinrei Shashin Kitan (Japan) (En) (v1.0) (Random Edition) (SnowyAria)" },
+      { hash = "eb9dba80cb58018e27f0f46157cc741a", label = "Kowai Shashin - Shinrei Shashin Kitan (Japan) (En) (v1.1) (Random Edition) (SnowyAria)" },
+      { hash = "fbac33a36c83276eb15fc7916917a339", label = "Kowai Shashin - Shinrei Shashin Kitan (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X9FE42, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Max combo gotten" },
+        { address=0XFFC2E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo get" },
+        { address=0XFFC30, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo done" },
+        { address=0XFFC32, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo state variable" },
+      },
+    },
+  },
+}

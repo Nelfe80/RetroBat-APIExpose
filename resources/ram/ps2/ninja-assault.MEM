@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Ninja Assault",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "ninja-assault",
+    file = "ninja-assault.zip",
+    hashes = {
+      { hash = "fcc7c232f0c2d77159848bf184e14b0d", label = "Ninja Assault (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X955808, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] game score" },
+      },
+      collectibles = {
+        { address=0X9557FA, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[8bit] ammo" },
+      },
+    },
+  },
+}

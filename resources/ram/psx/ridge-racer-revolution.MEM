@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Ridge Racer Revolution",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "ridge-racer-revolution",
+    file = "ridge-racer-revolution.zip",
+    hashes = {
+      { hash = "309e3f318b930369594fa43cbf6e1b19", label = "Ridge Racer Revolution (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X72486, type="u8", condition="eq", value=0X0000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/Everywhere else" },
+        { address=0X1DD824, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Start" },
+        { address=0X1DD824, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Options" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1950EC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - type of speed level:" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7D034, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bit) - score record for drifting mode (novice track)" },
+        { address=0X1DD21C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bit) - current score for drifting mode (novice track)" },
+      },
+      collectibles = {
+        { address=0X76D00, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) - 01 during race and demo mode, 00 - during menu increased" },
+        { address=0X194CB1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) - 01 during race and demo mode, 00 - during menu increased" },
+        { address=0X1DD82C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) - ???? unstable - 01 - during race and in menu, 00 - other time increased" },
+        { address=0X1DE318, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bits) - Number of alien destroyed during Galaga mini game increased" },
+        { address=0X1FFDD2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(8 bit) - do not use, sometimes strange behaviour - 01 during race, 00 - during menu and pause s" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7C3FC, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X7C52C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - 1st lap time (in milli seconds)" },
+        { address=0X7C530, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - 2nd lap time" },
+        { address=0X7C534, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - 3rd lap time" },
+        { address=0X194974, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8 bit) - Demo mode = 01 / other time = 00" },
+        { address=0X1DC9C0, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X1DD3B4, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the novice track (in milli seconds)" },
+        { address=0X1DD3C0, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the novice track TYPEZ (in milli seconds)" },
+        { address=0X1DD408, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the intermidiate track (in milli seconds)" },
+        { address=0X1DD410, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the intermidiate track TYPEZ (in milli seconds)" },
+        { address=0X1DD45C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the expert track (in milli seconds)" },
+        { address=0X1DD460, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the expert track TYPE Z (in milli seconds)" },
+        { address=0X1DD544, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the novice extra track (in milli seconds)" },
+        { address=0X1DD550, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the novice extra track TYPE Z (in milli seconds)" },
+        { address=0X1DD598, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the intermidiate extra track (in milli seconds)" },
+        { address=0X1DD5A0, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the intermidiate extra track TYPEZ (in milli seconds)" },
+        { address=0X1DD5EC, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the expert extra track (in milli seconds)" },
+        { address=0X1DD5F0, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="(32 bit) - best lap time for the expert extra track TYPE Z (in milli seconds)" },
+      },
+    },
+  },
+}

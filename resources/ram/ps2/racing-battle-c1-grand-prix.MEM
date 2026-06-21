@@ -1,0 +1,101 @@
+return {
+  game = {
+    title = "Racing Battle: C1 Grand Prix",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "racing-battle-c1-grand-prix",
+    file = "racing-battle-c1-grand-prix.zip",
+    hashes = {
+      { hash = "98675270049feb00310a014db99cbd2e", label = "Racing Battle - C1 Grand Prix (Japan)" },
+      { hash = "fbb92d0d6f55ea9de36408fd9fd035b3", label = "Racing Battle - C1 Grand Prix (Japan) (En) (v8.1) (igorciz777)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X636E33, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Dry" },
+        { address=0X637170, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="MILEAGE - Divide by 1,000, rounds down" },
+        { address=0X6373A6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373A9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373AD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373AE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373AF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373B9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6373BA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: TOP LEVEL" },
+        { address=0X6378CA, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="GROUNDING KIT" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X636E3C, type="u8", condition="eq", value=0X46, action="LIVES_STATE", no_log=false, no_survey=false, desc="HONDA LiFE D TURBO" },
+        { address=0X6A0840, type="u8", condition="eq", value=0X46, action="LIVES_STATE", no_log=false, no_survey=false, desc="HONDA LiFE D TURBO" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6378C4, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="RACING SUIT" },
+        { address=0X6378C4, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="OFFICIAL SUIT" },
+        { address=0X6378C4, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="REPLICA SUIT" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6A04E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="TSUKUBA CIRCUIT - DP ATTACK - 1st place high score" },
+      },
+      collectibles = {
+        { address=0X6373BB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373BC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373BD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373BE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373BF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373C9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373CB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373CC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373CD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373CE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6373CF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[bitflags] FIELD 3: RANK A - Team: RINGS increased" },
+        { address=0X6378C6, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="GOLD SPARK PLUGS" },
+        { address=0X6378CE, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="COIN HOLDER" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X58AB50, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Session Play Time, added to overall" },
+        { address=0X636E31, type="u8", condition="eq", value=0X5, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME ATTACK" },
+        { address=0X636E31, type="u8", condition="eq", value=0XA, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME ATTACK" },
+        { address=0X636E31, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Event type" },
+        { address=0X69FC20, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME ATTACK - Tsukuba Circuit: 1st place vehicle" },
+        { address=0X69FC24, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME ATTACK - Tsukuba Circuit: 1st place time - Sector 1" },
+      },
+    },
+  },
+}

@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Sylvester and Tweety in Cagey Capers",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "sylvester-and-tweety-in-cagey-capers",
+    file = "sylvester-and-tweety-in-cagey-capers.zip",
+    hashes = {
+      { hash = "9d30afdb3b71c74bcacaccb75250b9ba", label = "Sylvester & Tweety in Cagey Capers (USA) (AntiCheat) (Bartis1989).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X000A, type="u16be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo = 01" },
+        { address=0XFBD4, type="u16be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X25AC, type="u16le", condition="eq", value=0X0000, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XFBCE, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Domestic Devils 1" },
+        { address=0XFBCE, type="u16le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Domestic Devils 2" },
+        { address=0XFBCE, type="u16le", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mayhem Express" },
+        { address=0XFBCE, type="u16le", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Back Alley Blues" },
+        { address=0XFBCE, type="u16le", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hyde and Shriek 1" },
+        { address=0XFBCE, type="u16le", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hyde and Shriek 2" },
+        { address=0XFBCE, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Oceans of Trouble" },
+        { address=0XFBCE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFBCA, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XFBCA, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XFBBE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x65,535" },
+        { address=0XFBC0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

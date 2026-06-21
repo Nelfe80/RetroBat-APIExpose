@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Otostaz",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "otostaz",
+    file = "otostaz.zip",
+    hashes = {
+      { hash = "a91a971379213a7e48d1a4cf8c1e4ae3", label = "Otostaz (Japan) (En,Ja)" },
+    }
+  },
+
+  events = {
+  },
+}

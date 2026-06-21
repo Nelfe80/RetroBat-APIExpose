@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Ultimate Card Games",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "ultimate-card-games",
+    file = "ultimate-card-games.zip",
+    hashes = {
+      { hash = "84a330b01126dea962417481ec841930", label = "Ultimate Card Games (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1D04D4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Statistics - blackjack total rounds played" },
+        { address=0X1D0834, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Statistics - texas holdem total rounds played" },
+        { address=0X1D0874, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Statistics - double flop total rounds played" },
+        { address=0X1D08B4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Statistics - omaha rounds played" },
+        { address=0X1D08F4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Statistics - pineapple rounds played" },
+        { address=0X1D0934, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Statistics - crazy pineapple rounds played" },
+        { address=0X1D09B4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Statistics - 7 card stud total rounds played" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X240780, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player deadwood (gin rummy)" },
+        { address=0X240784, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Computer deadwood (gin rummy)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1BB554, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - Spades total points" },
+        { address=0X1BB558, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - Spades net score difference" },
+        { address=0X1D0434, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - hearts total points" },
+        { address=0X1D0494, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - bridge total points" },
+        { address=0X1D0498, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - bridge net score difference" },
+        { address=0X1D0514, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - crazy eights total points" },
+        { address=0X1D0574, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - skat total points" },
+        { address=0X1D05D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - euchre total points" },
+        { address=0X1D05D8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - euchre net score difference" },
+        { address=0X1D0674, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - Gin Rummy total points scored" },
+        { address=0X1D0678, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - Gin Rummy net score difference" },
+        { address=0X1D06B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - cribbage total points" },
+        { address=0X1D06B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - cribbage net score diffeerence" },
+        { address=0X1D06F4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - romme total points" },
+        { address=0X1D0754, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - canasta total points" },
+        { address=0X1D0758, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Statistics - canasta net score difference" },
+        { address=0X240790, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player/Computer deadwood points (gin rummy)" },
+        { address=0X2407A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player game score (gin rummy)" },
+        { address=0X2407A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Computer game score (gin rummy)" },
+        { address=0X2407AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player total game score (gin rummy)" },
+        { address=0X2407B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Computer total game score (gin rummy)" },
+      },
+      collectibles = {
+        { address=0X1D04CC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - blackjack total money bet increased" },
+        { address=0X1D04D0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - blackjack total money won increased" },
+        { address=0X1D0790, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - video poker total money bet increased" },
+        { address=0X1D0794, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - video poker total money won increased" },
+        { address=0X1D082C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - texas holdem total money bet increased" },
+        { address=0X1D0830, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - texas holdem total money won increased" },
+        { address=0X1D086C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - double flop total money bet increased" },
+        { address=0X1D0870, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - double flop total money won increased" },
+        { address=0X1D08AC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - omaha total money bet increased" },
+        { address=0X1D08B0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - omaha total money won increased" },
+        { address=0X1D08EC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - pineapple total money bet increased" },
+        { address=0X1D08F0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - pineapple total money won increased" },
+        { address=0X1D092C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - crazy pineapple total money bet increased" },
+        { address=0X1D0930, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - crazy pineapple total money won increased" },
+        { address=0X1D096C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - 5 card draw total money bet increased" },
+        { address=0X1D0970, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - 5 card draw total money won increased" },
+        { address=0X1D09AC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - 7 card stud total money bet increased" },
+        { address=0X1D09B0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Statistics - 7 card stud total money won increased" },
+      },
+    },
+  },
+}

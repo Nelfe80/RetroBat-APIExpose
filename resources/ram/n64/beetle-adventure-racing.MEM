@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Beetle Adventure Racing!",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "beetle-adventure-racing",
+    file = "beetle-adventure-racing.zip",
+    hashes = {
+      { hash = "26f7d8f4640ebdfa823f84e5f89d62bf", label = "HSV Adventure Racing! (Australia).z64" },
+      { hash = "cf97c336479ddbf1217e4dde89d9d2d3", label = "Beetle Adventure Racing! (USA) (En,Fr,De).z64" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X2CC1F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="*AU* decreased" },
+        { address=0X2CD74, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="*US* decreased" },
+        { address=0X2CD78, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="*US* decreased" },
+        { address=0X2CD90, type="u32be", condition="eq", value=0X00, action="HIT", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X2CD90, type="u32be", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Half" },
+        { address=0X2CD90, type="u32be", condition="eq", value=0X02, action="HIT", no_log=false, no_survey=false, desc="Double" },
+        { address=0X2CD90, type="u32be", condition="eq", value=0X03, action="HIT", no_log=false, no_survey=false, desc="Triple" },
+        { address=0X2D00F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="*US* decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2CC1F, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X2CC1F, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Unlocked" },
+        { address=0X2CD74, type="u32be", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X2CD74, type="u32be", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-ups Only" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mines" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rockets" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Stealer" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nitros" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X05, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="?" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X06, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Health" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X07, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Invincible" },
+        { address=0X2CD78, type="u32be", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off" },
+        { address=0X2D00F, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X2D00F, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Unlocked" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X25D18, type="u32be", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X25D18, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*US*" },
+        { address=0X25D6C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit Float] Time inbetween Screens?" },
+        { address=0X2C874, type="u32be", condition="eq", value=0X05, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X2C874, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*AU*" },
+        { address=0X2C8A7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*AU*" },
+        { address=0X2CC1E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*AU*" },
+        { address=0X2CC22, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*AU*" },
+        { address=0X2CC64, type="u32be", condition="eq", value=0X05, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack" },
+        { address=0X2CC64, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*US*" },
+        { address=0X2CC97, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*US*" },
+        { address=0X2D00E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*US*" },
+        { address=0X2D012, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="*US*" },
+      },
+    },
+  },
+}

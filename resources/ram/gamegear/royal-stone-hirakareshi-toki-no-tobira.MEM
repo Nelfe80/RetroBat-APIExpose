@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Royal Stone: Hirakareshi Toki no Tobira",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "royal-stone-hirakareshi-toki-no-tobira",
+    file = "royal-stone-hirakareshi-toki-no-tobira.zip",
+    hashes = {
+      { hash = "0e3fecf6ebb236531743fcef29ed7f64", label = "Royal Stone - Hirakareshi Toki no Tobira (Japan) (En) (v1.0) (Aeon Genesis).gg" },
+      { hash = "c05b51ea07c8017a6d12badaea9daf29", label = "Royal Stone - Hirakareshi Toki no Tobira (Japan).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X030A, type="u8", condition="eq", value=0XDD, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level transitions" },
+        { address=0X0773, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Number" },
+        { address=0X0942, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a round" },
+        { address=0X0942, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In between rounds" },
+        { address=0X0942, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round 6" },
+        { address=0X09C9, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a round" },
+        { address=0X09C9, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In between rounds" },
+        { address=0X09C9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round" },
+        { address=0X09E4, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a round" },
+        { address=0X09E4, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In between rounds" },
+        { address=0X09E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round 3" },
+        { address=0X09FF, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a round" },
+        { address=0X09FF, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In between rounds" },
+        { address=0X09FF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round 8" },
+        { address=0X0A1A, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a round" },
+        { address=0X0A1A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In between rounds" },
+        { address=0X0A1A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round 4 - 5" },
+        { address=0X0A35, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a round" },
+        { address=0X0A35, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In between rounds" },
+        { address=0X0A35, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round 6-7" },
+        { address=0X0A6B, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a round" },
+        { address=0X0A6B, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In between rounds" },
+        { address=0X0A6B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round 10-11" },
+        { address=0X0ABC, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In a round" },
+        { address=0X0ABC, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In between rounds" },
+        { address=0X0ABC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round 9" },
+        { address=0X0B40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Eva Level" },
+        { address=0X0B50, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Vaslery Level" },
+        { address=0X0B60, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Nico Level" },
+        { address=0X0B70, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Torris Level" },
+        { address=0X0B80, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Liveil Level" },
+        { address=0X0B90, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skrall Level" },
+        { address=0X0BA0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Horai Level" },
+        { address=0X0BB0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pauline Level" },
+        { address=0X0BC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Perlis Level" },
+        { address=0X0BD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Papure Level" },
+        { address=0X0BE0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tor Level" },
+      },
+    },
+  },
+}

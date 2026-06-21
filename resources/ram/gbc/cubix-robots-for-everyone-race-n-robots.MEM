@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cubix: Robots for Everyone - Race 'n Robots",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cubix-robots-for-everyone-race-n-robots",
+    file = "cubix-robots-for-everyone-race-n-robots.zip",
+    hashes = {
+      { hash = "9eb8be5600d2408352bf9ef32b91d1df", label = "Cubix - Robots for Everyone - Race 'n Robots (USA) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

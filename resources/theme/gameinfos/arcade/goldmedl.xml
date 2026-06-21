@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>unknown</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button A</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button B</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Button C</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button A</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button B</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Button C</text>
+			<color>${green}</color>
+		</text>
+		<text name="p3button1" extra="true">
+			<text>Button A</text>
+			<color>${red}</color>
+		</text>
+		<text name="p3button2" extra="true">
+			<text>Button B</text>
+			<color>${red}</color>
+		</text>
+		<text name="p3button6" extra="true">
+			<text>Button C</text>
+			<color>${red}</color>
+		</text>
+		<text name="p4button1" extra="true">
+			<text>Button A</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p4button2" extra="true">
+			<text>Button B</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p4button6" extra="true">
+			<text>Button C</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${blue}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+	</view>
+</theme>

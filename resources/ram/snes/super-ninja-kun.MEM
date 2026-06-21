@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Super Ninja-kun",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "super-ninja-kun",
+    file = "super-ninja-kun.zip",
+    hashes = {
+      { hash = "af7582ecc80e950295d5a9f3fb8ecc48", label = "Super Ninja-kun (Japan).bs" },
+      { hash = "ebbf4d87c6bf5256398d9b028bb0b9ab", label = "Super Ninja-kun (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0934, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X009E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X009E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X00FE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Player 2 Lives increased" },
+        { address=0X00FE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Player 2 Lives decreased" },
+        { address=0X0B0E, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="3" },
+        { address=0X0B0E, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="5" },
+        { address=0X0B0E, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="7" },
+        { address=0X0B0E, type="u8", condition="eq", value=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="cutscene, 31 = playing (after starting)" },
+        { address=0X0B0E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Initial Lives (before starting) increased" },
+        { address=0X0B0E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Initial Lives (before starting) decreased" },
+      },
+      health = {
+        { address=0X0060, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X0060, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0X007A, type="u8", condition="bit_true", bit=0, mask=0X01, action="HIT", no_log=false, no_survey=false, desc="Damaged" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0088, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shuriken" },
+        { address=0X0088, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0X0088, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lightning" },
+        { address=0X0088, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Boomerang" },
+        { address=0X0470, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shuriken" },
+        { address=0X0470, type="u8", condition="eq", value=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bomb and the above" },
+        { address=0X0470, type="u8", condition="eq", value=0X0C, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Lightning and the above" },
+        { address=0X0470, type="u8", condition="eq", value=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Boomerang and the above" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0072, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Points (decimal)" },
+      },
+      collectibles = {
+        { address=0X0FF8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 1st and 2nd Boss Health and 5th Boss' stage 1 and 2 Health (during fight) increased" },
+        { address=0X179F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 3rd Boss Health and 4th Boss Grenade Launcher Health and 7th Boss Dragon Form Health (dur" },
+        { address=0X17D7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 3rd Boss Armor Health and 4th Boss Missile Launcher Health and 6th Boss Left Arm Health a" },
+        { address=0X180F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 4th Boss Gun Health (during fight) increased" },
+        { address=0X1847, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 6th Boss Body Health (during fight) increased" },
+        { address=0X187F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 4th Boss Main Health and 6th Boss Right Arm Health (during fight) increased" },
+        { address=0X18EF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8bit] 7th Boss First Form Health (during battle) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X04A2, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="No Boss Battle" },
+        { address=0X17B0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] 8th Boss Gun Health" },
+        { address=0X17F0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] 8th Boss Missile Health" },
+        { address=0X1830, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8bit] 8th Boss Main Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1078, type="u8", condition="eq", value=0XFF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X10F8, type="u8", condition="eq", value=0XFF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X1178, type="u8", condition="eq", value=0XFF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X11F8, type="u8", condition="eq", value=0XFF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+        { address=0X1278, type="u8", condition="eq", value=0XFF, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+      },
+    },
+  },
+}

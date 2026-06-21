@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Gummy Bears: Magical Medallion",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "gummy-bears-magical-medallion",
+    file = "gummy-bears-magical-medallion.zip",
+    hashes = {
+      { hash = "3af8891c659d637ca3bb089d41926050", label = "Gummy Bears - Magical Medallion (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C24B8, type="u32be", condition="eq", value=0X01, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In Level" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C2488, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit BE] Boolean - Load LevelImg_Preview" },
+        { address=0X1C25C8, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit BE] Current Level ID" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1C62E7, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Jelly's Medal" },
+        { address=0X1C6593, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Jelly's Medal" },
+        { address=0X1C683F, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Jumping Jelly's Medal" },
+      },
+    },
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Grandia Xtreme",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "grandia-xtreme",
+    file = "grandia-xtreme.zip",
+    hashes = {
+      { hash = "439735def5e80581b578c3381cd5cd6d", label = "Grandia Xtreme (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XBEFB0C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 1 - Level" },
+        { address=0XBEFE24, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 2 - Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X4EF19C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Evann/Character 1 - Max HP decreased" },
+        { address=0X4EF19C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Evann/Character 1 - Max HP increased" },
+        { address=0X4EF1A0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Evann - Current HP decreased" },
+        { address=0X4EF1A0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Evann - Current HP increased" },
+        { address=0X4EF224, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Brandol - Current HP decreased" },
+        { address=0X4EF224, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Brandol - Current HP increased" },
+        { address=0XBEFB1C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character 1 - Current HP decreased" },
+        { address=0XBEFB1C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character 1 - Current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4EF1CA, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Evann - Weapon Slot" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4ED7AC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+      },
+    },
+  },
+}

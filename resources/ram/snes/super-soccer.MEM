@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Super Soccer",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "super-soccer",
+    file = "super-soccer.zip",
+    hashes = {
+      { hash = "15bc713c9464c0e3243d1dbcf75c9bee", label = "Super Soccer (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X02C6, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="used for in-game pause" },
+        { address=0X0760, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X075A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals - Team 1" },
+        { address=0X075B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals - Team 2" },
+        { address=0X1003, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #1 (Team 1)" },
+        { address=0X1004, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #2 (Team 1)" },
+        { address=0X1005, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #3 (Team 1)" },
+        { address=0X1006, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #4 (Team 1)" },
+        { address=0X1007, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #5 (Team 1)" },
+        { address=0X1008, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #6 (Team 1)" },
+        { address=0X1009, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #7 (Team 1)" },
+        { address=0X100A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #8 (Team 1)" },
+        { address=0X100B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #9 (Team 1)" },
+        { address=0X100C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #10 (Team 1)" },
+        { address=0X100D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #11 (Team 1)" },
+        { address=0X100E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #12 (Team 1)" },
+        { address=0X100F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #13 (Team 1)" },
+        { address=0X1010, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #14 (Team 1)" },
+        { address=0X1011, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #15 (Team 1)" },
+        { address=0X1012, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #16 (Team 1)" },
+        { address=0X1013, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #1 (Team 2)" },
+        { address=0X1014, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #2 (Team 2)" },
+        { address=0X1015, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #3 (Team 2)" },
+        { address=0X1016, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #4 (Team 2)" },
+        { address=0X1017, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #5 (Team 2)" },
+        { address=0X1018, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #6 (Team 2)" },
+        { address=0X1019, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #7 (Team 2)" },
+        { address=0X101A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #8 (Team 2)" },
+        { address=0X101B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #9 (Team 2)" },
+        { address=0X101C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #10 (Team 2)" },
+        { address=0X101D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #11 (Team 2)" },
+        { address=0X101E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #12 (Team 2)" },
+        { address=0X101F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #13 (Team 2)" },
+        { address=0X1020, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #14 (Team 2)" },
+        { address=0X1021, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #15 (Team 2)" },
+        { address=0X1022, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number Goals by player #16 (Team 2)" },
+        { address=0X1795, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="first half goals - Team 1 (changes at the end of the half)" },
+        { address=0X1796, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="first half goals - Team 2 (changes at the end of the half)" },
+        { address=0X1797, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="second half goals - Team 1 (changes at the end of the half)" },
+        { address=0X1798, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="second half goals - Team 2 (changes at the end of the half)" },
+        { address=0X17A7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Team 1 Goalie" },
+        { address=0X17A8, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Team 2 Goalie" },
+        { address=0X1890, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals in Shootout Team 1" },
+        { address=0X1891, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goals in Shootout Team 2" },
+        { address=0X18FD, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goalkeeper in Shootout" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1705, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Time - Seconds (During match) increased" },
+        { address=0X1706, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Time - Minutes (During match) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0757, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Half time" },
+        { address=0X17A4, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Match time (Minutes)" },
+        { address=0X1809, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tournament match counter" },
+      },
+    },
+  },
+}

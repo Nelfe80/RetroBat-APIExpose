@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Brave",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "brave",
+    file = "brave.zip",
+    hashes = {
+      { hash = "6d8d8972e5272b0acd2e92c2be7b3469", label = "Brave (USA) (En,Fr,Es).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Nekketsu Koukou Dodgeball-bu: Soccer-hen",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "nekketsu-koukou-dodgeball-bu-soccer-hen",
+    file = "nekketsu-koukou-dodgeball-bu-soccer-hen.zip",
+    hashes = {
+      { hash = "d3cfa3ffd3414a94b6ce768e27d729ee", label = "Nekketsu Koukou Dodgeball-bu - Soccer Hen (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X052A, type="u8", condition="eq", value=0X2F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Technos Presents Screen, 00 = Title Screen, 06 = Intro (1st part), 07 = Intro (2nd part)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Super Robot Taisen OG Saga: Endless Frontier",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "super-robot-taisen-og-saga-endless-frontier",
+    file = "super-robot-taisen-og-saga-endless-frontier.zip",
+    hashes = {
+      { hash = "caa30b4682c46779e7239fdc480ea6a6", label = "Super Robot Taisen OG Saga - Endless Frontier (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1C6387, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Haken Level" },
+        { address=0X1C63F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Aschen Level" },
+        { address=0X1C6467, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kaguya Level" },
+        { address=0X1C64D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Suzuka Level" },
+        { address=0X1C6547, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reiji Level" },
+        { address=0X1C65B7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Xiaomu Level" },
+        { address=0X1C6627, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="KOSMOS Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1C5ABD, type="u8", condition="eq", value=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="battle end dead" },
+      },
+      health = {
+        { address=0X1C5C50, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Max Damage" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1C5C44, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0X1C5FB1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Puzzle Ring increased" },
+        { address=0X1C5FC1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Star Coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1C5CE3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit4 = optional enemy 'boss' at Celeste" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1C5ABC, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switching Enemy and Player turns," },
+        { address=0X1C5D62, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bit4 Bit5 and Bit6 are push-blocks for making shortcuts when they are pushed all the way" },
+      },
+    },
+  },
+}

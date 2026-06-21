@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "LMA Manager 2007",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Construction and Management Simulation, Sports"
+  },
+
+  rom = {
+    name = "lma-manager-2007",
+    file = "lma-manager-2007.zip",
+    hashes = {
+      { hash = "e26ce3eb8b2127871422b3301b90c27c", label = "LMA Manager 2007 (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

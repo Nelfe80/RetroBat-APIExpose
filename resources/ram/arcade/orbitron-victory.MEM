@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Orbitron | Victory (Comsoft)",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "orbitron-victory",
+    file = "orbitron-victory.zip",
+    hashes = {
+      { hash = "96a6fb911c0d9013293e807cecc6d75c", label = "victoryc.7z <Victory (Comsoft)>" },
+      { hash = "b3a48113583be33c807741d7e6691f0d", label = "orbitron.7z <Orbitron>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0015, type="u16le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (not in hex, 10 = 10 credits, not 16 credits)" },
+      },
+    },
+  },
+}

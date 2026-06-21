@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Ghostbusters",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ghostbusters",
+    file = "ghostbusters.zip",
+    hashes = {
+      { hash = "dbae1ad6d3917a95b96d28bfc6f3f90a", label = "Ghostbusters (USA, Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0F07, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Play" },
+        { address=0X0F08, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause [8 bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0E0B, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PK Meter Energy [16 bit] decreased" },
+        { address=0X0E0B, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PK Meter Energy [16 bit] increased" },
+        { address=0X0E96, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gozer Health [8bit] decreased" },
+        { address=0X0E96, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gozer Health [8bit] increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0E00, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money [32 bit] increased" },
+      },
+    },
+  },
+}

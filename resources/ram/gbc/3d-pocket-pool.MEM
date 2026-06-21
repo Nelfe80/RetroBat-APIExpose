@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "3D Pocket Pool",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "3d-pocket-pool",
+    file = "3d-pocket-pool.zip",
+    hashes = {
+      { hash = "429e6da4b32d8caa22e78d92c0febd12", label = "3D Pocket Pool (Europe) (En,Fr,De,Es,It,Nl).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

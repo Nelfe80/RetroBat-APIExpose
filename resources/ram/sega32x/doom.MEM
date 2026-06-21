@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Doom",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "doom",
+    file = "doom.zip",
+    hashes = {
+      { hash = "79339867d9d4f58b169753d9a29ea1a5", label = "Doom (Japan, USA) (En).32x" },
+    }
+  },
+
+  events = {
+  },
+}

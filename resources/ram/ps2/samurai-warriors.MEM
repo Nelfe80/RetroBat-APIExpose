@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Samurai Warriors",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "samurai-warriors",
+    file = "samurai-warriors.zip",
+    hashes = {
+      { hash = "68dbdffd725de0cd8ae1295edb7e4d37", label = "Samurai Warriors (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4EBFCF, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="--- Bit0 | Movies - Other - Credits" },
+      },
+    },
+  },
+}

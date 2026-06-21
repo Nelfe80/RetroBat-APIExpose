@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "yamyam",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "yam-yam",
+    file = "yam-yam.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X901, type="u32be", condition="change", action="TREASURE", color="white", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Score delta 10000-10000" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X901, type="u32be", condition="change", action="SCORE_STATE", min=50, max=499, no_log=false, no_survey=false, desc="Score delta 50-499: A simple regular action" },
+        { address=0X901, type="u32be", condition="change", action="SCORE_STATE", color="orange", min=500, max=1000, no_log=false, no_survey=false, desc="Score delta 500-1000: Score delta 500-1000" },
+        { address=0X901, type="u32be", condition="change", action="SCORE_STATE", color="cyan", min=1001, max=2000, no_log=false, no_survey=false, desc="Score delta 1001-2000: Score delta 1001-2000" },
+      },
+      collectibles = {
+        { address=0XA01, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

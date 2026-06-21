@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Virtual Chess 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Board Game, Strategy"
+  },
+
+  rom = {
+    name = "virtual-chess-64",
+    file = "virtual-chess-64.zip",
+    hashes = {
+      { hash = "f8a35270279b277586d7210fd15134ff", label = "Virtual Chess 64 (USA) (En,Fr,Es).z64" },
+    }
+  },
+
+  events = {
+  },
+}

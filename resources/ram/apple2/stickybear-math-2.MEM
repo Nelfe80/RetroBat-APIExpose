@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Stickybear Math 2",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "stickybear-math-2",
+    file = "stickybear-math-2.zip",
+    hashes = {
+      { hash = "f9bc68768f40f145955ca341b9976b00", label = "Stickybear Math 2 (1986)(Optimum Resource)(US)[cr 4am].dsk" },
+    }
+  },
+
+  events = {
+  },
+}

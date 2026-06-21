@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Need for Speed: Underground 2",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "need-for-speed-underground-2",
+    file = "need-for-speed-underground-2.zip",
+    hashes = {
+      { hash = "1c74a45d3da2b9681a06decc4bf319bc", label = "Need for Speed - Underground 2 (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

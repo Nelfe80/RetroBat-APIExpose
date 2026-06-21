@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Tag Team Wrestling",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "tag-team-wrestling",
+    file = "tag-team-wrestling.zip",
+    hashes = {
+      { hash = "fa57750ad33815e99c40986f26fc697e", label = "Tag Team Wrestling (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X007B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="demo =80" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X004F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE 0-9" },
+        { address=0X0083, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE TOO" },
+        { address=0X0084, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="21 a 29" },
+        { address=0X0084, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE: 00=0 a 9 / 01=10 a 19 / 02=10 a 19" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0048, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PLAYER 1 HP decreased" },
+        { address=0X0048, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PLAYER 1 HP increased" },
+        { address=0X004D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Teammate health decreased" },
+        { address=0X004D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Teammate health increased" },
+        { address=0X0058, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="PLAYER 2 HP decreased" },
+        { address=0X0058, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="PLAYER 2 HP increased" },
+        { address=0X005D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Teammate health decreased" },
+        { address=0X005D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Teammate health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0055, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="42=fora do ring 20? increased" },
+      },
+    },
+  },
+}

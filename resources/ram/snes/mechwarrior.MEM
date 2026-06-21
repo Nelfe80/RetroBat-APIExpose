@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "MechWarrior",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter, Vehicle Simulation"
+  },
+
+  rom = {
+    name = "mechwarrior",
+    file = "mechwarrior.zip",
+    hashes = {
+      { hash = "2c3b742c31ecfb1d7e316ed344d808c7", label = "MechWarrior (Europe).sfc" },
+      { hash = "6abe3f39c2f6f58986dd8665c1147aa1", label = "MechWarrior (Italy).sfc" },
+      { hash = "71516a3b67963cf91055a6c78566a1ba", label = "MechWarrior (USA).sfc" },
+      { hash = "ae1525bf00efecc378c86048d2fdba4f", label = "MechWarrior (Spain).sfc" },
+      { hash = "bb4ca7b4dca71c3b8dcae129f6072313", label = "MechWarrior (Germany).sfc" },
+      { hash = "c320825e5ea7e4f1641071ad6524c727", label = "MechWarrior (France).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F3F, type="u16le", condition="eq", value=0X17, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1772, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Infinite Ammo Activated - 01" },
+        { address=0XD98A, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="C-Bills (Money) (USA) (16-Bit) increased" },
+        { address=0XDB4B, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo - Weapon Slot 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X176F, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Cheat Active - 01" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1BD2, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemy Mechs Destroyed" },
+        { address=0XDA3F, type="u8", condition="eq", value=0X09, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective Raid" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Garrison Duty" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Security Duty" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Riot Duty" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Defensive Campaign (Doesn't Exist)" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Relief Duty (Doesn't Exist)" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Planetary Assault" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X06, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Offensive Campaign" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Siege Campaign" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Recon Raid" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X09, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective Raid" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X0A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Diversionary Raid (Doesn't Exist)" },
+        { address=0XDAE0, type="u8", condition="eq", value=0X0B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Guerilla Warfare (Doesn't Exist)" },
+      },
+    },
+  },
+}

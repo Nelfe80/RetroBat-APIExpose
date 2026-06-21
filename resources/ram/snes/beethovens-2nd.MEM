@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Beethoven's 2nd",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "beethovens-2nd",
+    file = "beethovens-2nd.zip",
+    hashes = {
+      { hash = "4adfa292778a82285d80554ea6ed3497", label = "Beethoven - The Ultimate Canine Caper! (USA).sfc" },
+      { hash = "76fa6fdc5d0e0a52839d8548301644f1", label = "Beethoven - The Ultimate Canine Caper! (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0F13, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="pause is ff" },
+        { address=0X160E, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="03 Game Over?" },
+        { address=0X1610, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="03 Game Over?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X15B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X15C6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X15C6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X1628, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X1628, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1F6A, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility flag" },
+      },
+    },
+  },
+}

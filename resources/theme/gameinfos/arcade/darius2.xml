@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button 2</text>
+			<color>${cyan}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button 2</text>
+			<color>${cyan}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 FJI 350000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 KIK 345000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 SEN 340000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 KAT 335000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 DON 330000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 KUM 325000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 JUN 320000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 TRO 315000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 ONI 310000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 AON 305000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 DOH 300000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 OGR 295000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 WAT 290000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 AIU 285000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 TOS 280000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 SEI 275000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 KIK 270000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 OTK 265000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 TUZ 260000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 NAK 255000</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 YKI 250000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 KAI 245000</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 SAK 240000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 IGA 235000</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 ONO 230000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26  .Z 227300</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 TAN 225000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 MUR 220000</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 FUK 215000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 TOM 210000</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 NUM 205000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 YAB 200000</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 TKA 195000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 IMA 190000</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 FRK 185000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 YAG 180000</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 ONU 175000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 SMI 170000</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 OGA 165000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 ISI 160000</text>
+		</text>
+		<text name="hiscoreline41" extra="true">
+			<text>#41 YOS 155000</text>
+		</text>
+		<text name="hiscoreline42" extra="true">
+			<text>#42 MRI 150000</text>
+		</text>
+		<text name="hiscoreline43" extra="true">
+			<text>#43 TZA 145000</text>
+		</text>
+		<text name="hiscoreline44" extra="true">
+			<text>#44 NAD 140000</text>
+		</text>
+		<text name="hiscoreline45" extra="true">
+			<text>#45 ATA 135000</text>
+		</text>
+		<text name="hiscoreline46" extra="true">
+			<text>#46 NAG 130000</text>
+		</text>
+		<text name="hiscoreline47" extra="true">
+			<text>#47 PAN 125000</text>
+		</text>
+		<text name="hiscoreline48" extra="true">
+			<text>#48 TGS 120000</text>
+		</text>
+		<text name="hiscoreline49" extra="true">
+			<text>#49 RYO 115000</text>
+		</text>
+		<text name="hiscoreline50" extra="true">
+			<text>#50 KBA 110000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

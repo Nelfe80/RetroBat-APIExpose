@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Clannad",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Visual Novel"
+  },
+
+  rom = {
+    name = "clannad",
+    file = "clannad.zip",
+    hashes = {
+      { hash = "47fd08ad4c59007d5a14596c09dede1c", label = "Clannad (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Killing Zone",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "killing-zone",
+    file = "killing-zone.zip",
+    hashes = {
+      { hash = "39e9a11c0d9c08b2902c36c34c539bf4", label = "Killing Zone (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8FB6C, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X8FB6C, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X83640, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X83640, type="u8", condition="eq", value=0X38, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X83640, type="u8", condition="eq", value=0X70, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X83640, type="u8", condition="eq", value=0XA8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hardest" },
+        { address=0X83640, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Option - Level" },
+        { address=0X8F7DC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Won the round" },
+        { address=0X8F7DC, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Won the round" },
+        { address=0X8F96C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Rounds Won" },
+        { address=0X8FA64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X835D0, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Min" },
+        { address=0X835D0, type="u8", condition="eq", value=0X30, action="LIVES_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X835D0, type="u8", condition="eq", value=0X60, action="LIVES_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X835D0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Option - Life increased" },
+        { address=0X835D0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Option - Life decreased" },
+        { address=0X83F24, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1's Lifebar (red) increased" },
+        { address=0X83F24, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1's Lifebar (red) decreased" },
+        { address=0X83F2C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1's Lifebar (blue) increased" },
+        { address=0X83F2C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1's Lifebar (blue) decreased" },
+        { address=0X83F48, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2's Lifebar (blue) increased" },
+        { address=0X83F48, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2's Lifebar (blue) decreased" },
+        { address=0X8F9EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Life increased" },
+        { address=0X8F9EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Life decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X835EC, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="60" },
+        { address=0X835EC, type="u8", condition="eq", value=0X20, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="5" },
+        { address=0X835EC, type="u8", condition="eq", value=0X40, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="30" },
+        { address=0X835EC, type="u8", condition="eq", value=0X60, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="99" },
+        { address=0X835EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Option - Timer" },
+        { address=0X8F7D4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Battle Timer" },
+      },
+    },
+  },
+}

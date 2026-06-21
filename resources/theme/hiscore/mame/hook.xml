@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 -.Z 341800</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 HNY 299900</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 KUI 285900</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 SHO 307200</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 UTU 296700</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 IKO 154200</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 ROK 235900</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 GTI 221900</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 AWK 202300</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 NAK 333100</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 OGW 260200</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 CAT 109100</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 BUU 327200</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 MAT 308100</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 ISO 280500</text>
+		</text>
+	</view>
+</theme>

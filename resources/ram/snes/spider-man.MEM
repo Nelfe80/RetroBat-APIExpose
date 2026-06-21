@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Spider-Man",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Action"
+  },
+
+  rom = {
+    name = "spider-man",
+    file = "spider-man.zip",
+    hashes = {
+      { hash = "0d1a11295f79be9b15ddad53ab55bc1e", label = "[MSU-1] Spider-Man (USA) [Kurrono]" },
+      { hash = "73199b27fe52caa56b12e42122df1fc8", label = "Spider-Man (USA).sfc" },
+      { hash = "83b92fbb05fc2418266365f891e8fb57", label = "Spider-Man (Europe).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00F7, type="u8", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+        { address=0X00F7, type="u8", condition="eq", value=0X0B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0134, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUES" },
+        { address=0X0A4A, type="u8", condition="bit_true", bit=7, mask=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="1" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00A1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1 clear" },
+        { address=0X00F7, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0X00F7, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select (Cheat)" },
+        { address=0X00F7, type="u8", condition="eq", value=0X0F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 5 complete" },
+        { address=0X075B, type="u24le", condition="eq", value=0X18, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+      },
+      stage = {
+        { address=0X0726, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE ID" },
+        { address=0X075B, type="u24le", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X075B, type="u24le", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X075B, type="u24le", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X075B, type="u24le", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X075B, type="u24le", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 First Area" },
+        { address=0X075B, type="u24le", condition="eq", value=0X24, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 First Roller Coaster Area" },
+        { address=0X075B, type="u24le", condition="eq", value=0X26, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 Second Area" },
+        { address=0X075B, type="u24le", condition="eq", value=0X28, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 Third Area" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0132, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIVES increased" },
+        { address=0X0132, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIVES decreased" },
+      },
+      health = {
+        { address=0X0E3D, type="u8", condition="eq", value=0X14, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max Health" },
+        { address=0X0E3D, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="HEALTH BAR" },
+        { address=0X0EDC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="SOME ENEMIES HP decreased" },
+        { address=0X0EDC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="SOME ENEMIES HP increased" },
+        { address=0X0F7B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="SOME ENEMIES HP decreased" },
+        { address=0X0F7B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="SOME ENEMIES HP increased" },
+        { address=0X10B9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="SOME ENEMIES HP decreased" },
+        { address=0X10B9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="SOME ENEMIES HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0130, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="WHITE SUIT = 14" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X075B, type="u24le", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss fight and Stage 3" },
+        { address=0X075B, type="u24le", condition="eq", value=0X16, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+      },
+    },
+  },
+}

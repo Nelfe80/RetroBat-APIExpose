@@ -1,0 +1,34 @@
+return {
+  game = {
+    title = "Bomber",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bomber",
+    file = "bomber.zip",
+    hashes = {
+      { hash = "181b1d7e3a4f349bc708c0ba27aa3ab6", label = "Bomber (World) (v1.05) (Kerby).uze" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0B0C, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="BOOM! Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0B0C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0B0A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Vigilante 8: 2nd Offense",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing, Shooter, Vehicle Simulation"
+  },
+
+  rom = {
+    name = "vigilante-8-2nd-offense",
+    file = "vigilante-8-2nd-offense.zip",
+    hashes = {
+      { hash = "60cdf7445fad2aba05c958f46691501b", label = "Vigilante 8 - 2nd Offense (USA).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X19D81C, type="u8", condition="eq", value=0X0, action="LEVEL_ARIZONA_1_UTAH", no_log=false, no_survey=false, desc="arizona 1 = Utah" },
+        { address=0X19D81C, type="u8", condition="eq", value=0X2, action="LEVEL_LOUISIANA_3_FLORIDA", no_log=false, no_survey=false, desc="Louisiana 3 = Florida" },
+        { address=0X19D81C, type="u8", condition="eq", value=0X4, action="LEVEL_PENNSYLVANIA_5_MINNESOTA", no_log=false, no_survey=false, desc="Pennsylvania 5 = Minnesota" },
+        { address=0X19D81C, type="u8", condition="eq", value=0X6, action="LEVEL_ALASKA_7_CALIFORNIA", no_log=false, no_survey=false, desc="Alaska 7 = California" },
+        { address=0X19D81C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="<8-bit> arcade level select" },
+      },
+      stage = {
+        { address=0X19D7ED, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first" },
+        { address=0X19D7ED, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="last" },
+        { address=0X19D7ED, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="<8-bit> quest level (go in numerical sequence based off character chosen)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X199B04, type="u8", condition="eq", value=0X0, action="HIT", no_log=false, no_survey=false, desc="low" },
+        { address=0X199B04, type="u8", condition="eq", value=0X1, action="HIT", no_log=false, no_survey=false, desc="medium" },
+        { address=0X199B04, type="u8", condition="eq", value=0X2, action="HIT", no_log=false, no_survey=false, desc="high" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X18F0D9, type="u8", condition="eq", value=0X1, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="done" },
+      },
+    },
+  },
+}

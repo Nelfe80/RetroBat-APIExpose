@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "AH-3 ThunderStrike | Thunderhawk",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ah-3-thunderstrike-thunderhawk",
+    file = "ah-3-thunderstrike-thunderhawk.zip",
+    hashes = {
+      { hash = "aed2a9d6397feef628a62b75f9101bab", label = "AH3 - Thunderstrike (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Medarot 3: Kabuto Version",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "medarot-3-kabuto-version",
+    file = "medarot-3-kabuto-version.zip",
+    hashes = {
+      { hash = "cbc55f3bb98f8c0443917ae477e56e51", label = "Medarot 3 - Kabuto Version (Japan).gbc" },
+      { hash = "66039ffd2bd4ec27b8dd43c3ee0b7b7c", label = "Medarot 3 - Kabuto Version (Japan) (En) (v1.0) (Cash Medal Chameleon).gbc" },
+      { hash = "0ca36ed6f60bd296619be20a1ea046f7", label = "Medarot 3 - Kabuto Version (Japan) (En) (20250225) (Cash Medal Chameleon).gbc" },
+      { hash = "6ecf562c4b58d714473106a82a053701", label = "Medarot 3 - Kabuto Version (Japan) (En) (20250714) (Cash Medal Chameleon).gbc" },
+      { hash = "a1e8e2e7f5dd8bafd6bfeef22c960622", label = "Medarot 3 - Kabuto Version (Japan) (En) (20260228) (Cash Medal Chamaleon).gbc" },
+      { hash = "2d0e26e67a79b8315f27201613317d98", label = "Medarot 3 - Kabuto Version (Japan) (En-Us) (20260228) (Cash Medal Chamaleon).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC820, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mini Game 1 - Level [8bit]" },
+        { address=0X13129, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Medal 1 - Level [8bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X14000, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Life increased" },
+        { address=0X14000, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Life decreased" },
+        { address=0X14200, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle - 1P Medarot 2 | Life increased" },
+        { address=0X14200, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle - 1P Medarot 2 | Life decreased" },
+        { address=0X14400, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle - 1P Medarot 3 | Life increased" },
+        { address=0X14400, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle - 1P Medarot 3 | Life decreased" },
+        { address=0X14600, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Life increased" },
+        { address=0X14600, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Life decreased" },
+        { address=0X14800, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle - CPU Medarot 2 | Life increased" },
+        { address=0X14800, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle - CPU Medarot 2 | Life decreased" },
+        { address=0X14A00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Battle - CPU Medarot 3 | Life increased" },
+        { address=0X14A00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Battle - CPU Medarot 3 | Life decreased" },
+      },
+      health = {
+        { address=0X140DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Head HP MAX [8bit] decreased" },
+        { address=0X140DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Head HP MAX [8bit] increased" },
+        { address=0X140E6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Head HP [8bit] decreased" },
+        { address=0X140E6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Head HP [8bit] increased" },
+        { address=0X140FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Right HP MAX [8bit] decreased" },
+        { address=0X140FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Right HP MAX [8bit] increased" },
+        { address=0X14106, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Right HP [8bit] decreased" },
+        { address=0X14106, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Right HP [8bit] increased" },
+        { address=0X1411C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Left HP MAX [8bit] decreased" },
+        { address=0X1411C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Left HP MAX [8bit] increased" },
+        { address=0X14126, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Left HP [8bit] decreased" },
+        { address=0X14126, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Left HP [8bit] increased" },
+        { address=0X1413C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Leg HP MAX [8bit] decreased" },
+        { address=0X1413C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Leg HP MAX [8bit] increased" },
+        { address=0X14146, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Leg HP [8bit] decreased" },
+        { address=0X14146, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - 1P Medarot 1 | Leg HP [8bit] increased" },
+        { address=0X146DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Head HP MAX [8bit] decreased" },
+        { address=0X146DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Head HP MAX [8bit] increased" },
+        { address=0X146E6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Head HP [8bit] decreased" },
+        { address=0X146E6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Head HP [8bit] increased" },
+        { address=0X146FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Right HP MAX [8bit] decreased" },
+        { address=0X146FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Right HP MAX [8bit] increased" },
+        { address=0X14706, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Right HP [8bit] decreased" },
+        { address=0X14706, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Right HP [8bit] increased" },
+        { address=0X1471C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Left HP MAX [8bit] decreased" },
+        { address=0X1471C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Left HP MAX [8bit] increased" },
+        { address=0X14726, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Left HP [8bit] decreased" },
+        { address=0X14726, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Left HP [8bit] increased" },
+        { address=0X1473C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Leg HP MAX [8bit] decreased" },
+        { address=0X1473C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Leg HP MAX [8bit] increased" },
+        { address=0X14746, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Leg HP [8bit] decreased" },
+        { address=0X14746, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Battle - CPU Medarot 1 | Leg HP [8bit] increased" },
+        { address=0X14D35, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Battle - Damage Value [8bit]" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC83C, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mini Game 2 - Power Up [8bit BCD]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC821, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Mini Game 2 - Score [16bit BCD]" },
+      },
+      collectibles = {
+        { address=0XC670, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player Money [16bit BE] increased" },
+        { address=0XC671, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money? increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCD32, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Player Block Walk [8bit]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Shining Force Gaiden: Final Conflict",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "shining-force-gaiden-final-conflict",
+    file = "shining-force-gaiden-final-conflict.zip",
+    hashes = {
+      { hash = "219b1a3f5e055fce7245d869e1fc9249", label = "Shining Force Gaiden - Final Conflict (Japan) (En) (Debug Patch) (Bartis1989).gg" },
+      { hash = "b7b023b6c716c8c984c3268a962cf99b", label = "Shining Force Gaiden - Final Conflict (Japan) (Debug Patch) (Bartis1989).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X200B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ian's Level" },
+        { address=0X2033, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mead's Level" },
+        { address=0X205B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Paige's Level" },
+        { address=0X2083, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hawel's Level" },
+        { address=0X20AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Knuckles' Level" },
+        { address=0X20D3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sonette's Level" },
+        { address=0X20FB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cynthia's Level" },
+        { address=0X2123, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ruburan's Level" },
+        { address=0X214B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kiddo's Level" },
+        { address=0X2173, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sylvia's Level" },
+        { address=0X219B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Julia's Level" },
+      },
+      stage = {
+        { address=0X0050, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level of Selected Character" },
+        { address=0X0C20, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 16 Test" },
+        { address=0X0C40, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 Chest and Surrounding Bytes" },
+        { address=0X0C4B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 11 Chest" },
+        { address=0X0C4D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 Chest" },
+        { address=0X0C7B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 10 Chest" },
+        { address=0X0CAA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 21 Test" },
+        { address=0X0CE6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 18 Test" },
+        { address=0X0CEE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 18 Test" },
+        { address=0X0D00, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 16 Test" },
+        { address=0X0D03, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 Chest" },
+        { address=0X0D8C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 Test" },
+        { address=0X0DC7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 12 Chest" },
+        { address=0X0DD7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 15 Chest" },
+        { address=0X0DE2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 8 Chest" },
+        { address=0X0DE6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 11 Chest" },
+        { address=0X0E02, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 20 Chest" },
+        { address=0X0E16, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5/16 Chest" },
+        { address=0X0E22, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 18 Chest" },
+        { address=0X0E66, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 14 Chest" },
+        { address=0X0F59, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 16 Chest" },
+        { address=0X0FA2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7 Test" },
+        { address=0X0FC3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 12 Test" },
+      },
+    },
+  },
+}

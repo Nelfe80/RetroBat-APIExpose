@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "~Demo~ Metroid Prime: Hunters - First Hunt",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "demo-metroid-prime-hunters-first-hunt",
+    file = "demo-metroid-prime-hunters-first-hunt.zip",
+    hashes = {
+      { hash = "efc4c41019d65f4cbea17187704ba712", label = "Metroid Prime - Hunters - First Hunt (Europe) (En,Fr,De,Es,It) (Demo) (Not for Resale).nds" },
+      { hash = "fb0b7b8a81983425e4bd76200bdfaeb7", label = "Metroid Prime - Hunters - First Hunt (USA, Australia) (Demo) (Not for Resale).nds" },
+    }
+  },
+
+  events = {
+  },
+}

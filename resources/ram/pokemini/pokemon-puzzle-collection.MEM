@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Puzzle Collection",
+    system = "pokemini",
+    system_name = "Pokemon Mini",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-puzzle-collection",
+    file = "pokemon-puzzle-collection.zip",
+    hashes = {
+      { hash = "1bb47758e8ea1c5ba39acf4a1d10c78e", label = "Pokemon Puzzle Collection (USA, Europe).min" },
+    }
+  },
+
+  events = {
+  },
+}

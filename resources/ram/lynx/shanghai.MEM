@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Shanghai",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "shanghai",
+    file = "shanghai.zip",
+    hashes = {
+      { hash = "46634eb87e6380d4d10f7b80d177c1ff", label = "Shanghai (World).lnx" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X003F, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="00 - Title Screen" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00AB, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer - Minutes" },
+        { address=0X00AC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer - Seconds" },
+        { address=0X00AD, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer - milliseconds" },
+      },
+    },
+  },
+}

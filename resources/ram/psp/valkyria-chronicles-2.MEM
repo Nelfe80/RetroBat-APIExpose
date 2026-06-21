@@ -1,0 +1,114 @@
+return {
+  game = {
+    title = "Valkyria Chronicles 2",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "valkyria-chronicles-2",
+    file = "valkyria-chronicles-2.zip",
+    hashes = {
+      { hash = "37122215ce750d67b7142f4c137e37ec", label = "Valkyria Chronicles II (USA) (PSP) (PSN).iso" },
+      { hash = "64488ab73d4466ee9d7ff5d80fcc97f4", label = "Valkyria Chronicles 2 (USA) (Undub)" },
+      { hash = "677b5913e45b0ffac76119f9b55afb7a", label = "Valkyria Chronicles II (USA).iso" },
+      { hash = "d6df2375e15b0ce53a85fe46f9010f1d", label = "Valkyria Chronicles II (Europe).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD36A70, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Red" },
+        { address=0XD36A74, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Crew" },
+        { address=0XD4370D, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonblade - Defeated 'Whitaker Demonblade'" },
+        { address=0XD43714, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonshot - Defeated 'Whitaker Demonshot'" },
+        { address=0XD43741, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demonlords - Defeated 'Chaolen Demonlord'" },
+        { address=0XD43753, type="u8", condition="bit_true", bit=3, mask=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Lovers - Earned 50 titles" },
+        { address=0XD43753, type="u8", condition="bit_true", bit=5, mask=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Hunters - Earned 100 titles" },
+        { address=0XD43753, type="u8", condition="bit_true", bit=7, mask=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Maniacs - Earned 150 titles" },
+        { address=0XD43754, type="u8", condition="bit_true", bit=1, mask=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Masters - Earned 200 titles" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD38721, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Order of Golden Wings - Have all classes reach level 50" },
+        { address=0XD436FF, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Veteran - Completed all Drill Ground missions" },
+        { address=0XD43700, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Worldly - Completed missions in all areas" },
+        { address=0XD4371F, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underworld - Purchased all missions" },
+        { address=0XD4372A, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Company - Leveled all classes to 10" },
+        { address=0XD4372B, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Battalion - Leveled all classes to 20" },
+        { address=0XD4372B, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Regiment - Leveled all classes to 30" },
+        { address=0XD4372B, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Division - Leveled all classes to 40" },
+        { address=0XD4372B, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Corps - Leveled all classes to 50" },
+        { address=0XD4372C, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Recon Squad - Leveled Scout class to 10" },
+        { address=0XD4372C, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Combat Squad - Leveled Scout class to 30" },
+        { address=0XD4372C, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Special Ops - Leveled Scout class to 50" },
+        { address=0XD4372C, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Guerilla Squad - Leveled Shocktrooper class to 10" },
+        { address=0XD4372D, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strike Force - Leveled Shocktrooper class to 30" },
+        { address=0XD4372D, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Assault Squad - Leveled Shocktrooper class to 50" },
+        { address=0XD4372D, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Attack Squad - Leveled Lancer class to 10" },
+        { address=0XD4372D, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Armored Squad - Leveled Lancer class to 30" },
+        { address=0XD4372E, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Artillery Squad - Leveled Lancer class to 50" },
+        { address=0XD4372E, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Guards - Leveled Armored Tech class to 10" },
+        { address=0XD4372E, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Royal Guards - Leveled Armored Tech class to 30" },
+        { address=0XD4372E, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tech Masters - Leveled Armored Tech class to 50" },
+        { address=0XD4372F, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Defense Squad - Leveled Engineer class to 10" },
+        { address=0XD4372F, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bandsmen - Leveled Engineer class to 30" },
+        { address=0XD4372F, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Orchestra - Leveled Engineer class to 50" },
+        { address=0X1087310, type="u16le", condition="eq", value=0X28, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Morale level 3 (at the very beginning of the dial)" },
+        { address=0X1087310, type="u16le", condition="eq", value=0X64, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max morale (level 5)" },
+        { address=0X1087318, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In School Grounds" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD436FD, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Silver - Completed all Diebal missions" },
+        { address=0XD43705, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Elite - Completed a mission with one soldier" },
+        { address=0XD43707, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fearsome - Defeated 100 enemy soldiers" },
+        { address=0XD43707, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hel - Defeated 300 enemy soldiers" },
+        { address=0XD43707, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Nightmare - Defeated 500 enemy soldiers" },
+        { address=0XD43707, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bloodbath - Defeated 1000 enemy soldiers" },
+        { address=0XD43708, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death - Defeated 100 enemies with head shot" },
+        { address=0XD43711, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Cold-Blooded - Defeated 'Diess Cold-Blood'" },
+        { address=0XD4371F, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Fun - Viewed 50 daily life events" },
+        { address=0XD4371F, type="u8", condition="bit_true", bit=5, mask=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="Pleasant - Viewed all daily life events" },
+        { address=0XD43752, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ladies' Men - Half female classmate missions done" },
+      },
+      health = {
+        { address=0XD43704, type="u8", condition="bit_true", bit=3, mask=0X08, action="HIT", no_log=false, no_survey=false, desc="Magnificent - Completed a mission taking no damage" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XD38722, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Armament Excellence - Develop all weapons in R&D" },
+        { address=0XD43747, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Hunters - Developed 50% of weapons" },
+        { address=0XD43748, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Masters - Developed all weapons" },
+        { address=0XD4374B, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tank Hunters - Developed 50% of tank weapons" },
+        { address=0XD4374B, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Tank Masters - Developed all tank weapons" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD38720, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Class Ring - Complete all classmate missions" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD43738, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyers - Defeated 10 enemy tanks" },
+        { address=0XD43738, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyer Lords - Defeated 30 enemy tanks" },
+        { address=0XD43738, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyer Kings - Defeated 50 enemy tanks" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD3BAF4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Story Mission 1 Rebel Encounter - Rank" },
+        { address=0XD3BAF6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+        { address=0XD3BCDE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+        { address=0XD3BDC6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+        { address=0XD3C01E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

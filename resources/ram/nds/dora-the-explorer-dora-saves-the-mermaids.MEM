@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Dora the Explorer: Dora Saves the Mermaids",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "dora-the-explorer-dora-saves-the-mermaids",
+    file = "dora-the-explorer-dora-saves-the-mermaids.zip",
+    hashes = {
+      { hash = "31a6c756c8745c67fb891a78c3255d74", label = "Dora the Explorer - Dora Saves the Mermaids (Europe) (En,Fr,De,Nl).nds" },
+      { hash = "2defc15119ee892db182cae52923c508", label = "Dora the Explorer - Dora Saves the Mermaids (Europe) (Sv,No,Da,Fi).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X47744, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In level" },
+        { address=0X48424, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="in level" },
+        { address=0X4845C, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Boots clearing trash" },
+      },
+      stage = {
+        { address=0X47778, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0X48420, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X47760, type="u8", condition="eq", value=0X0F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dolphins with Diego" },
+        { address=0X48440, type="u8", condition="eq", value=0X0F, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dolphins with Diego" },
+        { address=0X4845C, type="u8", condition="eq", value=0X8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dolphins wityh Diego" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X47760, type="u8", condition="eq", value=0X15, action="SWIMMING", no_log=true, no_survey=false, desc="Mermaid Dora swimming" },
+        { address=0X48440, type="u8", condition="eq", value=0X15, action="SWIMMING", no_log=true, no_survey=false, desc="Mermaid Dora swimming" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X48D6D, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="More values for specific levels, used for challenge achievements in unison with level counters." },
+      },
+    },
+  },
+}

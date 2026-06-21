@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Rising Zan: The Samurai Gunman",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "rising-zan-the-samurai-gunman",
+    file = "rising-zan-the-samurai-gunman.zip",
+    hashes = {
+      { hash = "591247c76ef63c29dc73b0628edb034a", label = "Rising Zan - The Samurai Gunman (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBA464, type="u32le", condition="eq", value=0X800BA4F0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="At the main title screen/the menus" },
+        { address=0XBA468, type="u32le", condition="eq", value=0X00000080, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X886AC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="cleared" },
+        { address=0X913B8, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="impact cleared" },
+        { address=0X94B00, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on the ground" },
+        { address=0XE4204, type="u32le", condition="eq", value=0X00000000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on the ground" },
+      },
+      stage = {
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1st Impact" },
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="2nd Impact" },
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="3rd Impact" },
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="4th Impact" },
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="5th Impact" },
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="6th Impact" },
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="7th Impact" },
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8th Impact" },
+        { address=0X1FFEE4, type="u8", condition="eq", value=0X9, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Impact" },
+        { address=0X1FFEE4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Impact (Level)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X90878, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Points (Results Screen) increased" },
+        { address=0X90878, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Points (Results Screen) decreased" },
+      },
+      health = {
+        { address=0XEA478, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2nd Impact Health? decreased" },
+        { address=0XEA478, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2nd Impact Health? increased" },
+        { address=0XF2988, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1st Impact Health? decreased" },
+        { address=0XF2988, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1st Impact Health? increased" },
+        { address=0XF3278, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1st Impact Health? decreased" },
+        { address=0XF3278, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1st Impact Health? increased" },
+        { address=0X116038, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2nd Impact Health? decreased" },
+        { address=0X116038, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2nd Impact Health? increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X908B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16/32-bit] Finish Points (Results Screen)" },
+      },
+      collectibles = {
+        { address=0XF14F2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Special Ammo?" },
+        { address=0XF3272, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Missile Ammo?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X908A0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Hustle Time Meter Charges" },
+      },
+    },
+  },
+}

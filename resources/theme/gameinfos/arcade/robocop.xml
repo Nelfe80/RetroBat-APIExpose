@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Shoot/Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Jump</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Shoot/Punch</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Jump</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${yellow}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 5ZB 79100</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 MURPHY   50000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 LEWIS    48000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ED-209   47000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 SCI-VAX. 46000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 SWORDMST 43000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 GANGAN.H 35000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 STADIUM  32000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 HERO     31000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 O.C.P.   30000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

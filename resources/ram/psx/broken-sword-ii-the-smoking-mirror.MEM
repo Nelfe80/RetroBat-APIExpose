@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Broken Sword II: The Smoking Mirror",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "broken-sword-ii-the-smoking-mirror",
+    file = "broken-sword-ii-the-smoking-mirror.zip",
+    hashes = {
+      { hash = "037d1cfdb2102e1d7366bbd0b5a8ebec", label = "Broken Sword II - The Smoking Mirror (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7FE94, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Doesn't have it (still on the ground)" },
+        { address=0X7FEE0, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The tequila worm is laying on the ground." },
+        { address=0X807B8, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground" },
+        { address=0X80844, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Creeper lay on the ground" },
+        { address=0X809AC, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Still on the ground" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X807B0, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7FE1C, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The bookcase was checked and also the loose block of wood. Once it falls it will return to zero." },
+        { address=0X7FE20, type="u8", condition="eq", value=0X0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="George can’t interact with the loose block of wood yet." },
+        { address=0X7FE20, type="u8", condition="eq", value=0X1, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="George can kick the loos block of wood." },
+        { address=0X7FFB0, type="u8", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Cabinet doors are sealed and weren’t opened yet." },
+        { address=0X7FFB0, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="George opened the cabinet doors with the dart." },
+        { address=0X7FFF0, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door found" },
+        { address=0X80644, type="u8", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door is locked." },
+        { address=0X80644, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door is unlocked." },
+        { address=0X807F8, type="u8", condition="eq", value=0X0, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door still closed" },
+        { address=0X807F8, type="u8", condition="eq", value=0X1, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door was unlocked" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7FCA0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+        { address=0X7FE98, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+        { address=0X802E4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+        { address=0X802F4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+        { address=0X803CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

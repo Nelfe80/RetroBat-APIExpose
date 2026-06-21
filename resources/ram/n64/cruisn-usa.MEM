@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Cruis'n USA",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "cruisn-usa",
+    file = "cruisn-usa.zip",
+    hashes = {
+      { hash = "00a3e885f8d899646228a21d946b2102", label = "Cruis'n USA (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X150A80, type="u8", condition="eq", value=0X0E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen or Ending Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X150A88, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cruis'n USA Mode" },
+        { address=0X150A88, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x00=Stage Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X150A80, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Valley" },
+      },
+    },
+  },
+}

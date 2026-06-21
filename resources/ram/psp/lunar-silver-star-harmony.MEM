@@ -1,0 +1,118 @@
+return {
+  game = {
+    title = "Lunar: Silver Star Harmony",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lunar-silver-star-harmony",
+    file = "lunar-silver-star-harmony.zip",
+    hashes = {
+      { hash = "2f10dfcb7c13e3035b0704c79e9a0e4f", label = "Lunar - Silver Star Harmony (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB06E81, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Luna's Throne / Title Screen" },
+        { address=0XB4E948, type="u16le", condition="eq", value=0X1, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over screen" },
+        { address=0XCE9504, type="u8", condition="eq", value=0X3D, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="End Credits" },
+        { address=0X13D3B16, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen Showing" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XCE875A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alex Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCE9504, type="u8", condition="eq", value=0X16, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ladies' Man or Ladyboy?" },
+        { address=0X1E117E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Royce - Player Party Death Count" },
+        { address=0X1E21660, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Magic Emperor (Hall of Rebirth) - Player Party Death Count" },
+        { address=0X1E2C8A0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Xenobia - Player Party Death Count" },
+        { address=0X1E2F660, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Magic Emperor (Grindery) - Player Party Death Count" },
+        { address=0X1E75360, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Bronze Dogs - Player Party Death Count" },
+        { address=0X1EBD4E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Saline Slimer - Player Party Death Count" },
+        { address=0X1EE85A0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Black Dragon - Player Party Death Count" },
+        { address=0X1EEB2E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Grand Doom - Player Party Death Count" },
+        { address=0X1EFC5A0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Shadow - Player Party Death Count" },
+        { address=0X1EFD6E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Ultragoyles - Player Party Death Count" },
+        { address=0X1EFF7E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Mobile Masher - Player Party Death Count" },
+        { address=0X1F01A60, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss - Aqua Lizard - Player Party Death Count" },
+      },
+      health = {
+        { address=0XD06BB0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mel - Battle HP decreased" },
+        { address=0XD06BB0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mel - Battle HP increased" },
+        { address=0XD0ABA0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Lemia - Battle HP decreased" },
+        { address=0XD0ABA0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Lemia - Battle HP increased" },
+        { address=0XD59920, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ghaleon - Battle HP decreased" },
+        { address=0XD59920, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ghaleon - Battle HP increased" },
+        { address=0XD59CD0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dyne - Battle HP decreased" },
+        { address=0XD59CD0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dyne - Battle HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCE8614, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Wrath Ring increased" },
+        { address=0XCE8616, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Equipped Item - Wrath Ring increased" },
+        { address=0XCE861C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Healing Ring increased" },
+        { address=0XCE861E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Equipped Item - Healing Ring increased" },
+        { address=0XCE8624, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Fresh Ring increased" },
+        { address=0XCE8628, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Clear Ring increased" },
+        { address=0XCE862C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Angel Ring increased" },
+        { address=0XCE8630, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Tri-Ring increased" },
+        { address=0XCE8638, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Flame Ring increased" },
+        { address=0XCE863C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Barrier Ring increased" },
+        { address=0XCE8640, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Orb Ring increased" },
+        { address=0XCE8644, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Fortune Ring increased" },
+        { address=0XCE8646, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Equipped Item - Fortune Ring increased" },
+        { address=0XCE864C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Gale Ring increased" },
+        { address=0XCE8654, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Protection Ring increased" },
+        { address=0XCE8656, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Equipped Item - Protection Ring increased" },
+        { address=0XCE86C4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Althena's Ring increased" },
+        { address=0XCE86D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Dragon Ring increased" },
+        { address=0XCE86D6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Equipped Item - Dragon Ring increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XAB4C80, type="u8", condition="eq", value=0XE3, action="BOSS_HIT", no_log=false, no_survey=false, desc="Silver Tower - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XEB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Saith Docks - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XEC, action="BOSS_HIT", no_log=false, no_survey=false, desc="Meribian Sewers - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XED, action="BOSS_HIT", no_log=false, no_survey=false, desc="Cave of Trial - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XEE, action="BOSS_HIT", no_log=false, no_survey=false, desc="Islet of Lann - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XEF, action="BOSS_HIT", no_log=false, no_survey=false, desc="Vann - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XF0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Red Dragon Cave - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XF2, action="BOSS_HIT", no_log=false, no_survey=false, desc="Talon Mine - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XF4, action="BOSS_HIT", no_log=false, no_survey=false, desc="Grindery - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XF5, action="BOSS_HIT", no_log=false, no_survey=false, desc="Azure City - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XF6, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goddess Tower - Boss Battle" },
+        { address=0XAB4C80, type="u8", condition="eq", value=0XF7, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hall of Rebirth - Boss Battle" },
+        { address=0XC522BC, type="u16le", condition="eq", value=0X00E8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Meribian Sewer - Boss Room" },
+        { address=0XC522BC, type="u16le", condition="eq", value=0X00ED, action="BOSS_HIT", no_log=false, no_survey=false, desc="Cave of Trial - Boss Room" },
+        { address=0XC522BC, type="u16le", condition="eq", value=0X0156, action="BOSS_HIT", no_log=false, no_survey=false, desc="Talon Mines - Boss Room" },
+        { address=0XC522BC, type="u16le", condition="eq", value=0X018A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Grindery - Boss Room" },
+        { address=0XC522BC, type="u16le", condition="eq", value=0X01B8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goddess Tower - Boss Room" },
+        { address=0XC522BC, type="u16le", condition="eq", value=0X01BB, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hall of Rebirth - Final Boss Room" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCE854C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Wooden Shield" },
+        { address=0XCE8550, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Iron Shield" },
+        { address=0XCE8554, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Silver Shield" },
+        { address=0XCE8558, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Steel Shield" },
+        { address=0XCE855C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Warrior Shield" },
+        { address=0XCE8560, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Insane Shield" },
+        { address=0XCE8564, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Lacquer Shield" },
+        { address=0XCE8568, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Dragon Shield" },
+        { address=0XCE85B4, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory Item - Spare Shield" },
+        { address=0XCE9504, type="u8", condition="eq", value=0X17, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="The Red Dragon Shield" },
+      },
+    },
+  },
+}

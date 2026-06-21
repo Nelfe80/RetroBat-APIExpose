@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Asahi Shinbun Rensai: Katou Ichi-Ni-San Shougi: Shingiryuu",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "asahi-shinbun-rensai-katou-ichi-ni-san-shougi-shingiryuu",
+    file = "asahi-shinbun-rensai-katou-ichi-ni-san-shougi-shingiryuu.zip",
+    hashes = {
+      { hash = "3d3c735ad372dbbbb7cafb809c60678b", label = "Asahi Shinbun Rensai - Katou Hifumi Kudan Shougi - Shingiryuu (Japan).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X09C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X09C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XD871, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Crateria Missile 1" },
+        { address=0XD871, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Brinstar Power Bomb 4" },
+        { address=0XD871, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Brinstar Super Missile 1" },
+        { address=0XD871, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Brinstar Missile 3" },
+        { address=0XD873, type="u8", condition="bit_true", bit=5, mask=0X20, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Brinstar Energy Tank 3" },
+        { address=0XD873, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Brinstar Energy Tank 2" },
+        { address=0XD874, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Brinstar Energy Tank 4" },
+        { address=0XD875, type="u8", condition="bit_true", bit=4, mask=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Brinstar Missile 12" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XD876, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Bit0: Varia Suit" },
+      },
+    },
+  },
+}

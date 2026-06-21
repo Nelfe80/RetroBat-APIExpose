@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Power Dolls FX",
+    system = "pcfx",
+    system_name = "PC-FX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "power-dolls-fx",
+    file = "power-dolls-fx.zip",
+    hashes = {
+      { hash = "1982933e6620687f0bf5b90f7a38dfdc", label = "Power DoLLS FX (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XCD464, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title;" },
+        { address=0XCD464, type="u8", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Briefly seen on Title;" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XCD9B9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Haddie Newland HP" },
+      },
+      health = {
+        { address=0XCD9CF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Yao Faerun HP decreased" },
+        { address=0XCD9CF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Yao Faerun HP increased" },
+        { address=0XCD9E5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Julia Rayburg HP decreased" },
+        { address=0XCD9E5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Julia Rayburg HP increased" },
+        { address=0XCD9FB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Thelma Shelly HP decreased" },
+        { address=0XCD9FB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Thelma Shelly HP increased" },
+        { address=0XCDA11, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Faan Kuanmei HP decreased" },
+        { address=0XCDA11, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Faan Kuanmei HP increased" },
+        { address=0XCDA27, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Alice Nox HP decreased" },
+        { address=0XCDA27, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Alice Nox HP increased" },
+      },
+    },
+  },
+}

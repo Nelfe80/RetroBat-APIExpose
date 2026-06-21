@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Naruto Shippuden: Ultimate Ninja 5",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Fighting"
+  },
+
+  rom = {
+    name = "naruto-shippuden-ultimate-ninja-5",
+    file = "naruto-shippuden-ultimate-ninja-5.zip",
+    hashes = {
+      { hash = "4b6f2d1cf417316cbccadbdd2a8beeea", label = "Naruto Shippuden - Ultimate Ninja 5 (Europe) (En,Fr,De,Es,It)" },
+      { hash = "b709146033756e98ee2560e8fcecdf5a", label = "Naruto Shippuden - Ultimate Ninja 5 (Europe) (En,Fr,De,Es,It) (60FPS) (v1.5) (Bit.Raiden, ZMath3us)" },
+      { hash = "318e876f9bef89766d4b5018629f0594", label = "Naruto Shippuden - Ultimate Ninja 5 (Europe) (Pt) (60FPS) (v9.0) (Bit.Raiden, ZMath3us)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X618068, type="u16le", condition="eq", value=0X0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Forest of Death" },
+      },
+    },
+  },
+}

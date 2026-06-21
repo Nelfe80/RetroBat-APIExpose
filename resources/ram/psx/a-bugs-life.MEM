@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "A Bug's Life",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "a-bugs-life",
+    file = "a-bugs-life.zip",
+    hashes = {
+      { hash = "924c0404484d1604a834cbf8b7d2e362", label = "Disney-Pixar A Bug's Life (USA) (Rerelease)" },
+      { hash = "95f1fb0af5234175ec1c1c25bdc1815e", label = "Disney-Pixar A Bug's Life (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X822E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grasshopper chain for bonus level (EU)" },
+        { address=0X823A0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01 - Level Complete" },
+        { address=0X82440, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="exit level (EU)" },
+        { address=0X82504, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="The real level ID (US)" },
+        { address=0X94A7D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Seed 1 Status" },
+        { address=0X94A7E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Seed 1 Color" },
+        { address=0X94B0A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Seed 2 Color" },
+        { address=0X94BA0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Token spin on bonus level 2" },
+        { address=0X94BD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level 3 seed color animation" },
+        { address=0X94E8A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2 Seed 3 Color" },
+        { address=0X9B88A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of bonus levels completed (US)" },
+        { address=0X9B92A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of bonus levels cleared (EU)" },
+        { address=0XA64B0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XA6637, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Berry level (EU)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X82440, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death in level (EU)" },
+        { address=0XA65A0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XA65A0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0XA6640, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (EU) increased" },
+        { address=0XA6640, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (EU) decreased" },
+      },
+      health = {
+        { address=0XA6594, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XA6594, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XA6634, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (EU) decreased" },
+        { address=0XA6634, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (EU) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA658E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Remaining Enemies for Gold Berry Token - HEX increased" },
+        { address=0XA662E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Enemies left for gold medal (EU) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XA657E, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility Powerup Timer" },
+      },
+      player = {
+        { address=0X822B8, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Number of seeds jumped on" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X94A88, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level 2 Seed 1 Timer" },
+        { address=0X94B14, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level 2 Seed 2 Timer" },
+        { address=0X94E94, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level 2 Seed 3 Timer" },
+      },
+    },
+  },
+}

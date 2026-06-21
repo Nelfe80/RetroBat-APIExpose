@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Spider-Man: Friend or Foe",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "spider-man-friend-or-foe",
+    file = "spider-man-friend-or-foe.zip",
+    hashes = {
+      { hash = "b92b2547387504ae16f2a031751462ca", label = "Spider-Man - Friend or Foe (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

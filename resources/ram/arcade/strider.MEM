@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Strider",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "strider",
+    file = "strider.zip",
+    hashes = {
+      { hash = "16c28324602b195c476a7d65fead9391", label = "striderjr.7z <Strider Hiryu (Japan Resale Ver.)>" },
+      { hash = "a27e29f4186914735ee68e23357012f8", label = "strider.7z <Strider (US set 1)>" },
+      { hash = "bcf90b4c244f2af8ee9193c9a1f334f7", label = "striderj.7z <Strider Hiryu (Japan)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00B1, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="neither" },
+        { address=0X00B1, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="game over / time over" },
+        { address=0X00B1, type="u8", condition="eq", value=0X10, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue?" },
+        { address=0X0C6E, type="u8", condition="bit_true", bit=6, mask=0X40, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Allow Continue (0 = On, 1 = Off)" },
+        { address=0X0C85, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+        { address=0X0C85, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="playing (incl. intro and continue screen)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0CB3, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X0CB3, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2" },
+        { address=0X0CB3, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 4 (!!!???)" },
+        { address=0X0CB3, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3 (???!!!)" },
+        { address=0X0CB3, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5" },
+        { address=0X0CB3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0C6E, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 = 4 lives" },
+        { address=0X0C6E, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 = 5 lives" },
+        { address=0X0C6E, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Freeze (0 = Off, 1 = On)" },
+        { address=0X0C6E, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Free Play (0 = Off, 1 = On)" },
+        { address=0X0C6E, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="Flip (0 = Off, 1 = On)" },
+        { address=0X0C6E, type="u8", condition="bit_true", bit=5, mask=0X20, action="LIVES_STATE", no_log=false, no_survey=false, desc="Sound (0 = On, 1 = Off)" },
+        { address=0X0C6E, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="Game Mode (0 = Game, 1 = Test)" },
+        { address=0X0CE6, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="filled (green)" },
+        { address=0X0CE6, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="'red' (covered by an option) (bit0 still active)" },
+        { address=0X0CE6, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="'yellow' (covered by robopanther) (bit0 not active until lost)" },
+        { address=0X0CE6, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="active/part of life bar" },
+        { address=0X0CE7, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="filled (green)" },
+        { address=0X0CE7, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="'red' (covered by an option) (bit0 still active)" },
+        { address=0X0CE7, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="'yellow' (covered by robopanther) (bit0 not active until lost)" },
+        { address=0X0CE7, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="active/part of life bar" },
+        { address=0X0CE8, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="filled (green)" },
+        { address=0X0CE8, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="'red' (covered by an option) (bit0 still active)" },
+        { address=0X0CE8, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="'yellow' (covered by robopanther) (bit0 not active until lost)" },
+        { address=0X0CE8, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="active/part of life bar" },
+        { address=0X0CE9, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="filled (green)" },
+        { address=0X0CE9, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="'red' (covered by an option) (bit0 still active)" },
+        { address=0X0CE9, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="'yellow' (covered by robopanther) (bit0 not active until lost)" },
+        { address=0X0CE9, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="active/part of life bar" },
+        { address=0X0CEB, type="u8", condition="bit_true", bit=0, mask=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="filled (green)" },
+        { address=0X0CEB, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="'red' (covered by an option) (bit0 still active)" },
+        { address=0X0CEB, type="u8", condition="bit_true", bit=2, mask=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="'yellow' (covered by robopanther) (bit0 not active until lost)" },
+        { address=0X0CEB, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="active/part of life bar" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0C60, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="coin input" },
+        { address=0X0C61, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="coin input" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0C64, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="jump" },
+        { address=0X0C65, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=false, no_survey=false, desc="jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0C82, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Upright 1P" },
+        { address=0X0C82, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Upright 2P" },
+        { address=0X0C82, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cocktail" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00B1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="game over / continue screens" },
+      },
+    },
+  },
+}

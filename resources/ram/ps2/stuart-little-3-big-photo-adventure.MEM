@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Stuart Little 3: Big Photo Adventure",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "stuart-little-3-big-photo-adventure",
+    file = "stuart-little-3-big-photo-adventure.zip",
+    hashes = {
+      { hash = "44fae66216703dba2ed719db8394ab24", label = "Stuart Little 3 - Big Photo Adventure (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X326863, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Load Game" },
+        { address=0X3288E0, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X3288E0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True Stage ID" },
+        { address=0X3A42C8, type="u16le", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Garden" },
+        { address=0X3A42C8, type="u16le", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Forest" },
+        { address=0X3A42C8, type="u16le", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Street" },
+        { address=0X3A42C8, type="u16le", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lake" },
+        { address=0X3A42C8, type="u16le", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="House" },
+        { address=0X3A42C8, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID on the save file" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X341FE0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Weasels Health [Float] decreased" },
+        { address=0X341FE0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Weasels Health [Float] increased" },
+      },
+    },
+  },
+}

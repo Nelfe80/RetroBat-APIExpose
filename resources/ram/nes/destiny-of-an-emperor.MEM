@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Destiny of an Emperor",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "destiny-of-an-emperor",
+    file = "destiny-of-an-emperor.zip",
+    hashes = {
+      { hash = "516136715d9e29e889f3c9d7c7d12a42", label = "Destiny of an Emperor (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X007F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X6073, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X60D0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Leader Soldiers (Tiger Priority Guan Yu/Guan Xing)" },
+        { address=0X60D4, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd General Soldiers (Tiger Priority Zhang Fei/Zhang Bao)" },
+        { address=0X60D8, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd General Soldiers (Tiger Priority Zhao Yun/Liu Bei)" },
+        { address=0X60DC, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="4th General Soldiers (Tiger Priority Huang Zhong)" },
+        { address=0X60E0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="5th General Soldiers (Tiger Priority Zhu Ge Liang)" },
+        { address=0X60E4, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="6th General Soldiers (Tiger Priority Ma Chao)" },
+        { address=0X60E8, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Last General Soldiers (Tiger Priority Jiang Wei)" },
+        { address=0X60EC, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Leader Soldiers/hp" },
+        { address=0X60F0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2nd Enemy Soldiers/hp" },
+        { address=0X60F4, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="3rd Enemy Soldiers/hp" },
+        { address=0X60F8, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="4th Enemy Soldiers/hp" },
+        { address=0X60FC, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="5th Enemy Soldiers/hp" },
+        { address=0X6300, type="u8", condition="eq", value=0XE0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead on Reserve" },
+        { address=0X63BC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lu Bu (439 Soldiers) (see 0x6300)" },
+        { address=0X63C0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lu Bu (613 soldiers) (see 0x6300)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0005, type="u8", condition="eq", value=0X07, action="TREASURE", no_log=false, no_survey=false, desc="Found Treasure Chest" },
+        { address=0X6604, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Qing Zhou Castle - Hidden Cave = Ax" },
+        { address=0X6629, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Nu Long in Wu Cave" },
+        { address=0X662D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Wei Cave A Treasures" },
+        { address=0X662E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Wei Cave B Treasure bits" },
+        { address=0X664C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X664D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6676, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X667A, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Tie Men Xia - Ax" },
+        { address=0X6680, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6681, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6683, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6684, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6685, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6686, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6687, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6688, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6689, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X668A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X668B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X668C, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X668D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X668E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X668F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6690, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6691, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6692, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+        { address=0X6693, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bits" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0047, type="u8", condition="eq", value=0X2A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Key Cave" },
+        { address=0X6076, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(24-bit)Money increased" },
+        { address=0X662A, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Key" },
+        { address=0X662A, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money" },
+        { address=0X662B, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money" },
+        { address=0X662C, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money" },
+      },
+    },
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Cobra Triangle",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "cobra-triangle",
+    file = "cobra-triangle.zip",
+    hashes = {
+      { hash = "4d40ce0e6f39220ac87470fa508a3d3a", label = "Cobra Triangle (Europe).nes" },
+      { hash = "81e7d9c694e20f75219b7c00ba66a618", label = "Cobra Triangle (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001A, type="u8", condition="eq", value=0X4A, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+  },
+}

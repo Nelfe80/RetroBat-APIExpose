@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Rage Racer",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "rage-racer",
+    file = "rage-racer.zip",
+    hashes = {
+      { hash = "79c653243266254c78a935cbaf43ad73", label = "Rage Racer (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9A434, type="u8", condition="eq", value=0X00000000, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X99134, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer?" },
+        { address=0X99135, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="System Timer" },
+        { address=0X9B070, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X9B070, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GP Race" },
+        { address=0X9B070, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GP/Time Trial - Set upon seeing Course Select" },
+        { address=0X9E560, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Lap 1 Time (GP/TT)" },
+        { address=0X9E564, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap 2 Time (GP/TT)" },
+        { address=0X9E568, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap 3 Time (GP/TT)" },
+        { address=0X19E2A8, type="u8", condition="eq", value=0X08, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mythical Coast" },
+        { address=0X19E2A8, type="u8", condition="eq", value=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Over Pass City" },
+        { address=0X19E2A8, type="u8", condition="eq", value=0X18, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lakeside Gate" },
+        { address=0X19E2A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial Race Selection" },
+        { address=0X1E3E8C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Menu Options: Grand Prix =00, Time Attack =02, Save&Load =03, Option =04" },
+        { address=0X1F3AB8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time (Seconds) ?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Professor Layton and the Curious Village",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "professor-layton-and-the-curious-village",
+    file = "professor-layton-and-the-curious-village.zip",
+    hashes = {
+      { hash = "e8f6f07eb7138aec4d75492b3511dc03", label = "Professor Layton and the Curious Village (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "fc519507f2e6f07c1f212ea00744e21a", label = "Professor Layton and the Curious Village (USA, Australia).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X2ADA7F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+        { address=0X2B18FF, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="--- World Map [8bit]" },
+        { address=0X2B191F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="--- World Map [8bit]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2AD8D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Collected Hint Coins increased" },
+        { address=0X2AD914, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] Coins increased" },
+        { address=0X2B1754, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hint Coins collected [8bit] {EU} increased" },
+        { address=0X2B1755, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hint Coins collected [8bit] {EU} increased" },
+        { address=0X2B1756, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hint Coins collected [8bit] {EU} increased" },
+        { address=0X2B1758, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hint Coins collected [8bit] {EU} increased" },
+        { address=0X2B1759, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hint Coins collected [8bit] {EU} increased" },
+        { address=0X2B175A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hint Coins collected [8bit] {EU} increased" },
+        { address=0X2B175B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Hint Coins collected [8bit] {EU} increased" },
+        { address=0X2B1794, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Hint Coins [16bit] {EU} increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2AD60F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bitflag for Hidden Door" },
+        { address=0X2AEA44, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hidden Door Input (only open menu)" },
+        { address=0X2B148F, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[EU] Hidden Door Bitflag" },
+        { address=0X2B1854, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Objective ID [8bit] {EU}" },
+        { address=0X2B3564, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[EU] Hidden Door Input (only open menu)" },
+      },
+    },
+  },
+}

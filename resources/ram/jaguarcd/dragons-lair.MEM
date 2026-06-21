@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Dragon's Lair",
+    system = "jaguarcd",
+    system_name = "Atari Jaguar CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dragons-lair",
+    file = "dragons-lair.zip",
+    hashes = {
+      { hash = "d068b02bd51d0548fd3740d3e02f3d56", label = "Dragon's Lair (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5657, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="0x0a on Continue Screen..." },
+        { address=0X566C, type="u16be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu (16-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X567B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) increased" },
+        { address=0X567B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit) decreased" },
+        { address=0X5707, type="u32be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Room Death ID (32-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X56EA, type="u16be", condition="eq", value=0X7440, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 1' (Drawbridge - Pool Room) - THIS IS ALSO THE TITLE SCREEN VALUE." },
+        { address=0X56EA, type="u16be", condition="eq", value=0X7454, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 2' (Wizard's Chamber - Grim Reaper)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X7468, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 3' (Wind Room - Robot Knight)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X747C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 4' (Crypt Creeps - The Lizard King)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X7490, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 5' (Wizard's Kitchen - Mudmen)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X74A4, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 6' (Black Knight - Dragon's Lair)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X74B8, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 1' Alternate (Fire Ropes and Pool Room are mirrored)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X74CC, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 2' Alternate (Smithee is mirrored)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X74E0, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 3' Alternate (Flying Barding and Robot Knight are mirrored)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X74F4, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 4' Alternate (Crypt Creeps and elevator Floor are mirrored)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X7F08, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 5' Alternate (Nothing actually gets mirrored in this one)" },
+        { address=0X56EA, type="u16be", condition="eq", value=0X7F1C, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="'Level 6' Alternate (No Mirrors)" },
+      },
+    },
+  },
+}

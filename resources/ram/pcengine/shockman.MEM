@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "ShockMan",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "shockman",
+    file = "shockman.zip",
+    hashes = {
+      { hash = "57c888f4af792dc4588a2f9dbebea31a", label = "Shockman (USA).pce" },
+      { hash = "9093143f244b56eb4b93d210c9c80f87", label = "tg16/shockman.7z <Shockman>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0702, type="u8", condition="bit_true", bit=0, mask=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0E0C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X0E0C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+        { address=0X0E0D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X0E0D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+      },
+    },
+  },
+}

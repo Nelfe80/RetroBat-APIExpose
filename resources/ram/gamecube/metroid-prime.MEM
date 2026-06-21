@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Metroid Prime",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "metroid-prime",
+    file = "metroid-prime.zip",
+    hashes = {
+      { hash = "92385889dab3531142542a3b7f8502fd", label = "Metroid Prime (USA) (Rev 2)" },
+      { hash = "ca2481d35a3d7718a6e54eeb31a5ffde", label = "Metroid Prime (Europe) (En,Fr,De,Es,It)" },
+      { hash = "81a79abed14fae9ce67ecd2d2fe05a9a", label = "Metroid Prime (Europe) (En,Fr,De,Es,It) - Essence Health Patch" },
+      { hash = "0056df1976d415521c8e08a999b2ada0", label = "Metroid Prime (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3E298C, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Soft Paused" },
+        { address=0X3E298C, type="u32be", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X3E3018, type="u32be", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Game" },
+        { address=0X45AAAC, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Soft Paused" },
+        { address=0X45AAAC, type="u32be", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X45B138, type="u32be", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Game" },
+        { address=0X45BB0C, type="u32be", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Soft Paused" },
+        { address=0X45BB0C, type="u32be", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X45C198, type="u32be", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Game" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X4438FC, type="u32be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[JP] SM: Current Room ID in Current World [32-Bit BE]" },
+        { address=0X443900, type="u32be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[JP] SM: Previous Room ID in Current World [32-Bit BE]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X443F50, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[JP] SM: Boss String Index [32-Bit BE] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3E2FA4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[EU] SM: Total (Max) Boss Energy [Float BE]" },
+        { address=0X3E2FA8, type="u32be", condition="eq", value=0X55, action="BOSS_HIT", no_log=false, no_survey=false, desc="Metroid Prime" },
+        { address=0X443F48, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[JP] Boss Unique ID [16-Bit BE]" },
+        { address=0X443F4C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[JP] SM: Total (Max) Boss Energy [Float BE]" },
+        { address=0X45B0C4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[US-00] SM: Total (Max) Boss Energy [Float BE]" },
+        { address=0X45B0C8, type="u32be", condition="eq", value=0X5B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Metroid Prime" },
+        { address=0X45C124, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[US] SM: Total (Max) Boss Energy [Float BE]" },
+        { address=0X45C128, type="u32be", condition="eq", value=0X5B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Metroid Prime" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X3E2C08, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="B-Button (Jump)" },
+        { address=0X3F3B4C, type="u32be", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0X3F3B4C, type="u32be", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Space Jump" },
+        { address=0X3F3C6C, type="u32be", condition="eq", value=0X04, action="JUMPING", no_log=false, no_survey=false, desc="JumpOff" },
+        { address=0X45BD88, type="u8", condition="bit_true", bit=6, mask=0X40, action="JUMPING", no_log=false, no_survey=false, desc="B-Button (Jump)" },
+        { address=0X46CC90, type="u32be", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+        { address=0X46CC90, type="u32be", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Space Jump" },
+        { address=0X46CDB0, type="u32be", condition="eq", value=0X04, action="JUMPING", no_log=false, no_survey=false, desc="JumpOff" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3E2890, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[EU] SM: Object Lists Vector - Number of Object Lists Reserved [32-Bit BE]" },
+        { address=0X45A9B0, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[US-00] SM: Object Lists Vector - Number of Object Lists Reserved [32-Bit BE]" },
+        { address=0X45BA10, type="u32be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[US] SM: Object Lists Vector - Number of Object Lists Reserved [32-Bit BE]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3DFC34, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[EU] PlayerGun - Combo Transfer Timer [Float BE]" },
+        { address=0X3F42A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[EU] Player Death Timer [Float BE] (Starts at 0.0. If >0.0, means player is dying.)" },
+        { address=0X458DB4, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="[US] PlayerGun - Combo Transfer Timer [Float BE]" },
+        { address=0X46D3EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[US] Player Death Timer [Float BE] (Starts at 0.0. If >0.0, means player is dying.)" },
+      },
+    },
+  },
+}

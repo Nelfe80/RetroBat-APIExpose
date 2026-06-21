@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "CT Special Forces",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ct-special-forces",
+    file = "ct-special-forces.zip",
+    hashes = {
+      { hash = "81a78ebff4713c80857482ac6956f52f", label = "CT Special Forces (Europe) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "bb8477087e3d927af99cd3263c66f7cf", label = "CT Special Forces (USA) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X00E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Lives increased" },
+        { address=0X00E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Lives decreased" },
+      },
+      health = {
+        { address=0X00E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X00E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X00EC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Machine Gun Ammo" },
+        { address=0X00F4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Flamethrower Ammo" },
+      },
+    },
+  },
+}

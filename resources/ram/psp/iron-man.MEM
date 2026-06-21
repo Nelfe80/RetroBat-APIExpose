@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Iron Man",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "iron-man",
+    file = "iron-man.zip",
+    hashes = {
+      { hash = "9654a3cea829ec484c58d7e830a996c4", label = "Iron Man (USA) (En,Fr,Es).iso" },
+      { hash = "d9f3afec2a178422b123fbf5084ed69c", label = "Iron Man (Europe) (En,De,It).iso" },
+      { hash = "f666882518284ebbf627071e87675e1a", label = "Iron Man (Europe) (En,Fr,Es).iso" },
+    }
+  },
+
+  events = {
+  },
+}

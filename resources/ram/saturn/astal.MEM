@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Astal",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "astal",
+    file = "astal.zip",
+    hashes = {
+      { hash = "ee97ecb29151e4304b6bcbdbf75e47ef", label = "Astal (USA) (1S)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X145D40, type="u8", condition="eq", value=0X0, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Cursor on Yes" },
+        { address=0X145D40, type="u8", condition="eq", value=0X2, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Cursor on No" },
+        { address=0X1C75A8, type="u8", condition="eq", value=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/Continue Screen" },
+        { address=0X1CDD99, type="u8", condition="eq", value=0X1, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Rolling" },
+        { address=0X1DBB68, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X1DBC96, type="u8", condition="eq", value=0X1, action="DEMO_MODE", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1C770D, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Turning Around" },
+        { address=0X1DBD2E, type="u8", condition="eq", value=0X1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0X1DBD2E, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1DBD2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Lower4] Level Flag" },
+      },
+      stage = {
+        { address=0X1DBCBA, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Activated" },
+        { address=0X1DBCBA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Bit0] Stage Select Option" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X140706, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (Setting) increased" },
+        { address=0X140706, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (Setting) decreased" },
+        { address=0X14A94D, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14CE89, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X14D3CD, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X152DA1, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X15383D, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X155045, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X159441, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1C770A, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1C770E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1C770E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X1C778A, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1C778C, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1C778E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1C778E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X1C788A, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1C788E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X1C788E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X1DBB6C, type="u8", condition="eq", value=0X1, action="LIVES_STATE", no_log=false, no_survey=false, desc="Activated" },
+        { address=0X1DBB6C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bit0] Refill Life Cheat increased" },
+        { address=0X1DBB6C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bit0] Refill Life Cheat decreased" },
+        { address=0X1DBB6E, type="u8", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Activated" },
+      },
+      health = {
+        { address=0X14A94D, type="u8", condition="eq", value=0X6, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X14A94D, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Geist Health (Destiny Unfolds)" },
+        { address=0X14CE89, type="u8", condition="eq", value=0X5, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X14CE89, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] The Forest Fiend Health" },
+        { address=0X14D3CD, type="u8", condition="eq", value=0X5, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X14D3CD, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Behemoth Health" },
+        { address=0X152DA1, type="u8", condition="eq", value=0X8, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X152DA1, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4 Jerado Health (The Fight for the Future)" },
+        { address=0X15383D, type="u8", condition="eq", value=0X4, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X15383D, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Guardian of Fire Health" },
+        { address=0X155045, type="u8", condition="eq", value=0X6, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X155045, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Frostbite! Health" },
+        { address=0X159441, type="u8", condition="eq", value=0X6, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X159441, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Evil Eye Health" },
+        { address=0X1C770A, type="u8", condition="eq", value=0X3, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1C770A, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Astal Health" },
+        { address=0X1C770D, type="u8", condition="eq", value=0X1C, action="HIT", no_log=false, no_survey=false, desc="Taking Damage" },
+        { address=0X1C778A, type="u8", condition="eq", value=0X3, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1C778A, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Astal Health" },
+        { address=0X1C778C, type="u8", condition="eq", value=0X3, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1C778C, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Bird Health" },
+        { address=0X1C788A, type="u8", condition="eq", value=0X3, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1C788A, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Astal Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1C760D, type="u8", condition="eq", value=0X35, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Throw Large Object" },
+        { address=0X1C768D, type="u8", condition="eq", value=0X35, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Throw Large Object" },
+        { address=0X1C778D, type="u8", condition="eq", value=0X35, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Throw Large Object" },
+      },
+    },
+  },
+}

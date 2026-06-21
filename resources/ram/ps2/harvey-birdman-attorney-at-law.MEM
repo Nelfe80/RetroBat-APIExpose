@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Harvey Birdman: Attorney at Law",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "harvey-birdman-attorney-at-law",
+    file = "harvey-birdman-attorney-at-law.zip",
+    hashes = {
+      { hash = "c6b9053c10fef89b2b3b9390d9e16a85", label = "Harvey Birdman - Attorney at Law (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4B2DC0, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Options - Subtitles [Bit2]" },
+      },
+    },
+  },
+}

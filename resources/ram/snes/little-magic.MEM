@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Little Magic",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "little-magic",
+    file = "little-magic.zip",
+    hashes = {
+      { hash = "0c0fe140c1851b2d80148118f1de9b02", label = "Little Magic (Japan).sfc" },
+      { hash = "e1963d748672ace4074bdf24347cc340", label = "Little Magic (Japan) (En) (v1.0b) (Aeon Genesis).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X003A, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Intro/Map" },
+        { address=0X003A, type="u8", condition="eq", value=0X3, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Grass level" },
+        { address=0X003A, type="u8", condition="eq", value=0X4, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Lava level" },
+        { address=0X003A, type="u8", condition="eq", value=0X6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Ice level" },
+        { address=0X003A, type="u8", condition="eq", value=0X7, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Tower level" },
+        { address=0X003A, type="u8", condition="eq", value=0X8, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Dark level" },
+        { address=0X003A, type="u8", condition="eq", value=0X9, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Metal level" },
+        { address=0X003A, type="u8", condition="eq", value=0XA, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Completed level" },
+        { address=0X006D, type="u8", condition="eq", value=0X0E, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0058, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (-1)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0059, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives remaining increased" },
+        { address=0X0059, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives remaining decreased" },
+      },
+    },
+  },
+}

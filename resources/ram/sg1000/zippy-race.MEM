@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Zippy Race",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "zippy-race",
+    file = "zippy-race.zip",
+    hashes = {
+      { hash = "0eda34ba313d3bb34558fd5939b19794", label = "Zippy Race (Japan, Australia) (Ja).sg" },
+      { hash = "16856425e0bcc3ab475f46f7cfd00402", label = "Zippy Race (Taiwan) (Unl).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00A9, type="u8", condition="eq", value=0X3, action="GAME_OVER", no_log=false, no_survey=false, desc="third person section ending" },
+        { address=0X00A9, type="u8", condition="eq", value=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen" },
+        { address=0X00C0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00AC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Top score [16-bit BCD]" },
+        { address=0X00AE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [16-bit BCD]" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X00C7, type="u8", condition="eq", value=0X1, action="JUMPING", no_log=true, no_survey=false, desc="jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00A9, type="u8", condition="eq", value=0X4, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="checkpoint reached" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00B1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Distance timer" },
+        { address=0X00B6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Fuel timer" },
+      },
+    },
+  },
+}

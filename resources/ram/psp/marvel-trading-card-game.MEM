@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Marvel Trading Card Game",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "marvel-trading-card-game",
+    file = "marvel-trading-card-game.zip",
+    hashes = {
+      { hash = "19415f9112147dad5ad2be6cb332a6f0", label = "Marvel Trading Card Game (USA-1.02).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE35590, type="u32le", condition="eq", value=0X40A00000, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="5 Weird Science/Mutant Menace/Latverian Hospitality/Maximum Carnage/Into the Underworld/Reinforc" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE35590, type="u32le", condition="eq", value=0X3F800000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Night Patrol/Deadly Danger Room/Unpleasant Distraction/Hunted Heroes/Heroes for Hire/Enter the" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X40000000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="2 High Tech Heist/Deathstrike/Negative Attitude/Unfinished Business/Breaking and Entering/Big Tr" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X40400000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="3 Microchip Mayhem/Muir Island/The Not-So-Fantastic Four/Undead Interlude/A Not-So-Clean Getaway" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE35556, type="u32le", condition="eq", value=0XBF800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="-1 Not unlocked" },
+        { address=0XE35556, type="u32le", condition="eq", value=0X00000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="0 Not unlocked" },
+        { address=0XE35556, type="u32le", condition="eq", value=0X3F800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="1 Unlocked Loyalty" },
+        { address=0XE35556, type="u32le", condition="eq", value=0X40000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="2 Unlocked Boost" },
+        { address=0XE35556, type="u32le", condition="eq", value=0X40400000, action="SCORE_STATE", no_log=false, no_survey=false, desc="3 Unlocked Evasion/Reservist" },
+        { address=0XE35556, type="u32le", condition="eq", value=0X40800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="4 Unlocked Concealed" },
+        { address=0XE35556, type="u32le", condition="eq", value=0X40A00000, action="SCORE_STATE", no_log=false, no_survey=false, desc="5 Unlocked Leader" },
+        { address=0XE35556, type="u32le", condition="eq", value=0X429A0000, action="SCORE_STATE", no_log=false, no_survey=false, desc="77 Unlocked all (Cheat)" },
+        { address=0XE35556, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Unlocked puzzles (Floating Points) 32 bits" },
+        { address=0XE35584, type="u32le", condition="eq", value=0XBF800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="-1 None" },
+        { address=0XE35584, type="u32le", condition="eq", value=0X00000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="0 Hero" },
+        { address=0XE35584, type="u32le", condition="eq", value=0X3F800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="1 Villain" },
+        { address=0XE35584, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Choosen Path (Floating Points) 32 bits" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X40800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="4 Spidey to the Rescue/Lethal Gambit/Crackin' Some Skrulls/Crime and Punishment/X-Static Rescue/" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X40C00000, action="SCORE_STATE", no_log=false, no_survey=false, desc="6 Enter the Octopus/Tooth and Nail/Army of DOOM/Heroes United/Howling Mad/Hammer Time" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X40E00000, action="SCORE_STATE", no_log=false, no_survey=false, desc="7 Strange Nightmare/Menace Out of Time" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X41000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="8 Hand to Hand Combat/Supreme Effort" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X41100000, action="SCORE_STATE", no_log=false, no_survey=false, desc="9 Kang Redux" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X41200000, action="SCORE_STATE", no_log=false, no_survey=false, desc="10 More Kang for the Buck" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X41300000, action="SCORE_STATE", no_log=false, no_survey=false, desc="11 Kang and Kang Again" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X41400000, action="SCORE_STATE", no_log=false, no_survey=false, desc="12 Ultimate Evil" },
+        { address=0XE35590, type="u32le", condition="eq", value=0X00000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="0 Goblin/Mind Over Magnetism/No Bots About It/A Sinister Syndicate/I've Got Your Back/Kang Immor" },
+        { address=0XE35590, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Completed Missions Hero campaign (Floating Points) 32 bits" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X3F800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="1 Reprisals/Breakout!/The Siege of Atlantis/Open Season/Late Night Visitor/Dark Disguise/Siniste" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X40000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="2 Chips/Roadblock/The Natives are Restless/Hunted/Cage Match/Trask/Unlikely Allies" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X40400000, action="SCORE_STATE", no_log=false, no_survey=false, desc="3 Cloak and Dagger/Barroom Blitz/Nasty Surprise/Kraven Punishment/X-Static Ambush/Thunderbolts N" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X40800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="4 Inside Job/Trading Faces/Invasion!/Random Carnage/One Hell of a Fight/Masters of Evil/Final Sh" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X40A00000, action="SCORE_STATE", no_log=false, no_survey=false, desc="5 The Goblin and the Octopus/Springing the Trap/Namor/Clash of the Spiders/Bad Voodoo/Thundersto" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X40E00000, action="SCORE_STATE", no_log=false, no_survey=false, desc="Diversionary Tactics/Wrecked" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X41000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="8 Hand it Over/Dark Pharaoh" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X41100000, action="SCORE_STATE", no_log=false, no_survey=false, desc="9 The Growing Menace" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X41200000, action="SCORE_STATE", no_log=false, no_survey=false, desc="10 Supreme Sacrifice" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X41300000, action="SCORE_STATE", no_log=false, no_survey=false, desc="11 God of Thunder" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X41400000, action="SCORE_STATE", no_log=false, no_survey=false, desc="12 Gamma Rage" },
+        { address=0XE355BC, type="u32le", condition="eq", value=0X00000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="0 Spider Trouble/Master of Magnetism/DOOM Triumphant/Showdown/Mind if We Cut In?/Doomed/Master P" },
+        { address=0XE355BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Completed Missions Villain campaign (Floating Points) 32 bits" },
+        { address=0XFCB19A, type="u32le", condition="eq", value=0X42480000, action="SCORE_STATE", no_log=false, no_survey=false, desc="50 points" },
+        { address=0XFCB19A, type="u32le", condition="eq", value=0X3F800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="1 point" },
+        { address=0XFCB19A, type="u32le", condition="eq", value=0X00000000, action="SCORE_STATE", no_log=false, no_survey=false, desc="0 point" },
+        { address=0XFCB19A, type="u32le", condition="eq", value=0XBF800000, action="SCORE_STATE", no_log=false, no_survey=false, desc="-1 pont" },
+        { address=0XFCB19A, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player points total (Floating Point) 32 bits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE355BC, type="u32le", condition="eq", value=0X40C00000, action="BOSS_HIT", no_log=false, no_survey=false, desc="6 Who's the Boss?/De-Clawed/Uninvited Guests/A Bridge Too Far/Children of the Night/Kang Rising" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE3AB20, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Finished Hero Chapter 6 Hammer Time (Floating Point) 32 bits" },
+      },
+    },
+  },
+}

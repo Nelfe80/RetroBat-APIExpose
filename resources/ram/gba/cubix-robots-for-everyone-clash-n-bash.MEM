@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Cubix: Robots for Everyone - Clash 'n Bash",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "cubix-robots-for-everyone-clash-n-bash",
+    file = "cubix-robots-for-everyone-clash-n-bash.zip",
+    hashes = {
+      { hash = "4a5a274a7c2514b21ebb43b2ceade091", label = "Cubix - Robots for Everyone - Clash 'N Bash (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1417, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Gameplay - Pause Indicator" },
+        { address=0X1440, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Menu - Credits Progress" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1402, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu - Unlocked V.s Levels" },
+        { address=0X1404, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu - Level Selected" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1427, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Gameplay - Player Lives increased" },
+        { address=0X1427, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gameplay - Player Lives decreased" },
+        { address=0X709C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Gameplay - Score and Lives Left (AI 2) increased" },
+        { address=0X709C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gameplay - Score and Lives Left (AI 2) decreased" },
+        { address=0X7270, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Gameplay - Score and Lives Left (AI 3) increased" },
+        { address=0X7270, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gameplay - Score and Lives Left (AI 3) decreased" },
+        { address=0X7444, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Gameplay - Score and Lives Left (AI 4) increased" },
+        { address=0X7444, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gameplay - Score and Lives Left (AI 4) decreased" },
+      },
+      health = {
+        { address=0X678E, type="u8", condition="eq", value=0X38, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Full Health" },
+        { address=0X678E, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="No Helth" },
+        { address=0X678E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Gameplay - Dr K Health" },
+        { address=0X6EEE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gameplay - Player Health decreased" },
+        { address=0X6EEE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gameplay - Player Health increased" },
+        { address=0X7042, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gameplay - AI 1 Health decreased" },
+        { address=0X7042, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gameplay - AI 1 Health increased" },
+        { address=0X7216, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gameplay - AI 2 Health decreased" },
+        { address=0X7216, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gameplay - AI 2 Health increased" },
+        { address=0X73EA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gameplay - AI 3 Health decreased" },
+        { address=0X73EA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gameplay - AI 3 Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6B08, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Powerup 1 Type" },
+        { address=0X6B9C, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Powerup 2 Type" },
+        { address=0X6C30, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Powerup 3 Type" },
+        { address=0X6CC4, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Powerup 4 Type" },
+        { address=0X6D58, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Powerup 5 Type" },
+        { address=0X6DEC, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Powerup 6 Type" },
+        { address=0X6E80, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Gameplay - Powerup 7 Type" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6F37, type="u8", condition="eq", value=0X0, action="AMMO_STATE", no_log=false, no_survey=false, desc="No Special Ammo" },
+        { address=0X6F37, type="u8", condition="eq", value=0X1, action="AMMO_STATE", no_log=false, no_survey=false, desc="Special Ammo Collected" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1400, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Charge Station & 2nd Barrier is broken" },
+        { address=0X1400, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Construction Site & 4th Barrier is broken" },
+        { address=0X1400, type="u8", condition="bit_true", bit=12, mask=0X1000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="DownTown & 3rd Barrier is broken" },
+        { address=0X1400, type="u8", condition="bit_true", bit=14, mask=0X4000, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Botties Pit & 1st Barrier is broken" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X13A0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay Incrementing Timer" },
+        { address=0X1D4D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Companion Under Attack Counter" },
+        { address=0X679A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Dr K. Bomb Timer" },
+        { address=0X6EF4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Player 1 Strength Power up countdown" },
+        { address=0X6EF8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Player 1 Shield Power up countdown" },
+        { address=0X6EFC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Player 1 Speed Power up countdown" },
+        { address=0X6F14, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Special Counter" },
+        { address=0X6F16, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Character Respawn Timer" },
+        { address=0X6F18, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Gameplay - Securix Special Counter" },
+      },
+    },
+  },
+}

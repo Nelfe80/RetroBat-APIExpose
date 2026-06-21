@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "The Death and Return of Superman",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-death-and-return-of-superman",
+    file = "the-death-and-return-of-superman.zip",
+    hashes = {
+      { hash = "d7f8505280eb38ea52c8d1e3712f7c6a", label = "[MSU-1] Death and Return of Superman, The (USA) [v3 Conn, Kurrono]" },
+      { hash = "dbf576310985b10fa48c6a1c8915b19d", label = "Death and Return of Superman, The (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X041E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0412, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Number of Lives increased" },
+        { address=0X0412, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Number of Lives decreased" },
+      },
+      health = {
+        { address=0X0ED2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Player's Health decreased" },
+        { address=0X0ED2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Player's Health increased" },
+      },
+    },
+  },
+}

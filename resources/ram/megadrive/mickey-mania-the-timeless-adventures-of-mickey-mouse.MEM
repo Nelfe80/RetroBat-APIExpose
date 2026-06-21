@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Mickey Mania: The Timeless Adventures of Mickey Mouse",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "mickey-mania-the-timeless-adventures-of-mickey-mouse",
+    file = "mickey-mania-the-timeless-adventures-of-mickey-mouse.zip",
+    hashes = {
+      { hash = "965536e24760755413ae316d935710b1", label = "Mickey Mania - The Timeless Adventures of Mickey Mouse (USA).md" },
+      { hash = "b7f2cb46e00e6eeec726646565d850a7", label = "Mickey Mania - The Timeless Adventures of Mickey Mouse (Japan).md" },
+      { hash = "f5bcc0b3fc58ce5df04b7861f2d6eb3b", label = "Mickey Mania - Timeless Adventures of Mickey Mouse (USA) (Es) (v1.0) (Wave).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0460, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0452, type="u8", condition="eq", value=0XC2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="inside level (jp)" },
+        { address=0X0452, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="b0 = inside level" },
+        { address=0X045C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select" },
+      },
+      stage = {
+        { address=0X0468, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In Level/Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0452, type="u8", condition="eq", value=0X6E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death/pause" },
+        { address=0X0466, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives (FF = Game Over) increased" },
+        { address=0X0466, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives (FF = Game Over) decreased" },
+        { address=0X5EC6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Potential Basement 1UP 1900=Collected 19fe=Not increased" },
+        { address=0X5EC6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Potential Basement 1UP 1900=Collected 19fe=Not decreased" },
+        { address=0X6094, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="FirstLevel 1UP increased" },
+        { address=0X6094, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="FirstLevel 1UP decreased" },
+        { address=0X626E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="GhostHouse1UP L increased" },
+        { address=0X626E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="GhostHouse1UP L decreased" },
+        { address=0X6272, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="GhostHouse1UP R increased" },
+        { address=0X6272, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="GhostHouse1UP R decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X07C6, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="LastBossHits 000B=dead" },
+        { address=0X0878, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="FirstBossDefeated" },
+        { address=0X0AC0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="MadDoctorBossHP" },
+        { address=0X0C11, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="TopLCog FirstBoss" },
+        { address=0X0C51, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="TopRCog FirstBoss" },
+        { address=0X0D91, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BottomRCog FirstBoss" },
+        { address=0X0DD1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BottomLCog FirstBoss" },
+      },
+    },
+  },
+}

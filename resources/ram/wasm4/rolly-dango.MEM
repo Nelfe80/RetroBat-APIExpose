@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Rolly Dango",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rolly-dango",
+    file = "rolly-dango.zip",
+    hashes = {
+      { hash = "b6a2ad7b7268981e8fa01678588aea83", label = "Rolly Dango (World) (William Gulmont-Martin).wasm" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X2DBC, type="u16le", condition="eq", value=0X4C54, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X2DBC, type="u16le", condition="eq", value=0X4C04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X2DBC, type="u16le", condition="eq", value=0X4BB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X2DBC, type="u16le", condition="eq", value=0X4B64, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X2DBC, type="u16le", condition="eq", value=0X4B14, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X2DBC, type="u16le", condition="eq", value=0X4AB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 6" },
+        { address=0X2DBC, type="u16le", condition="eq", value=0X4A54, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 7" },
+        { address=0X2DBC, type="u16le", condition="eq", value=0X49E4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 8" },
+      },
+    },
+  },
+}

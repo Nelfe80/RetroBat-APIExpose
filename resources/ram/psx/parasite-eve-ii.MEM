@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Parasite Eve II",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Horror, Role-Playing"
+  },
+
+  rom = {
+    name = "parasite-eve-ii",
+    file = "parasite-eve-ii.zip",
+    hashes = {
+      { hash = "760380a9f3d118bb6b9dd000ff06bb48", label = "Parasite Eve II (USA) (Pt) (v2.0) (Gledson999) (Disc 1)" },
+      { hash = "813cc94b6570b8072746d762e27d4899", label = "Parasite Eve II (USA) (Disc 1)" },
+      { hash = "82a4a22c0a6cfd14f38e77410d0a12d2", label = "Parasite Eve II (USA) (Disc 2)" },
+      { hash = "cd0c5fc164380666c8c4a66cec57de80", label = "Parasite Eve II (USA) (Pt) (v2.0) (Gledson999) (Disc 2)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X73984, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Talk to the soldier at Akropolis Tower 2nd Elevator Hall and get the Cafeteria Key" },
+        { address=0X73994, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 NMC atacking soldier at Akropolis Tower Patio" },
+        { address=0X739BD, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="0 Run;" },
+        { address=0X739F5, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="0 Off;" },
+        { address=0X73A0D, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 On." },
+        { address=0X73A0D, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 On." },
+        { address=0X73A2E, type="u8", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Call;" },
+        { address=0X73A2E, type="u8", condition="eq", value=0X0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Save Pierce in GOLEM Freezer." },
+        { address=0X73A35, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1 Ask Jodie what is BP at B1 Mist Center Firearms Room" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X72718, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Jumper Plug;" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X73988, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Open the Cafeteria door's at Akropolis Tower" },
+        { address=0X7398C, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Nº 9 break the door at Akropolis Tower Bridge" },
+        { address=0X739A6, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="1 Off;" },
+        { address=0X739B5, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="On." },
+        { address=0X739D8, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1." },
+        { address=0X739DD, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 On." },
+        { address=0X739F1, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="0 Door Closed;" },
+        { address=0X739F2, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Open the door to the Powerhouse B;" },
+        { address=0X739FC, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 Opened Black Card door" },
+        { address=0X73A2D, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="1 On." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X739D5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Sequence of events 8bits" },
+      },
+    },
+  },
+}

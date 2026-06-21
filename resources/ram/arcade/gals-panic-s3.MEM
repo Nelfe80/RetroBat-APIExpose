@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Gals Panic S3",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Mature"
+  },
+
+  rom = {
+    name = "gals-panic-s3",
+    file = "gals-panic-s3.zip",
+    hashes = {
+      { hash = "17ab178d6ae7dce687e8eaaf913fd035", label = "galpans3.7z <Gals Panic S3 (Japan)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA0101, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Disabled" },
+        { address=0XA0101, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Activated" },
+        { address=0X196D22, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="On (default)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XA01F0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA01F4, type="u8", condition="eq", value=0XC, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hiyoko (ひよこ) (Brown Hair, Blue Eyes, Hoodie)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X196D18, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Slot Type increased" },
+        { address=0X196D1C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin 1 Rate: Credits increased" },
+        { address=0X196D1E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin 1 Rate: Coins increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X196D1A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="2P Time Count Speed" },
+        { address=0X196D1B, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="1P Time Count Speed" },
+      },
+    },
+  },
+}

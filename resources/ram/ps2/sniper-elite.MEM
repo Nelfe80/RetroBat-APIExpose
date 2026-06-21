@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sniper Elite",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter, Stealth, Strategy"
+  },
+
+  rom = {
+    name = "sniper-elite",
+    file = "sniper-elite.zip",
+    hashes = {
+      { hash = "6fcea9fdba2ffdc3b609fea9585f4fa6", label = "Sniper Elite (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

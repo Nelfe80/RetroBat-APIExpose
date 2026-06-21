@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Super Mad Champ",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "super-mad-champ",
+    file = "super-mad-champ.zip",
+    hashes = {
+      { hash = "62be3bf747a5b7122590c8e515258593", label = "Super Mad Champ (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0016, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Entry level class" },
+        { address=0X0154, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Music level vol" },
+        { address=0X0158, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="sfx vol level" },
+        { address=0X0688, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="music level vol" },
+        { address=0X074E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="sfx level vol" },
+        { address=0X0E96, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="music level vol" },
+        { address=0X0EA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="sfx vol level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1207, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health decreased" },
+        { address=0X1207, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X004C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial - Race 0x00" },
+        { address=0X004E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap Time" },
+        { address=0X005B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap Time" },
+        { address=0X0155, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GP2--1Select (Time Trial)" },
+        { address=0X0159, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GP-Select (Time Trial)" },
+        { address=0X015D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GP-Select (Time Trial)" },
+        { address=0X0161, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="GP-Select (Time Trial)" },
+        { address=0X1EC1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lap Time" },
+      },
+    },
+  },
+}

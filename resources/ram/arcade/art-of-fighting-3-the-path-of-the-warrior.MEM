@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Art of Fighting 3: The Path of the Warrior",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "art-of-fighting-3-the-path-of-the-warrior",
+    file = "art-of-fighting-3-the-path-of-the-warrior.zip",
+    hashes = {
+      { hash = "6311bda4830fadfb4cb19bb64e0aaabc", label = "aof3.7z <Art of Fighting 3 - The Path of the Warrior / Art of Fighting - Ryuuko no Ken Gaiden>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4BCA, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X4BCA, type="u8", condition="eq", value=0X25, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X4BCA, type="u8", condition="eq", value=0X26, action="DEMO_MODE", no_log=false, no_survey=false, desc="Today's Ranking (shows after the demo)" },
+        { address=0X4BCA, type="u8", condition="eq", value=0X05, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X4BCA, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over" },
+        { address=0X4BCA, type="u8", condition="eq", value=0X17, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Accepting the Continue" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4BEE, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1 Round" },
+        { address=0X4BEE, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3 Rounds (default)" },
+        { address=0X4BEE, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5 Rounds" },
+        { address=0X4BEE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Settings: Rounds" },
+        { address=0X4BF2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds Won" },
+        { address=0X4BF3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Won" },
+        { address=0X4BFA, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X4BFA, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X4BFA, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 (default AES)" },
+        { address=0X4BFA, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4 (default MVS)" },
+        { address=0X4BFA, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0X4BFA, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6" },
+        { address=0X4BFA, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7" },
+        { address=0X4BFA, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4BF0, type="u8", condition="eq", value=0X1E, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="30sec" },
+        { address=0X4BF0, type="u8", condition="eq", value=0X3C, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="60sec (default)" },
+        { address=0X4BF0, type="u8", condition="eq", value=0X5A, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="90sec" },
+        { address=0X4BF0, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Infinite" },
+        { address=0X4BF0, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Settings: Match Timer" },
+        { address=0XDF0E, type="u8", condition="eq", value=0X1E, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="30sec" },
+        { address=0XDF0E, type="u8", condition="eq", value=0X3C, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="60sec (default)" },
+        { address=0XDF0E, type="u8", condition="eq", value=0X5A, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="90sec" },
+        { address=0XDF0E, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Infinite" },
+        { address=0XDF0E, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Game: Match Timer" },
+        { address=0XFFFF, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Value Map - Moves (P1 Character Struct + 0x78)" },
+      },
+    },
+  },
+}

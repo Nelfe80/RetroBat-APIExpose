@@ -1,0 +1,111 @@
+return {
+  game = {
+    title = "Tony Hawk's Pro Skater 4 [Subset - Zero Stats]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "tony-hawks-pro-skater-4-subset-zero-stats",
+    file = "tony-hawks-pro-skater-4-subset-zero-stats.zip",
+    hashes = {
+      { hash = "feb843b86e4c80e7527c9fbe45e9c803", label = "Tony Hawk's Pro Skater 4 (USA) (v2.01) [Subset - Zero Stats].iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A7DD8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[ASCII] [14 Bytes] Shaun Murray Demo Serial Number" },
+      },
+      events = {
+        { address=0X8698E4, type="u32le", condition="eq", value=0X1, action="COMBO_HIT", no_log=false, no_survey=false, desc="In a Combo" },
+        { address=0X8698E4, type="u32le", condition="eq", value=0X2, action="COMBO_HIT", no_log=false, no_survey=false, desc="Score Vanishing" },
+        { address=0X86BB94, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Float] Combo Manual Seconds" },
+        { address=0X86BC04, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Float] Combo Grind Seconds" },
+        { address=0X86BC74, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[Float] Combo Lip Trick Seconds" },
+        { address=0X871DE8, type="u32le", condition="eq", value=0X1, action="COMBO_HIT", no_log=false, no_survey=false, desc="Landed" },
+        { address=0X871DE8, type="u32le", condition="eq", value=0X2, action="COMBO_HIT", no_log=false, no_survey=false, desc="Score Vanishing" },
+        { address=0X871E38, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Tricks in Combo (Multiplier)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X96F6EC, type="u32le", condition="eq", value=0XF9283EE7, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Single Session Run" },
+        { address=0X96FB80, type="u8", condition="eq", value=0XB7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alcatraz" },
+        { address=0X96FB80, type="u8", condition="eq", value=0XB6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="San Francisco" },
+        { address=0X96FB80, type="u8", condition="eq", value=0XB5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="College (Default)" },
+        { address=0X96FB80, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Levels Unlocked" },
+        { address=0X96FB81, type="u8", condition="eq", value=0XB5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chicago ($15,000)" },
+        { address=0X96FB81, type="u8", condition="eq", value=0XB4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Carnival ($15,000)" },
+        { address=0X96FB81, type="u8", condition="eq", value=0XB3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zoo" },
+        { address=0X96FB81, type="u8", condition="eq", value=0XB2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="London" },
+        { address=0X96FB81, type="u8", condition="eq", value=0XB1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shipyard" },
+        { address=0X96FB81, type="u8", condition="eq", value=0XB0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kona" },
+        { address=0X96FB81, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[bitflags] Levels Unlocked/Purchased" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="College" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="San Francisco" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alcatraz" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kona" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shipyard" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="London" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zoo" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Carnival" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0X9, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chicago" },
+        { address=0X96FBB4, type="u16le", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Created Park" },
+        { address=0X96FBB4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X96FB9D, type="u8", condition="eq", value=0XB3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Zero Or Die" },
+        { address=0X96FB9F, type="u8", condition="eq", value=0XB7, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Killers" },
+        { address=0X96FB9F, type="u8", condition="eq", value=0XB6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Iron Maiden (Eddie) (Default)" },
+        { address=0X96FB9F, type="u8", condition="eq", value=0XB5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Flip - Sorry" },
+        { address=0X96FB9F, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Flip - b&w" },
+        { address=0X96FB9F, type="u8", condition="eq", value=0XB3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="The Firm - Red" },
+        { address=0X96FB9F, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enjoi - Panda" },
+        { address=0X96FB9F, type="u8", condition="eq", value=0XB1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Element - Nature" },
+        { address=0X96FB9F, type="u8", condition="eq", value=0XB0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="City Stars" },
+        { address=0X96FBA0, type="u8", condition="eq", value=0XB7, action="LOSE_LIFE", no_log=false, no_survey=false, desc="IM Logo" },
+        { address=0X96FBA0, type="u8", condition="eq", value=0XB6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fear of the Dark" },
+        { address=0X96FBA0, type="u8", condition="eq", value=0XB5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Purgatory" },
+        { address=0X96FBA0, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Seventh Son" },
+        { address=0X96FBA0, type="u8", condition="eq", value=0XB3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Somewhere in Time" },
+        { address=0X96FBA0, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Trooper" },
+        { address=0X96FBA0, type="u8", condition="eq", value=0XB1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Powerslave" },
+        { address=0X96FBA0, type="u8", condition="eq", value=0XB0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Piece of Mind" },
+      },
+      health = {
+        { address=0X96FBA5, type="u8", condition="eq", value=0XB2, action="HEALTH_STATE", no_log=true, no_survey=false, desc="THPS4 Logo" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X871DE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+        { address=0X871DEC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Base Score" },
+        { address=0X871DF8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combo Score (Persistent)" },
+        { address=0X871DFC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combo Score (Volatile)" },
+        { address=0X96F6F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pro Points" },
+        { address=0X96F708, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pro Points Mirror" },
+      },
+      collectibles = {
+        { address=0X96FB98, type="u8", condition="eq", value=0XB4, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Muskalade" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X86CA48, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[Float] Switch Stat" },
+        { address=0X96FB97, type="u8", condition="eq", value=0XB2, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X86CA34, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[Float] Hangtime Stat" },
+        { address=0X96FBA0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[bitflags] Eddie - Decks Purchased" },
+      },
+    },
+  },
+}

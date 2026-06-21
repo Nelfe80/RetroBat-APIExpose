@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Metroid Prime [Subset - Low Percent]",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "metroid-prime-subset-low-percent",
+    file = "metroid-prime-subset-low-percent.zip",
+    hashes = {
+      { hash = "3b895069096fa40b37c59c27b96520be", label = "Metroid Prime [Subset - Low Percent]" },
+    }
+  },
+
+  events = {
+  },
+}

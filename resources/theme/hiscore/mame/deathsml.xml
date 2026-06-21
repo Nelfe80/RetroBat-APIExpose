@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 KEN 10000000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 JUN 9000000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 TAK 8000000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 YUJ 7000000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 ATS 6000000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 TOS 5000000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 AKI 4000000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HRT 3000000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 NOM 2000000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 MHO 1000000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 RUM 10000000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 NAT 9000000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 KRI 8000000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 MAN 7000000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 NOR 6000000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 MIK 5000000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 DTA 4000000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 YSK 3000000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 TYK 2000000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 NTS 1000000</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 RJI 10000000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 DSK 9000000</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 YKH 8000000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 SHW 7000000</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 TSK 6000000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 ATS 5000000</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 KRI 4000000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 SAT 3000000</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 TRO 2000000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 MAO 1000000</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 TKE 10000000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 FRT 9000000</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 HZM 8000000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 MRT 7000000</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 YMS 6000000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 AKM 5000000</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 RFJ 4000000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 MIT 3000000</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 TES 2000000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 DAD 1000000</text>
+		</text>
+		<text name="hiscoreline41" extra="true">
+			<text>#41 IDA 10000000</text>
+		</text>
+		<text name="hiscoreline42" extra="true">
+			<text>#42 HYS 9000000</text>
+		</text>
+		<text name="hiscoreline43" extra="true">
+			<text>#43 TUI 8000000</text>
+		</text>
+		<text name="hiscoreline44" extra="true">
+			<text>#44 NKM 7000000</text>
+		</text>
+		<text name="hiscoreline45" extra="true">
+			<text>#45 IUE 6000000</text>
+		</text>
+		<text name="hiscoreline46" extra="true">
+			<text>#46 NIK 5000000</text>
+		</text>
+		<text name="hiscoreline47" extra="true">
+			<text>#47 KRA 4000000</text>
+		</text>
+		<text name="hiscoreline48" extra="true">
+			<text>#48 YNB 3000000</text>
+		</text>
+		<text name="hiscoreline49" extra="true">
+			<text>#49 HSE 2000000</text>
+		</text>
+		<text name="hiscoreline50" extra="true">
+			<text>#50 MTM 1000000</text>
+		</text>
+	</view>
+</theme>

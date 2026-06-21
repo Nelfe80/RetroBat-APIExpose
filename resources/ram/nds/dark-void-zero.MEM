@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Dark Void Zero",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dark-void-zero",
+    file = "dark-void-zero.zip",
+    hashes = {
+      { hash = "d080287ca99643c37f9b956f0797e6c4", label = "Dark Void Zero (Europe, Australia)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC3A00, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X14A604, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X14A604, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X14A5FC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X14A5FC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X14A5F8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0X23EAF4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage 2 (Hard) - Tech Points" },
+        { address=0X27B5E8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Yellow Orbs/Tech Points (Stage 1 - Hard)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X323528, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit0 - Flag for defeating the boss (Stage 3 - Easy)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X14A614, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Enemies destroyed stat" },
+      },
+    },
+  },
+}

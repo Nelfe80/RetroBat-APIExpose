@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "American Gladiators",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "american-gladiators",
+    file = "american-gladiators.zip",
+    hashes = {
+      { hash = "d696e93ca35b59e2af943c2a3a526488", label = "American Gladiators (USA).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0593, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0X0593, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+        { address=0X07DD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Assault - Health increased" },
+        { address=0X07DD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Assault - Health decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X058E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score for All Events" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X047E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="wall -timer" },
+        { address=0X07F1, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="joust, human cannonball -timer" },
+        { address=0X07F5, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="assault, powerball- timer" },
+      },
+    },
+  },
+}

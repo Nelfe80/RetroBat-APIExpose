@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Harvest Moon: A Wonderful Life - Special Edition",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Life Simulation, Role-Playing, Sandbox"
+  },
+
+  rom = {
+    name = "harvest-moon-a-wonderful-life-special-edition",
+    file = "harvest-moon-a-wonderful-life-special-edition.zip",
+    hashes = {
+      { hash = "8fb39d0323a10587e032b72e338eab7c", label = "Harvest Moon - A Wonderful Life - Special Edition (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

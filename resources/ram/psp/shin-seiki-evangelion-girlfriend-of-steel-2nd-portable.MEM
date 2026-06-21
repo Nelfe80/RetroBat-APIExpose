@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Shin Seiki Evangelion: Girlfriend of Steel 2nd Portable",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "shin-seiki-evangelion-girlfriend-of-steel-2nd-portable",
+    file = "shin-seiki-evangelion-girlfriend-of-steel-2nd-portable.zip",
+    hashes = {
+      { hash = "32ed8cc0274f1bff3960a67cfce4841f", label = "Shinseiki Evangelion - Koutetsu no Girlfriend 2nd -portable- (Japan) (En) (v1.01) (Mugi).iso" },
+      { hash = "32c285eca82da1711d4364b63a818792", label = "Shinseiki Evangelion - Koutetsu no Girlfriend 2nd -portable- (Japan) (En) (v1.02) (Mugi).iso" },
+    }
+  },
+
+  events = {
+  },
+}

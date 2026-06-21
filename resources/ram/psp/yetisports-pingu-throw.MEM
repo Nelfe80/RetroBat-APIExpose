@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Yetisports: Pingu Throw",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "yetisports-pingu-throw",
+    file = "yetisports-pingu-throw.zip",
+    hashes = {
+      { hash = "404264f4f37a860f8854e50ac8e14e35", label = "Yeti Sports Pengu Throw (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

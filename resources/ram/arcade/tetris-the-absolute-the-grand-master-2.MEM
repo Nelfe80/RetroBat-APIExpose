@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Tetris: The Absolute - The Grand Master 2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "tetris-the-absolute-the-grand-master-2",
+    file = "tetris-the-absolute-the-grand-master-2.zip",
+    hashes = {
+      { hash = "7b8ee99d755c0f48c919b2ea1667bc84", label = "tgm2.7z <Tetris the Absolute The Grand Master 2>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9634A, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen, boolean" },
+        { address=0X100094, type="u8", condition="eq", value=0X54, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="M-Roll" },
+        { address=0X100094, type="u8", condition="eq", value=0XA0, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Normal Credits" },
+        { address=0X100094, type="u8", condition="eq", value=0X3F, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Normal Credits complete ?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X94DB8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level, goes from 0 up to 999 (16-bit)" },
+        { address=0X94DDB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total amount of Tetrises (4-line clears) the player has done since the match started, useful for" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X94DC8, type="u24le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hi-Score, goes from 0 to 999999 (24-bit)" },
+      },
+      collectibles = {
+        { address=0X94A7C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Value that enables during Demonstration Mode, is either 0 or 1 {8-bit} increased" },
+        { address=0X94DD0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Section Medal (1 for bronze, 2 for silver, 3 for gold) (8-bit) increased" },
+        { address=0X94DD1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="All Clear Medal (1 for bronze, 2 for silver, 3 for gold) (8-bit) increased" },
+        { address=0X94DD4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Combo Medal (1 for bronze, 2 for silver, 3 for gold) (8-bit) increased" },
+        { address=0X94DD5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rotation Medal (1 for bronze, 2 for silver, 3 for gold) (8-bit) increased" },
+        { address=0X94DD6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Recovery Medal (1 for bronze, 2 for silver, 3 for gold) (8-bit) increased" },
+        { address=0X94DD7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Skill Medal (1 for bronze, 2 for silver, 3 for gold) (8-bit) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X94DDE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Counts the blocks on the playfield. Useful for anti-cheating on the Recovery Medal) (8-bit)" },
+        { address=0X94DF5, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Modifies the blocks' appearance (1 for rainbow, 2 for big mode) (8-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X94DD8, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo counter (8-bit)" },
+        { address=0X94DE8, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time Counter (seconds * 60) (16-bit)" },
+        { address=0X94E26, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Hundreds Counter (increments each 100 levels, partially prevents cheating) (8-bit)" },
+      },
+    },
+  },
+}

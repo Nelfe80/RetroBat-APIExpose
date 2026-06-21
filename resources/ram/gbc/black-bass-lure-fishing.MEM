@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Black Bass: Lure Fishing",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "black-bass-lure-fishing",
+    file = "black-bass-lure-fishing.zip",
+    hashes = {
+      { hash = "a30b8e40344bcfbeb08110c79de4af14", label = "Black Bass - Lure Fishing (USA, Europe) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

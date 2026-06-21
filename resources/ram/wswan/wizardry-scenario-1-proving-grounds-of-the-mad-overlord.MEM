@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Wizardry Scenario #1: Proving Grounds of the Mad Overlord",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "wizardry-scenario-1-proving-grounds-of-the-mad-overlord",
+    file = "wizardry-scenario-1-proving-grounds-of-the-mad-overlord.zip",
+    hashes = {
+      { hash = "a9eca898b6014e7ce23b9493b2d12efe", label = "Wizardry Scenario 1 - Proving Grounds of the Mad Overlord (Japan) (En) (v1.1) (Hengki Kusuma Adi).wsc" },
+      { hash = "f0ba64cd7b88eab7add0f7af02080072", label = "Wizardry Scenario 1 - Proving Grounds of the Mad Overlord (Japan).wsc" },
+      { hash = "b6a7421c5731a2991f07290263d8bcec", label = "Wizardry Scenario 1 (Japan) (En) (v1.1) (WonderGate Unlock) (v1.0) (Justin Gibbins).wsc" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0246, type="u8", condition="eq", value=0X6, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+    },
+  },
+}

@@ -1,0 +1,72 @@
+return {
+  game = {
+    title = "Tom and Jerry Tales",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "tom-and-jerry-tales",
+    file = "tom-and-jerry-tales.zip",
+    hashes = {
+      { hash = "c9b861c89e3e5955355f3a377746cc1b", label = "Tom and Jerry Tales (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6B820, type="u8", condition="eq", value=0X03, action="GAME_PLAYING", no_log=false, no_survey=false, desc="In level" },
+        { address=0X6B820, type="u8", condition="eq", value=0X05, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits/House" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X6E72B, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yellow Stage thingy (Upgrade)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X6E6F4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Living Room Time High Score" },
+        { address=0X6E6F6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Living Room Break High Score" },
+        { address=0X6E6F8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Living Room Speed High Score" },
+        { address=0X6E6FA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Living Room Touch Time High Score" },
+        { address=0X6E6FC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Kitchen - Time High Score" },
+        { address=0X6E6FE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Kitchen - Break High Score" },
+        { address=0X6E700, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Kitchen Speed High Score" },
+        { address=0X6E702, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Kitchen Touch Time High Score" },
+        { address=0X6E704, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Yard - Time High Score" },
+        { address=0X6E706, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Yard - Break High Score" },
+        { address=0X6E708, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Yard - Speed High Score" },
+        { address=0X6E70A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Yard - Touch Time High Score" },
+        { address=0X6E70C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Dining Room - Time High Score" },
+        { address=0X6E70E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Dining Room - Break High Score" },
+        { address=0X6E710, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Dining Room - Speed High Score" },
+        { address=0X6E712, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Dining Room - Touch Time High Score" },
+        { address=0X6E714, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Game Room - Time High Score" },
+        { address=0X6E716, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Game Room - Break High Score" },
+        { address=0X6E718, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Game Room - Speed High Score" },
+        { address=0X6E71A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Game Room - Touch Time High Score" },
+        { address=0X6E71C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Bedroom - Time High Score" },
+        { address=0X6E71E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Bedroom - Break High Score" },
+        { address=0X6E720, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Bedroom - Speed High Score" },
+        { address=0X6E722, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Bedroom - Touch Time High Score" },
+        { address=0X6E724, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current amount of upgrade points" },
+      },
+      collectibles = {
+        { address=0X6E72A, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=true, no_survey=false, desc="Blue and White stripped Hammock (Upgrade)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6E72D, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks (Game Room - Break)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X877EC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="0x00=Touch Time" },
+      },
+    },
+  },
+}

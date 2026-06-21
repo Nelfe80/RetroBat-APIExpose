@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control1" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="control2" extra="true">
+			<text>joy8way</text>
+			<color>${red}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button3" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button5" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="button7" extra="true">
+			<text>Button 4</text>
+			<color>${blue}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button3" extra="true">
+			<text>Button 2</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="p2button5" extra="true">
+			<text>Button 3</text>
+			<color>${green}</color>
+		</text>
+		<text name="p2button7" extra="true">
+			<text>Button 4</text>
+			<color>${blue}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 Zたまたま 3147914</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 UOT 2500000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 ARO 2000000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 .AN 1500000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 D.P 1000000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#1 UOT 2500000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#2 ARO 2000000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#3 .AN 1500000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#4 D.P 1000000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#5 OKO 500000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

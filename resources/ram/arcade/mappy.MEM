@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Mappy",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "mappy",
+    file = "mappy.zip",
+    hashes = {
+      { hash = "5224cd08b735887698120b0a086014c1", label = "mappy.7z <Mappy (US)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1373, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X1400, type="u8", condition="eq", value=0XAA, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0X1400, type="u8", condition="eq", value=0XAF, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X138E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X20E1, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X20E1, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X20E1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X20E9, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X20E9, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X20E9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X20F1, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X20F1, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X20F1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X20F9, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X20F9, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X20F9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X2101, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X2101, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X2101, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X2109, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X2109, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X2109, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X2111, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X2111, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X2111, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X2119, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X2119, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X2119, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X2121, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X2121, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X2121, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+        { address=0X2129, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="closed" },
+        { address=0X2129, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open" },
+        { address=0X2129, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Door on stage 1" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1379, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dip-Switches - bonus 1-up increased" },
+        { address=0X1379, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dip-Switches - bonus 1-up decreased" },
+        { address=0X2030, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0X2030, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X07F8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower-4] 10s Score" },
+        { address=0X07F9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower-4] 100s Score" },
+        { address=0X07FA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower-4] 1000s Score" },
+        { address=0X07FB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower-4] 10000s Score" },
+        { address=0X07FC, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Lower-4] 100000s Score" },
+      },
+      collectibles = {
+        { address=0X1401, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="coin has appeared increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X137A, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Rank A" },
+        { address=0X137D, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="on" },
+      },
+    },
+  },
+}

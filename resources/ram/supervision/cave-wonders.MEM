@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Cave Wonders",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cave-wonders",
+    file = "cave-wonders.zip",
+    hashes = {
+      { hash = "7d62668f72381a077688e91383109495", label = "Cave Wonders (USA, Europe).sv" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X034A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Indicator" },
+        { address=0X06AF, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Amount of Goal Item collected" },
+        { address=0X06B0, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Amount of Goal Item Needed" },
+      },
+      stage = {
+        { address=0X0349, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Indicator" },
+        { address=0X034B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Something with the stages" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0348, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0348, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+  },
+}

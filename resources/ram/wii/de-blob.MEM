@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "de Blob",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "de-blob",
+    file = "de-blob.zip",
+    hashes = {
+      { hash = "cce8ed6e4be24ae004bd1d59fc372bc3", label = "De Blob (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X52DDFB, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Playing the Game" },
+        { address=0X52DDFB, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Resort" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Uptown" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Downtown" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Chroma Dam" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Guggentraz Island" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Docklands" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hanging Gardens" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chroma City Funk Park" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ministry of Ink" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lake Raydia" },
+        { address=0X11383F2C, type="u32be", condition="eq", value=0XFFFFFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Null" },
+        { address=0X11383F2C, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32-bit BE] Level ID (Main Missions)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X11383FB7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Blob's lives increased" },
+        { address=0X11383FB7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Blob's lives decreased" },
+      },
+    },
+  },
+}

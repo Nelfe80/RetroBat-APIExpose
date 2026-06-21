@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Stuntman",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform, Racing, Sports"
+  },
+
+  rom = {
+    name = "stuntman",
+    file = "stuntman.zip",
+    hashes = {
+      { hash = "870aaedb84a214fa52b167a37c94b591", label = "Stuntman (USA) (En,Fr,Es).gba" },
+      { hash = "dfd7387e205c01a4f044e3a1d4aaea68", label = "Stuntman (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X41257, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire in the Bus, Toothless in Wapping" },
+        { address=0X41257, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Control the Train, A Whoopin' and a Hollerin'" },
+        { address=0X41257, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Street-Rush, Blood Oath" },
+        { address=0X41257, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Danger on the Freeway, Blood Oath" },
+        { address=0X41257, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slippery Surfaces, Conspiracy" },
+        { address=0X41257, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice Forest, Conspiracy" },
+        { address=0X41257, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Panzer Attack, The Scarab of Lost Souls" },
+        { address=0X41257, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Moving Target, The Scarab of Lost Souls" },
+        { address=0X41257, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Helicopter Attack, Live Twice for Tomorrow" },
+        { address=0X41257, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fire in the Bus, Toothless in Wapping" },
+        { address=0X41257, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="File 1 Current Level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X41110, type="u16le", condition="eq", value=0X00C6, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="9 Seconds Left, Checkpoints Update to Show It" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X41110, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="16bit Timer" },
+      },
+    },
+  },
+}

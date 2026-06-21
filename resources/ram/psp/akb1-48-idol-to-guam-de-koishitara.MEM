@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "AKB1/48: Idol to Guam de Koishitara",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "akb1-48-idol-to-guam-de-koishitara",
+    file = "akb1-48-idol-to-guam-de-koishitara.zip",
+    hashes = {
+      { hash = "63c57640593599adaa353f6b26406658", label = "AKB1-48+10 - Idol to Guam de Koishitara... (Japan).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Action Fighter",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Racing, Shooter"
+  },
+
+  rom = {
+    name = "action-fighter",
+    file = "action-fighter.zip",
+    hashes = {
+      { hash = "47d736575f9a22f7490d62c76ed7c933", label = "Action Fighter (USA, Europe, Brazil) (En) (Rev 1).sms" },
+      { hash = "7e08a9854d61fece23d3c4a39539f4e9", label = "Action Fighter (Japan, Europe) (En).sms" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X0118, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Left (e7= Demo Mode)" },
+      },
+    },
+  },
+}

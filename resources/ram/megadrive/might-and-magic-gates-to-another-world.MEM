@@ -1,0 +1,34 @@
+return {
+  game = {
+    title = "Might and Magic: Gates to Another World",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "might-and-magic-gates-to-another-world",
+    file = "might-and-magic-gates-to-another-world.zip",
+    hashes = {
+      { hash = "3238047522caa4e27be2720da924777e", label = "Might and Magic - Gates to Another World (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFE0F, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="normal function" },
+        { address=0XFE0F, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="input disabled" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCEA2, type="u16le", condition="eq", value=0X0001, action="SCORE_STATE", no_log=false, no_survey=false, desc="66536 experience points" },
+        { address=0XCEA2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Party Member 1 Experience Points Overflow" },
+      },
+      collectibles = {
+        { address=0XCEA6, type="u16le", condition="eq", value=0X0001, action="MONEY_STATE", no_log=false, no_survey=false, desc="66536 gold" },
+      },
+    },
+  },
+}

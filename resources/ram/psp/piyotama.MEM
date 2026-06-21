@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Piyotama",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "piyotama",
+    file = "piyotama.zip",
+    hashes = {
+      { hash = "1483cbd51f7d777c615be72c4e6a9951", label = "Piyotama (USA) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Denki Blocks!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "denki-blocks",
+    file = "denki-blocks.zip",
+    hashes = {
+      { hash = "8b7a6c21e2619dbfb5064c76d074f582", label = "Denki Blocks! (USA) (En,Es).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6AEC, type="u16le", condition="eq", value=0X0E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X6AEC, type="u16le", condition="eq", value=0X4E, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X323C, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Perfecto 1 - Time (16-bits with 0x00323d,0x00323e)" },
+        { address=0X3241, type="u8", condition="bit_true", bit=7, mask=0X80, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Perfecto 2 - Time (16-bits with 0x003242,0x003243)" },
+      },
+    },
+  },
+}

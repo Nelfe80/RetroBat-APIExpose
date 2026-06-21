@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "Vexx",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "vexx",
+    file = "vexx.zip",
+    hashes = {
+      { hash = "dd2398a6720f472ac079e48662ed55d6", label = "Vexx (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X403718, type="u16le", condition="eq", value=0X0C, action="DEMO_MODE", no_log=false, no_survey=false, desc="Dragonreach inner-demon mini game" },
+        { address=0X1A0A2C4, type="u16le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="playing - pause screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6AFFA4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sudo Round" },
+        { address=0XC7F0E0, type="u32le", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Vexx in on ground" },
+        { address=0XC7F0E0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Drop and Hop #3 ground detection" },
+      },
+      stage = {
+        { address=0X445608, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="grabing a heart or coming back to hub after grabing a heart" },
+        { address=0X445608, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="02=in a stage" },
+        { address=0X6AFE2C, type="u16le", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="tutorial" },
+        { address=0X6AFE2C, type="u16le", condition="eq", value=0X74, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="tutorial end" },
+        { address=0X6AFE2C, type="u16le", condition="eq", value=0X79, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="TimberDale (entering from hub)" },
+        { address=0X6AFE2C, type="u16le", condition="eq", value=0XF2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Timberdale (entering from Darby's house" },
+        { address=0X6AFE2C, type="u16le", condition="eq", value=0XFC, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Timberdale (in the tower behind the water fall)" },
+        { address=0X6AFE2C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Some kind of ID where the character spawn in a room? Some may share the same value, but not in a" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="hub before loading a stage-or tutorial" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Timberdale" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dragonreach" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Neverglades" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tempest Peak Manor" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Below" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Daggercrag" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Summit of the sage" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Frostblight Mill" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Citadel of Shadows" },
+        { address=0X6B005C, type="u16le", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shadow Realms" },
+        { address=0X6B005C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage" },
+        { address=0X6B008C, type="u16le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="playing (once any stage is loaded from hub)" },
+        { address=0X6B008C, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="0x00=dying - when a stage resets after getting a heart" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X6AFE04, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives increased" },
+        { address=0X6AFE04, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives decreased" },
+        { address=0X6B0094, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="during boss" },
+        { address=0X6B0094, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="when falling, keeping an achievement to miss trigger until i find something better" },
+      },
+      health = {
+        { address=0X6AFE0C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X6AFE0C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X6B0024, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="rock suit power up" },
+        { address=0X6B0034, type="u32le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="air suit power up" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6AFFAC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sumo fallen out ring increased" },
+        { address=0X6AFFB4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Vexx fallen out ring increased" },
+        { address=0XC64310, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="32-bit ground detection (dynamic, but seems to be always here during the mini-game in Summit) in" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X6B01E4, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final boss hits" },
+        { address=0X6B01F4, type="u32le", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="active" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X403718, type="u16le", condition="eq", value=0X1D, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dragonreach block castle" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X403718, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="32bit map ID (for real this time)" },
+        { address=0X444AE0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="daytime cycle - will always be 2850 in subarea, sadly, and the animation for grabbing a heart wi" },
+      },
+    },
+  },
+}

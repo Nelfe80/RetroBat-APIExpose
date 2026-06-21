@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Loretta no Shouzou: Sherlock Holmes",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "loretta-no-shouzou-sherlock-holmes",
+    file = "loretta-no-shouzou-sherlock-holmes.zip",
+    hashes = {
+      { hash = "8dcdd83e58be634a3735911a1af05bb3", label = "Loretta no Shouzou - Sherlock Holmes (Japan).sg" },
+    }
+  },
+
+  events = {
+  },
+}

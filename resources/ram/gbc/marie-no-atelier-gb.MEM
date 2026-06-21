@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Marie no Atelier GB",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "marie-no-atelier-gb",
+    file = "marie-no-atelier-gb.zip",
+    hashes = {
+      { hash = "fe97e6bb194bd38e5baeb889b4c8e251", label = "Marie no Atelier GB (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "fadd4dd3bf289404520e77422cb9a635", label = "Atelier Marie GB (Japan) (En) (v1.1) (mayday).gbc" },
+      { hash = "6b869755e671180ea7ddf13e4fc5ddad", label = "Atelier Marie GB (Japan) (En) (v1.1) (Double Speed) (mayday).gbc" },
+      { hash = "67ea80061273914d1ecd507c7fe98b2a", label = "Atelier Marie GB (Japan) (En) (v1.2) (mayday).gbc" },
+      { hash = "f7f052e2a2bdac2236ec7a3ede15111d", label = "Atelier Marie GB (Japan) (En) (v1.2) (Double Speed) (mayday).gbc" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XCB41, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(16Bit) Money increased" },
+      },
+    },
+  },
+}

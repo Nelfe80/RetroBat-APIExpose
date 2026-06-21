@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Rudra no Hihou",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "rudra-no-hihou",
+    file = "rudra-no-hihou.zip",
+    hashes = {
+      { hash = "d2ee0f07eb882c6a989eef67a4a6f945", label = "Rudra no Hihou (Japan) (En) (Aeon Genesis) (2.0).sfc" },
+      { hash = "e5ffb8ca8331076037a32db94627518c", label = "Rudra no Hihou (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0C85, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 2nd char - level" },
+        { address=0X0D05, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 3rd char - level" },
+        { address=0X0D85, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) 4th char - level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0C08, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="first character HP ? decreased" },
+        { address=0X0C08, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="first character HP ? increased" },
+        { address=0X0C0A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="first character Max HP decreased" },
+        { address=0X0C0A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="first character Max HP increased" },
+        { address=0X0E08, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16 bits first opponent hp? decreased" },
+        { address=0X0E08, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16 bits first opponent hp? increased" },
+        { address=0X0E0A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16 bits first oponent max hp ? decreased" },
+        { address=0X0E0A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16 bits first oponent max hp ? increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X091B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0X0E3E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money given increased" },
+        { address=0XF39D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Sion's team money saved increased" },
+        { address=0XF611, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Surlent's group money saved increased" },
+        { address=0XF885, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="riza's group money saved increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X089C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="psycho shield" },
+      },
+    },
+  },
+}

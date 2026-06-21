@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Astro-Grover",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "astro-grover",
+    file = "astro-grover.zip",
+    hashes = {
+      { hash = "3f317ae0d53a6e299ba742f58c31305d", label = "Astro-Grover (1987) (Hi-Tech Expressions).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

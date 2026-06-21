@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Nettou Real Bout Garou Densetsu Special",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "nettou-real-bout-garou-densetsu-special",
+    file = "nettou-real-bout-garou-densetsu-special.zip",
+    hashes = {
+      { hash = "4c24f644e70f0786d20d8ca9ffcea51c", label = "Nettou Real Bout Garou Densetsu Special (Japan) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XDA3A, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Count combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD931, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Win" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD957, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life (p1) increased" },
+        { address=0XD957, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life (p1) decreased" },
+        { address=0XDA57, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life (P2) increased" },
+        { address=0XDA57, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life (P2) decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC2C3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "The Legend of Zelda: Ocarina of Time",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "the-legend-of-zelda-ocarina-of-time",
+    file = "the-legend-of-zelda-ocarina-of-time.zip",
+    hashes = {
+      { hash = "0d6331c2fa062f20272cc1a7f80f7271", label = "Legend of Zelda, The - Ocarina of Time (USA) (Pt) (v14).z64" },
+      { hash = "2ecb8739eb694133b88bdd2cf4617f24", label = "Legend of Zelda, The - Ocarina of Time (USA) (Pt) (v1.7) (Fserve).z64" },
+      { hash = "44e6921a257e913977088b9b6ba9d25b", label = "Legend of Zelda, The - Ocarina of Time (USA) (Es) (v2.0) (eduardo).z64" },
+      { hash = "5bd1fe107bf8106b2ab6650abecd54d6", label = "Legend of Zelda, The - Ocarina of Time (USA).z64" },
+      { hash = "77bf20d3eca19ebcfc5fed35f5cf65dc", label = "Legend of Zelda, The - Ocarina of Time (USA) (Pt) (v1.0).z64" },
+      { hash = "7fd3ba9b095c244367e84a6e4493349b", label = "Legend of Zelda, The - Ocarina of Time (USA) (Pt) (v1.5 Beta).z64" },
+      { hash = "86a9550ad8cddaca13813765045a00ee", label = "Legend of Zelda, The - Ocarina of Time (USA) (Es) (v2.2) (eduardo).z64" },
+      { hash = "9f04c8e68534b870f707c247fa4b50fc", label = "Zelda no Densetsu - Toki no Ocarina (Japan).z64" },
+      { hash = "af27177927468d885e49a0fcd0636768", label = "Legend of Zelda, The - Ocarina of Time (USA) (Es) (v2.0) (eduardo) (a1).z64" },
+      { hash = "bdaa297b76b7838319788dbfc0d510de", label = "Legend of Zelda, The - Ocarina of Time (USA) (Ru) (v1.0) (Shedevr).z64" },
+      { hash = "f85fc5ce4451c1e9f3ee00b814489a51", label = "Legend of Zelda, The - Ocarina of Time (USA) (Pt) (v42).z64" },
+      { hash = "155ecf879cb18f046624f61a0a7d88a1", label = "Legend of Zelda, The - Ocarina of Time (USA) (Ru) (v2.32) (Zelda64rus).z64" },
+      { hash = "ba04b138f996135d0b851fb150b5f55f", label = "Legend of Zelda, The - Ocarina of Time (USA) (Ru) (v2.32) (Zelda64rus) (Improvement) (GhostlyDark).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X11B9DC, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Option - Background-Music Changer [16bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2A3720, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="possible number of deaths" },
+      },
+      health = {
+        { address=0X11A5FC, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Total Health [16bit] decreased" },
+        { address=0X11A5FC, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Total Health [16bit] increased" },
+        { address=0X11A602, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health [16bit] decreased" },
+        { address=0X11A602, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health [16bit] increased" },
+        { address=0X1E25FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Iron Knuckle HP (young link) decreased" },
+        { address=0X1E25FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Iron Knuckle HP (young link) increased" },
+        { address=0X1E3C4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Iron Knuckle HP (adult link) decreased" },
+        { address=0X1E3C4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Iron Knuckle HP (adult link) increased" },
+        { address=0X1E592C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Shadow Link HP decreased" },
+        { address=0X1E592C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Shadow Link HP increased" },
+        { address=0X1E6C6C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 2nd Iron Knuckle HP (adult link) decreased" },
+        { address=0X1E6C6C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 2nd Iron Knuckle HP (adult link) increased" },
+        { address=0X1E71FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Goron Shadow HP decreased" },
+        { address=0X1E71FC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Goron Shadow HP increased" },
+        { address=0X1E840C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma HP decreased" },
+        { address=0X1E840C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma HP increased" },
+        { address=0X1E84F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 1st monster HP decreased" },
+        { address=0X1E84F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 1st monster HP increased" },
+        { address=0X1E84F6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 2nd monster HP decreased" },
+        { address=0X1E84F6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 2nd monster HP increased" },
+        { address=0X1E84FA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 3rd monster HP decreased" },
+        { address=0X1E84FA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Queen Gohma 3rd monster HP increased" },
+        { address=0X1EA2EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Volvagia HP decreased" },
+        { address=0X1EA2EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Volvagia HP increased" },
+        { address=0X1ECB76, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) King Dodongo HP decreased" },
+        { address=0X1ECB76, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) King Dodongo HP increased" },
+        { address=0X1F253C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Morpha HP decreased" },
+        { address=0X1F253C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Morpha HP increased" },
+        { address=0X1F9A4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Sorceress Sisters Twinrova HP - final form decreased" },
+        { address=0X1F9A4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Sorceress Sisters Twinrova HP - final form increased" },
+        { address=0X1FA2DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Ganon HP (last battle) decreased" },
+        { address=0X1FA2DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Ganon HP (last battle) increased" },
+        { address=0X20B5CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Ganondorf HP decreased" },
+        { address=0X20B5CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) Ganondorf HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X11B48C, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bit) points obtained from Poes" },
+        { address=0X11B9D4, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bit) Fish weight (during fishing)/ score at horseback archery game" },
+      },
+      collectibles = {
+        { address=0X11A6A2, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Skulltula Tokens [16bit] increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X11A642, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Current Equipment - Sword and Shield" },
+        { address=0X11A66E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Inventory - Swords and Shields" },
+        { address=0X11AD1E, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Kokiri Shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11A5E0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Nighttime Flag [32bit]" },
+        { address=0X11A5F0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Death Counter [16bit]" },
+        { address=0X11B9A2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8 bit) timer on Lon Lon Ranch mini game / death mountain crater / diving game/ horse racing" },
+      },
+    },
+  },
+}

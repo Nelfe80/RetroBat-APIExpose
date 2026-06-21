@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Ivy the Kiwi?",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ivy-the-kiwi",
+    file = "ivy-the-kiwi.zip",
+    hashes = {
+      { hash = "6bb936980ae5193c71f2bdcb35f47a29", label = "Ivy the Kiwi (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X2054F0, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE] Stage" },
+        { address=0X2BA270, type="u32be", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage trial" },
+        { address=0X2BA378, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32-bit BE] Feathers collected in current session. Does not reset when dying or changing stages" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X205554, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[200 bytes] High Score Main Game" },
+        { address=0X20561C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[200 bytes] High Score Bonus Game" },
+        { address=0X2058E4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Latest points recorded in the main or bonus mode. Updates on finishing a stage" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2056E4, type="u32be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[200 bytes] Best time in the Main Game in milliseconds. Only centiseconds are displayed in-game." },
+      },
+    },
+  },
+}

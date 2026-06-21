@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Shadow Tower Abyss",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Horror, Role-Playing"
+  },
+
+  rom = {
+    name = "shadow-tower-abyss",
+    file = "shadow-tower-abyss.zip",
+    hashes = {
+      { hash = "d8e315c1b3e38573939829da0fc108c2", label = "Shadow Tower Abyss (Japan) (En) (v1.0) (Mord of Swoonlight)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4AA40C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="NG+ Max Cleared" },
+        { address=0X4AA40E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="NG+ Max Cleared" },
+        { address=0X4AA412, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="NG+ Max Cleared" },
+        { address=0X4AA414, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="NG+ Max Cleared" },
+        { address=0X4AA416, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="NG+ Max Cleared" },
+        { address=0X4AA418, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="NG+ Max Cleared" },
+        { address=0X4AA4ED, type="u8", condition="bit_true", bit=2, mask=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Helm (Entry 13)" },
+        { address=0X4AA4ED, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Helm 14" },
+        { address=0X4AA4ED, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Helm 15" },
+        { address=0X4AA4ED, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Helm 16" },
+        { address=0X4AA4ED, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fear Round Helm 17" },
+        { address=0X4AA4ED, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fear Round Helm 18" },
+        { address=0X4AA4FD, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rattan Armor" },
+        { address=0X4AA4FD, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rattan Armor" },
+        { address=0X4AA4FD, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Rattan Armor" },
+        { address=0X4AA4FD, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cotton Armor" },
+        { address=0X4AA4FD, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cotton Armor" },
+        { address=0X4AA4FD, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cotton Armor" },
+        { address=0X4AA4FD, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ebony Do-Maru" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4AA501, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life Vest (Entry 66: FINAL ENTRY)" },
+      },
+      health = {
+        { address=0X202188, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] HP of Creature Selection in Databook decreased" },
+        { address=0X202188, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] HP of Creature Selection in Databook increased" },
+        { address=0X4B4D10, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Max HP decreased" },
+        { address=0X4B4D10, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Max HP increased" },
+        { address=0X4B4D14, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] current HP decreased" },
+        { address=0X4B4D14, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4AA544, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Low Sword (Entry 16)" },
+        { address=0X4AA544, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Low Sword 17" },
+        { address=0X4AA544, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Low Sword 18" },
+        { address=0X4AA544, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Infighting Sword (Blue) 19" },
+        { address=0X4AA544, type="u8", condition="bit_true", bit=4, mask=0X10, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Infighting Sword (Green) 20" },
+        { address=0X4AA544, type="u8", condition="bit_true", bit=5, mask=0X20, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Infighting Sword (yellow) 21" },
+        { address=0X4AA544, type="u8", condition="bit_true", bit=6, mask=0X40, action="WEAPON_STATE", no_log=false, no_survey=false, desc="High Sword 22" },
+        { address=0X4AA544, type="u8", condition="bit_true", bit=7, mask=0X80, action="WEAPON_STATE", no_log=false, no_survey=false, desc="High Sword 23" },
+        { address=0X4B4D90, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16 bit] Weapon R (Gun)" },
+        { address=0X4B4D92, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[16 bit] Weapon L (Melee Weapon)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4AA4F0, type="u8", condition="bit_true", bit=6, mask=0X40, action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammon (Entry 9)" },
+        { address=0X4AA4F0, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Mammon (Entry 10)" },
+        { address=0X4AA4F1, type="u8", condition="bit_true", bit=1, mask=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Deep Sea (Entry 7)" },
+        { address=0X4AA4F1, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Face (Entry 12)" },
+        { address=0X4AA4F1, type="u8", condition="bit_true", bit=4, mask=0X10, action="AMMO_STATE", no_log=true, no_survey=false, desc="Hat (41)" },
+        { address=0X4AA4F1, type="u8", condition="bit_true", bit=5, mask=0X20, action="AMMO_STATE", no_log=true, no_survey=false, desc="Hat (42)" },
+        { address=0X4AA4F1, type="u8", condition="bit_true", bit=6, mask=0X40, action="AMMO_STATE", no_log=true, no_survey=false, desc="Fritz Helmet (43)" },
+        { address=0X4AA4F1, type="u8", condition="bit_true", bit=7, mask=0X80, action="AMMO_STATE", no_log=true, no_survey=false, desc="Fritz Helmet (44)" },
+        { address=0X4AA538, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ruby Wing (Entry 5)" },
+        { address=0X4AA538, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Stand Ruby Wing 6" },
+        { address=0X4AA538, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Equal Ruby Wing 7" },
+        { address=0X4AA538, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Alert Ruby Wing 8" },
+        { address=0X4AA538, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Wise Ruby Ring 9" },
+        { address=0X4AA538, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Set Sapphire 10" },
+        { address=0X4AA538, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Set Sapphire 11" },
+        { address=0X4AA538, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Set Sapphire 12" },
+        { address=0X4AA53E, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Vice Shield (Entry 59)" },
+        { address=0X4AA53E, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Vice Shield 60" },
+        { address=0X4AA53E, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Void Claw 61" },
+        { address=0X4AA53E, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Void Claw 62" },
+        { address=0X4AA53E, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bainarwen (Rurufon defeated) 63" },
+        { address=0X4AA53E, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Marnrai 64" },
+        { address=0X4AA53E, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Nature Ring 65" },
+        { address=0X4AA53F, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Robust Nature Ring 66" },
+        { address=0X4AA53F, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Nature Ring 67" },
+        { address=0X4AA540, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Stand Geyser Ring" },
+        { address=0X4B4D9C, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 bit] Ring increased" },
+      },
+    },
+  },
+}

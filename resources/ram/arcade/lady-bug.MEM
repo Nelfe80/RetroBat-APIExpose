@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Lady Bug",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lady-bug",
+    file = "lady-bug.zip",
+    hashes = {
+      { hash = "7eef7295c50d70615433858746056bca", label = "ladybug.7z <Lady Bug>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001C, type="u8", condition="eq", value=0X42, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X001C, type="u8", condition="eq", value=0X81, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-Game, Demo" },
+        { address=0X005E, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00A9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Remaining Dots. Starts at 0x73 for early levels." },
+      },
+      stage = {
+        { address=0X006E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0029, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Death Animation" },
+        { address=0X0066, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X0066, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0068, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-Bit BCD] 1P Score XX0,000" },
+        { address=0X0069, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-Bit BCD] 1P Score 00X,X00" },
+        { address=0X006A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-Bit BCD] 1P Score 000,0XX" },
+        { address=0X006B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-Bit BCD] 2P Score XX0,000" },
+        { address=0X006C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-Bit BCD] 2P Score 00X,X00" },
+        { address=0X006D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-Bit BCD] 2P Score 000,0XX" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X009D, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Special Letter Counter" },
+        { address=0X009F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Multiplier Counter" },
+        { address=0X019A, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Color Timer Top Half" },
+      },
+    },
+  },
+}

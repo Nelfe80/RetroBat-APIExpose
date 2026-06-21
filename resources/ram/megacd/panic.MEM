@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Panic!",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "panic",
+    file = "panic.zip",
+    hashes = {
+      { hash = "070c46f42e72548c5df0c05fa58ed838", label = "Panic! (USA) (RE)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XED12, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen - Scene Select Cheat" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDE08, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time - Hours" },
+        { address=0XDE0A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time - Minutes" },
+        { address=0XDE0C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time - Milliseconds" },
+        { address=0XDE0D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Time - Seconds" },
+      },
+    },
+  },
+}

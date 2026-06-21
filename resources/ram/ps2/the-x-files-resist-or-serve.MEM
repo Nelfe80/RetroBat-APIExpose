@@ -1,0 +1,84 @@
+return {
+  game = {
+    title = "The X-Files: Resist or Serve",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-x-files-resist-or-serve",
+    file = "the-x-files-resist-or-serve.zip",
+    hashes = {
+      { hash = "9a591a94373b938cf95786e229b37207", label = "X-Files, The - Resist or Serve (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X328C10, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused (02)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X32FBA0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Episode/Act ID" },
+        { address=0X32FBA8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Next Episode/Act ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X86C910, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Sheriff Health decreased" },
+        { address=0X86C910, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Sheriff Health increased" },
+        { address=0X86E7B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Harvester Health decreased" },
+        { address=0X86E7B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Harvester Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X32FB80, type="u8", condition="eq", value=0X0004, action="WEAPON_STATE", no_log=true, no_survey=false, desc="Pistol" },
+        { address=0X32FB80, type="u8", condition="eq", value=0X0011, action="WEAPON_STATE", no_log=true, no_survey=false, desc="AK-47" },
+        { address=0X32FB80, type="u8", condition="eq", value=0X0205, action="WEAPON_STATE", no_log=true, no_survey=false, desc="12oz Molotov Cocktail" },
+        { address=0X32FB80, type="u8", condition="eq", value=0X0206, action="WEAPON_STATE", no_log=true, no_survey=false, desc="40oz Molotov Cocktail" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X326BC8, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Unlimited Ammo (01)" },
+        { address=0X32EF80, type="u24le", condition="eq", value=0X0061, action="AMMO_STATE", no_log=true, no_survey=false, desc="9mm Ammo Clip" },
+        { address=0X32EF80, type="u24le", condition="eq", value=0X0071, action="AMMO_STATE", no_log=true, no_survey=false, desc="Shotgun Ammo" },
+        { address=0X32EF80, type="u24le", condition="eq", value=0X00B0, action="AMMO_STATE", no_log=true, no_survey=false, desc="Package (9mm Ammo Clip)" },
+        { address=0X32EF80, type="u24le", condition="eq", value=0X023B, action="AMMO_STATE", no_log=true, no_survey=false, desc="AK-47 Ammo" },
+        { address=0X32EF80, type="u24le", condition="eq", value=0X0516, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Key" },
+        { address=0X86CD70, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Scully Health - Mulder Episode 1, Act 1 (During Antidote Creation) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X327848, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Related to Boss Health Bar (32-Bit)" },
+        { address=0X7F08FA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Bar Flag" },
+        { address=0X7F08FB, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health Bar Flag" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X326EE8, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Cheat (01)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X325D9C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Interact With Object (01)?" },
+        { address=0X32EF80, type="u24le", condition="eq", value=0X00ED, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Post Office Back Door Key" },
+        { address=0X32EF80, type="u24le", condition="eq", value=0X0542, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Post Office Front Door Keya" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7F08F2, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Encounter Flag" },
+        { address=0X7F08F4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Encounter Flag" },
+        { address=0X7F08F6, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Encounter Flag" },
+        { address=0X7F08FD, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Boss Encounter Flag" },
+      },
+    },
+  },
+}

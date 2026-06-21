@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Legacy of Kain: Blood Omen 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "legacy-of-kain-blood-omen-2",
+    file = "legacy-of-kain-blood-omen-2.zip",
+    hashes = {
+      { hash = "4ae1615340f2c32e6b59da314bfaeb68", label = "Blood Omen 2 - The Legacy of Kain Series (USA)" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X135C1F4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocking Type" },
+      },
+    },
+  },
+}

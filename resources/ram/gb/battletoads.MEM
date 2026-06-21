@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Battletoads",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Beat 'em Up, Platform"
+  },
+
+  rom = {
+    name = "battletoads",
+    file = "battletoads.zip",
+    hashes = {
+      { hash = "6d24c94d3acd89b4b703f7bd2a504833", label = "Battletoads (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC63E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0XC902, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="08=Paused" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC600, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Player State (13 H = Stage Beat)" },
+        { address=0XC65E, type="u24le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="24 H = Normal Shot, 34 H = Max Shot (Stage 2)" },
+        { address=0XC972, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XC98B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Enemy Explosion (Stage 2)" },
+        { address=0XC9F0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 Progression" },
+        { address=0XCAA0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC60E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XC60E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XC1CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="General Vermin Health decreased" },
+        { address=0XC1CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="General Vermin Health increased" },
+        { address=0XC60D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XC60D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0XC9C7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Brain Health decreased" },
+        { address=0XC9C7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Brain Health increased" },
+        { address=0XCA17, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rocket Rodent Health decreased" },
+        { address=0XCA17, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rocket Rodent Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC635, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon (FF = Axe)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC0CC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0XC9C3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health (might be more reliable)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XC607, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="jump height" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC0BB, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Hit?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC655, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ship Power Shot Timer (Stage 2)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "World Champ",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "world-champ",
+    file = "world-champ.zip",
+    hashes = {
+      { hash = "e8f365909bd0c5cc47898561cc5f9a93", label = "World Champ (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

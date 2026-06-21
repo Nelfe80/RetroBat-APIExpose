@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Samurai Shodown III: Blades of Blood",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "samurai-shodown-iii-blades-of-blood",
+    file = "samurai-shodown-iii-blades-of-blood.zip",
+    hashes = {
+      { hash = "42557655bd7484156c2d1287392374b0", label = "samsho3.7z <Samurai Shodown III / Samurai Spirits - Zankurou Musouken (NGM-087)>" },
+      { hash = "6b854f2a57cdbabc9e43e7d201841dc3", label = "fswords.7z <Fighters Swords (Korean release of Samurai Shodown III)>" },
+      { hash = "eda3599af1b0e1ba961fe63f90d73a02", label = "samsho3h.7z <Samurai Shodown III / Samurai Spirits - Zankurou Musouken (NGH-087)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFD8B, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Soft Dip - Continue: 00 = With, 01 = Without" },
+        { address=0XFD8C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Soft Dip - Demo Sound: 00 = With, 01 = Without" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8029, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level: 03 = Default (AES)" },
+        { address=0X8472, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2P Level: 00 = Beginner Class, 01 = Meduim Grade, 02 = Upper Grade" },
+        { address=0X8473, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Level: 00 = Beginner Class, 01 = Meduim Grade, 02 = Upper Grade" },
+        { address=0X849B, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="7F = Round Finished" },
+        { address=0X8593, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Won" },
+        { address=0X8693, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2P - Rounds Won" },
+        { address=0XFD8E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Soft Dip - Credit/Level: 00 = Default" },
+        { address=0XFD91, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Soft Dip - Violence Level: 03 = Default" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X8572, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP: 80 = Full decreased" },
+        { address=0X8572, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP: 80 = Full increased" },
+        { address=0X8672, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P HP: 80 = Full decreased" },
+        { address=0X8672, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P HP: 80 = Full increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X800C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score - Upper half" },
+        { address=0X800E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score - Lower half up to 9999" },
+      },
+      collectibles = {
+        { address=0XFD8F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Soft Dip - 1 Coin Match: 00 = Without, 01 = With increased" },
+      },
+    },
+  },
+}

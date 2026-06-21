@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Mortal Kombat: Special Forces",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "mortal-kombat-special-forces",
+    file = "mortal-kombat-special-forces.zip",
+    hashes = {
+      { hash = "c1ade5468b238380c981bc5a0f618609", label = "Mortal Kombat - Special Forces (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB4450, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo (01)" },
+        { address=0XB4F70, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused (01)" },
+      },
+      events = {
+        { address=0X1185B0, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Button 1" },
+        { address=0X1185B2, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Button 2" },
+        { address=0X1185B4, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Button 3" },
+        { address=0X1185B6, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Button 4" },
+        { address=0X1185B8, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Button 5" },
+        { address=0X1185BA, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Button 6" },
+        { address=0X1185BC, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Button 7" },
+        { address=0X1185BE, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Button 8" },
+        { address=0X16F01C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo Hits (Dynamic?)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9E218, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Enemies Remaining On Level?" },
+        { address=0XB5430, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Next Level Exp" },
+        { address=0XB5438, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Level" },
+        { address=0XB5488, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Changes on level completion?" },
+        { address=0XB5489, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Changes on level completion?" },
+        { address=0X1195D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB5478, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="01 on death?" },
+        { address=0XB547C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XB547C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X114CE8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Related. Counts down when dead" },
+      },
+      health = {
+        { address=0XAB25C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0XAB25C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+        { address=0XB458C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of Health Bars On Screen? decreased" },
+        { address=0XB458C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of Health Bars On Screen? increased" },
+        { address=0XB4718, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Special Move Energy decreased" },
+        { address=0XB4718, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Special Move Energy increased" },
+        { address=0XB471C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Special Move Energy Displayed decreased" },
+        { address=0XB471C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Special Move Energy Displayed increased" },
+        { address=0XB4758, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health Displayed decreased" },
+        { address=0XB4758, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health Displayed increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X118378, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Machinegun Ammo" },
+        { address=0X11837A, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Shotgun Ammo" },
+        { address=0X11837C, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Rocket Launcher Ammo" },
+        { address=0X11837E, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Grenade Launcher Ammo" },
+        { address=0X118380, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Sniper Rifle Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB4F60, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Related to Boss Music Playout" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1196B0, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Coordinates X" },
+        { address=0X1196B8, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint Coordinates Y" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB53D0, type="u8", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="Combo Timer" },
+      },
+    },
+  },
+}

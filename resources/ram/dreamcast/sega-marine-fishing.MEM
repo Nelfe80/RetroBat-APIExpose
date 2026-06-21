@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Sega Marine Fishing",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "sega-marine-fishing",
+    file = "sega-marine-fishing.zip",
+    hashes = {
+      { hash = "a509032283580cb42cb82aa38e1656c7", label = "Sega Marine Fishing (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X105F54, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo [bitflag]" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X106D86, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Fixed Object: Treasure Box 1" },
+        { address=0X106D87, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Fixed Object: Treasure Box 2" },
+        { address=0X106D88, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Fixed Object: Treasure Box 3" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X106A50, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Arcade - total points" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X106D85, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: Skeleton" },
+        { address=0X106D89, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: Buoy" },
+        { address=0X106D8A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: A Sunken Submarine" },
+        { address=0X106D8B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: A Sunken Ship" },
+        { address=0X106D8C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: Fighter 1" },
+        { address=0X106D8D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: FIghter 2" },
+        { address=0X106D8E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: Billboard" },
+        { address=0X106D8F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: Giant Ruins" },
+        { address=0X106D90, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: Giant Building" },
+        { address=0X106D91, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fixed Object: State Secrets" },
+        { address=0X106D95, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Scallop" },
+        { address=0X106D96, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Sea Turtle" },
+        { address=0X106D97, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Jellyfish" },
+        { address=0X106D98, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Horseshoe Crab" },
+        { address=0X106D99, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Tropical Fish" },
+        { address=0X106D9A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Diver 1" },
+        { address=0X106D9B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Diver 2" },
+        { address=0X106D9C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Submarine 1" },
+        { address=0X106D9D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Submarine 2" },
+        { address=0X106D9E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Crab" },
+        { address=0X106D9F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Squid" },
+        { address=0X106DA0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Octopus" },
+        { address=0X106DA1, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Sperm Whale" },
+        { address=0X106DA2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Moving Object: Dolphin" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X106CBC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time limit option (for Arcade)" },
+        { address=0X1D2858, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time limit setting" },
+      },
+    },
+  },
+}

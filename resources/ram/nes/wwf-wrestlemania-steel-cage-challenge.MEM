@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "WWF WrestleMania: Steel Cage Challenge",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "wwf-wrestlemania-steel-cage-challenge",
+    file = "wwf-wrestlemania-steel-cage-challenge.zip",
+    hashes = {
+      { hash = "3626695b1b25b4e1ff17a5cdc76f7b08", label = "WWF Wrestlemania - Steel Cage Challenge (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Tokimeki Memorial: Densetsu no Ki no Shita de",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy, Visual Novel"
+  },
+
+  rom = {
+    name = "tokimeki-memorial-densetsu-no-ki-no-shita-de",
+    file = "tokimeki-memorial-densetsu-no-ki-no-shita-de.zip",
+    hashes = {
+      { hash = "1c94de2aa930577409f3d6bfe1bd6fd2", label = "Tokimeki Memorial - Densetsu no Ki no Shita de (Japan) (Rev 1) (En) (v3.0) (Translated Games).sfc" },
+      { hash = "cd36eb8982de4bf8369deb9f2f23e590", label = "Tokimeki Memorial - Densetsu no Ki no Shita de (Japan) (Rev 1).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X008E, type="u24le", condition="eq", value=0X0268, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X008E, type="u24le", condition="eq", value=0X0274, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Epilogue | Credits" },
+        { address=0X00BC, type="u8", condition="eq", value=0X08, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Watching the credits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X008E, type="u24le", condition="eq", value=0X0230, action="BOSS_HIT", no_log=false, no_survey=false, desc="RPG Battle (Delinquent Boss | Himo Robo)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0B62, type="u8", condition="eq", value=0X08, action="SWIMMING", no_log=false, no_survey=false, desc="Swimming" },
+      },
+    },
+  },
+}

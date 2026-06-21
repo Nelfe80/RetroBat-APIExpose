@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Pac-Attack",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "pac-attack",
+    file = "pac-attack.zip",
+    hashes = {
+      { hash = "c3e152bcacad48d4cae994f27639a8a8", label = "Pac-Attack (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="eq", value=0X10, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X0000, type="u8", condition="eq", value=0X12, action="DEMO_MODE", no_log=false, no_survey=false, desc="Normal Demo" },
+        { address=0X0000, type="u8", condition="eq", value=0X14, action="DEMO_MODE", no_log=false, no_survey=false, desc="Puzzle Demo" },
+        { address=0X0000, type="u8", condition="eq", value=0X16, action="DEMO_MODE", no_log=false, no_survey=false, desc="Versus Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0002, type="u16be", condition="eq", value=0X0008, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Selected" },
+        { address=0X4134, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X4136, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X4138, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X413A, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X413C, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X413E, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X4140, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X4142, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X4144, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X4146, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X4148, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X414A, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X414C, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Inactive, proceeds to activate 0x004172 and 0x0041ac if value delta is" },
+        { address=0X4166, type="u8", condition="eq", value=0X0C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="The next Cluster placed or Line Clear will roll this value back to 0x00, plus any additional Lin" },
+        { address=0X4166, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Progression" },
+        { address=0X4180, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy/Normal" },
+        { address=0X4180, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X4180, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hyper" },
+        { address=0X4180, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Veteran (Hold Right Hyper)" },
+        { address=0X4180, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Godhand (Down Right Hyper)" },
+        { address=0X4180, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Value That Determines no. of Clusters Before Pac-Man Appears, used for determining starting Leve" },
+      },
+      stage = {
+        { address=0X4000, type="u8", condition="eq", value=0X64, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Congratulations Screen" },
+        { address=0X4000, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage in Puzzle Mode (found by Blazekickn)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X400E, type="u8", condition="eq", value=0XFF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Inactive, checks 0x0041f3 to activate" },
+        { address=0X400E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Cluster Lock Timer" },
+        { address=0X4134, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 1 Line Clear Lock Timer" },
+        { address=0X4136, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 2 Line Clear Lock Timer" },
+        { address=0X4138, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 3 Line Clear Lock Timer" },
+        { address=0X413A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 4 Line Clear Lock Timer" },
+        { address=0X413C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 5 Line Clear Lock Timer" },
+        { address=0X413E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 6 Line Clear Lock Timer" },
+        { address=0X4140, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 7 Line Clear Lock Timer" },
+        { address=0X4142, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 8 Line Clear Lock Timer" },
+        { address=0X4144, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 9 Line Clear Lock Timer" },
+        { address=0X4146, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 10 Line Clear Lock Timer" },
+        { address=0X4148, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 11 Line Clear Lock Timer" },
+        { address=0X414A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 12 Line Clear Lock Timer" },
+        { address=0X414C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Row 13 Line Clear Lock Timer" },
+      },
+    },
+  },
+}

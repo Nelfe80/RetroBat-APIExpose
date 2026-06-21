@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Donkey Xote",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "donkey-xote",
+    file = "donkey-xote.zip",
+    hashes = {
+      { hash = "454f792692754dbba6cd189d83933664", label = "Donkey Xote (Europe) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XCBA8C8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[ 8 bit ] Extra Lives Counter increased" },
+        { address=0XCBA8C8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[ 8 bit ] Extra Lives Counter decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCBA8CC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[ 16-bit ] Coin Counter increased" },
+      },
+    },
+  },
+}

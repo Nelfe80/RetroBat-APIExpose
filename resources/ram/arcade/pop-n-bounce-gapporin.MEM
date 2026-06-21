@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Pop 'n Bounce | Gapporin",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Ball & Paddle"
+  },
+
+  rom = {
+    name = "pop-n-bounce-gapporin",
+    file = "pop-n-bounce-gapporin.zip",
+    hashes = {
+      { hash = "0f462776370446d8e78a8fa2785c62f5", label = "popbounc.7z <Pop 'n Bounce / Gapporin>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X29F4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="ff: demo mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFD8B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dipswitch: level" },
+      },
+      stage = {
+        { address=0XFD90, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dipswitch: stage select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X823C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of balls remaining increased" },
+        { address=0X823C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of balls remaining decreased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF2AE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dipswitch, number of balls" },
+      },
+    },
+  },
+}

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>spinner</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Thrust</text>
+			<color>${red}</color>
+		</text>
+		<text name="button6" extra="true">
+			<text>Shields</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Thrust</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button6" extra="true">
+			<text>Shields</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${red}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 RES 1069846</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 MWG 20000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 DAD 18250</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 BLJ 18110</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 SDB 17970</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 JMC 17830</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 SRK 17690</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 BLJ 17550</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 MJN 17410</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 GGC 17270</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 RTP 17130</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 JCR 16990</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 EKS 16850</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 SES 16710</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 WZC 2600</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

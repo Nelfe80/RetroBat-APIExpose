@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Power Rangers: Super Legends",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "power-rangers-super-legends",
+    file = "power-rangers-super-legends.zip",
+    hashes = {
+      { hash = "122bf289144f0477399ef4c49868998b", label = "Power Rangers - Super Legends - 15th Anniversary (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

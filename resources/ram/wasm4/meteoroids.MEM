@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Meteoroids",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "meteoroids",
+    file = "meteoroids.zip",
+    hashes = {
+      { hash = "ba3635d1d50ee0dec99b49bf691abe0c", label = "Meteoroids (World) (v0.3) (Jeremy Zeiber).wasm" },
+    }
+  },
+
+  events = {
+  },
+}

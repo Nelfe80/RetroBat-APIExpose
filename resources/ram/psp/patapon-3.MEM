@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Patapon 3",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "patapon-3",
+    file = "patapon-3.zip",
+    hashes = {
+      { hash = "6f3fe3f563d21bdfe8b96cddf499f796", label = "Patapon 3 (Europe) (En,Fr,De,Es,It,Nl,Pt,Pl,Ru).iso" },
+    }
+  },
+
+  events = {
+  },
+}

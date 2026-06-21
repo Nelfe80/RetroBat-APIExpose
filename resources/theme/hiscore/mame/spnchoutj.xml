@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 NOA 88700</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 JNQ 87700</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 GEO 86700</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 DNN 85700</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 NTU 84700</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 DQZ 83700</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 YTH 82700</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 ING 81700</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 QOA 80700</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 ICO 79700</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 BGY 78700</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 PBH 77700</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 NEV 76700</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 NQB 75700</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 XRS 74700</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 WBD 73700</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 ANQ 72700</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 OTO 71700</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 DNQ 70700</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 SAV 69700</text>
+		</text>
+	</view>
+</theme>

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Phantasy Star II [Subset - Rolf Solo Challenge]",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "phantasy-star-ii-subset-rolf-solo-challenge",
+    file = "phantasy-star-ii-subset-rolf-solo-challenge.zip",
+    hashes = {
+      { hash = "61921a08de0b28e44bf63f4d0b2542f7", label = "Phantasy Star II [Subset - Rolf Solo Challenge].md" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC202, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0XC202, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0XC204, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Max HP decreased" },
+        { address=0XC204, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Max HP increased" },
+      },
+    },
+  },
+}

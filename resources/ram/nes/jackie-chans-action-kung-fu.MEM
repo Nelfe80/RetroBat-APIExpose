@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Jackie Chan's Action Kung Fu",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jackie-chans-action-kung-fu",
+    file = "jackie-chans-action-kung-fu.zip",
+    hashes = {
+      { hash = "4228196e1d200db26ac7bce4f55cdd5b", label = "Jackie Chan's Action Kung Fu (USA).nes" },
+      { hash = "66e4120446e9a2c6dea9b975d9e70aab", label = "Jackie Chan (Japan).nes" },
+      { hash = "802457d23975a97d9da23a15dbee283a", label = "Jackie Chan's Action Kung Fu (Europe).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006A, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01 = Pause" },
+        { address=0X0072, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Bit 2 - Level Select Active (Title Screen Only)" },
+        { address=0X00AB, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Bit 6 - Demo Flag (Ignore others)" },
+        { address=0X0701, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X0707, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="0 = Menu, 1 = Map, 2 = In-game, 6 = Game over 7 = Credits" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X00AA, type="u8", condition="eq", value=0X01, action="HIT", no_log=false, no_survey=false, desc="Lower4 - 01 = Damage (Scootaloo)" },
+        { address=0X06E7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy bowl = 3d? decreased" },
+        { address=0X06E7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy bowl = 3d? increased" },
+        { address=0X0702, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0702, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0705, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power up quantity" },
+        { address=0X0706, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power up item; Tornado attack = 1, 180 degree spin kick = 2, 360 degree spin kick = 3, Sky attac" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0039, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+        { address=0X003A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss active?" },
+        { address=0X003B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss?" },
+        { address=0X00C5, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Section value 09=after 1st boss, 0e, after 2nd boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X070C, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint / level" },
+      },
+    },
+  },
+}

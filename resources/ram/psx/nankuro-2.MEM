@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Nankuro 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "nankuro-2",
+    file = "nankuro-2.zip",
+    hashes = {
+      { hash = "92568cd142107e84ad2129d61a83b402", label = "SuperLite 1500 Series - NumCro 2 (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1B0042, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="False" },
+        { address=0X1B0042, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="True" },
+        { address=0X1B0042, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Frozen" },
+      },
+    },
+  },
+}

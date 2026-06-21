@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Fruit Panic",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "fruit-panic",
+    file = "fruit-panic.zip",
+    hashes = {
+      { hash = "b2ceee3005dc0a1d96389e5b2a2a42f7", label = "Fruit Panic [Set 1] {V1 mode}.d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0004, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16-bit BCD] Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0003, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0003, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0000, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE BCD] Score: XXXXXX0" },
+      },
+    },
+  },
+}

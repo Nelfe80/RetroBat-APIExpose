@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Diver's Dream",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "divers-dream",
+    file = "divers-dream.zip",
+    hashes = {
+      { hash = "eaf37e6964b19c2c7fd58703e209da37", label = "Diver's Dream (Europe) (En,Fr,De)" },
+      { hash = "2077af29836760c007b815626045e64f", label = "Diver's Dream (Europe) (En,Fr,De) (60Hz Selector) (v1.0) (Paradox)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE5876, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo countdown" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC04DA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16bit) HP bar decreased" },
+        { address=0XC04DA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16bit) HP bar increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC0472, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures 145-152" },
+        { address=0XC0473, type="u16le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasures 153-160" },
+      },
+      weapon = {
+        { address=0XC04E2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons acquired" },
+        { address=0XC04F2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Current weapon equipped" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC0460, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 1-8 increased" },
+        { address=0XC0462, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 17-24 increased" },
+        { address=0XC0463, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 25-32 increased" },
+        { address=0XC0464, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 33-40 increased" },
+        { address=0XC0465, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 41-48 increased" },
+        { address=0XC0466, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 49-56 increased" },
+        { address=0XC0467, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 57-64 increased" },
+        { address=0XC0468, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 65-72 increased" },
+        { address=0XC0469, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 73-80 increased" },
+        { address=0XC046A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 81-88 increased" },
+        { address=0XC046B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 89-96 increased" },
+        { address=0XC046C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 97-104 increased" },
+        { address=0XC046D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 105-112 increased" },
+        { address=0XC046E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 113-120 increased" },
+        { address=0XC0470, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 129-136 increased" },
+        { address=0XC0471, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Treasures 137-144 increased" },
+        { address=0XC04DC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total cash money (Lupecita). Anything above 000f423f gets visually glitchy. increased" },
+        { address=0XC04E4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo left in the Pizzicato" },
+        { address=0XC04E6, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo left in the S. spear" },
+        { address=0XC04E8, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo left in the Harpoon" },
+        { address=0XC04EA, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo left in the Flanker" },
+        { address=0XC04EC, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo left in the Layer" },
+        { address=0XC04EE, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo left in the Monster" },
+        { address=0XC13A4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (French) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC046F, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Treasures 121-128" },
+      },
+    },
+  },
+}

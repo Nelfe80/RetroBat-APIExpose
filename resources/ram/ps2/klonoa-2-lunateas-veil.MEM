@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Klonoa 2: Lunatea's Veil",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "klonoa-2-lunateas-veil",
+    file = "klonoa-2-lunateas-veil.zip",
+    hashes = {
+      { hash = "c2740e78454b63b002b5296e5975921a", label = "Klonoa 2 - Lunatea's Veil (Europe) (En,Fr,De,Es,It)" },
+      { hash = "6535721422d1c1507bb72b5f8ac02315", label = "Klonoa 2 - Lunatea's Veil (SCES-50354) [7EBEEBBD]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3759A9, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu option" },
+        { address=0X3759AB, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause menu selection" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3774E4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Section of the level" },
+        { address=0X40C314, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32Bit) Level" },
+        { address=0X40C715, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (from Vision Select)" },
+        { address=0X40D158, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pieces in level" },
+        { address=0X51920C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(32Bit) Level Pieces 2" },
+      },
+      stage = {
+        { address=0X352BA2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Related to Stage 1-1?" },
+        { address=0X352BD5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Max stones Underground Factory" },
+        { address=0X352BE7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Pieces Underground Factory" },
+        { address=0X3774E5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Actual level" },
+        { address=0X40C30C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(32Bit) Controls the stage of the level" },
+        { address=0X40D14C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dream stones obtenied in stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3778E8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X3778E8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X377FE8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (50hz) increased" },
+        { address=0X377FE8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (50hz) decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XFC2AC4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(Float) Boss HP" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X17632EC, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump action = 2" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X352BA4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32Bit) Best time Boss 1 Armor Beast" },
+        { address=0X352BA8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32Bit) Best time Boss 2 Flower Clown" },
+        { address=0X352BAC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32Bit) Best time Boss 3 Mobile Tank Biskarsh" },
+        { address=0X352BB0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32Bit) Best time Boss 4 Polonte the Hatchling" },
+        { address=0X352BB4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32Bit) Best time Boss 5 Cursed Leorina" },
+        { address=0X352BB8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32Bit) Best time Boss 6 King of Sorrow" },
+        { address=0X377924, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32 Bit) Best time in stage" },
+        { address=0X3CD350, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(32Bit) Timer that pauses on Pause" },
+      },
+    },
+  },
+}

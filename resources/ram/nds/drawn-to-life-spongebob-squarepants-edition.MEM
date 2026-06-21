@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Drawn To Life: SpongeBob SquarePants Edition",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "drawn-to-life-spongebob-squarepants-edition",
+    file = "drawn-to-life-spongebob-squarepants-edition.zip",
+    hashes = {
+      { hash = "24e279292467f8dd61d398c0f7779bb4", label = "Drawn to Life - SpongeBob SquarePants Edition (Europe) (En,Fr,De,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X72AD0, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="No" },
+        { address=0X72AD0, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Yes" },
+      },
+      events = {
+        { address=0X77D34, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3EFEB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Sub Level" },
+        { address=0X3EFFB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Percent of Goo Left in Level" },
+        { address=0X3F1B1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Uptown Bikini Bottom" },
+        { address=0X3F1BB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Bibo Industries" },
+        { address=0X3F1C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Lagoon Circus" },
+        { address=0X3F1C7, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="yes" },
+        { address=0X3F1C7, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+        { address=0X3F1C7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level Available - Lagoon Circus" },
+        { address=0X3F1CF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Blue Sky Flyer" },
+        { address=0X3F1D1, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X3F1D9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Doodled Tower" },
+        { address=0X3F1DB, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X3F1E3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Wild Jungle" },
+        { address=0X3F1E5, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X3F1ED, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Mine Cart Racer" },
+        { address=0X3F1EF, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X3F1F7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Perilous Cliffs" },
+        { address=0X3F1F9, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X3F201, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Bikinos Bottos" },
+        { address=0X3F203, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0X3F20B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Pyramid" },
+        { address=0X3F215, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Cliffs of Doom" },
+        { address=0X3F21F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Rock Bottom" },
+        { address=0X3F229, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Dutchman Deck" },
+        { address=0X3F233, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Below Deck" },
+        { address=0X3F23D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - No Turning Back" },
+        { address=0X3F247, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Moon Surface" },
+        { address=0X3F251, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Space Station" },
+        { address=0X3F25B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Bikini Doodle" },
+        { address=0X3F265, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Lunar Battle" },
+        { address=0X3F26F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Doodle Revenge" },
+        { address=0X3F279, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Asteroid Battle" },
+        { address=0X3F283, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Rocket Shootout" },
+        { address=0X3F28D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Stop DoodleBob!" },
+        { address=0X3F2A1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - The Final Battle" },
+      },
+      zone = {
+        { address=0X3EFEA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8bit] World" },
+        { address=0X3F297, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[4 bytes] Level Entry - Note World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3EFF6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X3EFF6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3F074, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+        { address=0X7458C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Save File Coins (x,000,000) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6436C, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="[480 Bytes] 'Checkpoint' Art Data" },
+      },
+    },
+  },
+}

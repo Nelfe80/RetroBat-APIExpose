@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Alex Kidd in the Enchanted Castle",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "alex-kidd-in-the-enchanted-castle",
+    file = "alex-kidd-in-the-enchanted-castle.zip",
+    hashes = {
+      { hash = "088bdda3f56e794f06c02eeea1c033b6", label = "Alex Kidd - Cheongong Maseong (Korea).md" },
+      { hash = "6dee3627fa7a28267efd07c51a467ad6", label = "Alex Kidd in the Enchanted Castle (USA).md" },
+      { hash = "cdcabca95b071e06eb278f67d700557c", label = "Alex Kidd in the Enchanted Castle (Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC186, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XD031, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+  },
+}

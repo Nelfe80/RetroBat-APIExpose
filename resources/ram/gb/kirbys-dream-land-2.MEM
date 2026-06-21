@@ -1,0 +1,108 @@
+return {
+  game = {
+    title = "Kirby's Dream Land 2",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "kirbys-dream-land-2",
+    file = "kirbys-dream-land-2.zip",
+    hashes = {
+      { hash = "ddb5bfae32b0ca39cf8ab6c46880126c", label = "Kirby's Dream Land 2 (USA, Europe) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X860D, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Seems to be 00 at the title screen and FF everywhere else except the credits and cutscenes." },
+        { address=0X8700, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Is at ff when the game is paused." },
+        { address=0X9191, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Is c4 when the game is paused." },
+        { address=0X9336, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Is 07 when the game is paused" },
+        { address=0XA082, type="u8", condition="eq", value=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XDF0A, type="u8", condition="eq", value=0X06, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDB7B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of Worlds Kirby can visit" },
+        { address=0XDF23, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus round stars" },
+        { address=0XDF2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Whispy Woods Bonus round stars" },
+        { address=0XDF2D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Big Forest bonus round stars" },
+        { address=0XDF2E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ripple Field bonus round stars" },
+        { address=0XDF2F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Iceberg bonus round stars" },
+        { address=0XDF30, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Canyon bonus round stars" },
+        { address=0XDF31, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cloudy Park bonus round stars" },
+      },
+      zone = {
+        { address=0XDB60, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID" },
+        { address=0XDB62, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 1 Level Completion" },
+        { address=0XDB63, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 2 Level Completion" },
+        { address=0XDB64, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 3 Level Completion" },
+        { address=0XDB65, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 4 Level Completion" },
+        { address=0XDB66, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 5 Level Completion" },
+        { address=0XDB67, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 6 Level Completion" },
+        { address=0XDB68, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World 7 Level Completion" },
+      },
+      stage = {
+        { address=0XDB61, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0XDB61, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA082, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Respawn" },
+        { address=0XA084, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (Decimal?) increased" },
+        { address=0XA084, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (Decimal?) decreased" },
+      },
+      health = {
+        { address=0XA04C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kirby's Health decreased" },
+        { address=0XA04C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kirby's Health increased" },
+        { address=0XA072, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Animal Friend's Health decreased" },
+        { address=0XA072, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Animal Friend's Health increased" },
+        { address=0XA94C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Mr. Bright Health decreased" },
+        { address=0XA94C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Mr. Bright Health increased" },
+        { address=0XBF12, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="File 1, Kirby's Saved Health. decreased" },
+        { address=0XBF12, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="File 1, Kirby's Saved Health. increased" },
+        { address=0XBF2E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="File 2, Kirby's Saved Health decreased" },
+        { address=0XBF2E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="File 2, Kirby's Saved Health increased" },
+        { address=0XDEE3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Alternate Kirby HP decreased" },
+        { address=0XDEE3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Alternate Kirby HP increased" },
+        { address=0XDEE5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Rick the Hamster health decreased" },
+        { address=0XDEE5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Rick the Hamster health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XDA3A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="02 during demo increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X81BD, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Dancing kirby after boss fb" },
+        { address=0X81BF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Dancing Kirby after Boss 6f" },
+        { address=0XA84C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Real Boss Health (Mr Bright Health)" },
+        { address=0XBF0B, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="File 1, Boss Defeat." },
+        { address=0XDB61, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+        { address=0XDB6A, type="u8", condition="bit_true", bit=0, mask=0X01, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Whispy Woods" },
+        { address=0XDB6A, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Nruff" },
+        { address=0XDB6A, type="u8", condition="bit_true", bit=2, mask=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Sweet Stuff" },
+        { address=0XDB6A, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Ice Dragon" },
+        { address=0XDB6A, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Mr. Shine & Mr. Bright" },
+        { address=0XDB6A, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Kracko" },
+        { address=0XDB6A, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="King Dedede" },
+        { address=0XDB6B, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Final Boss Defeated = Single-bit 1" },
+        { address=0XDEDF, type="u8", condition="bit_true", bit=1, mask=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Riding Animal" },
+        { address=0XDEE4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Current Boss Health HUD" },
+        { address=0XDF0A, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Rush;" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDF00, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Title Screen Timer" },
+      },
+    },
+  },
+}

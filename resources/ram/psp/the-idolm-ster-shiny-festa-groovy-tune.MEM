@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "The iDOLM@STER Shiny Festa: Groovy Tune",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-idolm-ster-shiny-festa-groovy-tune",
+    file = "the-idolm-ster-shiny-festa-groovy-tune.zip",
+    hashes = {
+      { hash = "dba60b941805604153d5f57cd1cc0066", label = "Idolmaster Shiny Festa, The - Groovy Tune (Japan).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XBC6C18, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="RELATIONS: DEBUT - HIGHEST COMBO" },
+        { address=0XBC6C54, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="RELATIONS: REGULAR - HIGHEST COMBO" },
+        { address=0XBC6FD8, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="FURUFURU FUTURE: DEBUT - HIGHEST COMBO" },
+        { address=0XBC7014, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="FURUFURU FUTURE: REGULAR - HIGHEST COMBO" },
+        { address=0XBC7938, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="MUSIC: DEBUT - HIGHEST COMBO" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBBECA4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Results screen - SCORE" },
+        { address=0XBC6C1C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="RELATIONS: DEBUT - HIGH SCORE" },
+        { address=0XBC6C58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="RELATIONS: REGULAR - HIGH SCORE" },
+        { address=0XBC6FDC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="FURUFURU FUTURE: DEBUT - HIGH SCORE" },
+        { address=0XBC7018, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="FURUFURU FUTURE: REGULAR - HIGH SCORE" },
+        { address=0XBC7054, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="FURUFURU FUTURE: PRO - HIGH SCORE" },
+        { address=0XBC793C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="MUSIC: DEBUT - HIGH SCORE" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBC6C30, type="u32le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="RELATIONS: DEBUT - TIMES GOTTEN FULL COMBO" },
+        { address=0XBC6C6C, type="u32le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="RELATIONS: REGULAR - TIMES GOTTEN FULL COMBO" },
+        { address=0XBC6FF0, type="u32le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="FURUFURU FUTURE: DEBUT - TIMES GOTTEN FULL COMBO" },
+        { address=0XBC73B0, type="u32le", condition="change", action="COMBO_TIMER", no_log=true, no_survey=false, desc="MASSUGU: DEBUT - TIMES GOTTEN FULL COMBO" },
+      },
+    },
+  },
+}

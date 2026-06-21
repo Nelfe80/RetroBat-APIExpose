@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Truck Rally",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "truck-rally",
+    file = "truck-rally.zip",
+    hashes = {
+      { hash = "daccdaa2b414ed841f59e6e401cc8b09", label = "Truck Rally (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

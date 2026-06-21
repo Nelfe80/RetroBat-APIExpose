@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "Final Fantasy V",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "final-fantasy-v",
+    file = "final-fantasy-v.zip",
+    hashes = {
+      { hash = "08388e4f59ca8ec1ef2114f5e5b53e85", label = "Final Fantasy V (Japan) (Pt).sfc" },
+      { hash = "202164a0c9c7faa2f64d7699cbac305d", label = "Final Fantasy V (Japan) (En) (GBA Script Port) (J121) (1.16) (BugFix).sfc" },
+      { hash = "3aa17ed76b3fa65af9fda914435a6a77", label = "Final Fantasy V (Japan) (Es) (noisecross) (1.06f).sfc" },
+      { hash = "4811b6be7fb2934c71342d66706d787e", label = "Final Fantasy V (Japan) (En) (GBA Script Port) (J121) (1.16).sfc" },
+      { hash = "5245a6ed780d896f416cc8824aa36182", label = "Final Fantasy V (Japan) (En) (RPGe) (1.1).sfc" },
+      { hash = "9304a04ab5aab54a7b978f8f2658166a", label = "Final Fantasy V (Japan) (En) (GBA Script) (J121) (1.5) (BugFixes).sfc" },
+      { hash = "b80f8f1eaad71e8e7d5ee22ed121aa20", label = "Final Fantasy V (Japan) (En) (GBA Script,BugFix) (1.15) (MSU-1) (darthvaderx) (4.0).sfc" },
+      { hash = "ca3969d5047dba8794e82cf9bd905f79", label = "Final Fantasy V (Japan) (En) (GBA Script) (J121) (1.5).sfc" },
+      { hash = "d69b2115e17d1cf2cb3590d3f75febb9", label = "Final Fantasy V (Japan).sfc" },
+      { hash = "f4cb9d7dfe369f2d49bb7e475b9886e3", label = "Final Fantasy V (Japan) (En) (RGPe) (1.1) (MSU-1) (darthvaderx) (4.0).sfc" },
+      { hash = "c14e11e33a238455b2f3b2e23c54245a", label = "Final Fantasy V (Japan) (En) (Legend of the Crystals) (v2.1) (Spooniest).sfc" },
+      { hash = "f56ae26c93cd09ba256b002b83b2d26b", label = "Final Fantasy V (Japan) (De) (v1.10) (mi213, RedScorpion, Conn).sfc" },
+      { hash = "e002240962051854afbf2e89bcb25128", label = "Final Fantasy V Spoof (v1.01) (Tzepish).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0ADA, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="moogle outfit" },
+        { address=0X0ADA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8 bit) character sprite on worldmap" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X201A, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="float, bit7=dead" },
+        { address=0X211A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X219A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0003, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Items" },
+        { address=0X0012, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Dropped Items" },
+        { address=0X7E2040, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Equippable Items (Weapon?)" },
+        { address=0X7E2041, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Equippable Items (Headgear?)" },
+        { address=0X7E2042, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Equippable Items (Body?)" },
+        { address=0X7E2043, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Equippable Items (Relic?)" },
+        { address=0X7E2826, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="1st Item ID" },
+        { address=0X7E2827, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="2nd Item ID" },
+        { address=0X7E2828, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="3rd Item ID" },
+        { address=0X7E2829, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="4th Item ID" },
+        { address=0X7E282A, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="5th Item ID" },
+        { address=0X7E282B, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="6th Item ID" },
+        { address=0X7E282C, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="7th Item ID" },
+        { address=0X7E282D, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="8th Item ID" },
+        { address=0X7E2B9A, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item #1" },
+        { address=0X7E2B9B, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item #2" },
+        { address=0X7E2B9C, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item #3" },
+        { address=0X7E2B9D, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item #4" },
+        { address=0X7E2B9E, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item #5" },
+        { address=0X7E2B9F, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item #6" },
+        { address=0X7E2BA0, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item #7" },
+        { address=0X7E2BA1, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="Item #8" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0A1D, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Flying Lonka Ruins canon destroyed" },
+      },
+    },
+  },
+}

@@ -1,0 +1,104 @@
+return {
+  game = {
+    title = "Guilty Gear Judgment",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "guilty-gear-judgment",
+    file = "guilty-gear-judgment.zip",
+    hashes = {
+      { hash = "7c329a5d392d102e0788d21a0953ae79", label = "Guilty Gear Judgment (Europe).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA80488, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0XB9AD7C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[GGX2] Title Screen Flag (8-bit)" },
+        { address=0XB9AD99, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X952DA4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="GG Judgment - Cutscene Flag [Used for cutscenes and 'Stage Clear' screen] (8-bit)" },
+        { address=0XA7C2C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won (8-bit)" },
+        { address=0XA7C2C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Rounds Won (8-bit)" },
+        { address=0XBA64A1, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0XBA64A1, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0XBA64A1, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5" },
+        { address=0XBA64A1, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="7" },
+        { address=0XBA64A1, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="9" },
+        { address=0XBA64A1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="GGX2 - Rounds (8-bit)" },
+        { address=0XBABBC4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[GGX2] Survival Mode Level (16-bit)" },
+      },
+      stage = {
+        { address=0X99B0A5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Sol (8-bit)" },
+        { address=0X99B0C5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Ky (8-bit)" },
+        { address=0X99B0E5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - May (8-bit)" },
+        { address=0X99B105, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Millia (8-bit)" },
+        { address=0X99B145, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Potemkin (8-bit)" },
+        { address=0X99B165, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Chipp (8-bit)" },
+        { address=0X99B185, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Faust (8-bit)" },
+        { address=0X99B1A5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Baiken (8-bit)" },
+        { address=0X99B1C5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Jam (8-bit)" },
+        { address=0X99B1E5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Johnny (8-bit)" },
+        { address=0X99B205, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Axl (8-bit)" },
+        { address=0X99B225, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Anji (8-bit)" },
+        { address=0X99B245, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Venom (8-bit)" },
+        { address=0X99B265, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Testament (8-bit)" },
+        { address=0X99B285, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Dizzy (8-bit)" },
+        { address=0X99B2A5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Slayer (8-bit)" },
+        { address=0X99B2C5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - I-No (8-bit)" },
+        { address=0X99B2E5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Zappa (8-bit)" },
+        { address=0X99B305, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Bridget (8-bit)" },
+        { address=0X99B325, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Judgment (8-bit)" },
+        { address=0XB9AD44, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="GGX2 - Arcade Stage (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X99B080, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="GG Judgment - Character Unlock Flags - Eddie (8-bit)" },
+        { address=0X99B125, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Latest Stage Unlocked - Eddie (8-bit)" },
+        { address=0XA0B58C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="GG Judgment - Current Lives (8-bit) increased" },
+        { address=0XA0B58C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="GG Judgment - Current Lives (8-bit) decreased" },
+        { address=0XA3E040, type="u16le", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie" },
+        { address=0XB9AE24, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie" },
+        { address=0XB9AE26, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie" },
+      },
+      health = {
+        { address=0XA3E158, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="GG Judgment - Player HP (32-bit) decreased" },
+        { address=0XA3E158, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="GG Judgment - Player HP (32-bit) increased" },
+        { address=0X1BF701E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="GGX2 - 1P HP (16-bit) decreased" },
+        { address=0X1BF701E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="GGX2 - 1P HP (16-bit) increased" },
+        { address=0X1BF712A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="GGX2 - 2P HP (16-bit) decreased" },
+        { address=0X1BF712A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="GGX2 - 2P HP (16-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X9D5934, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="GG Judgment - Score from Previous Levels (32-bit)" },
+        { address=0XA3E16C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="GG Judgment - Score (32-bit)" },
+        { address=0XB9AD18, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[GGX2] Score (32-bit)" },
+      },
+      collectibles = {
+        { address=0XB9ACE4, type="u16le", condition="eq", value=0X0B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XB9ACE6, type="u16le", condition="eq", value=0X0B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA3E518, type="u32le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="GG Judgment - Boss HP (32-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBA1A70, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="GGX1 - Round Timer (32-bit)" },
+        { address=0XBA64A0, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="GGX2 - Time Limit (8-bit)" },
+      },
+    },
+  },
+}

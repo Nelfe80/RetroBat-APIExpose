@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Fantasy Zone II DX: The Tears of Opa-Opa",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "fantasy-zone-ii-dx-the-tears-of-opa-opa",
+    file = "fantasy-zone-ii-dx-the-tears-of-opa-opa.zip",
+    hashes = {
+      { hash = "42d43b79ab85784459b542a5d78b6be8", label = "fantzn2x.7z <Fantasy Zone II - The Tears of Opa-Opa (System 16C)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3A690, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Fantasy Zone: The Maze",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "fantasy-zone-the-maze",
+    file = "fantasy-zone-the-maze.zip",
+    hashes = {
+      { hash = "d37f86c678b2ad0018518ea7278db24b", label = "Fantasy Zone - The Maze (USA, Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0036, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X0038, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X0038, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X0067, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+  },
+}

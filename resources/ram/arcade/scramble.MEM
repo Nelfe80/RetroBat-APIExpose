@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "scramble",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "scramble",
+    file = "scramble.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X40A2, type="u24be", condition="change", action="SCORE_STATE", min=50, max=80, no_log=false, no_survey=false, desc="Score delta 50-80: A simple regular action" },
+        { address=0X40A2, type="u24be", condition="change", action="SCORE_STATE", color="orange", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Score delta 100-100" },
+        { address=0X40A2, type="u24be", condition="change", action="SCORE_STATE", color="cyan", min=150, max=150, no_log=false, no_survey=false, desc="Score delta 150-150: Score delta 150-150" },
+        { address=0X40A2, type="u24be", condition="change", action="SCORE_STATE", color="green", min=200, max=300, no_log=false, no_survey=false, desc="Score delta 200-300: Score delta 200-300" },
+        { address=0X40A2, type="u24be", condition="change", action="SCORE_STATE", color="blue", min=2000, max=9500, no_log=false, no_survey=false, desc="Score delta 2000-9500: Score delta 2000-9500" },
+        { address=0X40A2, type="u24be", condition="change", action="SCORE_STATE", color="white", min=800, max=800, no_log=false, no_survey=false, desc="Score delta 800-800: Base at end" },
+      },
+      collectibles = {
+        { address=0X4002, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

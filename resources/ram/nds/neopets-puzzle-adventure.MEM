@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Neopets: Puzzle Adventure",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "neopets-puzzle-adventure",
+    file = "neopets-puzzle-adventure.zip",
+    hashes = {
+      { hash = "fb8e183a227d12e53cce875dcdfafa66", label = "Neopets Puzzle Adventure (Europe) (En,Fr,De,Es,Nl).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEBE14, type="u16le", condition="eq", value=0XE03, action="GAME_OVER", no_log=false, no_survey=false, desc="reversi game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XEBE14, type="u16le", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="game startup" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X87, action="NEW_LEVEL", no_log=false, no_survey=false, desc="opening logos" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X1997, action="NEW_LEVEL", no_log=false, no_survey=false, desc="main menu" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="blue clouds" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X2407, action="NEW_LEVEL", no_log=false, no_survey=false, desc="blue clouds" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X703, action="NEW_LEVEL", no_log=false, no_survey=false, desc="forging" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X2387, action="NEW_LEVEL", no_log=false, no_survey=false, desc="training" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X39F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="quick draw" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X403, action="NEW_LEVEL", no_log=false, no_survey=false, desc="reversi" },
+        { address=0XEBE14, type="u16le", condition="eq", value=0X29B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="overworld" },
+        { address=0XEBE14, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Top screen background game state" },
+      },
+    },
+  },
+}

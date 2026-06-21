@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Mad Panic Coaster",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "mad-panic-coaster",
+    file = "mad-panic-coaster.zip",
+    hashes = {
+      { hash = "0885b8b75cdf64db778f772f22a4b7da", label = "Mad Panic Coaster (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A5440, type="u16le", condition="eq", value=0X02, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Clear" },
+        { address=0X1A5440, type="u16le", condition="eq", value=0X07, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1A5440, type="u16le", condition="eq", value=0X0A, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Stage Clear" },
+        { address=0X1A5929, type="u8", condition="eq", value=0X0A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1A5440, type="u16le", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear" },
+        { address=0X1A5440, type="u16le", condition="eq", value=0X0A, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1A5A74, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="No Skull" },
+        { address=0X1A5A74, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Skull still there" },
+        { address=0X1A5A74, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="8-bit First HP Skull" },
+      },
+    },
+  },
+}

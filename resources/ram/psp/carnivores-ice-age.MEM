@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Carnivores: Ice Age",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "carnivores-ice-age",
+    file = "carnivores-ice-age.zip",
+    hashes = {
+      { hash = "5a77649ca4b86a14e3554ffce331267f", label = "Carnivores - Ice Age (Europe) (v2) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    inventory = {
+      weapon = {
+        { address=0X1962E8C, type="u32le", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Pistol" },
+        { address=0X1962E8C, type="u32le", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X1962E8C, type="u32le", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Double-Barelled Shotgun" },
+        { address=0X1962E8C, type="u32le", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="X-Bow" },
+        { address=0X1962E8C, type="u32le", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rifle" },
+        { address=0X1962E8C, type="u32le", condition="eq", value=0X5, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sniper Rifle" },
+        { address=0X1962E8C, type="u32le", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Laser Rifle" },
+        { address=0X1DC7050, type="u16le", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon select" },
+        { address=0X1DC7050, type="u16le", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="loading from weapon select to gameplay" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1964698, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score earned this hunt" },
+      },
+      collectibles = {
+        { address=0X8DA9B4, type="u32le", condition="eq", value=0X7, action="AMMO_STATE", no_log=false, no_survey=false, desc="Mammoths" },
+        { address=0X8DA9B8, type="u32le", condition="eq", value=0X2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Infernus" },
+        { address=0X1DC6DE0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+  },
+}

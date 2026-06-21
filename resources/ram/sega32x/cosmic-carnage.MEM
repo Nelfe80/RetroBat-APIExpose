@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Cosmic Carnage",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "cosmic-carnage",
+    file = "cosmic-carnage.zip",
+    hashes = {
+      { hash = "32f3002a46a462735aa12ca856cb7652", label = "Cosmic Carnage (Japan, USA) (En).32x" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF437, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0XF437, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2" },
+        { address=0XF437, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+        { address=0XF43C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds won by player" },
+        { address=0XF440, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds won by Enemy" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC90A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Related to player HP decreased" },
+        { address=0XC90A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Related to player HP increased" },
+        { address=0XCB16, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Related to Enemy HP Indicator decreased" },
+        { address=0XCB16, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Related to Enemy HP Indicator increased" },
+        { address=0XEEA0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (76 = Full) decreased" },
+        { address=0XEEA0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (76 = Full) increased" },
+        { address=0XEEA2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP Indicator (76 = Full) decreased" },
+        { address=0XEEA2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP Indicator (76 = Full) increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XEEA4, type="u8", condition="eq", value=0X63, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Start" },
+        { address=0XEEA4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0XF428, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="On" },
+        { address=0XF428, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time up" },
+      },
+    },
+  },
+}

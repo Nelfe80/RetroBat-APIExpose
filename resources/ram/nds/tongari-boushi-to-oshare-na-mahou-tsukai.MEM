@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Tongari Boushi to Oshare na Mahou Tsukai",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tongari-boushi-to-oshare-na-mahou-tsukai",
+    file = "tongari-boushi-to-oshare-na-mahou-tsukai.zip",
+    hashes = {
+      { hash = "3e4fbdb3dec5940fd4c75edc3e4018ae", label = "Tongari Boushi to Oshare na Mahou Tsukai (Japan).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X12922C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles" },
+        { address=0X12922D, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titles" },
+        { address=0X1299AC, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="{rev0} Titles" },
+        { address=0X1299AD, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="{rev0} Titles" },
+        { address=0X12B1EB, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Current Title" },
+        { address=0X12B96B, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="{rev0} Current Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X12B1EA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magician Level" },
+        { address=0X12B96A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="{rev0} Magician Level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X21A5D6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dialogue - Block Part" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1A55E3, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Mystery Time Flag" },
+      },
+    },
+  },
+}

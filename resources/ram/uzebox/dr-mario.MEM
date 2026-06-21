@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dr. Mario",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dr-mario",
+    file = "dr-mario.zip",
+    hashes = {
+      { hash = "a28ff30f3dc084e58b9a96dd002711d7", label = "Dr.Mario (World) (v1.0) (Codecrank).uze" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,141 @@
+return {
+  game = {
+    title = "Bare Knuckle III",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Beat'em Up"
+  },
+
+  rom = {
+    name = "bare-knuckle-iii",
+    file = "bare-knuckle-iii.zip",
+    hashes = {
+      { hash = "0b50b578631749a8d9a5e081abce6898", label = "Bare Knuckle III (Japan) (En) (Twilight Translations).md" },
+      { hash = "f1cb9e887bf4bc512d9535c89e420df7", label = "Bare Knuckle III (Japan).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9F19, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game paused" },
+        { address=0XDF00, type="u32be", condition="eq", value=0X5A, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue" },
+        { address=0XDF00, type="u32be", condition="eq", value=0X5E, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue or game over choice" },
+        { address=0XDF00, type="u32be", condition="eq", value=0X60, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0XDFA0, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Left" },
+        { address=0XE000, type="u32be", condition="eq", value=0X5A, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue" },
+        { address=0XE000, type="u32be", condition="eq", value=0X5E, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue or game over choice" },
+        { address=0XE000, type="u32be", condition="eq", value=0X60, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0XEC44, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause in between the railway vehicle passages." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDF3D, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="On the ground" },
+        { address=0XE110, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Groundslam (Zan)" },
+        { address=0XE15F, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player hit enemy" },
+        { address=0XE15F, type="u8", condition="eq", value=0XDF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy hit player" },
+        { address=0XE15F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="This value flips to depending on whether the player got hit by the enemy or the other way around" },
+        { address=0XE210, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Groundslam (Zan)" },
+        { address=0XE310, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Groundslam (Zan)" },
+        { address=0XE410, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Groundslam (Zan)" },
+        { address=0XE510, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Groundslam (Zan)" },
+        { address=0XE610, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Groundslam (Zan)" },
+        { address=0XEFB3, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="mainlevel" },
+        { address=0XEFB3, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="sublevel" },
+        { address=0XFF2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round-select cheat: Starting Round 0-5" },
+      },
+      stage = {
+        { address=0XEC0C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7: Dr. Zero claw logic: F6" },
+        { address=0XEC6D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 7: Dr. Zero health" },
+        { address=0XF524, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage select cheat active =01" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X884A, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="General is considered dead." },
+        { address=0XDF00, type="u32be", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XE000, type="u32be", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0XE100, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy died - countdown til despawn active" },
+        { address=0XE200, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy died - countdown til despawn active" },
+        { address=0XE300, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy died - countdown til despawn active" },
+        { address=0XE400, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy died - countdown til despawn active" },
+        { address=0XE500, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy died - countdown til despawn active" },
+        { address=0XE600, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy died - countdown til despawn active" },
+        { address=0XE70C, type="u8", condition="eq", value=0X54, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up" },
+        { address=0XE78C, type="u8", condition="eq", value=0X54, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up" },
+        { address=0XE80C, type="u8", condition="eq", value=0X54, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up" },
+        { address=0XE88C, type="u8", condition="eq", value=0X54, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up" },
+        { address=0XE90C, type="u8", condition="eq", value=0X54, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up" },
+        { address=0XE98C, type="u8", condition="eq", value=0X54, action="GAIN_LIFE", no_log=false, no_survey=false, desc="1-Up" },
+        { address=0XFF0A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting Lives 1-5 increased" },
+        { address=0XFF0A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting Lives 1-5 decreased" },
+      },
+      health = {
+        { address=0XDF14, type="u16be", condition="eq", value=0X1FA4, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Zan throwing Energy ball" },
+        { address=0XE70C, type="u8", condition="eq", value=0X84, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Zan's Energy Ball" },
+        { address=0XE78C, type="u8", condition="eq", value=0X84, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Zan's Energy Ball" },
+        { address=0XE80C, type="u8", condition="eq", value=0X84, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Zan's Energy Ball" },
+        { address=0XE88C, type="u8", condition="eq", value=0X84, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Zan's Energy Ball" },
+        { address=0XE90C, type="u8", condition="eq", value=0X84, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Zan's Energy Ball" },
+        { address=0XE98C, type="u8", condition="eq", value=0X84, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Zan's Energy Ball" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XDF00, type="u32be", condition="eq", value=0X2E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="throw weapon" },
+        { address=0XDF00, type="u32be", condition="eq", value=0X32, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon attack" },
+        { address=0XDF5A, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Holding a weapon" },
+        { address=0XDF5A, type="u8", condition="eq", value=0X0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Not holding a weapon" },
+        { address=0XE000, type="u32be", condition="eq", value=0X2E, action="WEAPON_STATE", no_log=false, no_survey=false, desc="throw weapon" },
+        { address=0XE000, type="u32be", condition="eq", value=0X32, action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon attack" },
+        { address=0XE158, type="u8", condition="eq", value=0X06, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hit by thrown weapon" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XDF00, type="u32be", condition="eq", value=0X62, action="SCORE_STATE", no_log=false, no_survey=false, desc="initials input for highscore" },
+      },
+      collectibles = {
+        { address=0XE20C, type="u8", condition="eq", value=0X2C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XE30C, type="u8", condition="eq", value=0X2C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XE40C, type="u8", condition="eq", value=0X2C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XE50C, type="u8", condition="eq", value=0X2C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XE60C, type="u8", condition="eq", value=0X2C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XE70C, type="u8", condition="eq", value=0X50, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money bag" },
+        { address=0XE70C, type="u8", condition="eq", value=0X52, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold bar" },
+        { address=0XE78C, type="u8", condition="eq", value=0X50, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money bag" },
+        { address=0XE78C, type="u8", condition="eq", value=0X52, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold bar" },
+        { address=0XE80C, type="u8", condition="eq", value=0X50, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money bag" },
+        { address=0XE80C, type="u8", condition="eq", value=0X52, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold bar" },
+        { address=0XE88C, type="u8", condition="eq", value=0X50, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money bag" },
+        { address=0XE88C, type="u8", condition="eq", value=0X52, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold bar" },
+        { address=0XE90C, type="u8", condition="eq", value=0X50, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money bag" },
+        { address=0XE90C, type="u8", condition="eq", value=0X52, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold bar" },
+        { address=0XE98C, type="u8", condition="eq", value=0X50, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money bag" },
+        { address=0XE98C, type="u8", condition="eq", value=0X52, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold bar" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE161, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss hit player" },
+        { address=0XE20C, type="u8", condition="eq", value=0X3C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Yasha (Onihime & Yasha bossfight)" },
+        { address=0XF509, type="u8", condition="eq", value=0X0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Player can control character" },
+        { address=0XF509, type="u8", condition="eq", value=0X1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Player can't control character" },
+        { address=0XF55B, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Round 6: Counts down as new enemies spawn in the Jet bossfight. When the value reaches 0 reinfor" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDF00, type="u32be", condition="eq", value=0X18, action="JUMPING", no_log=true, no_survey=false, desc="jump" },
+        { address=0XDF10, type="u8", condition="eq", value=0X04, action="JUMPING", no_log=true, no_survey=false, desc="Jump" },
+        { address=0XE000, type="u32be", condition="eq", value=0X18, action="JUMPING", no_log=true, no_survey=false, desc="jump" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X88F3, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Final Boss Counter Expiration: Good Ending =0, Bad Ending =1" },
+      },
+    },
+  },
+}

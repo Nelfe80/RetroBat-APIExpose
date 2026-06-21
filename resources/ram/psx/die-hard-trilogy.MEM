@@ -1,0 +1,107 @@
+return {
+  game = {
+    title = "Die Hard Trilogy",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing, Shooter"
+  },
+
+  rom = {
+    name = "die-hard-trilogy",
+    file = "die-hard-trilogy.zip",
+    hashes = {
+      { hash = "4bdfbe929e54a8dba320eb9874c1f18d", label = "Die Hard Trilogy (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1D63E4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="With a Vengeance pause state" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XA2EE8, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages saved in level" },
+        { address=0XA2F74, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Total Hostages Rescued (Resets after Bonus Levels)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X112B0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X112B2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X112BC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X112BE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X112C0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X7C582, type="u16le", condition="eq", value=0X0B, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0XA2FEC, type="u16le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0XA2FEC, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Playing Level" },
+        { address=0XA303C, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Leaderboard Entry" },
+        { address=0XA3054, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0XA30EC, type="u8", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Innocents Saved Percentage Count Active" },
+        { address=0XA3174, type="u16le", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0XA3174, type="u16le", condition="eq", value=0XFFFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Playing Level" },
+        { address=0XA319C, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard: Game Complete Flag" },
+        { address=0XA32F4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0XA33F4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0XB6768, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB6B88, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB6C60, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Final Results screen?" },
+        { address=0XB6CB0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB6CC0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB6D28, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB6D29, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB6DF8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB6E58, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB7220, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB7260, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XB7430, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XBD98A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0XCBAA5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X13A8E4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1C06CA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1C1ED4, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1C1EDE, type="u16le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1C1EF2, type="u16le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1C1EF4, type="u16le", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1C1EF7, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="LOL" },
+        { address=0X1C952E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1CB070, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1CB226, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1CB23C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1CB2B2, type="u16le", condition="eq", value=0X0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Health Full" },
+        { address=0X1CB2B4, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard: Equipped Gun" },
+        { address=0X1CB2B6, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard: Ammo (found by televandalist)" },
+        { address=0X1CB2B8, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard: Grenades (found by televandalist)" },
+        { address=0X1CCEA5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1D15C8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1D15CA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1D190C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1D190E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1D209C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Die Hard increased" },
+        { address=0X1D209C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Hard decreased" },
+        { address=0X1D59C0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1F77EE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1F780C, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1F7814, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1F7816, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1F781E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Die Harder" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB6A6C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1D2068, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Die Hard: Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XB6CC8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1CB2D6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1CC2A2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Die Hard" },
+        { address=0X1D15C6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Die Harder" },
+        { address=0X1D15CE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Die Harder" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Army Men: Sarge's Heroes",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "army-men-sarges-heroes",
+    file = "army-men-sarges-heroes.zip",
+    hashes = {
+      { hash = "0c80b03e9d7eaa77e6054c9b5696b6e2", label = "Army Men - Sarge's Heroes (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

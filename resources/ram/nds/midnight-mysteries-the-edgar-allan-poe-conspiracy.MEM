@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Midnight Mysteries: The Edgar Allan Poe Conspiracy",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "midnight-mysteries-the-edgar-allan-poe-conspiracy",
+    file = "midnight-mysteries-the-edgar-allan-poe-conspiracy.zip",
+    hashes = {
+      { hash = "42e45bba9e0a6df9b206ef8baa49a571", label = "Midnight Mysteries - The Edgar Allan Poe Conspiracy (Europe) (En,Fr,Nl) (Rev 1).nds" },
+      { hash = "96d7691e10d7150fdbfd22288178fc61", label = "Midnight Mysteries - Gaensehaut Wimmelbild-Abenteuer mit Edgar Allan Poe (Germany).nds" },
+      { hash = "9ebf187229672ead97a2a6b497ae49e0", label = "Midnight Mysteries - The Edgar Allan Poe Conspiracy (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XAA2B8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[US] Stage ID" },
+        { address=0XB259C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[GER] Stage ID" },
+      },
+    },
+  },
+}

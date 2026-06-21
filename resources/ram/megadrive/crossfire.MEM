@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "CrossFire",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "crossfire",
+    file = "crossfire.zip",
+    hashes = {
+      { hash = "8072f5025e9f874c0ccf0341c2081c74", label = "CrossFire (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2D88, type="u16be", condition="eq", value=0X2010, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Start with 4 extra credits" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2D88, type="u16be", condition="eq", value=0X4040, action="WEAPON_STATE", no_log=false, no_survey=false, desc="All weapons" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1071, type="u8", condition="eq", value=0X2, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Defeat Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2D88, type="u16be", condition="eq", value=0X4020, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="All weapons & invincible" },
+        { address=0X2E8D, type="u8", condition="eq", value=0X2, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="on" },
+      },
+    },
+  },
+}

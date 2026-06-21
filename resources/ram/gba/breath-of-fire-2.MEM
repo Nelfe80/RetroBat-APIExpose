@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Breath of Fire 2",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "breath-of-fire-2",
+    file = "breath-of-fire-2.zip",
+    hashes = {
+      { hash = "2132b06357239d4e6a0716d963f46597", label = "Breath of Fire II (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4DE3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 1 Level" },
+        { address=0X4EA7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 2 level" },
+        { address=0X4F6B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 3 level" },
+        { address=0X502F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 4 level" },
+        { address=0XEDA7, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit 7 = Cleared all the queens fat" },
+        { address=0XEDA8, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Boombada Cleared" },
+      },
+      stage = {
+        { address=0X4DE1, type="u8", condition="eq", value=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Zombified (1st stage)" },
+        { address=0X4DE1, type="u8", condition="eq", value=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Zombified (2nd stage)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4EA5, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Near death" },
+        { address=0XEDA9, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deathevn" },
+        { address=0XEDE7, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Inbattle Manson trigger on death" },
+        { address=0XEE27, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="LoveBR" },
+        { address=0XEE27, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="EmpireSD" },
+      },
+      health = {
+        { address=0X47E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 HP decreased" },
+        { address=0X47E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 HP increased" },
+        { address=0X48A8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X48A8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X496C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X496C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0X4DE4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 HP (also in battle) decreased" },
+        { address=0X4DE4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 HP (also in battle) increased" },
+        { address=0X4EA8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 2 HP (IN BATTLE) decreased" },
+        { address=0X4EA8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 2 HP (IN BATTLE) increased" },
+        { address=0X4F6C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 HP (IN BATTLE) decreased" },
+        { address=0X4F6C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 HP (IN BATTLE) increased" },
+        { address=0X5030, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 HP (IN BATTLE) decreased" },
+        { address=0X5030, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 HP (IN BATTLE) increased" },
+        { address=0XEA04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 HP decreased" },
+        { address=0XEA04, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 HP increased" },
+        { address=0XEA3C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 2 HP decreased" },
+        { address=0XEA3C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 2 HP increased" },
+        { address=0XEA74, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 HP decreased" },
+        { address=0XEA74, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 HP increased" },
+        { address=0XEAAC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 HP decreased" },
+        { address=0XEAAC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XEDC7, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon 2" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XEDB7, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[BROKEN] Uparupa defeated" },
+      },
+    },
+  },
+}

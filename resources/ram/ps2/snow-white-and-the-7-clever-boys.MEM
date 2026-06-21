@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Snow White and the 7 Clever Boys",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "snow-white-and-the-7-clever-boys",
+    file = "snow-white-and-the-7-clever-boys.zip",
+    hashes = {
+      { hash = "229635f68a1f1d95cffe3b51ea52bd43", label = "Snow White & the 7 Clever Boys (Europe) (En,Fr,De) (RA Compatibility) (v0.1) (pinguupinguu)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1D2410, type="u16le", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title/No Mode" },
+      },
+    },
+  },
+}

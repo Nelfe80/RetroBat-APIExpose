@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Kinniku Banzuke GB 2 - Mezase! Muscle Champion",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "kinniku-banzuke-gb-2-mezase-muscle-champion",
+    file = "kinniku-banzuke-gb-2-mezase-muscle-champion.zip",
+    hashes = {
+      { hash = "20102abb2a331ff4cc101d3513c891cd", label = "Kinniku Banzuke GB 2 - Mezase! Muscle Champion (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

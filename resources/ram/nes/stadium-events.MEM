@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Stadium Events",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "stadium-events",
+    file = "stadium-events.zip",
+    hashes = {
+      { hash = "fca585e11f803c851b621de88fbbd324", label = "Stadium Events (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

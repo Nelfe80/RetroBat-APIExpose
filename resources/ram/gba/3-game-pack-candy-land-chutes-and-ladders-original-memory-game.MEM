@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "3 Game Pack!: Candy Land, Chutes and Ladders, Original Memory Game",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "3-game-pack-candy-land-chutes-and-ladders-original-memory-game",
+    file = "3-game-pack-candy-land-chutes-and-ladders-original-memory-game.zip",
+    hashes = {
+      { hash = "12d9fcae83c5295aac6da015b75a24d6", label = "3 Game Pack! - Candy Land + Chutes and Ladders + Original Memory Game (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "Baroque: Yuganda Mousou",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "baroque-yuganda-mousou",
+    file = "baroque-yuganda-mousou.zip",
+    hashes = {
+      { hash = "673bfc4cc4718f993703f5ab1560ad27", label = "Baroque - Yuganda Mousou (Japan)" },
+      { hash = "f6717d80a458bcbc4ef5e47ad827240c", label = "Baroque - Yuganda Mousou (Japan) (En) (v1.02) (Plissken)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10BF08, type="u8", condition="bit_true", bit=0, mask=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title demo | Nerve Tower" },
+        { address=0X10BF08, type="u8", condition="bit_true", bit=1, mask=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title demo | Baroque" },
+        { address=0X10BF08, type="u8", condition="bit_true", bit=2, mask=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title demo | BAROQUE MODE" },
+        { address=0X10BF09, type="u8", condition="bit_true", bit=4, mask=0X10, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBFE74, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lowest level (1)" },
+        { address=0XBFE74, type="u8", condition="eq", value=0XC7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Maximum level (99)" },
+        { address=0XBFE74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current player level" },
+        { address=0XBFE7C, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[24-bit] EXP needed for level up" },
+        { address=0X10BA3E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level of Rank 1" },
+        { address=0X10C7AC, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="036 Coat Grounding" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X10C7C1, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="207 Bone Death" },
+      },
+      health = {
+        { address=0XBFE80, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Current decreased" },
+        { address=0XBFE80, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Current increased" },
+        { address=0XBFE82, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Max decreased" },
+        { address=0XBFE82, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Max increased" },
+        { address=0XC4EE4, type="u16le", condition="eq", value=0X03E7, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Unkillable NPC value" },
+        { address=0XC4EE4, type="u16le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Enemy slot 1 Health" },
+        { address=0XC4F4C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy slot 2 Health decreased" },
+        { address=0XC4F4C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy slot 2 Health increased" },
+        { address=0XC4FB4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy slot 3 Health decreased" },
+        { address=0XC4FB4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy slot 3 Health increased" },
+        { address=0X10C7B5, type="u8", condition="bit_true", bit=7, mask=0X80, action="HEALTH_STATE", no_log=true, no_survey=false, desc="112 Fluid Energy" },
+        { address=0X10C7BF, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=true, no_survey=false, desc="188 Pattern HPVT" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X10C7C2, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="210 Bone Gold" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XBFEB8, type="u8", condition="eq", value=0X15, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility" },
+        { address=0X10C7B9, type="u8", condition="bit_true", bit=5, mask=0X20, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="142 Brand Invincibility" },
+        { address=0X10C7C1, type="u8", condition="bit_true", bit=4, mask=0X10, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="205 Bone Invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC34EC, type="u32le", condition="eq", value=0X800F05A8, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Exit Portal" },
+        { address=0XC34F0, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 1 Interior object X rotation" },
+        { address=0XC34F2, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 1 Interior object Y rotation" },
+        { address=0XC34F4, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 1 Interior object Z rotation" },
+        { address=0XC34FA, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 1 X coordinates of interior object" },
+        { address=0XC34FE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 1 Y coordinates of interior object" },
+        { address=0XC3502, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 1 Z coordinates of interior object" },
+        { address=0XC3518, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 1 Interior object sub ID" },
+        { address=0XC3520, type="u32le", condition="eq", value=0X800F05A8, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Exit Portal" },
+        { address=0XC3524, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 2 Interior object X rotation" },
+        { address=0XC3526, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 2 Interior object Y rotation" },
+        { address=0XC3528, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 2 Interior object Z rotation" },
+        { address=0XC352E, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 2 X coordinates of interior object" },
+        { address=0XC3532, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 2 Y coordinates of interior object" },
+        { address=0XC3536, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 2 Z coordinates of interior object" },
+        { address=0XC354C, type="u16le", condition="eq", value=0X0001, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Exit Portal" },
+        { address=0XC3554, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 3 Interior object ID Bank (Category of which objects to choose from)" },
+        { address=0XC3558, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 3 Interior object X rotation" },
+        { address=0XC355A, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 3 Interior object Y rotation" },
+        { address=0XC355C, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 3 Interior object Z rotation" },
+        { address=0XC3562, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 3 X coordinates of interior object" },
+        { address=0XC3566, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 3 Y coordinates of interior object" },
+        { address=0XC356A, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 3 Z coordinates of interior object" },
+        { address=0XC3580, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 3 Interior object sub ID" },
+        { address=0XC3588, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 4 Interior object ID Bank (Category of which objects to choose from)" },
+        { address=0XC358C, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 4 Interior object X rotation" },
+        { address=0XC358E, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 4 Interior object Y rotation" },
+        { address=0XC3590, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 4 Interior object Z rotation" },
+        { address=0XC3596, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 4 X coordinates of interior object" },
+        { address=0XC359A, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 4 Y coordinates of interior object" },
+        { address=0XC359E, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 4 Z coordinates of interior object" },
+        { address=0XC35B4, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 4 Interior object sub ID" },
+        { address=0XC35BC, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 5 Interior object ID Bank (Category of which objects to choose from)" },
+        { address=0XC35C0, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 5 Interior object X rotation" },
+        { address=0XC35C2, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 5 Interior object Y rotation" },
+        { address=0XC35C4, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 5 Interior object Z rotation" },
+        { address=0XC35CA, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 5 X coordinates of interior object" },
+        { address=0XC35CE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 5 Y coordinates of interior object" },
+        { address=0XC35D2, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 5 Z coordinates of interior object" },
+        { address=0XC35E8, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Slot 5 Interior object sub ID" },
+      },
+    },
+  },
+}

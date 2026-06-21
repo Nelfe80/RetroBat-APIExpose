@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "The Lion King",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "the-lion-king",
+    file = "the-lion-king.zip",
+    hashes = {
+      { hash = "baf5068c926c2eabea4afe559f2e3cb0", label = "Lion King, The (Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC549, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused ( 00=No; 01=Yes )" },
+        { address=0XC559, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC52E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Distanced moved in a stage" },
+        { address=0XC563, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (0x00=Stage 1; 0x01=Stage 2; 0x02=Stage 3; 0x03=Stage 4; 0x04=Stage 5; 0x05=Stage" },
+        { address=0XC564, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Has the Bug Patrol's bug been collected in the stage?" },
+        { address=0XC577, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shows the current value when Simba is swing on any of the rhinoceros tails in Stage 2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC559, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XC59B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total Lives increased" },
+        { address=0XC59B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total Lives decreased" },
+      },
+      health = {
+        { address=0XC59A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Simba's Health decreased" },
+        { address=0XC59A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Simba's Health increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XC565, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Is the jump button being pressed?" },
+        { address=0XC580, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Previous jump Height ( Max=08, Jumping on enemies gives you 04 )" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC5A7, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current Checkpoint in stage" },
+      },
+    },
+  },
+}

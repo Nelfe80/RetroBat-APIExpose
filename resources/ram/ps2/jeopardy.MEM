@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Jeopardy!",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "jeopardy",
+    file = "jeopardy.zip",
+    hashes = {
+      { hash = "ea2a03ea5fccda0aea08ec8b739ee4dd", label = "Jeopardy! (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X358891, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Indicator" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X3586CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Round (Loads slightly early)" },
+        { address=0X35FD5C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Round" },
+        { address=0X9EF633, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] [Options] Sound Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X359260, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] [Career Statistics] Best Score" },
+        { address=0X359268, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] [Career Statistics] Worst Score" },
+      },
+      collectibles = {
+        { address=0X3586E8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Player 1 Money increased" },
+        { address=0X358718, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Player 2 Money increased" },
+        { address=0X358748, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32 Bit] Player 3 Money increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X35A938, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Contestant Exam Time Remaining" },
+      },
+    },
+  },
+}

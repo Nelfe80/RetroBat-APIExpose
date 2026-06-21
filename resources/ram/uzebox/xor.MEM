@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "XOR",
+    system = "uzebox",
+    system_name = "Uzebox",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "xor",
+    file = "xor.zip",
+    hashes = {
+      { hash = "bb2a4ded1128b57d81d3cd687b028103", label = "XOR (World) (Pitfall Jones).uze" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X07A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="bit 1 - level started" },
+        { address=0X07C2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total masks to collect in level" },
+        { address=0X07E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X07E8, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Least moves made for level 1" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X07AF, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Indicates which shield is in play" },
+      },
+    },
+  },
+}

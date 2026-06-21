@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 BBM 89175</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 FXL 88254</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 MEC 87830</text>
+		</text>
+	</view>
+</theme>

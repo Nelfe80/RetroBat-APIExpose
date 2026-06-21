@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Samurai Shodown IV: Amakusa's Revenge",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "samurai-shodown-iv-amakusas-revenge",
+    file = "samurai-shodown-iv-amakusas-revenge.zip",
+    hashes = {
+      { hash = "7d5a57459445a7a53fd8bed210d386fc", label = "samsho4k.7z <Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)>" },
+      { hash = "f1b0e1dd18eb6df18ddbe5db53e1d8b2", label = "samsho4.7z <Samurai Shodown IV - Amakusa's Revenge / Samurai Spirits - Amakusa Kourin (NGM-222)(NGH-222)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFD8B, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Soft Dip Setup - toggle continue" },
+        { address=0XFD8D, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Soft Dip Setup -demo setup" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue" },
+        { address=0XFDB6, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continue" },
+        { address=0XFDB7, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8326, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2P Level: 00 = Beginner Class, 01 = Medium Grade, 02 = Upper Grade" },
+        { address=0X8327, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Level: 00 = Beginner Class, 01 = Medium Grade, 02 = Upper Grade" },
+        { address=0X8463, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Won" },
+        { address=0X8663, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="2P - Rounds Won" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8442, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Health: FC = Full, 00 = Dead" },
+        { address=0X8642, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P Health: FC = Full, 00 = Dead" },
+      },
+    },
+  },
+}

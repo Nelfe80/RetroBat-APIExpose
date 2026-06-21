@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Konami's Golf",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "konamis-golf",
+    file = "konamis-golf.zip",
+    hashes = {
+      { hash = "7d22b53c88fe5b6b352e9af89e1c16d3", label = "Konami's Golf (Japan).rom" },
+    }
+  },
+
+  events = {
+  },
+}

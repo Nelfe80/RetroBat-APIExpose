@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Grand Prix",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Racing, Driving"
+  },
+
+  rom = {
+    name = "grand-prix",
+    file = "grand-prix.zip",
+    hashes = {
+      { hash = "2903896d88a341511586d69fcfc20f7d", label = "Grand Prix (USA).a26" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X0003, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Select Switch function" },
+        { address=0X0051, type="u8", condition="eq", value=0X60, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="released" },
+        { address=0X0051, type="u8", condition="eq", value=0XE0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="pressed" },
+      },
+    },
+  },
+}

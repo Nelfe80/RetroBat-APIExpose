@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Todd's Adventures in Slime World",
+    system = "lynx",
+    system_name = "Atari Lynx",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "todds-adventures-in-slime-world",
+    file = "todds-adventures-in-slime-world.zip",
+    hashes = {
+      { hash = "4581ac0418679567dce041c88cc97719", label = "Todd's Adventures in Slime World (World).lnx" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X03F4, type="u8", condition="eq", value=0XFE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+      },
+      health = {
+        { address=0X03F4, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[8bit] - HP/Explosion" },
+      },
+    },
+  },
+}

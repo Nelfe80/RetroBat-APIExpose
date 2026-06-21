@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Férias Frustradas do Pica-Pau",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ferias-frustradas-do-pica-pau",
+    file = "ferias-frustradas-do-pica-pau.zip",
+    hashes = {
+      { hash = "34c0d6f73c5d0efddcee1bea1ed3463f", label = "Ferias Frustradas do Pica Pau (Brazil).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0044, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Brazil] Demo Mode Cycle" },
+        { address=0XF853, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="game over?" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0036, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Brazil] Return to First Stage (Beginning of the Game) Cheat flag" },
+        { address=0X004C, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage id? 16bits" },
+        { address=0X01FE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="n. keys last stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X01D6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Brazil] Life Counter address increased" },
+        { address=0X01D6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Brazil] Life Counter address decreased" },
+        { address=0X0DE0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life last boss increased" },
+        { address=0X0DE0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life last boss decreased" },
+        { address=0XE898, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Brazil] Background Music ID increased" },
+        { address=0XE898, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Brazil] Background Music ID decreased" },
+      },
+      health = {
+        { address=0X01D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Brazil] Health Bar (Blood Bar) decreased" },
+        { address=0X01D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Brazil] Health Bar (Blood Bar) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Brazil] Points of Enemies defeated" },
+      },
+      collectibles = {
+        { address=0X01DA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Brazil] Bags of Money taken increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0D04, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss hp?" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0EB4, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="[Brazil] Invincibility Cheat flag" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0010, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="checkpoint id" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0EC8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Brazil] Stage Part Counter ID" },
+      },
+    },
+  },
+}

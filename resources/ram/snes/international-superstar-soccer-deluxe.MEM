@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "International Superstar Soccer Deluxe",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Sports, Football"
+  },
+
+  rom = {
+    name = "international-superstar-soccer-deluxe",
+    file = "international-superstar-soccer-deluxe.zip",
+    hashes = {
+      { hash = "345ddedcd63412b9373dabb67c11fc05", label = "International Superstar Soccer Deluxe (USA).sfc" },
+      { hash = "51da200d9c04bb26c3c3e55796d84f0c", label = "International Superstar Soccer Deluxe (Europe).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE52E, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 2" },
+        { address=0XE52E, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 3 3= level 4" },
+        { address=0XE52E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 = level 1 (challenge mode)" },
+      },
+      zone = {
+        { address=0X1E5E, type="u8", condition="eq", value=0X2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Series" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00A8, type="u8", condition="eq", value=0X2, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra time first half" },
+        { address=0X00A8, type="u8", condition="eq", value=0X3, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Extra time second half and penalty shootout" },
+        { address=0X00A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Period (8-bit)" },
+      },
+    },
+  },
+}

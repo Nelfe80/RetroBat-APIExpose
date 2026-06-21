@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Casper",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "casper",
+    file = "casper.zip",
+    hashes = {
+      { hash = "792c706a0addebed39d177077a1caac0", label = "Casper (USA).gb" },
+      { hash = "a614bbd7851374a870e57f43896ffe0e", label = "Casper (Europe).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD8C7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+  },
+}

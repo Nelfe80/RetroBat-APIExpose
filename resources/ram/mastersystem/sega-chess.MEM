@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Sega Chess",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Board Game, Strategy"
+  },
+
+  rom = {
+    name = "sega-chess",
+    file = "sega-chess.zip",
+    hashes = {
+      { hash = "92334e9e52eeb8d27606e319b1f8b617", label = "Sega Chess (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X03BE, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="intro video" },
+        { address=0X03BE, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beginner" },
+        { address=0X03BE, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Novice" },
+        { address=0X03BE, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Amateur" },
+        { address=0X03BE, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Intermediate" },
+        { address=0X03BE, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Professional" },
+        { address=0X03BE, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chess Champion" },
+        { address=0X03BE, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grand Chess Champion" },
+        { address=0X03BE, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chess Master" },
+        { address=0X03BE, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Grand Chess Master" },
+        { address=0X03BE, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Adaptive" },
+        { address=0X03BE, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Infinite Think Mode" },
+        { address=0X03BE, type="u8", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Problem Solving Mode" },
+        { address=0X03BE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level:" },
+      },
+    },
+  },
+}

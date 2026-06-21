@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Red Faction II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "red-faction-ii",
+    file = "red-faction-ii.zip",
+    hashes = {
+      { hash = "715b2bdd3443d6f4dada9de399ac2b0e", label = "Red Faction II (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

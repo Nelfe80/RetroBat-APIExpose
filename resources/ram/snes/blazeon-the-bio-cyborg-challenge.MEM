@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "BlaZeon: The Bio-Cyborg Challenge",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "blazeon-the-bio-cyborg-challenge",
+    file = "blazeon-the-bio-cyborg-challenge.zip",
+    hashes = {
+      { hash = "0fc1dd2c3ac2ec5baed77b3a32590ba4", label = "BlaZeon - The Bio-Cyborg Challenge (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0098, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 bits] Stage distance" },
+        { address=0X0E1E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 bits] Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0E18, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 bits] Lives increased" },
+        { address=0X0E18, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 bits] Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0018, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 bits] Total score in stage clear" },
+        { address=0X0E20, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bits] Score" },
+        { address=0X0E28, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 bits] boss score" },
+        { address=0X0E30, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 bits] High Score" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0E45, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_STOP", no_log=false, no_survey=false, desc="No" },
+      },
+    },
+  },
+}

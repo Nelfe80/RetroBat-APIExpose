@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "Running Battle",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "running-battle",
+    file = "running-battle.zip",
+    hashes = {
+      { hash = "c32c95222ce705c0c93732a8922f7453", label = "Running Battle (Europe, Brazil) (En).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0E5B, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Cheat Not Used/Game Over not Gotten" },
+        { address=0X0E5B, type="u8", condition="eq", value=0X6C, action="GAME_OVER", no_log=false, no_survey=false, desc="Cheat Code Used (Also pops up quickly at the Game Over Screen)." },
+        { address=0X0E5B, type="u8", condition="eq", value=0XEA, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0EBE, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X0EDF, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Main Menu/Demo/Has a rifle" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X001D, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dark Zone" },
+        { address=0X001D, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Parson Hangout 1" },
+        { address=0X001D, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Parson Hangout 2" },
+        { address=0X001D, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Parson Hangout 3" },
+        { address=0X001D, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="ESP Training Room" },
+        { address=0X001D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Levels" },
+      },
+      stage = {
+        { address=0X0E64, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0EBE, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="3 Lives (Staring lives)" },
+        { address=0X0EBE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives increased" },
+        { address=0X0EBE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Lives decreased" },
+      },
+      health = {
+        { address=0X0EBB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Attacks decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0EBB, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Not attacking" },
+        { address=0X0EBB, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Punch" },
+        { address=0X0EBB, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Kicking" },
+        { address=0X0EBB, type="u8", condition="eq", value=0X03, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Picking up a power up" },
+        { address=0X0EBB, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Re-Spawning" },
+      },
+      weapon = {
+        { address=0X0EDB, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Handgun" },
+        { address=0X0EDB, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rifle" },
+        { address=0X0EDB, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Extra Strength" },
+        { address=0X0EDB, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="SR/Super Speed" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X001D, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mr. M Last Boss" },
+        { address=0X0ECD, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Milicle Man" },
+        { address=0X0ECD, type="u8", condition="eq", value=0X06, action="BOSS_HIT", no_log=false, no_survey=false, desc="Samrai Man" },
+        { address=0X0ECD, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Killer the Kid" },
+        { address=0X0EED, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Captain Brass" },
+        { address=0X0EED, type="u8", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mr. M" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0EBA, type="u8", condition="eq", value=0X03, action="JUMPING", no_log=false, no_survey=false, desc="Jumping" },
+      },
+    },
+  },
+}

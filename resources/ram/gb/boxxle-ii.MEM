@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Boxxle II",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "boxxle-ii",
+    file = "boxxle-ii.zip",
+    hashes = {
+      { hash = "308abd707a48ee9d69c287d818469fd6", label = "Boxxle II (USA, Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC139, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="01=Pause" },
+        { address=0XC33B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[2 Byte] Steps (used in countdown when watching demo)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC352, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Possible level?" },
+        { address=0XC962, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Completed Level?" },
+        { address=0XE352, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Possible level?" },
+      },
+      stage = {
+        { address=0XC162, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage? Prob Internal" },
+        { address=0XE162, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage? Prob Display" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC11E, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Idle timer (seconds)" },
+        { address=0XE05A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Counter?" },
+        { address=0XFE5A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Counter Sprite -Does not reset to 0" },
+      },
+    },
+  },
+}

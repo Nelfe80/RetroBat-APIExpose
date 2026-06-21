@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Destroy All Humans! 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "destroy-all-humans-2",
+    file = "destroy-all-humans-2.zip",
+    hashes = {
+      { hash = "331ac285989bc9a4286d8b32e5ef25f3", label = "Destroy All Humans! 2 (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XE32A3C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Alt 1] Number of Mission goals Available" },
+        { address=0XE32A4C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Alt 1] Current Mission Goal" },
+        { address=0X19027AC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[Alt 2] Number of Mission goals Available in Mission Goals Menu" },
+      },
+      stage = {
+        { address=0X48A454, type="u32le", condition="eq", value=0XE3C563FA, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bay City - Landing Zones activated" },
+      },
+    },
+  },
+}

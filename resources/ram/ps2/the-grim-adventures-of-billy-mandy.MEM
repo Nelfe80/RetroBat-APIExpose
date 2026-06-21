@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Grim Adventures of Billy & Mandy",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-grim-adventures-of-billy-mandy",
+    file = "the-grim-adventures-of-billy-mandy.zip",
+    hashes = {
+      { hash = "9e3d651c70171ef61a7d04a58ce004b0", label = "Grim Adventures of Billy & Mandy, The (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

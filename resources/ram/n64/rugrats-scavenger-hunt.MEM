@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Rugrats: Scavenger Hunt",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Board Game, Strategy"
+  },
+
+  rom = {
+    name = "rugrats-scavenger-hunt",
+    file = "rugrats-scavenger-hunt.zip",
+    hashes = {
+      { hash = "8c432235a57d34bc4a9b8b290e21e01e", label = "Rugrats - Scavenger Hunt (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X58BC4, type="u8", condition="eq", value=0X84, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Last Page" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X581EA, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="main" },
+        { address=0X581EA, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tommy" },
+        { address=0X581EA, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chuckie" },
+        { address=0X581EA, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lil" },
+        { address=0X581EA, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Phil" },
+        { address=0X581EA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raptar Rally zones(?)" },
+        { address=0X581EB, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tommy" },
+        { address=0X581EB, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Chuckie" },
+        { address=0X581EB, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lil" },
+        { address=0X581EB, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Phil" },
+        { address=0X581EB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Raptar Rally baby zones" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X259AEF, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Found" },
+        { address=0X259AEF, type="u8", condition="eq", value=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Not found" },
+        { address=0X259AF3, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Found" },
+        { address=0X259AF3, type="u8", condition="eq", value=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Not found" },
+      },
+    },
+  },
+}

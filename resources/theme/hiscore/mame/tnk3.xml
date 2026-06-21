@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1  .ZRBAIMNU 29650</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 &lt;boy4&gt;HASEGAWA  29130</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 &lt;boy5&gt;AKITA YO  28000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 &lt;boy7&gt;TSUJI     27000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 &lt;boy3&gt;SRX NAKAI 26000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 &lt;cat&gt;TAMA ART  25000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 &lt;boy1&gt;OBA + BON 24000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 &lt;boy6&gt;OKADA     23000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 &lt;girl&gt;TOMOTAE   22000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 &lt;boy2&gt;PUKU PUKU 21000</text>
+		</text>
+	</view>
+</theme>

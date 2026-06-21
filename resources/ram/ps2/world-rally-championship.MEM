@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "World Rally Championship",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "world-rally-championship",
+    file = "world-rally-championship.zip",
+    hashes = {
+      { hash = "0f952b2b89545da5817c37001da9ecee", label = "WRC - World Rally Championship (USA)" },
+      { hash = "6db620474014bc80d8c6a6f6d0b95cb7", label = "WRC - World Rally Championship (Europe, Australia) (En,Fr,De,Es,It,Pt,Fi)" },
+    }
+  },
+
+  events = {
+  },
+}

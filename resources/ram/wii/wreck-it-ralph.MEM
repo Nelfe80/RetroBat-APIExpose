@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Wreck-It Ralph",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "wreck-it-ralph",
+    file = "wreck-it-ralph.zip",
+    hashes = {
+      { hash = "b736576aa5c0f0046719a17cee0e019d", label = "Disney Wreck-It Ralph (USA) (En,Fr)" },
+    }
+  },
+
+  events = {
+  },
+}

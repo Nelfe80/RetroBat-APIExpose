@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Dancing Furby",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dancing-furby",
+    file = "dancing-furby.zip",
+    hashes = {
+      { hash = "ed517a9923865f4e4945ca4095313fe2", label = "Dancing Furby (Japan) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC8A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dance Mode - Level" },
+        { address=0XC8AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dance Mode - Current Background" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC8B5, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dance Mode - Points [16bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC114, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times of Dance Mode beaten on Easy" },
+        { address=0XC115, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times of Dance Mode beaten on Normal" },
+        { address=0XC116, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times of Dance Mode beaten on Hard" },
+        { address=0XC9CC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Furby-Hide and Seek - Time left (Seconds)" },
+      },
+    },
+  },
+}

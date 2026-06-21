@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 AFL 1923154</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 &amp;?! 1409420</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 BC  1078293</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 ',. 891011</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 +-/ 792462</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 TGR 200000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 TGR 190000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 TGR 180000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 TGR 170000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 TGR 160000</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 TGR 150000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 TGR 140000</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 TGR 130000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 TGR 120000</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 TGR 110000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 TGR 100000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 TGR 90000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 TGR 80000</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 TGR 70000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 TGR 60000</text>
+		</text>
+	</view>
+</theme>

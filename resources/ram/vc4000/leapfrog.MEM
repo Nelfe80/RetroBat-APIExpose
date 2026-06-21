@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Leapfrog",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "leapfrog",
+    file = "leapfrog.zip",
+    hashes = {
+      { hash = "8629936b14899ae89d57bb648112a9f1", label = "Leapfrog (World) (1982) (Voltmace - Derek Andrews).bin" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X05AC, type="u8", condition="eq", value=0XB6, action="DEMO_MODE", no_log=false, no_survey=false, desc="Potential Demo Mode Flag" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X051E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bitflags] Life Timer Multiplier (By Bitcount) increased" },
+        { address=0X051E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bitflags] Life Timer Multiplier (By Bitcount) decreased" },
+        { address=0X051F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[4bit Upper]Life Counter increased" },
+        { address=0X051F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[4bit Upper]Life Counter decreased" },
+        { address=0X054E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8bit] Life Timer increased" },
+        { address=0X054E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Life Timer decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X05A4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] BCD Score" },
+      },
+    },
+  },
+}

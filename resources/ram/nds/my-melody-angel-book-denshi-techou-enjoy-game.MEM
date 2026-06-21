@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "My Melody Angel Book: Denshi Techou & Enjoy Game",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "my-melody-angel-book-denshi-techou-enjoy-game",
+    file = "my-melody-angel-book-denshi-techou-enjoy-game.zip",
+    hashes = {
+      { hash = "06684b480a9bf0578953689144814b60", label = "My Melody Angel Book - Denshi Techou & Enjoy Game (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

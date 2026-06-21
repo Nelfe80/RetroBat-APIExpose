@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Medarot R",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "medarot-r",
+    file = "medarot-r.zip",
+    hashes = {
+      { hash = "e624f63505914cbdb73061be00d043c9", label = "Medarot R (Japan)" },
+      { hash = "f6216a38349a513f228f08a3374655d1", label = "Medarot R (Japan) (En) (v1.0) (Star Trinket)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XFCE80, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Type Zone [ASCII]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X75E70, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 - Head HP Max [8bit] decreased" },
+        { address=0X75E70, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 - Head HP Max [8bit] increased" },
+        { address=0X75E74, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 - Legs HP Max [8bit] decreased" },
+        { address=0X75E74, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 - Legs HP Max [8bit] increased" },
+        { address=0X75E78, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 - RArm HP Max [8bit] decreased" },
+        { address=0X75E78, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 - RArm HP Max [8bit] increased" },
+        { address=0X75E7C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 - LArm HP Max [8bit] decreased" },
+        { address=0X75E7C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 - LArm HP Max [8bit] increased" },
+        { address=0X75E80, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 - Head HP [8bit] decreased" },
+        { address=0X75E80, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 - Head HP [8bit] increased" },
+        { address=0X75E84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 - Legs HP [8bit] decreased" },
+        { address=0X75E84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 - Legs HP [8bit] increased" },
+        { address=0X75E88, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 - RArm HP [8bit] decreased" },
+        { address=0X75E88, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 - RArm HP [8bit] increased" },
+        { address=0X75E8C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 - LArm HP [8bit] decreased" },
+        { address=0X75E8C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 - LArm HP [8bit] increased" },
+        { address=0X761B0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M1 Enemy - HP decreased" },
+        { address=0X761B0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M1 Enemy - HP increased" },
+        { address=0X762C0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="M2 Enemy - HP decreased" },
+        { address=0X762C0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="M2 Enemy - HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X76724, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money [16bit] increased" },
+      },
+    },
+  },
+}

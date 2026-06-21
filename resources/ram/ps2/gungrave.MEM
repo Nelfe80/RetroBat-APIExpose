@@ -1,0 +1,133 @@
+return {
+  game = {
+    title = "Gungrave",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "gungrave",
+    file = "gungrave.zip",
+    hashes = {
+      { hash = "6887dcd0888a06ec4d15668a731370ab", label = "Gungrave (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X206BC1, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Finishing Demolition Shot" },
+        { address=0X206BC1, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demolition Shot" },
+        { address=0X211094, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Bullet Dance" },
+        { address=0X211094, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Hellhound Roar" },
+        { address=0X211094, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="Raging Inferno" },
+        { address=0X21109C, type="u8", condition="eq", value=0X0A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Infinite demolition shot cheat active" },
+        { address=0X224E66, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X224E66, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Infinite" },
+        { address=0X224E72, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Extra - Demolition Shot Option unlocked" },
+        { address=0X6046BC, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Has no control (Cutscenes & Demo etc.)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X206AF5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage completed flag" },
+      },
+      stage = {
+        { address=0X224F74, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1: Beat Skulls" },
+        { address=0X224F78, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1: Kill Rate Skulls" },
+        { address=0X224F84, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1: Artistic Bonus Skulls" },
+        { address=0X224F88, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2: Beat Skulls" },
+        { address=0X224F8C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2: Kill Rate Skulls" },
+        { address=0X224F98, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2: Artistic Bonus Skulls" },
+        { address=0X224F9C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3: Beat Skulls" },
+        { address=0X224FA0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3: Kill Rate Skulls" },
+        { address=0X224FAC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3: Artistic Bonus Skulls" },
+        { address=0X224FB0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4: Beat Skulls" },
+        { address=0X224FB4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4: Kill Rate Skulls" },
+        { address=0X224FC0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4: Artistic Bonus Skulls" },
+        { address=0X224FC4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5: Beat Skulls" },
+        { address=0X224FC8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5: Kill Rate Skulls" },
+        { address=0X224FD4, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5: Artistic Bonus Skulls" },
+        { address=0X224FD8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6: Beat Skulls" },
+        { address=0X224FDC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6: Kill Rate Skulls" },
+        { address=0X224FE8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6: Artistic Bonus Skulls" },
+        { address=0X60333C, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X60333C, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cutscenes and Save screen" },
+        { address=0X60333C, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1: Slaughter House (and on no Memory card/save file screen)" },
+        { address=0X60333C, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2: Factory" },
+        { address=0X60333C, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3: China Town" },
+        { address=0X60333C, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4: Subway" },
+        { address=0X60333C, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5: Underground" },
+        { address=0X60333C, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6: The Tower" },
+        { address=0X60333C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X206BC1, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X211094, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow" },
+        { address=0X211098, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow" },
+        { address=0X211098, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow, Bullet Dance" },
+        { address=0X211098, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow, Bullet Dance, Hellhound Roar" },
+        { address=0X211098, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Blow, Bullet Dance, Hellhound Roar, Raging Inferno" },
+        { address=0X224F80, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stage 1: Remain Life Skulls increased" },
+        { address=0X224F80, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 1: Remain Life Skulls decreased" },
+        { address=0X224F94, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stage 2: Remain Life Skulls increased" },
+        { address=0X224F94, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 2: Remain Life Skulls decreased" },
+        { address=0X224FA8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stage 3: Remain Life Skulls increased" },
+        { address=0X224FA8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 3: Remain Life Skulls decreased" },
+        { address=0X224FBC, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stage 4: Remain Life Skulls increased" },
+        { address=0X224FBC, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 4: Remain Life Skulls decreased" },
+        { address=0X224FD0, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stage 5: Remain Life Skulls increased" },
+        { address=0X224FD0, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 5: Remain Life Skulls decreased" },
+        { address=0X224FE4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stage 6: Remain Life Skulls increased" },
+        { address=0X224FE4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stage 6: Remain Life Skulls decreased" },
+        { address=0X66E08F, type="u32le", condition="eq", value=0X05A67000, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bunji's Death" },
+      },
+      health = {
+        { address=0X206BC1, type="u8", condition="bit_true", bit=1, mask=0X02, action="HIT", no_log=false, no_survey=false, desc="Flying from Damage" },
+        { address=0X206BC1, type="u8", condition="bit_true", bit=2, mask=0X04, action="HIT", no_log=false, no_survey=false, desc="Recovery from Damage" },
+        { address=0X206D40, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Health decreased" },
+        { address=0X206D40, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Health increased" },
+        { address=0X206D44, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float] Shield Health decreased" },
+        { address=0X206D44, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float] Shield Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X224EAC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highest score reached in a run (Data Screen)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5BD728, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0X604B0C, type="u32le", condition="eq", value=0X2253D8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 2nd phase" },
+        { address=0X604B0C, type="u32le", condition="eq", value=0X2254E0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight" },
+        { address=0X604B0C, type="u32le", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bear Walken Boss Fight 1" },
+        { address=0X604B0C, type="u32le", condition="eq", value=0X225640, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bear Walken Boss Fight 2nd Phase" },
+        { address=0X604B0C, type="u32le", condition="eq", value=0X225748, action="BOSS_HIT", no_log=false, no_survey=false, desc="Church (Bunji Boss Fight)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X206BC2, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=false, no_survey=false, desc="Shooting while dodge-jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X604B0C, type="u32le", condition="eq", value=0X225278, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Object Viewer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X224F7C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 1: Clear Time Skulls" },
+        { address=0X224F90, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 2: Clear Time Skulls" },
+        { address=0X224FA4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 3: Clear Time Skulls" },
+        { address=0X224FB8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 4: Clear Time Skulls" },
+        { address=0X224FCC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 5: Clear Time Skulls" },
+        { address=0X224FE0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage 6: Clear Time Skulls" },
+      },
+    },
+  },
+}

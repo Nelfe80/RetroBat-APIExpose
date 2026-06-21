@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Spirou",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Action"
+  },
+
+  rom = {
+    name = "spirou",
+    file = "spirou.zip",
+    hashes = {
+      { hash = "af9a48fc80b600539cc0f60ea6cdd1c5", label = "Spirou (Europe) (En,Fr,De,Es).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0590, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="flag in level" },
+        { address=0X05D2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level loaded" },
+        { address=0X05D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="intro level screen" },
+        { address=0X05D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level to load" },
+      },
+    },
+  },
+}

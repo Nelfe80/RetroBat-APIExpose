@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "AKB1/149: Renai Sousenkyo",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "akb1-149-renai-sousenkyo",
+    file = "akb1-149-renai-sousenkyo.zip",
+    hashes = {
+      { hash = "05fe8a73676024985e307d43d69dbad3", label = "AKB1-149 - Ren'ai Sousenkyo (Japan) (Game Disc).iso" },
+    }
+  },
+
+  events = {
+  },
+}

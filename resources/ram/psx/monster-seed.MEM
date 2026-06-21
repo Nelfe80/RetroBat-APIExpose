@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Monster Seed",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "monster-seed",
+    file = "monster-seed.zip",
+    hashes = {
+      { hash = "b29726f4c41fdd506af975a11b822455", label = "MonsterSeed (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E9164, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="New game" },
+        { address=0X1E9164, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1E9164, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Vs" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E9162, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Menu time. Enters cinematic at 0385." },
+      },
+    },
+  },
+}

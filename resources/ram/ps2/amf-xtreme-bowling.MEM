@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "AMF Xtreme Bowling",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "amf-xtreme-bowling",
+    file = "amf-xtreme-bowling.zip",
+    hashes = {
+      { hash = "98f568029d87d0d4934b7cbc94c10950", label = "AMF Xtreme Bowling (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

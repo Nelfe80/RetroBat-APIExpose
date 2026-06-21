@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle Bobble",
+    system = "neogeocd",
+    system_name = "Neo Geo CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "puzzle-bobble",
+    file = "puzzle-bobble.zip",
+    hashes = {
+      { hash = "282ffc9411808cd514c092d2772b5163", label = "Puzzle Bobble ~ Bust-A-Move (Japan) (En,Ja)" },
+    }
+  },
+
+  events = {
+  },
+}

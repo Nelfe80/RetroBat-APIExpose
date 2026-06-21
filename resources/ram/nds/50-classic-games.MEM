@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "50 Classic Games",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "50-classic-games",
+    file = "50-classic-games.zip",
+    hashes = {
+      { hash = "8576d87efb776d208d15285122fbc994", label = "50 Classic Games (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0XE5621, type="u16le", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blocks" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDEFAA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="End Screen" },
+      },
+    },
+  },
+}

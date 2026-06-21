@@ -1,0 +1,110 @@
+return {
+  game = {
+    title = "Silviana",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "silviana",
+    file = "silviana.zip",
+    hashes = {
+      { hash = "068d5ca06cf8149daf6bac0cde9f9938", label = "Silviana (Pack In Video) (JP) (En) (091213) (Jon Najar).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4E03, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Changes to 0x02 while talking to someone and the game is paused for the dialog" },
+        { address=0XBC96, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit 7 - Bread (Demon Island Castle)" },
+        { address=0XBC97, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit 7 - Key (Demon Island Castle)" },
+        { address=0XBC99, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit 7 - GammaEye (Demon Island Castle)" },
+        { address=0XBC9A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit 7 - Heart (Demon Island Castle)" },
+        { address=0XBC9E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit 7 - FairyFth (Demon Island Castle)" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X4C99, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBC11, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="bit 7 - Opened DeathFlw chest (River cCave)" },
+      },
+      health = {
+        { address=0X4C9D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X4C9D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+        { address=0X4CDD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X4CDD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X4CED, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X4CED, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X4CFD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X4CFD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X4D0D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X4D0D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0XBC0B, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="bit 7 - Damage St (West Tower)" },
+        { address=0XBC62, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="bit 7 - DamageSt (Mirror Mid Tower)" },
+        { address=0XBC7A, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="bit 7 - DamageSt (West Castle)" },
+        { address=0XBC81, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="bit 7 - DamageSt (Mirror South Cave)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X4CAF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4CA1, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0XBBE9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 5721 Gold (North Tower) increased" },
+        { address=0XBBFB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 20 Gold (Home Cave) increased" },
+        { address=0XBC0A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - Gold Key (West Tower) increased" },
+        { address=0XBC0C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 6 - boss room opened with Gold Key increased" },
+        { address=0XBC17, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 5721 Gold (East Cave) increased" },
+        { address=0XBC20, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 6 - Door Unlocked (South Cave) increased" },
+        { address=0XBC29, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 2580 Gold (South Cave) increased" },
+        { address=0XBC2A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 19 Gold (South Cave) increased" },
+        { address=0XBC2D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 2580 Gold (South Tower) increased" },
+        { address=0XBC42, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 93 Gold (Stardust Cave) increased" },
+        { address=0XBC49, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 65 Gold (Mirror North Tower) increased" },
+        { address=0XBC5B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 5721 Gold (Mirror Home Cave) increased" },
+        { address=0XBC68, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 5721 Gold (East Tower) increased" },
+        { address=0XBC69, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 5721 Gold (East Tower) increased" },
+        { address=0XBC75, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 5721 Gold (Mirror River Cave) increased" },
+        { address=0XBC80, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 5721 Gold (Mirror South Cave) increased" },
+        { address=0XBC86, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 2580 Gold (Mirror South Cave) increased" },
+        { address=0XBC94, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="bit 7 - 70 Gold (Mirror South Tower) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4CAA, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit 0 - First boss defeated" },
+        { address=0X4CB6, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="bit 0 - First boss defeated" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4CB0, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Eqiuipped shield" },
+        { address=0XBC04, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 7 - Ceramic Shield (Mid Tower)" },
+        { address=0XBC37, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 7 - Lucia's Shield (Light Island Castle)" },
+        { address=0XBC6A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 7 - Holy Shield (East Tower)" },
+        { address=0XBC72, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit 7 - Magic Shield (Mirror River Cave)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBBF5, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 6 - door unlocked (Home Cave)" },
+        { address=0XBBF7, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 6 - door unlocked (Home Cave)" },
+        { address=0XBC0D, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 6 - Door unlocked in River Cave" },
+        { address=0XBC12, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 6 - Door unlocked in River Cave" },
+        { address=0XBC14, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 6 - Unlocked door in River Cave" },
+        { address=0XBC19, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 6 - Door Unlocked" },
+        { address=0XBC27, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 6 - Door unlocked (South Cave)" },
+        { address=0XBC31, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="bit 6 - Door unlocked in South Tower" },
+      },
+    },
+  },
+}

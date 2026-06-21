@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Illust Logic DS + Colorful Logic",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "illust-logic-ds-colorful-logic",
+    file = "illust-logic-ds-colorful-logic.zip",
+    hashes = {
+      { hash = "b89a0c0916035afb35823434890575d8", label = "Illust Logic DS + Colorful Logic (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Videocart-06: Math Quiz I (Addition & Subtraction)",
+    system = "channelf",
+    system_name = "Fairchild Channel F",
+    genre = "Educational"
+  },
+
+  rom = {
+    name = "videocart-06-math-quiz-i",
+    file = "videocart-06-math-quiz-i.zip",
+    hashes = {
+      { hash = "a8e6103fcae4d0f9e14d9edcfc3fc493", label = "Math Quiz I - Addition + Subtraction (USA).bin" },
+    }
+  },
+
+  events = {
+  },
+}

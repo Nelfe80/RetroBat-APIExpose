@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Final Fantasy Type-0",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "final-fantasy-type-0",
+    file = "final-fantasy-type-0.zip",
+    hashes = {
+      { hash = "cf153c4979f64b97c8e2b49db47f0f01", label = "Final Fantasy Type-0 (Japan) (En) (v2.0) (SkyBladeCloud).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XBD6D84, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Number of transition ? Values around this could be interesting I feel" },
+        { address=0XC50FCE, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] SOS Cleared" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC50FAE, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[16 Bit] Number of Deaths" },
+      },
+      health = {
+        { address=0X17CB9C8, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Health Value Queen decreased" },
+        { address=0X17CB9C8, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Health Value Queen increased" },
+        { address=0X17CC648, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 bit] Health Value Nine decreased" },
+        { address=0X17CC648, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 bit] Health Value Nine increased" },
+        { address=0X1D955C4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Health Display Ace (Active Char 1 ?) decreased" },
+        { address=0X1D955C4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Health Display Ace (Active Char 1 ?) increased" },
+      },
+    },
+  },
+}

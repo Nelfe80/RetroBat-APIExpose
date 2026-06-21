@@ -1,0 +1,21 @@
+return {
+  game = {
+    title = "Batman Returns",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "batman-returns",
+    file = "batman-returns.zip",
+    hashes = {
+      { hash = "5ef8e1f3e88c86f149838c569a0c0328", label = "Batman Returns (USA).sfc" },
+      { hash = "672b5c06058ee8d1c28ae36b44eb1d12", label = "Batman Returns (Japan) (En).sfc" },
+      { hash = "8eef2ee384dc35849d5dd6a41dcb57c0", label = "Batman Returns (USA) (MSU-1) (v1.0) (Kurrono).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

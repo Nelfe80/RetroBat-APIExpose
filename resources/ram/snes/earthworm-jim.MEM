@@ -1,0 +1,112 @@
+return {
+  game = {
+    title = "Earthworm Jim",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "earthworm-jim",
+    file = "earthworm-jim.zip",
+    hashes = {
+      { hash = "25fdebdec0e83132d8f24e9ac5bfc45f", label = "Earthworm Jim (USA).sfc" },
+      { hash = "358d35b9e1468706f53b375a3dc6f6ed", label = "Earthworm Jim (USA) (MSU) (PepilloPEV) (1.1).sfc" },
+      { hash = "b6ee6ebc6847c93f50b6f2e3f4794a89", label = "Earthworm Jim (USA) (MSU-1) (Sega CD OST) (PepilloPEV) (1.0).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X50C0, type="u16le", condition="eq", value=0X0000, action="PAUSE_ON", no_log=false, no_survey=false, desc="On pause screen or code error reset" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X0010, action="PAUSE_ON", no_log=false, no_survey=false, desc="R" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X0020, action="PAUSE_ON", no_log=false, no_survey=false, desc="L" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X0040, action="PAUSE_ON", no_log=false, no_survey=false, desc="X" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X0100, action="PAUSE_ON", no_log=false, no_survey=false, desc="Right" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X0200, action="PAUSE_ON", no_log=false, no_survey=false, desc="Left" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X0400, action="PAUSE_ON", no_log=false, no_survey=false, desc="Down" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X0800, action="PAUSE_ON", no_log=false, no_survey=false, desc="Up" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X2000, action="PAUSE_ON", no_log=false, no_survey=false, desc="Select" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X4000, action="PAUSE_ON", no_log=false, no_survey=false, desc="Y" },
+        { address=0X50C2, type="u16le", condition="eq", value=0X8000, action="PAUSE_ON", no_log=false, no_survey=false, desc="B" },
+        { address=0X5164, type="u16le", condition="eq", value=0X0000, action="DEMO_MODE", no_log=false, no_survey=false, desc="In-game" },
+        { address=0X5164, type="u16le", condition="eq", value=0XFFFF, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode (or reset to main menu)" },
+        { address=0X516C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X51F5, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue related" },
+        { address=0X5224, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Related with levels again (15 = continue)" },
+        { address=0X6B8E, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Not demo" },
+        { address=0X6B8E, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5148, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - value corresponds to levels in a game:" },
+        { address=0X5149, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - value corresponds to levels in a game:" },
+        { address=0X5AA4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8 bit) - in the first level value 07 = Billy the Bin is dead" },
+        { address=0X65F1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Relatedwithlevel again !" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0038, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Poisson rouge Dead 2" },
+        { address=0X5162, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Lower4] Lives increased" },
+        { address=0X5162, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Lower4] Lives decreased" },
+        { address=0X5368, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fish Dead 3" },
+        { address=0X6820, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="FishDead 4" },
+        { address=0X68D0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Evil the cat (ordre croissant, 9 = DEAD)" },
+      },
+      health = {
+        { address=0X0021, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cheat health = ff ? decreased" },
+        { address=0X0021, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cheat health = ff ? increased" },
+        { address=0X01D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cheat health point decreased" },
+        { address=0X01D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cheat health point increased" },
+        { address=0X51F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Not SnowMan Health decreased" },
+        { address=0X51F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Not SnowMan Health increased" },
+        { address=0X52F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="SnowMan Health decreased" },
+        { address=0X52F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="SnowMan Health increased" },
+        { address=0X57F2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Major Mucus health 2 decreased" },
+        { address=0X57F2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Major Mucus health 2 increased" },
+        { address=0X5A6A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16 Bit = ffff - Bathyscaphe uses slot 2 HP decreased" },
+        { address=0X5A6A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16 Bit = ffff - Bathyscaphe uses slot 2 HP increased" },
+        { address=0X5AEA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="16 Bit = ffff - Bathyscaphe uses slot 1 HP decreased" },
+        { address=0X5AEA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="16 Bit = ffff - Bathyscaphe uses slot 1 HP increased" },
+        { address=0X6626, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Array] [4 bytes] [Lower4] Health decreased" },
+        { address=0X6626, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Array] [4 bytes] [Lower4] Health increased" },
+        { address=0X68C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Major Mucus Health decreased" },
+        { address=0X68C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Major Mucus Health increased" },
+        { address=0X69D2, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="(8 bit) Peter is hurt animation = 0b or 0c" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6620, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="[Array] [4 bytes] [Lower4] Basic Gun Ammo" },
+        { address=0X69A0, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Mega Blaster Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X5170, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Final boss dead" },
+        { address=0X517A, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="finalbossdead 2" },
+        { address=0X58F2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(8 bit) - Health of mini boss in Buttville" },
+        { address=0X5972, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 1 Health (and J Maggot boss on normal)" },
+        { address=0X5A72, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Sub-Boss Health" },
+        { address=0X6906, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Final Boss health (3c = dead)" },
+        { address=0X6B62, type="u16le", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="(16 bit) - FFFF after maggot boss dead" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X6B48, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield collected (Asteroids)" },
+      },
+      player = {
+        { address=0X519E, type="u16le", condition="eq", value=0X1B37, action="JUMPING", no_log=false, no_survey=false, desc="Jim jumps rope" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X5122, type="u32le", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="32 Bit - Checkpoint - coordinates" },
+      },
+    },
+  },
+}

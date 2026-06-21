@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Holidate",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "holidate",
+    file = "holidate.zip",
+    hashes = {
+      { hash = "e5866b4518ed4c68067f0b249ab4af52", label = "Holidate (World).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0103, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Intro/Title" },
+        { address=0X0103, type="u8", condition="eq", value=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X01BE, type="u8", condition="bit_true", bit=5, mask=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Frosty Friendzone" },
+        { address=0X01BE, type="u8", condition="bit_true", bit=6, mask=0X40, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Friendzone Frosty" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X01BE, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="You Died" },
+      },
+    },
+  },
+}

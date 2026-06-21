@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Asian Dynamite | Dynamite Deka EX",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "asian-dynamite-dynamite-deka-ex",
+    file = "asian-dynamite-dynamite-deka-ex.zip",
+    hashes = {
+      { hash = "d4d593b70f783dbc7acadd47f90822ca", label = "asndynmt.7z" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X23576E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player health use decreased" },
+        { address=0X23576E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player health use increased" },
+        { address=0X236CC4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 1 health bar for extra costumes decreased" },
+        { address=0X236CC4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 1 health bar for extra costumes increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X2357E8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="player 1 current weapon held/ can change with costumes on" },
+      },
+    },
+  },
+}

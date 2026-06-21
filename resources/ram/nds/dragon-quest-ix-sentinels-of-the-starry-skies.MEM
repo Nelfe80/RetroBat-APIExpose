@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Dragon Quest IX: Sentinels of the Starry Skies",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-quest-ix-sentinels-of-the-starry-skies",
+    file = "dragon-quest-ix-sentinels-of-the-starry-skies.zip",
+    hashes = {
+      { hash = "ebb3e9ee86d520f624ffc701a912779b", label = "Dragon Quest IX - Sentinels of the Starry Skies (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF1F7C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+        { address=0X115BB9, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="on the allocate skill point menu" },
+        { address=0X115BB9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Allocate Skill points (on the overworld) 8-bit" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X108912, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Observatory - Exterior, 50g [Chest]" },
+        { address=0X108912, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Observatory - Exterior, Wakerobin [Chest]" },
+        { address=0X108912, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Observatory - L1, Chimaera Wing [Chest]" },
+        { address=0X108913, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Hexagon - B2, Feather Fan [Chest]" },
+        { address=0X108913, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Hexagon - B2, 210g [Chest]" },
+        { address=0X108913, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Hexagon - B1, Seed of Deftness [Chest]" },
+        { address=0X1089DB, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Angel Falls, Wardrobe, Medicinal Herb" },
+        { address=0X1089DB, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Angel Falls, Wardrobe, 50g" },
+        { address=0X1089DB, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Angel Falls, Wardrobe, Medicinal Herb" },
+        { address=0X1089E7, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Observatory - L1, Medicinal Herb [Pot]" },
+        { address=0X1089E7, type="u8", condition="bit_true", bit=5, mask=0X20, action="TREASURE", no_log=false, no_survey=false, desc="Observatory - L2, Medicinal Herb [Pot]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X108925, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Mountain Pass, Gold Ring [Chest]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X108913, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Hexagon - L1, Leather Shield [Chest]" },
+      },
+    },
+  },
+}

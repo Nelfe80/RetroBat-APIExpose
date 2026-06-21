@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Ancient Tribe",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ancient-tribe",
+    file = "ancient-tribe.zip",
+    hashes = {
+      { hash = "a356faede1ade29f93e060f2e9ce485a", label = "Ancient Tribe (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB2840, type="u8", condition="eq", value=0XA0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="in the title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X16B7E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bits] Village level" },
+      },
+      zone = {
+        { address=0XB2840, type="u8", condition="eq", value=0X3C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="in world map" },
+      },
+    },
+  },
+}

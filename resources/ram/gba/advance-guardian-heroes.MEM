@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Advance Guardian Heroes",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Beat 'em Up, Role-Playing"
+  },
+
+  rom = {
+    name = "advance-guardian-heroes",
+    file = "advance-guardian-heroes.zip",
+    hashes = {
+      { hash = "a26c440065d89f56275644ffa34140ef", label = "Advance Guardian Heroes (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1D0F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level in-game" },
+        { address=0X226E1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Dylan" },
+        { address=0X226F5, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Ray" },
+        { address=0X22900, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) Gems Level Up Screen" },
+        { address=0X22904, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) Exp to Next Level Level Up Screen" },
+        { address=0X22910, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) LV Level Up Screen" },
+        { address=0X22912, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) HP Level Up Screen" },
+        { address=0X22914, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit) MP Level Up Screen" },
+      },
+      stage = {
+        { address=0X1D707, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4-late Devil check" },
+        { address=0X1D887, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 Devil Check" },
+        { address=0X1D88C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage4 Soul Slot" },
+        { address=0X1D893, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage4 Soul Slot 8" },
+        { address=0X1D9E4, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(16-bit) Gems Stage 4" },
+        { address=0X1E090, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Edo Soul Stage 4?" },
+        { address=0X1E0CA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage4 Attack Stat in-game" },
+        { address=0X2286D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID?" },
+        { address=0X22898, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(16-bit) Stage 4 Missile Launch" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X226D0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Soldier Unlock" },
+      },
+      health = {
+        { address=0X1D09E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit) HP in-game decreased" },
+        { address=0X1D09E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit) HP in-game increased" },
+        { address=0X1D31E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P Health decreased" },
+        { address=0X1D31E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X807C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) Dylan Endless Score" },
+        { address=0X80A4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) Ray Endless Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2039E, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="(16-bit) Boss HP" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1D14B, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Defense Power (0 = invincible)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X8058, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-bit) Soldier Time Attack" },
+        { address=0X1DA4C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-bit) Stage 4 Timer" },
+        { address=0X21168, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Timer?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,100 @@
+return {
+  game = {
+    title = "Ys II",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ys-ii",
+    file = "ys-ii.zip",
+    hashes = {
+      { hash = "09a2d928953001f81a16d189e97e45e8", label = "Ys II (Disk B).d88" },
+      { hash = "09af339f48e5f8c70e3967d8eb0645e2", label = "Ys II [Set 1] (Disk A).d88" },
+      { hash = "333568562d78f8e9a849776f02454f27", label = "Ys II [Set 1] (Program disk).d88" },
+      { hash = "91f88b9e8db38509dd6cb0751a0535c9", label = "Ys II (Program disk).d88" },
+      { hash = "c085bdfbb700c0f9e93ee39bc522163e", label = "Ys II [Set 1] (Disk B).d88" },
+      { hash = "d4646d4e1fd57dc998f87b679719bc36", label = "Ys II (Disk A).d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4B93, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X4BA5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 1 HP (resets on death)" },
+      },
+      health = {
+        { address=0X4B8C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X4B8C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+        { address=0X4B8D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max HP decreased" },
+        { address=0X4B8D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max HP increased" },
+        { address=0X4BA4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Max HP decreased" },
+        { address=0X4BA4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Max HP increased" },
+        { address=0X4BBD, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 HP decreased" },
+        { address=0X4BBD, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 HP increased" },
+        { address=0X4BD5, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X4BD5, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0X4BED, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 HP decreased" },
+        { address=0X4BED, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 HP increased" },
+        { address=0X4C05, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 HP decreased" },
+        { address=0X4C05, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 HP increased" },
+        { address=0X4C1D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 HP decreased" },
+        { address=0X4C1D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X4B2A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bitflags (4: battle sword)" },
+        { address=0X4B2D, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bitflags (1: genei no kagami; 2: seirei no koromo; 3: jaaku na suzu; 4: cleria no yubiw" },
+        { address=0X4B2E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bitflags (0: tekkouseki; 1: inishie no sekiban; 5: ishi no kutsu; 7: mattock)" },
+        { address=0X4B2F, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bitflags (0: taka no chouzou; 1: koorigiri no tama; 7: sei naru hai)" },
+        { address=0X4B30, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bitflags (0: kuroi shinju; resets when arriving to Fact section of Salmon palace; 2: ya" },
+        { address=0X4B31, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure bitflags (1: hayabusa no chouzou)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X4B45, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Event flags (5: made sei naru hai appear; 6: spoke to furea=raru/gave letter; 7: used genei no k" },
+        { address=0X4B96, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="GOLD (16-bit) increased" },
+        { address=0X4BAE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Enemy 1 GOLD increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X41D7, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss max HP (out of boss fight = 0x44?)" },
+        { address=0X41D8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss current HP (out of boss fight = 0x00?)" },
+        { address=0X4B4D, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss defeated flag (in game order)" },
+        { address=0X4B4F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Door bitflags (0: Nortia kagami door; 1: past boss; 2: central palace door; 3: past druegar; 7:" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4B2B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Treasure bitflags (7: iron shield; 2: battle armor)" },
+        { address=0X4B32, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Equipment bitflags (3 bytes, swords->armors->shields->magic)" },
+        { address=0X4B51, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Door bitflags (0: to iron shield, 1: to battle shield; 2: Dalles door(1) )" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4B42, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Event flags (0: rang jaaku na suzu; 2: seichi door opened (returned books); 3: hit mine wall wit" },
+        { address=0X4B43, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Event flags (0: met Astal; 1: got MP; 2: wall broken in mine; 3: gave Lilia's medicine; 4: spoke" },
+        { address=0X4B46, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Event flags (0: destroyed all ice pillars; 1: moat bridge opened; 2: spoke to ruba with telepath" },
+        { address=0X4B49, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Event flags (4: spoke to maria's mother; 2: spoke to Lilia and received shinden no kagi; 3: wate" },
+        { address=0X4B4E, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door bitflags (0: chika, 1~4: priest statue rooms; 5: Hadal, 6: Fact, 7: past Velagunder)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4B2C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Treasure bitflags (0: battle shield; 2: faiya no mahou; 3: raito no mahou; 6: telepathy; 5: time" },
+        { address=0X4B48, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Event bitflags (0: filled sei naru hai; 1: respoke to gorto with kaigara; 2: salmon gate opened" },
+        { address=0X4B50, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Door bitflags (7: to solomon; 3: to time stop; 2: to sewer under North area; 0: to Dalles (2); 1" },
+      },
+    },
+  },
+}

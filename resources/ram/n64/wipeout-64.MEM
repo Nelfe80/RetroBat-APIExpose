@@ -1,0 +1,134 @@
+return {
+  game = {
+    title = "Wipeout 64",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "wipeout-64",
+    file = "wipeout-64.zip",
+    hashes = {
+      { hash = "73c6d87dbe50f73f3b44e0f237a546d7", label = "Wipeout 64 (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X89F90, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X89F90, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="In Game" },
+      },
+      events = {
+        { address=0X94FAB, type="u8", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94FAB, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94FAB, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94FD7, type="u8", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94FD7, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94FD7, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X95003, type="u8", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X95003, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X95003, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X9502F, type="u8", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X9502F, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X9502F, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X9505B, type="u8", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X9505B, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X9505B, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X95087, type="u8", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X95087, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X95087, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X950B3, type="u8", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X950B3, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X950B3, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X91C25, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="On" },
+        { address=0X91C25, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Cheat - Infinite Energy" },
+        { address=0X91C2B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cheat - Cyclone Weapons Power Up decreased" },
+        { address=0X9BEB0, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Shield Energy" },
+        { address=0X1BC1DD, type="u8", condition="eq", value=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Energy Sphere" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X91C2B, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Off" },
+        { address=0X91C2B, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="On" },
+      },
+      weapon = {
+        { address=0X92D97, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="On (Default)" },
+        { address=0X94E77, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94E77, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94EA3, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94EA3, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94ECF, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94ECF, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94EFB, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94EFB, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94F27, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94F27, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94F53, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94F53, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Silver" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X94C0F, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94C3B, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94C67, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94C93, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94CBF, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94CEB, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94D17, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94D17, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94D17, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94D43, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94D6F, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94D9B, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94DC7, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94DF3, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94E1F, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94E4B, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94E4B, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94E4B, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94E77, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94EA3, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94ECF, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94EFB, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94F27, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94F53, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94F7F, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bronze" },
+        { address=0X94F7F, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver" },
+        { address=0X94F7F, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X9BEB0, type="u8", condition="eq", value=0X55, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Full" },
+        { address=0X1BCE3D, type="u8", condition="eq", value=0X12, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Raider" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X92E57, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="On (Default)" },
+        { address=0X9BA1B, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ship destroy (race failed)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X91C24, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Cheat - Infinite Time" },
+        { address=0X9238C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Screen. 01=Game select. 08=Challenge select. 09=Race Challenge select. 0a=Time Trial Challenges" },
+        { address=0X94D43, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenge Mode - Time Trial - Challenge 1 Medal" },
+        { address=0X94D6F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenge Mode - Time Trial - Challenge 2 Medal" },
+        { address=0X94D9B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenge Mode - Time Trial - Challenge 3 Medal" },
+        { address=0X94DC7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenge Mode - Time Trial - Challenge 4 Medal" },
+        { address=0X94DF3, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenge Mode - Time Trial - Challenge 5 Medal" },
+        { address=0X94E1F, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenge Mode - Time Trial - Challenge 6 Medal" },
+        { address=0X94E4B, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Challenge Mode - Time Trial - Gold Challenge Medal (7)" },
+      },
+    },
+  },
+}

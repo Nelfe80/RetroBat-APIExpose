@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Azumanga Daioh Advance",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Board"
+  },
+
+  rom = {
+    name = "azumanga-daioh-advance",
+    file = "azumanga-daioh-advance.zip",
+    hashes = {
+      { hash = "34a82a7281e62fdf2051b95dc0df0488", label = "Azumanga Daiou Advance (Japan).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0810, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Unpaused" },
+        { address=0X0810, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0BF4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current round in game" },
+        { address=0X15F59, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chiyo" },
+        { address=0X15F59, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Osaka" },
+        { address=0X15F59, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yomi" },
+        { address=0X15F59, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kagura" },
+        { address=0X15F59, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yukari" },
+        { address=0X15F59, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sakaki" },
+        { address=0X15F59, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tomo" },
+        { address=0X15F59, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nyamo" },
+        { address=0X15F5A, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Chiyo" },
+        { address=0X15F5A, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Osaka" },
+        { address=0X15F5A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yomi" },
+        { address=0X15F5A, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Kagura" },
+        { address=0X15F5A, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yukari" },
+        { address=0X15F5A, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sakaki" },
+        { address=0X15F5A, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tomo" },
+        { address=0X15F5A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Nyamo" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0419, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8bit] Sudden Death - Current Round" },
+        { address=0X0500, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sadendesu (Sudden Death)" },
+        { address=0X15F5B, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Chiyo" },
+        { address=0X15F5B, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Osaka" },
+        { address=0X15F5B, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Yomi" },
+        { address=0X15F5B, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Kagura" },
+        { address=0X15F5B, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Yukari" },
+        { address=0X15F5B, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sakaki" },
+        { address=0X15F5B, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tomo" },
+        { address=0X15F5B, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Nyamo" },
+      },
+      health = {
+        { address=0X0904, type="u8", condition="eq", value=0X4D, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Min" },
+        { address=0X0904, type="u8", condition="eq", value=0XE3, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0X0904, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[8bit] Opponent Health (Internal)" },
+        { address=0X0910, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Player Health (Internal) decreased" },
+        { address=0X0910, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Player Health (Internal) increased" },
+        { address=0X38C1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Opponent Health (Display) decreased" },
+        { address=0X38C1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Opponent Health (Display) increased" },
+        { address=0X38C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Player Health (Display) decreased" },
+        { address=0X38C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Player Health (Display) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X384A, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="A" },
+        { address=0X384A, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="B" },
+        { address=0X384A, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Select" },
+        { address=0X384A, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Start" },
+        { address=0X384A, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Right" },
+        { address=0X384A, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Left" },
+        { address=0X384A, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Up" },
+        { address=0X384A, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Down" },
+        { address=0X384B, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="R" },
+        { address=0X384B, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="L" },
+      },
+    },
+  },
+}

@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "National Geographic Panda",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "national-geographic-panda",
+    file = "national-geographic-panda.zip",
+    hashes = {
+      { hash = "33df861b4bf8b9901389483e1885f472", label = "National Geographic - Panda (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X11F138, type="u32le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Supporter" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X06, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Fanatic" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X07, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 1" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X0A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 2" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X0F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 3" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X14, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 4" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X19, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 5" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X1E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 6" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X23, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 7" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X28, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 8" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X2D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 9" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X32, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Lv. 10" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X37, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal White Belt" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X3C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Yellow Belt" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X41, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Orange Belt" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X46, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Green Belt" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X4B, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Blue Belt" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X50, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Brown Belt" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X55, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Black Belt" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X5A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Expert" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X5F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Master" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X64, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Pal Grand Master" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X69, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Star" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X6E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Lover" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X73, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Legend" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X78, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Ambassador" },
+        { address=0X11F138, type="u32le", condition="eq", value=0X79, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Panda Emissary" },
+        { address=0X11F83C, type="u16le", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X11F83C, type="u16le", condition="eq", value=0X29, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X11F168, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+        { address=0X11F83C, type="u16le", condition="eq", value=0X26, action="SCORE_STATE", no_log=false, no_survey=false, desc="Points Exchange" },
+      },
+      collectibles = {
+        { address=0X11F164, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X11F138, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Spent with Panda/Title" },
+      },
+    },
+  },
+}

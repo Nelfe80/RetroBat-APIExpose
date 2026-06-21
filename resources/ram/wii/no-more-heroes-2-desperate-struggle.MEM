@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "No More Heroes 2: Desperate Struggle",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "no-more-heroes-2-desperate-struggle",
+    file = "no-more-heroes-2-desperate-struggle.zip",
+    hashes = {
+      { hash = "0676ea2625a90ab903c13c266a829988", label = "No More Heroes 2 - Desperate Struggle (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

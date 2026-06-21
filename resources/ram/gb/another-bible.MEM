@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Another Bible",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "another-bible",
+    file = "another-bible.zip",
+    hashes = {
+      { hash = "b13538b9512185226eb21b8cdb534761", label = "Another Bible (Japan) (En) (v1.01) (Aeon Genesis).gb" },
+      { hash = "ff9196caa266ae36d409ce7e53ddc77a", label = "Another Bible (Japan) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X078A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="C1 - Level" },
+        { address=0XC78A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="c1 level" },
+        { address=0XC78F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="c1 EXP on current level" },
+        { address=0XC7AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="c2 level" },
+        { address=0XC7AF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="c2 EXP on current level" },
+      },
+      stage = {
+        { address=0XC1A9, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage treasure chests 1 (bitflags)" },
+        { address=0XC1AA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage treasure chests 2 (bitflags)" },
+        { address=0XC783, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="c1 - determines what sprite the character is. this is probably determined on what's loaded into" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X078B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="C1- max hp decreased" },
+        { address=0X078B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="C1- max hp increased" },
+        { address=0X078C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="C1- current hp decreased" },
+        { address=0X078C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="C1- current hp increased" },
+        { address=0X098C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP? decreased" },
+        { address=0X098C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP? increased" },
+        { address=0X09AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP? decreased" },
+        { address=0X09AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP? increased" },
+        { address=0X09CC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 HP decreased" },
+        { address=0X09CC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 HP increased" },
+        { address=0X09EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 HP decreased" },
+        { address=0X09EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 HP increased" },
+        { address=0X0A0C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 HP decreased" },
+        { address=0X0A0C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 HP increased" },
+        { address=0X0A2C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 HP decreased" },
+        { address=0X0A2C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 HP increased" },
+        { address=0XC78B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="c1 max hp decreased" },
+        { address=0XC78B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="c1 max hp increased" },
+        { address=0XC78C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="c1 current HP decreased" },
+        { address=0XC78C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="c1 current HP increased" },
+        { address=0XC7AB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="c2 max hp decreased" },
+        { address=0XC7AB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="c2 max hp increased" },
+        { address=0XC7AC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="c2 current HP decreased" },
+        { address=0XC7AC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="c2 current HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC795, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="c1 held weapon (I am pretty sure you cannot drop or exchange weapons, but im just noting these b" },
+        { address=0XC7B5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="c2 held weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC796, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="c1 - if this address is a0, character has a joy coin equipped increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC786, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="c1 - inactivity switch (bit 6 flipped = player has not been recruited?)" },
+      },
+    },
+  },
+}

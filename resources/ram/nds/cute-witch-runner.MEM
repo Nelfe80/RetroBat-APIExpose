@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cute Witch! Runner",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cute-witch-runner",
+    file = "cute-witch-runner.zip",
+    hashes = {
+      { hash = "d889aa1792368ace1ab44694ed4d2c25", label = "Cute Witch! Runner (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

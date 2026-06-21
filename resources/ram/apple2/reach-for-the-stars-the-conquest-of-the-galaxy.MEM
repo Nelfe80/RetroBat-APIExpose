@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Reach for the Stars: The Conquest of the Galaxy",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "reach-for-the-stars-the-conquest-of-the-galaxy",
+    file = "reach-for-the-stars-the-conquest-of-the-galaxy.zip",
+    hashes = {
+      { hash = "ba599b22520c889eb2ca852c115deb2e", label = "Reach for the Stars 3.0.woz" },
+    }
+  },
+
+  events = {
+  },
+}

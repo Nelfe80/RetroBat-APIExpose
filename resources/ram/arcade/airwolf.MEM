@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Airwolf",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "airwolf",
+    file = "airwolf.zip",
+    hashes = {
+      { hash = "084f1203e22df0fcad06b4088ff169f3", label = "airwolf.7z <Airwolf>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0012, type="u8", condition="eq", value=0X82, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Inserted" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X90C2, type="u64be", condition="change", action="TREASURE", color="blue", min=500, max=5000, no_log=false, no_survey=false, desc="Score delta 500-5000: A bonus type range" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X90C2, type="u64be", condition="change", action="SCORE_STATE", min=10, max=10, no_log=false, no_survey=false, desc="Score delta 10-10: Score delta 10-10" },
+        { address=0X90C2, type="u64be", condition="change", action="SCORE_STATE", color="orange", min=20, max=40, no_log=false, no_survey=false, desc="Score delta 20-40: Score delta 20-40" },
+        { address=0X90C2, type="u64be", condition="change", action="SCORE_STATE", color="cyan", min=50, max=80, no_log=false, no_survey=false, desc="Score delta 50-80: Score delta 50-80" },
+        { address=0X90C2, type="u64be", condition="change", action="SCORE_STATE", color="green", min=80, max=200, no_log=false, no_survey=false, desc="Score delta 80-200: Score delta 80-200" },
+      },
+      collectibles = {
+        { address=0X1, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0004, type="u8", condition="eq", value=0XFF, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Boot Up Complete" },
+      },
+    },
+  },
+}

@@ -1,0 +1,118 @@
+return {
+  game = {
+    title = "Mystic Warriors: Wrath of the Ninjas",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "mystic-warriors-wrath-of-the-ninjas",
+    file = "mystic-warriors-wrath-of-the-ninjas.zip",
+    hashes = {
+      { hash = "2c310979c1b31f460ff516a06d9cd125", label = "mystwarraa.7z <Mystic Warriors (ver AAA)>" },
+      { hash = "4547653eb8acfd35571e77f4775c7e2b", label = "mystwarra.7z <Mystic Warriors (ver AAB)>" },
+      { hash = "59ce2fb979b6d3953ee2abd6273e3da7", label = "mystwarrj.7z <Mystic Warriors (ver JAA)>" },
+      { hash = "7f9d5004c906aefcfdd840c3a28934c0", label = "mystwarr.7z <Mystic Warriors (ver EAA)>" },
+      { hash = "8fa3ea5bc3e9ecc5daf98fa5dbf7dc59", label = "mystwarru.7z <Mystic Warriors (ver UAA)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X6585, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="completely off" },
+        { address=0X6585, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="all the time (DEFAULT)" },
+        { address=0X6585, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="once every 2 cycles" },
+        { address=0X6585, type="u8", condition="eq", value=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="once every 8 cycles" },
+        { address=0X6587, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="game over after final stage" },
+        { address=0X6587, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="game over after second round" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X03A2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Options - Difficulty Level: 03 = Defaul, 07 = Hardest" },
+      },
+      stage = {
+        { address=0X0301, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number" },
+        { address=0X0328, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Distance (16-Bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0201, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 Lives increased" },
+        { address=0X0201, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 Lives decreased" },
+        { address=0X0241, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="2P Lives increased" },
+        { address=0X0241, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P Lives decreased" },
+        { address=0X030C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P - Number of Deaths" },
+        { address=0X030D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 - Number of Deaths" },
+        { address=0X03A1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Game Options - Player's Life: 02 = Default increased" },
+        { address=0X03A1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Game Options - Player's Life: 02 = Default decreased" },
+        { address=0X6580, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1life 1energy" },
+        { address=0X6580, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="1life 2energies" },
+        { address=0X6580, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="1life 3energies (DEFAULT)" },
+        { address=0X6580, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="1life 4energies" },
+        { address=0X6581, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1credit 1life" },
+        { address=0X6581, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="1credit 2lives (DEFAULT)" },
+        { address=0X6581, type="u8", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="1credit 9lives" },
+        { address=0X6581, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="player's life increased" },
+        { address=0X6581, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player's life decreased" },
+      },
+      health = {
+        { address=0X0200, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health decreased" },
+        { address=0X0200, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health increased" },
+        { address=0X0240, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P Health decreased" },
+        { address=0X0240, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P Health increased" },
+        { address=0X03B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Game Options - Player's Energy: 03 = Default decreased" },
+        { address=0X03B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Game Options - Player's Energy: 03 = Default increased" },
+        { address=0X6580, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="dipswitch - player's energy" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0206, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score: 00XX0000" },
+        { address=0X0207, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score: XX000000" },
+        { address=0X0208, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score: 000000XX" },
+        { address=0X0209, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score: 0000XX00" },
+        { address=0X0246, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2P Score: 00XX0000" },
+        { address=0X0247, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2P Score: XX000000" },
+        { address=0X0248, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2P Score: 000000XX" },
+        { address=0X0249, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="2P Score: 0000XX00" },
+      },
+      collectibles = {
+        { address=0X0051, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Coin Mechanism (0 = Common, 1 = Independent)" },
+        { address=0X0391, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Options - 01 = Free Play Mode Enabled increased" },
+        { address=0X0396, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Options - Coin Slot 1: 00 = Default increased" },
+        { address=0X0399, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coin Options - Coin Slot 2: 00 = Default increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0309, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="01 = Boss Beaten" },
+        { address=0X032A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="01 = At the Boss Fight" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0051, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sound Output (0 = Mono, 1 = Stereo)" },
+        { address=0X0051, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Number of Players (0 = 2 players, 1 = 4 players)" },
+        { address=0X6582, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="normal (DEFAULT)" },
+        { address=0X6582, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="up side down" },
+        { address=0X6583, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1/easiest" },
+        { address=0X6583, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="4/medium (DEFAULT)" },
+        { address=0X6583, type="u8", condition="eq", value=0X07, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="8/hardest" },
+        { address=0X6584, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="00" },
+        { address=0X6584, type="u8", condition="eq", value=0X28, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="40 (DEFAULT)" },
+        { address=0X6584, type="u8", condition="eq", value=0X3B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="59" },
+        { address=0X6587, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="endless" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X020A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 - Timer at Game Over" },
+        { address=0X024A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="2P - Timer at Game Over" },
+        { address=0X6585, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="dipswitch - sound in attract mode" },
+      },
+    },
+  },
+}

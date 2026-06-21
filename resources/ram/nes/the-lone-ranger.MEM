@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "The Lone Ranger",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "the-lone-ranger",
+    file = "the-lone-ranger.zip",
+    hashes = {
+      { hash = "bb88f06b99b0598e5d4e9738511d981a", label = "Lone Ranger, The (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0027, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo active = 01" },
+        { address=0X0046, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Play" },
+        { address=0X0046, type="u8", condition="eq", value=0X5E, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X0116, type="u8", condition="eq", value=0X83, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X005A, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Central Planes" },
+        { address=0X005A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Buzzards Basin" },
+        { address=0X005A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Madera Canyon" },
+        { address=0X005A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Area" },
+      },
+      zone = {
+        { address=0X0116, type="u8", condition="eq", value=0X70, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00B1, type="u8", condition="eq", value=0X05, action="LOSE_LIFE", no_log=false, no_survey=false, desc="1Ponyless Express/2Treasure Aquired/3Hotel Brother Dead/6Mine Battle Open/7Three Key" },
+        { address=0X00B1, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="3Railraod in Danger/6Magic Ninja Dead" },
+        { address=0X0684, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="red death" },
+        { address=0X0684, type="u8", condition="eq", value=0XFE, action="LOSE_LIFE", no_log=false, no_survey=false, desc="blue death" },
+        { address=0X091B, type="u8", condition="eq", value=0X2C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="enemy death sound" },
+      },
+      health = {
+        { address=0X005F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0X005F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X0390, type="u8", condition="eq", value=0X0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Clubs" },
+        { address=0X0390, type="u8", condition="eq", value=0X1, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Diamonds" },
+        { address=0X0390, type="u8", condition="eq", value=0X2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hearts" },
+        { address=0X0390, type="u8", condition="eq", value=0X3, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Spades" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0050, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money increased" },
+        { address=0X0051, type="u8", condition="eq", value=0X1, action="MONEY_STATE", no_log=false, no_survey=false, desc="256" },
+        { address=0X0053, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Regular Bullets Ammo" },
+        { address=0X0054, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Silver Bullets Ammo" },
+        { address=0X0055, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="TNT Ammo" },
+        { address=0X01EC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="b1=broken bottle during Range increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X005C, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight West Craggy" },
+        { address=0X005C, type="u8", condition="eq", value=0X13, action="BOSS_HIT", no_log=false, no_survey=false, desc="Eagle Boss Fight" },
+        { address=0X006E, type="u16le", condition="eq", value=0X96, action="BOSS_HIT", no_log=false, no_survey=false, desc="West Craggy Bandit Boss" },
+        { address=0X00B1, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="1West Craggy Mountain Open/2Plate2/3Walnut Grove Boss Unlocked/4Night on the Prarie/5Chief's Que" },
+        { address=0X00B1, type="u8", condition="eq", value=0X04, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="1WC Bandit Boss Dead/2Senior/3Hotel Boss Unlocked/5Rainbow Egg/6Back to Abilene/7Two Key" },
+        { address=0X00B1, type="u8", condition="eq", value=0X06, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="1Mount Up/3Both Brothers Dead/6Mine Boss Dead/7At the Gate" },
+        { address=0X0116, type="u8", condition="eq", value=0X72, action="BOSS_HIT", no_log=false, no_survey=false, desc="Train Boss" },
+        { address=0X0116, type="u8", condition="eq", value=0X7A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Eagle Boss/Twin Boss" },
+        { address=0X0116, type="u8", condition="eq", value=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Twin Boss Defeated/final boss defated" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0060, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Event trigger 0c = get quest item, complete objective" },
+      },
+    },
+  },
+}

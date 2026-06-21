@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Brain Age: Train Your Brain in Minutes a Day!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "brain-age-train-your-brain-in-minutes-a-day",
+    file = "brain-age-train-your-brain-in-minutes-a-day.zip",
+    hashes = {
+      { hash = "dd00d38b784adcb92a0f089173f9645c", label = "Dr Kawashima's Brain Training - How Old Is Your Brain (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDDA00, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XEDEDC, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Low To High Puzzles Cleared" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XDD9B0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Reading Aloud Syllables Per Second/Word Memory Score" },
+        { address=0XEDEF4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Low To High Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDD9D0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number Cruncher Time" },
+        { address=0XED708, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Lapse Time Taken" },
+        { address=0XED70C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Triangle Math Current Time" },
+        { address=0XED724, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Lapse Questions Answered" },
+        { address=0XED728, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Lapse Questions Correctly Answered" },
+        { address=0XED74C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Calculations x20/x100 Final Time" },
+        { address=0XEE8AC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="In Sudoku - Time spent (32bit)" },
+      },
+    },
+  },
+}

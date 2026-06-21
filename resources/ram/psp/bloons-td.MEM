@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bloons TD",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bloons-td",
+    file = "bloons-td.zip",
+    hashes = {
+      { hash = "cee6b95bb1eeba85309e024456eefc8c", label = "Bloons TD (USA) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

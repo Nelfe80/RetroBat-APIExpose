@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "The Muppets: On With the Show!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Casual Game"
+  },
+
+  rom = {
+    name = "the-muppets-on-with-the-show",
+    file = "the-muppets-on-with-the-show.zip",
+    hashes = {
+      { hash = "8cc1dd1718b63c9675a5e5d28c14936b", label = "Muppets, The - On with the Show! (USA, Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+  },
+}

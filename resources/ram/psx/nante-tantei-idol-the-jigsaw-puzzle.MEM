@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Nante Tantei Idol: The Jigsaw Puzzle",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nante-tantei-idol-the-jigsaw-puzzle",
+    file = "nante-tantei-idol-the-jigsaw-puzzle.zip",
+    hashes = {
+      { hash = "a310ddd1a4517a74de8f05cf9e8cd50f", label = "Simple Character 2000 Series Vol. 14 - Nante Tantei Idol - The Jigsaw Puzzle (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X614E0, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="This tells what puzzle is selected after selecting it. Starts with the Anime puzzles and continu" },
+        { address=0X1FFF70, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="This tells what puzzle is selected after selecting it. Starts with the Anime puzzles and continu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6144D, type="u8", condition="eq", value=0X4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6150C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="01 = In Time Attack mode" },
+        { address=0X1FFF60, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="This determines what is selected on the main menu." },
+      },
+    },
+  },
+}

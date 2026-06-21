@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Castle Wolfenstein",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "castle-wolfenstein",
+    file = "castle-wolfenstein.zip",
+    hashes = {
+      { hash = "462ffae94631792f90ef2e9541b79a9f", label = "Castle Wolfenstein (4am crack).dsk" },
+      { hash = "519dd5c639ae29dde3a8e7c0b33beeb1", label = "Castle Wolfenstein (1981)(Muse).do" },
+      { hash = "d3ec33dd785a8ef8f7a2e43fe01ef58a", label = "Castle Wolfenstein (1981)(Muse)[a4].do" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0E4B, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="ingame/playing" },
+        { address=0X436F, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="Not" },
+        { address=0X436F, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Win (You escaped)" },
+        { address=0X436F, type="u8", condition="eq", value=0X40, action="GAME_OVER", no_log=false, no_survey=false, desc="Caught (You are caught)" },
+        { address=0X436F, type="u8", condition="eq", value=0X50, action="GAME_OVER", no_log=false, no_survey=false, desc="Killed (They got you)" },
+        { address=0X436F, type="u8", condition="eq", value=0X60, action="GAME_OVER", no_log=false, no_survey=false, desc="Suicide (You were blown up in the explosion)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X434C, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Player Action: Collision" },
+      },
+    },
+  },
+}

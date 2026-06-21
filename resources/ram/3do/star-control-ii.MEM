@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Star Control II",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Adventure, Shooter"
+  },
+
+  rom = {
+    name = "star-control-ii",
+    file = "star-control-ii.zip",
+    hashes = {
+      { hash = "1d5ce3b4d6e5bd1a92550a987847c5cf", label = "Star Control II (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

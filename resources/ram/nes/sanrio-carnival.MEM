@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Sanrio Carnival",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "sanrio-carnival",
+    file = "sanrio-carnival.zip",
+    hashes = {
+      { hash = "e5afcb94a842a3a6dab41ac37ff94286", label = "Sanrio Carnival (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0016, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Action Buffer (Pause/Next Piece)" },
+        { address=0X0037, type="u8", condition="eq", value=0X05, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0026, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="ステージをクリア (Clear Stage)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0026, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="めざせハイスコア (High Score)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0016, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="In Mode Options (Block Type/Music)" },
+        { address=0X002B, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Selected Block" },
+      },
+    },
+  },
+}

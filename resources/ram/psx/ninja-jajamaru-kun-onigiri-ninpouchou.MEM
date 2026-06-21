@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ninja JaJaMaru-kun: Onigiri Ninpouchou",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "ninja-jajamaru-kun-onigiri-ninpouchou",
+    file = "ninja-jajamaru-kun-onigiri-ninpouchou.zip",
+    hashes = {
+      { hash = "911983ecf0ff62e781c2498451e2bd91", label = "Ninja Jajamaru-kun - Onigiri Ninpouchou (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

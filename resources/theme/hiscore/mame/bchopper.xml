@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 Y.TAGAMI  127630</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 Y.SHIMIZU 119390</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 M.HAMADA  98710</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 T.TANABE  71090</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 M.ISHIDA  60550</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 K.ODAGIRI 54170</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 .SHOBU   53610</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 MOMOKO.T  47950</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 T.SUMITA  31230</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 HIROKI.S  26410</text>
+		</text>
+	</view>
+</theme>

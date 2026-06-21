@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "Atelier Annie: Alchemists of Sera Island",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Construction and Management Simulation, Role-Playing"
+  },
+
+  rom = {
+    name = "atelier-annie-alchemists-of-sera-island",
+    file = "atelier-annie-alchemists-of-sera-island.zip",
+    hashes = {
+      { hash = "0100786fcd4e16f1f8b4e2efb4033047", label = "Atelier Annie - Alchemists of Sera Island (USA).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2269A8, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Almanac - 138 Demon Book" },
+        { address=0X226B32, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Enemy Almanac - 050 Demon Lord" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X129854, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shop Level" },
+        { address=0X12A50C, type="u16le", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Master" },
+        { address=0X12A50C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alchemy Level/ Rank" },
+        { address=0X134F28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Annie Current Level - Stat Screen" },
+        { address=0X134F4E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hans Current Level - Stat Screen" },
+        { address=0X134F74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Killbert Current Level - Stat Screen" },
+        { address=0X134F9A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gillian Current Level - Stat Screen" },
+        { address=0X134FC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kyle Current Level - Stat Screen" },
+        { address=0X134FE6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beaux Current Level - Stat Screen" },
+        { address=0X13500C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fitz Current Level - Stat Screen" },
+        { address=0X135032, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Liese Current Level - Stat Screen" },
+      },
+      zone = {
+        { address=0X2266DA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Almanac - 406 Royal World 1" },
+        { address=0X2266DC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Almanac - 407 Royal World 2" },
+        { address=0X2268E0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Almanac - 357 World Soul" },
+        { address=0X2269A0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Almanac - 134 World's Sweets" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2266E0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Almanac - 409 Secret of Life increased" },
+        { address=0X2266E0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Almanac - 409 Secret of Life decreased" },
+        { address=0X226760, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Almanac - 016 Life Fuel increased" },
+        { address=0X226760, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Almanac - 016 Life Fuel decreased" },
+        { address=0X226812, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Almanac - 270 Life Water increased" },
+        { address=0X226812, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Almanac - 270 Life Water decreased" },
+        { address=0X22686C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Almanac - 307 Cloudie" },
+      },
+      health = {
+        { address=0X134F2A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Annie Current HP - Stat Screen decreased" },
+        { address=0X134F2A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Annie Current HP - Stat Screen increased" },
+        { address=0X134F2C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Annie Max HP - Stat Screen decreased" },
+        { address=0X134F2C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Annie Max HP - Stat Screen increased" },
+        { address=0X134F50, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hans Current HP - Stat Screen decreased" },
+        { address=0X134F50, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hans Current HP - Stat Screen increased" },
+        { address=0X134F52, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hans Max HP - Stat Screen decreased" },
+        { address=0X134F52, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hans Max HP - Stat Screen increased" },
+        { address=0X134F9C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gillian Current HP - Stat Screen decreased" },
+        { address=0X134F9C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gillian Current HP - Stat Screen increased" },
+        { address=0X134F9E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Gillian Max HP - Stat Screen decreased" },
+        { address=0X134F9E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Gillian Max HP - Stat Screen increased" },
+        { address=0X2267EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Almanac - 256 Plant Energy decreased" },
+        { address=0X2267EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Almanac - 256 Plant Energy increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2269E6, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Almanac - 173 Sweet Suit" },
+        { address=0X226A0C, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Almanac - 160 Knight Suit" },
+        { address=0X226A0E, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Almanac - 161 Leather Suit" },
+        { address=0X226A10, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Almanac - 162 Venture Suit" },
+      },
+      weapon = {
+        { address=0X104E70, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Shop" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X6E44C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Multiplier increased" },
+        { address=0X119670, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money being added to Resort Fund increased" },
+        { address=0X129840, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Money increased" },
+        { address=0X226714, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 428 Gold Almanac increased" },
+        { address=0X22685C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 299 Gold Salmon increased" },
+        { address=0X226872, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 308 Gold Dust increased" },
+        { address=0X2268FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 210 Wasser Ring increased" },
+        { address=0X2268FE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 211 Ice Ring increased" },
+        { address=0X22690C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 218 Emerode Ring increased" },
+        { address=0X22690E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 219 Sappheiro Ring increased" },
+        { address=0X226910, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 220 Ryubi Ring increased" },
+        { address=0X226912, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 221 Azuro Ring increased" },
+        { address=0X226A66, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 370 Ancient Coin increased" },
+        { address=0X226A68, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Almanac - 371 Gold Coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X226B14, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy Almanac - 035 Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X226780, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Almanac - 041 Magical Shield" },
+        { address=0X226782, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Almanac - 042 War Shield" },
+      },
+    },
+  },
+}

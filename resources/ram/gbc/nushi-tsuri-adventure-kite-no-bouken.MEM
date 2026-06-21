@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Nushi Tsuri Adventure: Kite no Bouken",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "nushi-tsuri-adventure-kite-no-bouken",
+    file = "nushi-tsuri-adventure-kite-no-bouken.zip",
+    hashes = {
+      { hash = "c9a1f0543dd127e9e169f84ed5b04c0a", label = "Nushi Tsuri Adventure - Kite no Bouken (Japan) (En) (v2.0) (JaytheHam).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XCE33, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0XCE33, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kite's Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCE2F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Kite's Current HP (Player Character) - decreased" },
+        { address=0XCE2F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Kite's Current HP (Player Character) - increased" },
+        { address=0XCE31, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Kite (Player Character) - Max HP decreased" },
+        { address=0XCE31, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Kite (Player Character) - Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XCCC5, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16bit] Money / Gold (max is 0x3e7, or 999 gold ) increased" },
+      },
+    },
+  },
+}

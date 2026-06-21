@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Bratz",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "bratz",
+    file = "bratz.zip",
+    hashes = {
+      { hash = "8b809080a689886e7877ec89eb82ae99", label = "Bratz (USA) (En,Fr,Es).gba" },
+      { hash = "accb22e06c37f68b55d8fa34853f885b", label = "Bratz (Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X57C4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score" },
+      },
+    },
+  },
+}

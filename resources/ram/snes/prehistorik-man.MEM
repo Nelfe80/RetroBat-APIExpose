@@ -1,0 +1,131 @@
+return {
+  game = {
+    title = "Prehistorik Man",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "prehistorik-man",
+    file = "prehistorik-man.zip",
+    hashes = {
+      { hash = "fbe14d670f28fa5c67c00dc551204838", label = "Prehistorik Man (USA) (En,Fr,Es).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X008C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X008E, type="u16le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="<16-bit> Instructions for the demo playback" },
+        { address=0X0090, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="<8-bit> Related to demo playback" },
+        { address=0X0095, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="a2 = Game Over" },
+        { address=0X0534, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="<8-bit> Pause flag; 01 = Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0524, type="u16le", condition="eq", value=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete Stage" },
+        { address=0X05D2, type="u16le", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Skip Level, 08 = Secret Info," },
+        { address=0X080C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Green Ice Cream Cone Collected in Current Level" },
+        { address=0X080E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice Cream Cone Collected in Current Level" },
+        { address=0X0810, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cake Slice Collected in Current Level" },
+        { address=0X0812, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pudding Collected in Current Level" },
+        { address=0X0814, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blue Gem Collected in Current Level" },
+        { address=0X0816, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Green Gem Collected in Current Level" },
+        { address=0X0818, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Gem Collected in Current Level" },
+        { address=0X081A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fries Collected in Current level" },
+        { address=0X081C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Giant Hamburger Collected in Current Level" },
+        { address=0X081E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Stinky Cheese Collected in Current Level" },
+        { address=0X0820, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Giant Ham Collected in Current Level" },
+        { address=0X0822, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="DK's Treat's Collected in Current Level" },
+        { address=0X0824, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Giant CupCake Collected in Current Level" },
+        { address=0X3C00, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="<Area> When you enter a bonus stage, all of the object flags from 0x3000 are stored here until t" },
+      },
+      stage = {
+        { address=0X052A, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 01" },
+        { address=0X052A, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 02" },
+        { address=0X052A, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 03" },
+        { address=0X052A, type="u8", condition="eq", value=0X2C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 23 (Finale stage)" },
+        { address=0X052A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage id (Only even number)" },
+        { address=0X058A, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Get stone Green" },
+        { address=0X058A, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Get stone Blue" },
+        { address=0X058A, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Get stone Orange" },
+        { address=0X058A, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Place stone Green" },
+        { address=0X058A, type="u8", condition="bit_true", bit=4, mask=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Place stone Blue" },
+        { address=0X058A, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Place stone Orange" },
+        { address=0X058A, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Acquire Torc" },
+        { address=0X059A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus Stage ID (01 to 04)" },
+        { address=0X0804, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Total Food to Collect in a level ( Doesn't include if Bonus stage is present or grenade is used" },
+        { address=0X0808, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Total Food on Stage ( No Bonus or Grenade Food Included )" },
+        { address=0X080A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Popsicles Collected on Current Stage" },
+        { address=0X0828, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Gift Box Collected in Current Bonus Stage" },
+        { address=0X082A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Red Gift Box Collected in Current Bonus Stage" },
+        { address=0X082C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Yellow Gift Box Collected in Current Bonus Stage" },
+        { address=0X082E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Treasure Gift Box Collected in Current Bonus Stage" },
+        { address=0X0830, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Crown Gift Box Collected in Current Bonus Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0524, type="u16le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X0556, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0556, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X084C, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="<16-bit> Total food count required to earn an extra life during the tally screen increased" },
+        { address=0X084C, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="<16-bit> Total food count required to earn an extra life during the tally screen decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0564, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Number ammo (decimal)" },
+        { address=0X057A, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Number ammo (Display - Decimal)" },
+        { address=0X07BA, type="u8", condition="bit_true", bit=1, mask=0X02, action="AMMO_STATE", no_log=true, no_survey=false, desc="Hachet" },
+        { address=0X07BA, type="u8", condition="bit_true", bit=2, mask=0X04, action="AMMO_STATE", no_log=true, no_survey=false, desc="Spear" },
+        { address=0X0832, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Blue Gem Collected in Bonus Level Store here after clearing bonus increased" },
+        { address=0X0834, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Green Gem Collected in Bonus Level Store here after clearing bonus increased" },
+        { address=0X0836, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Red Gem Collected in Bonus Level Store here after clearing bonus increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0524, type="u16le", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Transition" },
+        { address=0X057C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health (Display)" },
+        { address=0X05AC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+        { address=0X1299, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss hits you" },
+        { address=0X3031, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 21 - Ice Dragon Boss" },
+        { address=0X3068, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 14 Dragon Boss" },
+        { address=0X3069, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 14 Dragon Boss" },
+        { address=0X3079, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 7 - Dragon Boss" },
+        { address=0X3148, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Stage 2 7c = Lion Boss Turns to 25 when dead" },
+        { address=0X3149, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 2 - Lion Boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X00B6, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Sam's hit detection invincibility frames" },
+      },
+      player = {
+        { address=0X0097, type="u8", condition="eq", value=0X72, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X078A, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<16-bit> Object ID of the currently activated Rees-Tartah?" },
+        { address=0X0790, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="<8-bit?> Checkpoint's map ID?" },
+        { address=0X2FFE, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="map array notes 0x3000-0x03007 origianal from Hyrax | Object IDs from SnowPin" },
+        { address=0X3000, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<Flag> Object ID" },
+        { address=0X3004, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<16-bit>Object spawn location X" },
+        { address=0X3006, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<16-bit>Object spawn location Y" },
+        { address=0X3008, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<Flag> Object ID" },
+        { address=0X300E, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<16-bit> Object spawn location X" },
+        { address=0X300F, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="<16-bit> Object spawn location Y" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X059D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Bonus Stage" },
+      },
+    },
+  },
+}

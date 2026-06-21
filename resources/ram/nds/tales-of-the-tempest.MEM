@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Tales of the Tempest",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "tales-of-the-tempest",
+    file = "tales-of-the-tempest.zip",
+    hashes = {
+      { hash = "1ffa3cc05f4be76f99f63c01aad141ec", label = "Tales of the Tempest (Japan).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X283BD5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Accessories] Demon's Seal" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X283C2E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[Valuables] World Map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X283B01, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Bottle increased" },
+        { address=0X283B01, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Bottle decreased" },
+      },
+      health = {
+        { address=0X2630B8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Battle] HP Char A decreased" },
+        { address=0X2630B8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Battle] HP Char A increased" },
+        { address=0X2644F8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Battle] HP Monster A decreased" },
+        { address=0X2644F8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Battle] HP Monster A increased" },
+        { address=0X283048, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Caius] Max HP decreased" },
+        { address=0X283048, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Caius] Max HP increased" },
+        { address=0X28304A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Caius] HP decreased" },
+        { address=0X28304A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Caius] HP increased" },
+        { address=0X283228, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Rubia] Max HP decreased" },
+        { address=0X283228, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Rubia] Max HP increased" },
+        { address=0X28322A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Rubia] HP decreased" },
+        { address=0X28322A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Rubia] HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X283B1B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Ore increased" },
+        { address=0X283BC9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Accessories] Technical Ring increased" },
+        { address=0X283BCA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Accessories] Emerald Ring increased" },
+        { address=0X283BCB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Accessories] Faerie Ring increased" },
+        { address=0X283BCC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Accessories] Force Ring increased" },
+        { address=0X283BCD, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Accessories] Resist Ring increased" },
+        { address=0X283BCE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Accessories] Vital Ring increased" },
+        { address=0X283BCF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Accessories] Mental Ring increased" },
+        { address=0X283BD0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Accessories] Heal Ring increased" },
+        { address=0X283C3D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Valuables] Bag of Gold increased" },
+      },
+    },
+  },
+}

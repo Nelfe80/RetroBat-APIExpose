@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Rockman.EXE WS | Mega Man Battle Network Wonderswan",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rockman-exe-ws-mega-man-battle-network-wonderswan",
+    file = "rockman-exe-ws-mega-man-battle-network-wonderswan.zip",
+    hashes = {
+      { hash = "20379c41873b0d99a2baaf2ef959e1e6", label = "Rockman EXE WS (Japan) (En) (v1.0) (Greiga Master).wsc" },
+      { hash = "a66390da2c2defcf092eb107edaf4fa0", label = "Rockman EXE WS (Japan).wsc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0BF8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0x02 = Menu / Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0BC4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X0BC6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0BC7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Screen except stays on whatever screen you died on until you catch back up to it." },
+        { address=0X0C3D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X0C3D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0X0C58, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Ene 1 life -ed- increased" },
+        { address=0X0C58, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ene 1 life -ed- decreased" },
+        { address=0X113B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X113B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1086D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health 2" },
+        { address=0X1086E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health 1" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X0BF0, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Freeze 0x00 for Super Jump" },
+      },
+    },
+  },
+}

@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Robot Wars: Metal Mayhem",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "robot-wars-metal-mayhem",
+    file = "robot-wars-metal-mayhem.zip",
+    hashes = {
+      { hash = "af4565bf1ea33c785fc9e05be2a9bad0", label = "Robot Wars - Metal Mayhem (Europe) (En,Fr,De,It,Nl,Sv).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC693, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="not in game" },
+        { address=0XC693, type="u8", condition="eq", value=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="no" },
+        { address=0XC693, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="yes" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC25A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="War Zone" },
+        { address=0XC25E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Warzone round" },
+        { address=0XC25F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fight Round" },
+        { address=0XFB63, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="War Zone" },
+        { address=0XFB6A, type="u8", condition="eq", value=0X31, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0XFB6A, type="u8", condition="eq", value=0X32, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2" },
+        { address=0XFB6A, type="u8", condition="eq", value=0X33, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3" },
+        { address=0XFB6A, type="u8", condition="eq", value=0X65, action="NEW_LEVEL", no_log=false, no_survey=false, desc="gauntlet fail" },
+        { address=0XFB6A, type="u8", condition="eq", value=0X74, action="NEW_LEVEL", no_log=false, no_survey=false, desc="gauntlet win" },
+        { address=0XFB6A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Grudge Round/Gauntlet win screen" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC29D, type="u8", condition="eq", value=0X70, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max" },
+        { address=0XC29D, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Health" },
+        { address=0XC2C6, type="u8", condition="eq", value=0X70, action="HEALTH_STATE", no_log=false, no_survey=false, desc="max" },
+        { address=0XC2C6, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Enemy Health" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XC27E, type="u8", condition="eq", value=0X5B, action="WEAPON_STATE", no_log=false, no_survey=false, desc="custom build - weapon" },
+        { address=0XC701, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="yes" },
+        { address=0XC702, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="yes" },
+      },
+    },
+  },
+}

@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "MRC: Multi-Racing Championship",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "mrc-multi-racing-championship",
+    file = "mrc-multi-racing-championship.zip",
+    hashes = {
+      { hash = "fc61d60f2c6fe4610f70ce4949a7a062", label = "MRC - Multi-Racing Championship (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA6D6E, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XA6D6E, type="u8", condition="eq", value=0X07, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XA9596, type="u8", condition="eq", value=0XF0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19E232, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Road" },
+        { address=0X19E232, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Offroad" },
+        { address=0X19E232, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Water" },
+        { address=0X19E232, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wood" },
+        { address=0X19E232, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Ground Type" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9452F, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X94595, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X9460A, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X94838, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Race (Milliseconds)" },
+        { address=0X9483A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Race (Seconds)" },
+        { address=0X9483B, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Race (Minutes)" },
+        { address=0X94840, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 1 (Milliseconds)" },
+        { address=0X94842, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 1 (Seconds)" },
+        { address=0X94843, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 1 Minutes" },
+        { address=0X94844, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 2 (Seconds)" },
+        { address=0X94845, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 2 (Minutes)" },
+        { address=0X9484A, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 2 (Milliseconds)" },
+        { address=0X9484C, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 3 (Milliseconds)" },
+        { address=0X9484E, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 3 (Seconds)" },
+        { address=0X9484F, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Lap 3 (Minutes)" },
+        { address=0X94E94, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Timer: Countdown (Seconds)" },
+        { address=0XA9596, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0XA9596, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Mode" },
+        { address=0X17EF1C, type="u8", condition="eq", value=0X00, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Off (default)" },
+        { address=0X17EF1C, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="On" },
+        { address=0X17EF1C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Config: Free Time On/Off" },
+      },
+    },
+  },
+}

@@ -1,0 +1,59 @@
+return {
+  game = {
+    title = "Disney's Activity Centre: A Bug's Life",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "disneys-activity-centre-a-bugs-life",
+    file = "disneys-activity-centre-a-bugs-life.zip",
+    hashes = {
+      { hash = "61b75c3e72fd1736d175c8590232373f", label = "Disney-Pixar A Bug's Life - Disney's Activity Centre (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2F57C, type="u16le", condition="eq", value=0XDC, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X616C4, type="u32le", condition="eq", value=0X107, action="DEMO_MODE", no_log=false, no_survey=false, desc="In Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X304B4, type="u32le", condition="eq", value=0X0AC85FFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Inside the Tin Can (Flower around Neck)" },
+      },
+      stage = {
+        { address=0X2FB80, type="u32le", condition="eq", value=0X020B8F7B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="First Interaction" },
+        { address=0X2FB80, type="u32le", condition="eq", value=0X0526FC1D, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Second Interaction" },
+        { address=0X2FB80, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Ant Island Gag Status (Stage)" },
+        { address=0X30E1C, type="u32le", condition="eq", value=0X049871D4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="First Interaction" },
+        { address=0X30E1C, type="u32le", condition="eq", value=0X06262825, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Second Interaction" },
+        { address=0X30E1C, type="u32le", condition="eq", value=0X07B3DE76, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Third Interaction" },
+        { address=0X30E1C, type="u32le", condition="eq", value=0X094194C7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fourth Interaction" },
+        { address=0X30E1C, type="u32le", condition="eq", value=0X0ACF4B18, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fifth Interaction" },
+        { address=0X30E1C, type="u32le", condition="eq", value=0X0C5D0169, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sixth Interaction" },
+        { address=0X30E1C, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32 Bit] Ant Island Gag Status (Stage)" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3003C, type="u32le", condition="eq", value=0X0A5CCC24, action="TREASURE", no_log=false, no_survey=false, desc="Buried Treasure 1" },
+        { address=0X3003C, type="u32le", condition="eq", value=0X032EEEB5, action="TREASURE", no_log=false, no_survey=false, desc="Buried Treasure 2" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X304B4, type="u32le", condition="eq", value=0X0AFE47A8, action="JUMPING", no_log=true, no_survey=false, desc="Jumping off Tin Can" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X303F8, type="u32le", condition="eq", value=0X02311325, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switching from Slim" },
+        { address=0X304B4, type="u32le", condition="eq", value=0X03BEC976, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switching from Heimlich" },
+      },
+    },
+  },
+}

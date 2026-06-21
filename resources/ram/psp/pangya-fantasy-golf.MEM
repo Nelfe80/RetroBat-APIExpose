@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Pangya Fantasy Golf",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pangya-fantasy-golf",
+    file = "pangya-fantasy-golf.zip",
+    hashes = {
+      { hash = "5dc357f1581e3a05fb611f809efdbda1", label = "Pangya - Fantasy Golf (USA).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X1492F44, type="u32le", condition="eq", value=0X29, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Pro E" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X2A, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Pro D" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X2B, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Pro C" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X2C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Pro B" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X2D, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Pro A" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X38, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Master E" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X39, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Master D" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X3A, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Master C" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X3B, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Master B" },
+        { address=0X1492F44, type="u32le", condition="eq", value=0X3C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Master A" },
+      },
+    },
+  },
+}

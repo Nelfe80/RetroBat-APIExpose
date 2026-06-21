@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "X-Men: The Official Game",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "x-men-the-official-game",
+    file = "x-men-the-official-game.zip",
+    hashes = {
+      { hash = "2584c4d9c73888ffc9096a02fafea08c", label = "X-Men - The Official Game (USA).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0329, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="game paused" },
+        { address=0X0329, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="not paused" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X22F9, type="u8", condition="eq", value=0X52, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X6122, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy Death" },
+      },
+      health = {
+        { address=0X09E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Wolverine Energy decreased" },
+        { address=0X09E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Wolverine Energy increased" },
+        { address=0X09E9, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x3" },
+        { address=0X09E9, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x4" },
+        { address=0X09E9, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x8" },
+        { address=0X09E9, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Wolverine's Energy" },
+        { address=0X09EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Collosus Energy decreased" },
+        { address=0X09EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Collosus Energy increased" },
+        { address=0X09EB, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x3" },
+        { address=0X09EB, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x4" },
+        { address=0X09EB, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x8" },
+        { address=0X09EB, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Colossus's Energy" },
+        { address=0X09EC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Iceman energy decreased" },
+        { address=0X09EC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Iceman energy increased" },
+        { address=0X09ED, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x3" },
+        { address=0X09ED, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x4" },
+        { address=0X09ED, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x8" },
+        { address=0X09ED, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Iceman's Energy" },
+        { address=0X09EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Nightcrawler energy decreased" },
+        { address=0X09EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Nightcrawler energy increased" },
+        { address=0X09EF, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x3" },
+        { address=0X09EF, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x4" },
+        { address=0X09EF, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=true, no_survey=false, desc="can reach up to x8" },
+        { address=0X09EF, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Nightcrawler's Energy" },
+        { address=0X0E28, type="u8", condition="eq", value=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="max" },
+        { address=0X0E28, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Wolverine health" },
+        { address=0X0E29, type="u8", condition="eq", value=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="max" },
+        { address=0X0E29, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Collosus health" },
+        { address=0X0E2B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Nightcrawler health decreased" },
+        { address=0X0E2B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Nightcrawler health increased" },
+      },
+    },
+  },
+}

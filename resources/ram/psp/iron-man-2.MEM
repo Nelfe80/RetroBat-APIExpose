@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Iron Man 2",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "iron-man-2",
+    file = "iron-man-2.zip",
+    hashes = {
+      { hash = "985a3473e4e5cb4fa8634bcfdf02e6ea", label = "Iron Man 2 (USA) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

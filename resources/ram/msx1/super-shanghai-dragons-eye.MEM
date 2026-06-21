@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Super Shanghai - Dragon's Eye",
+    system = "msx1",
+    system_name = "MSX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "super-shanghai-dragons-eye",
+    file = "super-shanghai-dragons-eye.zip",
+    hashes = {
+      { hash = "d7e3cef693172cd18c11906ca931e430", label = "Dragon's Eye - Super Shanghai (Japan) (En) (v1.0) (Ronin Translations).dsk" },
+      { hash = "7f4668096d1fe859f6f6701655dacb96", label = "Dragon's Eye Super Shanghai (1991)(Hot-B)(JP).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

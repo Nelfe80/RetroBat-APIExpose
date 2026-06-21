@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "~Z~ Super Mario All-Stars + World",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-super-mario-all-stars-world",
+    file = "z-super-mario-all-stars-world.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0100, type="u8", condition="eq", value=0X0E, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="OnMap, 0f=loads into current stage" },
+        { address=0X0100, type="u8", condition="eq", value=0X14, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="InStage, 0c=LeavingStageOrMenu" },
+        { address=0X0776, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0729, type="u8", condition="eq", value=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="InStage, 6=FinishedStageReturningToOW?? F=EnteringEvent?" },
+        { address=0X0729, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0=ShowsWorldPopupOverworld, B,D=Overworld" },
+        { address=0X0E21, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit Level ID" },
+        { address=0X1EC6, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="This region handles stage clears too.." },
+        { address=0X1F02, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Castle1, bit3=YoshisIsland4, bit6=YoshisIsland1" },
+        { address=0X1F02, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="YellowPowerSwitch, bit0=DonutPlains2" },
+        { address=0X1F07, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear Flags - bit7=GreenSwitchPalace" },
+        { address=0X1F11, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Caves, 3=Forest, 4=BowserCastle, 5=Special" },
+        { address=0X1F11, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Star" },
+        { address=0X1F11, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Displayed background in overworld - 1=Beginning" },
+        { address=0X1FF00, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="SMB2, 8=SMB3, a=SMW" },
+        { address=0X1FF00, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game ID - 0=Menus, 2=SMB1, 4=LostLevels" },
+      },
+      zone = {
+        { address=0X075F, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID (SMB1)" },
+      },
+      stage = {
+        { address=0X0237, type="u8", condition="eq", value=0XB0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X0237, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mario's Height on the map (in stage on SMB1)" },
+        { address=0X0729, type="u8", condition="eq", value=0XE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="StartsRandomStage?, 3,4,5=OWMarioMovingAcrossScreen" },
+        { address=0X073C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="SMB3 In-Stage status? 1=true, Overworld=8??" },
+        { address=0X0743, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Black" },
+        { address=0X0743, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Background Color (Behind Tile Sets)" },
+        { address=0X0744, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Black" },
+        { address=0X0744, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Background Color (Behind Tile Sets)" },
+        { address=0X075C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID (SMB1) (Only changes display text," },
+        { address=0X075D, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage1, 2=Stage1Bonus" },
+        { address=0X0760, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Real Stage ID (SMB1)" },
+        { address=0X0772, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In-Stage" },
+        { address=0X0772, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="LoadingScreen" },
+        { address=0X0772, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Load Status or in-stage status" },
+        { address=0X1F13, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="FacingLeft, 6=MovingRight, 10=InStage" },
+        { address=0X1F18, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Type of upcoming stage intro???" },
+        { address=0X1F1A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Type of upcoming stage intro???" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0713, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Flag to exit stage on death? SMB3" },
+        { address=0X075A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X075A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0715, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SMB3 Score - 1=655,360" },
+        { address=0X0716, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SMB3 Score - 1=2,560" },
+        { address=0X0717, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SMB3 Score - 1=10" },
+        { address=0X07CE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Millions" },
+        { address=0X07CF, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - 100,000s" },
+        { address=0X07D0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="8-bit, Score: 10000s" },
+        { address=0X07D1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="8-bit, Score: 1000s" },
+        { address=0X07D2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="8-bit, Score: 100s" },
+        { address=0X07D3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="8-bit, Score: 10s" },
+      },
+      collectibles = {
+        { address=0X0748, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SMB1 - Num of collected coins in current stage?? increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X07AF, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility Timer (SMB1)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1F27, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="bit0=ShowGreenBlocks" },
+        { address=0X1F28, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="SMW bit0=ShowYellowBlocks" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0747, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="SMB3 Suit or Big status - 1=BigMario, 3=Raccoon" },
+      },
+    },
+  },
+}

@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Ninja Combat",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "ninja-combat",
+    file = "ninja-combat.zip",
+    hashes = {
+      { hash = "039dc12553654c56e3c78f321ad6e620", label = "ncombat.7z <Ninja Combat (NGM-009)>" },
+      { hash = "77401c41d6adf4e2ae03f0ddbf3c7d44", label = "ncombath.7z <Ninja Combat (NGH-009)>" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X1800, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first stage" },
+        { address=0X1800, type="u8", condition="eq", value=0X1E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="tutorial before first stage" },
+        { address=0X1800, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage part" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0633, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X0633, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0X2403, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives: 00 is game over increased" },
+        { address=0X2403, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives: 00 is game over decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1816, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: 16 bits" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X08B3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss first form" },
+        { address=0X12B3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss energy" },
+        { address=0X1800, type="u8", condition="eq", value=0X45, action="BOSS_HIT", no_log=false, no_survey=false, desc="final boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X261F, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility timer" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFD8D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Dipswitch difficulty: 03 is default" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X12C6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="post death timer end boss" },
+        { address=0X2420, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Continue timer" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "NHL Hockey",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "nhl-hockey",
+    file = "nhl-hockey.zip",
+    hashes = {
+      { hash = "1eb65c531d702935d7d70e070ad2df18", label = "NHL Hockey (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFED5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+        { address=0XFF65, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD8E8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Period Time" },
+      },
+    },
+  },
+}

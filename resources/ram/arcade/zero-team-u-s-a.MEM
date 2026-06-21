@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Zero Team U.S.A.",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "zero-team-u-s-a",
+    file = "zero-team-u-s-a.zip",
+    hashes = {
+      { hash = "7cee41d38a47a2858490a1fe277bad25", label = "zeroteamd.7z <>" },
+      { hash = "7d72053a940801d39e68f4274672e3f9", label = "zeroteama.7z <>" },
+      { hash = "b76b486ddb647228b7e6061398bc5ab3", label = "zeroteam.7z <>" },
+      { hash = "cda527e6b1e989c081b79f33e3a8874d", label = "zeroteamb.7z <>" },
+      { hash = "d1c8a70beed9adf09503abeb5f753315", label = "zeroteams.7z <>" },
+      { hash = "d9da27aa14e8749c023dec77e9c9e39e", label = "zeroteamc.7z <>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X95B2, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (8bit): Max 9" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X970C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (8bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X92CE, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (P1) (16 Bit) increased" },
+        { address=0X92CE, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (P1) (16 Bit) decreased" },
+      },
+      health = {
+        { address=0X08DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP: !6 Bit decreased" },
+        { address=0X08DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP: !6 Bit increased" },
+        { address=0X12DC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP (16bot) decreased" },
+        { address=0X12DC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP (16bot) increased" },
+      },
+    },
+  },
+}

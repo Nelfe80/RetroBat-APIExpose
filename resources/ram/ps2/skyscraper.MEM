@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Skyscraper",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "skyscraper",
+    file = "skyscraper.zip",
+    hashes = {
+      { hash = "bb1d9dd37b149df3d1cb287dedba5914", label = "Skyscraper (Europe)" },
+      { hash = "bb5d24ad778116585ba878e5b4eeefd1", label = "Skyscraper (Europe) (50fps) (v1.0) (Souzooka)" },
+      { hash = "addd877f0fa366df4f9b904dc5a86565", label = "Skyscraper (Europe) (60fps) (v1.0) (Souzooka)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X373414, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID (for save profile 1) (Refer to note 0x3733F8)" },
+      },
+    },
+  },
+}

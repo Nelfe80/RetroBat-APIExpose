@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Saiyuuki World",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "saiyuuki-world",
+    file = "saiyuuki-world.zip",
+    hashes = {
+      { hash = "140927256e745288f2956917b48a0168", label = "Saiyuuki World (Japan).nes" },
+      { hash = "6ef9becd636773f7a1d89cc3d2f92d92", label = "Saiyuuki World (Japan) (Ru) (v1.0) (Guyver).nes" },
+    }
+  },
+
+  events = {
+  },
+}

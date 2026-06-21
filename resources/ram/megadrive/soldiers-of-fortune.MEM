@@ -1,0 +1,135 @@
+return {
+  game = {
+    title = "Soldiers of Fortune",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "soldiers-of-fortune",
+    file = "soldiers-of-fortune.zip",
+    hashes = {
+      { hash = "b90ff517cba6492377e02d23fcda4b80", label = "Soldiers of Fortune (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06DD, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Game paused" },
+        { address=0X085C, type="u16be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode: 0x0 - disabled, 0x2 - enabled" },
+        { address=0X0860, type="u32be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo bot commands address" },
+        { address=0X0864, type="u16be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="1st demo bot character" },
+        { address=0X0866, type="u16be", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="2nd demo bot character" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0004, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 kills on level" },
+        { address=0X0006, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 kills on level" },
+        { address=0X000C, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 level silver keys" },
+        { address=0X000E, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 level silver keys" },
+        { address=0X0B38, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level total enemies (stat screen)" },
+        { address=0X0B3A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level total kills (stat screen)" },
+        { address=0X0B3C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level total silver keys (stat screen)" },
+        { address=0X0B3E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level silver key collected (stat screen)" },
+        { address=0X0B44, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level pylons count (stat screen)" },
+        { address=0X0B48, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level available exits (stat screen)" },
+        { address=0X0B4A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level exits opened (stat screen)" },
+        { address=0X0B4C, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level completeon %" },
+        { address=0X410A, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 current weapon upgrade level" },
+        { address=0X4180, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 weapon upgrade level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X004C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 lives [hex -1] increased" },
+        { address=0X004C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 lives [hex -1] decreased" },
+        { address=0X004E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 lives [hex -1] increased" },
+        { address=0X004E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 lives [hex -1] decreased" },
+      },
+      health = {
+        { address=0X0AE8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Current max Health decreased" },
+        { address=0X0AE8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Current max Health increased" },
+        { address=0X0AEA, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 Health cap decreased" },
+        { address=0X0AEA, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 Health cap increased" },
+        { address=0X0B10, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Current max Health decreased" },
+        { address=0X0B10, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Current max Health increased" },
+        { address=0X0B12, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health cap decreased" },
+        { address=0X0B12, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health cap increased" },
+        { address=0X37C9, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 health decreased" },
+        { address=0X37C9, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 health increased" },
+        { address=0X4101, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 health decreased" },
+        { address=0X4101, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 health increased" },
+        { address=0X4177, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 health decreased" },
+        { address=0X4177, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 health increased" },
+        { address=0X715C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health upgrade cost decreased" },
+        { address=0X715C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health upgrade cost increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0AFA, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P1 Weapon upgrades available at shop" },
+        { address=0X0B06, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P1 Max weapon upgrade lvl" },
+        { address=0X0B08, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P1 Max weapon upgrade lvl available at shop" },
+        { address=0X0B22, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P2 Weapon upgrades available at shop" },
+        { address=0X0B2E, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P2 Max weapon upgrade lvl" },
+        { address=0X0B30, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P2 Max weapon upgrade lvl available at shop" },
+        { address=0X4103, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P1 attack type (weapon)" },
+        { address=0X4179, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="P2 attack type (weapon)" },
+        { address=0X716C, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon upgrade cost" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0044, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score (upper bits)" },
+        { address=0X0048, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score (upper bits)" },
+      },
+      collectibles = {
+        { address=0X0008, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 gold collected on level increased" },
+        { address=0X000A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 gold collected on level increased" },
+        { address=0X0010, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 level gold keys increased" },
+        { address=0X0012, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 level gold keys increased" },
+        { address=0X0046, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money P1 [16 bit] increased" },
+        { address=0X004A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money P2 [16 bit] increased" },
+        { address=0X03BE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Level number derived from password increased" },
+        { address=0X0960, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current level increased" },
+        { address=0X0AE4, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 money (at shop) increased" },
+        { address=0X0AE6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P1 money (at shop) increased" },
+        { address=0X0B0C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 money (at shop) increased" },
+        { address=0X0B0E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 money (at shop) increased" },
+        { address=0X0B34, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="level total gold (stat screen) increased" },
+        { address=0X0B36, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="level total gold collected (stat screen) increased" },
+        { address=0X0B40, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="level total gold keys (stat screen) increased" },
+        { address=0X0B42, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="level gold keys collected (stat screen) increased" },
+        { address=0X0B52, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="level gold collected (before split) increased" },
+        { address=0X0B54, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="gold given to P1 after stat screen increased" },
+        { address=0X0B56, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="gold given to P2 after stat screen increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X09A3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP bar 0x00 - Disabled, 0xff - Enabled" },
+        { address=0X383F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemy 2 health (Boss stats go here too)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0014, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P1 level pylons destroyed" },
+        { address=0X0016, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="P2 level pylons destroyed" },
+        { address=0X0018, type="u16be", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="P1 exit doors opened" },
+        { address=0X001A, type="u16be", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="P2 exit doors opened" },
+        { address=0X0927, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="some kind of switch" },
+        { address=0X0B46, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="level destroyed pylons (stat screen)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X085E, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Demo bot timer" },
+        { address=0X0958, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P1 ended level" },
+        { address=0X095A, type="u16be", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="P2 ended level" },
+      },
+    },
+  },
+}

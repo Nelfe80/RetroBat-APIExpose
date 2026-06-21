@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Drakkhen",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "drakkhen",
+    file = "drakkhen.zip",
+    hashes = {
+      { hash = "dbbf6ea2e52c988a1d519029ae4e731c", label = "Drakkhen (USA).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

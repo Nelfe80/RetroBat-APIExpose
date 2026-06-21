@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Kinnikuman: Muscle Generations",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kinnikuman-muscle-generations",
+    file = "kinnikuman-muscle-generations.zip",
+    hashes = {
+      { hash = "eed8bd36c5179ba73c302d203a84eed0", label = "Kinnikuman - Muscle Generations (Japan) (v1.02).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB1C9AC, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen = 0x01" },
+        { address=0XB60B94, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Not in Game/Not Paused" },
+        { address=0XB60B94, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X17C73AB, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x00=Title Screen" },
+      },
+      events = {
+        { address=0X17C6848, type="u8", condition="eq", value=0X02, action="COMBO_HIT", no_log=false, no_survey=false, desc="4D Killer Combo" },
+        { address=0X17C6848, type="u8", condition="eq", value=0X03, action="COMBO_HIT", no_log=false, no_survey=false, desc="Most Dangerous Combo" },
+        { address=0X17C6848, type="u8", condition="eq", value=0X05, action="COMBO_HIT", no_log=false, no_survey=false, desc="Chojin Master/Student Combo" },
+        { address=0X17C6848, type="u8", condition="eq", value=0X09, action="COMBO_HIT", no_log=false, no_survey=false, desc="Killer Game Combo" },
+        { address=0X17C6848, type="u8", condition="eq", value=0X0A, action="COMBO_HIT", no_log=false, no_survey=false, desc="Stray Devil Chojin Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9D666C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3 Special Used = 0x01" },
+        { address=0X17C6414, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XA57F1C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 HP decreased" },
+        { address=0XA57F1C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 HP increased" },
+        { address=0XA58AAC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 2 HP (1v1 - Opponent, 2v2 - 1st Slot's Partner) decreased" },
+        { address=0XA58AAC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 2 HP (1v1 - Opponent, 2v2 - 1st Slot's Partner) increased" },
+        { address=0XA5963C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 HP decreased" },
+        { address=0XA5963C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 HP increased" },
+        { address=0XA5A1CC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 HP decreased" },
+        { address=0XA5A1CC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X17C640C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stage increased" },
+      },
+    },
+  },
+}

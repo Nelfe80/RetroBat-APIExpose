@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tron: Deadly Discs",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "tron-deadly-discs",
+    file = "tron-deadly-discs.zip",
+    hashes = {
+      { hash = "a0ae3c350acb9b9bc51128011483d4be", label = "TRON Deadly Discs (USA, Europe).int" },
+    }
+  },
+
+  events = {
+  },
+}

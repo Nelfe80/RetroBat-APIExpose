@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Mega lo Mania",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "mega-lo-mania",
+    file = "mega-lo-mania.zip",
+    hashes = {
+      { hash = "34d8995fe25908757ad225b4d7a17581", label = "Mega lo Mania - Jikuu Daisenryaku (Japan).sfc" },
+      { hash = "7a67d33f2cfc8c284f772cb681c411a2", label = "Mega-lo-Mania (Europe) (En,Fr,De).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>joy8way</text>
+			<color>${blue}</color>
+		</text>
+		<text name="button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Button 2</text>
+			<color>${cyan}</color>
+		</text>
+		<text name="p2button1" extra="true">
+			<text>Button 1</text>
+			<color>${red}</color>
+		</text>
+		<text name="p2button2" extra="true">
+			<text>Button 2</text>
+			<color>${cyan}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 T.O  353600</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 T.A  212804</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 K.O  174001</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 K.K  122203</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 T.N  86300</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 S.T  77700</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 A.O  48601</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 Y.N  35000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 N.S  28500</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 AAA  22300</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 -!7 81600</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

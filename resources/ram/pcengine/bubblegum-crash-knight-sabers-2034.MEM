@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Bubblegum Crash!: Knight Sabers 2034",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "bubblegum-crash-knight-sabers-2034",
+    file = "bubblegum-crash-knight-sabers-2034.zip",
+    hashes = {
+      { hash = "4675116aa55dcf17f6311142d43808ec", label = "Bubblegum Crash! - Knight Sabers 2034 (Japan) (En) (v1.0) (Dave Shadoff, filler, Tomaitheous).pce" },
+      { hash = "8aa27a2cdc063b278e063166a168a307", label = "Bubblegum Crash! - Knight Sabers 2034 (Japan).pce" },
+    }
+  },
+
+  events = {
+  },
+}

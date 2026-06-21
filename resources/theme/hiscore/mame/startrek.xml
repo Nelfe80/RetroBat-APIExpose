@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 SLP 90625</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 MRB 87500</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 JDZ 84375</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 DCC 81250</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 CGW 78125</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 SRH 75000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 DWC 71875</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 JRP 68750</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 NSP 65625</text>
+		</text>
+	</view>
+</theme>

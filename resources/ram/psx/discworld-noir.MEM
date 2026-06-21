@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Discworld Noir",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "discworld-noir",
+    file = "discworld-noir.zip",
+    hashes = {
+      { hash = "2aa4faed80a4d4eeb0a6d8c6fae00340", label = "Discworld Noir (Europe) (En,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X91314, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo flag" },
+        { address=0X96C4C, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Subtitle Speed (00 - 64)" },
+        { address=0X96C54, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Display Subtitles (00 off, 01 on)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X115348, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act Number? (0x01-0x04) (Updates on regaining control, NOT on act card)" },
+        { address=0X1159AC, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Triggered Al Khali cutscene in Act II (Inverse)" },
+        { address=0X1159C8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Event Flag - Triggered Al Khali cutscene in Act II" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X115454, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Event Flag - Death spawned at Count" },
+        { address=0X115494, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Event Flag - Satrap dead" },
+        { address=0X11572C, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Event Flag - Notepad Clue - Dead Men's Pointy Boots" },
+        { address=0X115E30, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Event Flag - Met Death of Rats" },
+        { address=0X115E34, type="u32le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Event Flag - Met Death of Rats (Inverse)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1156C8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Event Flag - Notepad Clue - Sapphire's Money increased" },
+        { address=0X1156E8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Event Flag - Notepad Clue - Gold-Plated Jewel increased" },
+        { address=0X115748, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Event Flag - Notepad Clue - Sapphire's Money increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X115CB4, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Event Flag - Broken into Pier 5 (Inverse)" },
+        { address=0X115CB8, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Event Flag - Broken into Pier 5 (Inverse)" },
+      },
+    },
+  },
+}

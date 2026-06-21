@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Fire Emblem: Fuuin no Tsurugi [Subset - Trial Map Characters]",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "fire-emblem-fuuin-no-tsurugi-subset-trial-map-characters",
+    file = "fire-emblem-fuuin-no-tsurugi-subset-trial-map-characters.zip",
+    hashes = {
+      { hash = "630cade51d51c65f3646154ddcc007dc", label = "Fire Emblem - Fuuin no Tsurugi (Japan) (En) (v1.2.1) (Gringe) [Subset - Trial Map Characters].gba" },
+    }
+  },
+
+  events = {
+  },
+}

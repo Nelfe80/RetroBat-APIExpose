@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Hydlide",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hydlide",
+    file = "hydlide.zip",
+    hashes = {
+      { hash = "a62b04973732fed5038989c61b61bbbe", label = "Hydlide {V1 mode}.d88" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XFAAA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X10AAA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (pre-mkIISR)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFAE7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max LIFE increased" },
+        { address=0XFAE7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max LIFE decreased" },
+        { address=0XFAE8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIFE increased" },
+        { address=0XFAE8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIFE decreased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XFADF, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield of Justice" },
+      },
+    },
+  },
+}

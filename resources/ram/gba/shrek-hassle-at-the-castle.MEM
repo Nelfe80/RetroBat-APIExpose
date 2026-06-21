@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Shrek: Hassle at the Castle",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "shrek-hassle-at-the-castle",
+    file = "shrek-hassle-at-the-castle.zip",
+    hashes = {
+      { hash = "0af58674e0fef09ca529a0a27aecf17a", label = "Shrek - Hassle at the Castle (Europe) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "f986d79271e685679f0b5ecb673e9dea", label = "Shrek - Hassle at the Castle (USA) (En,Fr,De,Es,It,Nl).gba" },
+      { hash = "55515ba21dab2c4a3ff72a6e81a68f26", label = "Shrek - Hassle at the Castle (USA) (Ru) (v1.0) (MagicGame).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9A16, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="On" },
+        { address=0X9A17, type="u8", condition="eq", value=0X01, action="GAME_OVER", no_log=false, no_survey=false, desc="On" },
+        { address=0X9A98, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X9A98, type="u8", condition="eq", value=0X09, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X9A98, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9970, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Introduction Screen" },
+        { address=0X9970, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Select Level Off" },
+        { address=0X9970, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Select Level On" },
+        { address=0X9970, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Introduction Screen and Select Level Flag" },
+        { address=0X99F7, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Select Level" },
+        { address=0XAB9D, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1: 'Shrek's Swamp'" },
+        { address=0XAB9D, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2: 'The Road To Duloc'" },
+        { address=0XAB9D, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3: 'Duloc'" },
+        { address=0XAB9D, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 4: 'On The Way To The Dragon's Castle'" },
+        { address=0XAB9D, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5: 'Dragon's Castle'" },
+        { address=0XAB9D, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6: 'A Fork In The Road'" },
+        { address=0XAB9D, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7: 'Rescuing Princess Fiona'" },
+        { address=0XAB9D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Number Addresses" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X157D0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X157D0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X157D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+      collectibles = {
+        { address=0X157D1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X16F34, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Nope" },
+        { address=0X16F34, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="NPC" },
+        { address=0X16F34, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0404, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="On" },
+        { address=0X0404, type="u8", condition="eq", value=0XFF, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Reset Checkpoint" },
+      },
+    },
+  },
+}

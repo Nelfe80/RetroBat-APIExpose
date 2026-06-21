@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Frog Jump: Ordering Numbers",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "frog-jump-ordering-numbers",
+    file = "frog-jump-ordering-numbers.zip",
+    hashes = {
+      { hash = "f03195e9fac7e2d69bd94d0189eeb141", label = "Frog Jump- Ordering Numbers.woz" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X1F1E, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Lilypads jumped so far - player 1" },
+        { address=0X1F1F, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Lilypads jumped so far - player 2" },
+      },
+    },
+  },
+}

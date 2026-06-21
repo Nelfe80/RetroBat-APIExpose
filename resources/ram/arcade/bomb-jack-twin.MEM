@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Bomb Jack Twin",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "bomb-jack-twin",
+    file = "bomb-jack-twin.zip",
+    hashes = {
+      { hash = "3b0dcc4a156a52ad9abf82ee1fa240c0", label = "bjtwin.7z <Bombjack Twin (set 1)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9802, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of credits (max 0x09); still goes down in Free Play--loops back to 0x09 after losing a co" },
+        { address=0X9806, type="u8", condition="bit_true", bit=7, mask=0X80, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1 & Bit6 = 1 & Bit5 = 1 - 1P Free Play" },
+        { address=0X9806, type="u8", condition="bit_true", bit=4, mask=0X10, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="1 & Bit3 = 1 & Bit2 = 1 - 2P Free Play" },
+        { address=0X9850, type="u16le", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Countdown for continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X186A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of bombs collected in current round by 1P; 0x18 total in each round" },
+        { address=0X186C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total number of Fire Bombs collected in the current Round by 1P (Max: 0x17)" },
+        { address=0X196A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of bombs collected in current round by 2P; 0x18 total in each round" },
+        { address=0X196C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Total number of Fire Bombs collected in the current Round by 2P (Max: 0x17)" },
+        { address=0X9820, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level in arcade run; starts at 0x00 and changing this changes the next level" },
+        { address=0X9822, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Current 'loop'; this starts at 0x00 and goes up by 0x01 every 20 rounds cleared" },
+        { address=0X9892, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16-bit BCD] Seconds left in bonus round (fixed 1decimal point)" },
+        { address=0X9895, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit BCD] Current round in 'loop'; goes up to 20 and then rolls back to 0 and counts up again" },
+      },
+      stage = {
+        { address=0X9894, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current stage in Round; 0x90 when bonus" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1836, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives 1P increased" },
+        { address=0X1836, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives 1P decreased" },
+        { address=0X1936, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives 2P increased" },
+        { address=0X1936, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives 2P decreased" },
+        { address=0X9807, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 & Bit7 = 1 - 1 life" },
+        { address=0X9848, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Round that the last death was on; starts at 0x00 when starting a new game and will change to 0x0" },
+        { address=0X9878, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Progress towards extra life; goes up every time an enemy is killed and will spawn a life if the" },
+        { address=0X9878, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Progress towards extra life; goes up every time an enemy is killed and will spawn a life if the" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X9872, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Progress towards 'P' power-up spawn" },
+        { address=0XF104C, type="u32be", condition="change", action="TREASURE", color="orange", min=1000, max=1000, no_log=false, no_survey=false, desc="Score delta 1000-1000: Bonus Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="TREASURE", color="white", min=5000, max=5000, no_log=false, no_survey=false, desc="Score delta 5000-5000: Special Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="TREASURE", color="white", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Milestones" },
+        { address=0XF104C, type="u32be", condition="change", action="TREASURE", color="white", min=20000, max=20000, no_log=false, no_survey=false, desc="Score delta 20000-20000: Score 20000" },
+        { address=0XF104C, type="u32be", condition="change", action="TREASURE", color="white", min=30000, max=30000, no_log=false, no_survey=false, desc="Score delta 30000-30000: Score 30000" },
+        { address=0XF104C, type="u32be", condition="change", action="TREASURE", color="white", min=50000, max=50000, no_log=false, no_survey=false, desc="Score delta 50000-50000: Score 50000" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X184C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] 1P Score - leftmost 4 digits - xxxx0000; multiply by 10,000 and add to 0x00184e" },
+        { address=0X184E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] 1P Score - rightmost 4 digits - 0000xxxx; add to (0x00184c * 10,000)" },
+        { address=0X194C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] 2P Score - leftmost 4 digits - xxxx0000; multiply by 10,000 and add to 0x00194e" },
+        { address=0X194E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] 2P Score - rightmost 4 digits - 0000xxxx; add to (0x00194c * 10,000)" },
+        { address=0X9844, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] High Score - leftmost 4 digits - xxxx0000; multiply by 10,000 and add to 0x9846" },
+        { address=0X9846, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] High Score - rightmost 4 digits - 0000xxxx; add to (0x9844 * 10,000)" },
+        { address=0X9876, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="'P' color; higher the value, the more points it's worth" },
+        { address=0X988C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Enemy combo while under 'P' power-up; resets to 0x00 when next 'P' power-up is collected" },
+        { address=0X9900, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] High Score leaderboard #1 - leftmost 4 digits - xxxx0000; multiply by 10,000 and ad" },
+        { address=0X9902, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] High Score leaderboard #1 - rightmost 4 digits - 0000xxxx; add to (0x9900 * 10,000)" },
+        { address=0X9904, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[8-bit BCD] High Score leaderboard #1 - Round reached" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="white", min=10, max=10, no_log=false, no_survey=false, desc="Score delta 10-10: Jump Jump" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="white", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Single Bomb,Blue Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="red", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Red Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="pink", min=300, max=300, no_log=false, no_survey=false, desc="Score delta 300-300: Pink Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="green", min=500, max=500, no_log=false, no_survey=false, desc="Score delta 500-500: Green Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=800, max=800, no_log=false, no_survey=false, desc="Score delta 800-800: Aqua Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="yellow", min=1200, max=1200, no_log=false, no_survey=false, desc="Score delta 1200-1200: Yellow Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="white", min=2000, max=2000, no_log=false, no_survey=false, desc="Score delta 2000-2000: Gray Coin" },
+        { address=0XF104C, type="u32be", condition="change", action="SCORE_STATE", color="white", min=3000, max=3000, no_log=false, no_survey=false, desc="Score delta 3000-3000: Extra Coin" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9807, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1 & Bit5 = 0 - Easy" },
+      },
+    },
+  },
+}

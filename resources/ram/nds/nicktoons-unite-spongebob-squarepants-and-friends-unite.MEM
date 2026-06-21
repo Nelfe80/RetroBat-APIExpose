@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Nicktoons Unite! | SpongeBob SquarePants and Friends: Unite!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nicktoons-unite-spongebob-squarepants-and-friends-unite",
+    file = "nicktoons-unite-spongebob-squarepants-and-friends-unite.zip",
+    hashes = {
+      { hash = "bbe92d8ff8c93b8ac0069b088078e9a1", label = "SpongeBob SquarePants and Friends Unite! (Europe) (En,Fr,De,Es,Nl).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF26D8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fenton House (Level 1) Homework books" },
+        { address=0XF2C78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tracks levels beaten, from 0x00 to 0x0c (12 levels total)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD5A70, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Danny Phantoms HP Bar decreased" },
+        { address=0XD5A70, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Danny Phantoms HP Bar increased" },
+        { address=0XD5A94, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jimmy Neutron HP Bar decreased" },
+        { address=0XD5A94, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jimmy Neutron HP Bar increased" },
+        { address=0XD5AB8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Spongebob Squarepants HP Bar decreased" },
+        { address=0XD5AB8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Spongebob Squarepants HP Bar increased" },
+        { address=0XD5ADC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Timmy Turner HP Bar decreased" },
+        { address=0XD5ADC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Timmy Turner HP Bar increased" },
+        { address=0XEDFAC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Character's Health Bar decreased" },
+        { address=0XEDFAC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Character's Health Bar increased" },
+      },
+    },
+  },
+}

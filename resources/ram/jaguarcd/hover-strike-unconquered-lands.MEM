@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hover Strike: Unconquered Lands",
+    system = "jaguarcd",
+    system_name = "Atari Jaguar CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hover-strike-unconquered-lands",
+    file = "hover-strike-unconquered-lands.zip",
+    hashes = {
+      { hash = "3d9b6d476c08c214ed1821d77b9c2e39", label = "Hover Strike - Unconquered Lands (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

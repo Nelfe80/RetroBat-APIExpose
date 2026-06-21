@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mighty Beanz: Pocket Puzzles",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "mighty-beanz-pocket-puzzles",
+    file = "mighty-beanz-pocket-puzzles.zip",
+    hashes = {
+      { hash = "66e896522a91ecd1e45fde5e93920bf7", label = "Mighty Beanz - Pocket Puzzles (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

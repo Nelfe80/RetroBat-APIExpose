@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Cribbage",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cribbage",
+    file = "cribbage.zip",
+    hashes = {
+      { hash = "79e22c663acf649ff3c4e3ce6af765c3", label = "Cribbage (World) (v1.02).hex" },
+    }
+  },
+
+  events = {
+  },
+}

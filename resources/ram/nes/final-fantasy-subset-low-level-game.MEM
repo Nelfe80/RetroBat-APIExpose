@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Final Fantasy [Subset - Low Level Game]",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "final-fantasy-subset-low-level-game",
+    file = "final-fantasy-subset-low-level-game.zip",
+    hashes = {
+      { hash = "9279b3a2d2f6c17b8d2160d82e621e36", label = "Final Fantasy (USA) [Subset - Low Level Challenge].nes" },
+    }
+  },
+
+  events = {
+  },
+}

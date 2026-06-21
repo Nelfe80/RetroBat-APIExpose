@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Cattle Quest",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cattle-quest",
+    file = "cattle-quest.zip",
+    hashes = {
+      { hash = "a3e5f1a0fbfef7d05f93fd762585aaf1", label = "Cattle Quest (World).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0AA3, type="u16le", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[16 bit] Changes while on Game Over screen, is constant value otherwise." },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X01DA, type="u16le", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="farthest left" },
+        { address=0X01DA, type="u16le", condition="eq", value=0X10127, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="farthest right" },
+        { address=0X01DA, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 bit] Player shot location on stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0340, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 bit] Player lives remaining, 0 to 2, counts down increased" },
+        { address=0X0340, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 bit] Player lives remaining, 0 to 2, counts down decreased" },
+      },
+      health = {
+        { address=0X0342, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 bit] Tractor beam energy, 0 to 500, counts down decreased" },
+        { address=0X0342, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 bit] Tractor beam energy, 0 to 500, counts down increased" },
+      },
+    },
+  },
+}

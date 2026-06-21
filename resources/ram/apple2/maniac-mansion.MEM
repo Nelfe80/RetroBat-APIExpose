@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Maniac Mansion",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "maniac-mansion",
+    file = "maniac-mansion.zip",
+    hashes = {
+      { hash = "18ec40ab05a0a4b6a9344ed5ab398f20", label = "Maniac Mansion side A.woz" },
+      { hash = "296a70f4211395db9dde69552bf381d7", label = "Maniac Mansion (4am crack) side A.dsk" },
+      { hash = "394d0b39eb51ee850c45c31591f1bc7c", label = "Maniac Mansion (1987)(LFL)(Side A)[a].dsk" },
+      { hash = "6d3e9a44861d2e34df5e081eca2d72b3", label = "Maniac Mansion (Lucasfilm 1987) Side 1 (Cracked with Computist).dsk" },
+      { hash = "fa971de45d11f586136d12adda9cfc3f", label = "Maniac Mansion side B.woz" },
+      { hash = "fd7e3593570af7bcbfbfd030063849d2", label = "Maniac Mansion (1987)(LFL)(Side B).dsk" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X09DD, type="u16le", condition="eq", value=0X2D, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X09E6, type="u32le", condition="eq", value=0X34, action="DEMO_MODE", no_log=false, no_survey=false, desc="Green Tentacle's Demo Tape" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0A35, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Bit 1 - Light Switch, Nuclear Reactor Room/Clinic?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0980, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead Cousin Ted - Current Room" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0894, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Interacting Object ID?" },
+        { address=0X09E6, type="u32le", condition="eq", value=0X2C, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Record" },
+        { address=0X0A01, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Seckrit Lab Inner Door Code - First Number" },
+        { address=0X0A02, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Seckrit Lab Inner Door Code - Second Number" },
+        { address=0X0A03, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Seckrit Lab Inner Door Code - Third Number" },
+        { address=0X0A04, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Seckrit Lab Inner Door Code - Fourth Number" },
+      },
+    },
+  },
+}

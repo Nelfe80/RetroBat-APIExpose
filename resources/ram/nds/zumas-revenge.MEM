@@ -1,0 +1,107 @@
+return {
+  game = {
+    title = "Zuma's Revenge",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "zumas-revenge",
+    file = "zumas-revenge.zip",
+    hashes = {
+      { hash = "cbca9974e4795e31435e1b57c877805f", label = "Zuma's Revenge! (DSiware) (Europe, Australia) (En)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XF2A3C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Max combo" },
+        { address=0X2A4F05, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Largest Combo - Blitz - Profile 1" },
+        { address=0X2A4FD9, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Largest Combo - Profile 1" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF2A40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Max chain on current level" },
+        { address=0XF2A54, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus - above 0 only if player aced level" },
+        { address=0XF2A5C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Perfect level bonus" },
+        { address=0XF2A6C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X2A4C2E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Aced - Adventure - Profile 1" },
+        { address=0X2A4F1A, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Total waves cleared - Astro - Profile 1" },
+        { address=0X2A5056, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Aced - Profile 2" },
+        { address=0X2B0C3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of gaps - current level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2A4C2C, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Deaths - Adventure - Profile 1" },
+        { address=0X2A4CC6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X2A4CC6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X2A5016, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deaths after Zuma - Profile 1" },
+        { address=0X2A5054, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Numebr of deaths - Profile 2" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X2A4F14, type="u16le", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Powerup Landed - Astro - Profile 1" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XF2A58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points this level" },
+        { address=0XF2A60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total points - updates upon completing level" },
+        { address=0X2A4C28, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best score - Adventure - Profile 1" },
+        { address=0X2A4F38, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score - Blitz - Profile 1" },
+        { address=0X2A4F54, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score - Astro - Profile 1" },
+        { address=0X2A4FDA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Largest Gap Score - Profile 1" },
+        { address=0X2A5000, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Combo bonus points - Profile 1" },
+        { address=0X2A5004, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Chain bonus points - Profile 1" },
+        { address=0X2A5008, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Gap shot points - Profile 1" },
+        { address=0X2A500C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Powerup points - Profile 1" },
+        { address=0X2A5050, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Best Score - Profile 2" },
+        { address=0X2B0C80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - current level" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X2A4F1C, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Random ball landed - Boss - Profile 1" },
+        { address=0X2A4F1E, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Challenge condition achieved - Boss - Profile 1" },
+        { address=0X2A4F20, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Ace condition achieved - Boss - Profile 1" },
+        { address=0X2A5B1A, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Goes to 0xffff when frog is hit by boss attacks" },
+        { address=0X2A5B2A, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Goes to 0xffff when frog is hit by boss attacks" },
+        { address=0X2CEA40, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health - Kahtiki Khan" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF11F8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Active save block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF2A4C, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Ace time - only updates upon completion of level" },
+        { address=0XF2A50, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Current time - populates once level completed" },
+        { address=0X2A4F7E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Astro Stage 1 has been played - Profile 1" },
+        { address=0X2A4F80, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Astro Stage 2 has been played - Profile 1" },
+        { address=0X2A4F82, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Astro Stage 3 has been played - Profile 1" },
+        { address=0X2A4F84, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Astro Stage 4 has been played - Profile 1" },
+        { address=0X2A4F86, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times Astro Stage 5 has been played - Profile 1" },
+        { address=0X2A4F88, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Numnber of times boss challenge 1 has been played - Profile 1" },
+        { address=0X2A4F8A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Numnber of times boss challenge 2 has been played - Profile 1" },
+        { address=0X2A4F8C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Numnber of times boss challenge 3 has been played - Profile 1" },
+        { address=0X2A4F8E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Numnber of times boss challenge 4 has been played - Profile 1" },
+        { address=0X2A4F90, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times boss 5 challenge has been played - Profile 1" },
+        { address=0X2A4F92, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Numnber of times boss challenge 6 has been played - Profile 1" },
+        { address=0X2A4FF0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times bomb was used - Profile 1" },
+        { address=0X2A4FF2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times accuracy was used - Profile 1" },
+        { address=0X2A4FF4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times rewind was used - Profile 1" },
+        { address=0X2A4FF6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times slowdown was used - Profile 1" },
+        { address=0X2A4FF8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times lightning was used - Profile 1" },
+        { address=0X2A4FFA, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times tri shot was used - Profile 1" },
+        { address=0X2A4FFC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times laser was used - Profile 1" },
+      },
+    },
+  },
+}

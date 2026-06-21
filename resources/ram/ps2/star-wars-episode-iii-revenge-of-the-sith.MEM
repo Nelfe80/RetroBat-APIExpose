@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Star Wars - Episode III: Revenge of the Sith",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "star-wars-episode-iii-revenge-of-the-sith",
+    file = "star-wars-episode-iii-revenge-of-the-sith.zip",
+    hashes = {
+      { hash = "5a3ffeaaea273476859bd2972e12cbd0", label = "Star Wars - Episode III - Revenge of the Sith (USA)" },
+      { hash = "779c009ac9b35ecde046b55ba6d01114", label = "Star Wars - Episode III - Revenge of the Sith (Europe) (En,Es,It)" },
+      { hash = "5f9d72492608640de163de9b9055b6f9", label = "Star Wars - Episode III - Die Rache der Sith (Germany)" },
+      { hash = "fd9f563cd09b421792bf95d2b0137e07", label = "Star Wars - Episode III - La Revanche des Sith (France)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1AF880, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9947A1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unlimited Health (US, Story Mission) decreased" },
+        { address=0X9947A1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unlimited Health (US, Story Mission) increased" },
+        { address=0X994821, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Unlimited Health (PAL, Story Mission) decreased" },
+        { address=0X994821, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Unlimited Health (PAL, Story Mission) increased" },
+      },
+    },
+  },
+}

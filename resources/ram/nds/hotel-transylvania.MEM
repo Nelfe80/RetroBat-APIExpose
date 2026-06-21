@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Hotel Transylvania",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "hotel-transylvania",
+    file = "hotel-transylvania.zip",
+    hashes = {
+      { hash = "fbab3ac3d907e67dfebba82fadbc1f47", label = "Hotel Transylvania (Europe) (En,Fr,Nl).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XAC47A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Flag, File 1" },
+        { address=0XAC49E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Flag, File 2" },
+        { address=0XAC4C2, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game Clear Flag, File 3" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X139C04, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current HP (only during main game) increased" },
+        { address=0X139C08, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Max HP (only during main game) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X139AF0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Related" },
+      },
+    },
+  },
+}

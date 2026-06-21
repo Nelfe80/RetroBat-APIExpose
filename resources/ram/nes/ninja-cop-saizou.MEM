@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Ninja Cop Saizou",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ninja-cop-saizou",
+    file = "ninja-cop-saizou.zip",
+    hashes = {
+      { hash = "7fa6ecf88c4fe3aabff4de248a9e7435", label = "Ninja Cop Saizou (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X003C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo (1) - Game (2)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X054A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0X055E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0225, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life bar increased" },
+        { address=0X0225, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life bar decreased" },
+        { address=0X0547, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current lives increased" },
+        { address=0X0547, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current lives decreased" },
+      },
+      health = {
+        { address=0X0223, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health decreased" },
+        { address=0X0223, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X05A2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+        { address=0X06D8, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss explodes (22)" },
+      },
+    },
+  },
+}

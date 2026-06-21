@@ -1,0 +1,133 @@
+return {
+  game = {
+    title = "SpongeBob's Truth or Square",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "spongebobs-truth-or-square",
+    file = "spongebobs-truth-or-square.zip",
+    hashes = {
+      { hash = "020f70d9459aab23dc17dc17ae549956", label = "Nickelodeon SpongeBob's Truth or Square (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD9EDA4, type="u32le", condition="eq", value=0X31304C53, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="SL01_bgm (Titlescreen)" },
+        { address=0XDAFB9C, type="u8", condition="eq", value=0X03, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD88748, type="u32le", condition="eq", value=0X00627568, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Home Sweet Home!!" },
+        { address=0XD88748, type="u32le", condition="eq", value=0X31306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fun times jellyfishing with Patrick." },
+        { address=0XD88748, type="u32le", condition="eq", value=0X31626273, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pretending to be tuff with Patrick." },
+        { address=0XD88748, type="u32le", condition="eq", value=0X32306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Meeting Sandy Cheeks!" },
+        { address=0XD88748, type="u32le", condition="eq", value=0X32626273, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Squidward's first yummy Krabby Patty." },
+        { address=0XD88748, type="u32le", condition="eq", value=0X33306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bikini Bottom" },
+        { address=0XD88748, type="u32le", condition="eq", value=0X33626273, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hey that's not your formula Plankton!" },
+        { address=0XD88748, type="u32le", condition="eq", value=0X34306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Becoming a FRY COOK!!!" },
+        { address=0XD88748, type="u32le", condition="eq", value=0X35306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Santa! Santa!! SANTA!!!" },
+        { address=0XD88748, type="u32le", condition="eq", value=0X36306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Meeting Mermaidman and Barnacleboy!" },
+        { address=0XD88748, type="u32le", condition="eq", value=0X37306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="24 hours of Fun at the Krusty Krab with Squidward." },
+        { address=0XD88748, type="u32le", condition="eq", value=0X38306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kara-TAY with Sandy!" },
+        { address=0XD88748, type="u32le", condition="eq", value=0X39306C73, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Krusty Krab" },
+        { address=0XD88748, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Level ID" },
+        { address=0XD888A4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Number Of Enemies Defeated In Current Level" },
+        { address=0XDB0F88, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32bit] Check Please - Player 1 Goals Stat" },
+      },
+      stage = {
+        { address=0XD88930, type="u32le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="False" },
+        { address=0XD88930, type="u32le", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="True" },
+        { address=0XD88930, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32bit] Cheat Active - All Worlds" },
+        { address=0XD9EDA4, type="u32le", condition="eq", value=0X6F6D656, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="memobj_m (Level Victory)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD88898, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[32bit] Lives increased" },
+        { address=0XD88898, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[32bit] Lives decreased" },
+        { address=0XE5CCFC, type="u32le", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Losing A Life" },
+      },
+      health = {
+        { address=0XD88914, type="u32le", condition="eq", value=0X05, action="HEALTH_STATE", no_log=true, no_survey=false, desc="All Health Upgrades Purchased" },
+        { address=0XD88914, type="u32le", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="[32bit] Max Health (Number Of Pants)" },
+        { address=0X14C1458, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 1 Health decreased" },
+        { address=0X14C1458, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 1 Health increased" },
+        { address=0X14C14F0, type="u32le", condition="change", action="HIT", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 1 Total Damage" },
+        { address=0X14C1644, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 2 Health decreased" },
+        { address=0X14C1644, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 2 Health increased" },
+        { address=0X14C1830, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 3 Health decreased" },
+        { address=0X14C1830, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 3 Health increased" },
+        { address=0X14C1A1C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 4 Health decreased" },
+        { address=0X14C1A1C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Incoming!! - Player 4 Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD8889C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Happiness Points" },
+        { address=0XD888A0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Happiness Points Collected In Current Level" },
+        { address=0XD99B98, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Collide & Conch-Er Player 1 Score" },
+        { address=0XD99B9C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Collide & Conch-Er Player 2 Score" },
+        { address=0XD99BA0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Collide & Conch-Er Player 3 Score" },
+        { address=0XD99BA4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Collide & Conch-Er Player 4 Score" },
+        { address=0XDB08D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Check Please - Red Team Total Score" },
+        { address=0XDB08D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Check Please - Blue Team Total Score" },
+        { address=0XDB219C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Check Please - Red Team 1st Period Score" },
+        { address=0XDB21A0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Check Please - Blue Team 1st Period Score" },
+        { address=0XDB21A4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Check Please - Red Team 2nd Period Score" },
+        { address=0XDB21A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Check Please - Blue Team 2nd Period Score" },
+        { address=0XDB21B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Check Please - Red Team Overtime Score" },
+        { address=0XDB21B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Check Please - Blue Team Overtime Score" },
+      },
+      collectibles = {
+        { address=0XD888AC, type="u8", condition="bit_true", bit=5, mask=0X20, action="COIN_GAIN", no_log=false, no_survey=false, desc="Mermaidman & Barnacleboy's Ring Box" },
+        { address=0XD888AD, type="u8", condition="bit_true", bit=5, mask=0X20, action="COIN_GAIN", no_log=false, no_survey=false, desc="The BFF Ring" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDE74EC, type="u32le", condition="eq", value=0X00, action="JUMPING", no_log=true, no_survey=false, desc="False" },
+        { address=0XDE74EC, type="u32le", condition="eq", value=0X03, action="JUMPING", no_log=true, no_survey=false, desc="True" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD888AB, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Magic Conch Shell" },
+        { address=0XD888AB, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Heart-Shaped Acorn" },
+        { address=0XD888AB, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Mop" },
+        { address=0XD888AB, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Squidwards Clarinet" },
+        { address=0XD888AB, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Donut Of Shame" },
+        { address=0XD888AB, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Golden Spatula" },
+        { address=0XD888AB, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The #1 Soda Drinkin' Hat" },
+        { address=0XD888AB, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Snellie's Pet Carrier" },
+        { address=0XD888AC, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="A Toy Clarinet" },
+        { address=0XD888AC, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Paint Palette" },
+        { address=0XD888AC, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bellybutton Lint Earnmuffs" },
+        { address=0XD888AC, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Aquaphone" },
+        { address=0XD888AC, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mermaidman's Utility Belt" },
+        { address=0XD888AC, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="A 24-Hour Sign" },
+        { address=0XD888AC, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Patricks Alarm Clock" },
+        { address=0XD888AD, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Mr. Krabs First Dollar" },
+        { address=0XD888AD, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Karate Gloves" },
+        { address=0XD888AD, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Picnic Basket" },
+        { address=0XD888AD, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Volcano Hot Sauce" },
+        { address=0XD888AD, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Cashie" },
+        { address=0XD888AD, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Squidward's Blow Horn" },
+        { address=0XD888AD, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hot Dog" },
+        { address=0XD888AE, type="u8", condition="bit_true", bit=0, mask=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Krabby Patty" },
+        { address=0XD888AE, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="The Secret Recipe" },
+        { address=0XD888AE, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Fun times jellyfishing with Patrick." },
+        { address=0XD888AE, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Meeting Sandy Cheeks!" },
+        { address=0XD888AE, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bikini Bottom" },
+        { address=0XD888AE, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Becoming a FRY COOK!!!" },
+        { address=0XD888AE, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Santa! Santa!! SANTA!!!" },
+        { address=0XD888AE, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Meeting Mermaidman and Barnacleboy!" },
+      },
+    },
+  },
+}

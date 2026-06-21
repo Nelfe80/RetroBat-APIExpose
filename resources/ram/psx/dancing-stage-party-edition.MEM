@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "Dancing Stage: Party Edition",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dancing-stage-party-edition",
+    file = "dancing-stage-party-edition.zip",
+    hashes = {
+      { hash = "4c904e07b7e234c38544ede4141b27fb", label = "Dancing Stage - Party Edition (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC1838, type="u8", condition="eq", value=0X19, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XC1838, type="u8", condition="eq", value=0X22, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XC1838, type="u8", condition="eq", value=0X23, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XC1838, type="u8", condition="eq", value=0X3A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XE43CD, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[8 Bit] Options - Game Over" },
+      },
+      events = {
+        { address=0XC18D4, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P1 Max Combo" },
+        { address=0XC2B38, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32 Bit] P2 Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XE43A8, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[16 Bit] Amount of clears" },
+        { address=0XE43C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Options - Game Level" },
+        { address=0XE441C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - .59 - Amount of clears" },
+        { address=0XE4474, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - ABSOLUTE - Amount of clears" },
+        { address=0XE4524, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - AFRONOVA PRIMEVAL - Amount of clears" },
+        { address=0XE457C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - AFTER THE GAME - Amount of clears" },
+        { address=0XE45D4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - AM-3P (303 BASS MIX) - Amount of clears" },
+        { address=0XE462C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - B4U - Amount of clears" },
+        { address=0XE4684, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - BABY BABY GIMME YOUR LOVE - Amount of clears" },
+        { address=0XE46DC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - BRILLIANT 2U - Amount of clears" },
+        { address=0XE4734, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - BURNIN' THE FLOOR - Amount of clears" },
+        { address=0XE478C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - CAN'T GET YOU OUT OF MY HEAD - Amount of clears" },
+        { address=0XE47E4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - CAN'T STOP FALLIN' IN LOVE - Amount of clears" },
+        { address=0XE483C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - CELEBRATE NITE - Amount of clears" },
+        { address=0XE4894, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - CUTIE CHASER - Amount of clears" },
+        { address=0XE48EC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - DEAD END - Amount of clears" },
+        { address=0XE4944, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - Do It Right - Amount of clears" },
+        { address=0XE499C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - Don't Stop! (AMD 2nd MIX) - Amount of clears" },
+        { address=0XE49F4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - Don't Stop Movin' - Amount of clears" },
+        { address=0XE4A4C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - DROP OUT - Amount of clears" },
+        { address=0XE4AA4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - DROP THE BOMB - Amount of clears" },
+        { address=0XE4AFC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - DXY! - Amount of clears" },
+        { address=0XE4B54, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - DYNAMITE RAVE - Amount of clears" },
+        { address=0XE4BAC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - END OF THE CENTURY - Amount of clears" },
+        { address=0XE4C04, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - era (nostalmix) - Amount of clears" },
+        { address=0XE4C5C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - GROOVE - Amount of clears" },
+        { address=0XE4CB4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - Healing Vision - Amount of clears" },
+        { address=0XE4D0C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - HIGHER - Amount of clears" },
+        { address=0XE4D64, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - Holic- Amount of clears" },
+        { address=0XE4DBC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - HYSTERIA - Amount of clears" },
+        { address=0XE4E14, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - La Señorita Virtual - Amount of clears" },
+        { address=0XE4E6C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - LEADING CYBER - Amount of clears" },
+        { address=0XE4EC4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - Let the beat hit em! (CLASSIC R&B STYLE) - Amount of clears" },
+        { address=0XE4F1C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - LET THEM MOVE - Amount of clears" },
+        { address=0XE4F74, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - Look To The Sky - Amount of clears" },
+        { address=0XE4FCC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - LUV TO ME (AMD MIX) - Amount of clears" },
+        { address=0XE5024, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - MAKE A JAM! - Amount of clears" },
+        { address=0XE507C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - MAKE IT BETTER (So-REAL Mix) - Amount of clears" },
+        { address=0XE50D4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - Make Your Move - Amount of clears" },
+        { address=0XE512C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - MATSURI JAPAN - Amount of clears" },
+        { address=0XE5184, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - MY FAVOURITE GAME - Amount of clears" },
+        { address=0XE51DC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - ON THE JAZZ - Amount of clears" },
+        { address=0XE5234, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - ORION.78 (AMeuro-MIX) - Amount of clears" },
+        { address=0XE528C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - PARANOiA - Amount of clears" },
+        { address=0XE52E4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - PARANOiA Rebirth - Amount of clears" },
+        { address=0XE533C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - patsenner - Amount of clears" },
+        { address=0XE5394, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - R3 - Amount of clears" },
+        { address=0XE53EC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - SUPER STAR - Amount of clears" },
+        { address=0XE5444, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - THE BAD TOUCH - Amount of clears" },
+        { address=0XE549C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - think ya better D - Amount of clears" },
+        { address=0XE54F4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - TRIP MACHINE (luv mix) - Amount of clears" },
+        { address=0XE554C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - WILD RUSH - Amount of clears" },
+        { address=0XE55A4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Records - YOU GOT THE LOVE - Amount of clears" },
+      },
+      stage = {
+        { address=0XC1844, type="u16le", condition="eq", value=0XFFFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In the menu/End" },
+        { address=0XC1844, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Current Stage" },
+        { address=0XE43C9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Options - Number of stages" },
+        { address=0XE43CB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Options - Number of stages (Nonstop)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC1852, type="u16le", condition="eq", value=0X09, action="LOSE_LIFE", no_log=false, no_survey=false, desc="DEAD END" },
+      },
+      health = {
+        { address=0XE43DE, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Options - Damage Display" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC1864, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Visual Current Score" },
+        { address=0XC1868, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Previous Score" },
+        { address=0XC186C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Current Score" },
+        { address=0XC2AC8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Visual Current Score" },
+        { address=0XC2ACC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Previous Score" },
+        { address=0XC2AD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Current Score" },
+        { address=0XE5478, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Records - think ya better D - Single - Basic - Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE43CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Time Limit" },
+        { address=0XE43EA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Options - Time/Stage Display" },
+      },
+    },
+  },
+}

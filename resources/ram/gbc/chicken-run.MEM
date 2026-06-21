@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Chicken Run",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "chicken-run",
+    file = "chicken-run.zip",
+    hashes = {
+      { hash = "bda8c4e5e18070924261823e5fca655c", label = "Chicken Run (USA, Europe) (En,Fr,De,Es,It).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XC01A, type="u24le", condition="eq", value=0X19, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="end game sequence" },
+        { address=0XC01A, type="u24le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="level id - last stage=24" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC1FB, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time on Continue Screen" },
+      },
+    },
+  },
+}

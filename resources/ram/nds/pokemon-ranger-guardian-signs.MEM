@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Pokémon Ranger: Guardian Signs",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-ranger-guardian-signs",
+    file = "pokemon-ranger-guardian-signs.zip",
+    hashes = {
+      { hash = "a3a696ab8d189c3be6676e4776c2a3db", label = "Pokemon Ranger - Guardian Signs (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB58A4, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Quest Clear Pop Up!" },
+        { address=0XB58A8, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Almost Finished" },
+        { address=0X328BBD, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0X328BBD, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="New" },
+        { address=0X328BBD, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Read" },
+        { address=0X328BBE, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0X328BBE, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="New" },
+        { address=0X328BBE, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Read" },
+        { address=0X328BD4, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0X328BD4, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="New" },
+        { address=0X328BD4, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Read" },
+        { address=0X328BD4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Glossary Flags: Capture - Styler Level" },
+        { address=0X328C84, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Glossary - Ranger Union [GameZone Save]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD18B8, type="u8", condition="eq", value=0XE5D00009, action="HIT", no_log=false, no_survey=false, desc="Deactivated" },
+        { address=0XD18B8, type="u8", condition="eq", value=0XE5D0000A, action="HIT", no_log=false, no_survey=false, desc="Activated" },
+        { address=0XF0074, type="u8", condition="eq", value=0XE1D013B6, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Deactivated" },
+        { address=0XF0074, type="u8", condition="eq", value=0XE3A01A00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Activated" },
+        { address=0XF0074, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Pokémon Health doesn't recover" },
+        { address=0X1C470C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Health (GUI) decreased" },
+        { address=0X1C470C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Health (GUI) increased" },
+        { address=0X328BD1, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Hidden" },
+        { address=0X328BD1, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="New" },
+        { address=0X328BD1, type="u8", condition="eq", value=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Read" },
+        { address=0X328BD1, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[8bit] Glossary Flags: Capture - Styler Energy" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X328BAD, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Glossary Flags: Term - Stone of Time" },
+      },
+    },
+  },
+}

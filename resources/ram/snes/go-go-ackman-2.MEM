@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Go Go Ackman 2",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "go-go-ackman-2",
+    file = "go-go-ackman-2.zip",
+    hashes = {
+      { hash = "b835e0f37a804887c6041a6452a51b78", label = "Go Go Ackman 2 (Japan).sfc" },
+      { hash = "be2b1feb87a9f88db4249654fdb008da", label = "Go Go Ackman 2 (Japan) (En) (v1.0b) (Retroman_X).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X005E, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Some value that may be useful for title screen" },
+        { address=0X013E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo 80?" },
+        { address=0X0675, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue 3 Not Stable" },
+        { address=0X081B, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Related Screen 4 Not Stable" },
+        { address=0X0B82, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="3=Mini Demon in Attack Mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0063, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level?" },
+        { address=0X01E2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - Level: 0=Normal, 1=Easy" },
+        { address=0X1CE1, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="40 Stage clear ind" },
+        { address=0X1CE3, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01 Stage clear ind" },
+        { address=0X1CE4, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="01 Stage Clear Ind" },
+      },
+      stage = {
+        { address=0X0132, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Some Stage Phase Ind" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0124, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0124, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0120, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X0120, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0X0122, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max Health decreased" },
+        { address=0X0122, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1B58, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Inv Powerup" },
+      },
+      weapon = {
+        { address=0X0112, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon?" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0922, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss HP" },
+        { address=0X1322, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mid Boss 2 Health" },
+        { address=0X13A2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mid Boss 1 Milirary HP" },
+        { address=0X1C82, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="1st Boss HP" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Tane o Maku Tori",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "tane-o-maku-tori",
+    file = "tane-o-maku-tori.zip",
+    hashes = {
+      { hash = "e39e90944a683b9d4a996a53804826f0", label = "D's Garage 21 Koubo Game - Tane o Maku Tori (Japan).ws" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0247, type="u8", condition="eq", value=0X03, action="DEMO_MODE", no_log=false, no_survey=false, desc="DEMO" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Othello",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Board"
+  },
+
+  rom = {
+    name = "othello",
+    file = "othello.zip",
+    hashes = {
+      { hash = "1601fe20ae57415c9ce76481f2fa2389", label = "Othello (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0122, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- level" },
+      },
+    },
+  },
+}

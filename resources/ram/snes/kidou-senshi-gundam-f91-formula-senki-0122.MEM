@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Kidou Senshi Gundam F91: Formula Senki 0122",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "kidou-senshi-gundam-f91-formula-senki-0122",
+    file = "kidou-senshi-gundam-f91-formula-senki-0122.zip",
+    hashes = {
+      { hash = "c4b283e04966e9ab9cdc76f51d9969cf", label = "Kidou Senshi Gundam F91 - Formula Senki 0122 (Japan).sfc" },
+      { hash = "fe37b170c0c868c3aa1d67bdcf9df37f", label = "Kidou Senshi Gundam F91 - Formula Senki 0122 (Japan) (En) (Twilight).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00B3, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Scene Data - determines next cutscene to play. 00 is opening, 01 is Title Screen, etc." },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0D70, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mirrored 16-bit weapon selection ( 00 is first weapon, 02 is third weapon, etc )" },
+        { address=0X0E0F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gundam F90A Weapon Upgrade (starts at 03)" },
+        { address=0X0E2F, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gundam F90D Weapon Upgrade (starts at 03)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0DB0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="8-bit Deca-Heximal for Vulcan ammo, updates only when attempting to attack" },
+        { address=0X0DB3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Deca-Heximal of Cracker or Shoulder Ammo" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Postman Pat",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "postman-pat",
+    file = "postman-pat.zip",
+    hashes = {
+      { hash = "42d7f3b9c8f989d30906f9cee114e538", label = "Postman Pat (Europe) (En,Fr,De,Es,It,Nl,Pt,Sv,No,Da,Fi).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Ghostbusters",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ghostbusters",
+    file = "ghostbusters.zip",
+    hashes = {
+      { hash = "e314b42761cd13c03def744b4afc7b1b", label = "Ghostbusters (USA).a26" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X0040, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money (x10000) increased" },
+        { address=0X0041, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money (x100) increased" },
+        { address=0X0042, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money (x1) increased" },
+      },
+    },
+  },
+}

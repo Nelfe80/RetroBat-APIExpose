@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Space Subtraction",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "space-subtraction",
+    file = "space-subtraction.zip",
+    hashes = {
+      { hash = "4b24f3c661a58a466930abb4f60c44e6", label = "Mastering Math - Space Subtraction v1.0 (1985)(MECC)(US).do" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X005E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points to lots of things (16-bit)" },
+      },
+    },
+  },
+}

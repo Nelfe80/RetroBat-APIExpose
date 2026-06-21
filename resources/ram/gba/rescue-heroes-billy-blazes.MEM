@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Rescue Heroes: Billy Blazes!",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "rescue-heroes-billy-blazes",
+    file = "rescue-heroes-billy-blazes.zip",
+    hashes = {
+      { hash = "4261ad698a20c73552ba8b75d184a4c9", label = "Rescue Heroes - Billy Blazes! (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2110, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Bonus Level Token Collection" },
+        { address=0X382C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level ID Manipulable" },
+        { address=0X58BC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level ID Backup" },
+      },
+      stage = {
+        { address=0X2080, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Nb Hostage to Rescue" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X20F4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Remaining Lives increased" },
+        { address=0X20F4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Remaining Lives decreased" },
+        { address=0X2130, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Game Over Check increased" },
+        { address=0X2130, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Game Over Check decreased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X20BA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Concrete Block Breaker Available Flag" },
+      },
+    },
+  },
+}

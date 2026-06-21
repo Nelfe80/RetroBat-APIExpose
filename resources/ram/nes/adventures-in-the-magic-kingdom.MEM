@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Adventures in the Magic Kingdom",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "adventures-in-the-magic-kingdom",
+    file = "adventures-in-the-magic-kingdom.zip",
+    hashes = {
+      { hash = "c1eda7b38bd8fb314285ddcc766a2458", label = "Adventures in the Magic Kingdom (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00EA, type="u8", condition="eq", value=0X0A, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0037, type="u8", condition="eq", value=0X96, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X0037, type="u8", condition="eq", value=0XBB, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Transition to..." },
+        { address=0X0037, type="u8", condition="eq", value=0X1B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Gate Opening" },
+        { address=0X0037, type="u8", condition="eq", value=0XB3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Parade" },
+        { address=0X0037, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld State [8 bit]" },
+        { address=0X00EA, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld" },
+      },
+      stage = {
+        { address=0X03C9, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="first area" },
+        { address=0X03C9, type="u8", condition="eq", value=0X23, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="underground" },
+        { address=0X03C9, type="u8", condition="eq", value=0X16, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="second area" },
+        { address=0X03C9, type="u8", condition="eq", value=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="room 1" },
+        { address=0X03C9, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="room 2" },
+        { address=0X03C9, type="u8", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="room 3" },
+        { address=0X03C9, type="u8", condition="eq", value=0X30, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="parade started" },
+        { address=0X03C9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Section ID [8 bit]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X06D8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives Remaining [8 bit] increased" },
+        { address=0X06D8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives Remaining [8 bit] decreased" },
+      },
+      health = {
+        { address=0X0030, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health [8 bit] decreased" },
+        { address=0X0030, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health [8 bit] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X03C9, type="u8", condition="eq", value=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss room" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X00BB, type="u8", condition="eq", value=0X3C, action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="60 = 4 seconds" },
+      },
+    },
+  },
+}

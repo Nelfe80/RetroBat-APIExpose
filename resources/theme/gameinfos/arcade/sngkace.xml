@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 AAA 200000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 BBB 190000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 CCC 180000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 DDD 170000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 EEE 160000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FFF 150000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 GGG 140000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HHH 130000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 III 120000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 JJJ 110000</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

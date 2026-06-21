@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Future Avoid",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "future-avoid",
+    file = "future-avoid.zip",
+    hashes = {
+      { hash = "6ed7bf2107f26d9d9027eadd4ef16854", label = "Future Avoid (World) (Proto) (Joakim Hentula).wasm" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1DA0, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="(8 bit) Title Screen" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X63D8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bits) Current Score" },
+        { address=0X63DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bits) High Score" },
+      },
+    },
+  },
+}

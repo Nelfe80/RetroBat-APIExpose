@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Pitfall: The Mayan Adventure",
+    system = "sega32x",
+    system_name = "32X",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "pitfall-the-mayan-adventure",
+    file = "pitfall-the-mayan-adventure.zip",
+    hashes = {
+      { hash = "e091e542f7ea29ef3daf6022b36e219b", label = "Pitfall - The Mayan Adventure (USA).32x" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4E384, type="u8", condition="eq", value=0X19, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen / Interstitial" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4E384, type="u8", condition="eq", value=0X0F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ceiba Jungle" },
+        { address=0X4E384, type="u8", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Xibalba Falls" },
+        { address=0X4E384, type="u8", condition="eq", value=0X11, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tazamul Mines" },
+        { address=0X4E384, type="u8", condition="eq", value=0X12, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lost City of Copan" },
+        { address=0X4E384, type="u8", condition="eq", value=0X13, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Copan Temple" },
+        { address=0X4E384, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3EEC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X3EEC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3F02, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - High word" },
+        { address=0X3F04, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - Low word" },
+      },
+      collectibles = {
+        { address=0X3EED, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold coins increased" },
+      },
+    },
+  },
+}

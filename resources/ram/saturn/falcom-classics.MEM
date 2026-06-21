@@ -1,0 +1,83 @@
+return {
+  game = {
+    title = "Falcom Classics",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "falcom-classics",
+    file = "falcom-classics.zip",
+    hashes = {
+      { hash = "dc6fe98c2ebce3a16e8456101091458b", label = "Falcom Classics (Japan) (Disc 1) (Game Disc)" },
+      { hash = "ba1c720d0ba9cd6c9b586efbdf6825e7", label = "Falcom Classics (Japan) (En) (v0.763) (Murzik) (Disc 1) (Game Disc) (Track 1)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X18B5CE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fighter Level" },
+        { address=0X18B5D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Xanadu Wizard Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0934, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dragon Slayer HP x65535 display decreased" },
+        { address=0X0934, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dragon Slayer HP x65535 display increased" },
+        { address=0X0936, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dragon Slayer HP display decreased" },
+        { address=0X0936, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dragon Slayer HP display increased" },
+        { address=0X0F24, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dragon Slayer HP x65535 decreased" },
+        { address=0X0F24, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dragon Slayer HP x65535 increased" },
+        { address=0X0F26, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Dragon Slayer HP decreased" },
+        { address=0X0F26, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Dragon Slayer HP increased" },
+        { address=0X0FE6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Dragon Slayer) Left Dragon Head HP decreased" },
+        { address=0X0FE6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Dragon Slayer) Left Dragon Head HP increased" },
+        { address=0X1026, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Dragon Slayer) Center Dragon head HP decreased" },
+        { address=0X1026, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Dragon Slayer) Center Dragon head HP increased" },
+        { address=0X1066, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(Dragon Slayer) Right Dragon Head HP decreased" },
+        { address=0X1066, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(Dragon Slayer) Right Dragon Head HP increased" },
+        { address=0X10E6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #### - Current HP decreased" },
+        { address=0X10E6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #### - Current HP increased" },
+        { address=0X1166, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #### - Current HP decreased" },
+        { address=0X1166, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #### - Current HP increased" },
+        { address=0X11E6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #### - Current HP decreased" },
+        { address=0X11E6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #### - Current HP increased" },
+        { address=0X1266, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #### - Current HP decreased" },
+        { address=0X1266, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #### - Current HP increased" },
+        { address=0X12E6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #### - Current HP decreased" },
+        { address=0X12E6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #### - Current HP increased" },
+        { address=0X13E6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #### - Current HP decreased" },
+        { address=0X13E6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #### - Current HP increased" },
+        { address=0X1466, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #### - Current HP decreased" },
+        { address=0X1466, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #### - Current HP increased" },
+        { address=0X1526, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy #### - Current HP decreased" },
+        { address=0X1526, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy #### - Current HP increased" },
+        { address=0X38078, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ys Current HP decreased" },
+        { address=0X38078, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ys Current HP increased" },
+        { address=0X38082, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ys Max HP? decreased" },
+        { address=0X38082, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ys Max HP? increased" },
+        { address=0X18A15E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Xanadu HP display? decreased" },
+        { address=0X18A15E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Xanadu HP display? increased" },
+        { address=0X18B6B2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Xanadu HP decreased" },
+        { address=0X18B6B2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Xanadu HP increased" },
+        { address=0X18B6B6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Xanadu Max HP decreased" },
+        { address=0X18B6B6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Xanadu Max HP increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X091A, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dragon Slayer GOLD increased" },
+        { address=0X0926, type="u8", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring" },
+        { address=0X3807E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ys Gold increased" },
+        { address=0X18B6CA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Xanadu Gold increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XA2B74, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="(Dragon Slayer) Stays at 25, then switches to 26 when pushing a block" },
+      },
+    },
+  },
+}

@@ -1,0 +1,117 @@
+return {
+  game = {
+    title = "Metal Slug: Super Vehicle - 001",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "metal-slug-super-vehicle-001",
+    file = "metal-slug-super-vehicle-001.zip",
+    hashes = {
+      { hash = "3d160b0a49c87b309c92dae9780d17f7", label = "Metal Slug - Super Vehicle-001 (Japan, Asia)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X10066, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="P1 - Continues Used (Full Game) [8 bits]" },
+        { address=0X10067, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="P2 - Continues Used (Full Game) [8 bits]" },
+        { address=0X10603, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Outside Demo" },
+        { address=0X10603, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X10603, type="u8", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="End of Demo" },
+        { address=0X106A8, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Counter" },
+        { address=0X106A8, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X106A9, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Counter" },
+        { address=0X106A9, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X100B9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game - Players on Screen // sums as soon as player touches ground" },
+        { address=0X100BB, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Game - Stage Cleared [Bit0 Reverse] // Value flips to 00 when everything on screen is destroyed." },
+      },
+      stage = {
+        { address=0X21231, type="u8", condition="eq", value=0X30475453, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Menu/Mission All Over! (STG0)" },
+        { address=0X21231, type="u8", condition="eq", value=0X31475453, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Mission 1 (STG1)" },
+        { address=0X21231, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game - Stage File Name [4 bytes ASCII]" },
+        { address=0X21234, type="u8", condition="eq", value=0X30, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X21234, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game - Stage File Name ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X10235, type="u8", condition="eq", value=0XB0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pin Point 1" },
+        { address=0X10235, type="u8", condition="eq", value=0XB1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pin Point 2" },
+        { address=0X10235, type="u8", condition="eq", value=0XB2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pin Point 3" },
+        { address=0X10235, type="u8", condition="eq", value=0XB3, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pin Point 4" },
+        { address=0X10235, type="u8", condition="eq", value=0XB4, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pin Point 5" },
+        { address=0X10235, type="u8", condition="eq", value=0XB5, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Pin Point 6" },
+        { address=0X181A3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 - Lives [8 bits] increased" },
+        { address=0X181A3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 - Lives [8 bits] decreased" },
+        { address=0X18243, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 - Lives [8 bits] increased" },
+        { address=0X18243, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 - Lives [8 bits] decreased" },
+      },
+      health = {
+        { address=0X18412, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Vehicle - HP [16 bits] decreased" },
+        { address=0X18412, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Vehicle - HP [16 bits] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X182DD, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Handgun" },
+        { address=0X182DD, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shotgun" },
+        { address=0X182DD, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Flameshot" },
+        { address=0X182DD, type="u8", condition="eq", value=0X03, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Rocket Launcher" },
+        { address=0X182DD, type="u8", condition="eq", value=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="H.Machine Gun" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17E16, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="C.S - Previous Rank Points [16 bits BCD]" },
+        { address=0X17E18, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="C.S - Current Rank Points [16 bits BCD]" },
+        { address=0X17E54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game - Last Score [32 bits BE] // both P1 and P2 shares this" },
+        { address=0X17E58, type="u32le", condition="eq", value=0X100000, action="SCORE_STATE", no_log=false, no_survey=false, desc="You're Great!" },
+        { address=0X17E58, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game - Last Score Obtained [32 bits BCD] // both P1 and P2 shares this" },
+        { address=0X1ECC5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score 1st digit [Lower4]" },
+        { address=0X1ECC6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score 2nd Digit [Lower4]" },
+        { address=0X1ECC7, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score 3rd Digit [Lower4]" },
+        { address=0X1ECC8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score 4th Digit [Lower4]" },
+        { address=0X1ECC9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score 5th Digit [Lower4]" },
+        { address=0X1ECCA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score 6th Digit [Lower4]" },
+        { address=0X1ECCB, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Score 7th Digit [Lower4]" },
+        { address=0X1ECCD, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score 1st digit [Lower4]" },
+        { address=0X1ECCE, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score 2nd digit [Lower4]" },
+        { address=0X1ECCF, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score 3rd digit [Lower4]" },
+        { address=0X1ECD0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score 4th digit [Lower4]" },
+        { address=0X1ECD1, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score 5th digit [Lower4]" },
+        { address=0X1ECD2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score 6th digit [Lower4]" },
+        { address=0X1ECD3, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 - Score 7th digit [Lower4]" },
+      },
+      collectibles = {
+        { address=0X182EE, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="P1 - Ammo [8 bits]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X182B1, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="P1 - Invincibility Frames [8 bits]" },
+        { address=0X18351, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="P2 - Invincibility Frames [8 bits]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1826C, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P1 - Main/Leg Object Structure" },
+        { address=0X1830C, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="P2 - Main/Leg Object Structure" },
+        { address=0X183AC, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Vehicle -Object Structure" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X106A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P1 - State [8 bits]" },
+        { address=0X106A9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="P2 - State [8 bits]" },
+      },
+    },
+  },
+}

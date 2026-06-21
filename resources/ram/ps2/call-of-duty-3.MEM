@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Call of Duty 3",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "call-of-duty-3",
+    file = "call-of-duty-3.zip",
+    hashes = {
+      { hash = "f3b2a5a377b2317a028ce0040f5e2e71", label = "Call of Duty 3 (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X49C944, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked" },
+        { address=0X49C948, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (Doesn't work with Chapter 13)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X47C6E4, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipped Weapon ID" },
+        { address=0X47C6E8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Status" },
+        { address=0X47C704, type="u32le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Secondary Weapon ID" },
+        { address=0X859D6C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[ASCII] Current Weapon Equipped" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X4B9714, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1st Objective Event" },
+        { address=0X4B9738, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 1st Objective Event Identifier" },
+        { address=0X4B97B8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="2nd Objective Event" },
+        { address=0X4B97DC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 2nd Objective Event Identifier" },
+        { address=0X4B985C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="3rd Objective Event" },
+        { address=0X4B9880, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 3rd Objective Event Identifier" },
+        { address=0X4B9900, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="4th Objective Event" },
+        { address=0X4B9924, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 4th Objective Event Identifier" },
+        { address=0X4B99A4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="5th Objective Event" },
+        { address=0X4B99C8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 5th Objective Event Identifier" },
+        { address=0X4B9A48, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="6th Objective Event" },
+        { address=0X4B9A6C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 6th Objective Event Identifier" },
+        { address=0X4B9AEC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="7th Objective Event" },
+        { address=0X4B9B10, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 7th Objective Event Identifier" },
+        { address=0X4B9B90, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="8th Objective Event" },
+        { address=0X4B9BB4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 8th Objective Event Identifier" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X47C75C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Times Damage Taken" },
+      },
+    },
+  },
+}

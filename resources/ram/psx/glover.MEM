@@ -1,0 +1,117 @@
+return {
+  game = {
+    title = "Glover",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "glover",
+    file = "glover.zip",
+    hashes = {
+      { hash = "a36d0320ca25c34cdbc02e73881fe038", label = "Glover (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0780, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Closed" },
+        { address=0XC0780, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Open" },
+        { address=0X16C7E4, type="u16le", condition="eq", value=0X0000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XFD5E1, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XFD5E1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit0] Carnival 1 - Gate 3 Ground Pound Switch" },
+        { address=0XFDB15, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XFDB15, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit0] Carnival 1 - Gate 1 Ground Pound Switch" },
+        { address=0XFDCD1, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XFDCD1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Bit0] Carnival 1 - Gate 4 Ground Pound Switch" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC077C, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="Infinite Lives" },
+        { address=0XD1BDD, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="0 Lives" },
+        { address=0XD1BDD, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1 Life" },
+        { address=0XD1BDD, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XD1BDD, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0XBD6F8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Lower4] Powerups decreased" },
+        { address=0XC077C, type="u8", condition="bit_true", bit=3, mask=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Infinite Energy" },
+        { address=0XD1BDE, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="0 Energy" },
+        { address=0XD1BDE, type="u8", condition="eq", value=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="1 Energy" },
+        { address=0XD1BDE, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Energy" },
+        { address=0XD1BDF, type="u8", condition="eq", value=0X03, action="HEALTH_STATE", no_log=false, no_survey=false, desc="3 Energy Slots (default)" },
+        { address=0XD1BDF, type="u8", condition="eq", value=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="4 Energy Slots" },
+        { address=0XD1BDF, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="[Lower4] Energy Slots" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XBD6F8, type="u8", condition="eq", value=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Beach Ball" },
+        { address=0XBD6F8, type="u8", condition="eq", value=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Froggy Spell" },
+        { address=0XBD6F8, type="u8", condition="eq", value=0X0A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Hercules" },
+        { address=0XBD6F8, type="u8", condition="eq", value=0X0B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Speed Up" },
+        { address=0XBD6F8, type="u8", condition="eq", value=0X0C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rotor Blades" },
+        { address=0XBD6F8, type="u8", condition="eq", value=0X0D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Boomerang Ball" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB09A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="First Place High Score" },
+        { address=0XB09AC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Second Place High Score" },
+        { address=0XBE938, type="u32le", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="1 Score" },
+        { address=0XBE938, type="u32le", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="2 Score" },
+        { address=0XBE938, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0XBF0D4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[ASCII] First Place High Score Name - First Letter" },
+        { address=0XBF0D5, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[ASCII] First Place High Score Name - Second Letter" },
+        { address=0XBF0D6, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[ASCII] First Place High Score Name - Third Letter" },
+        { address=0XBF0D8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[ASCII] Second Place High Score Name - First Letter" },
+        { address=0XBF0D9, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[ASCII] Second Place High Score Name - Second Letter" },
+        { address=0XBF0DA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[ASCII] Second Place High Score Name - Third Letter" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XBD6F8, type="u8", condition="eq", value=0X08, action="TRANSFORMATION_FROG", no_log=false, no_survey=false, desc="Transformed into Froggy Spell" },
+      },
+      player = {
+        { address=0XC27A8, type="u8", condition="eq", value=0X04, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC077C, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoints" },
+        { address=0XC28A6, type="u8", condition="eq", value=0X02, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Atlantis" },
+        { address=0XC28A6, type="u8", condition="eq", value=0X03, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Carnival and Pirates" },
+        { address=0XC28A6, type="u8", condition="eq", value=0X05, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Fear and Prehistoric" },
+        { address=0XC28A6, type="u8", condition="eq", value=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Space" },
+        { address=0XF76EC, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XF7A64, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XFB2B0, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XFB654, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XFBD90, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XFD1E8, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0XFEEC1, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0X101A99, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0X10EEE4, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+        { address=0X11346C, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Switch Pressed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD6DB4, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Atlantis Boss Best Time (centiseconds)" },
+        { address=0XD6E2C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Carnival Boss Best Time (centiseconds)" },
+        { address=0XD6EA4, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Pirates Boss Best Time (centiseconds)" },
+        { address=0XD6F1C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Prehistoric Boss Best Time (centiseconds)" },
+        { address=0XD6F94, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Fear Boss Best Time (centiseconds)" },
+        { address=0XD700C, type="u32le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Space Boss Best Time (centiseconds)" },
+      },
+    },
+  },
+}

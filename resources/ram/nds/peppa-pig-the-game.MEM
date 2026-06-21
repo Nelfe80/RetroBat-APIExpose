@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "Peppa Pig: The Game",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "peppa-pig-the-game",
+    file = "peppa-pig-the-game.zip",
+    hashes = {
+      { hash = "19aec7c8814085cf06c604adba1d7a37", label = "Peppa Pig - The Game (Europe).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X3654B0, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages of Pancake liquid on pan" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X364C72, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] Kite Health decreased" },
+        { address=0X364C72, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] Kite Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2AF508, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bubble Score" },
+        { address=0X364C8C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Kite Score" },
+        { address=0X3654B4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pancakes Score" },
+        { address=0X36B694, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Make Pancakes (10 points)" },
+        { address=0X36B696, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Make Pancakes (20 points)" },
+        { address=0X36B698, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Make Pancakes (30 points)" },
+        { address=0X36B69A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Bubbles (100 points)" },
+        { address=0X36B69C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Bubbles (200 points)" },
+        { address=0X36B69E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Bubbles (400 points)" },
+        { address=0X36B6A0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Hide and Seek (3 points)" },
+        { address=0X36B6A2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Hide and Seek (6 points)" },
+        { address=0X36B6A4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 1 Ranks - Hide and Seek (10 points)" },
+        { address=0X36B6D6, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 2 Achievements - Pancake (10 Points)" },
+        { address=0X36B6D8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 2 Achievements - Pancake (20 Points)" },
+        { address=0X36B6DA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 2 Achievements - Pancake (30 Points)" },
+        { address=0X36B6DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 2 Achievements - Bubbles (100 Points)" },
+        { address=0X36B6DE, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 2 Achievements - Bubbles (200 Points)" },
+        { address=0X36B6E0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 2 Achievements - Bubbles (400 Points)" },
+        { address=0X36B718, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 3 Ranks - Pancakes (10 points)" },
+        { address=0X36B71A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 3 Ranks - Pancakes (20 points)" },
+        { address=0X36B71C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16bit] Profile 3 Ranks - Pancakes (30 points)" },
+        { address=0X36B71E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 3 Ranks - Bubbles (100 points)" },
+        { address=0X36B720, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 3 Ranks - Bubbles (200 points)" },
+        { address=0X36B722, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Profile 3 Ranks - Bubbles (400 points)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X36286C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32bit] Timer Mode" },
+      },
+    },
+  },
+}

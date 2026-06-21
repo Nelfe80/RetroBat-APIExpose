@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Power Blade",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "power-blade",
+    file = "power-blade.zip",
+    hashes = {
+      { hash = "1a305be0ef7295d57a13ee9d910d14e4", label = "Power Blade (Europe).nes" },
+      { hash = "94411c05d00adc7f89b440fe5af4e87f", label = "Power Blade (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0042, type="u8", condition="eq", value=0X2E, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0X0055, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="?Map=03, Level select=04, In-game=05, Game over =07?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0042, type="u8", condition="eq", value=0X1A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Compete" },
+        { address=0X0056, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level select, map" },
+        { address=0X0059, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sector 1" },
+        { address=0X0059, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sector 2" },
+        { address=0X0059, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sector 3" },
+        { address=0X0059, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sector 4" },
+        { address=0X0059, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sector 5" },
+        { address=0X0059, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sector 6" },
+        { address=0X005D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boomerang Power Level" },
+      },
+      stage = {
+        { address=0X0035, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="5b=contact chat? 0a=level done cutscene 37=ending" },
+        { address=0X006D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression (1) (Horizontal)" },
+        { address=0X006E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Progression (2) (Changes per area it seems)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0027, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0027, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X004C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player death 0d = last death animation" },
+      },
+      health = {
+        { address=0X04AB, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X04AB, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X009C, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Suit HP" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0080, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="In boss room =1" },
+        { address=0X04BA, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0028, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="0x02= Area Checkpoint is Boss Room" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0052, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Title screen timer" },
+      },
+    },
+  },
+}

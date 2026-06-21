@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Kamen Rider V3",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "kamen-rider-v3",
+    file = "kamen-rider-v3.zip",
+    hashes = {
+      { hash = "07b3828f378fb4a9706844449c626ee1", label = "Kamen Rider V3 (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X85A24, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="1" },
+        { address=0X85A24, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="5" },
+        { address=0X85A24, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of rounds in team mode" },
+        { address=0X90FD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 Rounds won and combatmen defeated" },
+        { address=0X91084, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2/CPU Rounds won" },
+        { address=0X91336, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds in 2 players mode" },
+      },
+      stage = {
+        { address=0X85B04, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade mode beat with V3" },
+        { address=0X85B04, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade mode beat with villains" },
+        { address=0X85B04, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X9101E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 HP (16-bit) decreased" },
+        { address=0X9101E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 HP (16-bit) increased" },
+        { address=0X910CA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2/CPU HP (16-bit) decreased" },
+        { address=0X910CA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2/CPU HP (16-bit) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X91312, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Coins (16-bit) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X85AC4, type="u8", condition="eq", value=0X07, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the barrel" },
+        { address=0X912F5, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroy the barrel mode unlock" },
+      },
+    },
+  },
+}

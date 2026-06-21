@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Spot: The Video Game",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "spot-the-video-game",
+    file = "spot-the-video-game.zip",
+    hashes = {
+      { hash = "44f5b716cf5ee0164c151106d0e68dce", label = "Spot - The Video Game (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0038, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause (1 - enabled, 0 - nope)" },
+        { address=0X05B0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0xff - Demo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1DC5, type="u8", condition="eq", value=0X5, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="No timer" },
+        { address=0X1DC5, type="u8", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="5 Seconds" },
+        { address=0X1DC5, type="u8", condition="eq", value=0X2, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="10 Seconds" },
+        { address=0X1DC5, type="u8", condition="eq", value=0X3, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="20 Seconds" },
+        { address=0X1DC5, type="u8", condition="eq", value=0X4, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="30 Seconds" },
+        { address=0X1DC5, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Player 1 Time (Yellow)" },
+        { address=0X1DC6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2 Time (Blue)" },
+        { address=0X1DC7, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 3 Time (Red)" },
+        { address=0X1DC8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 4 Time (Green)" },
+      },
+    },
+  },
+}

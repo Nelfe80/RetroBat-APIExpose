@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "PopCap Hits! Vol. 2",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "popcap-hits-vol-2",
+    file = "popcap-hits-vol-2.zip",
+    hashes = {
+      { hash = "11a80e09fe47fa84e188b6c351140b84", label = "PopCap Hits! Vol. 2 (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

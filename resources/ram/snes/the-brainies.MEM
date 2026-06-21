@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "The Brainies",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "the-brainies",
+    file = "the-brainies.zip",
+    hashes = {
+      { hash = "ef8f6f5d9f26f5af70b0892cc4fdea21", label = "Brainies, The (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0921, type="u8", condition="eq", value=0X0A, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen" },
+        { address=0X0E3E, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="- Continues left - flashes ff when you choose game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0066, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Increases every tenth level" },
+        { address=0X0915, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Current level starts at 01" },
+        { address=0X0917, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Levels completed" },
+        { address=0X091E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Brainies on level" },
+        { address=0X091F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="- Number of brainies at goal" },
+        { address=0X09C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Left to Right Color of 1st Brainie ff if not in level" },
+        { address=0X09C7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Color of 2nd Brainie ff if not in level" },
+        { address=0X09C8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Color of 3rd Brainie ff if not in level" },
+        { address=0X09C9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Color of 4th Brainie ff if not in level" },
+        { address=0X09CA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Color of 5th Brainie ff if not in level" },
+        { address=0X09CB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Color of 6th Brainie ff if not in level" },
+        { address=0X0A02, type="u8", condition="eq", value=0X4C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Placed on Goal" },
+        { address=0X0A03, type="u8", condition="eq", value=0X4C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Placed on Goal" },
+        { address=0X0A04, type="u8", condition="eq", value=0X4C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Placed on Goal" },
+        { address=0X0A05, type="u8", condition="eq", value=0X4C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Placed on Goal" },
+        { address=0X0A06, type="u8", condition="eq", value=0X4C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Placed on Goal" },
+        { address=0X0A07, type="u8", condition="eq", value=0X4C, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Placed on Goal" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X093C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Current score in game" },
+        { address=0X093E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Added up score after levels" },
+      },
+    },
+  },
+}

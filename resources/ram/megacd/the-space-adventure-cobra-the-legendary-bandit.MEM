@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "The Space Adventure: Cobra - The Legendary Bandit",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-space-adventure-cobra-the-legendary-bandit",
+    file = "the-space-adventure-cobra-the-legendary-bandit.zip",
+    hashes = {
+      { hash = "bf24a3dc6bd2aca3d32ef1f0dea1822b", label = "Space Adventure, The - Cobra - The Legendary Bandit (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0126, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background ID?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Gauntlet Legends",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "gauntlet-legends",
+    file = "gauntlet-legends.zip",
+    hashes = {
+      { hash = "074ad91b0a9500b1edeecf446f8788f5", label = "Gauntlet Legends (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X28CD04, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Float]Time In Level" },
+        { address=0X28D3EC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X28D3DC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Float]Health Value decreased" },
+        { address=0X28D3DC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Float]Health Value increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X28CD90, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 1" },
+        { address=0X28CDA0, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 2" },
+        { address=0X28CDAA, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits 2" },
+        { address=0X28CDB0, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 3" },
+        { address=0X28CDBA, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits -3" },
+        { address=0X28CDC0, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 4" },
+        { address=0X28CDCA, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits - 4" },
+        { address=0X28CDD0, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 5" },
+        { address=0X28CDDA, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits - 5" },
+        { address=0X28CDE0, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 6" },
+        { address=0X28CDEA, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits - 6" },
+        { address=0X28CDF0, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 7" },
+        { address=0X28CDFA, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits - 7" },
+        { address=0X28CE00, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 8" },
+        { address=0X28CE0A, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits - 8" },
+        { address=0X28CE10, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 9" },
+        { address=0X28CE1A, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits - 9" },
+        { address=0X28CE20, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Some value to do with power up 10" },
+        { address=0X28CE2A, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="player 1 last active powerup bits - 10" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X28D44C, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss defeated." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X28CD8C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 1" },
+        { address=0X28CD9C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 2" },
+        { address=0X28CDAC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 3" },
+        { address=0X28CDBC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 4" },
+        { address=0X28CDCC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 5" },
+        { address=0X28CDDC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 6" },
+        { address=0X28CDEC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 7" },
+        { address=0X28CDFC, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 8" },
+        { address=0X28CE0C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 9" },
+        { address=0X28CE1C, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[Float]powerup active seconds time - powerup 10" },
+      },
+    },
+  },
+}

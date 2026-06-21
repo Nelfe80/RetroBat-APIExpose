@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Nicktoons: Attack of the Toybots",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "nicktoons-attack-of-the-toybots",
+    file = "nicktoons-attack-of-the-toybots.zip",
+    hashes = {
+      { hash = "ace5dff7d63fb765515b43e6950a455c", label = "Nicktoons - Attack of the Toybots (USA).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X4022A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (0x00 to 0x05) decreased" },
+        { address=0X4022A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (0x00 to 0x05) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X40328, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+      },
+    },
+  },
+}

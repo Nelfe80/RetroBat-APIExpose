@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Spider-Man: Web of Shadows - Amazing Allies Edition",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "spider-man-web-of-shadows-amazing-allies-edition",
+    file = "spider-man-web-of-shadows-amazing-allies-edition.zip",
+    hashes = {
+      { hash = "13174b10a9340581c8d75777850a1f23", label = "Spider-Man - Web of Shadows - Amazing Allies Edition (USA) (En,Fr).iso" },
+    }
+  },
+
+  events = {
+    state = {
+      temporary = {
+        { address=0XCC8067, type="u8", condition="eq", value=0XFF, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Locked" },
+        { address=0XCC8067, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Unlocked" },
+      },
+    },
+  },
+}

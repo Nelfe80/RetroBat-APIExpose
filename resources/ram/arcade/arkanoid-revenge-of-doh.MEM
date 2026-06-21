@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "arknoid2",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "arkanoid-revenge-of-doh",
+    file = "arkanoid-revenge-of-doh.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="player1_die: lives" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X3A0, type="u24be", condition="change", action="TREASURE", color="white", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Pink capsule" },
+        { address=0X3A0, type="u24be", condition="change", action="TREASURE", color="yellow", min=20000, max=20000, no_log=false, no_survey=false, desc="Score delta 20000-20000: Extra live at 20000" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="white", min=50, max=50, no_log=false, no_survey=false, desc="Score delta 50-50: White brick" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="orange", min=60, max=60, no_log=false, no_survey=false, desc="Score delta 60-60: Orange brick" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="cyan", min=70, max=70, no_log=false, no_survey=false, desc="Score delta 70-70: Cyan brick/black capsule(2x)" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="cyan", min=140, max=140, no_log=false, no_survey=false, desc="Score delta 140-140: Score 140" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="green", min=80, max=80, no_log=false, no_survey=false, desc="Score delta 80-80: Green brick/black capsule(2x)" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="green", min=160, max=160, no_log=false, no_survey=false, desc="Score delta 160-160: Score 160" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="red", min=90, max=90, no_log=false, no_survey=false, desc="Score delta 90-90: Red brick/black capsule(2x)" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="red", min=180, max=180, no_log=false, no_survey=false, desc="Score delta 180-180: Score 180" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="blue", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Blue brick/black capsule(2x)" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="blue", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Score 200" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", min=110, max=110, no_log=false, no_survey=false, desc="Score delta 110-110: Magenta brick/black capsule(2x)" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", min=220, max=220, no_log=false, no_survey=false, desc="Score delta 220-220: Score 220" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="yellow", min=120, max=120, no_log=false, no_survey=false, desc="Score delta 120-120: Yellow brick/black capsule(2x)" },
+        { address=0X3A0, type="u24be", condition="change", action="SCORE_STATE", color="yellow", min=240, max=240, no_log=false, no_survey=false, desc="Score delta 240-240: Score 240" },
+      },
+    },
+  },
+}

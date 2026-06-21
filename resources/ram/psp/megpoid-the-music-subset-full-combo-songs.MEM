@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Megpoid the Music ♯ [Subset - Full Combo Songs]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "megpoid-the-music-subset-full-combo-songs",
+    file = "megpoid-the-music-subset-full-combo-songs.zip",
+    hashes = {
+      { hash = "663c167939f752ebe4a52d17833a784d", label = "Megpoid the Music Sharp [Subset  - Full Combo Songs]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD66FA8, type="u16le", condition="eq", value=0X15, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+      events = {
+        { address=0XCE1F84, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Results Screen - Max Combo [Mirror]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XCE1F80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Results Screen - Score [Mirror]" },
+      },
+    },
+  },
+}

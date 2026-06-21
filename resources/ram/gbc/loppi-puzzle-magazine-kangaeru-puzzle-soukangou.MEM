@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Loppi Puzzle Magazine: Kangaeru Puzzle Soukangou",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "loppi-puzzle-magazine-kangaeru-puzzle-soukangou",
+    file = "loppi-puzzle-magazine-kangaeru-puzzle-soukangou.zip",
+    hashes = {
+      { hash = "41c2515a1dda83aadfd0a134bc62656b", label = "Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Japan) (SGB Enhanced, GB Compatible) (NP).gbc" },
+      { hash = "4e5d7a1b65b52af7ca88e0b7b2016197", label = "Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Japan) (Rev 1) (SGB Enhanced, GB Compatible) (NP).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC251, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+  },
+}

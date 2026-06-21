@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Mind Castle II",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mind-castle-ii",
+    file = "mind-castle-ii.zip",
+    hashes = {
+      { hash = "936aecbb8fd34a410dc8ac6f153474f5", label = "Mind Castle II.woz" },
+    }
+  },
+
+  events = {
+  },
+}

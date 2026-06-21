@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Snake Rattle N Roll",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "snake-rattle-n-roll",
+    file = "snake-rattle-n-roll.zip",
+    hashes = {
+      { hash = "07c019dd98033e0402309f1f484f217c", label = "Snake Rattle n Roll (Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X08E6, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="demo" },
+        { address=0X08E6, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="otherwise" },
+        { address=0X08F4, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="game over screen" },
+        { address=0X0BC1, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Number of credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X08F4, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 1" },
+        { address=0X08F4, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level 2" },
+        { address=0X08F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level number:" },
+      },
+      stage = {
+        { address=0X09C4, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="in bonus (or underwater parts in level 8)" },
+        { address=0X09C4, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="otherwise" },
+        { address=0X09C4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus stage:" },
+        { address=0X0BE8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bonus stage: number of pibbleys eaten" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0BC0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives increased" },
+        { address=0X0BC0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives decreased" },
+      },
+      health = {
+        { address=0X0B54, type="u8", condition="eq", value=0X0, action="HEALTH_STATE", no_log=false, no_survey=false, desc="0 tail parts" },
+        { address=0X0B54, type="u8", condition="eq", value=0XFF, action="HEALTH_STATE", no_log=false, no_survey=false, desc="squished" },
+        { address=0X0B54, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Health." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X08FC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BCD] Score x100" },
+      },
+    },
+  },
+}

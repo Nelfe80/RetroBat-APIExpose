@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Barnyard Blast: Swine of the Night",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "barnyard-blast-swine-of-the-night",
+    file = "barnyard-blast-swine-of-the-night.zip",
+    hashes = {
+      { hash = "f531bca19e8429410841efe6c2151e76", label = "Barnyard Blast - Swine of the Night (USA) (En,Fr,Es,Pt).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X57608, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen/ Stage 6" },
+        { address=0X57608, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over Screen" },
+        { address=0X808CC, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0X8E420, type="u8", condition="eq", value=0X1F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X314130, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Resume" },
+        { address=0X314130, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Restart" },
+        { address=0X314130, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit" },
+        { address=0X317067, type="u8", condition="eq", value=0X69, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X80895, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="A flag that triggers once the first boss of a stage is cleared and will remain active until play" },
+        { address=0X80897, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Screens Cleared in a level" },
+        { address=0X8089B, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0X8089B, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 2" },
+        { address=0X8089B, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 3" },
+        { address=0X8089B, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 4" },
+        { address=0X8089B, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 5" },
+        { address=0X8089B, type="u8", condition="eq", value=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage 6" },
+      },
+      stage = {
+        { address=0X3175F3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8-bit ASCII] Stage number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X808C8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Stars (These equates to lives by every 10) increased" },
+        { address=0X808C8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Stars (These equates to lives by every 10) decreased" },
+        { address=0X30F9A9, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death" },
+      },
+      health = {
+        { address=0X808B4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slayer Whip Health decreased" },
+        { address=0X808B4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slayer Whip Health increased" },
+        { address=0X30FA78, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X30FA78, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X314128, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="current weapon selected" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X57608, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Room" },
+        { address=0X80918, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Seperate Boss Room Flag" },
+        { address=0X313578, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Reward Spawn Flag" },
+        { address=0X313580, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Status?" },
+        { address=0X314133, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Reward flag" },
+        { address=0X33D05B, type="u24le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[24-bit] Stage 3 Boss Completion flag" },
+      },
+    },
+  },
+}

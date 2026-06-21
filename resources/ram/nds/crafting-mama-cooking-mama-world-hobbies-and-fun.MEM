@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Crafting Mama | Cooking Mama World: Hobbies and Fun",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Simulation, health, Puzzle, cooking"
+  },
+
+  rom = {
+    name = "crafting-mama-cooking-mama-world-hobbies-and-fun",
+    file = "crafting-mama-cooking-mama-world-hobbies-and-fun.zip",
+    hashes = {
+      { hash = "60ac2688700c0378d64affc037a4edfe", label = "Cooking Mama World - Hobbies & Fun (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,90 @@
+return {
+  game = {
+    title = "Dragon Quest Heroes: Rocket Slime",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "dragon-quest-heroes-rocket-slime",
+    file = "dragon-quest-heroes-rocket-slime.zip",
+    hashes = {
+      { hash = "973e6373b082ab99675d7f32c2022ef1", label = "Dragon Quest Heroes - Rocket Slime (USA).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X13B06C, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Boingburg" },
+        { address=0X13B06C, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Forewood Forest" },
+        { address=0X13B06C, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tootinschleiman's Tomb" },
+        { address=0X13B06C, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Mt. Krakatroda" },
+        { address=0X13B06C, type="u8", condition="eq", value=0X4, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Backwoods" },
+        { address=0X13B06C, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Callmigh Bluff" },
+        { address=0X13B06C, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flucifer's Necropolis" },
+        { address=0X13B06C, type="u8", condition="eq", value=0X7, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Flying Clawtress" },
+        { address=0X13B06C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X13B5B4, type="u8", condition="eq", value=0X0, action="HIT", no_log=false, no_survey=false, desc="normal" },
+        { address=0X13B5B4, type="u8", condition="eq", value=0X1, action="HIT", no_log=false, no_survey=false, desc="0 HP explosion" },
+        { address=0X13B5B4, type="u8", condition="eq", value=0X2, action="HIT", no_log=false, no_survey=false, desc="engine destroyed explosion" },
+        { address=0X2143E7, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143E7, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143E8, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143E8, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143E9, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143E9, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143EB, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143EB, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143EC, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143EC, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143ED, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143ED, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143EE, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143EE, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143EF, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143EF, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143F0, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143F0, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143F1, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143F1, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143F2, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143F2, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143F4, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143F4, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143F5, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143F5, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143F7, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143F7, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+        { address=0X2143FA, type="u8", condition="bit_true", bit=0, mask=0X01, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143FA, type="u8", condition="bit_true", bit=1, mask=0X02, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Has been purchased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X13AED8, type="u16le", condition="eq", value=0X24, action="BOSS_HIT", no_log=false, no_survey=false, desc="Flucifer Final Boss" },
+        { address=0X13B068, type="u8", condition="eq", value=0X4A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Bough Beater Boss Room (from 0x49)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X2143AD, type="u8", condition="bit_true", bit=0, mask=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Recipe Unlocked" },
+        { address=0X2143AD, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Recipe Crafted at least once" },
+      },
+      player = {
+        { address=0X2143F8, type="u8", condition="bit_true", bit=0, mask=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Can be purchased" },
+        { address=0X2143F8, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Has been purchased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X2104F2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Surfari game state" },
+      },
+    },
+  },
+}

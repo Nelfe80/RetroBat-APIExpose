@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Pic Pic",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "pic-pic",
+    file = "pic-pic.zip",
+    hashes = {
+      { hash = "70f7e4f17f4438d4c1697471d3370f18", label = "Pic Pic (Europe).nds" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XDA00C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Maze-a-pix puzzle 1 time to complete - minutes" },
+        { address=0XDA00D, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Maze-a-pix puzzle 1 time to complete - seconds" },
+        { address=0XDA4C2, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Link-a-pix puzzle 1 time to complete - minutes" },
+        { address=0XDA4C3, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Link-a-pix puzzle 1 time to complete - seconds" },
+        { address=0XDA4C5, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Link-a-pix puzzle 2 time to complete - minutes" },
+        { address=0XDA4C6, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Link-a-pix puzzle 1 time to complete - seconds" },
+        { address=0XDA4CE, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Link-a-pix puzzle 3 time to complete - minutes" },
+        { address=0XDA4CF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Link-a-pix puzzle 3 time to complete - seconds" },
+        { address=0XDA990, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Fill-a-pix puzzle 1 time to complete - minutes" },
+        { address=0XDA991, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Fill-a-pix puzzle 1 time to complete - seconds" },
+      },
+    },
+  },
+}

@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Appleseed: Prometheus no Shintaku",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "appleseed-prometheus-no-shintaku",
+    file = "appleseed-prometheus-no-shintaku.zip",
+    hashes = {
+      { hash = "bc090bb8677b62961ebab3f87a2f622b", label = "Appleseed - Prometheus no Shintaku (Japan).sfc" },
+    }
+  },
+
+  events = {
+    state = {
+      player = {
+        { address=0X0680, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump state?" },
+        { address=0X0682, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump state?" },
+      },
+    },
+  },
+}

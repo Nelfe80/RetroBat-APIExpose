@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "Tom and Jerry in Fists of Furry",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "tom-and-jerry-in-fists-of-furry",
+    file = "tom-and-jerry-in-fists-of-furry.zip",
+    hashes = {
+      { hash = "a63a9af85be8bb47c1741b8a37115354", label = "Tom and Jerry in Fists of Furry (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF4C23, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Single Player - Continues left [8bit]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XE27CC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 1 - Round Wins [32bit]" },
+        { address=0XE2AA4, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player 2 - Round Wins [32bit]" },
+        { address=0XF463B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round - Mode [8bit]" },
+        { address=0XF4640, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Option - Round Length [8bit]" },
+        { address=0XF4647, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Option - Rounds [8bit]" },
+        { address=0XFED4B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round - Current Round [8bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XE279C, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Health [32bit; Float] decreased" },
+        { address=0XE279C, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Health [32bit; Float] increased" },
+        { address=0XE2A74, type="u32be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Health [32bit; Float] decreased" },
+        { address=0XE2A74, type="u32be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - Health [32bit; Float] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0002, type="u24be", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="=== Weapon IDs ===" },
+        { address=0XE2996, type="u16be", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Player 1 - Weapon ID [16bit]" },
+        { address=0XE2998, type="u32be", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Player 1 - Weapon Durability [32bit; Float]" },
+        { address=0XE2C6E, type="u16be", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Player 2 - Weapon ID [16bit]" },
+        { address=0XE2C70, type="u32be", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Player 1 - Weapon Durability [32bit; Float]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XE2973, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Player 1 - Shield active [8bit]" },
+        { address=0XE2C4B, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Player 2 - Shield active [8bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XE27C8, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 1 - Timer for Burn Status [32bit]" },
+        { address=0XE2968, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 1 - Invisibility Timer [32bit; Float]" },
+        { address=0XE2974, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 1 - Shield Timer [32bit; Float]" },
+        { address=0XE2980, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 1 - Poison Timer [32bit; Float]" },
+        { address=0XE298C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 1 - Strength Timer [32bit; Float]" },
+        { address=0XE2AA0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2 - Timer for Burn Status [32bit]" },
+        { address=0XE2C40, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2 - Invisibility Timer [32bit; Float]" },
+        { address=0XE2C4C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2 - Shield Timer [32bit; Float]" },
+        { address=0XE2C58, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2 - Poison Timer [32bit; Float]" },
+        { address=0XE2C64, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2 - Strength Timer [32bit; Float]" },
+        { address=0XFED4C, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round - Timer [32bit; Float]" },
+        { address=0X223E14, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Clock in Kitchen" },
+      },
+    },
+  },
+}

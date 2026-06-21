@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 NSR 100000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 CBX 99500</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 CBR 99000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 VFR 98500</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 CUB 98000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 FZR 97500</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 TZR 97000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 YZF 96500</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 RGV 96000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 GPZ 95500</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 GPX 95000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 ZII 94500</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 GSX 94000</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 JOG 93500</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 TDR 93000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 SRX 92500</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 SDR 92000</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 TDR 91500</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 YZF 91000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 SKY 90500</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 AUF 90000</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 GVH 89500</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 WRE 89000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 QXW 88500</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 HJA 88000</text>
+		</text>
+		<text name="hiscoreline26" extra="true">
+			<text>#26 ASQ 87500</text>
+		</text>
+		<text name="hiscoreline27" extra="true">
+			<text>#27 BHR 87000</text>
+		</text>
+		<text name="hiscoreline28" extra="true">
+			<text>#28 RUX 86500</text>
+		</text>
+		<text name="hiscoreline29" extra="true">
+			<text>#29 JLX 86000</text>
+		</text>
+		<text name="hiscoreline30" extra="true">
+			<text>#30 GPZ 85500</text>
+		</text>
+		<text name="hiscoreline31" extra="true">
+			<text>#31 GPX 85000</text>
+		</text>
+		<text name="hiscoreline32" extra="true">
+			<text>#32 RRD 84500</text>
+		</text>
+		<text name="hiscoreline33" extra="true">
+			<text>#33 SDR 84000</text>
+		</text>
+		<text name="hiscoreline34" extra="true">
+			<text>#34 TBF 83500</text>
+		</text>
+		<text name="hiscoreline35" extra="true">
+			<text>#35 RTQ 83000</text>
+		</text>
+		<text name="hiscoreline36" extra="true">
+			<text>#36 AOS 82500</text>
+		</text>
+		<text name="hiscoreline37" extra="true">
+			<text>#37 YSD 82000</text>
+		</text>
+		<text name="hiscoreline38" extra="true">
+			<text>#38 RGV 81500</text>
+		</text>
+		<text name="hiscoreline39" extra="true">
+			<text>#39 VFR 81000</text>
+		</text>
+		<text name="hiscoreline40" extra="true">
+			<text>#40 AAR 80500</text>
+		</text>
+		<text name="hiscoreline41" extra="true">
+			<text>#41 SAR 80000</text>
+		</text>
+		<text name="hiscoreline42" extra="true">
+			<text>#42 NNN 79500</text>
+		</text>
+		<text name="hiscoreline43" extra="true">
+			<text>#43 YZF 79000</text>
+		</text>
+		<text name="hiscoreline44" extra="true">
+			<text>#44 RLP 78500</text>
+		</text>
+		<text name="hiscoreline45" extra="true">
+			<text>#45 ADC 78000</text>
+		</text>
+		<text name="hiscoreline46" extra="true">
+			<text>#46 VFE 77500</text>
+		</text>
+		<text name="hiscoreline47" extra="true">
+			<text>#47 GUY 77000</text>
+		</text>
+		<text name="hiscoreline48" extra="true">
+			<text>#48 TZF 76500</text>
+		</text>
+		<text name="hiscoreline49" extra="true">
+			<text>#49 EGF 76000</text>
+		</text>
+		<text name="hiscoreline50" extra="true">
+			<text>#50 JUF 75500</text>
+		</text>
+		<text name="hiscoreline51" extra="true">
+			<text>#51 SRT 75000</text>
+		</text>
+		<text name="hiscoreline52" extra="true">
+			<text>#52 HJH 74500</text>
+		</text>
+		<text name="hiscoreline53" extra="true">
+			<text>#53 TZR 74000</text>
+		</text>
+		<text name="hiscoreline54" extra="true">
+			<text>#54 BAG 73500</text>
+		</text>
+		<text name="hiscoreline55" extra="true">
+			<text>#55 WGG 73000</text>
+		</text>
+		<text name="hiscoreline56" extra="true">
+			<text>#56 VTG 72500</text>
+		</text>
+		<text name="hiscoreline57" extra="true">
+			<text>#57 ETT 72000</text>
+		</text>
+		<text name="hiscoreline58" extra="true">
+			<text>#58 SDK 71500</text>
+		</text>
+		<text name="hiscoreline59" extra="true">
+			<text>#59 ERR 71000</text>
+		</text>
+		<text name="hiscoreline60" extra="true">
+			<text>#60 WTD 70500</text>
+		</text>
+		<text name="hiscoreline61" extra="true">
+			<text>#61 GSK 70000</text>
+		</text>
+		<text name="hiscoreline62" extra="true">
+			<text>#62 CVT 69500</text>
+		</text>
+		<text name="hiscoreline63" extra="true">
+			<text>#63 XJQ 69000</text>
+		</text>
+		<text name="hiscoreline64" extra="true">
+			<text>#64 RXG 68500</text>
+		</text>
+		<text name="hiscoreline65" extra="true">
+			<text>#65 HQT 68000</text>
+		</text>
+		<text name="hiscoreline66" extra="true">
+			<text>#66 RGB 67500</text>
+		</text>
+		<text name="hiscoreline67" extra="true">
+			<text>#67 XCT 67000</text>
+		</text>
+		<text name="hiscoreline68" extra="true">
+			<text>#68 DTW 66500</text>
+		</text>
+		<text name="hiscoreline69" extra="true">
+			<text>#69 IRT 66000</text>
+		</text>
+		<text name="hiscoreline70" extra="true">
+			<text>#70 UAG 65500</text>
+		</text>
+		<text name="hiscoreline71" extra="true">
+			<text>#71 YTR 65000</text>
+		</text>
+		<text name="hiscoreline72" extra="true">
+			<text>#72 QCV 64500</text>
+		</text>
+		<text name="hiscoreline73" extra="true">
+			<text>#73 GNG 64000</text>
+		</text>
+		<text name="hiscoreline74" extra="true">
+			<text>#74 RTD 63500</text>
+		</text>
+		<text name="hiscoreline75" extra="true">
+			<text>#75 HZH 63000</text>
+		</text>
+		<text name="hiscoreline76" extra="true">
+			<text>#76 YHP 62500</text>
+		</text>
+		<text name="hiscoreline77" extra="true">
+			<text>#77 XCB 62000</text>
+		</text>
+		<text name="hiscoreline78" extra="true">
+			<text>#78 NMM 61500</text>
+		</text>
+		<text name="hiscoreline79" extra="true">
+			<text>#79 RED 61000</text>
+		</text>
+		<text name="hiscoreline80" extra="true">
+			<text>#80 WDF 60500</text>
+		</text>
+		<text name="hiscoreline81" extra="true">
+			<text>#81 ERL 60000</text>
+		</text>
+		<text name="hiscoreline82" extra="true">
+			<text>#82 ECX 59500</text>
+		</text>
+		<text name="hiscoreline83" extra="true">
+			<text>#83 TRT 59000</text>
+		</text>
+		<text name="hiscoreline84" extra="true">
+			<text>#84 WKT 58500</text>
+		</text>
+		<text name="hiscoreline85" extra="true">
+			<text>#85 QUD 58000</text>
+		</text>
+		<text name="hiscoreline86" extra="true">
+			<text>#86 WMM 57500</text>
+		</text>
+		<text name="hiscoreline87" extra="true">
+			<text>#87 MAZ 57000</text>
+		</text>
+		<text name="hiscoreline88" extra="true">
+			<text>#88 GGQ 56500</text>
+		</text>
+		<text name="hiscoreline89" extra="true">
+			<text>#89 HAW 56000</text>
+		</text>
+		<text name="hiscoreline90" extra="true">
+			<text>#90 WYK 55500</text>
+		</text>
+		<text name="hiscoreline91" extra="true">
+			<text>#91 DAD 55000</text>
+		</text>
+		<text name="hiscoreline92" extra="true">
+			<text>#92 TBY 54500</text>
+		</text>
+		<text name="hiscoreline93" extra="true">
+			<text>#93 RUR 54000</text>
+		</text>
+		<text name="hiscoreline94" extra="true">
+			<text>#94 WNO 53500</text>
+		</text>
+		<text name="hiscoreline95" extra="true">
+			<text>#95 USI 53000</text>
+		</text>
+		<text name="hiscoreline96" extra="true">
+			<text>#96 AIA 52500</text>
+		</text>
+		<text name="hiscoreline97" extra="true">
+			<text>#97 TTI 52000</text>
+		</text>
+		<text name="hiscoreline98" extra="true">
+			<text>#98 TSC 51500</text>
+		</text>
+		<text name="hiscoreline99" extra="true">
+			<text>#99 OUP 51000</text>
+		</text>
+		<text name="hiscoreline100" extra="true">
+			<text>#100 END 50500</text>
+		</text>
+	</view>
+</theme>

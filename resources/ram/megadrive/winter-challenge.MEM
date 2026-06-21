@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Winter Challenge",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "winter-challenge",
+    file = "winter-challenge.zip",
+    hashes = {
+      { hash = "882565088f39ff017d1ff7005784c9c4", label = "Winter Challenge (USA, Europe) (Rev 1).md" },
+    }
+  },
+
+  events = {
+  },
+}

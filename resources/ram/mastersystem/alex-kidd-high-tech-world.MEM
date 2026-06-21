@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Alex Kidd: High-Tech World",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "alex-kidd-high-tech-world",
+    file = "alex-kidd-high-tech-world.zip",
+    hashes = {
+      { hash = "0f6ebfa2b24bb99dbea1142312fd33c9", label = "Alex Kidd - High-Tech World (USA, Europe, Brazil) (En).sms" },
+      { hash = "c6e271132566b4dd03981dcf2f8a6477", label = "Anmitsu Hime (Japan).sms" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0022, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[Hex] Paused" },
+        { address=0X0025, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Hex] Demo check" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0014, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Hex] Which Floor You Are On in castle/Level number" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X03E1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Hex] Coin chest is on screen increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0110, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Broken clock minutes" },
+        { address=0X0111, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Broken clock hours" },
+      },
+    },
+  },
+}

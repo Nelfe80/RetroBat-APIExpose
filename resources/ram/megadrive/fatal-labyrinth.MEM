@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "Fatal Labyrinth",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "fatal-labyrinth",
+    file = "fatal-labyrinth.zip",
+    hashes = {
+      { hash = "4f30ca0bbc44baf3ea688a04ada928a6", label = "Fatal Labyrinth (USA, Europe) (Ru) (Chief-Net).md" },
+      { hash = "6e277f8fbd78ecd48ec6a91db9b22cf5", label = "Shi no Meikyuu - Labyrinth of Death (Japan) (SegaNet).md" },
+      { hash = "f4550e6ca0b6c8a9de2376f85bdc6a8a", label = "Fatal Labyrinth (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9041, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Lightning title screen" },
+        { address=0X920D, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game over screen 1" },
+        { address=0X920F, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over screen" },
+        { address=0XFF93, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen, reset at 09" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X8600, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="8-bit -> Total Enemies on this level" },
+      },
+      stage = {
+        { address=0X9415, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character level [hex]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X86C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X86C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+        { address=0X8882, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Ennemy health (not useful) decreased" },
+        { address=0X8882, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Ennemy health (not useful) increased" },
+        { address=0X940E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current MAX Health [dec] decreased" },
+        { address=0X940E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current MAX Health [dec] increased" },
+        { address=0X940F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current MAX health decreased" },
+        { address=0X940F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current MAX health increased" },
+        { address=0X9410, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X9410, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0X9411, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X9411, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X9438, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Equipped" },
+        { address=0X9440, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[4 bytes] Weapon attributes - Slot 1" },
+        { address=0X9444, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[4 bytes] Weapon attributes - Slot 2" },
+        { address=0X9448, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[4 bytes] Weapon attributes - Slot 3" },
+        { address=0X944C, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[4 bytes] Weapon attributes - Slot 4" },
+        { address=0X9450, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[4 bytes] Weapon attributes - Slot 5" },
+        { address=0X9454, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[4 bytes] Weapon attributes - Slot 6" },
+        { address=0X9458, type="u16be", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[4 bytes] Weapon attributes - Slot 7" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X9424, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X9425, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold increased" },
+        { address=0X9437, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Ring effect increased" },
+        { address=0X9520, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Ring attributes - Slot 1 increased" },
+        { address=0X9524, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Ring attributes - Slot 2 increased" },
+        { address=0X9528, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Ring attributes - Slot 3 increased" },
+        { address=0X952C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Ring attributes - Slot 4 increased" },
+        { address=0X9530, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Ring attributes - Slot 5 increased" },
+        { address=0X9534, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Ring attributes - Slot 6 increased" },
+        { address=0X9538, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Ring attributes - Slot 7 increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8642, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Hp Final boss" },
+        { address=0X8643, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Hp Final boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X940A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Equipped" },
+        { address=0X9460, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Shield attributes - Slot 1" },
+        { address=0X9464, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Shield attributes - Slot 2" },
+        { address=0X9468, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Shield attributes - Slot 3" },
+        { address=0X946C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Shield attributes - Slot 4" },
+        { address=0X9470, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Shield attributes - Slot 5" },
+        { address=0X9474, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Shield attributes - Slot 6" },
+        { address=0X9478, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[4 bytes] Shield attributes - Slot 7" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9406, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="throwing an object" },
+      },
+    },
+  },
+}

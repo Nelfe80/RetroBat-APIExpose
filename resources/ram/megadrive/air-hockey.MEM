@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Air Hockey",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "air-hockey",
+    file = "air-hockey.zip",
+    hashes = {
+      { hash = "d562d0640d8729a95f5b1d32d53e84e7", label = "Air Hockey (Europe) (Sega Reactor).md" },
+      { hash = "e413d9bbad2a949de8fe26a4b1d32592", label = "Air Hockey (Brazil) (Mega Drive 4).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X005E, type="u16be", condition="eq", value=0XBBBB, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+  },
+}

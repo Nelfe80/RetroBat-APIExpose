@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "T'ai Fu: Wrath of the Tiger",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "tai-fu-wrath-of-the-tiger",
+    file = "tai-fu-wrath-of-the-tiger.zip",
+    hashes = {
+      { hash = "0670aaab23a41a5959112dcca9cfbdd0", label = "T'ai Fu - Wrath of the Tiger (USA)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X75A34, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="How much coins collectet in lvl increased" },
+        { address=0XAA93A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="How much coins collectet in lvl mirror increased" },
+      },
+    },
+  },
+}

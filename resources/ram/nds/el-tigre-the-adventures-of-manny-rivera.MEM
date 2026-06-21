@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "El Tigre: The Adventures of Manny Rivera",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "el-tigre-the-adventures-of-manny-rivera",
+    file = "el-tigre-the-adventures-of-manny-rivera.zip",
+    hashes = {
+      { hash = "cb67944663d6a8fedf70dd2de40e6428", label = "Tigre, El - The Adventures of Manny Rivera (USA).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X227D7A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Many's Health decreased" },
+        { address=0X227D7A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Many's Health increased" },
+      },
+    },
+  },
+}

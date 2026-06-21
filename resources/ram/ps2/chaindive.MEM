@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "ChainDive",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "chaindive",
+    file = "chaindive.zip",
+    hashes = {
+      { hash = "ecbc065fb19a2672d1aed0be9effff75", label = "Chain Dive (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

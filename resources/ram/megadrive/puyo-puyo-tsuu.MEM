@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Puyo Puyo Tsuu",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puyo-puyo-tsuu",
+    file = "puyo-puyo-tsuu.zip",
+    hashes = {
+      { hash = "92c7414e216a3c63c50125349f67ddee", label = "Puyo Puyo Tsuu (Japan) (Rev A).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA131, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4B18, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X4B18, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X4B18, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X4B18, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hardest" },
+        { address=0X4B18, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] VS Com Level" },
+        { address=0XA104, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XA104, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 6 (Schezo)" },
+        { address=0XA104, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 7 (Rulue)" },
+        { address=0XA104, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8 (Satan/Masked Satan)" },
+        { address=0XA104, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] 1P Game Level" },
+      },
+      stage = {
+        { address=0XA101, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1P Stage Number" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA121, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score(s) Tally" },
+        { address=0XA15A, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Experience Points" },
+        { address=0XD08C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="1P Current Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X4B02, type="u8", condition="eq", value=0X06, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Default (96 Seconds)" },
+        { address=0X4B02, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[8bit] Margin Time Settings" },
+        { address=0XD0D6, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Play Time in Current Stage" },
+      },
+    },
+  },
+}

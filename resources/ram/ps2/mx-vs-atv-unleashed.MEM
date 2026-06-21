@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "MX vs. ATV Unleashed",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "mx-vs-atv-unleashed",
+    file = "mx-vs-atv-unleashed.zip",
+    hashes = {
+      { hash = "fb31c3a3280a96e94553c4e49871d6fd", label = "MX vs. ATV Unleashed (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

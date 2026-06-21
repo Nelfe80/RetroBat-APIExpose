@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Laplace no Ma | Demon of Laplace",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "laplace-no-ma-demon-of-laplace",
+    file = "laplace-no-ma-demon-of-laplace.zip",
+    hashes = {
+      { hash = "3593df92fba7bedbb68f22f61f081d55", label = "Laplace no Ma (Japan).sfc" },
+      { hash = "a7db0b34a245ca1ac0240918339d365c", label = "Laplace no Ma (Japan) (En) (v2.0) (Aeon Genesis).sfc" },
+      { hash = "5851748e50f4a345198bc99a3a270a22", label = "Laplace no Ma (Japan) (Es) (v1.1) (semco).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006B, type="u8", condition="eq", value=0XF9, action="GAME_OVER", no_log=false, no_survey=false, desc="Bad Ending Screen" },
+        { address=0X3B7C, type="u8", condition="eq", value=0XB5, action="DEMO_MODE", no_log=false, no_survey=false, desc="Door Demon" },
+        { address=0X3B7D, type="u8", condition="eq", value=0XB5, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon's Eye" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X39B0, type="u8", condition="eq", value=0XB0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="First Wisdom trial cleared" },
+        { address=0X39B0, type="u8", condition="eq", value=0XB1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Second Wisdom trial cleared" },
+        { address=0X39B0, type="u8", condition="eq", value=0XB2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Third Wisdom trial cleared" },
+        { address=0X39B0, type="u8", condition="eq", value=0XB3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fourth Wisdom trial cleared" },
+        { address=0X39B0, type="u8", condition="eq", value=0XB4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fifth Wisdom trial cleared" },
+        { address=0X39B0, type="u8", condition="eq", value=0XB5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sixth Wisdom trial cleared" },
+        { address=0X39B0, type="u8", condition="eq", value=0XB6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Seventh Wisdom trial cleared" },
+        { address=0X39B0, type="u8", condition="eq", value=0XB7, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="First Strength Trial Room Cleared" },
+        { address=0X39B1, type="u8", condition="eq", value=0XB0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Second Strength Trial Room Cleared" },
+        { address=0X39B1, type="u8", condition="eq", value=0XB1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Third Strength Trial Room Cleared" },
+        { address=0X39B1, type="u8", condition="eq", value=0XB3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fourth Strength Trial Room Cleared" },
+        { address=0X39B1, type="u8", condition="eq", value=0XB4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fifth Strength Trial Room Cleared" },
+        { address=0X39B1, type="u8", condition="eq", value=0XB5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Sixth Strength Trial Room Cleared" },
+        { address=0X39B1, type="u8", condition="eq", value=0XB6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Seventh Strength Trial Room Cleared" },
+        { address=0X3B38, type="u8", condition="eq", value=0X0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Clear" },
+      },
+      zone = {
+        { address=0X12A7, type="u8", condition="eq", value=0X0, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Weathertop Hall" },
+        { address=0X12A7, type="u8", condition="eq", value=0X1, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fortune Teller" },
+        { address=0X12A7, type="u8", condition="eq", value=0X2, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Dry Goods Store" },
+        { address=0X12A7, type="u8", condition="eq", value=0X3, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Hotel" },
+        { address=0X12A7, type="u8", condition="eq", value=0X4, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Library" },
+        { address=0X12A7, type="u8", condition="eq", value=0X5, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Psychic-Medium" },
+        { address=0X12A7, type="u8", condition="eq", value=0X6, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Hospital" },
+        { address=0X12A7, type="u8", condition="eq", value=0X7, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Speak-Easy" },
+        { address=0X12A7, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8bit] World Map Location" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3B61, type="u8", condition="eq", value=0XB1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death's Sickle" },
+      },
+      health = {
+        { address=0X3942, type="u8", condition="eq", value=0XB0, action="HIT", no_log=false, no_survey=false, desc="Hall 2F chill wind damages party" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X3934, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver ring pulled from fire" },
+        { address=0X3935, type="u8", condition="eq", value=0XB6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Hall 1F Memento ring acquired" },
+        { address=0X3971, type="u8", condition="eq", value=0XB6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Castle 1F Cerulean Ring acquired" },
+        { address=0X3972, type="u8", condition="eq", value=0XB2, action="MONEY_STATE", no_log=false, no_survey=false, desc="Castle 1F Xanthous Ring acquired" },
+        { address=0X397F, type="u8", condition="eq", value=0XB3, action="MONEY_STATE", no_log=false, no_survey=false, desc="Castle Basement Old Gold Doubloon acquired" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3935, type="u8", condition="eq", value=0XB3, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hall 1F southern door unlocked" },
+        { address=0X3935, type="u8", condition="eq", value=0XB7, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hall 1F Hidden Door Opened" },
+        { address=0X3936, type="u8", condition="eq", value=0XB3, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Hall 1F northern door unlocked" },
+        { address=0X398B, type="u8", condition="eq", value=0XB3, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Man unlocks door to beast" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3933, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Event Flags" },
+        { address=0X3936, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[8bit] Event Flags" },
+      },
+    },
+  },
+}

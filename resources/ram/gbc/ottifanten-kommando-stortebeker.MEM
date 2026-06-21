@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "Ottifanten: Kommando Störtebeker",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "ottifanten-kommando-stortebeker",
+    file = "ottifanten-kommando-stortebeker.zip",
+    hashes = {
+      { hash = "4713c80f75168f12d7582e63abb6edef", label = "Ottifanten - Kommando Stoertebeker (Germany).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC0B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC0BC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0XC0BC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC0BD, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points (16bit, BCD)" },
+      },
+    },
+  },
+}

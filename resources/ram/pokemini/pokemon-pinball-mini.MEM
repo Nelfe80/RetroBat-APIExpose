@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Pokémon Pinball mini",
+    system = "pokemini",
+    system_name = "Pokemon Mini",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-pinball-mini",
+    file = "pokemon-pinball-mini.zip",
+    hashes = {
+      { hash = "086ec88930aa624a09d470858ccc9911", label = "Pokemon Pinball Mini (USA, Europe).min" },
+      { hash = "842551cdd9e0cafdf2a6a57159d5bbc8", label = "Pokemon Pinball Mini (Japan).min" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X071E, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="score attack" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0947, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="destroyed" },
+        { address=0X0967, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="destroyed" },
+      },
+    },
+  },
+}

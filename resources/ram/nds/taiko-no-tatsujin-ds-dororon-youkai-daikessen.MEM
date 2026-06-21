@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Taiko no Tatsujin DS: Dororon! Youkai Daikessen!!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "taiko-no-tatsujin-ds-dororon-youkai-daikessen",
+    file = "taiko-no-tatsujin-ds-dororon-youkai-daikessen.zip",
+    hashes = {
+      { hash = "2e135fce483f19d89d83ea6420abef46", label = "Taiko no Tatsujin DS - Dororon! Yookai Daikessen!! (Japan).nds" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X187756, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[DON-chan's Room] Lightbulb is held completely when switched to 01. If not, revert to 00." },
+      },
+    },
+  },
+}

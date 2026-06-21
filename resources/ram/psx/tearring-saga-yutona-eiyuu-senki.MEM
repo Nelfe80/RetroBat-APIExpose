@@ -1,0 +1,107 @@
+return {
+  game = {
+    title = "TearRing Saga: Yutona Eiyuu Senki",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tearring-saga-yutona-eiyuu-senki",
+    file = "tearring-saga-yutona-eiyuu-senki.zip",
+    hashes = {
+      { hash = "4249256a53dc338b9025281cc3a477e4", label = "Yutona Eiyuu Senki - TearRingSaga (Japan) (En) (v1.04) (Aethin)" },
+      { hash = "8ba3a6c1b9b94cd6311d964e953ac601", label = "Yutona Eiyuu Senki - TearRingSaga (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD24A8, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Hero Crest Chest in Chapter 11 (Chapter Clear Condition)" },
+        { address=0X170826, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Red Background color." },
+        { address=0X170827, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Green background color" },
+        { address=0X170828, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Blue background color" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD247A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Shigen Death before Chapter 24 (Sierra early recruitment requirement) (Gets flipped back after t" },
+        { address=0XD24EF, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Post Chapter 23 Cutscene if Shigen did die (Sierra Early Recruitment)" },
+        { address=0X173128, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of units that are currently dead. More accurately, I believe this is the value that track" },
+      },
+      health = {
+        { address=0XD24AD, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Potion Chest in Chapter 14 end" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XD249F, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Arkis and Esther talk in Chapter 2" },
+        { address=0XD249F, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Obtained Lar's Mirror from the Left House in Chapter 2" },
+        { address=0XD24AB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 7 = Money Bag Chest in the upperleftmost corner in Chapter 14 end increased" },
+        { address=0XD24AC, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Bag Chest on the left in the top on the right side in Chapter 14 end" },
+        { address=0XD24AC, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Bag Chest in the middle of the upper middle left side in Chapter 14 end" },
+        { address=0XD24AD, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Master Potion Chest in Chapter 14 end" },
+        { address=0XD24AD, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Bag Chest on the right in the upper middle right side in Chapter 14 end" },
+        { address=0XD24AD, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Magic Shield Chest in Chapter 14 end" },
+        { address=0XD24AD, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Goddess Potion Chest in Chapter 14 end" },
+        { address=0XD24AD, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Bag chest on the right in the middle on the left side in Chapter 14 end" },
+        { address=0XD24AD, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Knight Crest Chest in Chapter 14 end" },
+        { address=0XD24AE, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Bag Chest in the middle near the bottom on the left side in Chapter 14 end" },
+        { address=0XD24AE, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Bag Chest on the bottom rightmost left side in Chapter 14 end" },
+        { address=0XD24AE, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Bag Chest on the bottom leftmost right side in Chapter 14 end" },
+        { address=0XD24AF, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Elfire in Chapter 14 end" },
+        { address=0XD24AF, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Angelic Potion in Chapter 14 end" },
+        { address=0XD24C2, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Chapter 26A Northern Money Bag House" },
+        { address=0XD24C3, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Chapter 26A Money Bag House in the center of the map" },
+        { address=0XD24C4, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Chapter 26A Bottom Left Money Bag House" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD247C, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss conversation in Chapter 2" },
+        { address=0XD248C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit 4 = Initiated the boss killing himself in Chapter 18 rather than him doing it himself on Tur" },
+        { address=0XD24A0, type="u8", condition="bit_true", bit=3, mask=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chapter 1 Boss Dialogue" },
+        { address=0XD24DF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit 0 = Chapter 39 Kate/Boss Conversation" },
+        { address=0XD24E0, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chapter 40 End" },
+        { address=0XD24F9, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Chapter 22 Zachariah Boss Conversation viewed" },
+        { address=0XD251E, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Chapter 38 End" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD2475, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Thunder Shield Chest in Chapter 8" },
+        { address=0XD2476, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Wing Potion Chest in Chapter 8" },
+        { address=0XD2476, type="u8", condition="bit_true", bit=2, mask=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Knight Crest Chest in Chapter 8" },
+        { address=0XD2476, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="End of Chapter 8" },
+        { address=0XD2476, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Entered the Pub in Chapter 10 with Plum" },
+        { address=0XD2476, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Top house in Chapter 7 (Armorslayer)" },
+        { address=0XD2476, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Bottom house in Chapter 7 (Bridge Key)" },
+        { address=0XD2476, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Purchased the Wyvern Flute in Chapter 10" },
+        { address=0XD2478, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Magic Shield house in Chapter 24" },
+        { address=0XD2497, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Bit 0 = Steel Shield obtained after chapter 9" },
+        { address=0XD24AE, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Steel Shield Chest in the Bottom left in Chapter 14 End" },
+        { address=0XD24C2, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Chapter 26A Upper Leather Shield House" },
+        { address=0XD24C3, type="u8", condition="bit_true", bit=5, mask=0X20, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Chapter 26A Leather Shield House" },
+        { address=0XD24D0, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Silver Shield House in Chapter 35" },
+        { address=0XD24DC, type="u8", condition="bit_true", bit=2, mask=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Magic Shield Chest in Chapter 39" },
+        { address=0XD24F8, type="u8", condition="bit_true", bit=6, mask=0X40, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Made a Wardblade with the Blacksmith" },
+        { address=0XD24F8, type="u8", condition="bit_true", bit=7, mask=0X80, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Made a Thiefdagger with the Blacksmith" },
+        { address=0XD24FA, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Made a Silver Shield with the Alchemist" },
+        { address=0XD2513, type="u8", condition="bit_true", bit=1, mask=0X02, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Steel Shield Chest in Chapter 27" },
+        { address=0XD2525, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Goddess Shield in Tower of Morse Top" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD24A8, type="u8", condition="bit_true", bit=5, mask=0X20, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door in Chapter 11" },
+        { address=0XD24A8, type="u8", condition="bit_true", bit=6, mask=0X40, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door in Chapter 11" },
+        { address=0XD24C7, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Center Door Opened in Chapter 26B" },
+        { address=0XD24C7, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bandit Door Opened in Chapter 26B" },
+        { address=0XD24DB, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit 7 = Door Key Chest in Chapter 39" },
+        { address=0XD24DC, type="u8", condition="bit_true", bit=3, mask=0X08, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Key Chest in Chapter 39" },
+        { address=0XD24DD, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Chapter 29 Doors" },
+      },
+    },
+  },
+}

@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Ivy the Kiwi? Mini | GO Series: Ivy the Kiwi? Mini",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ivy-the-kiwi-mini-go-series-ivy-the-kiwi-mini",
+    file = "ivy-the-kiwi-mini-go-series-ivy-the-kiwi-mini.zip",
+    hashes = {
+      { hash = "709f953be54251cb7e3ad8b17368360e", label = "Ivy the Kiwi mini (USA)" },
+      { hash = "726926b467faa777ad1fcb4d6abe3b91", label = "GO Series - Ivy the Kiwi mini (Europe, Australia)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1F0514, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of feathers collected in current level" },
+        { address=0X1F873C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Number of feathers collected in current level (display)" },
+        { address=0X1F9870, type="u8", condition="eq", value=0XB0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Stage Clear" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1F6644, type="u8", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="Level timer [float]" },
+        { address=0X1F9870, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[EU] [8-bit] Game Status" },
+      },
+    },
+  },
+}

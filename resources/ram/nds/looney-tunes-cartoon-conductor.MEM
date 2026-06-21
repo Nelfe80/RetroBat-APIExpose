@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Looney Tunes: Cartoon Conductor",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Music"
+  },
+
+  rom = {
+    name = "looney-tunes-cartoon-conductor",
+    file = "looney-tunes-cartoon-conductor.zip",
+    hashes = {
+      { hash = "da968e565f56f88d4258f48ffbec151d", label = "Looney Tunes - Cartoon Concerto (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X193928, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tutorial cleared" },
+      },
+    },
+  },
+}

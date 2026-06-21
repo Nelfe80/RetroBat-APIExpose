@@ -1,0 +1,38 @@
+return {
+  game = {
+    title = "Super Kong",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "super-kong",
+    file = "super-kong.zip",
+    hashes = {
+      { hash = "d5ef26274492796050e53a1f5416152a", label = "Super Kong (USA, Europe).sv" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0003, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting Stage on Menu" },
+        { address=0X0004, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Number" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0005, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0005, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X58C3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ff when death causes a stage reset" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0001, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer Starts After Death; if this finishes before win timer finishes, the player loses." },
+        { address=0X0002, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer Starts After Win; if this finishes before death timer finishes, the player wins." },
+      },
+    },
+  },
+}

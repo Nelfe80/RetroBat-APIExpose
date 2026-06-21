@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Sesame Street: 123",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "sesame-street-123",
+    file = "sesame-street-123.zip",
+    hashes = {
+      { hash = "3f071c7839c4b04200ad0a4ee73bf44c", label = "Sesame Street - 123 (USA).nes" },
+    }
+  },
+
+  events = {
+  },
+}

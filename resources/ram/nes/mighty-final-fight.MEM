@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Mighty Final Fight",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "mighty-final-fight",
+    file = "mighty-final-fight.zip",
+    hashes = {
+      { hash = "423854f5f4cfa9bdd429e1313eec9bdd", label = "Mighty Final Fight (Europe).nes" },
+      { hash = "be4670792b17c74eecf3a0e7f37ecfe2", label = "Mighty Final Fight (USA).nes" },
+      { hash = "eff2d999a9a379f1ab52037188ac3404", label = "Mighty Final Fight (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X006B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL" },
+      },
+      stage = {
+        { address=0X0022, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE!!!" },
+        { address=0X0067, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE AND SUB-STAGE" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X003E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIVES!!! increased" },
+        { address=0X003E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIVES!!! decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0054, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="01=boss beat?" },
+        { address=0X005C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="FF=boss??" },
+      },
+    },
+  },
+}

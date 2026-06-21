@@ -1,0 +1,34 @@
+return {
+  game = {
+    title = "Uno Free Fall",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "uno-free-fall",
+    file = "uno-free-fall.zip",
+    hashes = {
+      { hash = "6ea2c5e69ef027c80c54a6b231706fab", label = "Uno - Free Fall (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1B55C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 8bit" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1B568, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score 16bit/32bit" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1B000, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Perfect Match and Timed Mode levels 1-10 8bit" },
+      },
+    },
+  },
+}

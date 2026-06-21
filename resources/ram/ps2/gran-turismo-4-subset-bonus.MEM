@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Gran Turismo 4 [Subset - Bonus]",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "gran-turismo-4-subset-bonus",
+    file = "gran-turismo-4-subset-bonus.zip",
+    hashes = {
+      { hash = "c64494995ddaf7849f1ea6934098efd1", label = "Gran Turismo 4 (Europe, Australia) (En,Fr,De,Es,It) [Subset - Bonus]" },
+      { hash = "8184ee230e74050f9711d8e6ddda526d", label = "Gran Turismo 4 (USA) [Subset - Bonus]" },
+    }
+  },
+
+  events = {
+  },
+}

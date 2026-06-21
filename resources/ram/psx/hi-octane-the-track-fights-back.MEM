@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Hi-Octane: The Track Fights Back!",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "hi-octane-the-track-fights-back",
+    file = "hi-octane-the-track-fights-back.zip",
+    hashes = {
+      { hash = "a9224a0b774d7f244aae67dd5e7d0973", label = "Hi-Octane - The Track Fights Back! (USA) (En,Fr,De,Es)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF07F6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Difficulty Level 0 - 3 8bit" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF048D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Death Match Lives settings 0 - 4 [8bit] increased" },
+        { address=0XF048D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Match Lives settings 0 - 4 [8bit] decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Mega Man Star Force 2: Zerker X Saurian",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Adventure, Strategy"
+  },
+
+  rom = {
+    name = "mega-man-star-force-2-zerker-x-saurian",
+    file = "mega-man-star-force-2-zerker-x-saurian.zip",
+    hashes = {
+      { hash = "9181379922085adff490dc69651e6dfc", label = "Mega Man Star Force 2 - Zerker x Saurian (USA) (Not Quite DX) (v1.0.1) (Prof. 9).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X11D61E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Acutal HP In Overworld] [16-Bits]" },
+        { address=0X122604, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Max HP In Overworld] [16-Bits]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1A0ED8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] decreased" },
+        { address=0X1A0ED8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] increased" },
+        { address=0X1A11C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] decreased" },
+        { address=0X1A11C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] increased" },
+        { address=0X1A14A8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] decreased" },
+        { address=0X1A14A8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy HP] [16-Bits] increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X119AD8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Pntd Fang] [8-Bits]" },
+        { address=0X119ADA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Star Hoop] [8-Bits]" },
+        { address=0X119ADB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Cobra Fang] [8-Bits]" },
+        { address=0X119ADC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Bust Glove] [8-Bits]" },
+        { address=0X119ADD, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Blinding Eye] [8-Bits]" },
+        { address=0X119ADE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Zphyr Wing] [8-Bits]" },
+        { address=0X119ADF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Bubble Fist] [8-Bits]" },
+        { address=0X119AE0, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Image Eye] [8-Bits]" },
+        { address=0X119AE1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/R-F Claw] [8-Bits]" },
+        { address=0X119AE2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Zenny Finder] [8-Bits]" },
+        { address=0X119AE3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Paralyzer] [8-Bits]" },
+        { address=0X119AE4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Titn Glove] [8-Bits]" },
+        { address=0X119AE5, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/White Breath] [8-Bits]" },
+        { address=0X119AE6, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Card Finder] [8-Bits]" },
+        { address=0X119AE7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Sang Claw] [8-Bits]" },
+        { address=0X119AE8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/K. Knuckle] [8-Bits]" },
+        { address=0X119AE9, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/M. Breath] [8-Bits]" },
+        { address=0X119AEA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/FM Bracalet] [8-Bits]" },
+        { address=0X119AEB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/SF Power] [8-Bits]" },
+        { address=0X119AEC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/BN Blaster] [8-Bits]" },
+        { address=0X119AED, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Bugged Weapon] [8-Bits]" },
+        { address=0X119AEE, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Bugged Weapon] [8-Bits]" },
+        { address=0X119AEF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[Weapon/Bugged Weapon] [8-Bits]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X119AD9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Weapon/Quick Ring] [8-Bits] increased" },
+      },
+    },
+  },
+}

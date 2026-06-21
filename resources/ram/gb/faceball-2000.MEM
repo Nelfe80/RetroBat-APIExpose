@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Faceball 2000",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "faceball-2000",
+    file = "faceball-2000.zip",
+    hashes = {
+      { hash = "05ba7f165dab1ffd49b63b4f5c704c02", label = "Faceball 2000 (USA).gb" },
+      { hash = "db7d676c93ce9cb24dad231cc8cf24d0", label = "Faceball 2000 DX (No GDMA) (v1.0) (kkzero).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC996, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Ending Credits = 0x04 (8-bit hex)" },
+        { address=0XDA2A, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode = 0x1 (Upper4)" },
+        { address=0XDF69, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused (0x00 = paused, 0x80 = playing) (8-bit hex)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDA2B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level (zero-based) (8-bit hex)" },
+        { address=0XDA2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Progression (zero-based) (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC20C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life (8-bit int) increased" },
+        { address=0XC20C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life (8-bit int) decreased" },
+        { address=0XC21C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 1 Life (8-bit int) increased" },
+        { address=0XC21C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 1 Life (8-bit int) decreased" },
+        { address=0XC22C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 2 Life (8-bit int) increased" },
+        { address=0XC22C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 2 Life (8-bit int) decreased" },
+        { address=0XC23C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 3 Life (8-bit int) increased" },
+        { address=0XC23C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 3 Life (8-bit int) decreased" },
+        { address=0XC24C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 4 Life (8-bit int) increased" },
+        { address=0XC24C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 4 Life (8-bit int) decreased" },
+        { address=0XC25C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 5 Life (8-bit int) increased" },
+        { address=0XC25C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 5 Life (8-bit int) decreased" },
+        { address=0XC26C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 6 Life (8-bit int) increased" },
+        { address=0XC26C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 6 Life (8-bit int) decreased" },
+        { address=0XC27C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 7 Life (8-bit int) increased" },
+        { address=0XC27C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 7 Life (8-bit int) decreased" },
+        { address=0XC28C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 8 Life (8-bit int) increased" },
+        { address=0XC28C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 8 Life (8-bit int) decreased" },
+        { address=0XC29C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 9 Life (8-bit int) increased" },
+        { address=0XC29C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 9 Life (8-bit int) decreased" },
+        { address=0XC2AC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 10 Life (8-bit int) increased" },
+        { address=0XC2AC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 10 Life (8-bit int) decreased" },
+        { address=0XC2BC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 11 Life (8-bit int) increased" },
+        { address=0XC2BC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 11 Life (8-bit int) decreased" },
+        { address=0XC2DC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 13 Life (8-bit int) increased" },
+        { address=0XC2DC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 13 Life (8-bit int) decreased" },
+        { address=0XC2EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 14 Life (8-bit int) increased" },
+        { address=0XC2EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 14 Life (8-bit int) decreased" },
+        { address=0XC2FC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Enemy 15 Life (8-bit int) increased" },
+        { address=0XC2FC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 15 Life (8-bit int) decreased" },
+        { address=0XC302, type="u8", condition="eq", value=0X0C, action="GAIN_LIFE", no_log=false, no_survey=false, desc="extra life" },
+        { address=0XC770, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit dec) increased" },
+        { address=0XC770, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (8-bit dec) decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XDA94, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (16-bit decimal)" },
+      },
+      collectibles = {
+        { address=0XC302, type="u8", condition="eq", value=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="coin" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC302, type="u8", condition="eq", value=0X06, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC700, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Shield Timer (8-bit hex)" },
+        { address=0XC9AB, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Full Timer 32-bit = 0x00000000 if dead timer" },
+      },
+    },
+  },
+}

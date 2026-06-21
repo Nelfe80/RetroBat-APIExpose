@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Robin Hood: The Siege",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "robin-hood-the-siege",
+    file = "robin-hood-the-siege.zip",
+    hashes = {
+      { hash = "ba923090f5658f9076ffa099e4c14251", label = "Robin Hood - The Siege (Europe)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X4B57A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="AI Skill Level [8bit]" },
+      },
+    },
+  },
+}

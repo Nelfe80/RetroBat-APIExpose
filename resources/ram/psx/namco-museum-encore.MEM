@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Namco Museum Encore",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "namco-museum-encore",
+    file = "namco-museum-encore.zip",
+    hashes = {
+      { hash = "b57ad65b9192e1347bb74c3ac64a4bc3", label = "Namco Museum Encore (Japan) (Shokai Gentei Special Box)" },
+      { hash = "dc09973deea8ec98826c8bd0d3a951b4", label = "Namco Museum Encore (Japan)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X4D661, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="King & Balloon - 1UP Score - Hundred Thousands and Ten Thousands increased" },
+        { address=0X4D661, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="King & Balloon - 1UP Score - Hundred Thousands and Ten Thousands decreased" },
+        { address=0X4D662, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="King & Balloon - 1UP Score - Thousands and Hundreds increased" },
+        { address=0X4D662, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="King & Balloon - 1UP Score - Thousands and Hundreds decreased" },
+        { address=0X4D663, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="King & Balloon - 1UP Score - Tens and Ones increased" },
+        { address=0X4D663, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="King & Balloon - 1UP Score - Tens and Ones decreased" },
+      },
+    },
+  },
+}

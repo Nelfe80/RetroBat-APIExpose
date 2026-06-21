@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Picross 3D",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "picross-3d",
+    file = "picross-3d.zip",
+    hashes = {
+      { hash = "76434a8ed6fa436cd9f214390577fc98", label = "Picross 3D (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X214AED, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="reveals stars" },
+        { address=0X214AED, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="New status off" },
+        { address=0X214AED, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="main puzzles (A-D) completed" },
+        { address=0X214AED, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="silver puzzle completed" },
+        { address=0X214AED, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="earned all 12 stars" },
+        { address=0X214B25, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="no longer new (1st puzzle completed)" },
+        { address=0X214B25, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="first eight puzzles completed" },
+        { address=0X214B25, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="silver and gold puzzles completed" },
+        { address=0X214B25, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="earned all 21 stars" },
+        { address=0X214BAD, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="first puzzle completed" },
+        { address=0X214BAD, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="first eight puzzles completed" },
+        { address=0X214BAD, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="silver and gold puzzles completed" },
+        { address=0X214BAD, type="u8", condition="bit_true", bit=4, mask=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="earned all 21 stars" },
+      },
+    },
+  },
+}

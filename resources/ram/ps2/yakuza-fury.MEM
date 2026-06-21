@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Yakuza Fury",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "yakuza-fury",
+    file = "yakuza-fury.zip",
+    hashes = {
+      { hash = "de1ebf47f8dd7d65ae4f88356fcc3aab", label = "Yakuza Fury (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

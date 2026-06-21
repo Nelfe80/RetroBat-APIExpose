@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Tom Clancy's Splinter Cell",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tom-clancys-splinter-cell",
+    file = "tom-clancys-splinter-cell.zip",
+    hashes = {
+      { hash = "ab7b66435bcecb60a786fd62a532e4ab", label = "Tom Clancy's Splinter Cell (Europe) (En,Fr,De,Es,It,Nl).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X76FF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X76FF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X770A, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="b0/1 = Smoke Grenades Upper4 = 0X ammo" },
+        { address=0X770B, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="b0 = X0 ammo" },
+      },
+    },
+  },
+}

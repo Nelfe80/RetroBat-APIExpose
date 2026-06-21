@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Game & Watch Collection 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Compilation"
+  },
+
+  rom = {
+    name = "game-watch-collection-2",
+    file = "game-watch-collection-2.zip",
+    hashes = {
+      { hash = "fc55fd53102bb4d24fda4b05f094c828", label = "Game & Watch Collection 2 (USA) (Club Nintendo).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFB97B, type="u8", condition="eq", value=0XD1, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+  },
+}

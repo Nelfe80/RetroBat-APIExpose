@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Driver '76",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "driver-76",
+    file = "driver-76.zip",
+    hashes = {
+      { hash = "152bb4ea3f9b26ccc940c1d0ac9bc037", label = "Driver 76 (Europe) (PSP) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

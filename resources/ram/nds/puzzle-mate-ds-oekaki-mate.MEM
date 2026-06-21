@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Puzzle Mate DS: Oekaki Mate",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-mate-ds-oekaki-mate",
+    file = "puzzle-mate-ds-oekaki-mate.zip",
+    hashes = {
+      { hash = "f50f22a74db34d3a74f203f3fc3ea0dc", label = "Puzzle Mate DS - Oekaki Mate (Japan).nds" },
+    }
+  },
+
+  events = {
+  },
+}

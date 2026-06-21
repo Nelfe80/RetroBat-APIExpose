@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hero's Saga Laevatein Tactics",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "heros-saga-laevatein-tactics",
+    file = "heros-saga-laevatein-tactics.zip",
+    hashes = {
+      { hash = "85d15a4c05e09e0e2a77e191ca299eab", label = "Hero's Saga - Laevatein Tactics (USA).nds" },
+    }
+  },
+
+  events = {
+  },
+}

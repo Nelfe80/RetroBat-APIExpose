@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 ッ ?? 1000000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2      900000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3    ガ 800000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 [jp-k-gi]グ[jp-k-ge][jp-k-go] 700000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 [jp-k-ba][jp-k-sa][jp-k-ra]2 600000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 [jp-k-ba][jp-k-sa][jp-k-ra]2 500000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 [jp-k-ba][jp-k-sa][jp-k-ra]2 400000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 [jp-k-ba][jp-k-sa][jp-k-ra]2 300000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 [jp-k-ba][jp-k-sa][jp-k-ra]2 200000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 [jp-k-a][jp-k-a-small][jp-k-one]5 119450</text>
+		</text>
+	</view>
+</theme>

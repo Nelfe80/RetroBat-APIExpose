@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "The Pagemaster",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-pagemaster",
+    file = "the-pagemaster.zip",
+    hashes = {
+      { hash = "46b265c3ea4e739656363e5232c8c56b", label = "Pagemaster, The (Europe).md" },
+      { hash = "aafa1208e6c1f0850d091d6b20ede002", label = "Pagemaster, The (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB426, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Buttons pressed (does not update while paused)" },
+        { address=0XE084, type="u8", condition="eq", value=0X0B, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0XFB10, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Fixed Screen (Title, World Intro, Ending)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X125A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus level magic dust meter" },
+        { address=0X15CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Keys collected in bonus level" },
+        { address=0XE084, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Dying" },
+        { address=0XE19C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="1=In a level" },
+        { address=0XEFFA, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player Y in level" },
+        { address=0XEFFE, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player X in level" },
+        { address=0XFAF2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level/Map ID" },
+        { address=0XFB10, type="u8", condition="eq", value=0X3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XFB10, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sublevel (In Portal Book)" },
+        { address=0XFB10, type="u8", condition="eq", value=0X8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Level" },
+        { address=0XFB46, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 0 complete" },
+        { address=0XFB5C, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 1 complete" },
+        { address=0XFB72, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 2 complete" },
+        { address=0XFB88, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 3 complete" },
+        { address=0XFB9E, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 4 complete" },
+        { address=0XFBB4, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 5 complete" },
+        { address=0XFBCA, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 6 complete" },
+        { address=0XFBE0, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 7 complete" },
+        { address=0XFBF6, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 8 complete" },
+        { address=0XFC0C, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 9 complete" },
+        { address=0XFC22, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 10 complete" },
+        { address=0XFC38, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 11 complete" },
+        { address=0XFC4E, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Subworld 12 complete" },
+      },
+      zone = {
+        { address=0XF526, type="u8", condition="eq", value=0X5, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Adventure" },
+        { address=0XF526, type="u8", condition="eq", value=0X6, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Horror" },
+        { address=0XF526, type="u8", condition="eq", value=0X8, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Fantasy" },
+        { address=0XF526, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World" },
+        { address=0XF528, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Level within world" },
+        { address=0XFAFC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Library cards collected this world" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFAF6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives remaining (-1) increased" },
+        { address=0XFAF6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives remaining (-1) decreased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XB446, type="u16be", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincibility Frames" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFB40, type="u16be", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Subworld 0 checkpoint" },
+      },
+    },
+  },
+}

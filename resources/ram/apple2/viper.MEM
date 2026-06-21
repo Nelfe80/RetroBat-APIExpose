@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Viper",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "viper",
+    file = "viper.zip",
+    hashes = {
+      { hash = "c8ae6c569a8eeba48afea85881b1ff37", label = "Viper (19xx)(RDA Systems)[cr Sledge Hammer].do" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X08FD, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8 Bit] Demo Indicator" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X097E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Obstacle Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X09FA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Vipers Left (Lives) value increased" },
+        { address=0X09FA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Vipers Left (Lives) value decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0878, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] BCD Display Score" },
+      },
+    },
+  },
+}

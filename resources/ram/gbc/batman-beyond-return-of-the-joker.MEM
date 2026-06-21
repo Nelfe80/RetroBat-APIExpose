@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Batman Beyond: Return of the Joker",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "batman-beyond-return-of-the-joker",
+    file = "batman-beyond-return-of-the-joker.zip",
+    hashes = {
+      { hash = "19cd9d45c6bb221613101b22c72593b2", label = "Batman of the Future - Return of the Joker (Europe) (En,Fr,De).gbc" },
+      { hash = "cdf275a96518efd2236f0bbb5321c0e3", label = "Batman Beyond - Return of the Joker (Japan) (NP).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XCAD6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Stage ID" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XCAF6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Batman Health decreased" },
+        { address=0XCAF6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Batman Health increased" },
+        { address=0XCAF8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Current Enemy Health decreased" },
+        { address=0XCAF8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Current Enemy Health increased" },
+        { address=0XD08A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Enemy 1 Health tracking decreased" },
+        { address=0XD08A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Enemy 1 Health tracking increased" },
+        { address=0XD0DA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Enemy 2 Health Tracking decreased" },
+        { address=0XD0DA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Enemy 2 Health Tracking increased" },
+        { address=0XEAF8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Memory Block] Multiple Enemies Health Memory decreased" },
+        { address=0XEAF8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Memory Block] Multiple Enemies Health Memory increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XCBE5, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[8 Bit] Shield Count" },
+      },
+    },
+  },
+}

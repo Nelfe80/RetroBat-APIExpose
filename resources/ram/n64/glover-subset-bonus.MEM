@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "Glover [Subset - Bonus]",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "glover-subset-bonus",
+    file = "glover-subset-bonus.zip",
+    hashes = {
+      { hash = "ab08abd00671025753fc354d939fd15d", label = "Glover [Subset - Bonus].z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E7533, type="u8", condition="eq", value=0X7, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Results Screen (Regular Level)" },
+        { address=0X1E7533, type="u8", condition="eq", value=0X8, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Loading Level" },
+        { address=0X1E7533, type="u8", condition="eq", value=0X9, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Results Screen (Boss Level)" },
+        { address=0X1ED40B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[Bit0] Demo Mode" },
+        { address=0X1F2198, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Down" },
+        { address=0X1F2198, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Up" },
+        { address=0X1F2198, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Left" },
+        { address=0X1F2198, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="Right" },
+        { address=0X1F2199, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Cheat" },
+        { address=0X1F219A, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Cheat" },
+        { address=0X1F219B, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Cheat" },
+        { address=0X1F219C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Cheat" },
+        { address=0X1F219D, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Cheat" },
+        { address=0X1F219E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Cheat" },
+        { address=0X1F219F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Cheat" },
+        { address=0X1F21A2, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu Cheat" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X10EA64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="instruction for level init" },
+        { address=0X1E753C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="brightness level" },
+        { address=0X1EAA48, type="u8", condition="eq", value=0XB0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Atlantis 1 Cleared" },
+        { address=0X1EAA48, type="u8", condition="eq", value=0XB1, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Atlantis 2 Cleared" },
+        { address=0X1EAA48, type="u8", condition="eq", value=0XB2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Atlantis 3 Cleared" },
+        { address=0X297BEE, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select" },
+        { address=0X29F487, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8-bit/bool] Ball Grounded" },
+        { address=0X339DBA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CARD tier 1 LEVEL ! ends at 30" },
+        { address=0X339DBB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CARD tier 2 LEVEL 1 ends at 35" },
+        { address=0X339E9D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cards collected. 17 = 38, 18 = 39, 19 = 30, 20 = 31. at 50/50 its 38 level 1" },
+      },
+      stage = {
+        { address=0X1088F8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Float] Spawn Ball Size - Stage 1" },
+        { address=0X10892C, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Double32] Spawn Ball Size - Stage 2" },
+        { address=0X1E7531, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Previous Stage ID" },
+        { address=0X1E7587, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="quit stage or game" },
+        { address=0X1E7587, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage won on results screen" },
+        { address=0X1E7587, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage exit" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X290190, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="32-bit lives increased" },
+        { address=0X290190, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="32-bit lives decreased" },
+        { address=0X2901E0, type="u32be", condition="eq", value=0X1, action="LOSE_LIFE", no_log=false, no_survey=false, desc="death spell" },
+        { address=0X297BEC, type="u8", condition="bit_true", bit=3, mask=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Infinite Lives" },
+        { address=0X299709, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="the bull in Atlantis 1 is not dead" },
+      },
+      health = {
+        { address=0X297BEC, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Infinite Energy" },
+        { address=0X29F5CA, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Amount of ball damage (0-3)" },
+        { address=0X33B6F0, type="u24be", condition="eq", value=0X29, action="HIT", no_log=false, no_survey=false, desc="oof! (taking damage)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1EA9E4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore 1 (32 Bit)" },
+        { address=0X1EA9EC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore 2 (32 Bit)" },
+        { address=0X1EA9F4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore 3 (32 Bit)" },
+        { address=0X1EA9FC, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore 4 (32 Bit)" },
+        { address=0X1EAA04, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore 5 (32 Bit)" },
+        { address=0X1EAA0C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Highscore 6 (32 Bit)" },
+        { address=0X290188, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+      collectibles = {
+        { address=0X1FAB7A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Equals 1 when the star animation upon entering a level is shown increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X310393, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Second boss health" },
+        { address=0X314543, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss health" },
+        { address=0X316283, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Third boss health" },
+        { address=0X3206A3, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="First boss health" },
+        { address=0X323123, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Fourth boss health" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X33B656, type="u16be", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="jumping" },
+        { address=0X33B6F0, type="u24be", condition="eq", value=0X2C, action="JUMPING", no_log=false, no_survey=false, desc="jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X297BEC, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="All Checkpoints Open" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E67A0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Atlantis Boss best time" },
+        { address=0X1E67C2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Carnival Boss best time" },
+        { address=0X1E67DC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Pirates Boss best time" },
+        { address=0X1E67FE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Prehistoric Boss best time" },
+        { address=0X1E6818, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Fortress of Fear Boss best time" },
+        { address=0X1E683A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Out of This World Boss best time" },
+        { address=0X1E683C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Out of This World Bonus best time" },
+      },
+    },
+  },
+}

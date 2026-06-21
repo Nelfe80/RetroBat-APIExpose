@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Zapper: One Wicked Cricket!",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "zapper-one-wicked-cricket",
+    file = "zapper-one-wicked-cricket.zip",
+    hashes = {
+      { hash = "14598cf7cdf79f8d235154bc8d415028", label = "Zapper - One Wicked Cricket (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X76A820, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected level in overworld map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X28E2B8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Unlimited lives cheat increased" },
+        { address=0X28E2B8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Unlimited lives cheat decreased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X28E2B4, type="u32le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Cosmetic" },
+        { address=0X28E2BC, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Unlimited shield cheat" },
+      },
+    },
+  },
+}

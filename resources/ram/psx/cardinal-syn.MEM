@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Cardinal Syn",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "cardinal-syn",
+    file = "cardinal-syn.zip",
+    hashes = {
+      { hash = "a82b215dc321534b7b21123adcf71370", label = "Cardinal Syn (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1C8FC, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X1CDFC, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X1CDFC, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Quit game?" },
+        { address=0X1FFE6F, type="u8", condition="eq", value=0XFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+      events = {
+        { address=0X1C500, type="u8", condition="eq", value=0X09, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combos" },
+        { address=0X1E2614, type="u8", condition="eq", value=0X44, action="COMBO_HIT", no_log=false, no_survey=false, desc="Combos" },
+        { address=0X1E268C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Training Menu - AI Opponent's Combos" },
+        { address=0X1E2788, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Training Menu - Combo Displayed" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E1D90, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="CHEAT : Fatalities in any round" },
+        { address=0X1E888A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="BATTLE : Round Duration" },
+        { address=0X1E888C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="BATTLE : Round Number" },
+        { address=0X1EE69C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Rounds Won" },
+        { address=0X1EE6D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Rounds Won" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1B1F0, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bit-A] Player's HPs vs Kron decreased" },
+        { address=0X1B1F0, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bit-A] Player's HPs vs Kron increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1E2614, type="u8", condition="eq", value=0X43, action="JUMPING", no_log=false, no_survey=false, desc="Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1E2614, type="u8", condition="eq", value=0X41, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Stand Block" },
+        { address=0X1E2614, type="u8", condition="eq", value=0X42, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Crouch Block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1E21E4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="BATTLE : Timer" },
+      },
+    },
+  },
+}

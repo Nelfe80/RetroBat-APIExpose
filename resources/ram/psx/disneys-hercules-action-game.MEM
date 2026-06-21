@@ -1,0 +1,118 @@
+return {
+  game = {
+    title = "Disney's Hercules Action Game",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "disneys-hercules-action-game",
+    file = "disneys-hercules-action-game.zip",
+    hashes = {
+      { hash = "c16749370c5090e31f58f52bbbed2408", label = "Disney's Hercules Action Game (USA) (Rerelease)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X34F16, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode" },
+        { address=0X34F20, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of Continues" },
+        { address=0X3504E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode (EU)" },
+        { address=0X65D30, type="u8", condition="eq", value=0XC9, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Used, or Game Over" },
+        { address=0X65D30, type="u8", condition="eq", value=0XE6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Returning to title screen (including from game over)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X34D98, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID (US 1.0)" },
+        { address=0X34D9D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level completed (US 1.0)" },
+        { address=0X34F15, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed" },
+        { address=0X35048, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Id (EU)" },
+        { address=0X3504D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level completed (EU)" },
+      },
+      stage = {
+        { address=0X34F10, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="N/A" },
+        { address=0X34F10, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 1 : Training" },
+        { address=0X34F10, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 2 - Gauntlet" },
+        { address=0X34F10, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level 3 - Forest" },
+        { address=0X34F10, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="N/A" },
+        { address=0X34F10, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Big Olive Part 1" },
+        { address=0X34F10, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Hydra Canyon" },
+        { address=0X34F10, type="u8", condition="eq", value=0X07, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Medusa's Lair" },
+        { address=0X34F10, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Cyclops Attack" },
+        { address=0X34F10, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Titan Flight" },
+        { address=0X34F10, type="u8", condition="eq", value=0X0A, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Passageway Of Eternal Torment" },
+        { address=0X34F10, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Vortex Of Souls" },
+        { address=0X34F10, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="LEVEL/STAGES ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X34DA3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives option (US 1.0) increased" },
+        { address=0X34DA3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives option (US 1.0) decreased" },
+        { address=0X34F1B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives option increased" },
+        { address=0X34F1B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives option decreased" },
+        { address=0X34F1C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives in game increased" },
+        { address=0X34F1C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives in game decreased" },
+        { address=0X34F2E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIFE UPGRADE increased" },
+        { address=0X34F2E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIFE UPGRADE decreased" },
+        { address=0X34F30, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Total life increased" },
+        { address=0X34F30, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Total life decreased" },
+        { address=0X34F34, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current life increased" },
+        { address=0X34F34, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current life decreased" },
+        { address=0X35053, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives option (EU) increased" },
+        { address=0X35053, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives option (EU) decreased" },
+        { address=0X35054, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current number of lives (EU) increased" },
+        { address=0X35054, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current number of lives (EU) decreased" },
+      },
+      health = {
+        { address=0X34DB6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health (US 1.0) decreased" },
+        { address=0X34DB6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health (US 1.0) increased" },
+        { address=0X34DB8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health shown in screen (US 1.0) decreased" },
+        { address=0X34DB8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health shown in screen (US 1.0) increased" },
+        { address=0X34DBA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health shown in screen (US 1.0) decreased" },
+        { address=0X34DBA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health shown in screen (US 1.0) increased" },
+        { address=0X34DBC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health (US 1.0) decreased" },
+        { address=0X34DBC, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health (US 1.0) increased" },
+        { address=0X35066, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health (EU) decreased" },
+        { address=0X35066, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health (EU) increased" },
+        { address=0X35068, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health shown in screen (EU) decreased" },
+        { address=0X35068, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health shown in screen (EU) increased" },
+        { address=0X3506A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health shown in screen (EU) decreased" },
+        { address=0X3506A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health shown in screen (EU) increased" },
+        { address=0X3506C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health (EU) decreased" },
+        { address=0X3506C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health (EU) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X34DAC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of silver coins collected (US 1.0) increased" },
+        { address=0X34DAE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of silver coins in the level (US 1.0) increased" },
+        { address=0X34DB0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of gold coins collected (US 1.0) increased" },
+        { address=0X34DB2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of gold coins in the level (US 1.0) increased" },
+        { address=0X34F24, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Silver Coins increased" },
+        { address=0X34F26, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Max silver coins increased" },
+        { address=0X34F28, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold coins increased" },
+        { address=0X34F2A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Max gold coins increased" },
+        { address=0X3505C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of silver coins collected (EU) increased" },
+        { address=0X3505E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of silver coins in the level (EU) increased" },
+        { address=0X35060, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of gold coins collected (EU) increased" },
+        { address=0X35062, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of gold coins in the level (EU) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X350B7, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump button (EU)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X34D9A, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current checkpoint (US 1.0)" },
+        { address=0X34F12, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Checkpoint count" },
+        { address=0X3504A, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="Current checkpoint (EU)" },
+      },
+    },
+  },
+}

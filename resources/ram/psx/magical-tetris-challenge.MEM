@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Magical Tetris Challenge",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "magical-tetris-challenge",
+    file = "magical-tetris-challenge.zip",
+    hashes = {
+      { hash = "4f04fb0ed1563d7f38c8d475efca95ea", label = "Magical Tetris Challenge (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E03E0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x00=Main Game has not been loaded or Demo Mode plays again" },
+      },
+      events = {
+        { address=0X1E0452, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Combo" },
+        { address=0X1E0453, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Max Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1E042E, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Last Battle" },
+        { address=0X1E042E, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ending" },
+        { address=0X1E042E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round in Story Mode" },
+        { address=0X1E0454, type="u8", condition="eq", value=0X08, action="LEVEL_EASY", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X1E0454, type="u8", condition="eq", value=0X05, action="LEVEL_NORMAL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X1E0454, type="u8", condition="eq", value=0X02, action="LEVEL_EXPERT", no_log=false, no_survey=false, desc="Expert" },
+        { address=0X1E0454, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Selected (Changes depending on difficulty)" },
+        { address=0X1E0455, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Selected in Menu" },
+        { address=0X1E045E, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Lines Cleared" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1E04E4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1DD7FC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Time - Milliseconds" },
+        { address=0X1DD7FD, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Time - Seconds" },
+        { address=0X1DD7FE, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Time - Minutes" },
+      },
+    },
+  },
+}

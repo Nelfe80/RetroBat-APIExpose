@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Rollerball",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Flipper"
+  },
+
+  rom = {
+    name = "rollerball",
+    file = "rollerball.zip",
+    hashes = {
+      { hash = "395dde2ac8d9b411a78b011ca5fa69a6", label = "Rollerball (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X052F, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X052F, type="u8", condition="eq", value=0X06, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X052F, type="u8", condition="eq", value=0X0A, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Music (Skyscraper)" },
+        { address=0X052F, type="u8", condition="eq", value=0X0B, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Music (Versus mainly?)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0306, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Balls Remaining increased" },
+        { address=0X0306, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Balls Remaining decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00BF, type="u8", condition="eq", value=0X00, action="SCORE_STATE", no_log=false, no_survey=false, desc="Normal Hole for points" },
+        { address=0X06D8, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="50K Points" },
+        { address=0X06DB, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="50K Points" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X067E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sky Part: Raise the Saver Switch 1" },
+        { address=0X067F, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sky Part: Raise the Saver Switch 2" },
+        { address=0X0680, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sky Part: Raise the Saver Switch 3" },
+        { address=0X0681, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sky Part: Raise the Saver Switch 4" },
+        { address=0X0682, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sky Part: Open the Gate Switch 1" },
+        { address=0X0683, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sky Part: Open the Gate Switch 2" },
+        { address=0X0684, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sky Part: Open the Gate Switch 3" },
+        { address=0X0685, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Sky Part: Open the Gate Switch 4" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X06B2, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Table Parts Middle and Top: Directional Shooter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Rampage 2: Universal Tour",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "rampage-2-universal-tour",
+    file = "rampage-2-universal-tour.zip",
+    hashes = {
+      { hash = "8113d0ea2008402d4631f241f625d16b", label = "Rampage 2 - Universal Tour (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XD4E1A, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="In Level/after game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD4E1A, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Day & City Screen" },
+        { address=0XD4E1A, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+      },
+    },
+  },
+}

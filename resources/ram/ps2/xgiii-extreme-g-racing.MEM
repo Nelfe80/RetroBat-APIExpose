@@ -1,0 +1,75 @@
+return {
+  game = {
+    title = "XGIII: Extreme G Racing",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "xgiii-extreme-g-racing",
+    file = "xgiii-extreme-g-racing.zip",
+    hashes = {
+      { hash = "60d9290c3a4cdded21100d3dd99ec217", label = "XGIII - Extreme G Racing (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X249A9C, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="f0 = Game Over Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1DE90C, type="u8", condition="eq", value=0X1C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Muon Harbor" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X1D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Verdegrand" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X1E, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Crystalaria" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X1F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Atradaitoshi" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Siris Canyon" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X21, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Oceania" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X22, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tundaria" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X23, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Megalopis 7" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X24, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pasiphae 6" },
+        { address=0X1DE90C, type="u8", condition="eq", value=0X25, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pion 6" },
+        { address=0X1DE90C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arcade Mode Level [8bit]:" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Muon Harbor" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Verdegrand" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Crystalaria" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Atradaitoshi" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Siris Canyon" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Oceania" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tundaria" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Megalopis 7" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pasiphae 6" },
+        { address=0X1DFC6C, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pion 6" },
+        { address=0X1DFC6C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Time Trial Level [8bit]:" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1DFD2B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Scoop Owned Flag [bit0]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1DFD04, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money in Bank [32bit] increased" },
+        { address=0X1DFD2A, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo Bank Owned Flag [bit0]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1DFD2C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Scoop Owned Flag [bit0]" },
+        { address=0X1DFD2D, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Boost Owned Flag [bit0]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1DD8A0, type="u8", condition="eq", value=0X01, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Trial" },
+        { address=0X1DD8A0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Race Type [8bit]:" },
+        { address=0X1DFC18, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Total Race Timer [32bit]" },
+        { address=0X1DFC24, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Total Race Timer [32bit]" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ultimate Puzzle Games",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "ultimate-puzzle-games",
+    file = "ultimate-puzzle-games.zip",
+    hashes = {
+      { hash = "1edb0b88ee507f5176900c419c52b570", label = "Ultimate Puzzle Games (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

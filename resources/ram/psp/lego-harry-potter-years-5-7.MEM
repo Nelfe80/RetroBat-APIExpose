@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "LEGO Harry Potter: Years 5-7",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "lego-harry-potter-years-5-7",
+    file = "lego-harry-potter-years-5-7.zip",
+    hashes = {
+      { hash = "1ec8754b60a0515d07d7c82d35e953c1", label = "LEGO Harry Potter - Years 5-7 (Europe) (En,Fr,De,Es,It,Nl,Da).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAEBE4D, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Voldemort available to purchase" },
+        { address=0XAEBE4D, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Voldemort purchased" },
+        { address=0XAEBE4D, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Lord Voldemort (suit) available to purchase" },
+        { address=0XAEBE4D, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Lord Voldemort (suit) purchased" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAEBE2A, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater available to purchase" },
+        { address=0XAEBE2A, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater purchased" },
+        { address=0XAEBE3A, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lucius Malfoy (Death eater) available to purchase" },
+        { address=0XAEBE3A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Malfoy (Death eater) purchased" },
+        { address=0XAEBEEE, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 1 beaten" },
+        { address=0XAEBEEE, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 2 beaten" },
+        { address=0XAEBEEE, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 3 beaten" },
+        { address=0XAEBEEE, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 4 beaten" },
+        { address=0XAEBEEF, type="u8", condition="bit_true", bit=0, mask=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 5 beaten" },
+        { address=0XAEBEEF, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 6 beaten" },
+        { address=0XAEBEEF, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 7 beaten" },
+        { address=0XAEBEEF, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 8 beaten" },
+        { address=0XAEBEEF, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 9 beaten" },
+        { address=0XAEBEEF, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 10 beaten" },
+        { address=0XAEBEEF, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eater 11 beaten" },
+        { address=0XAEBEF3, type="u8", condition="bit_true", bit=6, mask=0X40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death eaters" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XAEBE26, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Arthur Weasley (Suit) available to purchase" },
+        { address=0XAEBE26, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Arthur Weasley (Suit) purchased" },
+        { address=0XAEBE29, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cormac Mclaggen (Suit) available to purchase" },
+        { address=0XAEBE29, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Cormac Mclaggen (Suit) purchased" },
+        { address=0XAEBE2E, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Fred Weasley (suit) available to purchase" },
+        { address=0XAEBE2E, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Fred Weasley (suit) purchased" },
+        { address=0XAEBE2F, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="George Weasley (suit) available to purchase" },
+        { address=0XAEBE2F, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="George Weasley (suit) purchased" },
+        { address=0XAEBE34, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Harry (suit) available to purchase" },
+        { address=0XAEBE34, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Harry (suit) purchased" },
+        { address=0XAEBE4E, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ron (suit) available to purchase" },
+        { address=0XAEBE4E, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ron (suit) purchased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XAEBE47, type="u8", condition="bit_true", bit=4, mask=0X10, action="JUMPING", no_log=true, no_survey=false, desc="Ron (red jumper) available to purchase" },
+        { address=0XAEBE47, type="u8", condition="bit_true", bit=5, mask=0X20, action="JUMPING", no_log=true, no_survey=false, desc="Ron (red jumper) purchased" },
+        { address=0XAEBE48, type="u8", condition="bit_true", bit=2, mask=0X04, action="JUMPING", no_log=true, no_survey=false, desc="Ron (brown jumper) available to purchase" },
+        { address=0XAEBE48, type="u8", condition="bit_true", bit=3, mask=0X08, action="JUMPING", no_log=true, no_survey=false, desc="Ron (brown jumper) purchased" },
+      },
+    },
+  },
+}

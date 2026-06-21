@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "UFO Kamen Yakisoban: Kettler no Kuroi Inbou",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "ufo-kamen-yakisoban-kettler-no-kuroi-inbou",
+    file = "ufo-kamen-yakisoban-kettler-no-kuroi-inbou.zip",
+    hashes = {
+      { hash = "6bcc4773b3fa212ada8c8bbf5b630c9b", label = "U.F.O. Kamen Yakisoban - Kettler no Kuroi Inbou (Japan) (Keihin Ban).sfc" },
+    }
+  },
+
+  events = {
+  },
+}

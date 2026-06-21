@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "High School Musical 2: Work This Out!",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "high-school-musical-2-work-this-out",
+    file = "high-school-musical-2-work-this-out.zip",
+    hashes = {
+      { hash = "5ccd948c49068b1a9de2b1bc98465102", label = "High School Musical 2 - Work This Out! (USA) (En,Fr,De,Es,It,Nl).nds" },
+      { hash = "78d722c565d1321a5112eec30886591f", label = "High School Musical 2 - Work This Out! (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+  },
+}

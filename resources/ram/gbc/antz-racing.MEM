@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Antz Racing",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "antz-racing",
+    file = "antz-racing.zip",
+    hashes = {
+      { hash = "87397db3151f3dd5b53cdfbb24a98588", label = "Antz Racing (USA) (En,Fr,De,Es,It,Nl).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

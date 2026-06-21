@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "18 Wheeler: American Pro Trucker",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Action, Racing"
+  },
+
+  rom = {
+    name = "18-wheeler-american-pro-trucker",
+    file = "18-wheeler-american-pro-trucker.zip",
+    hashes = {
+      { hash = "aa5429328078f39078610df43a6446ff", label = "18 Wheeler - American Pro Trucker (Europe) (En,Fr,De,Es)" },
+      { hash = "aa571861964e9f58437f609239cbfb7c", label = "18 Wheeler - American Pro Trucker (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X273924, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Parking mode areas cleared." },
+      },
+      stage = {
+        { address=0X579704, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Objects hit in parking bonus stage." },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X2736AC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Total money. increased" },
+      },
+    },
+  },
+}

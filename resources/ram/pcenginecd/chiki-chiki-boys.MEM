@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Chiki Chiki Boys",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "chiki-chiki-boys",
+    file = "chiki-chiki-boys.zip",
+    hashes = {
+      { hash = "1d3d73850a127eae705686569fed9872", label = "Chiki Chiki Boys (Japan)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X047F, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score [32-bit BE]" },
+        { address=0X04BF, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score [32-bit BE]" },
+      },
+    },
+  },
+}

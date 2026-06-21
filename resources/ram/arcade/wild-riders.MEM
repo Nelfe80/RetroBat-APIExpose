@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Wild Riders",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Motorcycle"
+  },
+
+  rom = {
+    name = "wild-riders",
+    file = "wild-riders.zip",
+    hashes = {
+      { hash = "4f47983ac54499d795afd45260a1cffc", label = "wldrider.zip" },
+    }
+  },
+
+  events = {
+  },
+}

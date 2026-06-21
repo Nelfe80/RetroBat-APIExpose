@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "kamikaze",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "kamikaze",
+    file = "kamikaze.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X1D05, type="u16be", condition="change", action="SCORE_STATE", color="orange", min=10, max=100, no_log=false, no_survey=false, desc="Score delta 10-100: Score delta 10-100" },
+        { address=0X1D05, type="u16be", condition="change", action="SCORE_STATE", color="cyan", min=110, max=200, no_log=false, no_survey=false, desc="Score delta 110-200: Score delta 110-200" },
+        { address=0X1D05, type="u16be", condition="change", action="SCORE_STATE", color="green", min=210, max=500, no_log=false, no_survey=false, desc="Score delta 210-500: Score delta 210-500" },
+        { address=0X1D05, type="u16be", condition="change", action="SCORE_STATE", color="blue", min=510, max=1000, no_log=false, no_survey=false, desc="Score delta 510-1000: Score delta 510-1000" },
+      },
+      collectibles = {
+        { address=0X1F9D, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

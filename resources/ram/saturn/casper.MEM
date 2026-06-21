@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Casper",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "casper",
+    file = "casper.zip",
+    hashes = {
+      { hash = "d9e4c63e1a2386af1a1b2651b10aa323", label = "Casper (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X14D00A, type="u16le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="- 05 if paused" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X14D002, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="- Current Act" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1D808E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="- Health / Energy: decreased" },
+        { address=0X1D808E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="- Health / Energy: increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X14D016, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="- Coins increased" },
+        { address=0X14D7FE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="- Goes to 0x48 when a gold key is collected increased" },
+      },
+    },
+  },
+}

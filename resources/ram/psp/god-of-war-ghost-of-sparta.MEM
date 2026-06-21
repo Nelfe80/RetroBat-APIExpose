@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "God of War: Ghost of Sparta",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "god-of-war-ghost-of-sparta",
+    file = "god-of-war-ghost-of-sparta.zip",
+    hashes = {
+      { hash = "42c08dd581fca2db6dbe3cbe3ef6703a", label = "God of War - Ghost of Sparta (Europe, Australia) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC10B18, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="On" },
+        { address=0XCE44CC, type="u8", condition="bit_true", bit=4, mask=0X10, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X19CEAD4, type="u8", condition="bit_true", bit=1, mask=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ground Pounder" },
+        { address=0X19CEAD5, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="'Ground Pounder completed'" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X19CEAD1, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="'Six Ways to Die completed'" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X19CD0C4, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="IDENTIFIER - Ghost Value for in-game/out-game differentiator [00/01] [8-bits] // a good way to d" },
+        { address=0X19CEAC8, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="'Completed the game in any difficulty'" },
+        { address=0X19CEAC8, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="God Armor" },
+        { address=0X19CEAC8, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Deimos" },
+        { address=0X19CEAC8, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="'Unknown'" },
+        { address=0X19CEAC8, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Videos - Pride of Sparta (75000 Orbs)" },
+        { address=0X19CEAC8, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Videos - The Brother (25000 Orbs)" },
+        { address=0X19CEAC9, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Videos - The Marked Warrior (150000 Orbs)" },
+        { address=0X19CEAC9, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="'Unknown'" },
+        { address=0X19CEAC9, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Character Gallery 2, Environment Gallery 1 (15000 Orbs)" },
+        { address=0X19CEAC9, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Environment Gallery 2, Miscellaneous Gallery (5000 Orbs)" },
+        { address=0X19CEAC9, type="u8", condition="bit_true", bit=4, mask=0X10, action="TREASURE", no_log=false, no_survey=false, desc="Sparta Gallery, Character Gallery 1, Color Script Gallery (10000 Orbs)" },
+        { address=0X19CEAC9, type="u8", condition="bit_true", bit=6, mask=0X40, action="TREASURE", no_log=false, no_survey=false, desc="Robotos (250000 Orbs)" },
+        { address=0X19CEAC9, type="u8", condition="bit_true", bit=7, mask=0X80, action="TREASURE", no_log=false, no_survey=false, desc="Ghost of Sparta" },
+        { address=0X19CEACC, type="u8", condition="bit_true", bit=0, mask=0X01, action="TREASURE", no_log=false, no_survey=false, desc="Arena Combat Backdrop - Arctic (15000 Orbs)" },
+        { address=0X19CEACC, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Arena Combat Backdrop - Atlantis (25000 Orbs)" },
+        { address=0X19CEACC, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Arena Combat Backdrop - Desert (65000 Orbs)" },
+        { address=0X19CEACC, type="u8", condition="bit_true", bit=3, mask=0X08, action="TREASURE", no_log=false, no_survey=false, desc="Arena Combat Backdrop - Hades (40000 Orbs)" },
+      },
+    },
+  },
+}

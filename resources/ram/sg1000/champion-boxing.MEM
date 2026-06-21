@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Champion Boxing",
+    system = "sg1000",
+    system_name = "SG-1000",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "champion-boxing",
+    file = "champion-boxing.zip",
+    hashes = {
+      { hash = "3f54756fd73c3fbe33b56d7954d12f31", label = "Champion Boxing (Japan, New Zealand) (Ja).sg" },
+      { hash = "7527098abb9df1db29ba9f495b06998a", label = "Champion Boxing (Japan) (Rev 1).sg" },
+      { hash = "3e346c6137cab263643e42411f64a74d", label = "Champion Boxing (Taiwan) (Unl).sg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0049, type="u8", condition="eq", value=0X52, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In the title screen" },
+        { address=0X01D6, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen and select level" },
+      },
+    },
+  },
+}

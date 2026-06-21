@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 NEO 150000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 GEO 140000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 AZF 136800</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 NEO 130000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 GEO 120000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 NEO 110000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 91? 105700</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 GEO 100000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 .,  94000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 NEO 90000</text>
+		</text>
+	</view>
+</theme>

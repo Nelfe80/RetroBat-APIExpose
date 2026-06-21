@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Puyo Puyo CD",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puyo-puyo-cd",
+    file = "puyo-puyo-cd.zip",
+    hashes = {
+      { hash = "c9d0afcd0f73b7d718de90aeac84fa68", label = "Puyo Puyo CD (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0E6D, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Original" },
+        { address=0X0E6D, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Arrange" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X194A, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X194A, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 3" },
+        { address=0X194A, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 5" },
+        { address=0X194A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Starting Level (Endless Mode)" },
+      },
+    },
+  },
+}

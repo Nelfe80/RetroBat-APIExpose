@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "The Land Before Time: Great Valley Racing Adventure",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-land-before-time-great-valley-racing-adventure",
+    file = "the-land-before-time-great-valley-racing-adventure.zip",
+    hashes = {
+      { hash = "f106cce2405b60ada071756657294459", label = "Land Before Time, The - Great Valley Racing Adventure (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4D6AC, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="- Race Stages, Main/Pause Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X4D490, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Level Select Main Menu" },
+        { address=0X83B40, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Ground/Air Status" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1FFDB6, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="- Power up active" },
+        { address=0X1FFDF6, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="- Traction powerup active" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5D950, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Treestar Dash timer score save" },
+        { address=0X5D954, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Timberland Run timer score save" },
+        { address=0X5D958, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Rolling Hills Dash timer score save" },
+        { address=0X5D95C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Longneck Run timer score save" },
+        { address=0X5D960, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Dino Dash timer score save" },
+        { address=0X5D964, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Red Rock Run timer score save" },
+        { address=0X5D968, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Stone Den Dash timer score save" },
+        { address=0X5D96C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Saurus Rock Run timer score save" },
+        { address=0X5D9D0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Treestar Dash Treestar score save" },
+        { address=0X5D9D4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Timberland Run Treestar score save" },
+        { address=0X5D9D8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Rolling Hills Dash Treestar score save" },
+        { address=0X5D9DC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Longneck Run Treestar score save" },
+        { address=0X5D9E0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Dino Dash Treestar score save" },
+        { address=0X5D9E4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Red Rock Run Treestar score save" },
+        { address=0X5D9E8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Stone Den Dash Treestar score save" },
+        { address=0X5D9EC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="- Littlefoot Saurus Rock Run Treestar score save" },
+      },
+    },
+  },
+}

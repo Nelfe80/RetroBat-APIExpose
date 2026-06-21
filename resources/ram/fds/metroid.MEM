@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "Metroid",
+    system = "fds",
+    system_name = "Famicom Disk System",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "metroid",
+    file = "metroid.zip",
+    hashes = {
+      { hash = "867ea5239cd206c5e2cd8b4f131a965b", label = "Metroid (Japan) (Rev 1).fds" },
+      { hash = "bb765939f75bcf9234b4bf77ca04281b", label = "Metroid (Japan) (Rev 3).fds" },
+      { hash = "d68f36d25a3474663bb1decfe0fcb395", label = "Metroid (Japan) (Rev 2).fds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001E, type="u8", condition="eq", value=0X05, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+        { address=0X001E, type="u8", condition="eq", value=0X06, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB41A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Deaths" },
+      },
+      health = {
+        { address=0X0106, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Upper4] Energy Second Digit (0X) decreased" },
+        { address=0X0106, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Upper4] Energy Second Digit (0X) increased" },
+        { address=0X0107, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy decreased" },
+        { address=0X0107, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy increased" },
+        { address=0XB410, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of Energy Tanks Collected decreased" },
+        { address=0XB410, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of Energy Tanks Collected increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XB411, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Varia Suit" },
+        { address=0XB421, type="u32le", condition="eq", value=0X104E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Morph Ball (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X15E2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Varia Suit (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X0325, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Morph Ball Bombs (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X0771, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="High Jump Boots (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X0DF0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Screw Attack (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X211D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X212E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2156, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X21FD, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Ridley's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2239, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Ridley's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2327, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2353, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2363, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Energy Tank (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2495, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X24BB, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2535, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2559, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X262F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X264B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X264E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2658, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Ridley's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X266F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2676, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X268F, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2696, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X269E, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Ridley's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2703, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X271B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Ridley's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X274B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X276A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X276B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X278A, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X278B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2794, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Missile Tank (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2867, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Orange Door (Tourian)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2882, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X28E5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X28F5, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X28F6, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X28F8, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X291D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Kraid's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2927, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Tourian)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X292B, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Tourian)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X29E2, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X29F0, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2A1D, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Purple Door (Ridley's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2A39, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Ridley's Hideout)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2A55, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2A69, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2B25, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Brinstar)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2B4C, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X2B71, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Red Door (Norfair)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X3800, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Mother Brain (Tourian)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X3C00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Zebetite (Tourian)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X4000, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Zebetite (Tourian)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X4400, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Zebetite (Tourian)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X4800, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Zebetite (Tourian)" },
+        { address=0XB421, type="u32le", condition="eq", value=0X4C00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Zebetite (Tourian)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XB411, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="High Jump Boots" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00A9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Credits Flashing Timer" },
+      },
+    },
+  },
+}

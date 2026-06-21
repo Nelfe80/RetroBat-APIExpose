@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Bomberman: Party Edition",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "bomberman-party-edition",
+    file = "bomberman-party-edition.zip",
+    hashes = {
+      { hash = "36fa87f9779d09de561af1cfd8d0f9b8", label = "Bomberman - Party Edition (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X91638, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits = 8006abac" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X925BC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0X97EEC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID 3" },
+      },
+    },
+  },
+}

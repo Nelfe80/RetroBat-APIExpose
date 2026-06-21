@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Azurian Attack",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "azurian-attack",
+    file = "azurian-attack.zip",
+    hashes = {
+      { hash = "c8294c98c4a4cdd2d97030dc248d2936", label = "azurian.7z <Azurian Attack>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X03FD, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Difficulty - 0 = Hard/Very Hard, 1 = Easy/Normal" },
+        { address=0X03FD, type="u8", condition="bit_true", bit=7, mask=0X80, action="DEMO_MODE", no_log=false, no_survey=false, desc="Number of Lives per credit - 0 = 3, 1 = 5" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X001D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Player's Life Count increased" },
+        { address=0X001D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Player's Life Count decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0027, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE BCD] Score Bonus for entering the Home ship" },
+        { address=0X00A9, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE BCD] Player 1 Score" },
+        { address=0X00AC, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE BCD] Player 2 Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X00F4, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X00F4, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X00F4, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X00F4, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Very Hard" },
+      },
+    },
+  },
+}

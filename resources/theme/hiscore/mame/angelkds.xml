@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 PRESENT    10000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 BY         9800</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 SEGA       9600</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 AND        9400</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 EXA        9200</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 ELECA      9000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 INOUE      8800</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 HAMADA     8600</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 OHTA       8400</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 IIZUKA     8200</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 SATOH      8000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 SUGOH      7800</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 TAKASUGI   7600</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 HIRANO     7400</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15            7200</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 VERY       7000</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 THANKS     6800</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 FOR        6600</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 YOUR       6400</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 PLAYING    1</text>
+		</text>
+	</view>
+</theme>

@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Dai-2-ji Super Robot Taisen",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "dai-2-ji-super-robot-taisen",
+    file = "dai-2-ji-super-robot-taisen.zip",
+    hashes = {
+      { hash = "1a74b83f2e229b9c42794e26a1231c39", label = "Dai-2-ji Super Robot Taisen (Japan).nes + eng patch" },
+      { hash = "e26ffe52de7a0ae6470724ec7f269808", label = "Dai-2-ji Super Robot Taisen (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7412, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Stage Clear 1-8 (increments in reverse order)" },
+        { address=0X7413, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[bitflags] Stage Clear 9-16 (increments in reverse order)" },
+      },
+    },
+  },
+}

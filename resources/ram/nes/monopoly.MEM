@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Monopoly",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Board"
+  },
+
+  rom = {
+    name = "monopoly",
+    file = "monopoly.zip",
+    hashes = {
+      { hash = "fe0d9e38b3439d1e2fcf0ac2399a5347", label = "Monopoly (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0059, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0xff - Game mode (Demo possible) ???" },
+        { address=0X0070, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="01 - Demo" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X03C5, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 money (ten thousands) increased" },
+        { address=0X03C6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 money (thousands) increased" },
+        { address=0X03C7, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 money (hundreds) increased" },
+        { address=0X03C8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 money (tens) increased" },
+        { address=0X03C9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 1 money (ones) increased" },
+        { address=0X03CA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 2 money increased" },
+        { address=0X03CF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 3 money increased" },
+        { address=0X03D4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 4 money increased" },
+        { address=0X03D9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 5 money increased" },
+        { address=0X03DE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 6 money increased" },
+        { address=0X03E3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 7 money increased" },
+        { address=0X03E8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player 8 money increased" },
+        { address=0X0423, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Income tax money (thousands) increased" },
+        { address=0X0424, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Income tax money (hundreds) increased" },
+        { address=0X0425, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Income tax money (tens) increased" },
+        { address=0X0426, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Income tax money (ones) increased" },
+        { address=0X0452, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money (ten thousands) increased" },
+        { address=0X0453, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money (thousands) increased" },
+        { address=0X0454, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money (hundreds) increased" },
+        { address=0X0455, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money (tens) increased" },
+        { address=0X0456, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money (ones) increased" },
+        { address=0X0566, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player from (ten thousands) increased" },
+        { address=0X0567, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player from (thousands) increased" },
+        { address=0X0568, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player from (hundreds) increased" },
+        { address=0X0569, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player from (tens) increased" },
+        { address=0X056A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player from (ones) increased" },
+        { address=0X056B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player to (ten thousands) increased" },
+        { address=0X056C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player to (thousands) increased" },
+        { address=0X056D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player to (hundreds) increased" },
+        { address=0X056E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player to (tens) increased" },
+        { address=0X056F, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Trade: Money player to (ones) increased" },
+      },
+    },
+  },
+}

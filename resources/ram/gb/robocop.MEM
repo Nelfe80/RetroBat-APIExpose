@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "RoboCop",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "robocop",
+    file = "robocop.zip",
+    hashes = {
+      { hash = "a477ac86be35d1fa70b708ad08dc88b8", label = "RoboCop (USA, Europe) (Rev 1).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0BE, type="u8", condition="eq", value=0XE9, action="GAME_OVER", no_log=false, no_survey=false, desc="Paused / Game Over / Intro" },
+        { address=0XC0BE, type="u8", condition="eq", value=0XEB, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Intro / Continue" },
+      },
+    },
+  },
+}

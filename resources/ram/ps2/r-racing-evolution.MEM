@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "R: Racing Evolution",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "r-racing-evolution",
+    file = "r-racing-evolution.zip",
+    hashes = {
+      { hash = "25edb17a1cbe71a55f53502e18d3008b", label = "R-Racing (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X4E66A8, type="u32le", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Automatic" },
+        { address=0X4E66A8, type="u32le", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Manual" },
+        { address=0X4E66A8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Racing Life: Transmission increased" },
+        { address=0X4E66A8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Racing Life: Transmission decreased" },
+        { address=0X4E66B0, type="u32le", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="On" },
+        { address=0X4E66B0, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Racing Life: Brake Assist increased" },
+        { address=0X4E66B0, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Racing Life: Brake Assist decreased" },
+        { address=0X4E66C0, type="u32le", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X4E66C0, type="u32le", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X4E66C0, type="u32le", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X4E66C0, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Racing Life: Difficulty increased" },
+        { address=0X4E66C0, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Racing Life: Difficulty decreased" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 1" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 2" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 3" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 4" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 5" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 6" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X06, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 7" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X07, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 8" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 9" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X09, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 10" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X0A, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 11" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X0B, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 12" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X0C, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 13" },
+        { address=0X4FCEE0, type="u32le", condition="eq", value=0X0D, action="LIVES_STATE", no_log=false, no_survey=false, desc="Chapter 14" },
+        { address=0X4FCEE0, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Racing Life: Current Chapter increased" },
+        { address=0X4FCEE0, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Racing Life: Current Chapter decreased" },
+        { address=0X50A5E4, type="u32le", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Locked" },
+        { address=0X50A5E4, type="u32le", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Gold Star" },
+        { address=0X50A5E4, type="u32le", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Silver Star" },
+        { address=0X50A5E4, type="u32le", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="Bronze Star" },
+        { address=0X50A5E4, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Racing Life: Chatper 1 Flags increased" },
+        { address=0X50A5E4, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Racing Life: Chatper 1 Flags decreased" },
+      },
+    },
+  },
+}

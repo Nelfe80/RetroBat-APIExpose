@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "Puzzle! Mushihime-tama",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puzzle-mushihime-tama",
+    file = "puzzle-mushihime-tama.zip",
+    hashes = {
+      { hash = "4ac881b297a91bd43bd8366b9d495434", label = "mushitam.zip <Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X139158, type="u32le", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[32 Bit] Demo Mode Flag" },
+        { address=0X13D296, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch Demo Sound" },
+      },
+      events = {
+        { address=0X138E8E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[8 Bit] Latest chain combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1385EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Floor Level" },
+        { address=0X139172, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Relative Level" },
+        { address=0X17316A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Absolute Level ID - Can be manipulated" },
+        { address=0X17319E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Level Clear Flag" },
+      },
+      zone = {
+        { address=0X138DCA, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8 Bit] Current Level - World Dependant" },
+        { address=0X160C8A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8 Bit] 'World' flag" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X136CD6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Boss Life for end of world fight increased" },
+        { address=0X136CD6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Boss Life for end of world fight decreased" },
+        { address=0X13D28E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch 1P Life increased" },
+        { address=0X13D28E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch 1P Life decreased" },
+        { address=0X13D292, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch VS Life increased" },
+        { address=0X13D292, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch VS Life decreased" },
+        { address=0X175CF2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Life Counter increased" },
+        { address=0X175CF2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Life Counter decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X139188, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Score Upper" },
+        { address=0X13918A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Score Lower" },
+        { address=0X172F62, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Round Clear Bonus Score" },
+      },
+      collectibles = {
+        { address=0X13D2A6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch Coin Setting increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X13D28A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch Difficulty" },
+        { address=0X13D29A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch Song Timing" },
+        { address=0X13D29E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch Ranking Save Flag" },
+        { address=0X13D2A2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] DipSwitch Chute Type" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X138602, type="u16le", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[16 Bit] Round Clear Time" },
+        { address=0X15AB46, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8 Bit] Continue Counter" },
+      },
+    },
+  },
+}

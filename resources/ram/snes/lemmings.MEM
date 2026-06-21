@@ -1,0 +1,61 @@
+return {
+  game = {
+    title = "Lemmings",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "lemmings",
+    file = "lemmings.zip",
+    hashes = {
+      { hash = "ecf0db12f88db32c4a129ff11af7f73d", label = "Lemmings (USA) (Rev 1).sfc" },
+      { hash = "02a11cc95bf9f62c601a4909e9b22e95", label = "Lemmings (USA) (MSU-1).sfc" },
+      { hash = "283c2e794c1eae82a31dfac608e76222", label = "Lemmings (USA).sfc" },
+      { hash = "a702074d3315bbc5081eccba932ecad1", label = "Lemmings (Europe).sfc" },
+      { hash = "aff500ae36d63bb253fd36e8300cc812", label = "Lemmings (Japan) (En).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00C6, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen - Hidden Menu" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+        { address=0X0176, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Results /w password or a loading level" },
+        { address=0X0176, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Menu" },
+        { address=0X0290, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Register" },
+        { address=0X02D0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Register" },
+        { address=0X1FFC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked - Fun" },
+        { address=0X1FFC1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked - Tricky" },
+        { address=0X1FFC2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked - Taxing" },
+        { address=0X1FFC3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked - Mayhem" },
+        { address=0X1FFC4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked - Sunsoft" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X00CC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Level Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0098, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Skill - Blocker" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0067, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lemmings Spawn Counter" },
+        { address=0X0093, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Timer" },
+        { address=0X00AC, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0X00C0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level" },
+        { address=0X0176, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Screen Register (*Mod2 Timer during gameplay)" },
+      },
+    },
+  },
+}

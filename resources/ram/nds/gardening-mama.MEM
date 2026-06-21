@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Gardening Mama",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation, Puzzle"
+  },
+
+  rom = {
+    name = "gardening-mama",
+    file = "gardening-mama.zip",
+    hashes = {
+      { hash = "9ad186c7be7fc9211b79abf917cabc23", label = "Gardening Mama (Europe) (En,Fr,De,Es,It) (Rev 1).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X122791, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pansy Score (Sow the seeds!) {No Medal}" },
+        { address=0X122792, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Pansy Score (A sprout's appeared!) {No Medal}" },
+        { address=0X12281D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tulip Score (Plant the bulb!) {No Medal}" },
+        { address=0X12281E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Tulip Score (It's sprouting!) {No Medal}" },
+        { address=0X1228D2, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Squash Score (There's a tiny veggie!) {No Medal}" },
+        { address=0X2D10F4, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Shown on Result Screen (1/2)" },
+        { address=0X2D1398, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Shown on Result Screen (2/2)" },
+      },
+      collectibles = {
+        { address=0X15F7F8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Pansy Score (Sow the seeds!) {Medal} increased" },
+        { address=0X15F7F9, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Pansy Score (A sprout's appeared!) {Medal} increased" },
+        { address=0X15F884, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Tulip Score (Plant the bulb!) {Medal} increased" },
+        { address=0X15F885, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Tulip Score (It's sprouting!) {Medal} increased" },
+        { address=0X15F939, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Squash Score (There's a tiny veggie!) {Medal} increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5CDC4, type="u32le", condition="eq", value=0XE3A01000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stop Timer" },
+        { address=0X5CDC4, type="u32le", condition="eq", value=0XE3A01100, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stop Timer" },
+        { address=0X5CDC4, type="u32le", condition="eq", value=0XE5910FFF, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Crash the Game" },
+        { address=0X5CDC4, type="u32le", condition="eq", value=0XE5911000, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Default Value" },
+        { address=0X5CDC4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Speed" },
+        { address=0X15F76A, type="u8", condition="eq", value=0X0, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Not Unlocked" },
+        { address=0X15F76A, type="u8", condition="eq", value=0X1, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Newly Unlocked (Will have a 'New!' graphics over the cosmetic until applied.)" },
+        { address=0X15F76A, type="u8", condition="eq", value=0X2, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Unlocked (Default value for unlocked from the start cosmetics)" },
+        { address=0X15F76A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer Screen Cosmetic Unlock" },
+      },
+    },
+  },
+}

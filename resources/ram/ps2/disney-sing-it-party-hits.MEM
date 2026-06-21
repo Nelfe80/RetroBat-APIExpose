@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Disney Sing It: Party Hits",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "disney-sing-it-party-hits",
+    file = "disney-sing-it-party-hits.zip",
+    hashes = {
+      { hash = "30d45b541a49983aef782d3d60d6f7a6", label = "Disney Sing It - Party Hits (Europe, Australia) (En,De,Es)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X180A448, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Awards | Total Points" },
+        { address=0X1820E3C, type="u16le", condition="eq", value=0X04, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Scores" },
+      },
+      collectibles = {
+        { address=0X1814DF0, type="u32le", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1229190, type="u16le", condition="eq", value=0X1481, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Demi Lovato as Sonny - Me, Myself and Time" },
+        { address=0X1229190, type="u16le", condition="eq", value=0X1565, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Justin Bieber - One Time" },
+        { address=0X1229190, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Song ID" },
+        { address=0X1809DA0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Awards | Challenge - Tough Time" },
+      },
+    },
+  },
+}

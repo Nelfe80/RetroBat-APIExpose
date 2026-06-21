@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "The Misadventures of Flink",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "the-misadventures-of-flink",
+    file = "the-misadventures-of-flink.zip",
+    hashes = {
+      { hash = "4b6da602b30589b18be136f60b8000b2", label = "Flink (Europe) (En,Fr,De).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA2C8, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC838, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level icons visible:" },
+        { address=0XC83B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level icons visible:" },
+        { address=0XC83C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Levels completed:" },
+        { address=0XC83F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Levels completed:" },
+        { address=0XC88A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level currently playing (8-bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA2CA, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XA2CA, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XA2DE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Silver Ring (Hex) increased" },
+        { address=0XA2DF, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Ring (Hex) increased" },
+        { address=0XA2E1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Diamond Ring (Hex) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XC7F2, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump Height" },
+        { address=0XC879, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Is Jumping - 0 no, 1 yes" },
+      },
+    },
+  },
+}

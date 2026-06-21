@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "SRS: Street Racing Syndicate",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "srs-street-racing-syndicate",
+    file = "srs-street-racing-syndicate.zip",
+    hashes = {
+      { hash = "09b7a8b36ee99a55cced65e388d20674", label = "SRS - Street Racing Syndicate (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

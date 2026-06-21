@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Bubble Guppies",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "bubble-guppies",
+    file = "bubble-guppies.zip",
+    hashes = {
+      { hash = "5cd5dcf39cc6f74b51b2fa7d77a86f24", label = "Bubble Guppies (Europe).nds" },
+    }
+  },
+
+  events = {
+  },
+}

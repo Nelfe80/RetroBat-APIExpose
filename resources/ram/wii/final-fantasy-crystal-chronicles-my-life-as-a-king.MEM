@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Final Fantasy Crystal Chronicles: My Life as a King",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "final-fantasy-crystal-chronicles-my-life-as-a-king",
+    file = "final-fantasy-crystal-chronicles-my-life-as-a-king.zip",
+    hashes = {
+      { hash = "a9ad61c5cf4f84bd0d3008b3bbbc1a63", label = "Final Fantasy Crystal Chronicles - My Life as a King (Europe) (WiiWare)" },
+      { hash = "1abb0c2b1cea03d9043705321ad3a297", label = "Final Fantasy Crystal Chronicles - My Life as a King (USA) (WiiWare)" },
+    }
+  },
+
+  events = {
+  },
+}

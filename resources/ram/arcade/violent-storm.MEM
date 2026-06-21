@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Violent Storm",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "violent-storm",
+    file = "violent-storm.zip",
+    hashes = {
+      { hash = "ea64ee242af91a7cbea4fc772304d406", label = "viostorma.7z <Violent Storm (ver AAC)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00C0, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X00CF, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Active" },
+        { address=0X0834, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Active" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X069A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dipswitch Settings - Game Options - Difficulty Level" },
+      },
+      stage = {
+        { address=0X1433, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Section - Screens" },
+        { address=0X13740, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dabel breaking through the wall in stage 1" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0698, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dipswitch Settings - Game Options - Extra Life increased" },
+        { address=0X0698, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dipswitch Settings - Game Options - Extra Life decreased" },
+        { address=0X0699, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dipswitch Settings - Game Options - Player's Life increased" },
+        { address=0X0699, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dipswitch Settings - Game Options - Player's Life decreased" },
+        { address=0X080D, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Starting" },
+        { address=0X080D, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (Credit Lost)" },
+        { address=0X080D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives increased" },
+        { address=0X080D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 1 Lives decreased" },
+        { address=0X088D, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="Starting" },
+        { address=0X088D, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead (Credit Lost)" },
+        { address=0X088D, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives increased" },
+        { address=0X088D, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player 2 Lives decreased" },
+        { address=0X1608, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X1628, type="u8", condition="eq", value=0X00, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XDE80, type="u8", condition="eq", value=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead - Selecting Character" },
+      },
+      health = {
+        { address=0X1608, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1608, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player 1 Health" },
+        { address=0X1628, type="u8", condition="eq", value=0X90, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Max" },
+        { address=0X1628, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player 2 Health" },
+        { address=0X1664, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health of enemy you last hit. If you pick up an object it will make this value 0. decreased" },
+        { address=0X1664, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health of enemy you last hit. If you pick up an object it will make this value 0. increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0810, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - BCD - 16 Bit" },
+        { address=0X0812, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score - BCD - 16 Bit" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X16CC, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="No Boss" },
+        { address=0X16CC, type="u8", condition="eq", value=0XC0, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X13740, type="u8", condition="eq", value=0X00, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Wall Not Broken" },
+        { address=0X13740, type="u8", condition="eq", value=0X21, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Wall Broken" },
+      },
+    },
+  },
+}

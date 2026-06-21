@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Rockman.EXE: Operate Shooting Star",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "rockman-exe-operate-shooting-star",
+    file = "rockman-exe-operate-shooting-star.zip",
+    hashes = {
+      { hash = "c72b9401c6724fc98ee6c34cd77f537b", label = "Rockman EXE - Operate Shooting Star (Japan) (En) (Bugfix) (v1.0) (Jumi).nds" },
+      { hash = "c3da9fc7a013548124ea546961a93424", label = "Rockman EXE - Operate Shooting Star (Japan).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X24BA1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Battery Level in ElecMan Stage] [8-Bits]" },
+        { address=0X24BDD, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Ice Block Quantity] [FireMan Stage] [8-Bits]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB4500, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Rockman.Exe life] [16 bits] increased" },
+        { address=0XB4500, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Rockman.Exe life] [16 bits] decreased" },
+      },
+      health = {
+        { address=0X24B3E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Rockman Max HP] [16-Bits] decreased" },
+        { address=0X24B3E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Rockman Max HP] [16-Bits] increased" },
+        { address=0XB45CC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 1 HP] [16 Bits] decreased" },
+        { address=0XB45CC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 1 HP] [16 Bits] increased" },
+        { address=0XB4698, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 2 HP] [16 Bits] decreased" },
+        { address=0XB4698, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 2 HP] [16 Bits] increased" },
+        { address=0XB4764, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 3 HP] [16 Bits] decreased" },
+        { address=0XB4764, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 3 HP] [16 Bits] increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X24C1D, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="[Power-Up Quantity] [8-Bits]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X271C0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[Star Colo Points] [16-Bits]" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X25B7F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Battle won against a boss] [Bitflags]" },
+        { address=0X25B80, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Battle won against a boss] [Bitflags]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X25B7C, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[WWW Doors] [Bitflags]" },
+        { address=0X25B82, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[WWW Doors] [Bitflags]" },
+        { address=0X25B84, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[WWW Doors] [Bitflags]" },
+      },
+    },
+  },
+}

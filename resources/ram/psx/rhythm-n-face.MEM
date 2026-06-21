@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Rhythm 'n' Face",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "rhythm-n-face",
+    file = "rhythm-n-face.zip",
+    hashes = {
+      { hash = "426be0ff3b6f66f267554a314eefb22d", label = "Rhythm 'n' Face (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X98B00, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage [32bit]" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X951D0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Stage 1 POPS - Rhythm [32bit]" },
+        { address=0X951D4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Stage 1 POPS - Art [32bit]" },
+        { address=0X95358, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Stage 2 DISCO - Rhythm [32bit]" },
+        { address=0X9535C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score - Stage 2 DISCO - Art [32bit]" },
+      },
+    },
+  },
+}

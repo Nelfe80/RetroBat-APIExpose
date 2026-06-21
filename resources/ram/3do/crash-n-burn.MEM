@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Crash 'n Burn",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "crash-n-burn",
+    file = "crash-n-burn.zip",
+    hashes = {
+      { hash = "e318e62b60e8f7f30d7d1680288f0ead", label = "Crash 'n Burn (Korea)" },
+    }
+  },
+
+  events = {
+  },
+}

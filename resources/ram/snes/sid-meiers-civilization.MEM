@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Sid Meier's Civilization",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "sid-meiers-civilization",
+    file = "sid-meiers-civilization.zip",
+    hashes = {
+      { hash = "faa2d43f507e35caebbea263a36dc6bf", label = "Sid Meier's Civilization (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X764E, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Democracy" },
+        { address=0X7655, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Democracy" },
+        { address=0X7691, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Democracy" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1995, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level of city [City screen]" },
+        { address=0X1BBD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="City Level [2]" },
+        { address=0X75DA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level of Competition (Number of Civs)" },
+        { address=0X784A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current City Level" },
+      },
+      zone = {
+        { address=0X06EC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Related to custom world options [37 and higher=earth]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3168, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="16bit can be used for ending? 0404=space 1063=dead 2000=conquer 130=conquerspace" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X15E4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Civilization Score" },
+        { address=0X20078, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hall of Fame top score 16bit" },
+      },
+      collectibles = {
+        { address=0X7630, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16 Bit] Current Money increased" },
+      },
+    },
+  },
+}

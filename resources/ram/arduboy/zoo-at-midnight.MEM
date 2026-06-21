@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Zoo at Midnight",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "zoo-at-midnight",
+    file = "zoo-at-midnight.zip",
+    hashes = {
+      { hash = "c8459bc68c1a7bb1886ea092bf107cf3", label = "Zoo at Midnight (World) (Erwin's Collection).hex" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Championship Pool",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "championship-pool",
+    file = "championship-pool.zip",
+    hashes = {
+      { hash = "01214c42aa62b421e7cef6b3e4511a5f", label = "Championship Pool (USA).gb" },
+    }
+  },
+
+  events = {
+  },
+}

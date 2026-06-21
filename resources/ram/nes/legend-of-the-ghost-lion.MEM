@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Legend of the Ghost Lion",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "legend-of-the-ghost-lion",
+    file = "legend-of-the-ghost-lion.zip",
+    hashes = {
+      { hash = "15582c142115c575a126b047a2511d3b", label = "Ghost Lion (USA).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X0432, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Monster 1 Courage (0x__ff = Dead)" },
+        { address=0X0442, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Monster 2 Courage (0x__ff = Dead)" },
+        { address=0X0452, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Monster 3 Courage (0x__ff = Dead)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0562, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Equipment - Weapon (ie: whatever was last by Maria to attack):" },
+      },
+    },
+  },
+}

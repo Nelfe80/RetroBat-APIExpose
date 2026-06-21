@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Heracles no Eikou II: Titan no Metsubou",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "heracles-no-eikou-ii-titan-no-metsubou",
+    file = "heracles-no-eikou-ii-titan-no-metsubou.zip",
+    hashes = {
+      { hash = "08ee0c40f7a8e804335ab12a28761cdd", label = "Heracles no Eikou II - Titan no Metsubou (Japan) (En) (v1.31) (The Spoony Bard).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X7660, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hero's level" },
+        { address=0X7680, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Centaur's Level" },
+        { address=0X76A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Statue's Level" },
+        { address=0X7801, type="u8", condition="eq", value=0X2B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Noarn" },
+        { address=0X7801, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hero's second magic (level10)" },
+        { address=0X7819, type="u8", condition="eq", value=0X23, action="NEW_LEVEL", no_log=false, no_survey=false, desc="KPara" },
+        { address=0X7819, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Centaur's sixth magic (level 9)" },
+      },
+      zone = {
+        { address=0X00C4, type="u24le", condition="eq", value=0X1C1F, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X779B, type="u8", condition="eq", value=0X17, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death sword" },
+        { address=0X779B, type="u8", condition="eq", value=0X2C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadly armor" },
+        { address=0X779B, type="u8", condition="eq", value=0X45, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deadly" },
+        { address=0X779B, type="u8", condition="eq", value=0X53, action="LIVES_STATE", no_log=false, no_survey=false, desc="Life" },
+        { address=0X779B, type="u8", condition="eq", value=0X57, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death bracelet" },
+        { address=0X779B, type="u8", condition="eq", value=0X77, action="LIVES_STATE", no_log=false, no_survey=false, desc="LifePip" },
+        { address=0X77EA, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="TC Death Ring (Tower North of Loran)" },
+      },
+      health = {
+        { address=0X6240, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy hp decreased" },
+        { address=0X6240, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy hp increased" },
+        { address=0X7661, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero's current HP decreased" },
+        { address=0X7661, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero's current HP increased" },
+        { address=0X7671, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Hero's max HP decreased" },
+        { address=0X7671, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Hero's max HP increased" },
+        { address=0X7681, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Centaur's HP decreased" },
+        { address=0X7681, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Centaur's HP increased" },
+        { address=0X7691, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Centaur's Max HP decreased" },
+        { address=0X7691, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Centaur's Max HP increased" },
+        { address=0X76A1, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Statue's HP decreased" },
+        { address=0X76A1, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Statue's HP increased" },
+        { address=0X76B1, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Statue's Max HP decreased" },
+        { address=0X76B1, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Statue's Max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X7600, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="bit 0 - learn of treasure from Centaur" },
+      },
+      weapon = {
+        { address=0X77CB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Hero's equipped weapon" },
+        { address=0X77D1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Centy's equipped weapon" },
+        { address=0X77D7, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Statue's equipped weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X7736, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24-bit] Gold increased" },
+        { address=0X77E8, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="TC 15 Gold (Temple North of Aros)" },
+        { address=0X77EA, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="TC 16 gold (Tower North of Loran)" },
+        { address=0X77EB, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="TC Hades Ring (Ice Tower)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X77CC, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Hero's equipped shield" },
+        { address=0X77D2, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Centy's equipped shield" },
+        { address=0X77D8, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Statue's equipped shield" },
+        { address=0X77EA, type="u8", condition="bit_true", bit=4, mask=0X10, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="TC Mirror Shield (Tower North of Loran)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X7605, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Bit0= Open dog door on tree dungeon" },
+      },
+    },
+  },
+}

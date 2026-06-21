@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "Trouble Shooter",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "trouble-shooter",
+    file = "trouble-shooter.zip",
+    hashes = {
+      { hash = "2857b7730fb7dbc5f7c1ec1a4ba1b0ee", label = "Battle Mania (Japan).md" },
+      { hash = "f29c5049a48f37a37b811a22dc731e3c", label = "Trouble Shooter (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA822, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="1b - Demo mode" },
+        { address=0XF624, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits remaining" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XFE1D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFE20, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="life increased" },
+        { address=0XFE20, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="life decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFE18, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Increassing Power Up" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD004, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16 Bit - Score x 10" },
+      },
+    },
+  },
+}

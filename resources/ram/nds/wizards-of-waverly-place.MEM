@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Wizards of Waverly Place",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "wizards-of-waverly-place",
+    file = "wizards-of-waverly-place.zip",
+    hashes = {
+      { hash = "e0043057746b822639d3e4ba9c5d4738", label = "Wizards of Waverly Place (Europe) (En,Fr,De,Es,It,Nl).nds" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tonka Raceway",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "tonka-raceway",
+    file = "tonka-raceway.zip",
+    hashes = {
+      { hash = "e4e5488d10d69c4c12eb2a9a522ffc7b", label = "Tonka Raceway (USA) (Rumble Version).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

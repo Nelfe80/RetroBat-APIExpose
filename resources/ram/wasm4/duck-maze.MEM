@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Duck Maze",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "duck-maze",
+    file = "duck-maze.zip",
+    hashes = {
+      { hash = "a359288d51ebe7678df4891d09452aa4", label = "Duck Maze (World) (Julia Marques Sanches).wasm" },
+    }
+  },
+
+  events = {
+  },
+}

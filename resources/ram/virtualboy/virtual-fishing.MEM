@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Virtual Fishing",
+    system = "virtualboy",
+    system_name = "Virtual Boy",
+    genre = "Hunting and Fishing"
+  },
+
+  rom = {
+    name = "virtual-fishing",
+    file = "virtual-fishing.zip",
+    hashes = {
+      { hash = "c03e792d8628c3c5729fdcae1620fb9a", label = "Virtual Fishing (Japan).vb" },
+      { hash = "ef6e68d193dae7eb9f51face69e9dcf9", label = "Virtual Fishing (Japan) (En) (v1.0) (Benjamin Stevens,Thunderstruck).vb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X006E, type="u16le", condition="eq", value=0XFFFF, action="PAUSE_ON", no_log=false, no_survey=false, desc="fish being measured" },
+        { address=0X006E, type="u16le", condition="eq", value=0X0000, action="PAUSE_ON", no_log=false, no_survey=false, desc="back in fishing screen" },
+        { address=0X0078, type="u8", condition="bit_true", bit=1, mask=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="PAUSE" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0036, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fishing in any stage, stays 0x09 on win screen" },
+        { address=0X0036, type="u8", condition="eq", value=0X0C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="At Contest Select screen, Stage select screen, and rules screen, or in Time Attack" },
+        { address=0X0074, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="in start menus" },
+        { address=0X0074, type="u8", condition="eq", value=0XA7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="in stage select map / fishing" },
+        { address=0X0074, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] flag for in stage select menu map" },
+        { address=0X01B2, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 - When at stage select screen" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0024, type="u8", condition="bit_true", bit=0, mask=0X01, action="ENVIRONMENT_UNDERWATER", no_log=false, no_survey=false, desc="1 - fish is hooked during underwater cam" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0036, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[8bit] Currently fishing flag" },
+        { address=0X0072, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[bitflag] Time attack flag" },
+      },
+    },
+  },
+}

@@ -1,0 +1,81 @@
+return {
+  game = {
+    title = "The Warriors",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-warriors",
+    file = "the-warriors.zip",
+    hashes = {
+      { hash = "752c92cc4f71e93650472695fa3998b0", label = "Warriors, The (USA) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X619910, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[32bit] armies of the night credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6FE906, type="u8", condition="eq", value=0XB0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="sit up level 10" },
+        { address=0X6FE906, type="u8", condition="eq", value=0XB1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="chin up level 10" },
+        { address=0X6FE906, type="u8", condition="eq", value=0XB2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="push up level 10" },
+        { address=0X6FE906, type="u8", condition="eq", value=0XB3, action="NEW_LEVEL", no_log=false, no_survey=false, desc="heavy bag level 10" },
+      },
+      stage = {
+        { address=0X6FE8FB, type="u8", condition="eq", value=0XB0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="armies of the night stage 1" },
+        { address=0X6FE8FB, type="u8", condition="eq", value=0XB1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="armies of the night stage 2" },
+        { address=0X6FE8FB, type="u8", condition="eq", value=0XB2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="armies of the night stage 3" },
+        { address=0X6FE8FB, type="u8", condition="eq", value=0XB3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="armies of the night stage 4" },
+        { address=0X6FE8FB, type="u8", condition="eq", value=0XB4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="armies of the night stage 5" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1FD883C, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Hardcore Soldier" },
+      },
+      health = {
+        { address=0X65A684, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] current health decreased" },
+        { address=0X65A684, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] current health increased" },
+        { address=0X65A686, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] max health decreased" },
+        { address=0X65A686, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] max health increased" },
+        { address=0X65A984, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] 1vs 1 enemy health part 2 decreased" },
+        { address=0X65A984, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] 1vs 1 enemy health part 2 increased" },
+        { address=0X65BB84, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16bit] 1 vs 1 enemy health decreased" },
+        { address=0X65BB84, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16bit] 1 vs 1 enemy health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X615878, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] player score king of the hill" },
+        { address=0X6FE490, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] score" },
+        { address=0X6FE79C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] first mission score" },
+        { address=0X6FE7A8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] mission 2 score" },
+        { address=0X6FE7B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] mission 3 score" },
+      },
+      collectibles = {
+        { address=0X1FD88FC, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] money increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X65EA04, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[16 bit] armies of the night final boss health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X6FE4C0, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32bit] objects broken by throwing people" },
+        { address=0X6FE4D4, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32bit] glass broken by throwing people" },
+        { address=0X6FE52C, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32bit] stuff broken" },
+        { address=0X6FE530, type="u32le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="[32bit] glass broken" },
+        { address=0X6FE8F9, type="u8", condition="eq", value=0XB0, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="writers block" },
+        { address=0X6FE8F9, type="u8", condition="eq", value=0XB6, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Destroyed" },
+      },
+    },
+  },
+}

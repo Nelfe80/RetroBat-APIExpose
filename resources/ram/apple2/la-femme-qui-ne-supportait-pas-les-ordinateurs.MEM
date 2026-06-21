@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "La Femme qui ne supportait pas les ordinateurs...",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "la-femme-qui-ne-supportait-pas-les-ordinateurs",
+    file = "la-femme-qui-ne-supportait-pas-les-ordinateurs.zip",
+    hashes = {
+      { hash = "9d3749dceb156e166fea18765263ba92", label = "La Femme qui ne supportait pas les ordinateurs... (1985) (Froggy Software) (Disk 1).dsk" },
+      { hash = "b70feb11a48af379b44300e8a20e47ca", label = "La Femme qui ne supportait pas les ordinateurs... (1985) (Froggy Software) (Disk 2).dsk" },
+    }
+  },
+
+  events = {
+  },
+}

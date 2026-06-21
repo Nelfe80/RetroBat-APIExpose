@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Guilty Gear X Plus",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "guilty-gear-x-plus",
+    file = "guilty-gear-x-plus.zip",
+    hashes = {
+      { hash = "f362d9cecfba54f28a8baa9a936bf737", label = "Guilty Gear X Plus (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X55D8DE, type="u8", condition="eq", value=0X0A, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X55DB28, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X55DB58, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X55C121, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Options - Round (8-bit)" },
+        { address=0X55D8A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Round (8-bit)" },
+        { address=0X5CB31A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Won Rounds (8-bit)" },
+        { address=0X5CB31E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 Won Rounds (8-bit)" },
+      },
+      stage = {
+        { address=0X55D8DE, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Final Fight" },
+        { address=0X55D8DE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade Mode Stage (8-bit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1CB40A6, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP (16-bit) decreased" },
+        { address=0X1CB40A6, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP (16-bit) increased" },
+        { address=0X1CB41C2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP (16-bit) decreased" },
+        { address=0X1CB41C2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP (16-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X55D8BC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (32-bit)" },
+      },
+      collectibles = {
+        { address=0X55D8A2, type="u8", condition="eq", value=0X09, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0X55D8A3, type="u8", condition="eq", value=0X09, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X55C120, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Options - Time Limit (8-bit)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Law of the West",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "law-of-the-west",
+    file = "law-of-the-west.zip",
+    hashes = {
+      { hash = "992c4d5bfd39183620517feb750a5811", label = "Law of the West.woz" },
+    }
+  },
+
+  events = {
+  },
+}

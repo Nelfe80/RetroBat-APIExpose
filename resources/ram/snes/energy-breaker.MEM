@@ -1,0 +1,80 @@
+return {
+  game = {
+    title = "Energy Breaker",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "energy-breaker",
+    file = "energy-breaker.zip",
+    hashes = {
+      { hash = "65e200616fae85e163bb619937826a33", label = "Energy Breaker (Japan) (En) (v1.02) (Disnesquick).sfc" },
+      { hash = "b0010547a9c7812326da17b66e167004", label = "Energy Breaker (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X15BE8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level #1" },
+        { address=0X15C18, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level #2" },
+        { address=0X15C48, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level #3" },
+        { address=0X15C78, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level #4" },
+        { address=0X15CA8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level #5" },
+      },
+      stage = {
+        { address=0X5179, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+        { address=0X109AB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit 3 | SS System defeated [Underground Factory] [Event]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5105, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Bit 1 | Dark Blue Stone [Waterfall of Life] [Chest] increased" },
+        { address=0X5105, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit 1 | Dark Blue Stone [Waterfall of Life] [Chest] decreased" },
+      },
+      health = {
+        { address=0X1097E, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Bit 5 | Adam's Apple recieved for not hurting Marion [Item] *" },
+        { address=0X165A0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fire Energy + decreased" },
+        { address=0X165A0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fire Energy + increased" },
+        { address=0X165A1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Water Energy + decreased" },
+        { address=0X165A1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Water Energy + increased" },
+        { address=0X165A2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Wind Energy + decreased" },
+        { address=0X165A2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Wind Energy + increased" },
+        { address=0X165A3, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Earth Energy + decreased" },
+        { address=0X165A3, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Earth Energy + increased" },
+        { address=0X165A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Fire Energy - decreased" },
+        { address=0X165A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Fire Energy - increased" },
+        { address=0X165A6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Wind Energy - decreased" },
+        { address=0X165A6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Wind Energy - increased" },
+        { address=0X165A7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Earth Energy - decreased" },
+        { address=0X165A7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Earth Energy - increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X1096B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Bit 3 | Receive Emerald of Light [Story]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X5103, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 0 | Guardian Ring [Underground Passage] [Chest] increased" },
+        { address=0X5107, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bitt 0 | Flame Ring [Flame Mines - Map 6] [Chest] increased" },
+        { address=0X510B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 2 | Power Ring [Isaly's House] [Chest] increased" },
+        { address=0X510C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 4 | Soothing Ring [Palace of Rivers - Map 2] [Chest] increased" },
+        { address=0X1099C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit 1 | Magnifying Ring [Limitz Basement] [Item] increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X10969, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 4 | Dariem defeated [Boss]" },
+        { address=0X1097A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Bit 1 | Boss fight started Parasite [Flame Mines - Map 9] [Event]" },
+        { address=0X109A8, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 1 | Dariem defeated [Boss]" },
+        { address=0X109AA, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 1 | Defeat Parasite in Flame Mines [Event] [Boss] *" },
+        { address=0X109AF, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Bit 6 | Final Boss defeated [Temple of Dreams - Map 6] [Boss] [Event]" },
+        { address=0X15D88, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP (not for Barkley)" },
+      },
+    },
+  },
+}

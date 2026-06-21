@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "The King of Fighters: Evolution",
+    system = "dreamcast",
+    system_name = "Dreamcast",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-king-of-fighters-evolution",
+    file = "the-king-of-fighters-evolution.zip",
+    hashes = {
+      { hash = "650f02286c028f48c8929218f7d3f626", label = "King of Fighters, The - Evolution (USA) (En,Ja,Es,Pt)" },
+      { hash = "4cf6d6e830ee40a961ea3d8dff4fe8b1", label = "King of Fighters, The - Evolution (USA) (Skip Gai and Syo Hours Requirement)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X416C84, type="u32le", condition="eq", value=0X44205356, action="DEMO_MODE", no_log=false, no_survey=false, desc="VS DEMO" },
+        { address=0X416C84, type="u32le", condition="eq", value=0X746E6F43, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X451BE4, type="u8", condition="eq", value=0X05, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X451BE4, type="u8", condition="eq", value=0X14, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue?" },
+        { address=0X451BE4, type="u8", condition="eq", value=0X15, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Service" },
+        { address=0X451BE4, type="u8", condition="eq", value=0X16, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X45DC50, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CPU Energy at 1/3" },
+        { address=0X45DC50, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Power Gauge Max" },
+        { address=0X45DC50, type="u8", condition="eq", value=0X03, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Striker Max" },
+      },
+      events = {
+        { address=0X45E9D2, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P2 - Hit Combo [8 bits]" },
+        { address=0X45E9D3, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="P1 - Hit Combo [8 bits]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1FD10, type="u32le", condition="eq", value=0X23760000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="110 hours" },
+        { address=0X1FD10, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Code - Gai and Syo requirement last tier [32 bits] // Level 3 Justice, Level 3 Dark" },
+        { address=0X1FF44, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Code - Gai and Syo requirement tier one [32 bits] // Level One Justice versions" },
+        { address=0X45DC52, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Match - Current Round [8 bits]" },
+        { address=0X45DD5B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Daimon [8 bits]" },
+        { address=0X45DD5C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Goro [8 bits]" },
+        { address=0X45DD5D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Billy [8 bits]" },
+        { address=0X45DD5E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Billy [8 bits]" },
+        { address=0X45DD5F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Yamazaki [8 bits]" },
+        { address=0X45DD60, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Yamazaki [8 bits]" },
+        { address=0X45DD61, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Kyo [8 bits]" },
+        { address=0X45DD62, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Kyo [8 bits]" },
+        { address=0X45DD63, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Chizuru [8 bits]" },
+        { address=0X45DD64, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Chizuru [8 bits]" },
+        { address=0X45DD65, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Athena [8 bits]" },
+        { address=0X45DD66, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Athena [8 bits]" },
+        { address=0X45DD67, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Alfred [8 bits]" },
+        { address=0X45DD68, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Alfred [8 bits]" },
+        { address=0X45DD69, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Fio [8 bits]" },
+        { address=0X45DD6A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Fio [8 bits]" },
+        { address=0X45DD6B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Gai [8 bits]" },
+        { address=0X45DD6C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Gai [8 bits]" },
+        { address=0X45DD6D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Justice] - Syo [8 bits]" },
+        { address=0X45DD6E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Strikers Level [Dark] - Syo [8 bits]" },
+        { address=0X45E3C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 - Rounds Wins [8 bits]" },
+        { address=0X45E3C4, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 won match (Team Play)" },
+        { address=0X45E3C4, type="u8", condition="eq", value=0X33, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Clear" },
+        { address=0X45E3C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 - Rounds Wins [8 bits]" },
+      },
+      stage = {
+        { address=0X45DC51, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Krizalid 1st Stage" },
+        { address=0X45DC51, type="u8", condition="eq", value=0X09, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Krizalid 2nd Stage" },
+        { address=0X45DC51, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Game - Stage [8 bits]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X45DC58, type="u8", condition="bit_true", bit=4, mask=0X10, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Psycho Soldiers Team" },
+      },
+      health = {
+        { address=0X453922, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 - HP Presses on Kyo [8 bits] decreased" },
+        { address=0X453922, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 - HP Presses on Kyo [8 bits] increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X45DD7D, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="2 points (default)" },
+        { address=0X45DDAC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Save Data - Battle Points [32 bits]" },
+        { address=0X45DE28, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 - Battle Points [32 bits]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X45DC44, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game - Mode [8 bits]" },
+        { address=0X45DD7A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Settings - Play Time [8 bits]" },
+      },
+    },
+  },
+}

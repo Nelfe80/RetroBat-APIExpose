@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "RPG Tsukuru: Super Dante",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "rpg-tsukuru-super-dante",
+    file = "rpg-tsukuru-super-dante.zip",
+    hashes = {
+      { hash = "7c5346fde52d1524df151ced0a7a9b44", label = "RPG Tsukuru - Super Dante (Japan).sfc" },
+      { hash = "c42164c754c0c545cc34e74583af2b04", label = "RPG Tsukuru - Super Dante (En) (v0.90) (MageCraft Translations).sfc" },
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X81A5, type="u8", condition="bit_true", bit=1, mask=0X02, action="TREASURE", no_log=false, no_survey=false, desc="Guarded by Dragon" },
+        { address=0X81A5, type="u8", condition="bit_true", bit=2, mask=0X04, action="TREASURE", no_log=false, no_survey=false, desc="Guarded by Dragon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X8191, type="u24le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[24bit] Gold increased" },
+      },
+    },
+  },
+}

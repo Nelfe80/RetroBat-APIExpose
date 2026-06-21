@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 Zたまたま 3147914</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 UOT 2500000</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 ARO 2000000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 .AN 1500000</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 D.P 1000000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#1 UOT 2500000</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#2 ARO 2000000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#3 .AN 1500000</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#4 D.P 1000000</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#5 OKO 500000</text>
+		</text>
+	</view>
+</theme>

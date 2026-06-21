@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pilot Academy",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pilot-academy",
+    file = "pilot-academy.zip",
+    hashes = {
+      { hash = "28381b5575e9b05d388c68a0524b8aea", label = "Pilot Academy (Europe) (En,Ja,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+  },
+}

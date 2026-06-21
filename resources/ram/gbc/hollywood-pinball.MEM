@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Hollywood Pinball",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "hollywood-pinball",
+    file = "hollywood-pinball.zip",
+    hashes = {
+      { hash = "9889afc5b4e72c9f96db8e6b4260f6b7", label = "Hollywood Pinball (Europe) (En,Fr,De,It) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC003, type="u8", condition="eq", value=0X62, action="GAME_OVER", no_log=false, no_survey=false, desc="check out (all tables)" },
+      },
+    },
+  },
+}

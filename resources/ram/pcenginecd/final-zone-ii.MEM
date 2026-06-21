@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Final Zone II",
+    system = "pcenginecd",
+    system_name = "PC Engine CD/TurboGrafx-CD",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "final-zone-ii",
+    file = "final-zone-ii.zip",
+    hashes = {
+      { hash = "8eee6c4f0210aec421fbb1b0fc767b78", label = "Final Zone II (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X001E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="27 if in control (choose char & in level)" },
+        { address=0X0705, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="rd1" },
+        { address=0X0705, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="rd2" },
+        { address=0X0705, type="u8", condition="eq", value=0X6, action="NEW_LEVEL", no_log=false, no_survey=false, desc="rd7 (final level)" },
+        { address=0X0705, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0760, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp decreased" },
+        { address=0X0760, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp increased" },
+        { address=0X099C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X099C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X09B2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X09B2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X09C8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X09C8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X09DE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X09DE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X09F4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X09F4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X0A0A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X0A0A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X0A20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X0A20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X0A36, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X0A36, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X0A4C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X0A4C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+        { address=0X0A62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="hp for an enemy on screen decreased" },
+        { address=0X0A62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="hp for an enemy on screen increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0720, type="u8", condition="eq", value=0XB0, action="WEAPON_STATE", no_log=false, no_survey=false, desc="b (secondary weapon)" },
+        { address=0X0720, type="u8", condition="eq", value=0XB1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="a (main weapon)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0B5B, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="secondary weapon ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0986, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss hp (when not in cutscene)" },
+      },
+    },
+  },
+}

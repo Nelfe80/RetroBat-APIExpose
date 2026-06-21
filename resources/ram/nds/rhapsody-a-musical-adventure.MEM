@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Rhapsody: A Musical Adventure",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "rhapsody-a-musical-adventure",
+    file = "rhapsody-a-musical-adventure.zip",
+    hashes = {
+      { hash = "df464d4aee368c83e060d2e43790a81e", label = "Rhapsody - A Musical Adventure (Europe) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XF6872, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cornet's Level" },
+        { address=0XF68A6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Slot 1 - Current Level" },
+        { address=0XF6942, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Reserve Slot 1 - Level" },
+      },
+      zone = {
+        { address=0XF64BC, type="u16le", condition="eq", value=0X26AD, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Map" },
+      },
+      stage = {
+        { address=0XF68DA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot 2 - Level" },
+        { address=0XF690E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character Slot 3 - Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XF6812, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Candy in Inventory decreased" },
+        { address=0XF6812, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Candy in Inventory increased" },
+        { address=0XF6824, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Cocoa in Inventory decreased" },
+        { address=0XF6824, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Cocoa in Inventory increased" },
+        { address=0XF6876, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cornet's Current HP decreased" },
+        { address=0XF6876, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cornet's Current HP increased" },
+        { address=0XF6878, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Cornet's Max HP decreased" },
+        { address=0XF6878, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Cornet's Max HP increased" },
+        { address=0XF68AA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character Slot 1 - Current HP decreased" },
+        { address=0XF68AA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character Slot 1 - Current HP increased" },
+        { address=0XF68AC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character Slot 1 - Max HP decreased" },
+        { address=0XF68AC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character Slot 1 - Max HP increased" },
+        { address=0XF68DE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character Slot 2 - Current HP decreased" },
+        { address=0XF68DE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character Slot 2 - Current HP increased" },
+        { address=0XF68E0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character Slot 2 - Max HP decreased" },
+        { address=0XF68E0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character Slot 2 - Max HP increased" },
+        { address=0XF6912, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character Slot 3 - Current HP decreased" },
+        { address=0XF6912, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character Slot 3 - Current HP increased" },
+        { address=0XF6914, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Character Slot 3 - Max HP decreased" },
+        { address=0XF6914, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Character Slot 3 - Max HP increased" },
+        { address=0XF6946, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Reserve Slot 1 - Current HP decreased" },
+        { address=0XF6946, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Reserve Slot 1 - Current HP increased" },
+        { address=0XF6948, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Reserve Slot 1 - Max HP decreased" },
+        { address=0XF6948, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Reserve Slot 1 - Max HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XF673B, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Flags" },
+      },
+      weapon = {
+        { address=0XF6770, type="u8", condition="bit_true", bit=0, mask=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon (Red)" },
+        { address=0XF6770, type="u8", condition="bit_true", bit=1, mask=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon (Black)" },
+        { address=0XF6770, type="u8", condition="bit_true", bit=2, mask=0X04, action="WEAPON_STATE", no_log=false, no_survey=false, desc="T. Weapon" },
+        { address=0XF68A4, type="u16le", condition="eq", value=0X78, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+        { address=0XF68A4, type="u16le", condition="eq", value=0X79, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon" },
+        { address=0XF68A4, type="u16le", condition="eq", value=0X7A, action="WEAPON_STATE", no_log=false, no_survey=false, desc="T. Weapon" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF684E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Warp Ring in Inventory increased" },
+        { address=0XF6854, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rare Ring in Inventory increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XF682F, type="u8", condition="change", action="SPEED_START", no_log=false, no_survey=false, desc="Speed Shoes in Inventory" },
+      },
+    },
+  },
+}

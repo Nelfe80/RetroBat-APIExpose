@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "Mega Man Battle Network 3: Blue Version",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "mega-man-battle-network-3-blue-version",
+    file = "mega-man-battle-network-3-blue-version.zip",
+    hashes = {
+      { hash = "6fe31df0144759b34ad666badaacc442", label = "Megaman - Battle Network 3 - Blue Version (USA).gba" },
+      { hash = "c1f7ade0ebce39a97c6efcad33661e20", label = "Megaman - Battle Network 3 - Blue Version (Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9884, type="u16le", condition="eq", value=0X028A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Statue Comp" },
+        { address=0X117F8, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Main Menu" },
+        { address=0X117F8, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Normal Gameplay/Battles" },
+        { address=0X117F8, type="u8", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="In battle" },
+        { address=0X117F8, type="u8", condition="eq", value=0X14, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Capcom" },
+        { address=0X117F8, type="u8", condition="eq", value=0X18, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Inside a Menu" },
+        { address=0X117F8, type="u8", condition="eq", value=0X1C, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Shop" },
+        { address=0X117F8, type="u8", condition="eq", value=0X20, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X3F353, type="u8", condition="eq", value=0X3F, action="DEMO_MODE", no_log=false, no_survey=false, desc="BlueDemon" },
+        { address=0X3F353, type="u8", condition="eq", value=0X58, action="DEMO_MODE", no_log=false, no_survey=false, desc="DemonEye" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9895, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Style Level] [8-BIts]" },
+      },
+      stage = {
+        { address=0X8346, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="186 - IceStage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8349, type="u8", condition="bit_true", bit=6, mask=0X40, action="LIVES_STATE", no_log=false, no_survey=false, desc="LifeAura (Mega)" },
+        { address=0X835A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LIVES_STATE", no_log=false, no_survey=false, desc="LifeSwrd" },
+      },
+      health = {
+        { address=0X9884, type="u16le", condition="eq", value=0X0088, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Lan's HP" },
+        { address=0X9884, type="u16le", condition="eq", value=0X0188, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Mayl's HP" },
+        { address=0X9884, type="u16le", condition="eq", value=0X0288, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Dex's HP" },
+        { address=0X9884, type="u16le", condition="eq", value=0X0388, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Yai's HP" },
+        { address=0X9884, type="u16le", condition="eq", value=0X0488, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Tamako's HP" },
+        { address=0X9884, type="u16le", condition="eq", value=0X0588, action="HEALTH_STATE", no_log=false, no_survey=false, desc="???'s HP" },
+        { address=0X98A0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Mega Man Actual HP] [16-Bits] decreased" },
+        { address=0X98A0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Mega Man Actual HP] [16-Bits] increased" },
+        { address=0X98A2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Mega Man Max HP] [16-Bits] decreased" },
+        { address=0X98A2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Mega Man Max HP] [16-Bits] increased" },
+        { address=0X9A20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[HP Memory] [8-Bits] decreased" },
+        { address=0X9A20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[HP Memory] [8-Bits] increased" },
+        { address=0X3F294, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[MegaMan Actual HP In Battle] [16-Bits] decreased" },
+        { address=0X3F294, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[MegaMan Actual HP In Battle] [16-Bits] increased" },
+        { address=0X3F296, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[MegaMan Max HP In Battle] [16-Bits] decreased" },
+        { address=0X3F296, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[MegaMan Max HP In Battle] [16-Bits] increased" },
+        { address=0X3F368, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 1 Actual HP] [16-Bits] decreased" },
+        { address=0X3F368, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 1 Actual HP] [16-Bits] increased" },
+        { address=0X3F36A, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 1 Max HP] [16-Bits] decreased" },
+        { address=0X3F36A, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 1 Max HP] [16-Bits] increased" },
+        { address=0X3F43C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 2 Actual HP] [16-Bits] decreased" },
+        { address=0X3F43C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 2 Actual HP] [16-Bits] increased" },
+        { address=0X3F43E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 2 Max HP] [16-Bits] decreased" },
+        { address=0X3F43E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 2 Max HP] [16-Bits] increased" },
+        { address=0X3F510, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 3 Actual HP] [16-Bits] decreased" },
+        { address=0X3F510, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 3 Actual HP] [16-Bits] increased" },
+        { address=0X3F512, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[Enemy 3 Max HP] [16-Bits] decreased" },
+        { address=0X3F512, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[Enemy 3 Max HP] [16-Bits] increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X8E63, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="[Nv. Shield] [8-Bits]" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9884, type="u16le", condition="eq", value=0X0603, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Outdoor Bath" },
+        { address=0X9884, type="u16le", condition="eq", value=0X0307, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Wily Monitor Room" },
+        { address=0X9884, type="u16le", condition="eq", value=0X088A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Monitor Room Comp" },
+        { address=0X9884, type="u16le", condition="eq", value=0X038D, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Door Sensor Comp" },
+      },
+    },
+  },
+}

@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Scaffolder",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "scaffolder",
+    file = "scaffolder.zip",
+    hashes = {
+      { hash = "7816deddb48c44df99c6bb3535c1dc88", label = "Scaffolder (USA, Europe) (Level Fix by Hotscrock).sv" },
+      { hash = "c07638809b49f2c922c4d4d7519e6f9c", label = "Scaffolder (USA, Europe).sv" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X009E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X00E8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level beaten" },
+      },
+      zone = {
+        { address=0X009D, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current World" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00E9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X00E9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00EA, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Out" },
+      },
+    },
+  },
+}

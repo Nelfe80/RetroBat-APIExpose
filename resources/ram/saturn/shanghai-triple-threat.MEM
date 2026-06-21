@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Shanghai: Triple-Threat",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "shanghai-triple-threat",
+    file = "shanghai-triple-threat.zip",
+    hashes = {
+      { hash = "b4d6a5dd218520a93e5b7598a4a32e8a", label = "Shanghai - Triple-Threat (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18E754, type="u16le", condition="eq", value=0XFFFF, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Game Over" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X18E754, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="16-bit Continue Timer" },
+      },
+    },
+  },
+}

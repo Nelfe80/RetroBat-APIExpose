@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hell: A Cyberpunk Thriller",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "hell-a-cyberpunk-thriller",
+    file = "hell-a-cyberpunk-thriller.zip",
+    hashes = {
+      { hash = "08caedb4a8fba5f3584fcd45b5eb5189", label = "Hell - A Cyberpunk Thriller (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

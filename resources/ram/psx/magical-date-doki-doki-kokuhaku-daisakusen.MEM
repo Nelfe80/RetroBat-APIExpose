@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Magical Date: Doki Doki Kokuhaku Daisakusen",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Party"
+  },
+
+  rom = {
+    name = "magical-date-doki-doki-kokuhaku-daisakusen",
+    file = "magical-date-doki-doki-kokuhaku-daisakusen.zip",
+    hashes = {
+      { hash = "85f100bae1b33f7deaad1c760ddb2944", label = "Magical Date - Doki Doki Kokuhaku Daisakusen (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDC2FD, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Continue Play Allowed" },
+        { address=0XDC778, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Current Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XDC2FB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Difficulty Level" },
+        { address=0X10C04D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Look for the Star Difficulty Level" },
+        { address=0X10C04E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Perfect Match Level" },
+        { address=0X10C04F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Box Counting Difficulty Level" },
+        { address=0X10C050, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Crucible Aquarium Difficulty Level" },
+        { address=0X10C051, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Punch! Difficulty Level" },
+        { address=0X10C052, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Cycling Difficulty Level" },
+        { address=0X10C053, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Balloon Pump Difficulty Level" },
+        { address=0X10C054, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Seagull Flight Difficulty Level" },
+        { address=0X10C055, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Find the Letter Difficulty Level" },
+        { address=0X10C056, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Cooking Men Difficulty Level" },
+        { address=0X10C057, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Word Mixer Difficulty Level" },
+        { address=0X10C05A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Kero Kero Fighter Difficulty Level" },
+        { address=0X10C05C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Perfect Dock Difficulty Level" },
+        { address=0X10C05D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Dancing Match Difficulty Level" },
+        { address=0X10C05E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Eye Beams Difficulty Level" },
+        { address=0X10C05F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Go-Go Rocket Difficulty Level" },
+        { address=0X10C060, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Spin Master Difficulty Level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X14393C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Kero Kero Frog P1 Health decreased" },
+        { address=0X14393C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Kero Kero Frog P1 Health increased" },
+        { address=0X143A34, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Kero Kero Frog P2 Health decreased" },
+        { address=0X143A34, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Kero Kero Frog P2 Health increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1782B8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Minigame Objectives Left" },
+      },
+    },
+  },
+}

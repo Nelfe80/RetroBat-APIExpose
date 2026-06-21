@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Sesame Street: Elmo's Number Journey",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Education"
+  },
+
+  rom = {
+    name = "sesame-street-elmos-number-journey",
+    file = "sesame-street-elmos-number-journey.zip",
+    hashes = {
+      { hash = "f733453ed26afa0aca8d3eb3b5b6d8ea", label = "Sesame Street - Elmo's Number Journey (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X75094, type="u32be", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0X12F154, type="u32be", condition="eq", value=0X15, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA93A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Numbers collected on current level segment" },
+        { address=0XBD85B, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 1" },
+        { address=0XBD85B, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 2" },
+        { address=0XBD85B, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round 3" },
+        { address=0XBD85B, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Bonus Rounds Complete" },
+        { address=0XBD85B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Bonus Rounds" },
+        { address=0X10E648, type="u16be", condition="eq", value=0X0C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="12" },
+        { address=0X10E648, type="u16be", condition="eq", value=0X10, action="NEW_LEVEL", no_log=false, no_survey=false, desc="16" },
+        { address=0X10E648, type="u16be", condition="eq", value=0X14, action="NEW_LEVEL", no_log=false, no_survey=false, desc="20" },
+        { address=0X10E648, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Maximum amount of numbers that need to be collected to move onto the bonus round (Depends on dif" },
+        { address=0X12F154, type="u32be", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bonus Round" },
+      },
+    },
+  },
+}

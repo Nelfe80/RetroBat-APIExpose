@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Breaker's Revenge",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "breakers-revenge",
+    file = "breakers-revenge.zip",
+    hashes = {
+      { hash = "a416af718d16d91a017f185007e0466a", label = "breakrev.7z <Breakers Revenge>" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X734E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP (16-bit) decreased" },
+        { address=0X734E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP (16-bit) increased" },
+        { address=0X78AE, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP (16-bit) decreased" },
+        { address=0X78AE, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP (16-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X7176, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (16-bit)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7C26, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round Timer (16-bit)" },
+      },
+    },
+  },
+}

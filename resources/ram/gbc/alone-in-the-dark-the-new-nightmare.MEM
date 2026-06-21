@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Alone in the Dark: The New Nightmare",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Adventure, Horror"
+  },
+
+  rom = {
+    name = "alone-in-the-dark-the-new-nightmare",
+    file = "alone-in-the-dark-the-new-nightmare.zip",
+    hashes = {
+      { hash = "30ec849758f703d7071e2ac28e048101", label = "Alone in the Dark - The New Nightmare (Europe) (En,Fr,De,Es,It,Nl).gbc" },
+      { hash = "d97055e4a2fd4624fc924c4834ace35e", label = "Alone in the Dark - The New Nightmare (USA) (En,Fr,Es).gbc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC02A, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Number of invincibility frames left (0x00 unless taken damage recently)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XC02B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Player's health value (menu display, not updated during battle, caps at 0x64) increased" },
+        { address=0XC430, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Pause state during battle increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Who Wants to Be a Millionaire: Junior",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "who-wants-to-be-a-millionaire-junior",
+    file = "who-wants-to-be-a-millionaire-junior.zip",
+    hashes = {
+      { hash = "f131b1d41f097b7120415a29e67f2c58", label = "Who Wants to Be a Millionaire - Junior (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X16AE38, type="u8", condition="eq", value=0X08, action="GAME_OVER", no_log=false, no_survey=false, desc="Game is finished (Either game over or earn 1 mil)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X737EC, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X737EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bit 0] 50/50 Lifeline increased" },
+        { address=0X737EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bit 0] 50/50 Lifeline decreased" },
+        { address=0X73814, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X73814, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bit 0] Friend Lifeline increased" },
+        { address=0X73814, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bit 0] Friend Lifeline decreased" },
+        { address=0X7383C, type="u8", condition="eq", value=0X01, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Used" },
+        { address=0X7383C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[Bit 0] Audience Lifeline increased" },
+        { address=0X7383C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[Bit 0] Audience Lifeline decreased" },
+      },
+    },
+  },
+}

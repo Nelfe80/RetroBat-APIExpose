@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Prehistorik 2",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "prehistorik-2",
+    file = "prehistorik-2.zip",
+    hashes = {
+      { hash = "361b85ff77ff344ecd2082dfb99cc127", label = "Prehistorik 2 (1993)(Titus)(M3).dsk" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X3F30, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8 bit) - number of lives increased" },
+        { address=0X3F30, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) - number of lives decreased" },
+      },
+    },
+  },
+}

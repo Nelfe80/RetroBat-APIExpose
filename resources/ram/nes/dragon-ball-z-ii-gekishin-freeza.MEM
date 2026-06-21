@@ -1,0 +1,22 @@
+return {
+  game = {
+    title = "Dragon Ball Z II: Gekishin Freeza!!",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Fighting, Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "dragon-ball-z-ii-gekishin-freeza",
+    file = "dragon-ball-z-ii-gekishin-freeza.zip",
+    hashes = {
+      { hash = "59ce3cea96c3a41388a44eeed79b1c29", label = "Dragon Ball Z II - Gekishin Freeza!! (Japan) (Rev 1).nes" },
+      { hash = "b1bbdbb2a7f9dddd50d6cda1dbe876d6", label = "Dragon Ball Z II - Gekishin Freeza!! (Japan).nes" },
+      { hash = "236038b0e35445cd94525c223b23450e", label = "Dragon Ball Z II - Gekishin Freeza!! (Japan) (En) (v0.7) (Saiya Translations).nes" },
+      { hash = "1f541779a89d42646c9a04c73ae9a42f", label = "Dragon Ball Z II - Gekishin Freeza!! (Japan) (En) (v1.02) (Gyroballer).nes" },
+    }
+  },
+
+  events = {
+  },
+}

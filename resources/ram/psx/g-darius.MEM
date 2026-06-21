@@ -1,0 +1,63 @@
+return {
+  game = {
+    title = "G Darius",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Shoot'em up, Horizontal, Shoot'em Up"
+  },
+
+  rom = {
+    name = "g-darius",
+    file = "g-darius.zip",
+    hashes = {
+      { hash = "893f4781591dcc8808bc1297a2ce83c9", label = "G. Darius (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XABD80, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBABD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shot Level" },
+        { address=0XBABD9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shot Sublevel" },
+        { address=0XBAC08, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Missile Level" },
+        { address=0XBAC09, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Missile Sublevel" },
+        { address=0XBAC28, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arm Level" },
+        { address=0XBAC29, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arm Sublevel" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBA69E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XBA69E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBA698, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XABDC0, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Power Up Level (Beginner/VS Boss only)" },
+        { address=0XD5D10, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="VS Boss Option, Game Rank" },
+        { address=0XD5D12, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="VS Boss Option, Player Stock" },
+        { address=0XD5D14, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="VS Boss Option, Capture Ball Stock" },
+        { address=0XD5D16, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="VS Boss Option, Credit Stock" },
+        { address=0XD5D1C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Bitflags] VS Boss, Boss Select" },
+        { address=0XD5D1D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Bitflags] VS Boss, Boss Select" },
+        { address=0XD5D1E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Bitflags] VS Boss, Boss Select" },
+        { address=0XD5D1F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[8-bit Bitflags] VS Boss, Boss Select" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XBAC2A, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Strength" },
+      },
+    },
+  },
+}

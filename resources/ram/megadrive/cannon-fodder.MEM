@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Cannon Fodder",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "cannon-fodder",
+    file = "cannon-fodder.zip",
+    hashes = {
+      { hash = "80c93623c29ab70da823860a5f46e70c", label = "Cannon Fodder (Europe).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1D62, type="u16be", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="flag used password or reloading mission, 0xFFFF if used, cleared on next mission" },
+        { address=0X280B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level skip cheat flag by password MGFJH" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1DA4, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="soldier slot1 name_id" },
+        { address=0X1DA7, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="soldier slot1 rank" },
+        { address=0X1DB0, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="soldier slot2 name_id" },
+        { address=0X1DB3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="soldier slot2 rank" },
+        { address=0X1DBC, type="u16be", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="soldier slot3 name_id" },
+        { address=0X1DBF, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="soldier slot3 rank" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X445A, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="object slot 0x05 type" },
+        { address=0X48F6, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="object slot 0x0F type" },
+        { address=0X4ACE, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="object slot 0x13 type" },
+        { address=0X4B44, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="object slot 0x14 type" },
+        { address=0X4C30, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="object slot 0x16 type" },
+        { address=0X4F6A, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="object slot 0x1D type" },
+      },
+    },
+  },
+}

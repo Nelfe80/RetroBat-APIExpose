@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "The Weakest Link",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-weakest-link",
+    file = "the-weakest-link.zip",
+    hashes = {
+      { hash = "9f10a2103ee6d39a680572d2632829cb", label = "Weakest Link, The (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X795AC, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First Round" },
+        { address=0X795AC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="2nd Round" },
+        { address=0X795AC, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="3rd Round" },
+        { address=0X795AC, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="4th Round" },
+        { address=0X79884, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Possible Round Progress Indicator" },
+        { address=0X799A4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Possible Round Progress Indicator" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X796C8, type="u16le", condition="eq", value=0X0A, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Eddie" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X79110, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="2.500" },
+        { address=0X79110, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="5.000" },
+        { address=0X79110, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="10.000" },
+        { address=0X79110, type="u8", condition="eq", value=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="25.000" },
+        { address=0X79110, type="u8", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="50.000" },
+        { address=0X79110, type="u8", condition="eq", value=0X06, action="MONEY_STATE", no_log=false, no_survey=false, desc="75.000" },
+        { address=0X79110, type="u8", condition="eq", value=0X07, action="MONEY_STATE", no_log=false, no_survey=false, desc="125.000" },
+        { address=0X79110, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="p1 t1" },
+        { address=0X79110, type="u8", condition="eq", value=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="p1 t5" },
+        { address=0X79110, type="u8", condition="eq", value=0X09, action="MONEY_STATE", no_log=false, no_survey=false, desc="p2 t5" },
+        { address=0X797E0, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit] Prize Money increased" },
+        { address=0XA3830, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32bit]Money in the bank increased" },
+      },
+    },
+  },
+}

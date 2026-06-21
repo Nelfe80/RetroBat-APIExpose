@@ -1,0 +1,127 @@
+return {
+  game = {
+    title = "Hybrid Heaven",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "hybrid-heaven",
+    file = "hybrid-heaven.zip",
+    hashes = {
+      { hash = "c47e95bb32ab132c41d67bd243f9e02a", label = "Hybrid Heaven (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5B84A, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen: (8-Bit)" },
+        { address=0X8D54C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="PLAYER: Paused (8-Bit)" },
+        { address=0X1BBD58, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="SETTING: Demo Mode (8-Bit)" },
+      },
+      events = {
+        { address=0X17DF14, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 1, Move 3 (8-Bit)" },
+        { address=0X17DF15, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 1, Move 2 (8-Bit)" },
+        { address=0X17DF16, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 1, Move 1 (8-Bit)" },
+        { address=0X17DF17, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 1 Length (8-Bit)" },
+        { address=0X17DF18, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 2 Length (8-Bit)" },
+        { address=0X17DF1A, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 1, Move 5 (8-Bit)" },
+        { address=0X17DF1B, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 1, Move 4 (8-Bit)" },
+        { address=0X17DF1C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 2, Move 4 (8-Bit)" },
+        { address=0X17DF1D, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 2, Move 3 (8-Bit)" },
+        { address=0X17DF1E, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 2, Move 2 (8-Bit)" },
+        { address=0X17DF1F, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 2, Move 1 (8-Bit)" },
+        { address=0X17DF20, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 3, Move 1 (8-Bit)" },
+        { address=0X17DF21, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 3 Length (8-Bit)" },
+        { address=0X17DF23, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 2, Move 5 (8-Bit)" },
+        { address=0X17DF24, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 3, Move 5 (8-Bit)" },
+        { address=0X17DF25, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 3, Move 4 (8-Bit)" },
+        { address=0X17DF26, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 3, Move 3 (8-Bit)" },
+        { address=0X17DF27, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="PLAYER: Custom Combo 3, Move 2 (8-Bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X17DC8A, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="STAT: Level (16-Bit)" },
+        { address=0X1BEF38, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL: ElementTable (16-Bit)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X17E00B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="ITEM-REFRESH: Life Charger S (8-Bit) increased" },
+        { address=0X17E00B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ITEM-REFRESH: Life Charger S (8-Bit) decreased" },
+        { address=0X17E013, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="ITEM-REFRESH: Life Charger M (8-Bit) increased" },
+        { address=0X17E013, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ITEM-REFRESH: Life Charger M (8-Bit) decreased" },
+        { address=0X17E01B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="ITEM-REFRESH: Life Charger L (8-Bit) increased" },
+        { address=0X17E01B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ITEM-REFRESH: Life Charger L (8-Bit) decreased" },
+        { address=0X17E023, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="ITEM-REFRESH: Life Charger X (8-Bit) increased" },
+        { address=0X17E023, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ITEM-REFRESH: Life Charger X (8-Bit) decreased" },
+        { address=0X183EAB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="TECH-BOOL: Leg Death Lock (8-Bit)" },
+        { address=0X1BC374, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="BATTLE-ITEM-R: Life Charger X (8-Bit) increased" },
+        { address=0X1BC374, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BATTLE-ITEM-R: Life Charger X (8-Bit) decreased" },
+        { address=0X1BC375, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="BATTLE-ITEM-R: Life Charger L (8-Bit) increased" },
+        { address=0X1BC375, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BATTLE-ITEM-R: Life Charger L (8-Bit) decreased" },
+        { address=0X1BC376, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="BATTLE-ITEM-R: Life Charger M (8-Bit) increased" },
+        { address=0X1BC376, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BATTLE-ITEM-R: Life Charger M (8-Bit) decreased" },
+        { address=0X1BC377, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="BATTLE-ITEM-R: Life Charger S (8-Bit) increased" },
+        { address=0X1BC377, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="BATTLE-ITEM-R: Life Charger S (8-Bit) decreased" },
+      },
+      health = {
+        { address=0X17DC40, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="STAT: HP (16-Bit) decreased" },
+        { address=0X17DC40, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="STAT: HP (16-Bit) increased" },
+        { address=0X17DC42, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="STAT: Max HP (16-Bit) decreased" },
+        { address=0X17DC42, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="STAT: Max HP (16-Bit) increased" },
+        { address=0X17DCB4, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="STAT: Damage Count Head (16-Bit)" },
+        { address=0X17DCB8, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="STAT: Damage Count R-Arm (16-Bit)" },
+        { address=0X17DCBA, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="STAT: Damage Count Body (16-Bit)" },
+        { address=0X17DCBC, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="STAT: Damage Count R-Leg (16-Bit)" },
+        { address=0X17DCBE, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="STAT: Damage Count L-Arm (16-Bit)" },
+        { address=0X17DCC2, type="u16be", condition="change", action="HIT", no_log=false, no_survey=false, desc="STAT: Damage Count L-Leg (16-Bit)" },
+        { address=0X1BC03C, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="BATTLE: HP (16-Bit) decreased" },
+        { address=0X1BC03C, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="BATTLE: HP (16-Bit) increased" },
+        { address=0X1BC03E, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="BATTLE: Max HP (16-Bit) decreased" },
+        { address=0X1BC03E, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="BATTLE: Max HP (16-Bit) increased" },
+        { address=0X1BC3D8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="BATTLE: Enemy HP (16-Bit) decreased" },
+        { address=0X1BC3D8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="BATTLE: Enemy HP (16-Bit) increased" },
+        { address=0X1BC3DA, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="BATTLE: Enemy Max HP (16-Bit) decreased" },
+        { address=0X1BC3DA, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="BATTLE: Enemy Max HP (16-Bit) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X17E0A3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Flame Shot (8-Bit)" },
+        { address=0X17E0AB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Flame Shot SP (8-Bit)" },
+        { address=0X17E0B3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Ice Shot (8-Bit)" },
+        { address=0X17E0BB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Ice Shot SP (8-Bit)" },
+        { address=0X17E0C3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Poison Shot (8-Bit)" },
+        { address=0X17E0CB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Poison Shot SP (8-Bit)" },
+        { address=0X17E0D3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Hurricane Shot (8-Bit)" },
+        { address=0X17E0DB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Hurricane Shot SP (8-Bit)" },
+        { address=0X17E0E3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Ion Shot (8-Bit)" },
+        { address=0X17E0EB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Ion Shot SP (8-Bit)" },
+        { address=0X17E0F3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Offense Enhancer (8-Bit)" },
+        { address=0X17E0FB, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Defense Enhancer (8-Bit)" },
+        { address=0X17E103, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Speed Henhancer (8-Bit)" },
+        { address=0X17E10B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Stamina Booster (8-Bit)" },
+        { address=0X17E113, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Power Booster (8-Bit)" },
+        { address=0X17E11B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Offense Drainer (8-Bit)" },
+        { address=0X17E123, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Defense Drainer (8-Bit)" },
+        { address=0X17E12B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="ITEM-WEAPON: Speed Drainer (8-Bit)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X17E09B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="ITEM-REFRESH: Ring Eraser (8-Bit) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X183ED1, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="SPTECH-BOOL: Jumping Axe Kick (8-Bit)" },
+        { address=0X183ED5, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="SPTECH-FINISHER: Jumping Axe Kick (8-Bit)" },
+        { address=0X183ED6, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="SPTECH-UESD: Jumping Axe Kick (8-Bit)" },
+      },
+    },
+  },
+}

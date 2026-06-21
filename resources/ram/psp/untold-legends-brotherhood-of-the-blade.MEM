@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Untold Legends: Brotherhood of the Blade",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "untold-legends-brotherhood-of-the-blade",
+    file = "untold-legends-brotherhood-of-the-blade.zip",
+    hashes = {
+      { hash = "122b6f8d0464629419f7f37a9891f7e5", label = "Untold Legends - Brotherhood of the Blade (USA).iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XB697B2, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Shadowed Kaylee Health decreased" },
+        { address=0XB697B2, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Shadowed Kaylee Health increased" },
+        { address=0XBAD8E2, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32bit] Shadowed God Health decreased" },
+        { address=0XBAD8E2, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32bit] Shadowed God Health increased" },
+      },
+    },
+  },
+}

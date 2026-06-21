@@ -1,0 +1,69 @@
+return {
+  game = {
+    title = "Ace Combat 04: Shattered Skies",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Flight Simulator, Shooter"
+  },
+
+  rom = {
+    name = "ace-combat-04-shattered-skies",
+    file = "ace-combat-04-shattered-skies.zip",
+    hashes = {
+      { hash = "95d144fc041ea080750e381f0212c297", label = "Ace Combat 04 - Shattered Skies (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X29F377, type="u8", condition="eq", value=0X23, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X29F379, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="New Game/SP Continue" },
+        { address=0X29F381, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="In game, unpaused" },
+        { address=0X29F381, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="In game, paused" },
+        { address=0X2A0D30, type="u32le", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits - updates on menu screen" },
+        { address=0X39D510, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Demo/title screen" },
+        { address=0X39D510, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Not demo/title screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X29F377, type="u8", condition="eq", value=0X04, action="LIVES_STATE", no_log=false, no_survey=false, desc="Lifeline (Mission 5)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X29F353, type="u8", condition="eq", value=0X00, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 1" },
+        { address=0X29F353, type="u8", condition="eq", value=0X01, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 2" },
+        { address=0X29F353, type="u8", condition="eq", value=0X02, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Slot 3" },
+        { address=0X2A0340, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A0341, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A0342, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A0343, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A0344, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A0345, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A0349, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A034A, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A034B, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A034C, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+        { address=0X2A034D, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapons owned - each weapon is controlled by two bits as follows:" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X29F377, type="u8", condition="eq", value=0X05, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Invincible Fleet (Mission 6)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X29F377, type="u8", condition="eq", value=0X10, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blockade (Mission 4)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X42D2D0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Objective 1 time" },
+        { address=0X42D2D4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Objective 2 time" },
+      },
+    },
+  },
+}

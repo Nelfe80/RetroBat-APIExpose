@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Spot the Differences!",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "spot-the-differences",
+    file = "spot-the-differences.zip",
+    hashes = {
+      { hash = "85266f16098dcd6c6f1d62863ebade84", label = "Spot the Differences! (Europe) (En,Fr,Es,It) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

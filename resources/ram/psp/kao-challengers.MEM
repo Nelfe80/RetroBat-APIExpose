@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Kao Challengers",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "kao-challengers",
+    file = "kao-challengers.zip",
+    hashes = {
+      { hash = "b673b38d31449765bfa8ec175595bd87", label = "Kao Challengers (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X112D2C8, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Pause Active" },
+        { address=0X112D2D4, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[32 Bit Float] Pause Menu Transparency State" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X11182CC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32 Bit] Kao Health decreased" },
+        { address=0X11182CC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32 Bit] Kao Health increased" },
+      },
+    },
+  },
+}

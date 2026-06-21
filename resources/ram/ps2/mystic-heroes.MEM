@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Mystic Heroes",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mystic-heroes",
+    file = "mystic-heroes.zip",
+    hashes = {
+      { hash = "1ceaaae0bdc8171b9e6afe6e8ee13120", label = "Mystic Heroes (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X31E2D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Direct Level" },
+        { address=0X31E2D5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Target Level" },
+        { address=0X31E2D7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sword level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X31E2B4, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16bit) Health Stat decreased" },
+        { address=0X31E2B4, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16bit) Health Stat increased" },
+        { address=0X78EC52, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16bit) Health decreased" },
+        { address=0X78EC52, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16bit) Health increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X31E2D6, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Jump Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X31E2A8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="KO Counter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "Mortal Kombat 4",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-4",
+    file = "mortal-kombat-4.zip",
+    hashes = {
+      { hash = "f082959ea15c209c1060e45a6d33d68e", label = "Mortal Kombat 4 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA8908, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Set to 0xffffffff when game or demo is loaded, varies, but is mostly set to 0x00000001 in menus," },
+        { address=0XC6088, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused:" },
+        { address=0XD88AC, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues set in options" },
+        { address=0XD990C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues remaining" },
+        { address=0XD9910, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues set in options" },
+      },
+      events = {
+        { address=0XAAC6C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Used to determine address for P1 moves, combos e.t.c." },
+        { address=0XAAC70, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Used to determine address for P2 moves, combos e.t.c." },
+        { address=0XBFE9C, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Combo hits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XAABC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+        { address=0XAABC4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Background:" },
+        { address=0XAABCC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 won round tokens" },
+        { address=0XAABD0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 won round tokens" },
+        { address=0XD81DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Fatalities in cheat menu:" },
+        { address=0XD88A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Rounds to Win" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XAABA8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P Health (16 bit) decreased" },
+        { address=0XAABA8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P Health (16 bit) increased" },
+        { address=0XAABAC, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P health (16 bit) decreased" },
+        { address=0XAABAC, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P health (16 bit) increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XAAEC2, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="With weapon = 02" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA81FC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times P1 Character icon in selection menu is rotated 0-3, alters costumes" },
+        { address=0XA8200, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times P2 Character icon in selection menu is rotated 0-3, alters costumes" },
+        { address=0XAA994, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Countdown timer for continue" },
+        { address=0XAA9A0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Battle timer" },
+        { address=0XBFA98, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Countdown timer. Used for time left to perform Fatality, wait for demu in menu and probably some" },
+      },
+    },
+  },
+}

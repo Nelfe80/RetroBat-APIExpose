@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Monopoly",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "monopoly",
+    file = "monopoly.zip",
+    hashes = {
+      { hash = "5f1481260760c69843a61e9060ad7154", label = "Monopoly (USA) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+  },
+}

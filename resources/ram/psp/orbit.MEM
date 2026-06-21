@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Orbit",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "orbit",
+    file = "orbit.zip",
+    hashes = {
+      { hash = "fbb86a9f5fff1c7e7ab66681e7a60111", label = "Orbit (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XAB829C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stats - Money Lost (32bit) increased" },
+        { address=0XAB829C, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Stats - Money Lost (32bit) empty" },
+        { address=0XAB8304, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stats - Total Money Collected (32bit) increased" },
+        { address=0XAB8308, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stats - Total Money Spent (32bit) increased" },
+        { address=0XAB8308, type="u32le", condition="eq", value=0X0, action="COIN_LOSE", no_log=false, no_survey=false, desc="Stats - Total Money Spent (32bit) empty" },
+      },
+    },
+  },
+}

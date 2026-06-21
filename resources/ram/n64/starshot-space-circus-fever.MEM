@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Starshot: Space Circus Fever",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "starshot-space-circus-fever",
+    file = "starshot-space-circus-fever.zip",
+    hashes = {
+      { hash = "42af1992978229bbb5f560571708e25e", label = "Starshot - Space Circus Fever (USA) (En,Fr,Es).z64" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X982A6, type="u8", condition="eq", value=0XB7, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Virtua Circus Complete" },
+        { address=0X982A7, type="u8", condition="eq", value=0XB6, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tensuns Complete" },
+        { address=0X982A7, type="u8", condition="eq", value=0XB5, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Killer Expo Complete" },
+        { address=0X982A7, type="u8", condition="eq", value=0XB4, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Primitron Complete" },
+        { address=0X982A7, type="u8", condition="eq", value=0XB3, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Ultimacrash Complete" },
+        { address=0X982A7, type="u8", condition="eq", value=0XB2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Earth Complete" },
+        { address=0X982A7, type="u8", condition="eq", value=0XB0, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Technomummy Complete" },
+      },
+      stage = {
+        { address=0X982A6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Event Flags (Bitflags)" },
+        { address=0X982A7, type="u8", condition="eq", value=0XB7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Planet Switch Enabled" },
+        { address=0X982A7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S1 Stage Event Flags B (Bitflags)" },
+        { address=0X98322, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S2 Stage Event Flags B (Bitflags)" },
+        { address=0X9839D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S3 Stage Event Flags B (Bitflags)" },
+        { address=0X98418, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="S4 Stage Event Flags B (Bitflags)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1AA8C8, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Green Bonuses (Life) increased" },
+        { address=0X1AA8C8, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Green Bonuses (Life) decreased" },
+      },
+    },
+  },
+}

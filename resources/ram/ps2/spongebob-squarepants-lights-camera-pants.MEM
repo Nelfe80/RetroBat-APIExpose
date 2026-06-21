@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "SpongeBob SquarePants: Lights, Camera, Pants!",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "spongebob-squarepants-lights-camera-pants",
+    file = "spongebob-squarepants-lights-camera-pants.zip",
+    hashes = {
+      { hash = "5abb7bab476eb74e893f6ba67873f7f3", label = "Nickelodeon SpongeBob SquarePants - Lights, Camera, Pants! (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5B7704, type="u16le", condition="eq", value=0X08, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Titlescreen" },
+        { address=0X5B7708, type="u32le", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+        { address=0X5B7708, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X5B7D1C, type="u32le", condition="eq", value=0X22, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X5B7D4C, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="False" },
+        { address=0X5B7D4C, type="u16le", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="True" },
+        { address=0X5B7DA8, type="u32le", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="True" },
+        { address=0X5B7DA8, type="u32le", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="False" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5B7794, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Goes to 0x14 When Making a Mistake/Losing Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5B7708, type="u32le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[32bit] Audition Timer Paused Because The Game Is Paused" },
+      },
+    },
+  },
+}

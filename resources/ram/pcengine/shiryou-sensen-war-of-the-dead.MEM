@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Shiryou Sensen: War of the Dead",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "shiryou-sensen-war-of-the-dead",
+    file = "shiryou-sensen-war-of-the-dead.zip",
+    hashes = {
+      { hash = "c0e606b8ecb1c64b01ddd062e54672b7", label = "Shiryou Sensen - War of the Dead (Japan) (En) (v1.0) (Nebulous Translations).pce" },
+      { hash = "cfd7fc43a9664979685b8e4358e4555f", label = "Shiryou Sensen - War of the Dead (Japan).pce" },
+      { hash = "ecbd032873e2b30ed0bc25d20505a8ed", label = "pce/shiryo.7z <Shiryou Sensen>" },
+      { hash = "5fb0ef737dcea6a7cb8df0fbcd2670b6", label = "Shiryou Sensen - War of the Dead (Japan) (En) (v1.0) (Nebulous Translations).pce" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X003B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Related" },
+        { address=0X14C7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="NexT Level 1f=8k, last 27" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0038, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max Life increased" },
+        { address=0X0038, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max Life decreased" },
+      },
+      health = {
+        { address=0X162C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Hp decreased" },
+        { address=0X162C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Hp increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X16FF, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Start" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X003F, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X08F9, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="0xff - School Boss - Skeleton (defeated)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1409, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invincibility Timer" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X091A, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="0xff = Door at boathouse opened/unlocked" },
+        { address=0X09A7, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="0xff = Door at boathouse opened/unlocked" },
+      },
+    },
+  },
+}

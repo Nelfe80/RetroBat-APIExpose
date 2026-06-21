@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "BurgerTime",
+    system = "colecovision",
+    system_name = "ColecoVision",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "burgertime",
+    file = "burgertime.zip",
+    hashes = {
+      { hash = "927ce5ba5bf3e0f6c8c5a115db51f264", label = "BurgerTime (USA, Europe).col" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X004D, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X004D, type="u8", condition="eq", value=0X0F, action="GAME_OVER", no_log=false, no_survey=false, desc="Menu/Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X005C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="No. Levels beaten" },
+      },
+      stage = {
+        { address=0X005D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="No. of burger parts dropped in the plate (per stage, resets to 0x00 in stage completion)" },
+        { address=0X005E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="No. of pepper sprays spawned (per stage)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X005B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="No. Lives increased" },
+        { address=0X005B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="No. Lives decreased" },
+        { address=0X0085, type="u8", condition="eq", value=0X06, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fell from ingredient" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0056, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE BCD] Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X008B, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy #1 Timer until regaining control (decreases)" },
+        { address=0X0093, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy #2 Timer until regaining control (decreases)" },
+        { address=0X009B, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy #3 Timer until regaining control (decreases)" },
+        { address=0X00A3, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy #4 Timer until regaining control (decreases)" },
+        { address=0X00AB, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Enemy #5 Timer until regaining control (decreases)" },
+      },
+    },
+  },
+}

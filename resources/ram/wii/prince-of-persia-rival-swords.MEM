@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Prince of Persia: Rival Swords",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "prince-of-persia-rival-swords",
+    file = "prince-of-persia-rival-swords.zip",
+    hashes = {
+      { hash = "ac42750662e52d13371e5df067e2b73f", label = "Prince of Persia - Rival Swords (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+  },
+}

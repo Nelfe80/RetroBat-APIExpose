@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Family Mahjong",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "family-mahjong",
+    file = "family-mahjong.zip",
+    hashes = {
+      { hash = "9430962b99eaec0f191f76cf1618bc06", label = "Family Mahjong (Japan).nes" },
+      { hash = "97400ffa7cc140e028e2c49177689c33", label = "Family Mahjong (Japan) (Rev 1).nes" },
+    }
+  },
+
+  events = {
+  },
+}

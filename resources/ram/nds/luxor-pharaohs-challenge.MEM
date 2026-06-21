@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Luxor: Pharaoh's Challenge",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "luxor-pharaohs-challenge",
+    file = "luxor-pharaohs-challenge.zip",
+    hashes = {
+      { hash = "0915dd2b86078ac34969e81bd114226e", label = "Luxor - Pharaoh's Challenge (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X8E354, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32bit] Current Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2F29F0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit] Score - In Level" },
+      },
+    },
+  },
+}

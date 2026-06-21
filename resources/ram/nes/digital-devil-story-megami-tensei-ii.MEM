@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Digital Devil Story: Megami Tensei II",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "digital-devil-story-megami-tensei-ii",
+    file = "digital-devil-story-megami-tensei-ii.zip",
+    hashes = {
+      { hash = "4b4aa19206d5f6bc470e87cb61ff8cf5", label = "Digital Devil Story - Megami Tensei II (Japan) (En) (1.03).nes" },
+      { hash = "7e071c44b548c28a85080023473af872", label = "Digital Devil Story - Megami Tensei II (Japan) (Rev 1).nes" },
+      { hash = "ae2585fba46b125f1c3a3a1567ccef9a", label = "Digital Devil Story - Megami Tensei II (Japan) (En) (1.04).nes" },
+      { hash = "f065998ee5ff631d9a48b4fdae48ac94", label = "Digital Devil Story - Megami Tensei II (Japan).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X04AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overworld Section ID" },
+        { address=0X04C3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Magic Level" },
+      },
+      stage = {
+        { address=0X04AA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Overworld Location ID? (actually differs depending on where the player comes from, such as eleva" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X053C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party 1 Current HP decreased" },
+        { address=0X053C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party 1 Current HP increased" },
+        { address=0X053D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party 2 Current HP decreased" },
+        { address=0X053D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party 2 Current HP increased" },
+        { address=0X053E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party 3 Current HP decreased" },
+        { address=0X053E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party 3 Current HP increased" },
+        { address=0X053F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party 4 Current HP decreased" },
+        { address=0X053F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party 4 Current HP increased" },
+        { address=0X0548, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP decreased" },
+        { address=0X0548, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP increased" },
+        { address=0X0549, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 2 Current HP decreased" },
+        { address=0X0549, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 2 Current HP increased" },
+        { address=0X054A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 3 Current HP decreased" },
+        { address=0X054A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 3 Current HP increased" },
+        { address=0X054B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 4 Current HP decreased" },
+        { address=0X054B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 4 Current HP increased" },
+        { address=0X054C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 5 Current HP decreased" },
+        { address=0X054C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 5 Current HP increased" },
+        { address=0X054D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 6 Current HP decreased" },
+        { address=0X054D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 6 Current HP increased" },
+        { address=0X054E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 7 Current HP decreased" },
+        { address=0X054E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 7 Current HP increased" },
+        { address=0X054F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 8 Current HP decreased" },
+        { address=0X054F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 8 Current HP increased" },
+        { address=0X055C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Current HP (high byte) decreased" },
+        { address=0X055C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Current HP (high byte) increased" },
+        { address=0X0578, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party 1 Max HP (low byte) decreased" },
+        { address=0X0578, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party 1 Max HP (low byte) increased" },
+        { address=0X0583, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party 12 Max HP (low byte) decreased" },
+        { address=0X0583, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party 12 Max HP (low byte) increased" },
+        { address=0X0584, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Max HP (low byte) decreased" },
+        { address=0X0584, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Max HP (low byte) increased" },
+        { address=0X058B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 8 Max HP (low byte) decreased" },
+        { address=0X058B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 8 Max HP (low byte) increased" },
+        { address=0X058C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party 1 Max HP (high byte) decreased" },
+        { address=0X058C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party 1 Max HP (high byte) increased" },
+        { address=0X0597, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party 12 Max HP (high byte) decreased" },
+        { address=0X0597, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party 12 Max HP (high byte) increased" },
+        { address=0X0598, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 1 Max HP (high byte) decreased" },
+        { address=0X0598, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 1 Max HP (high byte) increased" },
+        { address=0X059F, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy 8 Max HP (high byte) decreased" },
+        { address=0X059F, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy 8 Max HP (high byte) increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X04C6, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 1 ID" },
+        { address=0X04C7, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 2 ID" },
+        { address=0X04C8, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 3 ID" },
+        { address=0X04C9, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure 4 ID" },
+      },
+    },
+  },
+}

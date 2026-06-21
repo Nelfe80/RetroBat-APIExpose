@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Metal Saver",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "metal-saver",
+    file = "metal-saver.zip",
+    hashes = {
+      { hash = "9c289d97231df84e75744c9444dbb93e", label = "metlsavr.zip" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X024E, type="u16le", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Finished" },
+      },
+      zone = {
+        { address=0X024A, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World" },
+      },
+      stage = {
+        { address=0X024C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0X024E, type="u16le", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Playing" },
+        { address=0X024E, type="u16le", condition="eq", value=0XFFFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Transition/Victory" },
+        { address=0X024E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(16Bit) Stage status" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0252, type="u8", condition="eq", value=0X8, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X0252, type="u8", condition="eq", value=0X9, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Also dead" },
+        { address=0X0258, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives P1 increased" },
+        { address=0X0258, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives P1 decreased" },
+        { address=0X052C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives P2 increased" },
+        { address=0X052C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives P2 decreased" },
+      },
+      health = {
+        { address=0X02B2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16Bit) HP Bar P1 decreased" },
+        { address=0X02B2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16Bit) HP Bar P1 increased" },
+        { address=0X0586, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16Bit) HP Bar P2 decreased" },
+        { address=0X0586, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16Bit) HP Bar P2 increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X025C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16bit) Score P1 (+00)" },
+        { address=0X0530, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16Bit) Score P2 (+00)" },
+      },
+      collectibles = {
+        { address=0X020C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins increased" },
+      },
+    },
+  },
+}

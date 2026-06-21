@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Game Boy Controller Kensa Cartridge",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "game-boy-controller-kensa-cartridge",
+    file = "game-boy-controller-kensa-cartridge.zip",
+    hashes = {
+      { hash = "9fcf969d7d4554997ca902bbf9033287", label = "Game Boy Controller Kensa Cartridge (Japan).gb" },
+    }
+  },
+
+  events = {
+  },
+}

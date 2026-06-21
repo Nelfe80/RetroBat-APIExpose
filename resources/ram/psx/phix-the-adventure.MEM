@@ -1,0 +1,97 @@
+return {
+  game = {
+    title = "Phix: The Adventure",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "phix-the-adventure",
+    file = "phix-the-adventure.zip",
+    hashes = {
+      { hash = "64529ce668178f14869de836619391e6", label = "Phix - The Adventure (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XDA094, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Stage Select/Title Screen" },
+        { address=0XDA0A4, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Yes" },
+        { address=0XDA0D6, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Resume" },
+        { address=0XDA0D6, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Vibration" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB05D7, type="u8", condition="eq", value=0X05, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Completed" },
+        { address=0XB06F0, type="u8", condition="eq", value=0X63, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Goal in training mode" },
+        { address=0XDA0C4, type="u8", condition="eq", value=0X08, action="LEVEL_GOAL_IN_LEVEL", no_log=false, no_survey=false, desc="Goal in level" },
+        { address=0XE86B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 1-1 Collectables" },
+        { address=0XE86B1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 1-2 Collectables" },
+        { address=0XE86B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 1-3 Collectables" },
+        { address=0XE86B4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 2-1 Collectables" },
+        { address=0XE86B5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 2-2 Collectables" },
+        { address=0XE86B6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 2-3 Collectables" },
+        { address=0XE86B8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 3-1 Collectables" },
+        { address=0XE86B9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 3-2 Collectables" },
+        { address=0XE86BA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 3-3 Collectables" },
+        { address=0XE86BC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 4-1 Collectables" },
+        { address=0XE86BD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 4-2 Collectables" },
+        { address=0XE86BE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 4-3 Collectables" },
+        { address=0XE86C0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 5-1 Collectables" },
+        { address=0XE86C1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 5-2 Collectables" },
+        { address=0XE86C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(Bitflag) Level 5-3 Collectables" },
+        { address=0X108104, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit) Tech City Level 1 Switches" },
+      },
+      zone = {
+        { address=0XB06E8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(8-bit) Current World 1-5" },
+        { address=0XB06F0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(8-bit) Current Level in a World" },
+        { address=0XDA0B0, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="(8-bit) Current World -Level Select Only-" },
+      },
+      stage = {
+        { address=0XDA0C4, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(8-bit) Level Selected (Stage Select)" },
+        { address=0XDA118, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDA096, type="u8", condition="eq", value=0X0E, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fell into Lava or Water (life counter loss screen also shares this value) Time's up text pops up" },
+        { address=0XDA096, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Fell into a Pit, Time runs out or lost all HP" },
+        { address=0XE7786, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="2 (default)" },
+        { address=0XE7786, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="(8-bit) Lives increased" },
+        { address=0XE7786, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8-bit) Lives decreased" },
+      },
+      health = {
+        { address=0XE7784, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8-bit) Health decreased" },
+        { address=0XE7784, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8-bit) Health increased" },
+        { address=0XE778E, type="u8", condition="eq", value=0X6F, action="HIT", no_log=false, no_survey=false, desc="Calimonstro (may have this value or higher if damage besides from the trees)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X1790CB, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(Will determine it's proper values) Checkpoint Coin increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XE778E, type="u8", condition="eq", value=0X40, action="BOSS_HIT", no_log=false, no_survey=false, desc="Full" },
+        { address=0XE778E, type="u8", condition="eq", value=0X00, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Dead" },
+        { address=0XE778E, type="u8", condition="eq", value=0XF8, action="BOSS_HIT", no_log=false, no_survey=false, desc="Killed discount bakugan just via environment" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XE0A34, type="u8", condition="eq", value=0X00, action="JUMPING", no_log=false, no_survey=false, desc="Not pressing X" },
+        { address=0XE0A34, type="u8", condition="eq", value=0X01, action="JUMPING", no_log=false, no_survey=false, desc="Pressing X" },
+        { address=0XE0A34, type="u8", condition="eq", value=0X02, action="JUMPING", no_log=false, no_survey=false, desc="You can let go now" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDA096, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(8-bit) Death Screens" },
+      },
+    },
+  },
+}

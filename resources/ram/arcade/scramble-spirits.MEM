@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Scramble Spirits",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "scramble-spirits",
+    file = "scramble-spirits.zip",
+    hashes = {
+      { hash = "1fd24ff9ddcec9081cd9478289777d54", label = "sspirits.7z <Scramble Spirits (World, Floppy Based)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X7F7C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+  },
+}

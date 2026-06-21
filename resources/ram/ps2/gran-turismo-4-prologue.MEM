@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Gran Turismo 4: Prologue",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "gran-turismo-4-prologue",
+    file = "gran-turismo-4-prologue.zip",
+    hashes = {
+      { hash = "7170e508085938a1515c1ecb876c66e0", label = "Gran Turismo 4 - Prologue (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X9C2518, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Read only player's time in msec after license/race finish" },
+      },
+    },
+  },
+}

@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "EA Playground",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Shooter, Sports"
+  },
+
+  rom = {
+    name = "ea-playground",
+    file = "ea-playground.zip",
+    hashes = {
+      { hash = "604a763e3b0dfe480eeee79d1c33559c", label = "EA Playground (USA) (En,Fr,De,Es,It).nds" },
+      { hash = "6de14a589c98a77717d3c720e556650e", label = "EA Playground (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XEFF04, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen when this is 0" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XF03B0, type="u32le", condition="eq", value=0XFFFFFFFF, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In the Playground" },
+        { address=0XF2708, type="u32le", condition="eq", value=0X2, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Cleared" },
+        { address=0XF3CA8, type="u32le", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In book" },
+        { address=0XF3CA8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="King of the playground sticker" },
+        { address=0X221E1C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hopscotch current round" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X20F078, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Skate and sketch points" },
+        { address=0X21D924, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bug Hunt score" },
+        { address=0X220844, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Hoops score" },
+        { address=0X222574, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Trampoline score" },
+        { address=0X2231C0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Kicks Score" },
+        { address=0X2231EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Dodgeball points" },
+      },
+    },
+  },
+}

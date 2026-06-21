@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Radical Psycho Machine Racing",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "radical-psycho-machine-racing",
+    file = "radical-psycho-machine-racing.zip",
+    hashes = {
+      { hash = "cb802f27cab677a9b5c1c7fa4258e259", label = "Radical Psycho Machine Racing (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X07CC, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Level (19 = Credits) (55 = Demo)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0A89, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="player 1 Health decreased" },
+        { address=0X0A89, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="player 1 Health increased" },
+        { address=0X0A8A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 Health decreased" },
+        { address=0X0A8A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 Health increased" },
+        { address=0X0A8B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P3 Health decreased" },
+        { address=0X0A8B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P3 Health increased" },
+        { address=0X0A8C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P4 Health decreased" },
+        { address=0X0A8C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P4 Health increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0A25, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (but not in hex) (1-99) increased" },
+        { address=0X0A26, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="money (2) (no hex) (*100) increased" },
+        { address=0X0A27, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (3) (no hex) (*10.000) increased" },
+        { address=0X0A28, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (4) (no Hex) (*1.000.000) increased" },
+      },
+    },
+  },
+}

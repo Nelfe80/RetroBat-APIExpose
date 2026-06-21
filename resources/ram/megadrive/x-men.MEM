@@ -1,0 +1,76 @@
+return {
+  game = {
+    title = "X-Men",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "x-men",
+    file = "x-men.zip",
+    hashes = {
+      { hash = "26c49c46b8e2574dde481132bbd34fd4", label = "X-Men (Europe).md" },
+      { hash = "63274bdd105d2abf265aa2d2934635c5", label = "X-Men (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XBFCE, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Flag? (02)" },
+        { address=0XBFD0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Related" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XD780, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Danger Room" },
+        { address=0XD780, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Danger Room" },
+        { address=0XD780, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Danger Room" },
+        { address=0XD780, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Savage Land" },
+        { address=0XD780, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Savage Land" },
+        { address=0XD780, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shiar Empire" },
+        { address=0XD780, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Excalibur" },
+        { address=0XD780, type="u8", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Excalibur Lighthouse" },
+        { address=0XD780, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Future Earth" },
+        { address=0XD780, type="u8", condition="eq", value=0X09, action="NEW_LEVEL", no_log=false, no_survey=false, desc="The Crunch" },
+        { address=0XD780, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Asteroid M" },
+        { address=0XD780, type="u8", condition="eq", value=0X0B, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Asteroid M" },
+        { address=0XD780, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBF65, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="X-Men Dead/In-Use" },
+        { address=0XD62A, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player Life (16-Bit) increased" },
+        { address=0XD62A, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player Life (16-Bit) decreased" },
+      },
+      health = {
+        { address=0XC080, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Zaladane Health decreased" },
+        { address=0XC080, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Zaladane Health increased" },
+        { address=0XC130, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Juggernaut Health (Savage Land) decreased" },
+        { address=0XC130, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Juggernaut Health (Savage Land) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC028, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Danger Room Orb Destroyed" },
+        { address=0XC0C3, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Danger Room Orb Destroyed" },
+        { address=0XC11B, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Danger Room Orb Destroyed" },
+        { address=0XC173, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Danger Room Orb Destroyed" },
+        { address=0XC32B, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Danger Room Orb Destroyed" },
+        { address=0XC389, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Lilandra Door Unlocked? (Bit 2)" },
+        { address=0XC3DB, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Danger Room Orb Destroyed" },
+        { address=0XC433, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Danger Room Orb Destroyed" },
+        { address=0XD756, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit 2 - Crunch Computer Intact, 0 = computer destroyed, prepared to reset?" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBDAE, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Boss Encountered Flag?" },
+        { address=0XC255, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Extender Destroyed, Danger Room 2-6" },
+        { address=0XC2AD, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Danger Room Time Extender Destroyed (Level 1. Better?)" },
+      },
+    },
+  },
+}

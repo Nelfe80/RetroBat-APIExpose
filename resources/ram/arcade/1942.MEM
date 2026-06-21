@@ -1,0 +1,91 @@
+return {
+  game = {
+    title = "1942",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Shoot'em Up"
+  },
+
+  rom = {
+    name = "1942",
+    file = "1942.zip",
+    hashes = {
+      { hash = "519c84155964659375821f7ca576f095", label = "1942.7z <1942 (Revision B)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0000, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract mode" },
+        { address=0X0000, type="u8", condition="eq", value=0X80, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credit Inserted" },
+        { address=0X0000, type="u8", condition="eq", value=0X84, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue countdown" },
+        { address=0X0002, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Attract mode: Number of demonstrations played" },
+        { address=0X0010, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (tens digit)" },
+        { address=0X0011, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits (ones digit)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X0155, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Planes Shot Down in Current Stage" },
+        { address=0X0165, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Possible Planes Shot Down in Current Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0101, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0101, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X0181, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dipswitch settings: Starting lives increased" },
+        { address=0X0181, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dipswitch settings: Starting lives decreased" },
+        { address=0X0190, type="u32be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Dipswitch settings: Additional extra life awards [32-bit BE] increased" },
+        { address=0X0190, type="u32be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dipswitch settings: Additional extra life awards [32-bit BE] decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X48, type="u64be", condition="change", action="TREASURE", color="yellow", min=1000, max=1500, no_log=false, no_survey=false, desc="Score delta 1000-1500: Bonus Points" },
+        { address=0X48, type="u64be", condition="change", action="TREASURE", color="white", min=20000, max=50000, no_log=false, no_survey=false, desc="Score delta 20000-50000: Challenge Stage Bonus" },
+        { address=0X011F, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Wingmen" },
+        { address=0X011F, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Quad-shot" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X48, type="u64be", condition="change", action="SCORE_STATE", color="silver", min=50, max=50, no_log=false, no_survey=false, desc="Score delta 50-50: Score 50" },
+        { address=0X48, type="u64be", condition="change", action="SCORE_STATE", color="cyan", min=70, max=70, no_log=false, no_survey=false, desc="Score delta 70-70: Score 70" },
+        { address=0X48, type="u64be", condition="change", action="SCORE_STATE", color="green", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Score 100" },
+        { address=0X48, type="u64be", condition="change", action="SCORE_STATE", color="cyan", min=200, max=200, no_log=false, no_survey=false, desc="Score delta 200-200: Score 200" },
+        { address=0X0000, type="u8", condition="eq", value=0X87, action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score Board" },
+        { address=0X0040, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High score x10,000,000 (found by PsyHunter29)" },
+        { address=0X0041, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score (millions digit)" },
+        { address=0X0042, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score (hundred thousands digit)" },
+        { address=0X0043, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score (ten thousands digit)" },
+        { address=0X0044, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score (thousands digit)" },
+        { address=0X0045, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score (hundreds digit)" },
+        { address=0X0046, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score (tens digit)" },
+        { address=0X0047, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score (ones digit)" },
+        { address=0X0048, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x10,000,000 (found by PsyHunter29)" },
+        { address=0X0049, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x1,000,000 (found by PsyHunter29)" },
+        { address=0X004A, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x100,000 (found by PsyHunter29)" },
+        { address=0X004B, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x10,000 (found by PsyHunter29)" },
+        { address=0X004C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x1000 (found by PsyHunter29)" },
+        { address=0X004D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x100 (found by PsyHunter29)" },
+        { address=0X004E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x10 (found by PsyHunter29)" },
+        { address=0X004F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score x1 (found by PsyHunter29)" },
+      },
+      collectibles = {
+        { address=0X10, type="u16be", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X48, type="u64be", condition="change", action="OBJECT_DESTROYED", min=30, max=30, no_log=false, no_survey=false, desc="Score delta 30-30: Planes are 30,50,70,100 and 200" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0099, type="u16be", condition="change", action="LEVEL_TIMER", no_log=true, no_survey=false, desc="[16-bit BE] Continue? Countdown Timer" },
+      },
+    },
+  },
+}

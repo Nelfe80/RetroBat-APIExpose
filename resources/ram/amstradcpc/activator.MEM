@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Activator",
+    system = "amstradcpc",
+    system_name = "Amstrad CPC",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "activator",
+    file = "activator.zip",
+    hashes = {
+      { hash = "7d23cc327db019f9792d19c97cf23ab7", label = "Activator (1986)(Cascade Games).dsk" },
+    }
+  },
+
+  events = {
+    progression = {
+      zone = {
+        { address=0X9F4E, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="This area of memory starts a section that stores world state. The following types of memory valu" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X7D6B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Health increased" },
+        { address=0X7D6B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X7D6E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number Of Lives increased" },
+        { address=0X7D6E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number Of Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA6DA, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X9E59, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time Extend Item Pickup Flag" },
+      },
+    },
+  },
+}

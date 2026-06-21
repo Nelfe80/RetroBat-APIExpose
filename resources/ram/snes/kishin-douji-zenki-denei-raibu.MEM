@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Kishin Douji Zenki: Denei Raibu",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting, Platform"
+  },
+
+  rom = {
+    name = "kishin-douji-zenki-denei-raibu",
+    file = "kishin-douji-zenki-denei-raibu.zip",
+    hashes = {
+      { hash = "fbbff1f9f8da69851f3c1d87013ebdb8", label = "Kishin Douji Zenki - Denei Raibu (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X180C0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="DEMO related NP" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X003B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Related to stage ?" },
+        { address=0X0CD2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Can be use as stage id, not really good" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1C06, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives? increased" },
+        { address=0X1C06, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives? decreased" },
+      },
+    },
+  },
+}

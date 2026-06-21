@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Reversi | Capture",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "reversi-capture",
+    file = "reversi-capture.zip",
+    hashes = {
+      { hash = "99a7dba888bf49be0694abb33ba67d76", label = "Reversi (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

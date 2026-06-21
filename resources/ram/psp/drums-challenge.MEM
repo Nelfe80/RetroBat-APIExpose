@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Drums Challenge",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "drums-challenge",
+    file = "drums-challenge.zip",
+    hashes = {
+      { hash = "848ee5dfc0b13992d9c8266c6b7c7721", label = "Drums Challenge (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1D7E6F4, type="u8", condition="eq", value=0X88, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X1D7E71C, type="u8", condition="eq", value=0X04, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title & Game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X853750, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select = 04" },
+        { address=0X1D7E6F4, type="u8", condition="eq", value=0XB8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loading Level" },
+        { address=0X1D7E6F4, type="u8", condition="eq", value=0XA0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Screen" },
+        { address=0X1D7E6F4, type="u8", condition="eq", value=0X70, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0X1D7E810, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1D7E684, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score save" },
+        { address=0X1D7E830, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

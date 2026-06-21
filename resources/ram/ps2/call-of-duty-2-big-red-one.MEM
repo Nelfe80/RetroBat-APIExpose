@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Call of Duty 2: Big Red One",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Shooter"
+  },
+
+  rom = {
+    name = "call-of-duty-2-big-red-one",
+    file = "call-of-duty-2-big-red-one.zip",
+    hashes = {
+      { hash = "eb104d302ea0ed82c118830bac192360", label = "Call of Duty 2 - Big Red One (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X393CA4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked" },
+        { address=0X393CA8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3C0CFA, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Screen Fade - Death/Level Complete" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3C0DA0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1st Objective Event" },
+        { address=0X3C0DB8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 1st Objective Event Identifier" },
+        { address=0X3C0E38, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="2nd Objective Event" },
+        { address=0X3C0E50, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 2nd Objective Event Identifier" },
+        { address=0X3C0ED0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="3rd Objective Event" },
+        { address=0X3C0EE8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 3rd Objective Event Identifier" },
+        { address=0X3C0F68, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="4th Objective Event" },
+        { address=0X3C0F80, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 4th Objective Event Identifier" },
+        { address=0X3C1000, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="5th Objective Event" },
+        { address=0X3C1018, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 5th Objective Event Identifier" },
+        { address=0X3C1098, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="6th Objective Event" },
+        { address=0X3C10B0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 6th Objective Event Identifier" },
+        { address=0X3C1130, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="7th Objective Event" },
+        { address=0X3C1148, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 7th Objective Event Identifier" },
+        { address=0X3C11C8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="8th Objective Event" },
+        { address=0X3C11E0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 8th Objective Event Identifier" },
+        { address=0X3C1260, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="9th Objective Event" },
+        { address=0X3C1278, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 9th Objective Event Identifier" },
+        { address=0X3C12F8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="10th Objective Event" },
+        { address=0X3C1310, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 10th Objective Event Identifier" },
+        { address=0X3C1390, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="11th Objective Event" },
+        { address=0X3C13A8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 11th Objective Event Identifier" },
+        { address=0X3C1428, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="12th Objective Event" },
+        { address=0X3C1440, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 12th Objective Event Identifier" },
+        { address=0X3C14C0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="13th Objective Event" },
+        { address=0X3C14D8, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 13th Objective Event Identifier" },
+        { address=0X3C1558, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="14th Objective Event" },
+        { address=0X3C1570, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[ASCII] 14th Objective Event Identifier" },
+      },
+    },
+  },
+}

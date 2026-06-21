@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Create",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "create",
+    file = "create.zip",
+    hashes = {
+      { hash = "b37502098e4f34d77583463ae5b70f49", label = "Create (USA) (En,Es)" },
+      { hash = "939825eda13dee45798da6245bf86e35", label = "Create (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+  },
+}

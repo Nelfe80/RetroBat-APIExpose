@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Fight Night 2004",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "fight-night-2004",
+    file = "fight-night-2004.zip",
+    hashes = {
+      { hash = "0a549e192dbe851563cbe1a12ec34ad5", label = "Fight Night 2004 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1AE6E90, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="- 01 when paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X544A50, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 1>Round" },
+        { address=0X544A84, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 2>Round" },
+        { address=0X544AB8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 3>Round" },
+        { address=0X544AEC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 4>Round" },
+        { address=0X544B20, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 5>Round" },
+        { address=0X544B54, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 6>Round" },
+        { address=0X544B88, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 7>Round" },
+        { address=0X544BBC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 8>Round" },
+        { address=0X544BF0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 9>Round" },
+        { address=0X544C24, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-Boxer>Rank 10>Round" },
+        { address=0X544C58, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 1>Round" },
+        { address=0X544C8C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 2>Round" },
+        { address=0X544CC0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 3>Round" },
+        { address=0X544CF4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 4>Round" },
+        { address=0X544D28, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 5>Round" },
+        { address=0X544D5C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 6>Round" },
+        { address=0X544D90, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 7>Round" },
+        { address=0X544DC4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 8>Round" },
+        { address=0X544DF8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 9>Round" },
+        { address=0X544E2C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="- Record Books>Fastest KO-User>Rank 10>Round" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X54564C, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="- Current money in bank increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,18 @@
+return {
+  game = {
+    title = "Corpse Party",
+    system = "3ds",
+    system_name = "Nintendo 3DS",
+    genre = "Adventure, Horror"
+  },
+
+  rom = {
+    name = "corpse-party",
+    file = "corpse-party.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+  },
+}

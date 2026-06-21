@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Adventures of Lolo III",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle-Game, Strategy"
+  },
+
+  rom = {
+    name = "adventures-of-lolo-iii",
+    file = "adventures-of-lolo-iii.zip",
+    hashes = {
+      { hash = "b34e53a328a30887d82f25bb6a4d3852", label = "Adventures of Lolo 3 (Europe).nes" },
+      { hash = "dc79b80fad740bafd7f485dd5d413740", label = "Adventures of Lolo 3 (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X003F, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="mode: ff=in game, fb=title, fe=password, others=cutscenes" },
+        { address=0X00A9, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="current screen: ff=titles, 00=level, 01=map, 03=entrance" },
+        { address=0X015A, type="u8", condition="eq", value=0X2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X014F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="current level" },
+        { address=0X0151, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="high4: level 1 progress" },
+        { address=0X0152, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="high4: level 3 progress" },
+        { address=0X0153, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="high4: level 5 progress" },
+        { address=0X0154, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="high4: level 7 progress" },
+        { address=0X0155, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="high4: level 9 progress" },
+        { address=0X0156, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="high4: level 11 progress" },
+        { address=0X0157, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="high4: level 13 progress" },
+        { address=0X0158, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="high4: level 15 progress" },
+        { address=0X015A, type="u8", condition="eq", value=0X5, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0065, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="1=dead 2=give up" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0093, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="boss HP" },
+        { address=0X015A, type="u8", condition="eq", value=0X4, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00D9, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="idle counter (increments roungly every 5 1/2 seconds) - shortly after hitting 15, sleep starts" },
+      },
+    },
+  },
+}

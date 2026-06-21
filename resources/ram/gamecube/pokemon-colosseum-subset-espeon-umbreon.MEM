@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Pokémon Colosseum [Subset - Espeon & Umbreon]",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-colosseum-subset-espeon-umbreon",
+    file = "pokemon-colosseum-subset-espeon-umbreon.zip",
+    hashes = {
+      { hash = "787df500bb8651e3cc411738b656b538", label = "Pokemon Colosseum (USA) [Subset - Espeon & Umbreon]" },
+    }
+  },
+
+  events = {
+  },
+}

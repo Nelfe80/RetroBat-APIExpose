@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Wedding Dash",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Construction and Management Simulation"
+  },
+
+  rom = {
+    name = "wedding-dash",
+    file = "wedding-dash.zip",
+    hashes = {
+      { hash = "d56d0ec52d9f3a762137c61753becb6c", label = "Wedding Dash (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1A3A50, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="0 in-game (includes planning, winning, pause screens), 1 otherwise" },
+        { address=0X1AA0E4, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="1 in-game/menus, 0 on winning/pause screens (unreliable)" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X1A3EC0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage (copies 0x001a3fd0)" },
+        { address=0X1A3FD0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage" },
+      },
+    },
+  },
+}

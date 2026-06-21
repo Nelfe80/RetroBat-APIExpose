@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Taz",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "taz",
+    file = "taz.zip",
+    hashes = {
+      { hash = "7574480ae2ab0d282c887e9015fdb54c", label = "Taz (USA).a26" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0038, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="crazed wave" },
+        { address=0X0038, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="'level' - ie. what is current item." },
+      },
+    },
+  },
+}

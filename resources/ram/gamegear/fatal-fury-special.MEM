@@ -1,0 +1,60 @@
+return {
+  game = {
+    title = "Fatal Fury Special",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "fatal-fury-special",
+    file = "fatal-fury-special.zip",
+    hashes = {
+      { hash = "4292c099f98cc0c6d03025f0729f64df", label = "Fatal Fury Special (USA).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0001, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Amount" },
+        { address=0X0021, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+        { address=0X1A80, type="u8", condition="bit_true", bit=7, mask=0X80, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0000, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X0000, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X0000, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hard" },
+        { address=0X0000, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level (Difficulty)" },
+        { address=0X0021, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X00B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Count?" },
+        { address=0X00B2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Count?" },
+        { address=0X1B0B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 Round Wins" },
+      },
+      stage = {
+        { address=0X00BF, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The 1st Stage" },
+        { address=0X00BF, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The 2nd Stage" },
+        { address=0X00BF, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Final Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1B3B, type="u8", condition="eq", value=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0X1B3B, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player 1 Health" },
+        { address=0X1B3C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="1P Health Effect decreased" },
+        { address=0X1B3C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="1P Health Effect increased" },
+        { address=0X1BB3, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=true, no_survey=false, desc="P1 Wins" },
+        { address=0X1BB3, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="2P/Enemy Health" },
+        { address=0X1BB4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P/Enemy Health Effect decreased" },
+        { address=0X1BB4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P/Enemy Health Effect increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer (Decimal)" },
+      },
+    },
+  },
+}

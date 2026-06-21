@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Tecmo Super Bowl",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "tecmo-super-bowl",
+    file = "tecmo-super-bowl.zip",
+    hashes = {
+      { hash = "f7d01adf9c430ef3db055466ecc18f58", label = "Tecmo Super Bowl (USA).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06F6, type="u8", condition="eq", value=0X07, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause and slowdown mode enabled" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0093, type="u16le", condition="eq", value=0X0670, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Left goal line" },
+        { address=0X0093, type="u16le", condition="eq", value=0X0990, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Right goal line" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X006C, type="u16le", condition="eq", value=0X0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Chargers" },
+        { address=0X679E, type="u16le", condition="eq", value=0X0C, action="LOSE_LIFE", no_log=false, no_survey=false, desc="San Diego Chargers" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X01A3, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Return" },
+        { address=0X01A3, type="u8", condition="eq", value=0X90, action="MONEY_STATE", no_log=false, no_survey=false, desc="Kickoff" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X002D, type="u8", condition="eq", value=0X8, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer ran out in a quarter, Preseason mode" },
+        { address=0X002D, type="u8", condition="eq", value=0X9, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time ran out in a quarter, Pro Bowl" },
+        { address=0X002D, type="u8", condition="eq", value=0XA, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer ran out in a quarter, Season mode" },
+        { address=0X002D, type="u8", condition="eq", value=0XB, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer ran out in a quarter, Playoff/Super Bowl" },
+        { address=0X002D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Game Mode (Lower)" },
+        { address=0X00C2, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-bit)" },
+        { address=0X06F6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Pause/Slowdown cheat code - Press down 7 times durring the intro to activate" },
+      },
+    },
+  },
+}

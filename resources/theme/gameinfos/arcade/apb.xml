@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+	<view name="gamecarousel, detailed, grid">
+		<!-- APIEXPOSE:CPO:BEGIN -->
+		<text name="panel_layout" extra="true">
+			<text>8-Button</text>
+		</text>
+		<text name="control" extra="true">
+			<text>pedal</text>
+		</text>
+		<text name="button1" extra="true">
+			<text>Siren / Start</text>
+			<color>${yellow}</color>
+		</text>
+		<text name="button2" extra="true">
+			<text>Fire</text>
+			<color>${red}</color>
+		</text>
+		<text name="buttoncoin" extra="true">
+			<text>Coin</text>
+			<color>${white}</color>
+		</text>
+		<text name="buttonstart" extra="true">
+			<text>Start</text>
+			<color>${white}</color>
+		</text>
+		<!-- APIEXPOSE:CPO:END -->
+		<!-- APIEXPOSE:HISCORE:BEGIN -->
+		<text name="hiscoreline1" extra="true">
+			<text>#1 DFT 10000</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 MLH 9500</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 AJM 9000</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 MLW 8500</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 BAF 8000</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 HLC 7500</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 EAR 7000</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 RBD 6500</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 DFT 6500</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 MLH 6250</text>
+		</text>
+		<text name="hiscoreline11" extra="true">
+			<text>#11 AJM 6000</text>
+		</text>
+		<text name="hiscoreline12" extra="true">
+			<text>#12 MLW 5750</text>
+		</text>
+		<text name="hiscoreline13" extra="true">
+			<text>#13 BAF 5500</text>
+		</text>
+		<text name="hiscoreline14" extra="true">
+			<text>#14 HLC 5250</text>
+		</text>
+		<text name="hiscoreline15" extra="true">
+			<text>#15 EAR 5000</text>
+		</text>
+		<text name="hiscoreline16" extra="true">
+			<text>#16 CJD 4750</text>
+		</text>
+		<text name="hiscoreline17" extra="true">
+			<text>#17 RBD 4500</text>
+		</text>
+		<text name="hiscoreline18" extra="true">
+			<text>#18 JFS 4250</text>
+		</text>
+		<text name="hiscoreline19" extra="true">
+			<text>#19 ROB 4000</text>
+		</text>
+		<text name="hiscoreline20" extra="true">
+			<text>#20 LIB 3750</text>
+		</text>
+		<text name="hiscoreline21" extra="true">
+			<text>#21 CAD 3500</text>
+		</text>
+		<text name="hiscoreline22" extra="true">
+			<text>#22 GAS 3250</text>
+		</text>
+		<text name="hiscoreline23" extra="true">
+			<text>#23 DAN 3000</text>
+		</text>
+		<text name="hiscoreline24" extra="true">
+			<text>#24 LYL 2750</text>
+		</text>
+		<text name="hiscoreline25" extra="true">
+			<text>#25 RCM 2500</text>
+		</text>
+		<!-- APIEXPOSE:HISCORE:END -->
+	</view>
+</theme>

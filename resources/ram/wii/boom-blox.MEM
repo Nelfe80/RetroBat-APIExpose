@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Boom Blox",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "boom-blox",
+    file = "boom-blox.zip",
+    hashes = {
+      { hash = "7560c27b3bcfdc32ceb2194f96eba3d5", label = "Boom Blox (Europe) (En,Fr,De,Es,It,Nl)" },
+      { hash = "2380236ea04ab7cc0bb2c9b8d87af1c2", label = "Boom Blox (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X5E43D7, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Initial value" },
+        { address=0X5E43D7, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Game Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5E9213, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Editing/Creating a Level" },
+        { address=0X5F1623, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Take a look around prompt" },
+      },
+    },
+  },
+}

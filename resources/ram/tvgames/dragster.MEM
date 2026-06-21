@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Dragster",
+    system = "tvgames",
+    system_name = "Elektor TV Games Computer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "dragster",
+    file = "dragster.zip",
+    hashes = {
+      { hash = "3a15e7b4920fe8ebb3253b01a226ee32", label = "Dragster (Europe) (ESS-011-6).tvc" },
+    }
+  },
+
+  events = {
+  },
+}

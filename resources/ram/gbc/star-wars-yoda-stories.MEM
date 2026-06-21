@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Star Wars: Yoda Stories",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "star-wars-yoda-stories",
+    file = "star-wars-yoda-stories.zip",
+    hashes = {
+      { hash = "544eb3962ef54f89718c8dfa668ec4be", label = "Star Wars - Yoda Stories (USA, Europe) (GB Compatible).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD202, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Items] Level 1" },
+        { address=0XD205, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Items] Level 1" },
+        { address=0XD207, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Event] Level 1" },
+        { address=0XD282, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0XD28C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Items] Level 1" },
+        { address=0XD29E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Items] Level 1" },
+        { address=0XD2E0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Puzzles] Level 1 Puzzle Solved" },
+        { address=0XD304, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Puzzles] Level 1 Puzzle Solved" },
+        { address=0XD3A0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Puzzles] Level 1 Puzzle Solved" },
+        { address=0XD3C5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Event Level2 Locator NPC Dialogue" },
+        { address=0XD3C6, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Locator not found" },
+        { address=0XD3C6, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Locator received" },
+        { address=0XD3C6, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="NPC dialogue expended" },
+        { address=0XD3C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Event Level 2 Locator" },
+        { address=0XD3F4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Puzzles] Level 1 Puzzle Solved" },
+        { address=0XD424, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Puzzles] Level 1 Puzzle Solved" },
+        { address=0XD448, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Puzzles] Level 1Puzzle Solved" },
+        { address=0XD44A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Event] Level 1" },
+        { address=0XD46C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Puzzles] Level 1 Puzzle Solved" },
+        { address=0XD484, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[Puzzles] Level 1 Puzzle Solved" },
+        { address=0XFFBE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+      },
+      stage = {
+        { address=0XD3C5, type="u8", condition="eq", value=0X63, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dialogue active" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD58A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Visual Health (8-Bit) decreased" },
+        { address=0XD58A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Visual Health (8-Bit) increased" },
+        { address=0XD58B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Actual Health (8-Bit) decreased" },
+        { address=0XD58B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Actual Health (8-Bit) increased" },
+      },
+    },
+  },
+}

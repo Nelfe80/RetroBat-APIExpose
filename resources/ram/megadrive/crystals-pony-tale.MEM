@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Crystal's Pony Tale",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Adventure, Platform"
+  },
+
+  rom = {
+    name = "crystals-pony-tale",
+    file = "crystals-pony-tale.zip",
+    hashes = {
+      { hash = "35f24197067a98e82a426631a4e0cfe6", label = "Crystal's Pony Tale (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0549, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="80=Paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X000D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Being Loaded" },
+      },
+      zone = {
+        { address=0X021D, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Current Gamestate/World" },
+      },
+      stage = {
+        { address=0X0008, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage, does not update on Hub for some" },
+        { address=0X021A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Player is in Stage, 0 if Hub or Menus" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X021E, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Can Jump" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X021B, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="At Bridge Doors" },
+      },
+    },
+  },
+}

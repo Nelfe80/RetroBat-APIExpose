@@ -1,0 +1,94 @@
+return {
+  game = {
+    title = "Worms: Open Warfare",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "worms-open-warfare",
+    file = "worms-open-warfare.zip",
+    hashes = {
+      { hash = "d4ef967d10104ae7b510f45d97ef819c", label = "Worms - Open Warfare (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X1062C8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 1 - Worm 1 Health decreased" },
+        { address=0X1062C8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 1 - Worm 1 Health increased" },
+        { address=0X10634C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 1 - Worm 2 Health decreased" },
+        { address=0X10634C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 1 - Worm 2 Health increased" },
+        { address=0X1063D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 1 - Worm 3 Health decreased" },
+        { address=0X1063D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 1 - Worm 3 Health increased" },
+        { address=0X106454, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 1 - Worm 4 Health decreased" },
+        { address=0X106454, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 1 - Worm 4 Health increased" },
+        { address=0X1064D8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 2 - Worm 1 Health decreased" },
+        { address=0X1064D8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 2 - Worm 1 Health increased" },
+        { address=0X10655C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 2 - Worm 2 Health decreased" },
+        { address=0X10655C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 2 - Worm 2 Health increased" },
+        { address=0X1065E0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 2 - Worm 3 Health decreased" },
+        { address=0X1065E0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 2 - Worm 3 Health increased" },
+        { address=0X106664, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 2 - Worm 4 Health decreased" },
+        { address=0X106664, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 2 - Worm 4 Health increased" },
+        { address=0X1066E8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 3 - Worm 1 Health decreased" },
+        { address=0X1066E8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 3 - Worm 1 Health increased" },
+        { address=0X10676C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 3 - Worm 2 Health decreased" },
+        { address=0X10676C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 3 - Worm 2 Health increased" },
+        { address=0X1067F0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 3 - Worm 3 Health decreased" },
+        { address=0X1067F0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 3 - Worm 3 Health increased" },
+        { address=0X106874, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 3 - Worm 4 Health decreased" },
+        { address=0X106874, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 3 - Worm 4 Health increased" },
+        { address=0X1068F8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 4 - Worm 1 Health decreased" },
+        { address=0X1068F8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 4 - Worm 1 Health increased" },
+        { address=0X10697C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 4 - Worm 2 Health decreased" },
+        { address=0X10697C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 4 - Worm 2 Health increased" },
+        { address=0X106A00, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 4 - Worm 3 Health decreased" },
+        { address=0X106A00, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 4 - Worm 3 Health increased" },
+        { address=0X106A84, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Team 4 - Worm 4 Health decreased" },
+        { address=0X106A84, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Team 4 - Worm 4 Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XF99C0, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Selected (alt)" },
+        { address=0XFE300, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Selected" },
+        { address=0X1056CC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Used ID" },
+        { address=0X1057F4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Used (CPU)" },
+        { address=0X105884, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Used ID (Player 1)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X105E95, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Air Strike (Team 1)" },
+        { address=0X105E9A, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Bazooka (Team 1)" },
+        { address=0X105E9B, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Blowtorch (Team 1)" },
+        { address=0X105E9D, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Banana Bomb (Team 1)" },
+        { address=0X105EA0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Mine (Team 1)" },
+        { address=0X105EA1, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Cluster Bomb (Team 1)" },
+        { address=0X105EA4, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Dynamite (Team 1)" },
+        { address=0X105EA7, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Fire Punch (Team 1)" },
+        { address=0X105EAA, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Girder (Team 1)" },
+        { address=0X105EAB, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Grenade (Team 1)" },
+        { address=0X105EB0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Homing Missile (Team 1)" },
+        { address=0X105EB1, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Jetpack (Team 1)" },
+        { address=0X105EB2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Kamikaze (Team 1)" },
+        { address=0X105EC2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Prod Ammo (Team 1)" },
+        { address=0X105EC3, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Ninja Rope (Team 1)" },
+        { address=0X105EC8, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Sheep (Team 1)" },
+        { address=0X105EC9, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Shotgun (Team 1)" },
+        { address=0X105ED1, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Teleport (Team 1)" },
+        { address=0X105ED2, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Uzi (Team 1)" },
+        { address=0X105EDA, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Bazooka (Team 2)" },
+        { address=0X105EDD, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammo - Banana Bomb (Team 2)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X105900, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Round Timer" },
+      },
+    },
+  },
+}

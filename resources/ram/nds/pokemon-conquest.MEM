@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Pokémon Conquest",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "pokemon-conquest",
+    file = "pokemon-conquest.zip",
+    hashes = {
+      { hash = "22d1e61f6bc137b752f8728e31fa3485", label = "Pokemon Conquest (USA, Australia) (NDSi Enhanced).nds" },
+      { hash = "af30a7e5e52586957e4d9112ea5b8b48", label = "Pokemon Conquest (Europe) (NDSi Enhanced).nds" },
+    }
+  },
+
+  events = {
+  },
+}

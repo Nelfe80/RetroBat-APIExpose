@@ -1,0 +1,57 @@
+return {
+  game = {
+    title = "Jak II",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jak-ii",
+    file = "jak-ii.zip",
+    hashes = {
+      { hash = "f51c94dd47cc2eb385d5733389428121", label = "Jak II (USA) (Debug Patch) (Bartis1989)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X622F49, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select (145 Orbs)" },
+      },
+      zone = {
+        { address=0X622F40, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mirror World - ON" },
+        { address=0X622F48, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mirror World (15 Orbs)" },
+      },
+      stage = {
+        { address=0X622F48, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Scene Player Act 1 (65 Orbs)" },
+        { address=0X622F48, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Scene Player Act 2 (95 Orbs)" },
+        { address=0X622F48, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Scene Player Act 3 (125 Orbs)" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X622FA0, type="u32le", condition="eq", value=0X0085F0F4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Krew Fight (Weapons Lab)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X372D37, type="u8", condition="eq", value=0X3E, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score on Screen" },
+      },
+      collectibles = {
+        { address=0X622F40, type="u8", condition="bit_true", bit=2, mask=0X04, action="AMMO_STATE", no_log=true, no_survey=false, desc="Unlimited Ammo - ON" },
+        { address=0X622F48, type="u8", condition="bit_true", bit=2, mask=0X04, action="AMMO_STATE", no_log=true, no_survey=false, desc="Unlimited Ammo (155 Orbs)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X622F33, type="u8", condition="bit_true", bit=0, mask=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Dark Jak is now invincible!" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X81CD59, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Monopoly",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Board Game"
+  },
+
+  rom = {
+    name = "monopoly",
+    file = "monopoly.zip",
+    hashes = {
+      { hash = "5a45ae003854f9aa9c91b8e12fcf3e8b", label = "Monopoly (Europe) (En,Fr,De,Es).gba" },
+      { hash = "ce55f087d1ed4ab12a5bad411dae1113", label = "Monopoly (USA).gba" },
+    }
+  },
+
+  events = {
+  },
+}

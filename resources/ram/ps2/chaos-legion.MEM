@@ -1,0 +1,121 @@
+return {
+  game = {
+    title = "Chaos Legion",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure, Beat 'em Up"
+  },
+
+  rom = {
+    name = "chaos-legion",
+    file = "chaos-legion.zip",
+    hashes = {
+      { hash = "b81e7179fcbcd7b83ee9f6a255b8628a", label = "Chaos Legion (USA) (En,Ja,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3D762C, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X5C1400, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Attack levels" },
+        { address=0X5C1401, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Attack levels" },
+        { address=0X5C1402, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Attack levels" },
+        { address=0X5C1403, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Attack levels" },
+        { address=0X5C1404, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Defense levels" },
+        { address=0X5C1405, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Defense levels" },
+        { address=0X5C1406, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Defense levels" },
+        { address=0X5C1407, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Defense levels" },
+        { address=0X5C1408, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Enchant levels" },
+        { address=0X5C1409, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Enchant levels" },
+        { address=0X5C140A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Enchant levels" },
+        { address=0X5C140B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Enchant levels" },
+        { address=0X5C140C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Assist levels" },
+        { address=0X5C140D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Assist levels" },
+        { address=0X5C140E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Assist levels" },
+        { address=0X5C140F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Assist levels" },
+        { address=0X5C1410, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Force levels" },
+        { address=0X5C1411, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Malice levels" },
+        { address=0X5C1412, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Force levels" },
+        { address=0X5C1413, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion Force levels" },
+        { address=0X646018, type="u8", condition="eq", value=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Legion level up" },
+      },
+      stage = {
+        { address=0X5A3835, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage ID" },
+        { address=0X5C1208, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Side-B for Stage 11 enabled (Delacroix no longer is available to fight)" },
+        { address=0X5C120B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Side-B missions enabled by completing Stage 12" },
+        { address=0X5C120E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Side-B missions for Stage 13" },
+        { address=0X5C4CDC, type="u16le", condition="eq", value=0XFFFE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage results" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X5A99C4, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Life increased" },
+        { address=0X5A99C4, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Life decreased" },
+        { address=0X5C143A, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max Life increased" },
+        { address=0X5C143A, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max Life decreased" },
+        { address=0X5C14C3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Life Recovery (S) possessed increased" },
+        { address=0X5C14C3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Life Recovery (S) possessed decreased" },
+        { address=0X5C14C5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Life Max Up (S) possessed increased" },
+        { address=0X5C14C5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Life Max Up (S) possessed decreased" },
+        { address=0X5C14C9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Life Recovery (L) possessed increased" },
+        { address=0X5C14C9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Life Recovery (L) possessed decreased" },
+        { address=0X5C14D5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Life Max Up (L) possessed increased" },
+        { address=0X5C14D5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Life Max Up (L) possessed decreased" },
+        { address=0X5C14E3, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Life Recovery (S) possessed by Arcia increased" },
+        { address=0X5C14E3, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Life Recovery (S) possessed by Arcia decreased" },
+        { address=0X5C14E5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Life Max Up (S) possessed by Arcia increased" },
+        { address=0X5C14E5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Life Max Up (S) possessed by Arcia decreased" },
+        { address=0X5C14E9, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Life Recovery (L) possessed by Arcia increased" },
+        { address=0X5C14E9, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Life Recovery (L) possessed by Arcia decreased" },
+      },
+      health = {
+        { address=0X5C14E4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of Energy Bullet (S) possessed by Arcia decreased" },
+        { address=0X5C14E4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of Energy Bullet (S) possessed by Arcia increased" },
+        { address=0X5C14EA, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Number of Energy Bullet (L) possessed by Arcia decreased" },
+        { address=0X5C14EA, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Number of Energy Bullet (L) possessed by Arcia increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5C4EE8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Scene Exp points" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3D762C, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Prologue - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 2 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 3 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 4 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X0C, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 5 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X0E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 6 - map 2/boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 7 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X15, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 8 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X18, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 9 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X1B, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 10 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X1E, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 11 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 12 - boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X24, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 13 - map 3/boss" },
+        { address=0X3D762C, type="u8", condition="eq", value=0X27, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Stage - boss" },
+        { address=0X5C4CE0, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Health of any boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X5C14D0, type="u8", condition="eq", value=0X00, action="SHIELD_LOST", no_log=false, no_survey=false, desc="no" },
+        { address=0X5C14D0, type="u8", condition="eq", value=0X01, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="yes" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X5C1468, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Clear Timer" },
+        { address=0X5C146C, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Boss Clear Timer" },
+        { address=0X5C4CDC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Cutscene timer" },
+      },
+    },
+  },
+}

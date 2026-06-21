@@ -1,0 +1,68 @@
+return {
+  game = {
+    title = "Ayakashi no Shiro",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "ayakashi-no-shiro",
+    file = "ayakashi-no-shiro.zip",
+    hashes = {
+      { hash = "501de1b6056bee7aeb0c2bcbb8b3d806", label = "Ayakashi no Shire (Japan) (En) (v1.1) (KingMike's Translations).gb" },
+      { hash = "8f3095c4d98694f19270d8c2788d5e46", label = "Ayakashi no Shiro (Japan).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFFBA, type="u8", condition="eq", value=0X5, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Blade - Seiryu3" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC010, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Rounds Paralyzed" },
+        { address=0XC0A5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Fuujin Level" },
+        { address=0XC0A6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Shadow Bind Level" },
+        { address=0XC0A7, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Hayabusa Level" },
+        { address=0XC0A8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Kagerou Level" },
+        { address=0XC0A9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Water Mirror Level" },
+        { address=0XC0AA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Substitution Level" },
+        { address=0XC0AB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Cicada Molt Level" },
+        { address=0XC0AC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Vajra Level (Heals)" },
+        { address=0XC0AD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Vidya-Raja Level" },
+        { address=0XC0AE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Angel's Robes Level" },
+        { address=0XC0AF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Art - Wei-To Level" },
+        { address=0XFFB1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8bit] Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFFBB, type="u8", condition="eq", value=0XD, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Armor - Byakko1" },
+      },
+      health = {
+        { address=0XC00D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Enemy HP decreased" },
+        { address=0XC00D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Enemy HP increased" },
+        { address=0XC0A4, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[8bit] Art - Raijin Level (Single Damage)" },
+        { address=0XFFB4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] Max HP decreased" },
+        { address=0XFFB4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] Max HP increased" },
+        { address=0XFFC0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] HP decreased" },
+        { address=0XFFC0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8bit] HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XFFBA, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Shinobi Blade - Start" },
+        { address=0XFFBA, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Sengoku Pole - Suzaku" },
+        { address=0XFFBA, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Glove Hook - Gengu1" },
+        { address=0XFFBA, type="u8", condition="eq", value=0X6, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Suzaku Blade - Suzaku" },
+        { address=0XFFBA, type="u8", condition="eq", value=0X7, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Genbu Blade - Genbu2" },
+        { address=0XFFBA, type="u8", condition="eq", value=0X8, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Byakko Blade - Byakko2" },
+        { address=0XFFBA, type="u8", condition="eq", value=0X9, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Seiryu Blade - Seiryu3" },
+        { address=0XFFBA, type="u8", condition="eq", value=0XA, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Gouma Blade - Doman" },
+      },
+    },
+  },
+}

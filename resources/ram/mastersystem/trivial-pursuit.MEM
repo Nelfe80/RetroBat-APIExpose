@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Trivial Pursuit",
+    system = "mastersystem",
+    system_name = "Master System",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "trivial-pursuit",
+    file = "trivial-pursuit.zip",
+    hashes = {
+      { hash = "87d44f3416d4f31959b583d0d460c7fb", label = "Trivial Pursuit - Genus Edition (Europe) (En,Fr,De,Es).sms" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,47 @@
+return {
+  game = {
+    title = "American Truck",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "american-truck",
+    file = "american-truck.zip",
+    hashes = {
+      { hash = "7309672ed6318695d1e6a1e319d709f1", label = "American Truck (SR) [Set 1].d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0849, type="u8", condition="eq", value=0XFF, action="GAME_OVER", no_log=false, no_survey=false, desc="Lost life or game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1D68, type="u8", condition="eq", value=0X7F, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Full, level complete" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0849, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Driving" },
+        { address=0X0849, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lost life flag increased" },
+        { address=0X0849, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lost life flag decreased" },
+        { address=0X084C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives (counts current life as 1) increased" },
+        { address=0X084C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives (counts current life as 1) decreased" },
+        { address=0X6B50, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Truck damage increased" },
+        { address=0X6B50, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Truck damage decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X084F, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE] Player 1 score (valid only while player 2 is active)" },
+        { address=0X085A, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE] Player 2 score (valid only while player 1 is active)" },
+        { address=0XAC11, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[24-bit BE] Active player score (right-padded with 00 on display)" },
+      },
+    },
+  },
+}

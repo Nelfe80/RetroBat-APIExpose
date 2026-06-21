@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Rolling Thunder 2",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "rolling-thunder-2",
+    file = "rolling-thunder-2.zip",
+    hashes = {
+      { hash = "3753ae738edf6f37203763f3a8a6e406", label = "Rolling Thunder 2 (USA).md" },
+      { hash = "be1185a2620c2d64d75e8827e00e8b3d", label = "Rolling Thunder 2 (Europe).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0XF04C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XF20C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0XF20C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Akazukin Chacha: Osawagase! Panic Race!",
+    system = "pcfx",
+    system_name = "PC-FX",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "akazukin-chacha-osawagase-panic-race",
+    file = "akazukin-chacha-osawagase-panic-race.zip",
+    hashes = {
+      { hash = "f6a842b53b2af1e4d50df6a99c35e0f9", label = "Akazukin ChaCha - Osawagase! Panic Race! (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

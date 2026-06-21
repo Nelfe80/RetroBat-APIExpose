@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "The iDOLM@STER Shiny Festa: Funky Note",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-idolm-ster-shiny-festa-funky-note",
+    file = "the-idolm-ster-shiny-festa-funky-note.zip",
+    hashes = {
+      { hash = "741f37a30897c612a6530146431399fd", label = "Idolmaster Shiny Festa, The - Funky Note (Japan).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XBBECE0, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Results screen - MAX COMBO" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XBC7A70, type="u32le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="THE WORLD IS ALL ONE !!: DEBUT - RANK" },
+      },
+      stage = {
+        { address=0XBBE384, type="u16le", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XE52528, type="u16le", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XE52528, type="u16le", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Backstage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XBBE388, type="u16le", condition="eq", value=0X11, action="LIVES_STATE", no_log=false, no_survey=false, desc="Next Life" },
+        { address=0XBC5D60, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="NEXT LIFE: DEBUT - RANK increased" },
+        { address=0XBC5D60, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="NEXT LIFE: DEBUT - RANK decreased" },
+        { address=0XBC5D9C, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="NEXT LIFE: REGULAR - RANK increased" },
+        { address=0XBC5D9C, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="NEXT LIFE: REGULAR - RANK decreased" },
+        { address=0XBC5DD8, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="NEXT LIFE: PRO - RANK increased" },
+        { address=0XBC5DD8, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="NEXT LIFE: PRO - RANK decreased" },
+        { address=0XBC5E14, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="NEXT LIFE: MASTER - RANK increased" },
+        { address=0XBC5E14, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="NEXT LIFE: MASTER - RANK decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XBBECE4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Results screen - SCORE" },
+        { address=0XBC5A8C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="VISIONARY: DEBUT - HIGH SCORE" },
+        { address=0XBC5B7C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="KIRAMEKIRARI: DEBUT - HIGH SCORE" },
+        { address=0XBC602C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="KYUN! VAMPIRE GIRL: DEBUT - HIGH SCORE" },
+        { address=0XBC79B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="MUSIC: REGULAR - HIGH SCORE" },
+        { address=0XE52948, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="SCORE" },
+      },
+      collectibles = {
+        { address=0XBBECF8, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Results screen - Money ganied increased" },
+        { address=0XBC48A4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="MONEY increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBC9E88, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="STAR OF FESTA: STANDARD - TIMES CLEARED" },
+      },
+    },
+  },
+}

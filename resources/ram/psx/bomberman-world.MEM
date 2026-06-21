@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Bomberman World",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "bomberman-world",
+    file = "bomberman-world.zip",
+    hashes = {
+      { hash = "a0146257f6a1ff1431adbf3dfba23629", label = "Bomberman World (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X78A7C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Current Worlds Unlocked" },
+        { address=0X78C6C, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="EASY" },
+        { address=0X78C6C, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="NORMAL" },
+        { address=0X78C6C, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="HARD" },
+        { address=0X78C6C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="< SELECT GAME TYPE : LEVEL >" },
+        { address=0X7F084, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Challenge Mode - Your Bomber Level" },
+      },
+      zone = {
+        { address=0X78AAC, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Planet Forest" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Planet Wind" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Planet Fire" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Planet Ocean" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Planet Black" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Slippy Valley" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X06, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Chimney Blast" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X07, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Slow or Fast" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Desert Warp" },
+        { address=0X78AAC, type="u8", condition="eq", value=0X09, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Seesaw Park" },
+        { address=0X78AAC, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[8 Bit] World / Stage" },
+        { address=0XD53DE, type="u8", condition="eq", value=0X00, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="W-1" },
+        { address=0XD53DE, type="u8", condition="eq", value=0X0C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="W-2" },
+        { address=0XD53DE, type="u8", condition="eq", value=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="W-3" },
+        { address=0XD53DE, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="W-4" },
+        { address=0XD53DE, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="< WORLD >" },
+      },
+      stage = {
+        { address=0X78BF2, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Total Crystals in Stage" },
+        { address=0X78C40, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="< STAGES >" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X78C6F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="< SELECT GAME TYPE : SUDDEN DEATH >" },
+        { address=0XCDB70, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives increased" },
+        { address=0XCDB70, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Lives decreased" },
+      },
+      health = {
+        { address=0XCDB71, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8 Bit] Health decreased" },
+        { address=0XCDB71, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[8 Bit] Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X78AA8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Challenge Bomber High Score [2 Minute Mode]" },
+        { address=0X78AAA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Challenge Bomber High Score [5 Minute Mode]" },
+        { address=0X78BFC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD6F15, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="< ITEM : BLOCK INV >" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X78C6E, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="< SELECT GAME TYPE : TIME >" },
+      },
+    },
+  },
+}

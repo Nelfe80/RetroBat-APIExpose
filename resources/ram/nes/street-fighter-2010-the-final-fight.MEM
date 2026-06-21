@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Street Fighter 2010: The Final Fight",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "street-fighter-2010-the-final-fight",
+    file = "street-fighter-2010-the-final-fight.zip",
+    hashes = {
+      { hash = "0050570a82fc31b0cd236f9098f80af9", label = "2010 Street Fighter (Japan).nes" },
+      { hash = "f5e07200389089e9b5b801a9a247dcef", label = "Street Fighter 2010 - The Final Fight (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X00AB, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Actual stage address" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00B1, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life increased" },
+        { address=0X00B1, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life decreased" },
+        { address=0X00B5, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X00B5, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X00B2, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="'C' Power Ups" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X05FE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health" },
+      },
+    },
+  },
+}

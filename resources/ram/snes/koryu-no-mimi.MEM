@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Koryu no Mimi",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat'em Up"
+  },
+
+  rom = {
+    name = "koryu-no-mimi",
+    file = "koryu-no-mimi.zip",
+    hashes = {
+      { hash = "069b50c7dab5d87b410b9c5ceaf0cfe7", label = "Kouryuu no Mimi (Japan) (En) (v1.0) (RPGOne).sfc" },
+      { hash = "198a029eb746756a79951004e96c4c86", label = "Kouryuu no Mimi (Japan).sfc" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0EE0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kiroemon's Energy: 40 = Full decreased" },
+        { address=0X0EE0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kiroemon's Energy: 40 = Full increased" },
+        { address=0X0EE2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X0EE2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X0EE4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X0EE4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X0EE6, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X0EE6, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X0EE8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X0EE8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0BC0, type="u8", condition="change", action="WEAPON_STATE", no_log=true, no_survey=false, desc="Weapon Type ?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Fantasia",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "fantasia",
+    file = "fantasia.zip",
+    hashes = {
+      { hash = "69c60599bcff0eb53a49dbaf09dbfc02", label = "Fantasia (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2465, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues" },
+        { address=0X255B, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo: (00-Off/FF-On)" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X0799, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World ID: (00-Water/01-Earth/02-Wind/03-Fire/04-Various)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0856, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [16-Bit] (Hex): (Value*655360)" },
+        { address=0X0858, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [16-Bit] (Hex): x10" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Touhou Spirits",
+    system = "wasm4",
+    system_name = "WASM-4",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "touhou-spirits",
+    file = "touhou-spirits.zip",
+    hashes = {
+      { hash = "d50e41fff554d2353f948538c27ce3cc", label = "Touhou Spirits (World) (v1.0.1) (Mr.Rafael).wasm" },
+    }
+  },
+
+  events = {
+  },
+}

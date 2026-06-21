@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "Uninvited",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "uninvited",
+    file = "uninvited.zip",
+    hashes = {
+      { hash = "b58849a42ca5e7e980b884b2d8351900", label = "Uninvited (USA).nes" },
+      { hash = "8878fb6757bae8349e945381f4f84249", label = "Uninvited (USA) (Uncensored) (v1.0f) (Safaribans,Dragon ZERO).nes" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X053D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Room ID 34=death" },
+        { address=0X2000, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death in Car" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0420, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Event trigger block 0=entermansion" },
+      },
+    },
+  },
+}

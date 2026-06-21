@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Madden NFL 2005",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Sports, Strategy"
+  },
+
+  rom = {
+    name = "madden-nfl-2005",
+    file = "madden-nfl-2005.zip",
+    hashes = {
+      { hash = "3d664b565156cfad8432ca102e4c8c28", label = "Madden NFL 2005 (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

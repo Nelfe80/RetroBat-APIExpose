@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Space Ace",
+    system = "jaguarcd",
+    system_name = "Atari Jaguar CD",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "space-ace",
+    file = "space-ace.zip",
+    hashes = {
+      { hash = "857cce0c114ff8975348d98e1e17d8f1", label = "Space Ace (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X586D, type="u16be", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause? [16bits]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X587B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current lives increased" },
+        { address=0X587B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current lives decreased" },
+        { address=0X5890, type="u32be", condition="eq", value=0X1B31D40, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Drill Press" },
+        { address=0X5890, type="u32be", condition="eq", value=0X4B103B0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Sarcastic Hit" },
+        { address=0X5890, type="u32be", condition="eq", value=0X5CD2520, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Sarcastic Hit Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0X70FDB20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Melting" },
+        { address=0X5890, type="u32be", condition="eq", value=0X82331A0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Melting Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0X8FF6820, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eaten by Space Pup" },
+        { address=0X5890, type="u32be", condition="eq", value=0X09E0C9A0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eaten by Space Pup Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0XA8264F0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Shrink Wrapped" },
+        { address=0X5890, type="u32be", condition="eq", value=0XB577720, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Shrink Wrapped Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0XC7216B0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Failure to Launch" },
+        { address=0X5890, type="u32be", condition="eq", value=0XD21B120, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Failure to Launch Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0XEE8D500, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Groots Death Pact" },
+        { address=0X5890, type="u32be", condition="eq", value=0XFA53630, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Groots Death Pact Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0X10C68BD0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eaten by Hexter" },
+        { address=0X5890, type="u32be", condition="eq", value=0X11AEC820, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Eaten by Hexter Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0X12F5FA90, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Motorcycle Heaven" },
+        { address=0X5890, type="u32be", condition="eq", value=0X143F0AC0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Motorcycle Heaven Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0X15409440, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Tickle Pit Dexter" },
+        { address=0X5890, type="u32be", condition="eq", value=0X155960D0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Tickle Pit Ace" },
+        { address=0X5890, type="u32be", condition="eq", value=0X16A3C4F0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Tickle Pit Dexter Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0X16BC7F20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Tickle Pit Ace Reversed" },
+        { address=0X5890, type="u32be", condition="eq", value=0X18CDA3A0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Face Smash Kick" },
+      },
+    },
+  },
+}

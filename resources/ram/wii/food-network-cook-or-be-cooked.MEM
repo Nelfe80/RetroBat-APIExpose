@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Food Network: Cook or Be Cooked!",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Life Simulation"
+  },
+
+  rom = {
+    name = "food-network-cook-or-be-cooked",
+    file = "food-network-cook-or-be-cooked.zip",
+    hashes = {
+      { hash = "3e75e98eac6e0b732cb441d7d9af8660", label = "Food Network - Cook or Be Cooked! (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

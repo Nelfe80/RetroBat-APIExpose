@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Monkey Ball",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Miscellaneous"
+  },
+
+  rom = {
+    name = "monkey-ball",
+    file = "monkey-ball.zip",
+    hashes = {
+      { hash = "7e2955bc0f1f7477e9621940259af633", label = "Monkey_Ball.lst" },
+      { hash = "f9574079e56032192c98d038188940c1", label = "MonkeyBall.bin" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X223620, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="00 - attract mode" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2237CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+      stage = {
+        { address=0X2280D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bananas remaining in a stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X227866, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Remaining lives increased" },
+        { address=0X227866, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Remaining lives decreased" },
+        { address=0X228089, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Starting lives increased" },
+        { address=0X228089, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Starting lives decreased" },
+        { address=0X2280CA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death count per stage" },
+        { address=0X229676, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="speed graphics (hundreds after a death)" },
+        { address=0X229677, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="speed graphics (tenths after a death)" },
+        { address=0X229678, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="speed graphics (ones after a death)" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X2280CE, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Floors jumped" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XCF7B4, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Times continued throughout total game session (ff in menus only on first boot)" },
+      },
+    },
+  },
+}

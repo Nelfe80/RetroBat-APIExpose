@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "O-chan no Oekaki Logic 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "o-chan-no-oekaki-logic-2",
+    file = "o-chan-no-oekaki-logic-2.zip",
+    hashes = {
+      { hash = "17be226a480083975836b848cbc0cda3", label = "Oh-chan no Oekaki Logic 2 (Japan) (Rev 1)" },
+    }
+  },
+
+  events = {
+  },
+}

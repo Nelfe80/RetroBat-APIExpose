@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Commando",
+    system = "atari7800",
+    system_name = "Atari 7800",
+    genre = "Action, Shooter, Run and Gun"
+  },
+
+  rom = {
+    name = "commando",
+    file = "commando.zip",
+    hashes = {
+      { hash = "2e8e28f6ad8b9b9267d518d880c73ebb", label = "Commando (USA).a78" },
+    }
+  },
+
+  events = {
+  },
+}

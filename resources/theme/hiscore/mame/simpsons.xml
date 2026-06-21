@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme>
+
+<view name="gamecarousel, detailed, grid">
+		<text name="hiscoreline1" extra="true">
+			<text>#1 BAT 108</text>
+		</text>
+		<text name="hiscoreline2" extra="true">
+			<text>#2 HOM 73</text>
+		</text>
+		<text name="hiscoreline3" extra="true">
+			<text>#3 LIS 61</text>
+		</text>
+		<text name="hiscoreline4" extra="true">
+			<text>#4 MAR 57</text>
+		</text>
+		<text name="hiscoreline5" extra="true">
+			<text>#5 MAG 49</text>
+		</text>
+		<text name="hiscoreline6" extra="true">
+			<text>#6 INC 41</text>
+		</text>
+		<text name="hiscoreline7" extra="true">
+			<text>#7 SIM 37</text>
+		</text>
+		<text name="hiscoreline8" extra="true">
+			<text>#8 MAT 33</text>
+		</text>
+		<text name="hiscoreline9" extra="true">
+			<text>#9 FOX 20</text>
+		</text>
+		<text name="hiscoreline10" extra="true">
+			<text>#10 KON 19</text>
+		</text>
+	</view>
+</theme>

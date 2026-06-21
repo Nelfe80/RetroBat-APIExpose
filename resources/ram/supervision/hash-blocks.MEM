@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hash Blocks",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "hash-blocks",
+    file = "hash-blocks.zip",
+    hashes = {
+      { hash = "33d66c6e198a63784e9d169291a737c5", label = "Hash Blocks (USA, Europe) (Rev 1).sv" },
+    }
+  },
+
+  events = {
+  },
+}

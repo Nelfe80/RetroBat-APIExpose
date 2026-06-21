@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Knockout Kings",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "knockout-kings",
+    file = "knockout-kings.zip",
+    hashes = {
+      { hash = "64fa89b64514a71651c1b8dc629ba8f3", label = "Knockout Kings (USA, Europe).gbc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC0AC, type="u8", condition="eq", value=0X05, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0XC2E1, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demolisher" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC35C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jabs thrown in current round" },
+        { address=0XC35E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jabs connected in current round" },
+        { address=0XC360, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power Punches thrown in current round" },
+        { address=0XC362, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power Punches connected in current round" },
+        { address=0XC364, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Knock downs against opponent in current round" },
+        { address=0XC3C6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jabs received in current round" },
+        { address=0XC3CA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power Punches received in current round" },
+        { address=0XC446, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current round" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC327, type="u8", condition="eq", value=0XC8, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0XC327, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player Health" },
+        { address=0XC38F, type="u8", condition="eq", value=0XC8, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Max" },
+        { address=0XC38F, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Opponent health" },
+        { address=0XC4FC, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Power-ups decreased" },
+        { address=0XC4FF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Who picked up power-up decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XC4FC, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power-up spawned in" },
+        { address=0XC4FC, type="u8", condition="eq", value=0XFF, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Health power-up activated" },
+        { address=0XC4FD, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Strength/Speed power-up active" },
+        { address=0XC4FF, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Player" },
+        { address=0XC4FF, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Opponent" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC2E8, type="u8", condition="eq", value=0X2D, action="SCORE_STATE", no_log=false, no_survey=false, desc="Base value (no build points used on Create A Boxer screen)" },
+        { address=0XC2E9, type="u8", condition="eq", value=0X2D, action="SCORE_STATE", no_log=false, no_survey=false, desc="Base value (no build points used on Create A Boxer screen)" },
+        { address=0XC2EA, type="u8", condition="eq", value=0X2D, action="SCORE_STATE", no_log=false, no_survey=false, desc="Base value (no build points used on Create A Boxer screen)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC095, type="u8", condition="eq", value=0X6B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Loss (but switches to 0x77 for 3 frames first)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC414, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Knockout timer" },
+        { address=0XC428, type="u8", condition="eq", value=0X3C, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="'Break' message appears" },
+        { address=0XC428, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Break message timer" },
+        { address=0XC44F, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round timer - tens place of seconds" },
+        { address=0XC450, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round timer - ones place of seconds" },
+      },
+    },
+  },
+}

@@ -1,0 +1,64 @@
+return {
+  game = {
+    title = "Choro Q",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "choro-q",
+    file = "choro-q.zip",
+    hashes = {
+      { hash = "5d9909133d5251bd4d2cf6df70539a38", label = "Penny Racers (Europe)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1F9F68, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Menus" },
+        { address=0X1F9F68, type="u8", condition="eq", value=0X01, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off" },
+        { address=0X1F9F68, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="On" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1EC5C1, type="u8", condition="bit_true", bit=0, mask=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="0 All-Around" },
+      },
+      zone = {
+        { address=0X1EC6D4, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="1 Win the World Grand Prix for the second time" },
+        { address=0X1EC6D4, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="1 Win the World Grand Prix for the first time" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1EC758, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Special Circuit best lap time 16Bits" },
+        { address=0X1EC75C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tunnel - Long best lap time 16Bits" },
+        { address=0X1EC764, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Big Dome best lap time 16Bits" },
+        { address=0X1EC768, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Highlands - Short best lap time 16Bits" },
+        { address=0X1EC76C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Snow Mountain - Short best lap time 16Bits" },
+        { address=0X1EC774, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Highlands - Long best lap time 16Bits" },
+        { address=0X1EC778, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Snow Mountain - Long best lap time 16Bits" },
+        { address=0X1EC77C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal Circuit - Easy best lap time 16Bits" },
+        { address=0X1EC784, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mountain Pass best lap time 16Bits" },
+        { address=0X1EC788, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Woodland best lap time 16Bits" },
+        { address=0X1EC78C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tunnel - Short best lap time 16Bits" },
+        { address=0X1EC790, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal Circuit - Hard best lap time 16Bits" },
+        { address=0X1EC798, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Special Circuit best total time 16Bits" },
+        { address=0X1EC7A4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Big Dome best total time 16Bits" },
+        { address=0X1EC7A8, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Highlands - Short best total time 16Bits" },
+        { address=0X1EC7AC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Snow Mountain - Short best total time 16Bits" },
+        { address=0X1EC7BC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal Circuit - Easy best total time 16Bits" },
+        { address=0X1EC7C4, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Mountain Pass best total time 16Bits" },
+        { address=0X1EC7C8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Woodland best total time 16Bits" },
+        { address=0X1EC7CC, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tunnel - Short best total time 16Bits" },
+        { address=0X1EC7D0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Normal Circuit - Hard best total time 16Bits" },
+        { address=0X1EC7DC, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Tunnel - Long best total time 16Bits" },
+        { address=0X1EC7F4, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Highlands - Long best total time 16Bits" },
+        { address=0X1EC7F8, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Snow Mountain - Long best total time 16Bits" },
+        { address=0X1EC830, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Drag Race best total time 16Bits" },
+      },
+    },
+  },
+}

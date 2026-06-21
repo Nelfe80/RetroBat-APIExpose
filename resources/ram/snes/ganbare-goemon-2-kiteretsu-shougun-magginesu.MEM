@@ -1,0 +1,125 @@
+return {
+  game = {
+    title = "Ganbare Goemon 2: Kiteretsu Shougun Magginesu",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "ganbare-goemon-2-kiteretsu-shougun-magginesu",
+    file = "ganbare-goemon-2-kiteretsu-shougun-magginesu.zip",
+    hashes = {
+      { hash = "4fa977e155ded5192fdf8ea006cf094f", label = "Ganbare Goemon 2 - Kiteretsu Shougun Magginesu (Japan) (Es) (jackic) (0.99).sfc" },
+      { hash = "794e91614f4a3c5d6ca53e03eb8d3471", label = "Ganbare Goemon 2 - Kiteretsu Shougun Magginesu (Japan) (En) (3.0) (DDSTrans).sfc" },
+      { hash = "a5dee584b008de1c57745824d379211b", label = "Ganbare Goemon 2 - Kiteretsu Shougun Magginesu (Japan) (En) (1.0) (DDSTrans).sfc" },
+      { hash = "afd06ade29b5270a79199a531b0c7964", label = "Ganbare Goemon 2 - Kiteretsu Shougun Magginesu (Japan).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X2023A, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear 'Oedo Castle Underground Workshop'" },
+        { address=0X2023B, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear 'Former Site of Oedo Castle'" },
+        { address=0X2023B, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear 'Nebuta Road', open northern passage" },
+        { address=0X2023B, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear 'Bluefish Road'" },
+        { address=0X2023B, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear 'Castle of the Wooden Dolls'" },
+      },
+      zone = {
+        { address=0X00AA, type="u16le", condition="eq", value=0X1F, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Mechnical World Eawase-ya (mini game)" },
+        { address=0X20234, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="XEXEX;" },
+        { address=0X20234, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="e-awase;" },
+        { address=0X20234, type="u8", condition="bit_true", bit=2, mask=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="bazooca onitaiji;" },
+        { address=0X20234, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="zoukin gake race;" },
+      },
+      stage = {
+        { address=0X0092, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage1; 0x01=stage2; 0x02=stage3;" },
+        { address=0X0092, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage4; 0x04=stage5; 0x05=stage6;" },
+        { address=0X0092, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage7;" },
+        { address=0X0092, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[Current stage]" },
+        { address=0X0098, type="u8", condition="eq", value=0X29, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="goemon impact;" },
+        { address=0X0098, type="u8", condition="eq", value=0X2F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="general magginesu;" },
+        { address=0X0098, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[area in each stage]" },
+        { address=0X00AA, type="u16le", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="action stage or town" },
+        { address=0X20238, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Completion Bitflags" },
+        { address=0X20239, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Area 3 Dragon God Lake" },
+        { address=0X20239, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Akafuku Village (100 gold fee)" },
+        { address=0X2023A, type="u8", condition="bit_true", bit=5, mask=0X20, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open route to 'Oedo Castle Underground Workshop'" },
+        { address=0X2023A, type="u8", condition="bit_true", bit=6, mask=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open route to 'Former Site of Oedo Castle'" },
+        { address=0X2023B, type="u8", condition="bit_true", bit=1, mask=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open path to 'Nebuta Road'" },
+        { address=0X2023B, type="u8", condition="bit_true", bit=3, mask=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="open southern passage to 'Bluefish Road'" },
+        { address=0X2023C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Completion Bitflags" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0446, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[life] 0x00(death)~0x0A(max) increased" },
+        { address=0X0446, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[life] 0x00(death)~0x0A(max) decreased" },
+        { address=0X0479, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[helm life] increased" },
+        { address=0X0479, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[helm life] decreased" },
+        { address=0X047B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[armor life] increased" },
+        { address=0X047B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[armor life] decreased" },
+        { address=0X0498, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives: [remaining number] 0x00-0x99 (decimal) increased" },
+        { address=0X0498, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives: [remaining number] 0x00-0x99 (decimal) decreased" },
+        { address=0X04B4, type="u8", condition="eq", value=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="1scale; 0x04=2scales; 0x06=3scales" },
+        { address=0X04B4, type="u8", condition="eq", value=0X08, action="LIVES_STATE", no_log=false, no_survey=false, desc="4scales; 0x0A=5scales;" },
+        { address=0X04B4, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[max life] increased" },
+        { address=0X04B4, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[max life] decreased" },
+        { address=0X05C6, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[boss life] some non-impact bosses' life ratio increased" },
+        { address=0X05C6, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[boss life] some non-impact bosses' life ratio decreased" },
+        { address=0X0746, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[boss life] hyottoko-maru2; increased" },
+        { address=0X0746, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[boss life] hyottoko-maru2; decreased" },
+        { address=0X07A6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[boss life] hyottoko-maru1; increased" },
+        { address=0X07A6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[boss life] hyottoko-maru1; decreased" },
+        { address=0X0806, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[boss life hyottoko-maru] increased" },
+        { address=0X0806, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[boss life hyottoko-maru] decreased" },
+        { address=0X16B0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[boss life] General Magginesu, Dracula; increased" },
+        { address=0X16B0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[boss life] General Magginesu, Dracula; decreased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X0460, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon currently equipped. The names below are Goemon's but the other 2 use the same values." },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0790, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[RACE] score" },
+        { address=0X0791, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[RACE] score" },
+        { address=0X144E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[minigame E-AWASE] score(1P)" },
+        { address=0X1450, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[minigame E-AWASE] score(2P)" },
+        { address=0X1B56, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[minigame BAZOOCA] score(1P)" },
+        { address=0X1B58, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[minigame BAZOOCA] score(2P)" },
+      },
+      collectibles = {
+        { address=0X0474, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[gold] 1's increased" },
+        { address=0X0475, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[gold] 100's increased" },
+        { address=0X0478, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold helm;" },
+        { address=0X047A, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="gold armor;" },
+        { address=0X1B4A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[impact game(BOSS)] gold remain 1's increased" },
+        { address=0X1B4B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[impact game(BOSS)] gold remain 100's increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0098, type="u8", condition="eq", value=0X19, action="BOSS_HIT", no_log=false, no_survey=false, desc="area 2 boss;" },
+        { address=0X0098, type="u8", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="area 3-3 boss(tasogare 1-gou);" },
+        { address=0X0098, type="u8", condition="eq", value=0X20, action="BOSS_HIT", no_log=false, no_survey=false, desc="area 4 boss;" },
+        { address=0X00D4, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[impact game(BOSS)] bomb remain" },
+        { address=0X0486, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[impact game(BOSS)] oil remain 1's" },
+        { address=0X0487, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[impact game(BOSS)] oil remain 100's" },
+        { address=0X07A7, type="u8", condition="eq", value=0X1, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goemon's melee" },
+        { address=0X07A7, type="u8", condition="eq", value=0XE, action="BOSS_HIT", no_log=false, no_survey=false, desc="Goemon's ranged" },
+        { address=0X0E16, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[impact game(BOSS)] energy?" },
+        { address=0X368A, type="u8", condition="eq", value=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="beat boss 'Tasogare 1-gou'" },
+        { address=0X368B, type="u8", condition="eq", value=0X3B, action="BOSS_HIT", no_log=false, no_survey=false, desc="beat boss 'Tasogare 1-gou'" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X0466, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="[invincible timer] 0x00-0x80;" },
+      },
+    },
+  },
+}

@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Majong",
+    system = "supervision",
+    system_name = "Watara Supervision",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "majong",
+    file = "majong.zip",
+    hashes = {
+      { hash = "57c7f913afe11d5c30252280a31eb04a", label = "Majong (USA, Europe).sv" },
+      { hash = "84e6a39d21d4bbbf266566f8d5beeee2", label = "Majong (USA, Europe) (Opponent Unlock Fix) (Hotscrock).sv" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0X0039, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bits] Player's money 0000XX increased" },
+        { address=0X003A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bits] Player's money 00XX00 increased" },
+        { address=0X003B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bits] Player's money XX0000 increased" },
+        { address=0X003C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bits] Oponent's money 0000XX increased" },
+        { address=0X003D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bits] Oponent's money 00XX00 increased" },
+        { address=0X003E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[8 bits] Oponent's money XX0000 increased" },
+      },
+    },
+  },
+}

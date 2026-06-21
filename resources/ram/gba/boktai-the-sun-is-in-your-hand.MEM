@@ -1,0 +1,70 @@
+return {
+  game = {
+    title = "Boktai: The Sun is in Your Hand",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Role-Playing"
+  },
+
+  rom = {
+    name = "boktai-the-sun-is-in-your-hand",
+    file = "boktai-the-sun-is-in-your-hand.zip",
+    hashes = {
+      { hash = "9f1c1202ed1d856c5836cee6818a171e", label = "Bokura no Taiyou - Taiyou Action RPG (Japan).gba" },
+      { hash = "c8b49c53003b8d9a15d91a5a5d5cc91b", label = "Boktai - The Sun Is in Your Hand (Europe) (En,Fr,De,Es,It).gba" },
+      { hash = "ff75c62ab690410cc8fca24204d783e9", label = "Boktai - The Sun Is in Your Hand (USA).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0204, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="(32-bit): A sprite index memory location. Among other things, when the 'Results' screen is shown" },
+        { address=0X1C2C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(8-bit): Solar Sensor Level" },
+        { address=0X45818, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(16-bit): Solar Gun Battery level; one full battery = 0x0400" },
+        { address=0X4586C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Overheat level (16-bit)" },
+        { address=0X45926, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Kaamos level (16-bit)" },
+        { address=0X45928, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Dungeon cleared bitflags (0: Fog Castle; 5: Dark Castle; 6: Small Cave; 7: Gate of the Dead)" },
+        { address=0X45ADC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Area ID (0: fog castle, undead offset = 9, overworld offset = approx. 0x20)" },
+        { address=0X46814, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Immortal dungeon ranks (0x0a = not yet cleared, 0 = S, 1 = A+, 2 = A, etc.)" },
+        { address=0X46898, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Elemental blocks cleared (actual effect unknown) (0x00 -> 0x20 = earth)" },
+        { address=0X46899, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Elemental blocks cleared on overworld (bit 2: earth)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X45840, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life bar size (base = 5000, +1000 per extension, max 9000) increased" },
+        { address=0X45840, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life bar size (base = 5000, +1000 per extension, max 9000) decreased" },
+        { address=0X45C1A, type="u16le", condition="eq", value=0X0, action="LIVES_STATE", no_log=false, no_survey=false, desc="green apple, 1 = red apple, 4 = sun fruit, 16 = life fruit" },
+        { address=0X4681E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undead dungeon ranks" },
+        { address=0X4681F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gate of the Dead" },
+      },
+      health = {
+        { address=0XF958, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Golem health decreased" },
+        { address=0XF958, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Golem health increased" },
+        { address=0X12910, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Count health decreased" },
+        { address=0X12910, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Count health increased" },
+        { address=0X458FA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit): Django's HP decreased" },
+        { address=0X458FA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit): Django's HP increased" },
+        { address=0X460FA, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(16-bit): The value of Django's health when he entered the current room decreased" },
+        { address=0X460FA, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(16-bit): The value of Django's health when he entered the current room increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X45914, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32-bit): Energy Stored during current dungeon. Appears to only be a counter used for the result" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X4686A, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss flags (bit 0: defeated, bit 1: purified)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X45918, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-bit): 'Being Found' counter; live number used by the game to increment the count in the back" },
+        { address=0X4591A, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="(16-bit): Number of 'Continues' used in the current dungeon. The in-game counter maxes out at 99" },
+      },
+    },
+  },
+}

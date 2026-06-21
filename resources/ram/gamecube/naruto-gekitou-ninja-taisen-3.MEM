@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Naruto: Gekitou Ninja Taisen! 3",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "naruto-gekitou-ninja-taisen-3",
+    file = "naruto-gekitou-ninja-taisen-3.zip",
+    hashes = {
+      { hash = "ba03edfe739e8dcd332287d5666788a8", label = "Naruto - Gekitou Ninja Taisen! 3 (Japan) (Rev 1)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X1F14D6, type="u16be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Option - Number of Rounds [16-bit BE]" },
+        { address=0X1F4DC0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game Option - Number of Rounds [32bit BE]" },
+      },
+      stage = {
+        { address=0X1F1489, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shop Purchased - Stages" },
+        { address=0X1F148A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shop Purchased - Stages" },
+        { address=0X1F148B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Shop Purchased - Stages" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1F4E88, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 - Score [32-bit BE]" },
+        { address=0X1F50F8, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 - Score [32-bit BE]" },
+      },
+      collectibles = {
+        { address=0X1F1440, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money [32bit BE] increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1F14BC, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stat- Fastest Winning Time [32bit BE]" },
+        { address=0X1F40A0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Haku [16bit BE]" },
+        { address=0X1F4150, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Lee [16bit BE]" },
+        { address=0X1F41A8, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Iruka [16bit BE]" },
+        { address=0X1F4200, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Zabuza [16bit BE]" },
+        { address=0X1F4258, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Sakura [16bit BE]" },
+        { address=0X1F43B8, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Ino [16bit BE]" },
+        { address=0X1F4410, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Shikamaru [16bit BE]" },
+        { address=0X1F4468, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Neji [16bit BE]" },
+        { address=0X1F44C0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Hinata [16bit BE]" },
+        { address=0X1F4518, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Might Guy [16bit BE]" },
+        { address=0X1F4570, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Kankuro [16bit BE]" },
+        { address=0X1F45C8, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Crow [16bit BE]" },
+        { address=0X1F4620, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Kiba [16bit BE]" },
+        { address=0X1F4678, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Akamaru [16bit BE]" },
+        { address=0X1F46D0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Gaara [16bit BE]" },
+        { address=0X1F4780, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Orochimaru [16bit BE]" },
+        { address=0X1F4830, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Mizuki [16bit BE]" },
+        { address=0X1F4888, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Anko [16bit BE]" },
+        { address=0X1F48E0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Jiraiya [16bit BE]" },
+        { address=0X1F4938, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Choji [16bit BE]" },
+        { address=0X1F4990, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Tenten [16bit BE]" },
+        { address=0X1F49E8, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Temari [16bit BE]" },
+        { address=0X1F4A40, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Shino [16bit BE]" },
+        { address=0X1F4A98, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Itachi [16bit BE]" },
+        { address=0X1F4AF0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Tsunade [16bit BE]" },
+        { address=0X1F4B48, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - The Third Hokage [16bit BE]" },
+        { address=0X1F4BA0, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Sasuke [16bit BE]" },
+        { address=0X1F4BF8, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Kakashi [16bit BE]" },
+        { address=0X1F4C50, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Times Played - Naruto [16bit BE]" },
+        { address=0X1F4EC0, type="u32be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time Attack - Timer [32-bit BE]" },
+      },
+    },
+  },
+}

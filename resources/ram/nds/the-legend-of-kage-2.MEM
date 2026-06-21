@@ -1,0 +1,102 @@
+return {
+  game = {
+    title = "The Legend of Kage 2",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-legend-of-kage-2",
+    file = "the-legend-of-kage-2.zip",
+    hashes = {
+      { hash = "693196c26f72939b485542dd80f7017a", label = "Legend of Kage 2, The (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XB97BC, type="u32le", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Is game Paused" },
+        { address=0XDE004, type="u32le", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Slot 1 Prologue Normal Title Rank" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XBB524, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Selected in menu" },
+        { address=0XDE904, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Prologue Best Stage Clear Rank" },
+        { address=0XDE90C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Quickening Best Stage Clear Rank" },
+        { address=0XDE914, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Trap Best Stage Clear Rank" },
+        { address=0XDE91C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Flight Best Stage Clear Rank" },
+        { address=0XDE924, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Twilight Best Stage Clear Rank" },
+        { address=0XDE92C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Caverns Best Stage Clear Rank" },
+        { address=0XDE934, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Onslaught Best Stage Clear Rank" },
+        { address=0XDE93C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 The Castle Best Stage Clear Rank" },
+        { address=0XDE944, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 The Tower Best Stage Clear Rank" },
+        { address=0XDE94C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Abyss Best Stage Clear Rank" },
+        { address=0XDE954, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Inferno Best Stage Clear Rank" },
+        { address=0XDE95C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 Reckoning Best Stage Clear Rank" },
+        { address=0XDE96C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Prologue Best Stage Clear Rank" },
+        { address=0XDE974, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Quickening Best Stage Clear Rank" },
+        { address=0XDE97C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Trap Best Stage Clear Rank" },
+        { address=0XDE984, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Flight Best Stage Clear Rank" },
+        { address=0XDE98C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Twilight Best Stage Clear Rank" },
+        { address=0XDE994, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Caverns Best Stage Clear Rank" },
+        { address=0XDE99C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Onslaught Best Stage Clear Rank" },
+        { address=0XDE9A4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD The Castle Best Stage Clear Rank" },
+        { address=0XDE9AC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD The Tower Best Stage Clear Rank" },
+        { address=0XDE9B4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Abyss Best Stage Clear Rank" },
+        { address=0XDE9BC, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Inferno Best Stage Clear Rank" },
+        { address=0XDE9C4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 HARD Reckoning Best Stage Clear Rank" },
+        { address=0XDE9D4, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Slot 4 EXPERT Prologue Best Stage Clear Rank" },
+        { address=0XE6E04, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Slots Stage Clear Rank Screen" },
+        { address=0XF2DFC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level 1/4" },
+        { address=0XF2E10, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level 2/4" },
+        { address=0XF2E24, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level 3/4" },
+        { address=0XF2E38, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level 4/4" },
+      },
+      stage = {
+        { address=0XBA934, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Part of Stage Loaded" },
+        { address=0XBA936, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Last/Current Stage Loaded" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XDE1DC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 1 Health and Magic Total decreased" },
+        { address=0XDE1DC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 1 Health and Magic Total increased" },
+        { address=0XDE4DC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 2 Health and Magic Total decreased" },
+        { address=0XDE4DC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 2 Health and Magic Total increased" },
+        { address=0XDE7DC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 3 Health and Magic Total decreased" },
+        { address=0XDE7DC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 3 Health and Magic Total increased" },
+        { address=0XDEADC, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Slot 4 Health and Magic Total decreased" },
+        { address=0XDEADC, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Slot 4 Health and Magic Total increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB9930, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+        { address=0XDE000, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Slot 1 Prologue Normal Record Score" },
+        { address=0XDE008, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Slot 1 Quickening Normal Record Score" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XDE170, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 1 Total Jumps" },
+        { address=0XDE208, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 1 Jump Skill" },
+        { address=0XDE20C, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 1 Jump Skill" },
+        { address=0XDE210, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 1 Jump Skill" },
+        { address=0XDE470, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 2 Total Jumps" },
+        { address=0XDE508, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 2 Jump Skill" },
+        { address=0XDE50C, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 2 Jump Skill" },
+        { address=0XDE510, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 2 Jump Skill" },
+        { address=0XDE770, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 3 Kage Total Jumps" },
+        { address=0XDE808, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 3 Jump Skill" },
+        { address=0XDE80C, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 3 Jump Skill" },
+        { address=0XDE810, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 3 Jump Skill" },
+        { address=0XDEB08, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 4 Jump Skill" },
+        { address=0XDEB0C, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 4 Jump Skill" },
+        { address=0XDEB10, type="u32le", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Slot 4 Jump Skill" },
+      },
+    },
+  },
+}

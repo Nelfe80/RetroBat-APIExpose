@@ -1,0 +1,28 @@
+return {
+  game = {
+    title = "Pitfall: The Mayan Adventure",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "pitfall-the-mayan-adventure",
+    file = "pitfall-the-mayan-adventure.zip",
+    hashes = {
+      { hash = "bfe0d87c045a6198aad7133f37a754ed", label = "Pitfall - The Mayan Adventure (USA)" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X198B0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X198B0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X19537, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="Damage" },
+      },
+    },
+  },
+}

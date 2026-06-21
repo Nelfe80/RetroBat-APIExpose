@@ -1,0 +1,96 @@
+return {
+  game = {
+    title = "Chameleon Twist 2",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Adventure, Platform"
+  },
+
+  rom = {
+    name = "chameleon-twist-2",
+    file = "chameleon-twist-2.zip",
+    hashes = {
+      { hash = "00327e0b5df6dce6decc31353f33a3d3", label = "Chameleon Twist 2 (USA).z64" },
+      { hash = "45d1d039ab7926adc748de640afd986a", label = "Chameleon Twist 2 (Europe).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X18A67C, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="This and around: collected items that respawn upon game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X164518, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sky Land" },
+        { address=0X164518, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Carnival Land" },
+        { address=0X164518, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ice Land" },
+        { address=0X164518, type="u8", condition="eq", value=0X04, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Great Edo Land" },
+        { address=0X164518, type="u8", condition="eq", value=0X05, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Toy Land" },
+        { address=0X164518, type="u8", condition="eq", value=0X06, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Pyramid Land" },
+        { address=0X164518, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Selected level" },
+        { address=0X20FDBC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="e3/e4/e5/e9 = strike/double/turkey/spare but it sticks around?" },
+      },
+      zone = {
+        { address=0X1644F6, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Sky Land 1st Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X29, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Sky Land 2nd Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X1B, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Sky Land Training Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X02, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Carnival Land 1st Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X30, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Carnival Land 2nd Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X2A, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Carnival Land 3rd Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X1C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Carnival Land Training Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X03, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ice Land 1st Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X31, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ice Land 2nd Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X2B, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Ice Land Training Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X04, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Great Edo Land 1st Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X2C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Great Edo Land 2nd Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X27, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Great Edo Land Training Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X05, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Toy Land 1st Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X2D, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Toy Land 2nd Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X28, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Toy Land Training Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X06, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pyramid Land 1st Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X2E, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pyramid Land 2nd Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X2F, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pyramid Land Training Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X0B, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Practice Room 1" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X0C, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Practice Room 2" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X0D, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Practice Room 3" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X0E, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Poledancer Minigame" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X0F, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Pocket Pool Minigame" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X10, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Bowled Over Minigame" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X11, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Twisted Math Minigame" },
+        { address=0X1644F6, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Room ID [8-bit] (Rooms ordered by world)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X18BA7E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current HP decreased" },
+        { address=0X18BA7E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current HP increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X18A6D4, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Poledancer & Twisted Math Current Score" },
+        { address=0X18AFAC, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Bowled Over final score (16-bit)" },
+      },
+      collectibles = {
+        { address=0X164502, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins currently collected increased" },
+        { address=0X164511, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stage 1 coins (current file) increased" },
+        { address=0X164512, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stage 2 coins (current file) increased" },
+        { address=0X164513, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Stage 3 coins (current file) increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X1644F6, type="u8", condition="eq", value=0X15, action="BOSS_HIT", no_log=false, no_survey=false, desc="Sky Land Boss Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X16, action="BOSS_HIT", no_log=false, no_survey=false, desc="Carnival Land Boss Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X17, action="BOSS_HIT", no_log=false, no_survey=false, desc="Ice Land Boss Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X18, action="BOSS_HIT", no_log=false, no_survey=false, desc="Great Edo Land Boss Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X19, action="BOSS_HIT", no_log=false, no_survey=false, desc="Toy Land Boss Room" },
+        { address=0X1644F6, type="u8", condition="eq", value=0X1A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Pyramid Land Boss Room" },
+        { address=0X1644FE, type="u16be", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP for most worlds" },
+        { address=0X20BC1A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss 6 HP?" },
+      },
+    },
+  },
+}

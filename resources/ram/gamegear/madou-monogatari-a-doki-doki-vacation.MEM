@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Madou Monogatari A: Doki-Doki Vacation",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "madou-monogatari-a-doki-doki-vacation",
+    file = "madou-monogatari-a-doki-doki-vacation.zip",
+    hashes = {
+      { hash = "ab0d1eb20ac63a984d874a885ca2588d", label = "Madou Monogatari A - Dokidoki Vacation (Japan).gg" },
+      { hash = "72039298000870f8b75787fb44ff16e6", label = "Sorcery Saga A - Vivacious Vacation (Japan) (En) (v1.0) (Supper).gg" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0A81, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level [8bit]" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0B2E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Current [16bit] decreased" },
+        { address=0X0B2E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Current [16bit] increased" },
+        { address=0X0B30, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP Max [16bit] decreased" },
+        { address=0X0B30, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP Max [16bit] increased" },
+      },
+    },
+  },
+}

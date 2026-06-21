@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Warlock",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform, Puzzle"
+  },
+
+  rom = {
+    name = "warlock",
+    file = "warlock.zip",
+    hashes = {
+      { hash = "f0b53e15d054bd3ab09b2c5da1499276", label = "Warlock (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0B2D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Enemy health starts around here" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X26A0, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="The item in a given slot in inventory (00 = ?, 01 = crystals, 02 = potion, 03 = extra life) incr" },
+        { address=0X26A0, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="The item in a given slot in inventory (00 = ?, 01 = crystals, 02 = potion, 03 = extra life) decr" },
+      },
+      health = {
+        { address=0X0B29, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player health (0f = max) decreased" },
+        { address=0X0B29, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player health (0f = max) increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X1864, type="u8", condition="change", action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Player's invincibility frames" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X1D80, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="The stones you have might be around here (but the game gives you the 'right' stones every time a" },
+      },
+    },
+  },
+}

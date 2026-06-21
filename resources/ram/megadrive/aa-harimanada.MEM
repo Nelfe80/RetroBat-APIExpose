@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Aa Harimanada",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Fighting, Sports"
+  },
+
+  rom = {
+    name = "aa-harimanada",
+    file = "aa-harimanada.zip",
+    hashes = {
+      { hash = "009c279b77b890c7b197667d254cc362", label = "Aa Harimanada (Japan).md" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X276A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Health - left side decreased" },
+        { address=0X276A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Health - left side increased" },
+        { address=0X2E62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 Health - left side decreased" },
+        { address=0X2E62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 Health - left side increased" },
+      },
+    },
+  },
+}

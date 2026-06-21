@@ -1,0 +1,86 @@
+return {
+  game = {
+    title = "Wappy Dog",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Life Simulation, Puzzle"
+  },
+
+  rom = {
+    name = "wappy-dog",
+    file = "wappy-dog.zip",
+    hashes = {
+      { hash = "346d6ec41050e2175938e1dfb3c17586", label = "Wappy Dog (Europe) (En,Fr,De,Es,It).nds" },
+      { hash = "472a853a7ac478572cd18d40e65ac6ed", label = "Wappy Dog (USA) (En,Fr).nds" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X88EBF, type="u8", condition="bit_true", bit=5, mask=0X20, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Play - Die" },
+        { address=0X88ECE, type="u8", condition="bit_true", bit=3, mask=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Play - Die" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X88F14, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Fruit Catch (Easy) - Best Score (16bit)" },
+        { address=0X88F16, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Fruit Catch (Normal) - Best Score (16bit)" },
+        { address=0X88F18, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Fruit Catch (Hard) - Best Score (16bit)" },
+        { address=0X88F1A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Get the Critters! (Easy) - Best Score (16bit)" },
+        { address=0X88F1C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Get the Critters! (Normal) - Best Score (16bit)" },
+        { address=0X88F1E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Get the Critters! (Hard) - Best Score (16bit)" },
+        { address=0X88F20, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Penguin Race (Easy) - Best Score (16bit)" },
+        { address=0X88F22, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Penguin Race (Normal) - Best Score (16bit)" },
+        { address=0X88F24, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Penguin Race (Hard) - Best Score (16bit)" },
+        { address=0X88F26, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Target Practice (Easy) - Best Score (16bit)" },
+        { address=0X88F28, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Target Practice (Normal) - Best Score (16bit)" },
+        { address=0X88F2A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Target Practice (Hard) - Best Score (16bit)" },
+        { address=0X88F2C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Where's the Food? (Easy) - Best Score (16bit)" },
+        { address=0X88F2E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Where's the Food? (Normal) - Best Score (16bit)" },
+        { address=0X88F30, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Home) - Where's the Food? (Hard) - Best Score (16bit)" },
+        { address=0X88F32, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Fruit Catch (Easy) - Best Score (16bit)" },
+        { address=0X88F34, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Fruit Catch (Normal) - Best Score (16bit)" },
+        { address=0X88F36, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Fruit Catch (Hard) - Best Score (16bit)" },
+        { address=0X88F38, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Which one is Wappy? (Easy) - Best Score (16bit)" },
+        { address=0X88F3A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Which one is Wappy? (Normal) - Best Score (16bit)" },
+        { address=0X88F3C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Which one is Wappy? (Hard) - Best Score (16bit)" },
+        { address=0X88F3E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Wappy's Race (Easy) - Best Score (16bit)" },
+        { address=0X88F40, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Wappy's Race (Normal) - Best Score (16bit)" },
+        { address=0X88F42, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Wappy's Race (Hard) - Best Score (16bit)" },
+        { address=0X88F44, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Wappy's Pirate Battle (Easy) - Best Score (16bit)" },
+        { address=0X88F46, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Wappy's Pirate Battle (Normal) - Best Score (16bit)" },
+        { address=0X88F48, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Wappy's Pirate Battle (Hard) - Best Score (16bit)" },
+        { address=0X88F4A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Find the Food! (Easy) - Best Score (16bit)" },
+        { address=0X88F4C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Find the Food! (Normal) - Best Score (16bit)" },
+        { address=0X88F4E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Minigame (Travel) - Find the Food! (Hard) - Best Score (16bit)" },
+      },
+      collectibles = {
+        { address=0X88EBE, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Play - Flying Ring" },
+        { address=0X88EC5, type="u8", condition="bit_true", bit=7, mask=0X80, action="MONEY_STATE", no_log=false, no_survey=false, desc="Color - Gold" },
+        { address=0X88ECD, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Play - Flying Ring" },
+        { address=0X88ED4, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Color - Gold" },
+        { address=0X88EFC, type="u8", condition="eq", value=0X05, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X88ECA, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=true, no_survey=false, desc="Trick - Jump and Flip" },
+        { address=0X88ED8, type="u8", condition="bit_true", bit=7, mask=0X80, action="JUMPING", no_log=true, no_survey=false, desc="Trick - Jump and Flip" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X88EC3, type="u8", condition="bit_true", bit=4, mask=0X10, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Questions - What time is it?" },
+        { address=0X88ED2, type="u8", condition="bit_true", bit=2, mask=0X04, action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Questions - What time is it?" },
+        { address=0X88F50, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Responses from Toy-Counter" },
+        { address=0X88F51, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Minigame Win-Counter" },
+        { address=0X88F52, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dog cleaned-Counter" },
+        { address=0X88F53, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dog feeded-Counter" },
+        { address=0X88F54, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Minigame played-Counter" },
+        { address=0X88F55, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dog petting-Counter" },
+        { address=0X88F56, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Dog communicating-Counter" },
+      },
+    },
+  },
+}

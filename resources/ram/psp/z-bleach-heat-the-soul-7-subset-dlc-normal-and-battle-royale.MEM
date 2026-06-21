@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "~Z~ Bleach: Heat the Soul 7 [Subset - DLC Normal and Battle Royale]",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "z-bleach-heat-the-soul-7-subset-dlc-normal-and-battle-royale",
+    file = "z-bleach-heat-the-soul-7-subset-dlc-normal-and-battle-royale.zip",
+    hashes = {
+      { hash = "227397e64bf77c2966d11a858293e615", label = "Bleach - Heat the Soul 7 [Subset - DLC Normal and Battle Royale].iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X115A448, type="u32le", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Result Screen - Highest Combo 32 bits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA44858, type="u16le", condition="eq", value=0X0000, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Fight - Rematch" },
+        { address=0XA44858, type="u16le", condition="eq", value=0X0100, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Fight" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA4484C, type="u8", condition="eq", value=0X06, action="SCORE_STATE", no_log=false, no_survey=false, desc="Score Screen" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X115A440, type="u32le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Result Screen - Blocked Attacks 32 bits" },
+      },
+    },
+  },
+}

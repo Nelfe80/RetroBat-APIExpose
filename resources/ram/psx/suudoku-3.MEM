@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Suudoku 3",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Board Game, Puzzle"
+  },
+
+  rom = {
+    name = "suudoku-3",
+    file = "suudoku-3.zip",
+    hashes = {
+      { hash = "1ab68c23886379fdeead9dc85aa9edfd", label = "SuperLite 1500 Series - Suudoku 3 (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

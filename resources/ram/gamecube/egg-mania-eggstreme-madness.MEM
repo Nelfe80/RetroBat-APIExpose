@@ -1,0 +1,46 @@
+return {
+  game = {
+    title = "Egg Mania: Eggstreme Madness",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "egg-mania-eggstreme-madness",
+    file = "egg-mania-eggstreme-madness.zip",
+    hashes = {
+      { hash = "8d8954977f96ad92330385a8cc10f306", label = "Egg Mania - Eggstreme Madness (USA) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X16E440, type="u32be", condition="eq", value=0X01, action="COMBO_HIT", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X16E444, type="u32be", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="[32bit] Solo - Current Build Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X6D06C0, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit BE] Main Mode - Round Number" },
+        { address=0X6D06C4, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit BE] Main Mode - Max Rounds" },
+        { address=0X6D0B40, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit BE] Number of Losses in Main Mode. Credit Count = Round # - losses" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X170474, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] User High Score. Solo - Easy" },
+        { address=0X6D1060, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32bit BE] Solo Score - Total" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X16E308, type="u32be", condition="eq", value=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Bomb" },
+        { address=0X16E308, type="u32be", condition="eq", value=0X0A, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Filler" },
+        { address=0X16E308, type="u32be", condition="eq", value=0X0B, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Hammer" },
+        { address=0X16E308, type="u32be", condition="eq", value=0X0C, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Storm" },
+      },
+    },
+  },
+}

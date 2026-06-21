@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Endless Ocean",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "endless-ocean",
+    file = "endless-ocean.zip",
+    hashes = {
+      { hash = "4e98aa3ae32eb80e02ad5282069a460e", label = "Endless Ocean (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XF5D533, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[NBit] Encyclopedia - Small Fish & Creatures - Starck's Demoiselle" },
+        { address=0XF8EC13, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="[NBit] Encyclopedia - Small Fish & Creatures - Goldtail Demoiselle" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X49BBC0, type="u32be", condition="eq", value=0X10000001, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main" },
+        { address=0X49BBC0, type="u32be", condition="eq", value=0X10000002, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Aquarium" },
+        { address=0X49BBC0, type="u32be", condition="eq", value=0X10000003, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="The Abyss" },
+        { address=0X49BBC0, type="u32be", condition="eq", value=0X10000004, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ship's Rest" },
+        { address=0X49BBC0, type="u32be", condition="eq", value=0X10000005, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Underwater Ruins of Mo'ia Atoll" },
+        { address=0X49BBC0, type="u32be", condition="eq", value=0X10000006, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Great Aqua Cave" },
+        { address=0X49BBC0, type="u32be", condition="eq", value=0X30000000, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="On the Gabbiano" },
+        { address=0X49BBC0, type="u32be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[32bit BE] Stage ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X49A76B, type="u8", condition="bit_true", bit=4, mask=0X10, action="LIVES_STATE", no_log=false, no_survey=false, desc="The Jewel of Life" },
+        { address=0XF671F3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[NBit] Encyclopedia - Small Fish & Creatures - Sea Goldie" },
+        { address=0XFA0913, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[NBit] Encyclopedia - Deep-Sea Dwellers - Popeye Grenadier" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X49A742, type="u8", condition="bit_true", bit=0, mask=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Blue Eternal Suit" },
+        { address=0X49A742, type="u8", condition="bit_true", bit=1, mask=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Nautical Sky Suit" },
+        { address=0X49A742, type="u8", condition="bit_true", bit=2, mask=0X04, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Marine Sunset Suit" },
+        { address=0X49A742, type="u8", condition="bit_true", bit=3, mask=0X08, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Diftwood Suit (Default)" },
+        { address=0X49A742, type="u8", condition="bit_true", bit=4, mask=0X10, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Monochrome Trunks Suit" },
+        { address=0X49A742, type="u8", condition="bit_true", bit=5, mask=0X20, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Wetsuits - Dusty Sub Suit" },
+        { address=0X49A742, type="u8", condition="bit_true", bit=6, mask=0X40, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Anemone Suit" },
+        { address=0X49A742, type="u8", condition="bit_true", bit=7, mask=0X80, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Ocean Glare Suit" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X49A765, type="u8", condition="bit_true", bit=1, mask=0X02, action="COIN_GAIN", no_log=false, no_survey=false, desc="Rare Ancient Coins" },
+        { address=0X49A767, type="u8", condition="bit_true", bit=1, mask=0X02, action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Artifact Piece" },
+        { address=0X49A767, type="u8", condition="bit_true", bit=2, mask=0X04, action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Artifact Piece" },
+        { address=0X49A767, type="u8", condition="bit_true", bit=3, mask=0X08, action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Artifact Piece" },
+        { address=0X49A767, type="u8", condition="bit_true", bit=4, mask=0X10, action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Artifact (Fighter Wreckage)" },
+        { address=0X49A76A, type="u8", condition="bit_true", bit=0, mask=0X01, action="AMMO_STATE", no_log=true, no_survey=false, desc="Ammonite Fossil" },
+        { address=0X49A76A, type="u8", condition="bit_true", bit=2, mask=0X04, action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Bar" },
+        { address=0XF5F8D3, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[NBit] Encyclopedia - Coral Dwellers - Gold-Eye Rockfish increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X49A5A5, type="u8", condition="bit_true", bit=5, mask=0X20, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Blue Holes - Find Precious Object" },
+        { address=0X49A5B3, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Ruins Fully Explored (All Areas, eight artifact pieces, roof destroyed)" },
+      },
+    },
+  },
+}

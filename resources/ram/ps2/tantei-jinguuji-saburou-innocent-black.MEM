@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Tantei Jinguuji Saburou: Innocent Black",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "tantei-jinguuji-saburou-innocent-black",
+    file = "tantei-jinguuji-saburou-innocent-black.zip",
+    hashes = {
+      { hash = "b5ed867b7d61411a3ad59e93ec07d1f2", label = "Tantei Jinguuji Saburou - Innocent Black (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

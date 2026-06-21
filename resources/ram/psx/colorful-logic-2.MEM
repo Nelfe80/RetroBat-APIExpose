@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Colorful Logic 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "colorful-logic-2",
+    file = "colorful-logic-2.zip",
+    hashes = {
+      { hash = "dbfa047bf4b21285e8afc5b0db715464", label = "Colorful Logic 2 (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

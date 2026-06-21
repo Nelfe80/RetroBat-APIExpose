@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Dragon Ball Z",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Fighter"
+  },
+
+  rom = {
+    name = "dragon-ball-z",
+    file = "dragon-ball-z.zip",
+    hashes = {
+      { hash = "4da47cd8c9da987779c51f2278c93ab1", label = "dbz.7z <Dragonball Z (rev B)>" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X56C9, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x80=demo" },
+        { address=0X56D4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continues used" },
+        { address=0X659C, type="u8", condition="change", action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X648C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 rounds won" },
+        { address=0X648E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 rounds won" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X567C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP decreased" },
+        { address=0X567C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP increased" },
+        { address=0X56A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P1 HP (hud only) decreased" },
+        { address=0X56A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P1 HP (hud only) increased" },
+        { address=0X587C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP decreased" },
+        { address=0X587C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP increased" },
+        { address=0X58A4, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="P2 HP (hud only) decreased" },
+        { address=0X58A4, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="P2 HP (hud only) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X569C, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) Score - Current XXXX0000" },
+        { address=0X569E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) Score - Current XXXX" },
+        { address=0X63F2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) Score - Hi XXXX0000" },
+        { address=0X63F4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16-bit) Score - Hi XXXX" },
+      },
+    },
+  },
+}

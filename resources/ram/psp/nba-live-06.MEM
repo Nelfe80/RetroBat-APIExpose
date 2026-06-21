@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "NBA Live 06",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "nba-live-06",
+    file = "nba-live-06.zip",
+    hashes = {
+      { hash = "5238bfe6398a9e98cd1672494f358e69", label = "NBA Live 06 (USA).iso" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XE66408, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Home team score" },
+      },
+    },
+  },
+}

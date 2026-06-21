@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "The Texas Chainsaw Massacre",
+    system = "atari2600",
+    system_name = "Atari 2600",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "the-texas-chainsaw-massacre",
+    file = "the-texas-chainsaw-massacre.zip",
+    hashes = {
+      { hash = "5eeb81292992e057b290a5cd196f155d", label = "Texas Chainsaw Massacre, The (USA).a26" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0001, type="u8", condition="eq", value=0X5F, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="game" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X000C, type="u8", condition="eq", value=0X01, action="SCORE_STATE", no_log=false, no_survey=false, desc="10,000" },
+        { address=0X000C, type="u8", condition="eq", value=0X02, action="SCORE_STATE", no_log=false, no_survey=false, desc="20,000" },
+        { address=0X000C, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+        { address=0X000D, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points x100" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0040, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Timer when you get stuck on an object" },
+      },
+    },
+  },
+}

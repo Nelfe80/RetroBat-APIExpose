@@ -1,0 +1,85 @@
+return {
+  game = {
+    title = "Blades of Vengeance",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "blades-of-vengeance",
+    file = "blades-of-vengeance.zip",
+    hashes = {
+      { hash = "0ef8cf31e77cf8fab03bd7540a4751c0", label = "Blades of Vengeance (USA, Europe).md" },
+      { hash = "95bda8c491d9c67a5a97f00d9062cd08", label = "Blades of Vengeance (USA, Europe) (Ru) (Chief-Net).md" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X02C8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3 number" },
+        { address=0X07F6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 4 A" },
+        { address=0X1272, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 7 fix" },
+        { address=0X134B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5" },
+        { address=0X134D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1 real" },
+        { address=0X136F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5 fix" },
+        { address=0X1EB2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE NUMBERS" },
+        { address=0X685B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 8" },
+        { address=0X6B6D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 4 B" },
+        { address=0X6CF3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage number" },
+        { address=0XEA26, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Lower4 Scenario change related. This will change only when the current stage/scenario changes." },
+        { address=0XEEB8, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="<16-bit> Scenario loading ref. point. It changes between stages. Works as a way to reset items t" },
+        { address=0XEEE2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="current screen/stage" },
+        { address=0XF44E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 6" },
+        { address=0XF464, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Invisibility collected on stage" },
+        { address=0XF466, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Force Field collected on stage" },
+        { address=0XF468, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Strength collected on stage" },
+        { address=0XF469, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Gas Potion collected on stage" },
+        { address=0XF46A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Blast collected on stage" },
+        { address=0XF46B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Key collected on stage" },
+        { address=0XF46C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Transform collected on stage" },
+        { address=0XF46D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] Midas collected on stage" },
+        { address=0XF516, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 7 ..5.." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEA9B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="number of life 02 increased" },
+        { address=0XEA9B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="number of life 02 decreased" },
+        { address=0XEACB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of life01 increased" },
+        { address=0XEACB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of life01 decreased" },
+        { address=0XF46F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of life increased" },
+        { address=0XF46F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of life decreased" },
+      },
+      health = {
+        { address=0X9B62, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0X9B62, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+        { address=0XEA85, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> Related to the player's health. decreased" },
+        { address=0XEA85, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> Related to the player's health. increased" },
+        { address=0XEA86, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> Player's health on screen decreased" },
+        { address=0XEA86, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> Player's health on screen increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XF44A, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Number of Stars (Power-Up)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XF428, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bits) score x10e4 (binary-coded decimal)" },
+        { address=0XF42A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16 bits) score (binary-coded decimal)" },
+      },
+      collectibles = {
+        { address=0XEB45, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="silver coins increased" },
+        { address=0XEB4C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Midas Ring increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XF4EC, type="u16be", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="<16-bit>Current Door" },
+      },
+    },
+  },
+}

@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Loppi Puzzle Magazine: Kangaeru Puzzle Dai-3-gou",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "loppi-puzzle-magazine-kangaeru-puzzle-dai-3-gou",
+    file = "loppi-puzzle-magazine-kangaeru-puzzle-dai-3-gou.zip",
+    hashes = {
+      { hash = "c16f93ef289c6524dff09b8906eef668", label = "Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Japan) (SGB Enhanced, GB Compatible) (NP).gbc" },
+      { hash = "4cf4a9af727673fa31cfe9d991428b6a", label = "Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Japan) (Rev 1) (SGB Enhanced, GB Compatible) (NP).gbc" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0XA005, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="The current time in a puzzle in mili seconds" },
+        { address=0XA006, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="The current time in a puzzle in seconds" },
+        { address=0XA007, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="The current time in a puzzle in minutes" },
+      },
+    },
+  },
+}

@@ -1,0 +1,87 @@
+return {
+  game = {
+    title = "Kururin Squash! [Subset - Super Player]",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "kururin-squash-subset-super-player",
+    file = "kururin-squash-subset-super-player.zip",
+    hashes = {
+      { hash = "73ea6bada83c495fe630e724fdd19a98", label = "Kururin Squash! (Japan) (En) (v2.0.1) [Subset - Super Player]" },
+      { hash = "069b6608784fbdd7eb4561ec084f7c19", label = "Kururin Squash (Japan) [Subset - Super Player]" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X19EAE0, type="u32be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[32-bit BE] Current level in the story mode; continues to count up through the worlds" },
+        { address=0X19EAF1, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause status ~ this is more than just pause" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0X19EAD8, type="u32be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32-bit BE] Current world selected" },
+        { address=0X19EADC, type="u32be", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="[32-bit BE] Current level in that particular world/mode" },
+      },
+      stage = {
+        { address=0X1A05D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="HEART-UP [Save 1]; consumable that raises your max HP to 5 for a stage" },
+        { address=0X1A067F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Most recent Adventure stage entered [Save 1]" },
+        { address=0X1A08D0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="HEART-UP [Save 2]; consumable that raises your max HP to 5 for a stage" },
+        { address=0X1A097F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Most recent Adventure stage entered [Save 2]" },
+        { address=0X1A0BD0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="HEART-UP [Save 3]; consumable that raises your max HP to 5 for a stage" },
+        { address=0X1A0C7F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Most recent Adventure stage entered [Save 3]" },
+        { address=0X1A0ED0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="HEART-UP [Save 4]; consumable that raises your max HP to 5 for a stage" },
+        { address=0X1A0F7F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Most recent Adventure stage entered [Save 4]" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1A05D5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amazing Heart [Save 1]; consumable that lets you respawn if you die" },
+        { address=0X1A05D9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Blue Gradient Helirin [Save 1]" },
+        { address=0X1A05DA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Orange Gradient Helirin [Save 1]" },
+        { address=0X1A05DB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Green Gradient Helirin [Save 1]" },
+        { address=0X1A08D5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amazing Heart [Save 2]; consumable that lets you respawn if you die" },
+        { address=0X1A08D9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Blue Gradient Helirin [Save 2]" },
+        { address=0X1A08DA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Orange Gradient Helirin [Save 2]" },
+        { address=0X1A08DB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Green Gradient Helirin [Save 2]" },
+        { address=0X1A0BD5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amazing Heart [Save 3]; consumable that lets you respawn if you die" },
+        { address=0X1A0BD9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Blue Gradient Helirin [Save 3]" },
+        { address=0X1A0BDA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Orange Gradient Helirin [Save 3]" },
+        { address=0X1A0BDB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Green Gradient Helirin [Save 3]" },
+        { address=0X1A0ED5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Amazing Heart [Save 4]; consumable that lets you respawn if you die" },
+        { address=0X1A0ED9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Blue Gradient Helirin [Save 4]" },
+        { address=0X1A0EDA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Orange Gradient Helirin [Save 4]" },
+        { address=0X1A0EDB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Green Gradient Helirin [Save 4]" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X19EB10, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Coins collected for recently completed stage increased" },
+        { address=0X1A039C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Total coins [Save 1] increased" },
+        { address=0X1A0608, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Helirin [Save 1] increased" },
+        { address=0X1A069C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Total coins [Save 2] increased" },
+        { address=0X1A0908, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Helirin [Save 2] increased" },
+        { address=0X1A099C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Total coins [Save 3] increased" },
+        { address=0X1A0C08, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Helirin [Save 3] increased" },
+        { address=0X1A0C9C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Total coins [Save 4] increased" },
+        { address=0X1A0F08, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Helirin [Save 4] increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1A039B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Various event flags and helirin type [Save 1]; block Bit0" },
+        { address=0X1A05DC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Helirin [Save 1]" },
+        { address=0X1A069B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Various event flags and helirin type [Save 2]; block Bit0" },
+        { address=0X1A08DC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Helirin [Save 2]" },
+        { address=0X1A099B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Various event flags and helirin type [Save 3]; block Bit0" },
+        { address=0X1A0BDC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Helirin [Save 3]" },
+        { address=0X1A0C9B, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Various event flags and helirin type [Save 4]; block Bit0" },
+        { address=0X1A0EDC, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block Helirin [Save 4]" },
+      },
+    },
+  },
+}

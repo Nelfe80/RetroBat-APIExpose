@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Power Rangers S.P.D.",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "power-rangers-s-p-d",
+    file = "power-rangers-s-p-d.zip",
+    hashes = {
+      { hash = "2892a0fcefc0c183bf725b0a2540a83a", label = "Power Rangers S.P.D. (USA, Europe).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X71F8, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="unpaused" },
+        { address=0X71F8, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X59F9, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Player SP (Ranger levels)" },
+      },
+      stage = {
+        { address=0X3430, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="* Progression on the stage (?)" },
+        { address=0X344C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="* Progression on the stage (?)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X3D53, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Rhinix Boss Trigger (Episode 3) = 0x01" },
+        { address=0X5A0A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Trigger (Ranger Levels):" },
+      },
+    },
+  },
+}

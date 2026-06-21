@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Hive Sweeper",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "hive-sweeper",
+    file = "hive-sweeper.zip",
+    hashes = {
+      { hash = "7a5a78877e6466211280573e0775ff0a", label = "Hive Sweeper (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+  },
+}

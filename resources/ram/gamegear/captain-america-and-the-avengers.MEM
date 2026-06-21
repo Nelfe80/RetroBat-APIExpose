@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "Captain America and the Avengers",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "captain-america-and-the-avengers",
+    file = "captain-america-and-the-avengers.zip",
+    hashes = {
+      { hash = "dfb20211ef127b605849abfd85300afc", label = "Captain America and the Avengers (USA).gg" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X0320, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0320, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+  },
+}

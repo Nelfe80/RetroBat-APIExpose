@@ -1,0 +1,98 @@
+return {
+  game = {
+    title = "Bugs Bunny in Double Trouble",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "bugs-bunny-in-double-trouble",
+    file = "bugs-bunny-in-double-trouble.zip",
+    hashes = {
+      { hash = "3d6dc43a998301c6a9ed2fc1a7e8db40", label = "Bugs Bunny in Double Trouble (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00E8, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="On" },
+        { address=0X00F2, type="u8", condition="eq", value=0X00, action="PAUSE_OFF", no_log=false, no_survey=false, desc="Off" },
+        { address=0X00F2, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="On" },
+        { address=0X00F2, type="u8", condition="eq", value=0X02, action="PAUSE_ON", no_log=false, no_survey=false, desc="Loading" },
+        { address=0X00F2, type="u8", condition="eq", value=0X03, action="PAUSE_ON", no_log=false, no_survey=false, desc="Loading" },
+        { address=0X0100, type="u8", condition="eq", value=0X23, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X0108, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X0108, type="u8", condition="eq", value=0X17, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Copyright and Probe Entertainment, Stage Text and Credits" },
+        { address=0XFA58, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues Screen Selector" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00FE, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X00FE, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X014E, type="u8", condition="eq", value=0X10, action="HEALTH_STATE", no_log=true, no_survey=false, desc="0 Carrot Bites" },
+        { address=0X014E, type="u8", condition="eq", value=0X20, action="HEALTH_STATE", no_log=true, no_survey=false, desc="1 Carrot Bites" },
+        { address=0X014E, type="u8", condition="eq", value=0X30, action="HEALTH_STATE", no_log=true, no_survey=false, desc="2 Carrot Bites" },
+        { address=0X014E, type="u8", condition="eq", value=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="3 Carrot Bites" },
+        { address=0X014E, type="u8", condition="eq", value=0X18, action="HEALTH_STATE", no_log=true, no_survey=false, desc="1 Carrot Bites" },
+        { address=0X014E, type="u8", condition="eq", value=0X28, action="HEALTH_STATE", no_log=true, no_survey=false, desc="3 Carrot Bites" },
+        { address=0X014E, type="u8", condition="eq", value=0X38, action="HEALTH_STATE", no_log=true, no_survey=false, desc="5 Carrot Bites" },
+        { address=0X014E, type="u8", condition="change", action="HEALTH_STATE", no_log=true, no_survey=false, desc="Player Health" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0136, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Carrot Ammo" },
+        { address=0X013A, type="u8", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="Missile Carrot Ammo" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0100, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Hare-abian Nights - Boss Map" },
+        { address=0X0100, type="u8", condition="eq", value=0X14, action="BOSS_HIT", no_log=false, no_survey=false, desc="Knighty-Knight Bugs - Boss Map" },
+        { address=0X010A, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Map" },
+        { address=0X010A, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Map" },
+        { address=0XCA2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 1" },
+        { address=0XCB2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 2" },
+        { address=0XCC2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 3" },
+        { address=0XCD2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 4" },
+        { address=0XCE2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 5" },
+        { address=0XCF2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 6" },
+        { address=0XD02E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 7" },
+        { address=0XD12E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 8" },
+        { address=0XD22E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 9" },
+        { address=0XD32E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 10" },
+        { address=0XD42E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 11" },
+        { address=0XD52E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 12" },
+        { address=0XD62E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 13" },
+        { address=0XD72E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 14" },
+        { address=0XD82E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 15" },
+        { address=0XD92E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 16" },
+        { address=0XDA2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 17" },
+        { address=0XDC2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 18" },
+        { address=0XDD2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 19" },
+        { address=0XDE2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 20" },
+        { address=0XDF2E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 21" },
+        { address=0XE02E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 22" },
+        { address=0XE12E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Bosses Health 23" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X037A, type="u16be", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Invulnerability Potion Timer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XF9DC, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Ammo Barrels Counter" },
+        { address=0XF9E4, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Spaced Out Bunny - Timer Transition to the Next Stage" },
+        { address=0XFA5A, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Continues Counter" },
+        { address=0XFA84, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Bonus Stage - Carrot Counter" },
+      },
+    },
+  },
+}

@@ -1,0 +1,41 @@
+return {
+  game = {
+    title = "Rescue: The Embassy Mission",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Shooter, Stealth"
+  },
+
+  rom = {
+    name = "rescue-the-embassy-mission",
+    file = "rescue-the-embassy-mission.zip",
+    hashes = {
+      { hash = "0c3052f71a7be0319ba2f4846d310d93", label = "Rescue - The Embassy Mission (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X00E5, type="u8", condition="eq", value=0X40, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Rescued" },
+        { address=0X00E5, type="u8", condition="eq", value=0X82, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X00E5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostage 1 Status" },
+        { address=0X00E6, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostage 1 Location" },
+        { address=0X00E7, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostage 2 Status (Bit 6 = Rescued, Bit 7 = Dead)" },
+        { address=0X00E8, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostage 2 Location" },
+        { address=0X00E9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostage 3 Status (Bit 6 = Rescued, Bit 7 = Dead)" },
+        { address=0X00EA, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Hostage 3 Location" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0436, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mike Status/Objective (Bit 7 = Dead)" },
+        { address=0X0437, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Steve Status/Objective (Bit 7 = Dead)" },
+        { address=0X0438, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Jumbo Status/Objective (Bit 7 = Dead)" },
+        { address=0X0471, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ron Status (Bit 7 = Dead)" },
+        { address=0X0481, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dick Status (Bit 7 = Dead)" },
+        { address=0X0491, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Kemco Status (Bit 7 = Dead)" },
+      },
+    },
+  },
+}

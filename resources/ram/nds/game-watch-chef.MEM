@@ -1,0 +1,27 @@
+return {
+  game = {
+    title = "Game & Watch: Chef",
+    system = "nds",
+    system_name = "Nintendo DSi",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "game-watch-chef",
+    file = "game-watch-chef.zip",
+    hashes = {
+      { hash = "f3f883708b030d052c443bd67e271599", label = "Game & Watch - Chef (USA, Europe)" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X149070, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game - Starting Score [16bit]" },
+        { address=0X149090, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game A - Highscores [10 Bytes; 16bit each]" },
+        { address=0X14909A, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Game B - Highscores [10 Bytes; 16bit each]" },
+        { address=0X149470, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Ingame - Score [16bit]" },
+      },
+    },
+  },
+}

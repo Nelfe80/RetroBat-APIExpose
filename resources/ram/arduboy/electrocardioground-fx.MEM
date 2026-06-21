@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Electrocardioground FX",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "electrocardioground-fx",
+    file = "electrocardioground-fx.zip",
+    hashes = {
+      { hash = "cb860501a5f16a84fe2359e4498d0fe4", label = "Electrocardioground FX (World) (oddgoo).hex" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X01D0, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Gentle" },
+        { address=0X01D0, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Endless" },
+        { address=0X01D0, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Info" },
+        { address=0X01D8, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X01C2, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="False" },
+        { address=0X01C2, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="True" },
+        { address=0X01C2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Beat Stomped this round?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X01D8, type="u8", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death" },
+        { address=0X065F, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Left Column Life increased" },
+        { address=0X065F, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Left Column Life decreased" },
+        { address=0X0665, type="u16le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Right Column Life increased" },
+        { address=0X0665, type="u16le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Right Column Life decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X01CA, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

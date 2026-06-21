@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "BC Racers",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "bc-racers",
+    file = "bc-racers.zip",
+    hashes = {
+      { hash = "25fafab4899f915d3454218771ae7bee", label = "BC Racers (USA, Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

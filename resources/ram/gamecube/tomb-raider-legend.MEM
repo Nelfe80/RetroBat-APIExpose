@@ -1,0 +1,54 @@
+return {
+  game = {
+    title = "Tomb Raider: Legend",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tomb-raider-legend",
+    file = "tomb-raider-legend.zip",
+    hashes = {
+      { hash = "d9c4058243b262d1c0df9205f5d63277", label = "Lara Croft Tomb Raider - Legend (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X44197A, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X3FE153, type="u8", condition="bit_true", bit=6, mask=0X40, action="HEALTH_STATE", no_log=true, no_survey=false, desc="Enemy Health Cheat Enabled" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X34F9B0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[Float BE] Unlimited Ammo in 2nd Weapon Check" },
+        { address=0X34F9E0, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[Float BE] Dual Berretas Ammo" },
+        { address=0X34FA08, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="[Float BE] Remaining ammo in 2nd weapon" },
+        { address=0X34FDF8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Float BE] Gold Rewards in Bolivia increased" },
+        { address=0X34FE00, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Float BE] Gold Rewards in Croft Manor increased" },
+        { address=0X34FE08, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Float BE] Gold Reward in Peru increased" },
+        { address=0X34FE18, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Float BE] Gold Rewards in Japan increased" },
+        { address=0X34FE20, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Float BE] Gold Rewards in Ghana increased" },
+        { address=0X34FE30, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Float BE] Gold Rewards in Kazakhstan increased" },
+        { address=0X34FE38, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Float BE] Gold Rewards in England increased" },
+        { address=0X34FE48, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[Float BE] Gold Rewards for Nepal increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X34FAA0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[Float BE] Boss HP (Display Value)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X34FF28, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[Float BE] Current Time in a Level" },
+      },
+    },
+  },
+}

@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Private Idol Disc Vol. 9: Nagamatsu Keiko",
+    system = "saturn",
+    system_name = "Saturn",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "private-idol-disc-vol-9-nagamatsu-keiko",
+    file = "private-idol-disc-vol-9-nagamatsu-keiko.zip",
+    hashes = {
+      { hash = "30f2e6007b044f5b9127187a83e06297", label = "Private Idol Disc Vol. 9 - Keiko Nagamatsu (Japan)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X12C93D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Quiz level" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X108DDE, type="u16le", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Menu object thing for RP" },
+      },
+    },
+  },
+}

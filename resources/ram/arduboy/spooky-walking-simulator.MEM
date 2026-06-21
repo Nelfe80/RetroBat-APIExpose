@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Spooky Walking Simulator",
+    system = "arduboy",
+    system_name = "Arduboy",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "spooky-walking-simulator",
+    file = "spooky-walking-simulator.zip",
+    hashes = {
+      { hash = "23f8643db43fdda595c3d2e56baef643", label = "Spooky Walking Simulator FX (World) (v1.0.1) (haloopdy).arduboy" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X018B, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+      },
+    },
+  },
+}

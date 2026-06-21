@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Metal Warriors",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Shooter"
+  },
+
+  rom = {
+    name = "metal-warriors",
+    file = "metal-warriors.zip",
+    hashes = {
+      { hash = "1b1282421d39a473f634958c28dca0d4", label = "Metal Warriors (USA).sfc" },
+      { hash = "589f5449a76c4e8797abb0a663001542", label = "Metal Warriors (USA) (Pt) (Unknown Rev).sfc" },
+      { hash = "b6630c4fee7a20414c4751bb7eb558c3", label = "Metal Warriors (USA) (Pt) (v1.0).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1320, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="continues" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1EF8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level, d=basketball" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0198, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="ammo type blaster (8=1upgrade 9=2upgrade a=3 or 4upgrade b=Seeking c=bouncing increased" },
+        { address=0X0198, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="ammo type blaster (8=1upgrade 9=2upgrade a=3 or 4upgrade b=Seeking c=bouncing decreased" },
+        { address=0X0822, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="pilot life (on foot) increased" },
+        { address=0X0822, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="pilot life (on foot) decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X019A, type="u16le", condition="change", action="AMMO_STATE", no_log=false, no_survey=false, desc="16 bits ammo for blaster" },
+      },
+    },
+  },
+}

@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Cadash",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform, Role-Playing"
+  },
+
+  rom = {
+    name = "cadash",
+    file = "cadash.zip",
+    hashes = {
+      { hash = "c9b85d5f6880e7734112887675115220", label = "Cadash (USA, Korea) (En).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0A7A, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues ?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0AC0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Armor level type" },
+        { address=0X0AC2, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Helmet Level" },
+        { address=0X0AC4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shield Level" },
+        { address=0X0AC6, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sword level type" },
+        { address=0X0AC8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Robe level type" },
+        { address=0X0ACA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Wand level type" },
+        { address=0X0E4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ? -1" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0E50, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP decreased" },
+        { address=0X0E50, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X02A4, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Mage Weapon ? Base 26 second 44 Third 66" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0E8E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="16 bits GOLD increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,62 @@
+return {
+  game = {
+    title = "Magical Quest 2 Starring Mickey & Minnie",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "magical-quest-2-starring-mickey-minnie",
+    file = "magical-quest-2-starring-mickey-minnie.zip",
+    hashes = {
+      { hash = "9397ee8e46cd0357d49af1cff6fd97b3", label = "Magical Quest 2 Starring Mickey & Minnie (USA) (En,Fr,De).gba" },
+      { hash = "9a56bc96339193e7c198c20d2ca11afe", label = "Magical Quest 2 Starring Mickey & Minnie (Europe) (En,Fr,De).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X4144, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Mode flag?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X36C8D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID?" },
+        { address=0X36C8E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete Flag?" },
+        { address=0X3B310, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+        { address=0X3B311, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Part of level" },
+        { address=0X3B312, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X411B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of lives increased" },
+        { address=0X411B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of lives decreased" },
+      },
+      health = {
+        { address=0X408C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0X408C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+        { address=0X408D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Also Current Health? decreased" },
+        { address=0X408D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Also Current Health? increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X4114, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score: 16-Bit" },
+      },
+      collectibles = {
+        { address=0X410B, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Vacuum Ammo" },
+        { address=0X410D, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Cork Gun Ammo" },
+        { address=0X4118, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Coins increased" },
+        { address=0X41FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="P2 Coins increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X28FED, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health?" },
+      },
+    },
+  },
+}

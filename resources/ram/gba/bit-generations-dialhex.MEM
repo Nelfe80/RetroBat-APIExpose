@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "bit Generations: Dialhex",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "bit-generations-dialhex",
+    file = "bit-generations-dialhex.zip",
+    hashes = {
+      { hash = "a4fe285e6e4c0248d9d2fd9ae22590cd", label = "bit Generations - Dialhex (Japan) (En).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X3CC8, type="u8", condition="eq", value=0X00, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1DCC, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="nothing cleared yet (or just orange or just lime green)" },
+        { address=0X1DCC, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="lime green+orange cleared which spawns in yellow" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1DEA, type="u8", condition="eq", value=0X60, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max, but not death" },
+      },
+      health = {
+        { address=0X225C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[8bit] decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X225C, type="u8", condition="eq", value=0X00, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="no powerup" },
+        { address=0X225C, type="u8", condition="eq", value=0X01, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Black Powerup" },
+        { address=0X225C, type="u8", condition="eq", value=0X02, action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="White Powerup" },
+      },
+    },
+  },
+}

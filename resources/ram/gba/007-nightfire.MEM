@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "007: NightFire",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Sports, Shooter, 1ere Personne"
+  },
+
+  rom = {
+    name = "007-nightfire",
+    file = "007-nightfire.zip",
+    hashes = {
+      { hash = "71259fb2bf7adeb9b5d8c84619a2531e", label = "007 - NightFire (USA, Europe) (En,Fr,De).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X874A, type="u8", condition="eq", value=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full Health" },
+        { address=0X874A, type="u8", condition="eq", value=0X00, action="HEALTH_STATE", no_log=false, no_survey=false, desc="1 Hit Left" },
+        { address=0X874A, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="Player Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X26DA4, type="u8", condition="eq", value=0X00, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Disabled" },
+        { address=0X26DA4, type="u8", condition="eq", value=0X01, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="Enabled" },
+      },
+    },
+  },
+}

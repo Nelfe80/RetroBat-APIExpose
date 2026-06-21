@@ -1,0 +1,66 @@
+return {
+  game = {
+    title = "Musashi no Bouken",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "musashi-no-bouken",
+    file = "musashi-no-bouken.zip",
+    hashes = {
+      { hash = "1d8bbc8316f06ac14a2b0333bd154060", label = "Musashi no Bouken (Japan).nes" },
+      { hash = "369222823053e95d1d117985184fd880", label = "Musashi no Bouken (Japan) (En) (v0.98) (Gaijin Productions).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X659C, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon guarding stair 1 (Uzuki tower)" },
+        { address=0X65A9, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Flag for defeating the demon guarding the Tanuki" },
+        { address=0X65B4, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="DemonKo defeated" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X64EB, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X6563, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tanuki level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X64C1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy max HP decreased" },
+        { address=0X64C1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy max HP increased" },
+        { address=0X64C2, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy HP decreased" },
+        { address=0X64C2, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy HP increased" },
+        { address=0X64EE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP current decreased" },
+        { address=0X64EE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP current increased" },
+        { address=0X64EF, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP max decreased" },
+        { address=0X64EF, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP max increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X64FA, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="weapon equipped" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X64F4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Money (Ryo) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X657D, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Jade door in Uzuki tower" },
+        { address=0X6581, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Uzuki tower door" },
+        { address=0X6583, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Suigetsu tower door" },
+        { address=0X6594, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Yougetsu tower Genbu door" },
+        { address=0X6595, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Yougetsu tower SulDrgn door" },
+        { address=0X6597, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Yougetsu tower F4 door" },
+        { address=0X6598, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="Yougetsu tower basement door" },
+      },
+    },
+  },
+}

@@ -1,0 +1,37 @@
+return {
+  game = {
+    title = "Kim Possible 3: Team Possible",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "kim-possible-3-team-possible",
+    file = "kim-possible-3-team-possible.zip",
+    hashes = {
+      { hash = "3c629e441d4842ccb9d05e1c91853f80", label = "Kim Possible 3 - Team Possible (USA) (En,Fr).gba" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1E3E8, type="u8", condition="eq", value=0X13, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause Menu" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X1E39C, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Kim's HP (Max|Current) decreased" },
+        { address=0X1E39C, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Kim's HP (Max|Current) increased" },
+        { address=0X1E39E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit] Ron's HP (Max|Current) decreased" },
+        { address=0X1E39E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit] Ron's HP (Max|Current) increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X1E3A8, type="u8", condition="bit_true", bit=1, mask=0X02, action="JUMPING", no_log=false, no_survey=false, desc="Walljump Unlocked" },
+      },
+    },
+  },
+}

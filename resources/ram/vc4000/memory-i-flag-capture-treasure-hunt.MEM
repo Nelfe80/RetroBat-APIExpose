@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Memory I: Flag Capture | Treasure Hunt",
+    system = "vc4000",
+    system_name = "Interton VC 4000",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "memory-i-flag-capture-treasure-hunt",
+    file = "memory-i-flag-capture-treasure-hunt.zip",
+    hashes = {
+      { hash = "f57e7904203e509f54a008c8b363579d", label = "Memory I - Flag Capture (Europe).bin" },
+    }
+  },
+
+  events = {
+  },
+}

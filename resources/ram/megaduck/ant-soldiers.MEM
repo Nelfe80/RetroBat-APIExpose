@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Ant Soldiers",
+    system = "megaduck",
+    system_name = "Mega Duck",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "ant-soldiers",
+    file = "ant-soldiers.zip",
+    hashes = {
+      { hash = "d446648d78544497d8a1f654ba19e423", label = "Ant Soldiers (World).bin" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC273, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level id - starts at 00 and works upwards" },
+        { address=0XC28D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="max ants in level" },
+        { address=0XC28E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ants that need to be saved in level" },
+        { address=0XC2A3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="ants in level currently" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XC284, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="blocker ants" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC270, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer: 0:0x" },
+        { address=0XC271, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer: 0:x0" },
+        { address=0XC272, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="timer: x:00" },
+      },
+    },
+  },
+}

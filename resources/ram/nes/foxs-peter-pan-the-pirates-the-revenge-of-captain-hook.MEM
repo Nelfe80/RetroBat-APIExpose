@@ -1,0 +1,39 @@
+return {
+  game = {
+    title = "Fox's Peter Pan & the Pirates: The Revenge of Captain Hook",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "foxs-peter-pan-the-pirates-the-revenge-of-captain-hook",
+    file = "foxs-peter-pan-the-pirates-the-revenge-of-captain-hook.zip",
+    hashes = {
+      { hash = "c809e96a2bc4f9f671bbe3c4b3f25d1f", label = "Fox's Peter Pan & the Pirates - The Revenge of Captain Hook (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X0036, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0050, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X0050, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+      health = {
+        { address=0X0051, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health decreased" },
+        { address=0X0051, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X001F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+  },
+}

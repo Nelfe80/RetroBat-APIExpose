@@ -1,0 +1,50 @@
+return {
+  game = {
+    title = "Tass Times in Tonetown",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "tass-times-in-tonetown",
+    file = "tass-times-in-tonetown.zip",
+    hashes = {
+      { hash = "cb2a4697676bc50fc604438da7247a46", label = "Tass Times in Tonetown side A.woz" },
+      { hash = "286391da1be944aec2df3685343eaa3d", label = "Tass Times in Tonetown side B.woz" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0XBE2B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Countdown after buying burger at Fast Freddies (starts at 41)" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XBE12, type="u8", condition="eq", value=0XB6, action="MONEY_STATE", no_log=false, no_survey=false, desc="Wear gold mask" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XBE10, type="u8", condition="eq", value=0XB1, action="JUMPING", no_log=true, no_survey=false, desc="Wear Jumpsuit" },
+        { address=0XBE16, type="u8", condition="eq", value=0XB0, action="JUMPING", no_log=true, no_survey=false, desc="Buy jumpsuit; approach snarl in estate" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XBE09, type="u8", condition="eq", value=0XB6, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Spot disappears" },
+        { address=0XBE09, type="u8", condition="eq", value=0XB4, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Turn on computer" },
+        { address=0XBE09, type="u8", condition="eq", value=0XB3, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Type your name (goes back to 0 after printing pass)" },
+        { address=0XBE09, type="u8", condition="eq", value=0XB2, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Turn on printer" },
+        { address=0XBE13, type="u8", condition="eq", value=0XB3, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Rowboat destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XBE39, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of times walked down the infinite hallway" },
+      },
+    },
+  },
+}

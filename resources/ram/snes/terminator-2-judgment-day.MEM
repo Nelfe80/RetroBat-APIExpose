@@ -1,0 +1,77 @@
+return {
+  game = {
+    title = "Terminator 2: Judgment Day",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "terminator-2-judgment-day",
+    file = "terminator-2-judgment-day.zip",
+    hashes = {
+      { hash = "4a82f6a55b17d9bb730aeda043711c58", label = "Terminator 2 - Judgment Day (Europe).sfc" },
+      { hash = "64e0fdfc5dd759018924791faa77c2f9", label = "Terminator 2 - Judgment Day (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X00E2, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Bit 0 indicates whether an event is in progress(title screen, paused, screen transition, game ov" },
+        { address=0X0260, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="Indicates game over screens." },
+        { address=0X0D8D, type="u8", condition="eq", value=0X00, action="PAUSE_ON", no_log=false, no_survey=false, desc="Active" },
+        { address=0X0D8D, type="u8", condition="eq", value=0X01, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused or message shown." },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0095, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Represents ammo/rounds. 16-bit value spanning 0x95-0x96." },
+        { address=0X0096, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Represents ammo/rounds. 16-bit value spanning 0x95-0x96." },
+        { address=0X00D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Possible level ID." },
+        { address=0X00D5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Possible level ID." },
+        { address=0X00F6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Represents ammo/rounds. 16-bit value spanning 0x95-0x96." },
+        { address=0X00F7, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Represents ammo/rounds. 16-bit value spanning 0x95-0x96." },
+        { address=0X0DB3, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Represents frames played since level has began. 24-bit value spanning 0xdb3-0xdb5." },
+        { address=0X0DB4, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Represents frames played since level has began. 24-bit value spanning 0xdb3-0xdb5." },
+        { address=0X0DB5, type="u24le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Represents frames played since level has began. 24-bit value spanning 0xdb3-0xdb5." },
+        { address=0X1416, type="u8", condition="eq", value=0X00, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level active." },
+        { address=0X1416, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="level completed." },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0097, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health/Status percentage. Represents display value only. decreased" },
+        { address=0X0097, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health/Status percentage. Represents display value only. increased" },
+        { address=0X0242, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Represents flag for infinite health cheat. decreased" },
+        { address=0X0242, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Represents flag for infinite health cheat. increased" },
+        { address=0X1407, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit>Player health (true value) decreased" },
+        { address=0X1407, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit>Player health (true value) increased" },
+        { address=0X1452, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="<8-bit> Connor's health decreased" },
+        { address=0X1452, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="<8-bit> Connor's health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X1422, type="u16le", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Represents weapons held." },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X013F, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Low nybble represents hundreds place for ammo." },
+        { address=0X0140, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Low nybble represents tens place for ammo." },
+        { address=0X0141, type="u8", condition="change", action="AMMO_STATE", no_log=true, no_survey=false, desc="Low nybble represents ones place for ammo." },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0D74, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Represents whether the molten T-1000(final boss) is active(Bit 0)." },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0DBB, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Represents items destroyed at Cyberdyne Systems." },
+      },
+    },
+  },
+}

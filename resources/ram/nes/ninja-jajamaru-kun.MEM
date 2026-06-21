@@ -1,0 +1,49 @@
+return {
+  game = {
+    title = "Ninja JaJaMaru-kun",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "ninja-jajamaru-kun",
+    file = "ninja-jajamaru-kun.zip",
+    hashes = {
+      { hash = "421a0c4b0b148b0a7f214f6f1b9cccda", label = "Ninja Jajamaru-kun (Japan).nes" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0067, type="u8", condition="bit_true", bit=6, mask=0X40, action="PAUSE_ON", no_log=false, no_survey=false, desc="Can pause" },
+        { address=0X0069, type="u8", condition="eq", value=0X40, action="PAUSE_ON", no_log=false, no_survey=false, desc="Paused / Enemy intro" },
+        { address=0X0069, type="u8", condition="eq", value=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title screen" },
+        { address=0X006C, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Becomes 0xff in title screen and demo mode" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0X002D, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="A bonus stage has been entered this playthrough" },
+        { address=0X0067, type="u8", condition="bit_true", bit=7, mask=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="In a bonus stage (briefly turns off during completion)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0021, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="- Lives increased" },
+        { address=0X0021, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="- Lives decreased" },
+        { address=0X002B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives lost in this scene increased" },
+        { address=0X002B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives lost in this scene decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0060, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P1 Score x10" },
+        { address=0X0062, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="P2 Score x10" },
+        { address=0X0064, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="High Score" },
+        { address=0X0317, type="u8", condition="eq", value=0X60, action="SCORE_STATE", no_log=false, no_survey=false, desc="Obliterated for 1000 points" },
+      },
+    },
+  },
+}

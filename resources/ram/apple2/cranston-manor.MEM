@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "Cranston Manor",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "cranston-manor",
+    file = "cranston-manor.zip",
+    hashes = {
+      { hash = "14eaf619c453cef19fd54a15508c5b60", label = "Cranston Manor.woz" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X897A, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over triggered" },
+        { address=0X897A, type="u8", condition="eq", value=0X03, action="GAME_OVER", no_log=false, no_survey=false, desc="(Value used just before game over is triggered)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X007F, type="u8", condition="eq", value=0X98, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Tin soldier sentry" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X007F, type="u8", condition="eq", value=0XCC, action="TREASURE", no_log=false, no_survey=false, desc="Escaped Cranston Manor with all 16 treasures" },
+        { address=0X0083, type="u8", condition="eq", value=0X5A, action="TREASURE", no_log=false, no_survey=false, desc="Closeup of cat fountain statue (two large emeralds)" },
+        { address=0X0929, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0936, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0943, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X099F, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X09AD, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X09FC, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0A59, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0A73, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0A80, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0AB4, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0AC1, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0ACE, type="u8", condition="eq", value=0XFE, action="TREASURE", no_log=false, no_survey=false, desc="In inventory" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0083, type="u8", condition="eq", value=0X4C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Garage attic (coin)" },
+        { address=0X0083, type="u8", condition="eq", value=0X7C, action="MONEY_STATE", no_log=false, no_survey=false, desc="Tower lookout (heavy gold spyglass)" },
+        { address=0X0083, type="u8", condition="eq", value=0X2A, action="MONEY_STATE", no_log=false, no_survey=false, desc="Sloping N/S crawlway (bars of gold)" },
+        { address=0X0083, type="u8", condition="eq", value=0X2E, action="MONEY_STATE", no_log=false, no_survey=false, desc="Nugget room (enormous gold nugget)" },
+        { address=0X0083, type="u8", condition="eq", value=0X44, action="MONEY_STATE", no_log=false, no_survey=false, desc="Master bedroom (ring with a huge pearl)" },
+        { address=0X096A, type="u8", condition="eq", value=0XFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0985, type="u8", condition="eq", value=0XFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0992, type="u8", condition="eq", value=0XFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="In inventory" },
+        { address=0X0A66, type="u8", condition="eq", value=0XFE, action="MONEY_STATE", no_log=false, no_survey=false, desc="In inventory" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0083, type="u8", condition="eq", value=0X3E, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Stone porch of front door" },
+        { address=0X0083, type="u8", condition="eq", value=0XA2, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Stairs and door with triangle keyhole" },
+        { address=0X0083, type="u8", condition="eq", value=0XAC, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Blast door" },
+        { address=0X0083, type="u8", condition="eq", value=0XE4, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Room with debris blocking a passage" },
+        { address=0X8909, type="u8", condition="eq", value=0X7A, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Blast door room" },
+        { address=0X8909, type="u8", condition="eq", value=0X88, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Reading blast door room sign" },
+      },
+    },
+  },
+}

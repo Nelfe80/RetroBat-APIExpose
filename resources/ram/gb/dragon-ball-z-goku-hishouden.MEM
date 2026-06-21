@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Goku Hishouden",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "dragon-ball-z-goku-hishouden",
+    file = "dragon-ball-z-goku-hishouden.zip",
+    hashes = {
+      { hash = "3d4537f6a0542f781e408bd5440d23dd", label = "Dragon Ball Z - Gokuu Hishouden (Japan) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC1FD, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hit Bricks Minigame -> Remaining Rounds" },
+        { address=0XC200, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Waiting for next round" },
+        { address=0XC200, type="u8", condition="eq", value=0X2, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round execution" },
+        { address=0XC200, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hit Bricks Minigame -> Roundstate" },
+        { address=0XD7E1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tournament Round State Indicator" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC1F5, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Kaio-Ken Minigame -> Remaining Energy left to build up (Starting at 600 and finishing at 0) decr" },
+        { address=0XC1F5, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Kaio-Ken Minigame -> Remaining Energy left to build up (Starting at 600 and finishing at 0) incr" },
+        { address=0XD9B8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Stats -> HP decreased" },
+        { address=0XD9B8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Stats -> HP increased" },
+        { address=0XD9D4, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Battle -> Player HP (Underflows if Attack Damage > HP)" },
+        { address=0XD9E8, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Opponent Stats -> HP decreased" },
+        { address=0XD9E8, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Opponent Stats -> HP increased" },
+        { address=0XDA04, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Battle -> Opponent HP (Underflows if Attack Damage > HP)" },
+        { address=0XDA23, type="u8", condition="eq", value=0X1F, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Energy Wave" },
+        { address=0XDA27, type="u16le", condition="change", action="HIT", no_log=false, no_survey=false, desc="Attack Damage" },
+      },
+    },
+  },
+}

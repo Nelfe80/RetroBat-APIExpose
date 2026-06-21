@@ -1,0 +1,35 @@
+return {
+  game = {
+    title = "duckhunt",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Gun"
+  },
+
+  rom = {
+    name = "vs-duck-hunt",
+    file = "vs-duck-hunt.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0XC7, type="u32be", condition="change", action="TREASURE", color="white", min=10000, max=10000, no_log=false, no_survey=false, desc="Score delta 10000-10000: Perfect round 1-10" },
+        { address=0XC7, type="u32be", condition="change", action="TREASURE", color="white", min=15000, max=15000, no_log=false, no_survey=false, desc="Score delta 15000-15000: Perfect round 11-15" },
+        { address=0XC7, type="u32be", condition="change", action="TREASURE", color="white", min=20000, max=20000, no_log=false, no_survey=false, desc="Score delta 20000-20000: Perfect round 16-20" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC7, type="u32be", condition="change", action="SCORE_STATE", color="cyan", min=500, max=800, no_log=false, no_survey=false, desc="Score delta 500-800: Lower level duck" },
+        { address=0XC7, type="u32be", condition="change", action="SCORE_STATE", color="green", min=1000, max=2400, no_log=false, no_survey=false, desc="Score delta 1000-2400: Significant duck" },
+        { address=0XC7, type="u32be", condition="change", action="SCORE_STATE", color="blue", min=3000, max=3000, no_log=false, no_survey=false, desc="Score delta 3000-3000: THE duck" },
+      },
+      collectibles = {
+        { address=0X635, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

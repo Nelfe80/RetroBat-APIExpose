@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Elemental Pinball",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "elemental-pinball",
+    file = "elemental-pinball.zip",
+    hashes = {
+      { hash = "480dbbb137fbad3492f64b5b659f2e33", label = "Elemental Pinball (Europe)" },
+    }
+  },
+
+  events = {
+  },
+}

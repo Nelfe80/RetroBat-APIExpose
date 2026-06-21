@@ -1,0 +1,31 @@
+return {
+  game = {
+    title = "kyros",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "kyros",
+    file = "kyros.zip",
+    hashes = {
+    }
+  },
+
+  events = {
+    inventory = {
+      items = {
+        { address=0X20024, type="u32be", condition="change", action="TREASURE", color="blue", min=2000, max=9500, no_log=false, no_survey=false, desc="Score delta 2000-9500: SC=400:400:FF_Flasher DV_FLOL,FL_TT,1,450,100,Orange|FF_Flasher DV_FLOR,F" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X20024, type="u32be", condition="change", action="SCORE_STATE", min=100, max=100, no_log=false, no_survey=false, desc="Score delta 100-100: Base bad guy" },
+      },
+      collectibles = {
+        { address=0X2000F, type="u8", condition="any", action="MONEY_STATE", no_log=false, no_survey=false, desc="coin: credits" },
+      },
+    },
+  },
+}

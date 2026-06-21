@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Gokumakaimura Kai",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "gokumakaimura-kai",
+    file = "gokumakaimura-kai.zip",
+    hashes = {
+      { hash = "cb0118c732bb003c684a22517cd06cac", label = "Goku Makaimura Kai (Japan).iso" },
+    }
+  },
+
+  events = {
+    resources = {
+      lives = {
+        { address=0X1F9A9B8, type="u8", condition="eq", value=0XCD, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Undies" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD800EC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-bit Score" },
+      },
+    },
+  },
+}

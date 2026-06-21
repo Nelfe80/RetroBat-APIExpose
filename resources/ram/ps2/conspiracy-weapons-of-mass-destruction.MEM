@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Conspiracy: Weapons of Mass Destruction",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "conspiracy-weapons-of-mass-destruction",
+    file = "conspiracy-weapons-of-mass-destruction.zip",
+    hashes = {
+      { hash = "cb379ce0cf525d7d89f76b2323533400", label = "Conspiracy - Weapons of Mass Destruction (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+  },
+}

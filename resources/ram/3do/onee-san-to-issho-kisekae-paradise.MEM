@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Onee-san to Issho! Kisekae Paradise",
+    system = "3do",
+    system_name = "3DO Interactive Multiplayer",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "onee-san-to-issho-kisekae-paradise",
+    file = "onee-san-to-issho-kisekae-paradise.zip",
+    hashes = {
+      { hash = "c4cd53e4b988b699029ab11b27657c59", label = "Onee-san to Issho! Kisekae Paradise (Japan)" },
+    }
+  },
+
+  events = {
+  },
+}

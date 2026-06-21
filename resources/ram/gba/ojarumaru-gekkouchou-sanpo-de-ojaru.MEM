@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Ojarumaru: Gekkouchou Sanpo de Ojaru",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ojarumaru-gekkouchou-sanpo-de-ojaru",
+    file = "ojarumaru-gekkouchou-sanpo-de-ojaru.zip",
+    hashes = {
+      { hash = "fd1d6711a0cca4c15a627183aec0a854", label = "Ojarumaru - Gekkouchou Sanpo de Ojaru (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

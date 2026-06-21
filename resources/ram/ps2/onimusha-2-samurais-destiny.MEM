@@ -1,0 +1,143 @@
+return {
+  game = {
+    title = "Onimusha 2: Samurai's Destiny",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "onimusha-2-samurais-destiny",
+    file = "onimusha-2-samurais-destiny.zip",
+    hashes = {
+      { hash = "63b3b6d2b76a94bf14d3280dd225d2ae", label = "Onimusha 2 - Samurai's Destiny (USA)" },
+      { hash = "c3a7465d3fe51ec66670a80917fdde0a", label = "Onimusha 2 - Samurai's Destiny (USA) (Undub) (v2021-02-14) (swosho)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X8ACC93, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Stones (0x03, 0x46)" },
+        { address=0X8ACC94, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Kechacha Illusion Demon Defeated 1/3 (0x04, 0x04)" },
+        { address=0X8ACC94, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Kechacha Illusion Demon Defeated 2/3 (0x04, 0x10)" },
+        { address=0X8ACC9C, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="[TMIB] Fog Demon 1 Defeated (0x06, 0x11)" },
+        { address=0X8ACC9C, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="[TMIB] Fog Demon 2 Defeated (0x06, 0x11)" },
+        { address=0X8ACC9C, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="[TMIB] Fog Demon 2 Defeated (0x06, 0x11)" },
+        { address=0X8ACD8A, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Cave Map (0x02, 0x1b)" },
+        { address=0X8ACD8C, type="u8", condition="bit_true", bit=0, mask=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="[OniTeam] Flamethrower+Fuel [0x08, 0x41]" },
+        { address=0X8ACD8C, type="u8", condition="bit_true", bit=1, mask=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="[OniTeam] Cannon+Rounds [0x08, 0x41]" },
+        { address=0X8ACD8C, type="u8", condition="bit_true", bit=2, mask=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="[OniTeam] Herb [0x08, 0x41]" },
+        { address=0X8ACD8C, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="[OniTeam] Dokoutsui Lv1 [0x08, 0x41]" },
+        { address=0X8ACD8C, type="u8", condition="bit_true", bit=4, mask=0X10, action="DEMO_MODE", no_log=false, no_survey=false, desc="Hidden Chest Medicine (0x00, 0x0d)" },
+        { address=0X8ACD8C, type="u8", condition="bit_true", bit=5, mask=0X20, action="DEMO_MODE", no_log=false, no_survey=false, desc="Hidden Chest x10 Normal Bullets (0x02, 0x1e)" },
+        { address=0X8ACD8C, type="u8", condition="bit_true", bit=6, mask=0X40, action="DEMO_MODE", no_log=false, no_survey=false, desc="Hidden Chest Medicine (0x03, 0x31)" },
+        { address=0X8ACDAB, type="u8", condition="bit_true", bit=3, mask=0X08, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon's History (0x03, 0x11)" },
+        { address=0X17DE830, type="u8", condition="eq", value=0X07, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demon Base" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X17DE86D, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X17DE86D, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X17DE86D, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Max" },
+        { address=0X17DE86D, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Buraitou Level" },
+        { address=0X17DE86E, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X17DE86E, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X17DE86E, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Max" },
+        { address=0X17DE86E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Hyoujin-Yari Level" },
+        { address=0X17DE870, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X17DE870, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X17DE870, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Max" },
+        { address=0X17DE870, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Senpumaru Level" },
+        { address=0X17DE871, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lv1" },
+        { address=0X17DE871, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lv2" },
+        { address=0X17DE871, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Lv3" },
+        { address=0X17DE871, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Dokoutsui Level:" },
+        { address=0X17DE873, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X17DE873, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X17DE873, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Max" },
+        { address=0X17DE873, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yagyu Armor Level" },
+        { address=0X17DE874, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X17DE874, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X17DE874, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Max" },
+        { address=0X17DE874, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Foot Armor Level" },
+        { address=0X17DE875, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1" },
+        { address=0X17DE875, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 2" },
+        { address=0X17DE875, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Max" },
+        { address=0X17DE875, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arm Armor Level" },
+        { address=0X17E0348, type="u8", condition="bit_true", bit=7, mask=0X80, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Critical Level" },
+      },
+      stage = {
+        { address=0X17DC0F9, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Turn Around" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X2E890C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lifebar Displayed Flag increased" },
+        { address=0X2E890C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lifebar Displayed Flag decreased" },
+        { address=0X17DC0F8, type="u8", condition="eq", value=0X03, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+      },
+      health = {
+        { address=0X2E891C, type="u32le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[32-Bits] Health Displayed decreased" },
+        { address=0X2E891C, type="u32le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[32-Bits] Health Displayed increased" },
+        { address=0X8ACC8A, type="u8", condition="bit_true", bit=6, mask=0X40, action="HIT", no_log=false, no_survey=false, desc="Kotaro Hurt (0x07, 0x0a)" },
+        { address=0X17DC0F9, type="u8", condition="eq", value=0X0C, action="HIT", no_log=false, no_survey=false, desc="Damaged" },
+        { address=0X17DC1C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-Bits] Health decreased" },
+        { address=0X17DC1C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-Bits] Health increased" },
+        { address=0X17DC1C2, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16-Bits] Max Health decreased" },
+        { address=0X17DC1C2, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16-Bits] Max Health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X8ACDAC, type="u8", condition="bit_true", bit=3, mask=0X08, action="WEAPON_STATE", no_log=false, no_survey=false, desc="Oni's Super Weapon (0x05, 0x08)" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X17E034F, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Final Ranking Points:" },
+      },
+      collectibles = {
+        { address=0X8ACC81, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Slave saved - Red Ring (0x01, 0x04)" },
+        { address=0X8ACC86, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Narrator Gold Was Discovered..." },
+        { address=0X8ACC8D, type="u8", condition="bit_true", bit=2, mask=0X04, action="MONEY_STATE", no_log=false, no_survey=false, desc="Magoichi gold in Dragon Shrine (0x05, 0x01)" },
+        { address=0X8ACC90, type="u8", condition="bit_true", bit=3, mask=0X08, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Katajo Used (0x00, 0x10)" },
+        { address=0X8ACC92, type="u8", condition="bit_true", bit=0, mask=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Red Ring Used (0x02, 0x0b)" },
+        { address=0X8ACC9B, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="[TMIB] Ring of Takajo Used (0x06, 0x0b)" },
+        { address=0X8ACD84, type="u8", condition="bit_true", bit=5, mask=0X20, action="MONEY_STATE", no_log=false, no_survey=false, desc="Oolong Tea (0x00, 0x10) / [TMIB] Ring of Takajo (0x06, 0x0b)" },
+        { address=0X8ACD8A, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Mine Map (0x02, 0x01)" },
+        { address=0X8ACD8B, type="u8", condition="bit_true", bit=4, mask=0X10, action="AMMO_STATE", no_log=true, no_survey=false, desc="[OniTeam] Goraishinki + Ammo [0x08, 0x3e]" },
+        { address=0X8ACD90, type="u8", condition="bit_true", bit=4, mask=0X10, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ring of Takajo (0x00, 0x08)" },
+        { address=0X17DE830, type="u8", condition="eq", value=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Mine / Caves" },
+        { address=0X17DE9C4, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-Bits] Gold increased" },
+        { address=0X17DE9FD, type="u8", condition="eq", value=0X00, action="MONEY_STATE", no_log=false, no_survey=false, desc="Bought" },
+        { address=0X17DE9FD, type="u8", condition="eq", value=0X01, action="MONEY_STATE", no_log=false, no_survey=false, desc="Stock" },
+        { address=0X17DEA08, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Ancient Coin [D]" },
+        { address=0X17DEA10, type="u8", condition="bit_true", bit=6, mask=0X40, action="MONEY_STATE", no_log=false, no_survey=false, desc="Silver Coin [C]" },
+        { address=0X17DEA18, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Copper Coin [D]" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X8ACD84, type="u8", condition="bit_true", bit=3, mask=0X08, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Gogandantess Shield (0x05, 0x14)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X8ACC80, type="u8", condition="bit_true", bit=7, mask=0X80, action="DOOR_OPENED", no_log=false, no_survey=false, desc="After Charity Orb Door (0x02, 0x0a)" },
+        { address=0X8ACC90, type="u8", condition="bit_true", bit=2, mask=0X04, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Rocks Broken (0x00, 0x0d)" },
+        { address=0X8ACC90, type="u8", condition="bit_true", bit=7, mask=0X80, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Broken Bell Rescued (0x00, 0x01)" },
+        { address=0X8ACC95, type="u8", condition="bit_true", bit=2, mask=0X04, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Jujudormah Room Door Opened (0x04, 0xb)" },
+        { address=0X8ACD0B, type="u8", condition="bit_true", bit=1, mask=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Blacksmith Barrel Destroyed" },
+        { address=0X8ACD66, type="u8", condition="bit_true", bit=0, mask=0X01, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Sealed Door Hyoujin Lv1 (0x02, 0x07)" },
+        { address=0X8ACD66, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Sealed Door Dokoutsui Lv1 (0x05, 0x0b)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X17E0347, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Team Oni Result Screen State:" },
+      },
+    },
+  },
+}

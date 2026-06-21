@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "The Sims: Bustin' Out",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "the-sims-bustin-out",
+    file = "the-sims-bustin-out.zip",
+    hashes = {
+      { hash = "a0935241ad7c5005657b77eaf5b70848", label = "Sims, The - Bustin' Out (Europe) (En,Fr,De,Es,It,Nl)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X13C71F0, type="u8", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="10" },
+        { address=0X13C71F0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Changing this above the current Body level will cause the jingle not to play on body stat level" },
+        { address=0X13CF450, type="u8", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="10" },
+        { address=0X13CF450, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Changing this above the current Creative level will cause the jingle not to play on body stat le" },
+        { address=0X13D3642, type="u8", condition="eq", value=0XA, action="NEW_LEVEL", no_log=false, no_survey=false, desc="10" },
+        { address=0X13D3642, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Changing this above the current Charisma level will cause the jingle not to play on body stat le" },
+        { address=0X15A6358, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Find out what is going on at Toane's Gym" },
+        { address=0X15A6358, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Press the R1 button for double speed" },
+        { address=0X15A6358, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Invite Your Lover Over" },
+        { address=0X15A6358, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Invite Your Lover Over" },
+        { address=0X15A6358, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Invite Your Lover Over" },
+        { address=0X15A6358, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Super Model" },
+        { address=0X15A6358, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Get to Lingerie Model" },
+        { address=0X15A6358, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Get to Body Waxer" },
+        { address=0X15A6361, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Covert Ops" },
+        { address=0X15A6361, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Secret Agent" },
+        { address=0X15A6361, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Code Breaker" },
+        { address=0X15A6361, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Intelligence Director" },
+        { address=0X15A6361, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Show off some moves at Studio 8" },
+        { address=0X15A6361, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Find the Fern" },
+        { address=0X15A6361, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Fix all the broken things" },
+        { address=0X15A6361, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Go to Dudley's Trailer and PARTY!" },
+        { address=0X15A6362, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Use a Toilet to Empty Your Bladder" },
+        { address=0X15A6362, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Do fun stuff to raise your fun level" },
+        { address=0X15A6362, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Eat enough food to fill your stomach" },
+        { address=0X15A63DA, type="u8", condition="bit_true", bit=0, mask=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Use a toilet to empty your bladder" },
+        { address=0X15A63DA, type="u8", condition="bit_true", bit=1, mask=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Do fun stuff to raise your fun level" },
+        { address=0X15A63DA, type="u8", condition="bit_true", bit=2, mask=0X04, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Eat enough food to fill your stomach" },
+        { address=0X15A63DA, type="u8", condition="bit_true", bit=7, mask=0X80, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Seduce someone at Casa Caliente" },
+        { address=0X15A63DA, type="u8", condition="bit_true", bit=3, mask=0X08, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Interact with other sims to satisfy your social needs" },
+        { address=0X15A63DA, type="u8", condition="bit_true", bit=4, mask=0X10, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Interact with other sims to satisfy your social needs" },
+        { address=0X15A63DA, type="u8", condition="bit_true", bit=5, mask=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Score with 2 sims at the same party" },
+        { address=0X15A63DA, type="u8", condition="bit_true", bit=6, mask=0X40, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Send your child to prep school with straight a's" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X15A635D, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Ray Inventor" },
+        { address=0X15A635F, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Get to Kiddie Show Sidekick" },
+        { address=0X15A6369, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Make friends with Max or Goldie" },
+        { address=0X15A63D5, type="u8", condition="bit_true", bit=2, mask=0X04, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Ray Inventor" },
+        { address=0X15A63D7, type="u8", condition="bit_true", bit=1, mask=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Get to Kiddie Show Sidekick" },
+        { address=0X15A63E1, type="u8", condition="bit_true", bit=7, mask=0X80, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Make friends with Max or Goldie" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X15A6355, type="u8", condition="bit_true", bit=3, mask=0X08, action="SCORE_STATE", no_log=false, no_survey=false, desc="Find out where you can score a red pool table" },
+        { address=0X15A63CD, type="u8", condition="bit_true", bit=3, mask=0X08, action="SCORE_STATE", no_log=false, no_survey=false, desc="Find out where you can score a red pool table" },
+      },
+      collectibles = {
+        { address=0X3F8A82, type="u8", condition="bit_true", bit=1, mask=0X02, action="MONEY_STATE", no_log=false, no_survey=false, desc="Give Money Active" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X15A6359, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mob Boss" },
+        { address=0X15A63D1, type="u8", condition="bit_true", bit=7, mask=0X80, action="BOSS_HIT", no_log=false, no_survey=false, desc="Mob Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X3F8A82, type="u8", condition="bit_true", bit=3, mask=0X08, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Unlock all objects" },
+        { address=0X15A6355, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mission Seek and Destroy Bioweapons" },
+        { address=0X15A63CD, type="u8", condition="bit_true", bit=4, mask=0X10, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Mission Seek and Destroy Bioweapons" },
+        { address=0X15A63D9, type="u8", condition="bit_true", bit=6, mask=0X40, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Fix all the broken things" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X15A61F0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] Career - Counter Culture" },
+        { address=0X15A6268, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="[16bit] Career - Counter Culture" },
+      },
+    },
+  },
+}

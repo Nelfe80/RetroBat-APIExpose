@@ -1,0 +1,58 @@
+return {
+  game = {
+    title = "Arle no Bouken: Mahou no Jewel | Arle's Adventure: Magical Jewels",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "arle-no-bouken-mahou-no-jewel-arles-adventure-magical-jewels",
+    file = "arle-no-bouken-mahou-no-jewel-arles-adventure-magical-jewels.zip",
+    hashes = {
+      { hash = "9abaf0dfeb58b76d6b5cce4b42756c8e", label = "Arle no Bouken - Mahou no Jewel (Japan) (SGB Enhanced) (GB Compatible).gbc" },
+      { hash = "5bb9c512ec6c4d1eb4862b220eaecf5b", label = "Arle no Bouken (Japan) (En) (v1.0) (Jazz).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB210, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arle Level" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XA9EC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="treasure flags increased" },
+        { address=0XA9EC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="treasure flags decreased" },
+        { address=0XA9EF, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="treasure flags increased" },
+        { address=0XA9EF, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="treasure flags decreased" },
+      },
+      health = {
+        { address=0XB040, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Top Player Monster HP decreased" },
+        { address=0XB040, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Top Player Monster HP increased" },
+        { address=0XB0C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bottom Player monster HP decreased" },
+        { address=0XB0C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bottom Player monster HP increased" },
+        { address=0XB140, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Top enemy HP decreased" },
+        { address=0XB140, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Top enemy HP increased" },
+        { address=0XB1C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Bottom enemy HP decreased" },
+        { address=0XB1C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Bottom enemy HP increased" },
+        { address=0XB211, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Arle Max HP decreased" },
+        { address=0XB211, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Arle Max HP increased" },
+        { address=0XB240, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Arle HP decreased" },
+        { address=0XB240, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Arle HP increased" },
+        { address=0XB2C0, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Middle enemy HP decreased" },
+        { address=0XB2C0, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Middle enemy HP increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA9EE, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure flags" },
+        { address=0XA9F0, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure flags" },
+        { address=0XA9F1, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure flags" },
+        { address=0XA9F2, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure flags" },
+        { address=0XA9F3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="treasure flags" },
+      },
+    },
+  },
+}

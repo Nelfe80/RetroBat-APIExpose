@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Mortal Kombat II",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "mortal-kombat-ii",
+    file = "mortal-kombat-ii.zip",
+    hashes = {
+      { hash = "159256f5a372f2e409ecb343a3946001", label = "Mortal Kombat II (World).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X043E, type="u8", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="is fighitng or watching the demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00DC, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Yes" },
+        { address=0X00DC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round-In-Progress Flag?" },
+      },
+    },
+  },
+}

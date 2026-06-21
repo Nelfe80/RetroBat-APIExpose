@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Kotoba no Puzzle: Mojipittan DS",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "kotoba-no-puzzle-mojipittan-ds",
+    file = "kotoba-no-puzzle-mojipittan-ds.zip",
+    hashes = {
+      { hash = "a0a757fd073047bbf3a8bb1bf9b6c822", label = "Kotoba no Puzzle - Mojipittan DS (Japan).nds" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0X35FE80, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [32bit]" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X36FEE8, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Quiz - 20 Second Timer [8bit Hex]" },
+      },
+    },
+  },
+}

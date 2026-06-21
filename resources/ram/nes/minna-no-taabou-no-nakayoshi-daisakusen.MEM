@@ -1,0 +1,44 @@
+return {
+  game = {
+    title = "Minna no Taabou no Nakayoshi Daisakusen",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "minna-no-taabou-no-nakayoshi-daisakusen",
+    file = "minna-no-taabou-no-nakayoshi-daisakusen.zip",
+    hashes = {
+      { hash = "81115b54fca5e7574f0d395e6a19b654", label = "Minna no Taabou no Nakayoshi Daisakusen (Japan).nes" },
+      { hash = "00b049a36318f81e4d449103648324c1", label = "Minna no Taabou no Nakayoshi Daisakusen (Japan) (Rev 1).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X037F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+      zone = {
+        { address=0X0379, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="ff=moving on world map" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X036A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives (Mario) increased" },
+        { address=0X036A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives (Mario) decreased" },
+        { address=0X036B, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Current Lives (Luigi) increased" },
+        { address=0X036B, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Current Lives (Luigi) decreased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X036C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dragon Coins (Mario) increased" },
+        { address=0X036D, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Dragon Coins (Luigi) increased" },
+        { address=0X0376, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins (Mario) increased" },
+        { address=0X0377, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Coins (Luigi) increased" },
+      },
+    },
+  },
+}

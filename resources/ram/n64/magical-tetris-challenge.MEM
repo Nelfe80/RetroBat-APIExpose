@@ -1,0 +1,79 @@
+return {
+  game = {
+    title = "Magical Tetris Challenge",
+    system = "n64",
+    system_name = "Nintendo 64",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "magical-tetris-challenge",
+    file = "magical-tetris-challenge.zip",
+    hashes = {
+      { hash = "79fcc98002d1f4c79deaf55784222df8", label = "Magical Tetris Challenge (USA).z64" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X14F3D5, type="u8", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode inactive" },
+        { address=0X1BCFA6, type="u8", condition="eq", value=0X28, action="GAME_OVER", no_log=false, no_survey=false, desc="At menu" },
+        { address=0X1D7B73, type="u8", condition="eq", value=0X0E, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (Magical Story Mode and Updown)" },
+        { address=0X1D7B73, type="u8", condition="eq", value=0X0F, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over (Endless)" },
+        { address=0X1D7B87, type="u8", condition="eq", value=0X01, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="One continue used" },
+        { address=0X1D7B87, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Two continues used" },
+        { address=0X1D7B8D, type="u8", condition="eq", value=0X00, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="In game" },
+        { address=0X1D7B8D, type="u8", condition="eq", value=0X02, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="At continue screen" },
+        { address=0X1D7B8F, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Count Down" },
+      },
+      events = {
+        { address=0X1D2610, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Max Combo" },
+        { address=0X1D2611, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current Combo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1D25ED, type="u8", condition="eq", value=0X07, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Complete" },
+        { address=0X1D261C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of lines cleared" },
+        { address=0X1D261D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Number of lines cleared above 255" },
+        { address=0X1D2632, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Increases by 2 for every piece locked in current round" },
+        { address=0X1D2634, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Single line clears - persistent throughout story mode" },
+        { address=0X1D2638, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Triple line clears - persistent throughout story mode" },
+        { address=0X1D263A, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Double line clears - persistent throughout story mode" },
+        { address=0X1D263C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Pentris clears - persistent throughout story mode" },
+        { address=0X1D263E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tetris clears - persistent throughout story mode" },
+        { address=0X1D263F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Tetris clears - persistent throughout story mode" },
+        { address=0X1D6E4F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="All Clear" },
+        { address=0X1D7B74, type="u8", condition="eq", value=0X00, action="LEVEL_PRACTICE", no_log=false, no_survey=false, desc="Practice" },
+        { address=0X1D7B74, type="u8", condition="eq", value=0X01, action="LEVEL_NORMAL", no_log=false, no_survey=false, desc="Normal" },
+        { address=0X1D7B74, type="u8", condition="eq", value=0X02, action="LEVEL_EXPERT", no_log=false, no_survey=false, desc="Expert" },
+        { address=0X1D7B74, type="u8", condition="eq", value=0X00, action="LEVEL_EASY", no_log=false, no_survey=false, desc="Easy" },
+        { address=0X1D7B74, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Menu Selector - Can be used to track level selected." },
+      },
+      stage = {
+        { address=0X1D25ED, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Starting" },
+        { address=0X1D25ED, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X1D26A4, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score(32 bit recommended)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XDBCD8, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Value increases by one everytime 0x0dbcdf overflows, which takes about 45.3 seconds. Resets to 0" },
+        { address=0X1D25CC, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time until active piece falls one row" },
+        { address=0X1D25E0, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Lock Delay Timer" },
+        { address=0X1D25F2, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Magic Bar Animation Timer" },
+        { address=0X1D2613, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Number of Counters this round" },
+        { address=0X1D7A82, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Player 2/Opponent Blocks Placed" },
+        { address=0X1D7B81, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Time - Minutes" },
+        { address=0X1D7B82, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Time - Seconds" },
+        { address=0X1D7B83, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Round Time - Milliseconds" },
+        { address=0X1D7BA6, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Round Time - Hours" },
+      },
+    },
+  },
+}

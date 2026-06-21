@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Sonic the Hedgehog [Subset - Perfect Bonus]",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "sonic-the-hedgehog-subset-perfect-bonus",
+    file = "sonic-the-hedgehog-subset-perfect-bonus.zip",
+    hashes = {
+      { hash = "09dadb5071eb35050067a32462e39c5f", label = "Sonic The Hedgehog (Japan, Europe, Korea) (En).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFFF0, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="{Rev.01} Demo Active" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XFE10, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="{Rev.01} Current Stage" },
+        { address=0XFE17, type="u8", condition="change", action="STAGE_SELECT", no_log=false, no_survey=false, desc="{Rev.01} Special Stage - Last Played" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XFE13, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="{Rev.01} Lives increased" },
+        { address=0XFE13, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="{Rev.01} Lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XFE56, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="{Rev.01} Chaos Emeralds" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XF7D4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{Rev.01} Ring Bonus (x10) increased" },
+        { address=0XFE20, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{Rev.01} Current Rings increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XFE31, type="u8", condition="change", action="OBJECT_INTERACTION_CHECKPOINT", no_log=false, no_survey=false, desc="{Rev.01} Signpost ID - Last Active" },
+      },
+    },
+  },
+}

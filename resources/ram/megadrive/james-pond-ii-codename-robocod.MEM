@@ -1,0 +1,107 @@
+return {
+  game = {
+    title = "James Pond II - Codename: RoboCod",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "james-pond-ii-codename-robocod",
+    file = "james-pond-ii-codename-robocod.zip",
+    hashes = {
+      { hash = "bb689dd3822853a5417cdec4a3da114b", label = "James Pond II - Codename - Robocod (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X884F, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Last Input on Pause Screen _1" },
+        { address=0XB4F0, type="u16be", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Number of continues left" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X5C, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+        { address=0XFFFE, type="u8", condition="eq", value=0XD2, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="titlescreen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB436, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Endlevel set to 00" },
+        { address=0XB4EC, type="u32be", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Data Offset ???" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X1A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="endoflevel" },
+      },
+      zone = {
+        { address=0XFFFE, type="u8", condition="eq", value=0X64, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="world/gameplay (picodrive)" },
+        { address=0XFFFE, type="u8", condition="eq", value=0X88, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="world/gameplay" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XB3F8, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Number of Lives Left increased" },
+        { address=0XB3F8, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Number of Lives Left decreased" },
+        { address=0XB3FB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Maximum Lives cheat = 0xff increased" },
+        { address=0XB3FB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Maximum Lives cheat = 0xff decreased" },
+      },
+      health = {
+        { address=0XB4C8, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Energy Bonus Amount decreased" },
+        { address=0XB4C8, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Energy Bonus Amount increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XB3F0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score actual, upper 16 bits" },
+        { address=0XB3F2, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score actual, lower 16 bits" },
+      },
+      collectibles = {
+        { address=0XB3FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Number of Power Coins health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X9C40, type="u16be", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss: Giant Teddy Hits made on. crouched hits count double. Becomes 00ff when defeated" },
+        { address=0X9C6C, type="u8", condition="change", action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="Boss: (Giant Teddy) Hits made on. crouched hits count double. Becomes 0xff when defeated" },
+      },
+    },
+    state = {
+      player = {
+        { address=0XB182, type="u32be", condition="eq", value=0X000126EE, action="JUMPING", no_log=false, no_survey=false, desc="jump on enemy SFX" },
+        { address=0XB184, type="u16be", condition="eq", value=0X26EE, action="JUMPING", no_log=false, no_survey=false, desc="jump on enemy SFX" },
+        { address=0XB3D8, type="u16be", condition="eq", value=0X0, action="JUMPING", no_log=false, no_survey=false, desc="jumping" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X9730, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[80bytes] Block data chunk 1: hidden blocks etc" },
+        { address=0X975D, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block data chunk 1:" },
+        { address=0X9762, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block data chunk 1:" },
+        { address=0X9763, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block data chunk 1:" },
+        { address=0X9766, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block data chunk 1:" },
+        { address=0X977C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Block data chunk 1:" },
+        { address=0X9780, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[80bytes] Block data chunk 2: hidden blocks etc" },
+        { address=0X97D0, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[80bytes] Block data chunk 3: hidden blocks etc" },
+        { address=0X9C38, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Enemy Object 1 X Loc" },
+        { address=0X9C3C, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Enemy Object 1 Y Loc" },
+        { address=0X9C46, type="u16be", condition="eq", value=0XFFFF, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="doing something" },
+        { address=0X9C49, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Enemy Object 1 - Iterations In Current Phase." },
+        { address=0X9C62, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 2" },
+        { address=0X9C8E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 3" },
+        { address=0X9CBA, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 4" },
+        { address=0X9CE6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 5" },
+        { address=0X9D12, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 6" },
+        { address=0X9D3E, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 7" },
+        { address=0X9D6A, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 8" },
+        { address=0X9D96, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 9" },
+        { address=0X9DC2, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[44bytes] ====Enemy Object Data ==== Object 10" },
+        { address=0XB350, type="u16be", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[64bytes][16-bit] To do with the interactable state of the castle doors" },
+        { address=0XB358, type="u16be", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="To do with the interactable state of the doors" },
+        { address=0XB4B2, type="u16be", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Number of enemies destroyed this level" },
+        { address=0XB4F4, type="u16be", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="- If set to 0xffff, unlock all doors" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0010, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="EndLevel Summary; timer before countdown" },
+        { address=0X9C46, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Enemy Object 1 Timer Left Til Finish Resting" },
+      },
+    },
+  },
+}

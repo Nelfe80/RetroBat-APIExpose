@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Jeopardy!",
+    system = "megacd",
+    system_name = "Sega CD",
+    genre = "Quiz"
+  },
+
+  rom = {
+    name = "jeopardy",
+    file = "jeopardy.zip",
+    hashes = {
+      { hash = "9a163ef05322da9dd903e282c139e18e", label = "Jeopardy! (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

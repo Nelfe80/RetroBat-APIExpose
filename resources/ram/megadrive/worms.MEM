@@ -1,0 +1,29 @@
+return {
+  game = {
+    title = "Worms",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "worms",
+    file = "worms.zip",
+    hashes = {
+      { hash = "0d53ce8f8d060900805b798a1d9d2579", label = "Worms (Europe).md" },
+    }
+  },
+
+  events = {
+    scoring = {
+      collectibles = {
+        { address=0XA966, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="1=hovering on credits option in menu increased" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X35CF, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="time remaining for shot" },
+      },
+    },
+  },
+}

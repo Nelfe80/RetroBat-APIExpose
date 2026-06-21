@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Mighty Morphin Power Rangers: The Movie",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Beat 'em Up"
+  },
+
+  rom = {
+    name = "mighty-morphin-power-rangers-the-movie",
+    file = "mighty-morphin-power-rangers-the-movie.zip",
+    hashes = {
+      { hash = "6312f48f6fd194b7eeb1f948b1ece8c3", label = "Mighty Morphin Power Rangers - The Movie (Europe).sfc" },
+      { hash = "f184e696c1fb1c984e530f504eebd234", label = "Mighty Morphin Power Rangers - The Movie (USA).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0250, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="00= Ingame, 01=Paused" },
+        { address=0X0602, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1F1A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 00 - Normal 02 - Hard" },
+      },
+      stage = {
+        { address=0X0390, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 - Area 1" },
+        { address=0X0390, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 2 - Area 1" },
+        { address=0X0390, type="u8", condition="eq", value=0X08, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 3 - Area 1" },
+        { address=0X0390, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 4 - Area 1" },
+        { address=0X0390, type="u8", condition="eq", value=0X0E, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 5 - Area 1" },
+        { address=0X0390, type="u8", condition="eq", value=0X12, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 6 - Area 1" },
+        { address=0X0394, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X060A, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X060A, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+        { address=0X060E, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="2P Lives increased" },
+        { address=0X060E, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="2P Lives decreased" },
+      },
+      health = {
+        { address=0X0628, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP character decreased" },
+        { address=0X0628, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP character increased" },
+        { address=0X062C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="2P Health decreased" },
+        { address=0X062C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="2P Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0390, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 1 - Area 4 (Boss)" },
+        { address=0X0390, type="u8", condition="eq", value=0X07, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 2 - Area 3 (Boss)" },
+        { address=0X0390, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 3 - Area 3 (Boss)" },
+        { address=0X0390, type="u8", condition="eq", value=0X0D, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 4 - Area 3 (Boss)" },
+        { address=0X0390, type="u8", condition="eq", value=0X11, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 5 - Area 4 (Boss)" },
+        { address=0X0390, type="u8", condition="eq", value=0X15, action="BOSS_HIT", no_log=false, no_survey=false, desc="Stage 6 - Area 4 (Boss)" },
+        { address=0X0390, type="u8", condition="eq", value=0X16, action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss" },
+        { address=0X0650, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss HP Bar active" },
+        { address=0X0652, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="HP Boss" },
+        { address=0X1B3A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Health" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1F20, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="active" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X03C9, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage 7 - Timer after Ivan Ooze [8-bit BCD]" },
+      },
+    },
+  },
+}

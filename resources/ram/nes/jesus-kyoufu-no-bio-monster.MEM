@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Jesus: Kyoufu no Bio Monster",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Adventure"
+  },
+
+  rom = {
+    name = "jesus-kyoufu-no-bio-monster",
+    file = "jesus-kyoufu-no-bio-monster.zip",
+    hashes = {
+      { hash = "224d24688e7b36ae464d4f4f7e09ccdd", label = "Jesus - Kyoufu no Bio Monster (Japan) (En) (3 Days Later Edition Rev 2) (Stardust Crusaders).nes" },
+    }
+  },
+
+  events = {
+    world_interaction = {
+      objects = {
+        { address=0X03B6, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8 Bit] Current Menu Object Being Interacted With" },
+      },
+    },
+  },
+}

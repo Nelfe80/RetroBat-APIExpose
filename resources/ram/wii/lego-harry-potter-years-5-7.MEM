@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "LEGO Harry Potter: Years 5-7",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Adventure, Puzzle"
+  },
+
+  rom = {
+    name = "lego-harry-potter-years-5-7",
+    file = "lego-harry-potter-years-5-7.zip",
+    hashes = {
+      { hash = "d4adea977396129e813d6065b0d04ebb", label = "LEGO Harry Potter - Years 5-7 (USA) (En,Fr,Es,Pt) (Rev 1)" },
+      { hash = "b0d9168d200e8ccdafe283af04b92a2a", label = "LEGO Harry Potter - Years 5-7 (Europe) (En,Fr,De,Es,It,Nl,Da)" },
+      { hash = "c07f938d90fb50b434b89ce27936b3c5", label = "LEGO Harry Potter - Years 5-7 (Europe) (En,Fr,De,Es,It,Nl,Da) (Rev 1)" },
+      { hash = "fcfdc076d6cce7c61cd47e1065f9e6bb", label = "LEGO Harry Potter - Years 5-7 (USA) (En,Fr,Es,Pt)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X9341CC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Collectibles collected in current Level [8bit]" },
+      },
+      stage = {
+        { address=0X9341CE, type="u16be", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Collectibles collected in current Level - Character Tokens [6 Bytes; 16bit each]" },
+      },
+    },
+  },
+}

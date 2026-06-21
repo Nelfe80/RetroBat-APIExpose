@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Sonic the Hedgehog Spinball",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Pinball"
+  },
+
+  rom = {
+    name = "sonic-the-hedgehog-spinball",
+    file = "sonic-the-hedgehog-spinball.zip",
+    hashes = {
+      { hash = "3a12dc6b4f41681e0dc0ae3b2f894b4f", label = "Sonic Spinball (Japan).md" },
+      { hash = "800c7c12bc1eae7ddb61186875b29733", label = "Sonic Spinball (Europe).md" },
+      { hash = "841e347b30a6e298ee2b0c722f19fe74", label = "Sonic Spinball (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0007, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="0x01 for Demo" },
+        { address=0X7839, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+        { address=0XF536, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="0x09 at Title Screen, 0x0a at some cutscenes, 0x00 otherwise" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X547C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Win Bonus Round" },
+        { address=0X5751, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level Select input progress" },
+        { address=0X5752, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="0f = level select cheat" },
+        { address=0X5756, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 = Switch Loop Bonus;" },
+        { address=0X7849, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Level Complete" },
+        { address=0XF1FC, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level 1 = Worm Lights;" },
+      },
+      stage = {
+        { address=0X5788, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XF8F9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bit0 = Actual Level Select Code" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X579F, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives increased" },
+        { address=0X579F, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives decreased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X578A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald 1" },
+        { address=0X578E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald 2" },
+        { address=0X5792, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald 3" },
+        { address=0X5796, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald 4" },
+        { address=0X579A, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emerald 5" },
+        { address=0X579E, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Emeralds" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X57A1, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Rings increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8625, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Surge Protection on in Stage 3 Boss" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X02A4, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Left Switch Ramp" },
+        { address=0X02A7, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Right Switch Ramp" },
+      },
+    },
+  },
+}

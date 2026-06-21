@@ -1,0 +1,95 @@
+return {
+  game = {
+    title = "Silent Bomber",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "silent-bomber",
+    file = "silent-bomber.zip",
+    hashes = {
+      { hash = "f8783759899b6ea0df1f0597c8af1527", label = "Silent Bomber (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC7E80, type="u8", condition="eq", value=0X88, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XB5C4A, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="First Part" },
+        { address=0XB5C4A, type="u8", condition="eq", value=0X03, action="NEW_LEVEL", no_log=false, no_survey=false, desc="After leaving the first platform" },
+        { address=0XB5C4A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Some sort of current room, values varies per level" },
+        { address=0XC7E28, type="u8", condition="eq", value=0XE8, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Loading new level" },
+        { address=0XC7E80, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Loading Mission Clear Screen" },
+        { address=0XC7E80, type="u8", condition="eq", value=0X02, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission Clear Screen before rank" },
+        { address=0XC7E80, type="u8", condition="eq", value=0X03, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Mission Clear Screen after rank" },
+        { address=0XD7E38, type="u8", condition="eq", value=0X01, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Opening Scene" },
+        { address=0XD7E38, type="u8", condition="eq", value=0X02, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Tutorial" },
+        { address=0XD7E38, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Starting State" },
+        { address=0XD7E38, type="u8", condition="eq", value=0X0A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="After Second Door Opens" },
+        { address=0XD7E38, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level State 1" },
+        { address=0XD7E39, type="u8", condition="eq", value=0X00, action="NEW_LEVEL", no_log=false, no_survey=false, desc="normal play" },
+        { address=0XD7E39, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level State 2" },
+        { address=0X1E18C4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current level number" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD73BD, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (1600 max, 16-bit) decreased" },
+        { address=0XD73BD, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (1600 max, 16-bit) increased" },
+        { address=0XD740D, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Health (1600 max, 16-bit) decreased" },
+        { address=0XD740D, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Health (1600 max, 16-bit) increased" },
+        { address=0X13E091, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player2/CPU Hp in VR (16-bit) decreased" },
+        { address=0X13E091, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player2/CPU Hp in VR (16-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD7E84, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Stage Score (32-bit)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XB5C4A, type="u8", condition="eq", value=0X04, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss" },
+        { address=0XB5C4A, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="After Boss" },
+        { address=0XD7E38, type="u8", condition="eq", value=0X03, action="BOSS_HIT", no_log=false, no_survey=false, desc="Enemies and Boss fight" },
+        { address=0XD7E38, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Fight" },
+        { address=0XD7E39, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0XD7E39, type="u8", condition="eq", value=0X02, action="BOSS_HIT", no_log=false, no_survey=false, desc="after boss" },
+        { address=0XD7E39, type="u8", condition="eq", value=0X05, action="BOSS_HIT", no_log=false, no_survey=false, desc="boss" },
+        { address=0XD7E39, type="u8", condition="eq", value=0X0A, action="BOSS_HIT", no_log=false, no_survey=false, desc="After boss" },
+        { address=0XD7E39, type="u8", condition="eq", value=0X00, action="BOSS_HIT", no_log=false, no_survey=false, desc="Before and after boss" },
+        { address=0XD7E6A, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="3C in mission 8 boss" },
+        { address=0X1A04AD, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 1 Boss HP (16-bit)" },
+        { address=0X1B3571, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Tutorial Boss HP (16-bit)" },
+        { address=0X1BCCD9, type="u16le", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mission 6 Boss HP (16-bit)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XD7E30, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Spent E-Chips (Shield)" },
+        { address=0X179BB5, type="u16le", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Mission 12 Shield (16-bit)" },
+      },
+      player = {
+        { address=0XD3CAC, type="u8", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Can Jump (0 = airborne or in cutscene)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XD7E39, type="u8", condition="eq", value=0X01, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Boss being destroyed cutscene" },
+        { address=0XD7E39, type="u8", condition="eq", value=0X02, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Boss Being Destroyed" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XD7E80, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Stage Timer (32-bit)" },
+      },
+    },
+  },
+}

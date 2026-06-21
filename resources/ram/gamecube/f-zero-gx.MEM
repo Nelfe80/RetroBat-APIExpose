@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "F-Zero GX",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "f-zero-gx",
+    file = "f-zero-gx.zip",
+    hashes = {
+      { hash = "15449523ead65939970e336a91bf943b", label = "F-Zero GX (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X3F857F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Grand Prix Clear" },
+        { address=0X3F8580, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Grand Prix Clear" },
+        { address=0X3F8581, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Grand Prix Clear" },
+        { address=0X3F8582, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Grand Prix Clear" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC9CC44, type="u16be", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[16 Bit BE] Energy decreased" },
+        { address=0XC9CC44, type="u16be", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[16 Bit BE] Energy increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X378668, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit BE] Ranking Points" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X378634, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit BE] Mission Timer" },
+        { address=0X3F4578, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit BE] Time Attack Mute City Twist Road Max Speed" },
+        { address=0XC9D7A2, type="u16be", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[16 Bit BE] Current Lap Time" },
+      },
+    },
+  },
+}

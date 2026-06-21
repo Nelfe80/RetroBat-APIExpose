@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "River King: Mystic Valley",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "river-king-mystic-valley",
+    file = "river-king-mystic-valley.zip",
+    hashes = {
+      { hash = "16ebc822ee743818918339089100d080", label = "Harvest Fishing (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X17F74C, type="u32le", condition="eq", value=0XC8, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits Sequence" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X17F752, type="u16le", condition="eq", value=0X07, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Underground Lake" },
+        { address=0X180730, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arapaima Max Size Caught (Underground Lake)" },
+        { address=0X180732, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Arapaima Caught Total (Underground Lake)" },
+        { address=0X180734, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sturgeon Max Size Caught (Underground Lake)" },
+        { address=0X180736, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sturgeon Caught Total (Underground Lake)" },
+        { address=0X180738, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Garpike (W) Max Size Caught (Underground Lake)" },
+        { address=0X18073A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Garpike (W) Caught Total (Underground Lake)" },
+        { address=0X18073C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Garpike Max Size Caught (Underground Lake)" },
+        { address=0X18073E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Garpike Caught Total (Underground Lake)" },
+        { address=0X180740, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alligator Gar Max Size Caught (Underground Lake)" },
+        { address=0X180742, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alligator Gar Caught Total (Underground Lake)" },
+        { address=0X180744, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coelacanth Max Size Caught (Underground Lake)" },
+        { address=0X180746, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Coelacanth Caught Total (Underground Lake)" },
+        { address=0X180748, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Asian Arowana Max Size Caught (Underground Lake)" },
+        { address=0X18074A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Asian Arowana Caught Total (Underground Lake)" },
+        { address=0X18074C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cuban Gar Max Size Caught (Underground Lake)" },
+        { address=0X18074E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Cuban Gar Caught Total (Underground Lake)" },
+        { address=0X180750, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Butterfly Fish Max Size Caught (Underground Lake)" },
+        { address=0X180752, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Butterfly Fish Caught Total (Underground Lake)" },
+        { address=0X180754, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Royal Knife Fish Max Size Caught (Underground Lake)" },
+        { address=0X180756, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Royal Knife Fish Caught Total (Underground Lake)" },
+        { address=0X180758, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alligator Arowana Max Size Caught (Underground Lake)" },
+        { address=0X18075A, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Alligator Arowana Caught Total (Underground Lake)" },
+        { address=0X18075C, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Black Arowana Max Size Caught (Underground Lake)" },
+        { address=0X18075E, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Black Arowana Caught Total (Underground Lake)" },
+        { address=0X180760, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Freshwater Stingray Max Size Caught (Underground Lake)" },
+        { address=0X180762, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Freshwater Stingray Caught Total (Underground Lake)" },
+        { address=0X180949, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Jewel Beetle Collected (Underground Lake)" },
+      },
+      stage = {
+        { address=0X180256, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kuon Growth Stage" },
+        { address=0X18026A, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Ponta Growth Stage" },
+        { address=0X18027E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tenma Growth Stage" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X180230, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Energy Value decreased" },
+        { address=0X180230, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Energy Value increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X176272, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Weed Cutting Minigame Score" },
+      },
+      collectibles = {
+        { address=0X17F73E, type="u16le", condition="eq", value=0X1D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Crucian Carp" },
+        { address=0X17F74A, type="u16le", condition="eq", value=0X7B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold-Banded Lily" },
+        { address=0X17F7E0, type="u8", condition="eq", value=0X13, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold-Banded Lily Request" },
+        { address=0X17FC8C, type="u16le", condition="eq", value=0X3D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold-Banded Lily" },
+        { address=0X17FDFA, type="u16le", condition="eq", value=0X1D, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold Crucian Carp" },
+        { address=0X17FDFA, type="u16le", condition="eq", value=0X7B, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold-Banded Lily" },
+        { address=0X180056, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crucian Carp Card Obtained increased" },
+        { address=0X1801CE, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold-Banded Lily Card Obtained increased" },
+        { address=0X1802A8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crucian Carp Max Size Caught (Pond) increased" },
+        { address=0X1802AA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crucian Carp Caught Total (Pond) increased" },
+        { address=0X180694, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crucian Carp Max Size Caught (Swamp) increased" },
+        { address=0X180696, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold Crucian Carp Caught Total (Swamp) increased" },
+        { address=0X18093B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold-Banded Lily Collected (Mountain Lake) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X17F74C, type="u32le", condition="eq", value=0X82, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Swamp Rock Destroyed" },
+      },
+    },
+  },
+}

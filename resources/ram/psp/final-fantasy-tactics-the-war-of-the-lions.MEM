@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Final Fantasy Tactics: The War of the Lions",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "final-fantasy-tactics-the-war-of-the-lions",
+    file = "final-fantasy-tactics-the-war-of-the-lions.zip",
+    hashes = {
+      { hash = "33fba46bc9484e609986ae6e7045c1e9", label = "Final Fantasy Tactics - The War of the Lions (Europe).iso" },
+      { hash = "8cc93de4b2c827232fd45bb7eda6a4e2", label = "Final Fantasy Tactics - The War of the Lions (USA) (Slowdown Fix) (v2.0) (Eternal248).iso" },
+      { hash = "b81199e201db86f760c504d2f08a1a8c", label = "Final Fantasy Tactics - The War of the Lions (USA).iso" },
+      { hash = "e61c731f888f65bb47821e66c7f60755", label = "Final Fantasy Tactics - The War of the Lions (Europe) (Slowdown Fix) (v2.0) (Eternal248).iso" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X144B420, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Map/Level Id" },
+        { address=0X144F578, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Ramza Level" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0X12EA9F5, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Treasure Hunter" },
+        { address=0X12EAC67, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Rubber suit qty" },
+      },
+      weapon = {
+        { address=0X12EABA1, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Dagger Type Qty" },
+        { address=0X12EABB3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Sword Type Qty Start" },
+        { address=0X12EABD3, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="Weapon Rod Type Start Qty" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X12EAC7E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Cursed Ring Qty increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X12EAC2E, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Venetian Shield qty" },
+      },
+      player = {
+        { address=0X144F5AC, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="Ramza Jump" },
+      },
+    },
+  },
+}

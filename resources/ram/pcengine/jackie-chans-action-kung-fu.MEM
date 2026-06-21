@@ -1,0 +1,78 @@
+return {
+  game = {
+    title = "Jackie Chan's Action Kung Fu",
+    system = "pcengine",
+    system_name = "PC Engine/TurboGrafx-16",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "jackie-chans-action-kung-fu",
+    file = "jackie-chans-action-kung-fu.zip",
+    hashes = {
+      { hash = "3bd2ca1f224368a5df255b97903ef967", label = "tg16/jchan.7z <Jackie Chan's Action Kung Fu>" },
+      { hash = "5a8c0f70f333ff03c8eb836eeb5f2ff9", label = "Jackie Chan's Action Kung Fu (USA).pce" },
+      { hash = "730d3d5d8792b0897f534d9a42d9c3a2", label = "Jackie Chan's Action Kung-Fu (USA) (Ru) (Mario Soft).pce" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0002, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title screen adress, value 0xc0" },
+        { address=0X00C5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo mode: value is 00" },
+        { address=0X00D1, type="u16le", condition="eq", value=0X35, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="ending credits" },
+        { address=0X00D2, type="u8", condition="eq", value=0X00, action="GAME_OVER", no_log=false, no_survey=false, desc="0 = game over" },
+        { address=0X0100, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Numbers of continues remaining (5 at the beginning) [BCD]" },
+        { address=0X0700, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Effect on the title screen (value =/0)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X00D1, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="level number:" },
+        { address=0X026C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level select effect" },
+      },
+      zone = {
+        { address=0X0BC8, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World five dragons health" },
+      },
+      stage = {
+        { address=0X0260, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Level number in stage select: from 00 to 04" },
+        { address=0X026D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Effects in the stage select screen" },
+        { address=0X026E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Numbers of items (fruits, robots, fishes) in bonus stage (max is h10)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X00D2, type="u8", condition="eq", value=0X3F, action="LIVES_STATE", no_log=false, no_survey=false, desc="6" },
+        { address=0X00D2, type="u8", condition="eq", value=0X1F, action="LIVES_STATE", no_log=false, no_survey=false, desc="5" },
+        { address=0X00D2, type="u8", condition="eq", value=0X0F, action="LIVES_STATE", no_log=false, no_survey=false, desc="4" },
+        { address=0X00D2, type="u8", condition="eq", value=0X07, action="LIVES_STATE", no_log=false, no_survey=false, desc="3" },
+        { address=0X00D2, type="u8", condition="eq", value=0X03, action="LIVES_STATE", no_log=false, no_survey=false, desc="2" },
+        { address=0X00D2, type="u8", condition="eq", value=0X01, action="LIVES_STATE", no_log=false, no_survey=false, desc="1" },
+        { address=0X00D2, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life remaining increased" },
+        { address=0X00D2, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life remaining decreased" },
+      },
+      health = {
+        { address=0X0BEE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Wizard health (max is 1f) decreased" },
+        { address=0X0BEE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Wizard health (max is 1f) increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X0A78, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Effect when you kill midboss (tiger girl, purple demon with gold armor) and some bosses. Value i" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0BC9, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Tiger Girl health (mid boss world 4) max is 18" },
+        { address=0X0BCC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Mid boss world 5 health (max is 18)" },
+        { address=0X0BD0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss _3 health (max is 10)" },
+        { address=0X0BD1, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss_2 health (max is 0f)" },
+        { address=0X0BDC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss _1 health (0f is max)" },
+        { address=0X0BFF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss _4 health (max is 0f)" },
+        { address=0X0C8D, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Effect when you kill the first boss (value is 0e)" },
+        { address=0X0E7F, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Last boss turns into spider (value = 00) ?" },
+      },
+    },
+  },
+}

@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Tropical Trouble",
+    system = "intellivision",
+    system_name = "Intellivision",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "tropical-trouble",
+    file = "tropical-trouble.zip",
+    hashes = {
+      { hash = "e5836f66acd6ba7b31c7dccda23b34dc", label = "Tropical Trouble (USA, Europe).int" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X06EC, type="u8", condition="eq", value=0XFF, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen / Game Over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0680, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[16 Bit] Level ID" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0674, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Active Player Lives increased" },
+        { address=0X0674, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Active Player Lives decreased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X0C58, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16 Bit] 1P Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,56 @@
+return {
+  game = {
+    title = "Batman: Revenge of the Joker",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "batman-revenge-of-the-joker",
+    file = "batman-revenge-of-the-joker.zip",
+    hashes = {
+      { hash = "6c31495e2f75c4643837558488b03947", label = "Batman - Revenge of the Joker (USA).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XFFB9, type="u8", condition="eq", value=0X05, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo / Options Menu / Passcode Menu" },
+        { address=0XFFB9, type="u8", condition="eq", value=0X09, action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continue Screen / Game Over" },
+        { address=0XFFB9, type="u8", condition="eq", value=0X0A, action="GAME_PLAYING", no_log=false, no_survey=false, desc="Flying Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X3FF6, type="u16be", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Life Bar / Power Level (16 bit) increased" },
+        { address=0X3FF6, type="u16be", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Life Bar / Power Level (16 bit) decreased" },
+        { address=0X5D11, type="u8", condition="eq", value=0X00, action="LIVES_STATE", no_log=false, no_survey=false, desc="Last Life" },
+        { address=0X5D11, type="u8", condition="eq", value=0XFF, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Dead" },
+        { address=0X5D11, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives / Tries: increased" },
+        { address=0X5D11, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives / Tries: decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X53AE, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Power" },
+        { address=0XFFB9, type="u8", condition="eq", value=0X08, action="BOSS_HIT", no_log=false, no_survey=false, desc="Fight Mode (Bosses)" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X4022, type="u8", condition="eq", value=0X04, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield Star" },
+        { address=0X6040, type="u8", condition="change", action="INVINCIBILITY_TIMER", no_log=true, no_survey=false, desc="Backpack Invincibility Timer:" },
+      },
+      player = {
+        { address=0X97D7, type="u32be", condition="eq", value=0X31, action="JUMPING", no_log=false, no_survey=false, desc="Fire, Jump, Kick" },
+        { address=0X97D7, type="u32be", condition="eq", value=0X32, action="JUMPING", no_log=false, no_survey=false, desc="Fire, Kick, Jump" },
+        { address=0X97D7, type="u32be", condition="eq", value=0X33, action="JUMPING", no_log=false, no_survey=false, desc="Jump, Fire, Kick" },
+        { address=0X97D7, type="u32be", condition="eq", value=0X34, action="JUMPING", no_log=false, no_survey=false, desc="Jump, Kick, Fire" },
+        { address=0X97D7, type="u32be", condition="eq", value=0X35, action="JUMPING", no_log=false, no_survey=false, desc="Kick, Fire, Jump" },
+        { address=0X97D7, type="u32be", condition="eq", value=0X36, action="JUMPING", no_log=false, no_survey=false, desc="Kick, Jump, Fire" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "GrimGrimoire",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "grimgrimoire",
+    file = "grimgrimoire.zip",
+    hashes = {
+      { hash = "4d7d5c166efb4a8bb96544d811cb8350", label = "GrimGrimoire (USA) (En,Ja)" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X1C6F974, type="u8", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="State change" },
+      },
+    },
+  },
+}

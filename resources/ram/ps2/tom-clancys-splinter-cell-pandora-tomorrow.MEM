@@ -1,0 +1,20 @@
+return {
+  game = {
+    title = "Tom Clancy's Splinter Cell: Pandora Tomorrow",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "tom-clancys-splinter-cell-pandora-tomorrow",
+    file = "tom-clancys-splinter-cell-pandora-tomorrow.zip",
+    hashes = {
+      { hash = "1079baf23ab584d33b86774807848dc3", label = "Tom Clancy's Splinter Cell - Pandora Tomorrow (USA)" },
+      { hash = "95216e769587f0c7886d5e4bf6eca7fd", label = "Tom Clancy's Splinter Cell - Pandora Tomorrow (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

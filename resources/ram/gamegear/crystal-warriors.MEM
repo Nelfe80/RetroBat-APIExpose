@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Crystal Warriors",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "crystal-warriors",
+    file = "crystal-warriors.zip",
+    hashes = {
+      { hash = "35d3fc09fcf22e35db4bac8cee9967f3", label = "Crystal Warriors (USA, Europe).gg" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X001D, type="u8", condition="eq", value=0X03, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X001D, type="u8", condition="eq", value=0X1A, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Transition To Round" },
+        { address=0X001D, type="u8", condition="eq", value=0X1C, action="NEW_LEVEL", no_log=false, no_survey=false, desc="In Round" },
+        { address=0X001D, type="u8", condition="eq", value=0X20, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round End" },
+        { address=0X001E, type="u8", condition="eq", value=0X20, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="round clear" },
+      },
+      stage = {
+        { address=0X0482, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 1 - Level (Iris)" },
+        { address=0X04A2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 2 - Level (Dayne)" },
+        { address=0X04C2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 3 - Level (Eldor)" },
+        { address=0X04E2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 4 - Level (Ratt)" },
+        { address=0X0502, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 5 - Level (Murak)" },
+        { address=0X0522, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 6 - Level (Frye)" },
+        { address=0X0542, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 7 - Level (Flare)" },
+        { address=0X0562, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 8 - Level (Oryon)" },
+        { address=0X0582, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Character 9 - Level (Sophi)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X07E0, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) status 0=dead 2=alive" },
+        { address=0X0800, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="(8 bit) status 0=dead 2=alive" },
+      },
+      health = {
+        { address=0X0487, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) current HP decreased" },
+        { address=0X0487, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) current HP increased" },
+        { address=0X0488, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) max HP decreased" },
+        { address=0X0488, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) max HP increased" },
+        { address=0X06C7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 1st enemy hero - current HP decreased" },
+        { address=0X06C7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 1st enemy hero - current HP increased" },
+        { address=0X06E7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 2nd enemy hero - current HP decreased" },
+        { address=0X06E7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 2nd enemy hero - current HP increased" },
+        { address=0X0707, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 3rd enemy hero - current HP decreased" },
+        { address=0X0707, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 3rd enemy hero - current HP increased" },
+        { address=0X0727, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) 4th enemy hero - current HP decreased" },
+        { address=0X0727, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) 4th enemy hero - current HP increased" },
+        { address=0X07E7, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) enemy - current HP decreased" },
+        { address=0X07E7, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) enemy - current HP increased" },
+        { address=0X0807, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="(8 bit) enemy - current HP decreased" },
+        { address=0X0807, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="(8 bit) enemy - current HP increased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,120 @@
+return {
+  game = {
+    title = "Red Alarm",
+    system = "virtualboy",
+    system_name = "Virtual Boy",
+    genre = "Simulation"
+  },
+
+  rom = {
+    name = "red-alarm",
+    file = "red-alarm.zip",
+    hashes = {
+      { hash = "e56e85761f52a613b34079d5322088ce", label = "Red Alarm (USA).vb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X02CF, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[bit 1] Pause (0 = Active, 1 = Paused)" },
+        { address=0X02F4, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="Continues (0 to 3)" },
+        { address=0X8A28, type="u8", condition="eq", value=0X1F, action="DEMO_MODE", no_log=false, no_survey=false, desc="'Demon Hand'," },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X02D4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Zone" },
+      },
+      stage = {
+        { address=0X02D2, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage (1-6, 7 is results)" },
+        { address=0X71C0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 2 (see 0x0071b8 for object values)" },
+        { address=0X71C8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 3 (see 0x0071b8 for object values)" },
+        { address=0X71D0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 4 (see 0x0071b8 for object values)" },
+        { address=0X71D8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 5 (see 0x0071b8 for object values)" },
+        { address=0X71E0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 6 (see 0x0071b8 for object values)" },
+        { address=0X71E8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 7 (see 0x0071b8 for object values)" },
+        { address=0X71F0, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 8 (see 0x0071b8 for object values)" },
+        { address=0X71F8, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 9 (see 0x0071b8 for object values)" },
+        { address=0X7200, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 10 (see 0x0071b8 for object values)" },
+        { address=0X7208, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 11 (see 0x0071b8 for object values)" },
+        { address=0X7210, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 12 (see 0x0071b8 for object values)" },
+        { address=0X7218, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 13 (see 0x0071b8 for object values)" },
+        { address=0X7220, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 14 (see 0x0071b8 for object values)" },
+        { address=0X7228, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 15 (see 0x0071b8 for object values)" },
+        { address=0X7230, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Objects 16 (see 0x0071b8 for object values)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8A30, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 1 Health (0xFFFF = Dead)" },
+        { address=0X8AB0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 2 Health (0xFFFF = Dead)" },
+        { address=0X8B30, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 3 Health (0xFFFF = Dead)" },
+        { address=0X8BB0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 4 Health (0xFFFF = Dead)" },
+        { address=0X8C30, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 5 Health (0xFFFF = Dead)" },
+        { address=0X8CB0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 6 Health (0xFFFF = Dead)" },
+        { address=0X8D30, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 7 Health (0xFFFF = Dead)" },
+        { address=0X8DB0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 8 Health (0xFFFF = Dead)" },
+        { address=0X8E30, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 9 Health (0xFFFF = Dead)" },
+        { address=0X8EB0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 10 Health (0xFFFF = Dead)" },
+        { address=0X8F30, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 11 Health (0xFFFF = Dead)" },
+        { address=0X8FB0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 12 Health (0xFFFF = Dead)" },
+        { address=0X9030, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 13 Health (0xFFFF = Dead)" },
+        { address=0X90B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 14 Health (0xFFFF = Dead)" },
+        { address=0X9130, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 15 Health (0xFFFF = Dead)" },
+        { address=0X91B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Enemy 16 Health (0xFFFF = Dead)" },
+        { address=0X9230, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 1 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X92B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 2 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X9330, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 3 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X93B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 4 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X9430, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 5 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X94B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 6 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X9530, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 7 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X95B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 8 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X9630, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 9 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X96B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 10 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X9730, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 11 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X97B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 12 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X9830, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 13 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X98B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 14 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X9930, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 15 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+        { address=0X99B0, type="u16le", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Projectile 16 Status (0x0 = Active, 0x8000 = Hit, 0xFFFF = Dead)" },
+      },
+      health = {
+        { address=0X8A28, type="u8", condition="eq", value=0X36, action="HEALTH_STATE", no_log=true, no_survey=false, desc="'Energy Beam'," },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X889E, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score (XXXX00 first 4 digits)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X8A28, type="u8", condition="eq", value=0X17, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Little Face', // Stage 1 mini boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X18, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Multiface', // Stage 1 mini boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X1A, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Hork Lander', // Stage 1 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X21, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Dragon', // Stage 1 mini boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X25, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Mini Barabary', // Stage 2 boss minion" },
+        { address=0X8A28, type="u8", condition="eq", value=0X26, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Barabary', // Stage 2 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X2C, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Sea Horse', // Stage 3 boss minion" },
+        { address=0X8A28, type="u8", condition="eq", value=0X2D, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Gaint Crab', // Stage 3 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X33, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Guardian', // Stage 4 Midboss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X34, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Frogman', // Stage 4 Midboss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X35, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Totem', // Stage 4 Boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X3E, action="BOSS_HIT", no_log=false, no_survey=false, desc="'Battle Angel Mech', // Stage 5 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X41, action="BOSS_HIT", no_log=false, no_survey=false, desc="'KAOS', // Stage 6 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X42, action="BOSS_HIT", no_log=false, no_survey=false, desc="'KAOS', // Stage 6 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X43, action="BOSS_HIT", no_log=false, no_survey=false, desc="'KAOS', // Stage 6 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X44, action="BOSS_HIT", no_log=false, no_survey=false, desc="'KAOS', // Stage 6 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X45, action="BOSS_HIT", no_log=false, no_survey=false, desc="'KAOS', // Stage 6 boss" },
+        { address=0X8A28, type="u8", condition="eq", value=0X46, action="BOSS_HIT", no_log=false, no_survey=false, desc="'KAOS' // Stage 6 boss (core)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X02D0, type="u16le", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Stage Counter" },
+      },
+    },
+  },
+}

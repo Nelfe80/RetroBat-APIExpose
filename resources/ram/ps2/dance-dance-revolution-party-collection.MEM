@@ -1,0 +1,74 @@
+return {
+  game = {
+    title = "Dance Dance Revolution: Party Collection",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "dance-dance-revolution-party-collection",
+    file = "dance-dance-revolution-party-collection.zip",
+    hashes = {
+      { hash = "3abb40bb90fd6dcee9a6afd09845c442", label = "Dance Dance Revolution - Party Collection (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2AFD5C, type="u8", condition="change", action="GAME_OVER", no_log=false, no_survey=false, desc="[8 Bit] Options - Game Over Type" },
+        { address=0X590360, type="u16le", condition="eq", value=0X1B, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0X590360, type="u16le", condition="eq", value=0X24, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0X590360, type="u16le", condition="eq", value=0X25, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0X590360, type="u16le", condition="eq", value=0X35, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X642298, type="u16le", condition="eq", value=0X0A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Booting/Demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2AFD58, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Options - Game Level" },
+        { address=0X2B1F60, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Total of songs cleared" },
+        { address=0X2B1F6C, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Total of songs cleared - Light" },
+        { address=0X2B1F70, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Total of songs cleared - Standard" },
+        { address=0X2B1F74, type="u32le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[32 Bit] Total of songs cleared - Heavy" },
+        { address=0X6B786B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Endless Mode - Level" },
+      },
+      stage = {
+        { address=0X2AFD5A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Options - Max Stage" },
+        { address=0X590369, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Nothing" },
+        { address=0X590369, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Try Extra Stage!/ New Song is Unlocked" },
+        { address=0X590369, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Extra Stage Check" },
+        { address=0X59036E, type="u16le", condition="eq", value=0XFFFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="End" },
+        { address=0X59036E, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[16 Bit] Current Stage" },
+        { address=0X6B7873, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8 Bit] Endless Mode - Break Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X642298, type="u16le", condition="eq", value=0X02, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Diet" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X5903B0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Visual Total Score" },
+        { address=0X5903B4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Previous Score" },
+        { address=0X5903B8, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P1 Total Score" },
+        { address=0X5E4660, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Visual Total Score" },
+        { address=0X5E4664, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Previous Score" },
+        { address=0X5E4668, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] P2 Total Score" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X2B31E0, type="u8", condition="bit_true", bit=4, mask=0X10, action="DOOR_OPENED", no_log=false, no_survey=false, desc="I Need You (Insideout Door Mix)" },
+        { address=0X590384, type="u24le", condition="eq", value=0X18, action="DOOR_OPENED", no_log=false, no_survey=false, desc="I Need You (Insideout Door Mix)" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X6422A0, type="u32le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[32 Bit] Timer transition to black fade out in main menu" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Konjiki no Gash Bell!! Unare! Yuujou no Zakeru Dream Tag Tournament",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "konjiki-no-gash-bell-unare-yuujou-no-zakeru-dream-tag-tournament",
+    file = "konjiki-no-gash-bell-unare-yuujou-no-zakeru-dream-tag-tournament.zip",
+    hashes = {
+      { hash = "e61314983c8438a7431b40564f8d6acb", label = "Konjiki no Gashbell!! Yuujou no Zakeru - Dream Tag Tournament (Japan).gba" },
+    }
+  },
+
+  events = {
+  },
+}

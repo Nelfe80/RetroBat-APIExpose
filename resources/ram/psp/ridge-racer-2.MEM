@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Ridge Racer 2",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "ridge-racer-2",
+    file = "ridge-racer-2.zip",
+    hashes = {
+      { hash = "4efd51ecc4a7cce255efcf6e0ff06d62", label = "Ridge Racer 2 (Asia) (En,Fr,De,Es,It).iso" },
+      { hash = "fac5ed82d77917a6bc49be9bf87958e2", label = "Ridge Racer 2 (Europe, Australia) (En,Fr,De,Es,It).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XA76C48, type="u8", condition="eq", value=0X04, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+        { address=0XA76C58, type="u8", condition="bit_true", bit=2, mask=0X04, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over" },
+        { address=0XA76C59, type="u8", condition="bit_true", bit=2, mask=0X04, action="PAUSE_ON", no_log=false, no_survey=false, desc="Pause" },
+      },
+    },
+    progression = {
+      zone = {
+        { address=0XA13540, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="Basic" },
+        { address=0XA13540, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Current Tour" },
+        { address=0XA13544, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Current Tour Number" },
+        { address=0XA13548, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Current Tour Race" },
+        { address=0XA57C44, type="u8", condition="eq", value=0X01, action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tours" },
+        { address=0XA57C54, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Tour - Current Tour Number" },
+      },
+      stage = {
+        { address=0XA76C48, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Challenging Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XA76C60, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bits] New Rally-X (Mini Game) - Current Score" },
+        { address=0XA76C7C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bits] New Rally-X (Mini Game) - Hi-Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA57C44, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Current Mode" },
+        { address=0XA57C4C, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Arcade/Duel/Survival/Time Attack Mode Course ID" },
+      },
+    },
+  },
+}

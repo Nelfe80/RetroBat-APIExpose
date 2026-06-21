@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Poker Face Paul's Blackjack",
+    system = "gamegear",
+    system_name = "Game Gear",
+    genre = "Casino"
+  },
+
+  rom = {
+    name = "poker-face-pauls-blackjack",
+    file = "poker-face-pauls-blackjack.zip",
+    hashes = {
+      { hash = "1148f0cbddb95b61a9e3366649ceccd0", label = "Poker Face Paul's Blackjack (USA).gg" },
+    }
+  },
+
+  events = {
+  },
+}

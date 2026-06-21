@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "C3 Racing: Car Constructors Championship",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Racing"
+  },
+
+  rom = {
+    name = "c3-racing-car-constructors-championship",
+    file = "c3-racing-car-constructors-championship.zip",
+    hashes = {
+      { hash = "8de6e8b48eed3218d69478bb82429a13", label = "C3 Racing - Car Constructors Championship (Europe) (En,Fr,De,Es,It)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X254FC, type="u16le", condition="eq", value=0X0016, action="CREDITS_SCREEN", no_log=false, no_survey=false, desc="Credits" },
+        { address=0X254FC, type="u16le", condition="eq", value=0X000A, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X3A928, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Menu timer for demo in miliseconds." },
+        { address=0X3A92C, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Menu timer for demo in seconds. Enters the demo mode at 1E." },
+        { address=0X3A954, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Menu time not really useful." },
+      },
+    },
+  },
+}

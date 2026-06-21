@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Dragon Ball Z: Sagas",
+    system = "gamecube",
+    system_name = "GameCube",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "dragon-ball-z-sagas",
+    file = "dragon-ball-z-sagas.zip",
+    hashes = {
+      { hash = "c0049ec5184cf091519f0546a2f22976", label = "Dragon Ball Z - Sagas (USA)" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X38B47F, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels Unlocked" },
+        { address=0X3946D3, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0X38B37C, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Current Z-Coins [32-bit BE] increased" },
+      },
+    },
+  },
+}

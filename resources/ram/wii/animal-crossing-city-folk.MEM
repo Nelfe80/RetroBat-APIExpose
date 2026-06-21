@@ -1,0 +1,92 @@
+return {
+  game = {
+    title = "Animal Crossing: City Folk",
+    system = "wii",
+    system_name = "Wii",
+    genre = "Construction and Management Simulation, Life Simulation"
+  },
+
+  rom = {
+    name = "animal-crossing-city-folk",
+    file = "animal-crossing-city-folk.zip",
+    hashes = {
+      { hash = "8d742de1faad9215f3be8887e5cf3783", label = "Animal Crossing - City Folk (USA) (En,Fr,Es)" },
+      { hash = "aacc76eff22469bad8d6b967cb772bf2", label = "Animal Crossing - City Folk (USA, Asia) (En,Fr,Es) (Rev 1)" },
+      { hash = "ca5a777aae147cdd5abfc37c55269f07", label = "Animal Crossing - Let's Go to the City (Europe) (En,Fr,De,Es,It)" },
+      { hash = "03630eabddabdaf9289ef7113a9f1285", label = "Animal Crossing - Let's Go to the City (Europe) (En,Fr,De,Es,It) (Rev 1)" },
+      { hash = "65e95310e9abb346161213703975089d", label = "Machi e Ikou yo - Doubutsu no Mori (Japan) (Rev 1)" },
+      { hash = "48721d158d74803b5c3530b86c9b436b", label = "Tauneuro Nolleogayo - Dongmurui Sup (Korea) (Rev 1)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X74B33C, type="u8", condition="eq", value=0X38, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="[title?]" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X46EDE4, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[12 bytes] Holiday Data - Groundhog Day" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X10E92896, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[6400 Bytes] Tile Grass Health decreased" },
+        { address=0X10E92896, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[6400 Bytes] Tile Grass Health increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X10E27D2C, type="u32be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32-bit BE] Player 1 - HRA Score" },
+        { address=0X10E2EBA0, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Player 1 - Total Nook Points" },
+        { address=0X10E2EBA2, type="u16be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[16-bit BE] Player 1 - Rank Nook Points" },
+      },
+      collectibles = {
+        { address=0X589B74, type="u16be", condition="eq", value=0X1010, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f056" },
+        { address=0X589B74, type="u16be", condition="eq", value=0X1210, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f05a" },
+        { address=0X589B76, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Money Rock - Times Hit increased" },
+        { address=0X589B78, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[16-bit BE] Money Rock - Time Left increased" },
+        { address=0X589DF4, type="u16be", condition="eq", value=0X1010, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f056" },
+        { address=0X589DF4, type="u16be", condition="eq", value=0X1210, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f05a" },
+        { address=0X589DF6, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{US rev 1} [16-bit BE] Money Rock - Times Hit increased" },
+        { address=0X589DF8, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{US rev 1} [16-bit BE] Money Rock - Time Left increased" },
+        { address=0X58C7F4, type="u16be", condition="eq", value=0X1010, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f056" },
+        { address=0X58C7F4, type="u16be", condition="eq", value=0X1210, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f05a" },
+        { address=0X58C7F6, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{EU rev 0} [16-bit BE] Money Rock - Times Hit increased" },
+        { address=0X58C7F8, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{EU rev 0} [16-bit BE] Money Rock - Time Left increased" },
+        { address=0X58CA74, type="u16be", condition="eq", value=0X1010, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f056" },
+        { address=0X58CA74, type="u16be", condition="eq", value=0X1210, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f05a" },
+        { address=0X58CA76, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{EU rev 1} [16-bit BE] Money Rock - Times Hit increased" },
+        { address=0X58CA78, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{EU rev 1} [16-bit BE] Money Rock - Time Left increased" },
+        { address=0X58E274, type="u16be", condition="eq", value=0X1010, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f056" },
+        { address=0X58E274, type="u16be", condition="eq", value=0X1210, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f05a" },
+        { address=0X58E276, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{JP rev 1} [16-bit BE] Money Rock - Times Hit increased" },
+        { address=0X58E278, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{JP rev 1} [16-bit BE] Money Rock - Time Left increased" },
+        { address=0X5A4EF4, type="u16be", condition="eq", value=0X1010, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f056" },
+        { address=0X5A4EF4, type="u16be", condition="eq", value=0X1210, action="MONEY_STATE", no_log=false, no_survey=false, desc="0x10e8f05a" },
+        { address=0X5A4EF6, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{KR rev 1} [16-bit BE] Money Rock - Times Hit increased" },
+        { address=0X5A4EF8, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="{KR rev 1} [16-bit BE] Money Rock - Time Left increased" },
+        { address=0X10E27D34, type="u32be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[32-bit BE] Player 1 - Bells (Money) increased" },
+        { address=0X10E2EFF9, type="u8", condition="eq", value=0X03, action="MONEY_STATE", no_log=false, no_survey=false, desc="Money Luck" },
+        { address=0X10E8F056, type="u16be", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="[12800 Bytes] Town Objects (TownData) increased" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X589B84, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[16-bit BE] Interact Object - Tile ID" },
+        { address=0X589B8A, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[16-bit BE] Interact Object - Object ID" },
+        { address=0X589E04, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{US rev 1} [16-bit BE] Interact Object - Tile ID" },
+        { address=0X589E0A, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{US rev 1} [16-bit BE] Interact Object - Object ID" },
+        { address=0X58C804, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{EU rev 0} [16-bit BE] Interact Object - Tile ID" },
+        { address=0X58C80A, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{EU rev 0} [16-bit BE] Interact Object - Object ID" },
+        { address=0X58CA84, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{EU rev 1} [16-bit BE] Interact Object - Tile ID" },
+        { address=0X58CA8A, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{EU rev 1} [16-bit BE] Interact Object - Object ID" },
+        { address=0X58E284, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{JP rev 1} [16-bit BE] Interact Object - Tile ID" },
+        { address=0X58E28A, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{JP rev 1} [16-bit BE] Interact Object - Object ID" },
+        { address=0X5A4F04, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{KR rev 1} [16-bit BE] Interact Object - Tile ID" },
+        { address=0X5A4F0A, type="u16be", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="{KR rev 1} [16-bit BE] Interact Object - Object ID" },
+      },
+    },
+  },
+}

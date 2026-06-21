@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "The Lost Vikings II",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Platform, Puzzle"
+  },
+
+  rom = {
+    name = "the-lost-vikings-ii",
+    file = "the-lost-vikings-ii.zip",
+    hashes = {
+      { hash = "6808b453828d6a6f228e3225055df4c4", label = "Lost Vikings 2 (USA).sfc" },
+      { hash = "bc627db3e168a9f87c038d530825c994", label = "Lost Vikings II, The (USA) (Ru) (Shedevr).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0060, type="u8", condition="eq", value=0XA8, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0X031B, type="u8", condition="eq", value=0XA, action="PAUSE_ON", no_log=false, no_survey=false, desc="paused" },
+        { address=0X031B, type="u8", condition="eq", value=0X8, action="PAUSE_ON", no_log=false, no_survey=false, desc="select pause" },
+        { address=0X032C, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="darken screen (pause)" },
+        { address=0X032E, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="darken screen (pause)" },
+        { address=0X037C, type="u8", condition="eq", value=0X11, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title" },
+        { address=0X037E, type="u8", condition="eq", value=0X1770, action="PAUSE_ON", no_log=false, no_survey=false, desc="screensaver" },
+        { address=0X03D3, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="80: demo" },
+        { address=0X09FB, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="c0: hide selection hammer (title) / ? help box" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1333, type="u16le", condition="eq", value=0X37, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="completing final stage" },
+        { address=0X3090, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="(region) colors of foreground" },
+      },
+      zone = {
+        { address=0X1A92, type="u16le", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Value 16 BIt" },
+        { address=0X1A93, type="u8", condition="change", action="PROGRESSION_ZONE", no_log=false, no_survey=false, desc="World Value" },
+      },
+      stage = {
+        { address=0X0060, type="u8", condition="eq", value=0X80, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage loading" },
+        { address=0X0483, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1 as stage starts" },
+        { address=0X13D5, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1->2->3: when exiting stage: 1-1" },
+        { address=0X13DF, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="1->2->3: when exiting stage: 1-2" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X046B, type="u8", condition="eq", value=0X2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead or missing" },
+        { address=0X1089, type="u8", condition="eq", value=0X2, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+        { address=0X1177, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Char 1 Value (0=Erik; 1=Baleog; 2=Olaf; 3=Feng; 4=Torch; 5=Noone) ff=dead" },
+        { address=0X1AE6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="char 2 id - independant of death" },
+      },
+      health = {
+        { address=0X0453, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="char 2 hp decreased" },
+        { address=0X0453, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="char 2 hp increased" },
+        { address=0X1037, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char1 Health - determines portrait too decreased" },
+        { address=0X1037, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char1 Health - determines portrait too increased" },
+        { address=0X1039, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char2 Health decreased" },
+        { address=0X1039, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char2 Health increased" },
+        { address=0X103B, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Char3 Health decreased" },
+        { address=0X103B, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Char3 Health increased" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0X103C, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="bit7: shield" },
+        { address=0X1384, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="olaf shield state when walking" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0344, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="e->13: Door unlocked" },
+        { address=0X0349, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="1 door unlocked?" },
+        { address=0X1335, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="14 when door opened" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0048, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="0 title" },
+        { address=0X037E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Idle Timer, pause or normal" },
+        { address=0X047C, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="pause screen save timer down" },
+        { address=0X1A90, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="1: first time in first level of world?" },
+        { address=0X1AA2, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Level value seems wired some times you can change it somehow; last level of world always: 013a" },
+      },
+    },
+  },
+}

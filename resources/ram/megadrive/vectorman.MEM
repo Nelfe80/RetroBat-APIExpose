@@ -1,0 +1,88 @@
+return {
+  game = {
+    title = "Vectorman",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "vectorman",
+    file = "vectorman.zip",
+    hashes = {
+      { hash = "5448efd7bc131e4ca610d863c5751e22", label = "Vectorman (USA, Europe) (Ru) (NewGame).md" },
+      { hash = "d7171a867739c8ec325aa65b175b0c49", label = "Vectorman (USA, Europe).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XE812, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="ff= paused" },
+        { address=0XE88E, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="bit0: demo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XC47F, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1 xxxx 09=stage 10" },
+        { address=0XC47F, type="u8", condition="eq", value=0X10, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Segascreen" },
+        { address=0XC47F, type="u8", condition="eq", value=0XFF, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Menu or Bonus Stage" },
+        { address=0XC47F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+        { address=0XDB4D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="8-bit -> Health 1st TV Stage 1 (wip)" },
+        { address=0XE874, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="On-stage Photons collected" },
+        { address=0XE876, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Total of on-stage photons" },
+        { address=0XE88C, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="total TVs on stage" },
+        { address=0XE8FC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1 = 07d0, Stage 4 = 1770, Stage 6 = 2710, Stage 9 = 36b0, Stage 14 = 55f0, Final stage = e" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XE87C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0XE87C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+      health = {
+        { address=0XCDDE, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="radar health ? decreased" },
+        { address=0XCDDE, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="radar health ? increased" },
+        { address=0XE878, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="health decreased" },
+        { address=0XE878, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="health increased" },
+        { address=0XE87A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="max health decreased" },
+        { address=0XE87A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="max health increased" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0XE390, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="rapidfire" },
+        { address=0XE390, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="wave (spreadshot)" },
+        { address=0XE390, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="bolo" },
+        { address=0XE390, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="orb" },
+        { address=0XE886, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="special weapon ammunition" },
+        { address=0XF65A, type="u8", condition="eq", value=0X1, action="WEAPON_STATE", no_log=false, no_survey=false, desc="rapidfire" },
+        { address=0XF65A, type="u8", condition="eq", value=0X2, action="WEAPON_STATE", no_log=false, no_survey=false, desc="wave (spreadshot)" },
+        { address=0XF65A, type="u8", condition="eq", value=0X3, action="WEAPON_STATE", no_log=false, no_survey=false, desc="bolo" },
+        { address=0XF65A, type="u8", condition="eq", value=0X4, action="WEAPON_STATE", no_log=false, no_survey=false, desc="orb" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XE864, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16bit) score x 2e16" },
+        { address=0XE866, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="(16bit) score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XC1DC, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="0844= use for 6 stage boss" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XE390, type="u8", condition="eq", value=0X5, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield" },
+        { address=0XF65A, type="u8", condition="eq", value=0X5, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="shield" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XE88D, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="TVs destroyed" },
+      },
+    },
+  },
+}

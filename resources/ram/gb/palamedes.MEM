@@ -1,0 +1,45 @@
+return {
+  game = {
+    title = "Palamedes",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "palamedes",
+    file = "palamedes.zip",
+    hashes = {
+      { hash = "f4e5b89f72cf88c203d8f66c627acd91", label = "Palamedes (Europe).gb" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XC634, type="u8", condition="eq", value=0XFE, action="PAUSE_ON", no_log=false, no_survey=false, desc="pause block" },
+        { address=0XFFFB, type="u8", condition="eq", value=0X21, action="GAME_OVER", no_log=false, no_survey=false, desc="winning? or game over" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XC634, type="u8", condition="eq", value=0XFD, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="clear block" },
+        { address=0XC63B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0XFFFB, type="u8", condition="eq", value=0X1F, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level select" },
+      },
+      stage = {
+        { address=0XC63A, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC638, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC610, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="lines throw counter (will always be 0 before throwing lines)" },
+      },
+    },
+  },
+}

@@ -1,0 +1,73 @@
+return {
+  game = {
+    title = "The Legend of Zelda: Link's Awakening",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-playing (RPG)"
+  },
+
+  rom = {
+    name = "the-legend-of-zelda-links-awakening",
+    file = "the-legend-of-zelda-links-awakening.zip",
+    hashes = {
+      { hash = "5bc0913d533000522c7c9cac1ef6f97f", label = "Legend of Zelda, The - Link's Awakening (France).gb" },
+      { hash = "69d643bf4e37b3c133518517338b6a1c", label = "Legend of Zelda, The - Link's Awakening (USA, Europe) (Rev 2).gb" },
+      { hash = "8b7af1a8ca96c74301d633e0ce83ba0b", label = "Legend of Zelda, The - Link's Awakening (Germany).gb" },
+      { hash = "ae08c1f73f822116060ef58293b94ed8", label = "Zelda no Densetsu - Yume o Miru Shima (Japan).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD401, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Destination data byte 1: 00 - overworld," },
+        { address=0XDB43, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Power bracelet's level" },
+        { address=0XDB44, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Shield's level" },
+        { address=0XDB4E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Sword (Level-1 Sword = 1, Level-2 Sword = 2)" },
+        { address=0XDB54, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Link's Current Screen ID (Overworld)" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XDB57, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Deaths (00-99)" },
+        { address=0XDB58, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death (100-900)" },
+      },
+      health = {
+        { address=0XC173, type="u8", condition="eq", value=0X1B, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Just a kid who wants you to enter a house or cave when low on health." },
+        { address=0XDB5A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health decreased" },
+        { address=0XDB5A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XDB0E, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="item in trading game (01=Yoshi, 0E=magnifier)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XD369, type="u8", condition="eq", value=0X09, action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss Battle!" },
+        { address=0XD369, type="u8", condition="eq", value=0X15, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="HC picked up, boss defeated!" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XC173, type="u8", condition="eq", value=0X3D, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="You got a shield via Trendy Game." },
+        { address=0XC173, type="u8", condition="eq", value=0X54, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Tarin has your shield!" },
+        { address=0XC173, type="u8", condition="eq", value=0X91, action="SHIELD_GAIN", no_log=false, no_survey=false, desc="You got your Shield back!" },
+        { address=0XDB00, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="B button item (Nothing = 00, Sword = 01, Bomb = 02, Bracelet = 03, Shield = 04, Bow = 05, Hook =" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCE80, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start of Memory Block: Last n map coordinates entered" },
+        { address=0XD800, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="Start map memory block" },
+        { address=0XD8FF, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="End map memory block" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XC173, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Last Dialogue ID" },
+      },
+    },
+  },
+}

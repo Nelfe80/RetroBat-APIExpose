@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "ObsCure: The Aftermath",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Action, Horror"
+  },
+
+  rom = {
+    name = "obscure-the-aftermath",
+    file = "obscure-the-aftermath.zip",
+    hashes = {
+      { hash = "7f7f0cc393ea14c4cdf451db9c2c5ae4", label = "ObsCure - The Aftermath (USA) (En,Fr,Es)" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0XC99B40, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health Float - P2 Mirror decreased" },
+        { address=0XC99B40, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health Float - P2 Mirror increased" },
+        { address=0XCDFC20, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player Health Float - P1 Mirror decreased" },
+        { address=0XCDFC20, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player Health Float - P1 Mirror increased" },
+        { address=0X1062EC8, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jun Health decreased" },
+        { address=0X1062EC8, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jun Health increased" },
+        { address=0X116EB48, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Jun Health 2 decreased" },
+        { address=0X116EB48, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Jun Health 2 increased" },
+        { address=0X1435760, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Enemy Health decreased" },
+        { address=0X1435760, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Enemy Health increased" },
+      },
+    },
+  },
+}

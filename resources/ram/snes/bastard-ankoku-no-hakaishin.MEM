@@ -1,0 +1,52 @@
+return {
+  game = {
+    title = "Bastard!! Ankoku no Hakaishin",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "bastard-ankoku-no-hakaishin",
+    file = "bastard-ankoku-no-hakaishin.zip",
+    hashes = {
+      { hash = "2d11339b1a2dd1fe166ab1aaac8aad7d", label = "Bastard!! - Ankoku no Hakaishin (Japan).sfc" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X0A4C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="CONTINUES USED" },
+        { address=0X0AD5, type="u8", condition="change", action="DEMO_MODE", no_log=false, no_survey=false, desc="ff=demo" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X01EA, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round" },
+        { address=0X07CF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1 ROUND COUNT" },
+        { address=0X07EF, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2 ROUND COUNT" },
+      },
+      stage = {
+        { address=0X1FFE, type="u8", condition="eq", value=0X72, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0X1FFE, type="u8", condition="eq", value=0X7F, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2" },
+        { address=0X1FFE, type="u8", condition="eq", value=0X8C, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3" },
+        { address=0X1FFE, type="u8", condition="eq", value=0X96, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 4" },
+        { address=0X1FFE, type="u8", condition="eq", value=0XAE, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5" },
+        { address=0X1FFE, type="u8", condition="eq", value=0XCB, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 6" },
+        { address=0X1FFE, type="u8", condition="eq", value=0XE6, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 7" },
+        { address=0X1FFE, type="u8", condition="eq", value=0XF5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="good ending" },
+        { address=0X1FFE, type="u8", condition="eq", value=0XF0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="bad ending" },
+        { address=0X1FFE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="story stage/cutscene" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X0191, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 1 - Health decreased" },
+        { address=0X0191, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 1 - Health increased" },
+        { address=0X01B1, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player 2 - Health decreased" },
+        { address=0X01B1, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player 2 - Health increased" },
+      },
+    },
+  },
+}

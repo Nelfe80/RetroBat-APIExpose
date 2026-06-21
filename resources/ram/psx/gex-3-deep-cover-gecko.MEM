@@ -1,0 +1,113 @@
+return {
+  game = {
+    title = "Gex 3: Deep Cover Gecko",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "gex-3-deep-cover-gecko",
+    file = "gex-3-deep-cover-gecko.zip",
+    hashes = {
+      { hash = "3a548db07c3e47b9ae6ba33c0f3b2269", label = "Gex 3 - Deep Cover Gecko (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0XAA5D4, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Bugs Collected - Pause Menu" },
+        { address=0XAA5E0, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="Remotes - Pause Menu" },
+        { address=0XC6130, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="none selected" },
+        { address=0XC6130, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="new game" },
+        { address=0XC6130, type="u8", condition="eq", value=0X02, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="load game" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X9626A, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="LEVEL SELECT MENU CHEAT:" },
+        { address=0XAA6B5, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="level select" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XAA5CC, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="GEX'S LIFES COUNT: increased" },
+        { address=0XAA5CC, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="GEX'S LIFES COUNT: decreased" },
+        { address=0XAA6B4, type="u8", condition="bit_true", bit=0, mask=0X01, action="GAIN_LIFE", no_log=false, no_survey=false, desc="extra life" },
+        { address=0XAA6B5, type="u8", condition="bit_true", bit=1, mask=0X02, action="LIVES_STATE", no_log=false, no_survey=false, desc="ten extra lives" },
+      },
+      health = {
+        { address=0XAA5D0, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="GEX'S HP COUNT: decreased" },
+        { address=0XAA5D0, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="GEX'S HP COUNT: increased" },
+      },
+    },
+    scoring = {
+      collectibles = {
+        { address=0XAA5D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="PAW COINS COUNT: increased" },
+        { address=0XAA5DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="BONUS COINS COUNT: increased" },
+        { address=0XAA5F0, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 01 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA5F2, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 02 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA5F4, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 03 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA5F6, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 04 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA5F8, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 05 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA5FA, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 06 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA5FC, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 07 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA5FE, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 08 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA600, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 09 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA602, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 10 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA604, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 11 PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA61E, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="MISSION CONTROL PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA620, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="LAKE FLACCID PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA622, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SLAPPY VALLEY PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA624, type="u16le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FUNKY TOWN PAW COINS BITFLAG: (16-bit) increased" },
+        { address=0XAA628, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 01 BONUS COINS BITFLAG: increased" },
+        { address=0XAA62A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 02 BONUS COINS BITFLAG: increased" },
+        { address=0XAA62C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 03 BONUS COINS BITFLAG: increased" },
+        { address=0XAA62E, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 04 BONUS COINS BITFLAG: increased" },
+        { address=0XAA630, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 05 BONUS COINS BITFLAG: increased" },
+        { address=0XAA632, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 06 BONUS COINS BITFLAG: increased" },
+        { address=0XAA634, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 07 BONUS COINS BITFLAG: increased" },
+        { address=0XAA636, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 08 BONUS COINS BITFLAG: increased" },
+        { address=0XAA638, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 09 BONUS COINS BITFLAG: increased" },
+        { address=0XAA63A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 10 BONUS COINS BITFLAG: increased" },
+        { address=0XAA63C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="TV 11 BONUS COINS BITFLAG: increased" },
+        { address=0XAA656, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="MISSION CONTROL BONUS COINS BITFLAG: increased" },
+        { address=0XAA658, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="LAKE FLACCID BONUS COINS BITFLAG: increased" },
+        { address=0XAA65A, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="SLAPPY VALLEY BONUS COINS BITFLAG: increased" },
+        { address=0XAA65C, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="FUNKY TOWN BONUS COINS BITFLAG: increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XA222C, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="BOSSES' HP HITS:" },
+        { address=0XAA5EE, type="u8", condition="bit_true", bit=4, mask=0X10, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="boss 1 Rock Hard" },
+        { address=0XAA5EE, type="u8", condition="bit_true", bit=5, mask=0X20, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="boss 2 Brain of Oz" },
+        { address=0XAA5EE, type="u8", condition="bit_true", bit=6, mask=0X40, action="BOSS_DEFEATED", no_log=false, no_survey=false, desc="boss 3 Rez" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XAA6B5, type="u8", condition="bit_true", bit=2, mask=0X04, action="INVINCIBILITY_START", no_log=false, no_survey=false, desc="invincibility" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X1A31C8, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="square" },
+        { address=0X1A31C8, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="triangle" },
+        { address=0X1A31C8, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="circle" },
+        { address=0X1A31C8, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="ecs" },
+        { address=0X1A31C8, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="diamond" },
+        { address=0X1A31C8, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="star" },
+        { address=0X1A31C8, type="u8", condition="eq", value=0XC9, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="2nd / CA = 3th / CB = 4th / CC = 5h" },
+        { address=0X1A31CD, type="u8", condition="eq", value=0X00, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="square" },
+        { address=0X1A31CD, type="u8", condition="eq", value=0X01, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="triangle" },
+        { address=0X1A31CD, type="u8", condition="eq", value=0X02, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="circle" },
+        { address=0X1A31CD, type="u8", condition="eq", value=0X03, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="ecs" },
+        { address=0X1A31CD, type="u8", condition="eq", value=0X04, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="diamond" },
+        { address=0X1A31CD, type="u8", condition="eq", value=0X05, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="star" },
+        { address=0X1A31CD, type="u8", condition="eq", value=0XC9, action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="2nd / CA = 3th / CB = 4th / CC = 5h" },
+      },
+    },
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Puyo Puyo",
+    system = "arcade",
+    system_name = "Arcade",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "puyo-puyo",
+    file = "puyo-puyo.zip",
+    hashes = {
+      { hash = "b03daf0c9756a52a8323ca3ba1abe354", label = "arcade\puyo.zip" },
+    }
+  },
+
+  events = {
+    scoring = {
+      points = {
+        { address=0XE00A, type="u24be", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Score [24-bit BE]" },
+      },
+    },
+  },
+}

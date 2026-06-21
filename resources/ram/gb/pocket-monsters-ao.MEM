@@ -1,0 +1,40 @@
+return {
+  game = {
+    title = "Pocket Monsters Ao",
+    system = "gb",
+    system_name = "Game Boy",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "pocket-monsters-ao",
+    file = "pocket-monsters-ao.zip",
+    hashes = {
+      { hash = "c1adf0a77809ac91d905a4828888a2f0", label = "Pocket Monsters - Ao (Japan) (SGB Enhanced).gb" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD14C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Party slot 1 level" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XD12C, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party slot 1 HP (current, 2 bytes) decreased" },
+        { address=0XD12C, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party slot 1 HP (current, 2 bytes) increased" },
+        { address=0XD14D, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party slot 1 HP (maximum, 2 bytes) decreased" },
+        { address=0XD14D, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party slot 1 HP (maximum, 2 bytes) increased" },
+        { address=0XD14E, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Party monster HP (maximum, 1 byte each) decreased" },
+        { address=0XD14E, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Party monster HP (maximum, 1 byte each) increased" },
+        { address=0XD528, type="u8", condition="bit_true", bit=2, mask=0X04, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Hp Up (Route 2)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0XCD38, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="1: walk through solid objects" },
+      },
+    },
+  },
+}

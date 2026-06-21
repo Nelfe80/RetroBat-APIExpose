@@ -1,0 +1,30 @@
+return {
+  game = {
+    title = "Build-A-Lot",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle, Strategy"
+  },
+
+  rom = {
+    name = "build-a-lot",
+    file = "build-a-lot.zip",
+    hashes = {
+      { hash = "1882746fcaf5df9321e05816d61bd2a3", label = "Build-a-Lot (Europe).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XB27ED, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="false" },
+        { address=0XB27ED, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="true" },
+        { address=0XB27ED, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="in carrer menu or level (boolean)" },
+        { address=0XB27EE, type="u8", condition="eq", value=0X0, action="NEW_LEVEL", no_log=false, no_survey=false, desc="false" },
+        { address=0XB27EE, type="u8", condition="eq", value=0X1, action="NEW_LEVEL", no_log=false, no_survey=false, desc="true" },
+        { address=0XB27EE, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="in casual menu or level (boolean)" },
+        { address=0XD4A48, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level win flag (boolean)" },
+      },
+    },
+  },
+}

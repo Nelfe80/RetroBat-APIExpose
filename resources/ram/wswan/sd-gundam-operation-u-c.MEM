@@ -1,0 +1,42 @@
+return {
+  game = {
+    title = "SD Gundam: Operation U.C.",
+    system = "wswan",
+    system_name = "WonderSwan",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "sd-gundam-operation-u-c",
+    file = "sd-gundam-operation-u-c.zip",
+    hashes = {
+      { hash = "12c3cca0ef52343509dda1c1fb4c1b65", label = "SD Gundam - Operation U.C. (Japan).wsc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC48C, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC48D, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC48E, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC48F, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC490, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC491, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC492, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC493, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC494, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC495, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC497, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC498, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+        { address=0XC499, type="u8", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="[8 Bit] Bitflags Survival Mode Clear" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XD217, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Current Life increased" },
+        { address=0XD217, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="[8 Bit] Current Life decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,65 @@
+return {
+  game = {
+    title = "TVDJ",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Music"
+  },
+
+  rom = {
+    name = "tvdj",
+    file = "tvdj.zip",
+    hashes = {
+      { hash = "54f5c7b0923d02f3a1bb221804f9de17", label = "TVDJ (Japan)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X2692CA, type="u16le", condition="eq", value=0X0000, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="TVDJ - Normal" },
+        { address=0X2692CA, type="u16le", condition="eq", value=0X0001, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="TVDJ Director's Cut - Hard" },
+        { address=0X2692CA, type="u16le", condition="eq", value=0X0002, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="TVDJ Free Play - Custom" },
+        { address=0X29E048, type="u16le", condition="eq", value=0X0000, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over & Everything else" },
+        { address=0X29E04A, type="u16le", condition="eq", value=0X00, action="DEMO_MODE", no_log=false, no_survey=false, desc="Player Controlled" },
+        { address=0X29E04A, type="u16le", condition="eq", value=0X01, action="DEMO_MODE", no_log=false, no_survey=false, desc="Now On Air" },
+        { address=0X29E04A, type="u16le", condition="eq", value=0X02, action="DEMO_MODE", no_log=false, no_survey=false, desc="Demo Controlled" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X2692CC, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - The Code Name 777 - Film Cleared" },
+        { address=0X2692CE, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Rabbit Telephone Shopping - Film Cleared" },
+        { address=0X2692D0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Woody's Love Letter - Film Cleared" },
+        { address=0X2692D2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Terry the Kid - Film Cleared" },
+        { address=0X2692D4, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - The Code Name 777: Director's Cut - Film Cleared" },
+        { address=0X2692D6, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Rabbit Telephone Shopping: Director's Cut - Film Cleared" },
+        { address=0X2692D8, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Woody's Love Letter: Director's Cut - Film Cleared" },
+        { address=0X2692DA, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Terry the Kid: Director's Cut - Film Cleared" },
+        { address=0X2692DC, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - The Code Name 777: Free Play - Film Cleared" },
+        { address=0X2692DE, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Rabbit Telephone Shopping: Free Play - Film Cleared" },
+        { address=0X2692E0, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Woody's Love Letter: Free Play - Film Cleared" },
+        { address=0X2692E2, type="u16le", condition="change", action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="16-Bit - Terry the Kid: Free Play - Film Cleared" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X2692EC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bit - The Code Name 777 - High Score" },
+        { address=0X2692F0, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bit - Rabbit Telephone Shopping - High Score" },
+        { address=0X2692F4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bit - Woody's Love Letter - High Score" },
+        { address=0X2692F8, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bit - Terry the Kid - High Score" },
+        { address=0X2692FC, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bit - The Code Name 777: Director's Cut - High Score" },
+        { address=0X269300, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bit - Rabbit Telephone Shopping: Director's Cut - High Score" },
+        { address=0X269304, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bit - Woody's Love Letter: Director's Cut - High Score" },
+        { address=0X269308, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="16-Bit - Terry the Kid: Director's Cut - High Score" },
+        { address=0X2CFA54, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Final Score" },
+        { address=0X2CFADC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="32-Bit - Highscore Flashing Timer" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X29E00E, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="16-Bit - Ingame - Failure Counter" },
+      },
+    },
+  },
+}

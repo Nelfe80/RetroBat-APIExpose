@@ -1,0 +1,55 @@
+return {
+  game = {
+    title = "Skyblazer",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform"
+  },
+
+  rom = {
+    name = "skyblazer",
+    file = "skyblazer.zip",
+    hashes = {
+      { hash = "5dd2c9f0a933e6a43b7e38e6ef0769ba", label = "Skyblazer (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X0BA5, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level?" },
+      },
+      stage = {
+        { address=0X1F02, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage" },
+        { address=0X2943, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="some axis for side scroller stages" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X1F00, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="lives increased" },
+        { address=0X1F00, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="lives decreased" },
+      },
+      health = {
+        { address=0X1F05, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="ll Amount of HP capsules decreased" },
+        { address=0X1F05, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="ll Amount of HP capsules increased" },
+        { address=0X200A, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health (Placeholder) decreased" },
+        { address=0X200A, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health (Placeholder) increased" },
+        { address=0XF801, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current Health decreased" },
+        { address=0XF801, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current Health increased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XF820, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health?" },
+        { address=0XF821, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="2nd boss hp 7/0" },
+        { address=0XF830, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="1st boss HP 20/0" },
+        { address=0XF83E, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Final Boss Health" },
+      },
+    },
+    state = {
+      temporary = {
+        { address=0XF35F, type="u8", condition="change", action="SHIELD_GAIN", no_log=false, no_survey=false, desc="Shield flag mb" },
+      },
+    },
+  },
+}

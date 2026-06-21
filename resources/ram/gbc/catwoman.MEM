@@ -1,0 +1,33 @@
+return {
+  game = {
+    title = "Catwoman",
+    system = "gbc",
+    system_name = "Game Boy Color",
+    genre = "Action, Adventure"
+  },
+
+  rom = {
+    name = "catwoman",
+    file = "catwoman.zip",
+    hashes = {
+      { hash = "482a7fe10c3e3d10127bbb08447a15cb", label = "Catwoman (Europe).gbc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XC9B6, type="u8", condition="eq", value=0X1D, action="NEW_LEVEL", no_log=false, no_survey=false, desc="final level catwoman holding skull" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0XC907, type="u24le", condition="eq", value=0X24, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Full" },
+        { address=0XC907, type="u24le", condition="eq", value=0X1C, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Last White Bar" },
+        { address=0XC907, type="u24le", condition="eq", value=0X1B, action="HEALTH_STATE", no_log=false, no_survey=false, desc="Orange Turned Into White" },
+        { address=0XC907, type="u24le", condition="eq", value=0X08, action="HEALTH_STATE", no_log=false, no_survey=false, desc="During intro cutscene" },
+        { address=0XC907, type="u24le", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="HP" },
+      },
+    },
+  },
+}

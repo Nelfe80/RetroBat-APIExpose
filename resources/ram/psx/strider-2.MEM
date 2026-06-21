@@ -1,0 +1,89 @@
+return {
+  game = {
+    title = "Strider 2",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action"
+  },
+
+  rom = {
+    name = "strider-2",
+    file = "strider-2.zip",
+    hashes = {
+      { hash = "6414b73e0ce2030a199dbb259db71b77", label = "Strider 2 (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9FCC8, type="u8", condition="eq", value=0X1, action="PAUSE_ON", no_log=false, no_survey=false, desc="true" },
+        { address=0X9FCC8, type="u8", condition="eq", value=0X0, action="PAUSE_ON", no_log=false, no_survey=false, desc="false" },
+        { address=0XAB718, type="u32le", condition="eq", value=0XFFFF0101, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="title menu" },
+        { address=0X1F69F8, type="u8", condition="bit_true", bit=7, mask=0X80, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="game start" },
+        { address=0X1F69F8, type="u8", condition="bit_true", bit=6, mask=0X40, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="options" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XA8D59, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 0 Unlocked [Bit0]" },
+        { address=0XAB718, type="u32le", condition="eq", value=0X00000101, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 1" },
+        { address=0XAB718, type="u32le", condition="eq", value=0X01010101, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 2" },
+        { address=0XAB718, type="u32le", condition="eq", value=0X02020101, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 3" },
+        { address=0XAB718, type="u32le", condition="eq", value=0X04040101, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 4" },
+        { address=0XAB718, type="u32le", condition="eq", value=0X05050101, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage 5" },
+        { address=0XD9DDC, type="u8", condition="eq", value=0X0, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE 1" },
+        { address=0XD9DDC, type="u8", condition="eq", value=0X1, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE 2" },
+        { address=0XD9DDC, type="u8", condition="eq", value=0X2, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE 3" },
+        { address=0XD9DDC, type="u8", condition="eq", value=0X4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE 4" },
+        { address=0XD9DDC, type="u8", condition="eq", value=0X5, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE 5" },
+        { address=0XD9DDC, type="u8", condition="eq", value=0X8, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Main menu" },
+        { address=0XD9DDC, type="u8", condition="eq", value=0X3, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 0" },
+        { address=0XD9DDC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE" },
+        { address=0XD9DDE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage part (Scene)" },
+        { address=0XD9DE3, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="[8bit] stage select stage selected." },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XABA32, type="u8", condition="eq", value=0X0, action="LOSE_LIFE", no_log=false, no_survey=false, desc="dead" },
+      },
+      health = {
+        { address=0XA4601, type="u8", condition="change", action="HIT", no_log=false, no_survey=false, desc="[ 8bit ] damage given to boss" },
+        { address=0XABA32, type="u8", condition="change", action="HEALTH_STATE", no_log=false, no_survey=false, desc="player current health" },
+        { address=0XE0B02, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[ 8bit ] random enemy health decreased" },
+        { address=0XE0B02, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[ 8bit ] random enemy health increased" },
+        { address=0XE0B04, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="[ 8bit ] random enemy health on screen decreased" },
+        { address=0XE0B04, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="[ 8bit ] random enemy health on screen increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XABB3D, type="u8", condition="change", action="DYNAMIC_INVENTORY", no_log=false, no_survey=false, desc="Power up activated = 01" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XD9DEC, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 bit Score in hex]" },
+        { address=0XD9DF0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[ 32bit ] total score" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0XCDF80, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[ 8bit ] bosses healthbar" },
+        { address=0XCDFD0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="[ 8-bit ] bosshealthbar on-screen" },
+        { address=0XDE0D2, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss health" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0XA8D4E, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="time limit" },
+        { address=0XD9DFF, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[ 8-bits ] Clear Time minutes" },
+        { address=0XD9E00, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[ 8-bits ] Clear Time seconds" },
+        { address=0XD9E01, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[ 8-bits ] Clear Time milliseconds" },
+        { address=0XEBB8A, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[ 8bit ] continue timer seconds" },
+        { address=0XEBB8E, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="[ 8bit ] continue timer milliseconds" },
+      },
+    },
+  },
+}

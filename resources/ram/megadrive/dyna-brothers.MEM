@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Dyna Brothers",
+    system = "megadrive",
+    system_name = "Genesis/Mega Drive",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "dyna-brothers",
+    file = "dyna-brothers.zip",
+    hashes = {
+      { hash = "7c8fd927407ada4d06fc2ebafa693fab", label = "Dyna Brothers (Japan) (En) (v0.1) (Tybis).md" },
+      { hash = "909e835620e1ee74862b759a3bf81ff6", label = "Dyna Brothers (Japan).md" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X002A, type="u8", condition="eq", value=0X01, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title menu, extinction event looming" },
+        { address=0X0030, type="u16be", condition="eq", value=0XC5DC, action="DEMO_MODE", no_log=false, no_survey=false, desc="DEMO" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X0033, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round." },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X7BB6, type="u16be", condition="change", action="GENERAL_TIMER", no_log=true, no_survey=false, desc="Time remaining." },
+      },
+    },
+  },
+}

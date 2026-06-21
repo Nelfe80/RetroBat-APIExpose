@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Paladin's Quest [Subset - No Mercenaries]",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Role-Playing"
+  },
+
+  rom = {
+    name = "paladins-quest-subset-no-mercenaries",
+    file = "paladins-quest-subset-no-mercenaries.zip",
+    hashes = {
+      { hash = "d866b186f68e9ed4fe493395e7ce05a6", label = "Paladin's Quest (USA) [Subset - No Mercenaries].sfc" },
+    }
+  },
+
+  events = {
+  },
+}

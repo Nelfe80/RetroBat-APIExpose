@@ -1,0 +1,48 @@
+return {
+  game = {
+    title = "Doomsday Warrior",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "doomsday-warrior",
+    file = "doomsday-warrior.zip",
+    hashes = {
+      { hash = "49c1fbb62cd882128fbb13c9fe11ac4c", label = "Doomsday Warrior (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X019B, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P1- Round Win" },
+        { address=0X019C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="P2- Round Win" },
+        { address=0X0280, type="u8", condition="eq", value=0X11, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Special Ground Punch" },
+        { address=0X0380, type="u8", condition="eq", value=0X11, action="NEW_LEVEL", no_log=false, no_survey=false, desc="Special Ground Punch" },
+      },
+      stage = {
+        { address=0X013F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="??stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X02C6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 - Life Bar (in Hex). start with 40 increased" },
+        { address=0X02C6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 - Life Bar (in Hex). start with 40 decreased" },
+        { address=0X02C7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P1 - Life (in Hex) - start with 40 increased" },
+        { address=0X02C7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P1 - Life (in Hex) - start with 40 decreased" },
+        { address=0X03C6, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 - Life Bar (in Hex). start with 40 increased" },
+        { address=0X03C6, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 - Life Bar (in Hex). start with 40 decreased" },
+        { address=0X03C7, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="P2 - Life (in Hex) - start with 40 increased" },
+        { address=0X03C7, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="P2 - Life (in Hex) - start with 40 decreased" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X0220, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Layban 05 = Grimrock 09 = Main (boss)" },
+        { address=0X0320, type="u8", condition="eq", value=0X01, action="BOSS_HIT", no_log=false, no_survey=false, desc="Layban 05 = Grimrock 09 = Main (boss)" },
+      },
+    },
+  },
+}

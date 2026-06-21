@@ -1,0 +1,32 @@
+return {
+  game = {
+    title = "Mission: Asteroid",
+    system = "apple2",
+    system_name = "Apple II",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "mission-asteroid",
+    file = "mission-asteroid.zip",
+    hashes = {
+      { hash = "4cdace0399c61ccb173a4c1c6a5edf60", label = "Mission Asteroid.woz" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X897A, type="u8", condition="eq", value=0X02, action="GAME_OVER", no_log=false, no_survey=false, desc="Game over triggered" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X0079, type="u8", condition="eq", value=0X4A, action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Rocket throttle broken" },
+        { address=0X0083, type="u8", condition="eq", value=0XC4, action="DOOR_OPENED", no_log=false, no_survey=false, desc="Earth/Asteroid: Rocket's outer door" },
+        { address=0X8911, type="u8", condition="change", action="DOOR_OPENED", no_log=false, no_survey=false, desc="[8-bit Boolean] Spaceship Inner Airlock Door (0 = closed, 1 = open)" },
+        { address=0X8923, type="u8", condition="change", action="OBJECT_INTERACTION", no_log=false, no_survey=false, desc="[8-bit Boolean] Watch Switch Pressed (0 = no, 1 = yes)" },
+      },
+    },
+  },
+}

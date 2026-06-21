@@ -1,0 +1,25 @@
+return {
+  game = {
+    title = "American Dragon: Jake Long - Rise of the Huntsclan",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Platform"
+  },
+
+  rom = {
+    name = "american-dragon-jake-long-rise-of-the-huntsclan",
+    file = "american-dragon-jake-long-rise-of-the-huntsclan.zip",
+    hashes = {
+      { hash = "8a46b929f0dc1522fc0cc378685d8337", label = "American Dragon - Jake Long - Rise of the Huntsclan (USA, Europe) (En,Fr,De,Es,It).gba" },
+    }
+  },
+
+  events = {
+    resources = {
+      health = {
+        { address=0X7026, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Player HP (16-bit) decreased" },
+        { address=0X7026, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Player HP (16-bit) increased" },
+      },
+    },
+  },
+}

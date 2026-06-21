@@ -1,0 +1,51 @@
+return {
+  game = {
+    title = "Town & Country Surf Designs: Wood & Water Rage",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Sports"
+  },
+
+  rom = {
+    name = "town-country-surf-designs-wood-water-rage",
+    file = "town-country-surf-designs-wood-water-rage.zip",
+    hashes = {
+      { hash = "9f97ce5192b42eca6b22180a4e23718a", label = "Town & Country Surf Designs - Wood & Water Rage (USA).nes" },
+    }
+  },
+
+  events = {
+    progression = {
+      stage = {
+        { address=0X002E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="stage progress without being hit" },
+        { address=0X0083, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="WITH STAGE" },
+        { address=0X0084, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="STAGE" },
+        { address=0X03A5, type="u16le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="(16-bit) Stage progress?" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0047, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="LIFE increased" },
+        { address=0X0047, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="LIFE decreased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X04E6, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="JUMP" },
+        { address=0X0568, type="u8", condition="change", action="JUMPING", no_log=true, no_survey=false, desc="6 if jump," },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X0036, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time X:00:0" },
+        { address=0X0037, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time 0:X0:0" },
+        { address=0X0038, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time 0:0X:0" },
+        { address=0X0039, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Time 0:00:X" },
+        { address=0X1835, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME: x:00:0" },
+        { address=0X1836, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME: 0:x0:0" },
+        { address=0X1837, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME: 0:0x:0" },
+        { address=0X1838, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="TIME: 0:00:x" },
+      },
+    },
+  },
+}

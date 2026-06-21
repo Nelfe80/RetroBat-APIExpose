@@ -1,0 +1,132 @@
+return {
+  game = {
+    title = "Guilty Gear XX Accent Core Plus",
+    system = "ps2",
+    system_name = "PlayStation 2",
+    genre = "Fighting"
+  },
+
+  rom = {
+    name = "guilty-gear-xx-accent-core-plus",
+    file = "guilty-gear-xx-accent-core-plus.zip",
+    hashes = {
+      { hash = "fdaf8f838a984214f13a0ed60b69cc32", label = "Guilty Gear XX Accent Core Plus (USA)" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0X3C6E56, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Current combo count; resets to 0x00 when combo window is over" },
+        { address=0X3C6E58, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Most recent combo total" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X302B88, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival - Current level; 999 (dec) for Order Sol and flips to 1000 (dec) after winning" },
+        { address=0X302BA4, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival - Attack Level" },
+        { address=0X302BA8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival - Defense Level" },
+        { address=0X302BAC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival - Speed Level" },
+        { address=0X302BB0, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival - Tension Rate Level" },
+        { address=0X302BB8, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival - Burst Rate Level" },
+        { address=0X302BBC, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Survival - Air Dash Level" },
+        { address=0X34E8C1, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Game options - Rounds in a match (best of)" },
+      },
+      stage = {
+        { address=0X3C6AFC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade/M.O.M. - P1 Stage wins (for the whole set)" },
+        { address=0X3C6AFE, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade/M.O.M. - P2 Stage wins (for the whole set)" },
+        { address=0X3E99CC, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Painting shown in London stage" },
+        { address=0X4A81C0, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade - Player 1 wins on current stage" },
+        { address=0X4A81C1, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Arcade - Player 2/CPU wins on current stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X34E916, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="EX Mode unlocked - Eddie" },
+        { address=0X350809, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 1 - Eddie" },
+        { address=0X350822, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 2 - Eddie" },
+        { address=0X35083B, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 3 - Eddie" },
+        { address=0X350854, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 4 - Eddie" },
+        { address=0X35086D, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 5 - Eddie" },
+        { address=0X350886, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 6 - Eddie" },
+        { address=0X35089F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 7 - Eddie" },
+        { address=0X3508B8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 8 - Eddie" },
+        { address=0X3508D1, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 9 - Eddie" },
+        { address=0X3508EA, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 10 - Eddie" },
+        { address=0X350903, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 11 - Eddie" },
+        { address=0X35091C, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 12 - Eddie" },
+        { address=0X350935, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 13 - Eddie" },
+        { address=0X35094E, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 14 - Eddie" },
+        { address=0X350967, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 15 - Eddie" },
+        { address=0X350980, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 16 - Eddie" },
+        { address=0X350999, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 17 - Eddie" },
+        { address=0X3509B2, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 18 - Eddie" },
+        { address=0X3509CB, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 19 - Eddie" },
+        { address=0X3509E4, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 20 - Eddie" },
+        { address=0X3509FD, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 21 - Eddie" },
+        { address=0X350A16, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 22 - Eddie" },
+        { address=0X350A2F, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 23 - Eddie" },
+        { address=0X350A48, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 24 - Eddie" },
+        { address=0X350A61, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 25 - Eddie" },
+        { address=0X350A7A, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 26 - Eddie" },
+        { address=0X350A93, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 27 - Eddie" },
+        { address=0X350AAC, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 28 - Eddie" },
+        { address=0X350AC5, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 29 - Eddie" },
+        { address=0X350ADE, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Mission 30 - Eddie" },
+        { address=0X350B77, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gallery - Arcade Mode - Eddie" },
+        { address=0X350B90, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gallery - EX Character - EX Eddie" },
+        { address=0X350BA9, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Gallery - Story Mode - Eddie" },
+      },
+      health = {
+        { address=0X1E5B01E, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP - Player 1 decreased" },
+        { address=0X1E5B01E, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP - Player 1 increased" },
+        { address=0X1E5B142, type="u16le", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="HP - Player 2/CPU decreased" },
+        { address=0X1E5B142, type="u16le", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="HP - Player 2/CPU increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X3C6AD0, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 1 Score - Arcade/M.O.M./Survival" },
+        { address=0X3C6AD4, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Player 2 Score - Arcade/M.O.M./Survival" },
+      },
+      collectibles = {
+        { address=0X34E8D8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Sol increased" },
+        { address=0X34E8DA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Ky increased" },
+        { address=0X34E8DC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - May increased" },
+        { address=0X34E8DE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Millia increased" },
+        { address=0X34E8E0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Axl increased" },
+        { address=0X34E8E2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Potemkin increased" },
+        { address=0X34E8E4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Chipp increased" },
+        { address=0X34E8E6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Eddie increased" },
+        { address=0X34E8E8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Baiken increased" },
+        { address=0X34E8EA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Faust increased" },
+        { address=0X34E8EC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Testament increased" },
+        { address=0X34E8EE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Jam increased" },
+        { address=0X34E8F0, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Anji increased" },
+        { address=0X34E8F2, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Johnny increased" },
+        { address=0X34E8F4, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Venom increased" },
+        { address=0X34E8F6, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Dizzy increased" },
+        { address=0X34E8F8, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Slayer increased" },
+        { address=0X34E8FA, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - I-No increased" },
+        { address=0X34E8FC, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Zappa increased" },
+        { address=0X34E8FE, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Bridget increased" },
+        { address=0X34E900, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Robo-Ky increased" },
+        { address=0X34E902, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - A.B.A. increased" },
+        { address=0X34E904, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Order Sol increased" },
+        { address=0X34E906, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Kliff increased" },
+        { address=0X34E908, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Gold/Darkside unlocked - Justice increased" },
+        { address=0X3C6B70, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Arcade/M.O.M modifier - Gold; this affects all opponents increased" },
+      },
+    },
+    state = {
+      player = {
+        { address=0X302BC0, type="u32le", condition="change", action="JUMPING", no_log=false, no_survey=false, desc="Survival - Air Jump Level" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X34E8C0, type="u8", condition="change", action="LEVEL_TIMER", no_log=false, no_survey=false, desc="Game options - Round time limit" },
+      },
+    },
+  },
+}

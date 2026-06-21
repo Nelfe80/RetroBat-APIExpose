@@ -1,0 +1,36 @@
+return {
+  game = {
+    title = "Naruto Shippuden: Ultimate Ninja Heroes 3",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "naruto-shippuden-ultimate-ninja-heroes-3",
+    file = "naruto-shippuden-ultimate-ninja-heroes-3.zip",
+    hashes = {
+      { hash = "3d01acb5915c48c0cd21ef1fa03f9568", label = "Naruto Shippuden - Ultimate Ninja Heroes 3 (Europe) (En,Fr,De,Es,It).iso" },
+      { hash = "6e585bcefe436d14a1688e2fc1450b6d", label = "Naruto Shippuden - Ultimate Ninja Heroes 3 (USA).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      events = {
+        { address=0XEAAF89, type="u8", condition="change", action="COMBO_HIT", no_log=false, no_survey=false, desc="Figure - Immortal Combo" },
+      },
+    },
+    progression = {
+      stage = {
+        { address=0XEAAFC9, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Tree of Mettle - Stage" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XEAAF88, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Figure - A Boy's Life on the Battlefield increased" },
+        { address=0XEAAF88, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Figure - A Boy's Life on the Battlefield decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Warzone 2100",
+    system = "psx",
+    system_name = "PlayStation",
+    genre = "Action, Strategy"
+  },
+
+  rom = {
+    name = "warzone-2100",
+    file = "warzone-2100.zip",
+    hashes = {
+      { hash = "b1c3c50f72585fe8e1a6480d8d09c3ce", label = "Warzone 2100 (USA)" },
+    }
+  },
+
+  events = {
+  },
+}

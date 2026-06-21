@@ -1,0 +1,124 @@
+return {
+  game = {
+    title = "ActRaiser",
+    system = "snes",
+    system_name = "SNES/Super Famicom",
+    genre = "Action, Platform, Role-Playing, Strategy"
+  },
+
+  rom = {
+    name = "actraiser",
+    file = "actraiser.zip",
+    hashes = {
+      { hash = "079d3e448c3ee99444710c12d903ffb0", label = "ActRaiser (USA) (MSU-1) (Abyss Rebirth OST) (v1.0) (Darkshock).sfc" },
+      { hash = "635d5d7dd2aad4768412fbae4a32fd6e", label = "ActRaiser (USA).sfc" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0X022E, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Fillmore civilization level" },
+        { address=0X0291, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Level" },
+        { address=0X0349, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Professional Mode current level" },
+      },
+      stage = {
+        { address=0X0018, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Sim mode" },
+        { address=0X0018, type="u8", condition="eq", value=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Fillmore" },
+        { address=0X0018, type="u8", condition="eq", value=0X02, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bloodpool" },
+        { address=0X0018, type="u8", condition="eq", value=0X03, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Kasandora" },
+        { address=0X0018, type="u8", condition="eq", value=0X04, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Aitos" },
+        { address=0X0018, type="u8", condition="eq", value=0X05, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Marahna" },
+        { address=0X0018, type="u8", condition="eq", value=0X06, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Northwall" },
+        { address=0X0018, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act mode region" },
+        { address=0X001C, type="u8", condition="eq", value=0X99, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="sim mode" },
+        { address=0X001D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current health in Act mode" },
+        { address=0X001E, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Max health in Act mode" },
+        { address=0X006F, type="u8", condition="bit_true", bit=0, mask=0X01, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act mode" },
+        { address=0X00AB, type="u8", condition="eq", value=0XFB, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Act mode victory pose" },
+        { address=0X0205, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit0=Fillmore Act 2 flag" },
+        { address=0X0207, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit0=Bloodpool Act 2 flag" },
+        { address=0X0209, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit0=Kasandora Act 2 flag" },
+        { address=0X020B, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit0=Aitos Act 2 flag" },
+        { address=0X020D, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit0=Marahna Act 2 flag" },
+        { address=0X020F, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Bit0=Northwall Act 2 flag" },
+        { address=0X0295, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="MP in Act mode" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X0018, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Heim" },
+        { address=0X0019, type="u8", condition="eq", value=0X08, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Sim mode audience" },
+        { address=0X001C, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Player lives in Act mode increased" },
+        { address=0X001C, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Player lives in Act mode decreased" },
+        { address=0X02A2, type="u8", condition="eq", value=0X05, action="LIVES_STATE", no_log=false, no_survey=false, desc="Source of Life" },
+        { address=0X02AB, type="u8", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Max lives in Act mode increased" },
+        { address=0X02AB, type="u8", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Max lives in Act mode decreased" },
+        { address=0X0341, type="u8", condition="eq", value=0X07, action="LOSE_LIFE", no_log=false, no_survey=false, desc="Death Heim" },
+        { address=0X0347, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Boss number in Death Heim" },
+      },
+      health = {
+        { address=0X0286, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Current health in Sim mode decreased" },
+        { address=0X0286, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Current health in Sim mode increased" },
+        { address=0X0287, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Max health in Sim mode decreased" },
+        { address=0X0287, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Max health in Sim mode increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X001F, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Score" },
+        { address=0X02B3, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Fillmore Act-1 score (value*10)" },
+        { address=0X02B5, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Fillmore Act-2 score (value*10)" },
+        { address=0X02B7, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Bloodpool Act-1 score (value*10)" },
+        { address=0X02B9, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Bloodpool Act-2 score (value*10)" },
+        { address=0X02BB, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Kasandora Act-1 score (value*10)" },
+        { address=0X02BD, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Kasandora Act-2 score (value*10)" },
+        { address=0X02BF, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Aitos Act-1 score (value*10)" },
+        { address=0X02C1, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Aitos Act-2 score (value*10)" },
+        { address=0X02C3, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Marahna Act-1 score (value*10)" },
+        { address=0X02C5, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Marahna Act-2 score (value*10)" },
+        { address=0X02C7, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Northwall Act-1 score (value*10)" },
+        { address=0X02C9, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[BCD] Northwall Act-2 score (value*10)" },
+      },
+    },
+    combat = {
+      enemies = {
+        { address=0X00EF, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss current health in Act mode" },
+        { address=0X00F0, type="u8", condition="change", action="BOSS_HIT", no_log=false, no_survey=false, desc="Boss max health in Act mode" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X195C9, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Fillmore, west Blue Dragons" },
+        { address=0X195CB, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Fillmore, northeast Napper Bats" },
+        { address=0X195CD, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Fillmore, south Napper Bats" },
+        { address=0X195CF, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Fillmore, northwest Napper Bats" },
+        { address=0X195D1, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Bloodpool, southwest Red Demons" },
+        { address=0X195D3, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Bloodpool, northwest Napper Bats" },
+        { address=0X195D5, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Bloodpool, south Blue Dragons" },
+        { address=0X195D7, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Bloodpool, east Blue Dragons" },
+        { address=0X195D9, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Kasandora, northeast Blue Dragons" },
+        { address=0X195DB, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Kasandora, north Red Demons" },
+        { address=0X195DD, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Kasandora, southeast Red Demons" },
+        { address=0X195DF, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Kasandora, central Napper Bats" },
+        { address=0X195E1, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Aitos, northwest Blue Dragons" },
+        { address=0X195E3, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Aitos, central Skull Heads" },
+        { address=0X195E5, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Aitos, northeast Blue Dragons" },
+        { address=0X195E7, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Aitos, southwest Blue Dragons" },
+        { address=0X195E9, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Marahna, northwest Red Demons" },
+        { address=0X195EB, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Marahna, southwest Napper Bats" },
+        { address=0X195ED, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Marahna, east Blue Dragons" },
+        { address=0X195EF, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Marahna, central Blue Dragons" },
+        { address=0X195F1, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Northwall, northeast Skull Heads" },
+        { address=0X195F3, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Northwall, central Skull Heads" },
+        { address=0X195F5, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Northwall, south Blue Dragons" },
+        { address=0X195F7, type="u8", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Bit7=Monster lair destroyed, Northwall, northwest Red Demons" },
+      },
+    },
+    system = {
+      timer = {
+        { address=0X00E6, type="u16le", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="[BCD] Time remaining in Act mode" },
+      },
+    },
+  },
+}

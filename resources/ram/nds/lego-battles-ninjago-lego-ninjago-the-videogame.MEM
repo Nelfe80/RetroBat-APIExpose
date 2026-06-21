@@ -1,0 +1,71 @@
+return {
+  game = {
+    title = "LEGO Battles: Ninjago | LEGO Ninjago: The Videogame",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Strategy"
+  },
+
+  rom = {
+    name = "lego-battles-ninjago-lego-ninjago-the-videogame",
+    file = "lego-battles-ninjago-lego-ninjago-the-videogame.zip",
+    hashes = {
+      { hash = "17df0ebe61d4a80d25ba7fcc2eac3161", label = "LEGO Battles - Ninjago (USA) (En,Fr,Es).nds" },
+      { hash = "59060f8e5a9a2f0ef416c4b43bbe163d", label = "LEGO Ninjago - The Videogame (Europe) (En,Fr,De,Es,It,Nl,Da).nds" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X13F925, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="In Pause Menu (8-bit)" },
+        { address=0X3FFE00, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Game Title (ASCII) (96-bit)" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X13B03C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Over (8-bit)" },
+        { address=0X13B09C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Over (EU) (8-bit)" },
+        { address=0X13BF3C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Round Over (EU Rev 1) (8-bit)" },
+        { address=0X13FC8C, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level LEGO Bricks Collected (32-bit)" },
+        { address=0X13FC94, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level LEGO Studs Collected (32-bit)" },
+        { address=0X13FC98, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Booster Packs Collected (16-bit)" },
+        { address=0X13FCA4, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Heroes Defeated (16-bit)" },
+        { address=0X13FCA6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Builders Defeated (16-bit)" },
+        { address=0X13FCAC, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Heroes Built (16-bit)" },
+        { address=0X13FCAE, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Builders Built (16-bit)" },
+        { address=0X13FCB0, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Towers Built (16-bit)" },
+        { address=0X13FCB2, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Structures Built (16-bit)" },
+        { address=0X13FCB6, type="u16le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Current Level Spells Cast (16-bit)" },
+        { address=0X209750, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels (NBit)" },
+        { address=0X209751, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels (NBit)" },
+        { address=0X209752, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels (NBit)" },
+        { address=0X209753, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels (NBit)" },
+        { address=0X209754, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels (NBit)" },
+        { address=0X209755, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels (NBit)" },
+        { address=0X2097B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels (EU) (NBit)" },
+        { address=0X20A3B0, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Levels (EU Rev 1) (NBit)" },
+      },
+    },
+    resources = {
+      health = {
+        { address=0X20BA23, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Regenerating Health Red Brick Activated (8-bit) decreased" },
+        { address=0X20BA23, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Regenerating Health Red Brick Activated (8-bit) increased" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X13FC0C, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total Points Healed (32-bit)" },
+        { address=0X13FCB4, type="u16le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Current Level Points Healed (16-bit)" },
+      },
+    },
+    world_interaction = {
+      objects = {
+        { address=0X13FBCA, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Total Towers Destroyed (16-bit)" },
+        { address=0X13FBCC, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Total Structures Destroyed (16-bit)" },
+        { address=0X13FCA8, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Current Level Towers Destroyed (16-bit)" },
+        { address=0X13FCAA, type="u16le", condition="change", action="OBJECT_DESTROYED", no_log=false, no_survey=false, desc="Current Level Structures Destroyed (16-bit)" },
+      },
+    },
+  },
+}

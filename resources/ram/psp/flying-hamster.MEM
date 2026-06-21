@@ -1,0 +1,43 @@
+return {
+  game = {
+    title = "Flying Hamster",
+    system = "psp",
+    system_name = "PlayStation Portable",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "flying-hamster",
+    file = "flying-hamster.zip",
+    hashes = {
+      { hash = "4d538087072cc8bb6c3052f6b703c49c", label = "Flying Hamster (Europe) (minis) (PSN).iso" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X1AB1C34, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Continue Select Level" },
+        { address=0X1B1C81C, type="u8", condition="change", action="CONTINUE_SCREEN", no_log=false, no_survey=false, desc="[8 Bit] Level ID (at least from Continue Menu)" },
+        { address=0X1F40B38, type="u8", condition="change", action="PAUSE_ON", no_log=false, no_survey=false, desc="[8 Bit] Game Pause" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0X1F40A4C, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Level ID" },
+        { address=0X1F40BD8, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[8 Bit] Levels SubID" },
+      },
+    },
+    inventory = {
+      weapon = {
+        { address=0X18C1BD8, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Tentative Ammunition for non default weapons" },
+        { address=0X18C1BDC, type="u8", condition="change", action="WEAPON_STATE", no_log=false, no_survey=false, desc="[8 Bit] Weapon ID" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0X871750, type="u32le", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="[32 Bit] Score" },
+      },
+    },
+  },
+}

@@ -1,0 +1,26 @@
+return {
+  game = {
+    title = "Where in Time is Carmen Sandiego?",
+    system = "nes",
+    system_name = "NES/Famicom",
+    genre = "Education, Puzzle"
+  },
+
+  rom = {
+    name = "where-in-time-is-carmen-sandiego",
+    file = "where-in-time-is-carmen-sandiego.zip",
+    hashes = {
+      { hash = "345239ef1a72c1a509ed1a06aec2fca6", label = "Where in Time Is Carmen Sandiego (USA).nes" },
+    }
+  },
+
+  events = {
+    system = {
+      timer = {
+        { address=0X003D, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer - 1's digit display" },
+        { address=0X0075, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Timer" },
+        { address=0X04ED, type="u8", condition="change", action="GENERAL_TIMER", no_log=false, no_survey=false, desc="Countdown timer" },
+      },
+    },
+  },
+}

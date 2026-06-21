@@ -1,0 +1,67 @@
+return {
+  game = {
+    title = "Harvest Moon: Friends of Mineral Town",
+    system = "gba",
+    system_name = "Game Boy Advance",
+    genre = "Action, Simulation, Strategy"
+  },
+
+  rom = {
+    name = "harvest-moon-friends-of-mineral-town",
+    file = "harvest-moon-friends-of-mineral-town.zip",
+    hashes = {
+      { hash = "02a9fddd43013966303a043db1c0a479", label = "Harvest Moon - Friends of Mineral Town (Europe).gba" },
+      { hash = "61d0616b30f8e111ccb68004be97d4eb", label = "Harvest Moon - Friends of Mineral Town (Germany).gba" },
+      { hash = "80355c831a7a25b0f70dc021ebd344f1", label = "Harvest Moon - Friends of Mineral Town (USA).gba" },
+      { hash = "d92308bc903f4e92587df2cedc89b477", label = "Bokujou Monogatari - Mineral Town no Nakama-tachi (Japan).gba" },
+      { hash = "b284a36c70fd62b79e6c4588354f7c4f", label = "Harvest Moon - Friends of Mineral Town (True Love Edition) (v4.0) (kataiki).gba" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XA7CC, type="u8", condition="bit_true", bit=3, mask=0X08, action="NEW_LEVEL", no_log=false, no_survey=false, desc="roundwindow" },
+        { address=0XC765, type="u8", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="Bit0 - Seen round 1 of public lapidation" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0XC9F6, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ingredient 1" },
+        { address=0XC9F8, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Ingredient 2" },
+        { address=0XCEA3, type="u8", condition="change", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Bit4 - Candied Potato recipe" },
+      },
+      health = {
+        { address=0X41064, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="Map Health check after load decreased" },
+        { address=0X41064, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="Map Health check after load increased" },
+        { address=0X41098, type="u8", condition="decrease", action="HIT", no_log=false, no_survey=false, desc="map health F4 decreased" },
+        { address=0X41098, type="u8", condition="increase", action="HEAL", no_log=false, no_survey=false, desc="map health F4 increased" },
+      },
+    },
+    inventory = {
+      items = {
+        { address=0XA730, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(31Bit) Pirate Treasure" },
+        { address=0XA7B0, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(31Bit) Emerald" },
+        { address=0XA7B3, type="u8", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="Bit7 - Got Emerald" },
+        { address=0XD258, type="u32le", condition="change", action="TREASURE", no_log=false, no_survey=false, desc="(32Bit) Pirate Treasure" },
+        { address=0X0032, type="u8", condition="change", action="INVENTORY_ITEM", no_log=false, no_survey=false, desc="long. The MSB has to be either 0 or 8, depending if you want it on the list or not. Then the qua" },
+      },
+    },
+    scoring = {
+      points = {
+        { address=0XC85E, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Frisbee max score loaded" },
+        { address=0XE0DA, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Harvesting points" },
+        { address=0XE0E0, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Final score of Harvest minigame" },
+        { address=0XE3E8, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Points" },
+        { address=0XE450, type="u8", condition="change", action="SCORE_STATE", no_log=false, no_survey=false, desc="Total score Watering minigame" },
+      },
+      collectibles = {
+        { address=0XA788, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(31Bit) Gold Ore increased" },
+        { address=0XA78B, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Bit7 - Got Gold Ore increased" },
+        { address=0XC080, type="u32le", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="(32Bit) Gold increased" },
+        { address=0XC1E6, type="u8", condition="eq", value=0X00011011, action="MONEY_STATE", no_log=false, no_survey=false, desc="Gold" },
+        { address=0XE458, type="u8", condition="increase", action="COIN_GAIN", no_log=false, no_survey=false, desc="Required points for Watering minigame increased" },
+      },
+    },
+  },
+}

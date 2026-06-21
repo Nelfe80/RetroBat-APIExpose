@@ -1,0 +1,53 @@
+return {
+  game = {
+    title = "Magnet World 2",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "magnet-world-2",
+    file = "magnet-world-2.zip",
+    hashes = {
+      { hash = "69513f2ea19b19dabc1727b819d8d059", label = "Magnet World 2.d88" },
+    }
+  },
+
+  events = {
+    flow = {
+      lifecycle = {
+        { address=0X9FFC, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0X9FFC, type="u8", condition="eq", value=0X05, action="GAME_OVER", no_log=false, no_survey=false, desc="Game Over/Give Up/Stage Ckear" },
+        { address=0XAED0, type="u8", condition="eq", value=0XC0, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title Screen" },
+        { address=0XAED0, type="u8", condition="eq", value=0XD9, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Black Screen/returned to Title Screen from game over..." },
+        { address=0XAED0, type="u8", condition="eq", value=0XD6, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="For one frame Between Title and Stage select" },
+        { address=0XAED1, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0XAED2, type="u8", condition="eq", value=0X00, action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Title" },
+        { address=0XAED4, type="u8", condition="change", action="TITLE_SCREEN", no_log=false, no_survey=false, desc="Are we on the title screen?" },
+      },
+    },
+    progression = {
+      level = {
+        { address=0XA003, type="u8", condition="eq", value=0X01, action="LEVEL_CLEAR", no_log=false, no_survey=false, desc="Yes" },
+      },
+      stage = {
+        { address=0X8611, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage [MBF32 LE]" },
+        { address=0X8635, type="u32le", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Max Stage Reached [MBF32 LE]" },
+        { address=0XA002, type="u8", condition="eq", value=0X00, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 1" },
+        { address=0XA002, type="u8", condition="eq", value=0X0B, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage 12" },
+        { address=0XA002, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Current Stage (Display)" },
+        { address=0XA666, type="u8", condition="change", action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Number of Magnets remaining in stage" },
+        { address=0XAED0, type="u8", condition="eq", value=0XC7, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Screen" },
+        { address=0XAED0, type="u8", condition="eq", value=0XDC, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="Stage Select" },
+        { address=0XAED0, type="u8", condition="eq", value=0XD4, action="PROGRESSION_STAGE", no_log=false, no_survey=false, desc="For one frame Between Black Screen (including Stage Select) and Stage Screen" },
+      },
+    },
+    resources = {
+      lives = {
+        { address=0X8619, type="u32le", condition="increase", action="GAIN_LIFE", no_log=false, no_survey=false, desc="Lives [MBF32 LE] increased" },
+        { address=0X8619, type="u32le", condition="decrease", action="LOSE_LIFE", no_log=false, no_survey=false, desc="Lives [MBF32 LE] decreased" },
+      },
+    },
+  },
+}

@@ -1,0 +1,19 @@
+return {
+  game = {
+    title = "Blue Mint",
+    system = "pc88",
+    system_name = "PC-8000/8800",
+    genre = "Unknown"
+  },
+
+  rom = {
+    name = "blue-mint",
+    file = "blue-mint.zip",
+    hashes = {
+      { hash = "e4a9591b33c0da0668458445142e3e27", label = "Blue Mint.d88" },
+    }
+  },
+
+  events = {
+  },
+}

@@ -1,0 +1,24 @@
+return {
+  game = {
+    title = "Sokoban DS",
+    system = "nds",
+    system_name = "Nintendo DS",
+    genre = "Puzzle"
+  },
+
+  rom = {
+    name = "sokoban-ds",
+    file = "sokoban-ds.zip",
+    hashes = {
+      { hash = "ef8c0a3703934ddc4b61aace20603e44", label = "Sokoban DS (Europe) (En,Fr,De,Es,It).nds" },
+    }
+  },
+
+  events = {
+    progression = {
+      level = {
+        { address=0XD9604, type="u32le", condition="change", action="NEW_LEVEL", no_log=false, no_survey=false, desc="[32bit] Number of Steps (Current Level)" },
+      },
+    },
+  },
+}
